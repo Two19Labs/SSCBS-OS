@@ -55,3 +55,22 @@ REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM authenticated;
 CREATE OR REPLACE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- 4. Enforce domain restriction on Sign Up (Only allow @sscbs.du.ac.in)
+CREATE OR REPLACE FUNCTION public.check_sscbs_email()
+RETURNS TRIGGER
+SECURITY DEFINER
+SET search_path = public, auth
+AS $$
+BEGIN
+    IF NEW.email NOT LIKE '%@sscbs.du.ac.in' THEN
+        RAISE EXCEPTION 'Access Denied: Only @sscbs.du.ac.in emails are allowed.';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Bind the email validation trigger BEFORE insertion to block immediately
+CREATE OR REPLACE TRIGGER enforce_sscbs_email
+    BEFORE INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION public.check_sscbs_email();
