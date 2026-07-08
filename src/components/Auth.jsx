@@ -90,12 +90,7 @@ export default function Auth() {
           <div className="left-content-wrapper">
             
             <div className="sscbs-badge">
-              <svg className="sscbs-svg-logo" viewBox="0 0 100 100" width="48" height="48">
-                <path d="M50 5 L85 20 V55 C85 75 50 95 50 95 C50 95 15 75 15 55 V20 Z" fill="none" stroke="#d4af37" strokeWidth="3" />
-                <path d="M32 48 C39 48 46 51 50 54 C54 51 61 48 68 48 M32 61 C39 61 46 64 50 67 C54 64 61 61 68 61" fill="none" stroke="#f8fafc" strokeWidth="2" strokeLinecap="round" />
-                <line x1="50" y1="51" x2="50" y2="70" stroke="#d4af37" strokeWidth="2" />
-                <path d="M50 20 C47 26 45 30 45 34 C45 38 47 41 50 41 C53 41 55 38 55 34 C55 30 53 26 50 20 Z" fill="#d4af37" />
-              </svg>
+              <img className="sscbs-logo-img" src="/sscbs_logo.png" alt="SSCBS Crest" width="48" height="48" />
               <div className="badge-text">
                 <span className="inst-name">SHAHEED SUKHDEV</span>
                 <span className="inst-sub">COLLEGE OF BUSINESS STUDIES</span>
@@ -135,9 +130,7 @@ export default function Auth() {
               </div>
             </div>
 
-            <div className="left-footer">
-              <span>University of Delhi • Sector 16, Rohini</span>
-            </div>
+
           </div>
         </div>
 
