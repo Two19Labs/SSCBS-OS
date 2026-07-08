@@ -181,12 +181,6 @@
   border-radius: 4px;
 }
 
-.left-footer {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.3);
-  font-weight: 500;
-  letter-spacing: 0.5px;
-}
 
 /* Right Panel: Clean form layout */
 .auth-panel-right {
