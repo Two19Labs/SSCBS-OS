@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuth } from './context/AuthContext';
 import Auth from './components/Auth';
 import './App.css';
+import { Analytics } from '@vercel/analytics/react';
 
 function App() {
   const { user, signOut, loading, isConfigured } = useAuth();
@@ -34,9 +35,10 @@ function App() {
   };
 
   return (
-    <div className="workspace-container">
-      {/* Top Bar / Navigation */}
-      <header className="workspace-header">
+    <>
+      <div className="workspace-container">
+        {/* Top Bar / Navigation */}
+        <header className="workspace-header">
         <div className="header-left">
           <span className="terminal-icon">💻</span>
           <span className="workspace-title">SSCBS OS <span className="version-badge">v1.0.0</span></span>
@@ -138,7 +140,9 @@ function App() {
           </div>
         </section>
       </main>
-    </div>
+      </div>
+      <Analytics />
+    </>
   );
 }
 
