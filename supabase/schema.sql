@@ -36,13 +36,20 @@ CREATE POLICY "Users can update their own progress"
 -- 3. Automatic Profile Creation Trigger on Sign Up
 -- Whenever a user registers in auth.users, this function automatically creates their user_progress profile
 CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
     INSERT INTO public.user_progress (user_id)
     VALUES (new.id);
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql;
+
+-- Revoke default public execution privileges to secure the SECURITY DEFINER function
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM public;
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM authenticated;
 
 -- Bind the trigger to auth.users
 CREATE OR REPLACE TRIGGER on_auth_user_created
