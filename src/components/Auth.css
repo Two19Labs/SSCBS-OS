@@ -28,7 +28,7 @@
   padding: 60px;
   background-image: url('/sscbs_building.jpg');
   background-size: cover;
-  background-position: center;
+  background-position: 20% center;
   position: relative;
   border-right: 1px solid var(--border-glass);
 }
