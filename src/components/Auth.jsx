@@ -53,13 +53,19 @@ export default function Auth() {
     setLoading(true);
 
     if (!isConfigured) {
-      setTimeout(() => {
-        setLoading(false);
-        setSuccessMsg(
-          `Demo mode: Logged in as ${email || 'guest@example.com'}. ` +
-          'Configure Supabase in your .env file to enable live database sync.'
-        );
-      }, 1000);
+      setTimeout(async () => {
+        try {
+          if (isSignUp) {
+            await signUp(email, password, { full_name: fullName });
+          } else {
+            await signIn(email, password);
+          }
+          setLoading(false);
+        } catch (err) {
+          setError(err.message || 'An error occurred.');
+          setLoading(false);
+        }
+      }, 800);
       return;
     }
 

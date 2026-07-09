@@ -1,0 +1,685 @@
+/* Class Schedules Card & Timetable Widget Styling */
+
+.schedule-card-container {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.25s ease;
+}
+
+.schedule-card-container.active-tracker {
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.schedule-card-container.configure-prompt {
+  padding: 40px 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+/* 1. Setup Banner/Prompt Styling */
+.setup-banner-wrapper {
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.lock-icon-glow {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid var(--border-gold-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-gold);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+}
+
+.setup-banner-wrapper h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-main);
+}
+
+.setup-banner-wrapper p {
+  font-size: 0.825rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.btn-setup-action {
+  background: var(--accent-gold);
+  border: 1px solid var(--accent-gold);
+  color: #070b12;
+  font-weight: 700;
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.btn-setup-action:hover {
+  background: #e5c150;
+  box-shadow: 0 0 14px rgba(212, 175, 55, 0.35);
+  transform: translateY(-1px);
+}
+
+/* 2. Live Tracker Grid Layout */
+.tracker-grid {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tracker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 16px;
+}
+
+.tracker-title-group h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 4px 0;
+  color: var(--text-main);
+}
+
+.tracker-title-group .subtitle {
+  font-size: 0.775rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  color: var(--accent-green);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  font-family: monospace;
+}
+
+.live-dot-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--accent-green);
+  animation: pulse 1.5s infinite;
+}
+
+.tracker-time-display {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.clock-digits {
+  font-family: monospace;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.clock-sec {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+/* Status Hero Section */
+.tracker-main-status {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .tracker-main-status {
+    grid-template-columns: 1fr;
+  }
+}
+
+.status-hero {
+  background: rgba(7, 11, 18, 0.45);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.status-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+}
+
+.status-hero.ongoing::before { background-color: var(--accent-gold); }
+.status-hero.break::before { background-color: var(--accent-cyan); }
+.status-hero.free-slot::before { background-color: var(--accent-green); }
+.status-hero.inactive::before { background-color: var(--text-dim); }
+
+.badge-status {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.badge-status.live { background: rgba(212, 175, 55, 0.1); color: var(--accent-gold); border: 1px solid rgba(212, 175, 55, 0.2); }
+.badge-status.break-badge { background: rgba(56, 189, 248, 0.1); color: var(--accent-cyan); border: 1px solid rgba(56, 189, 248, 0.2); }
+.badge-status.free { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.2); }
+.badge-status.offline { background: rgba(148, 163, 184, 0.1); color: var(--text-dim); border: 1px solid rgba(148, 163, 184, 0.2); }
+.badge-status.weekend { background: rgba(251, 191, 36, 0.1); color: var(--accent-amber); border: 1px solid rgba(251, 191, 36, 0.2); }
+
+.status-hero h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 4px 0;
+  color: var(--text-main);
+}
+
+.status-hero p {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin: 2px 0;
+}
+
+.status-hero .highlight-tag {
+  color: var(--accent-gold);
+  font-weight: 600;
+}
+
+.progress-bar-container {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #d4af37, #f5d061);
+  border-radius: 3px;
+}
+
+.progress-bar-fill.break { background: linear-gradient(90deg, #38bdf8, #0ea5e9); }
+.progress-bar-fill.free { background: linear-gradient(90deg, #10b981, #059669); }
+
+.progress-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.725rem;
+  color: var(--text-dim);
+  font-family: monospace;
+}
+
+/* Next Class Panel */
+.tracker-next-class-panel {
+  background: rgba(7, 11, 18, 0.25);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tracker-next-class-panel h4 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.next-class-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.next-class-icon {
+  color: var(--accent-gold);
+}
+
+.next-class-info .next-sub {
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-main);
+  line-height: 1.3;
+}
+
+.next-class-info .next-details {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  margin: 2px 0 0 0;
+}
+
+.next-class-empty {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  padding: 12px 0;
+}
+
+.btn-view-weekly {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  font-size: 0.775rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.btn-view-weekly:hover {
+  background: rgba(12, 35, 64, 0.2);
+  border-color: var(--border-gold-glow);
+}
+
+/* 3. Daily Timeline Tracker Styling */
+.daily-timeline-section h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  color: var(--text-main);
+}
+
+.timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.timeline-slot-card {
+  background: rgba(7, 11, 18, 0.35);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.timeline-slot-card.active {
+  border-color: var(--accent-gold);
+  background: rgba(212, 175, 55, 0.04);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.08);
+}
+
+.timeline-slot-card.past {
+  opacity: 0.45;
+}
+
+.timeline-slot-time {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.timeline-slot-card.active .timeline-slot-time {
+  color: var(--accent-gold);
+}
+
+.active-glow-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: var(--accent-gold);
+  box-shadow: 0 0 6px var(--accent-gold);
+}
+
+.slot-subject {
+  font-size: 0.775rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-main);
+  line-height: 1.3;
+}
+
+.slot-meta {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  margin: 2px 0 0 0;
+}
+
+/* 4. Time Warp Debugger */
+.debugger-collapsible {
+  border-top: 1px solid var(--border-color);
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.btn-toggle-debugger {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.btn-toggle-debugger:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.debugger-panel {
+  padding: 14px 24px;
+  border-top: 1px dashed var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.debugger-row {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.debugger-controls-row {
+  display: flex;
+  gap: 16px;
+  animation: fadeIn 0.2s ease;
+}
+
+.control-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.control-item label {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.control-item select,
+.control-item input[type="time"] {
+  background: rgba(7, 11, 18, 0.8);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 6px 10px;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.775rem;
+}
+
+/* 5. Weekly Timetable Modal Dialog Styling */
+.weekly-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(4, 7, 13, 0.75);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.25s ease-out;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.weekly-modal-card {
+  width: 100%;
+  max-width: 900px;
+  max-height: 90%;
+  background: linear-gradient(135deg, rgba(12, 35, 64, 0.45) 0%, rgba(7, 11, 18, 0.75) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border-gold-glow);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.weekly-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.weekly-modal-header h3 {
+  margin: 0;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent-gold);
+}
+
+.weekly-modal-header p {
+  margin: 4px 0 0 0;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.weekly-modal-body {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: rgba(7, 11, 18, 0.4);
+}
+
+.weekly-timetable-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.8rem;
+  min-width: 800px;
+}
+
+.weekly-timetable-table th {
+  background: rgba(12, 35, 64, 0.3);
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: top;
+}
+
+.th-period-label {
+  font-weight: 700;
+  color: var(--text-main);
+  font-size: 0.8rem;
+}
+
+.th-time-label {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  font-family: monospace;
+  margin-top: 2px;
+}
+
+.weekly-timetable-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  vertical-align: top;
+}
+
+.weekly-timetable-table td:last-child {
+  border-right: none;
+}
+
+.weekly-timetable-table tr:last-child td {
+  border-bottom: none;
+}
+
+.day-name-cell {
+  background: rgba(12, 35, 64, 0.15);
+  font-family: 'Outfit', sans-serif;
+  color: var(--accent-gold);
+  text-align: center;
+  vertical-align: middle !important;
+  font-size: 0.85rem;
+}
+
+.weekly-class-cell {
+  height: 80px;
+}
+
+.weekly-class-cell.free {
+  background: rgba(255, 255, 255, 0.01);
+  color: rgba(255, 255, 255, 0.15);
+  vertical-align: middle;
+  text-align: center;
+}
+
+.cell-free {
+  font-size: 0.725rem;
+  font-style: italic;
+  color: var(--text-dim);
+  opacity: 0.6;
+}
+
+.cell-subject {
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.3;
+}
+
+.cell-teacher {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.cell-room {
+  display: inline-block;
+  font-size: 0.65rem;
+  color: var(--accent-gold);
+  background: rgba(212, 175, 55, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-top: 6px;
+}
+
+.cell-empty {
+  color: rgba(255, 255, 255, 0.1);
+  text-align: center;
+  padding-top: 15px;
+}
+
+.weekly-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-color);
+}
+
+.break-info-note {
+  font-size: 0.725rem;
+  color: var(--text-dim);
+}
+
+.btn-close-modal {
+  background: var(--accent-gold);
+  border: 1px solid var(--accent-gold);
+  color: #070b12;
+  font-weight: 700;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.btn-close-modal:hover {
+  background: #e5c150;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+/* Slide Down animation for Collapsible debugger */
+@keyframes slideDown {
+  from { height: 0; opacity: 0; }
+  to { height: auto; opacity: 1; }
+}
+
+.animate-slide-down {
+  animation: slideDown 0.2s ease-out forwards;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  50% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.6; }
+}

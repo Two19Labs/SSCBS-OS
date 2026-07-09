@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from './context/AuthContext';
 import Auth from './components/Auth';
+import ProfileModal from './components/ProfileModal';
+import ClassSchedulesCard from './components/ClassSchedulesCard';
 import './App.css';
 import { Analytics } from '@vercel/analytics/react';
 
 function App() {
   const { user, signOut, loading, isConfigured } = useAuth();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   if (loading) {
     return (
@@ -25,6 +28,9 @@ function App() {
   // Extract user info
   const displayName = user.user_metadata?.full_name || user.email.split('@')[0];
   const userEmail = user.email;
+  const userCourse = user.user_metadata?.course;
+  const userSemester = user.user_metadata?.semester;
+  const userSection = user.user_metadata?.section;
 
   const handleLogout = async () => {
     try {
@@ -47,13 +53,25 @@ function App() {
             </span>
           </div>
           <div className="header-right">
-            <div className="user-profile">
+            <div 
+              className="user-profile" 
+              onClick={() => setIsProfileOpen(true)} 
+              title="Edit Profile"
+              style={{ cursor: 'pointer' }}
+            >
               <div className="avatar">
                 {displayName.charAt(0).toUpperCase()}
               </div>
               <div className="user-details">
                 <span className="user-name">{displayName}</span>
-                <span className="user-role">{userEmail}</span>
+                <div className="user-role-badge-row">
+                  <span className="user-role">{userEmail}</span>
+                  {userCourse && (
+                    <span className="user-class-badge-small">
+                      {userCourse} {userSemester}{userSection}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
             <button className="btn-signout" onClick={handleLogout} title="Sign Out">
@@ -74,6 +92,9 @@ function App() {
               {isConfigured ? 'Synced' : 'Sandbox Mode'}
             </div>
           </section>
+
+          {/* Core Feature: Timetable Schedule Tracker */}
+          <ClassSchedulesCard onOpenProfile={() => setIsProfileOpen(true)} />
 
           {/* Student Tools Grid */}
           <section className="dashboard-grid">
@@ -100,16 +121,6 @@ function App() {
 
             <div className="dashboard-card locked">
               <div className="card-header">
-                <h3>Class Schedules</h3>
-              </div>
-              <p>Access your personalized course timetable, classrooms, sections, and notifications.</p>
-              <div className="card-footer">
-                <span className="badge-lock">Coming Soon</span>
-              </div>
-            </div>
-
-            <div className="dashboard-card locked">
-              <div className="card-header">
                 <h3>PYQs & Resources</h3>
               </div>
               <p>Search and download previous years' examination papers, syllabus, and study notes.</p>
@@ -121,6 +132,13 @@ function App() {
           </section>
         </main>
       </div>
+
+      {/* Profile Modal */}
+      <ProfileModal 
+        isOpen={isProfileOpen} 
+        onClose={() => setIsProfileOpen(false)} 
+      />
+
       <Analytics />
     </>
   );

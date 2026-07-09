@@ -337,3 +337,21 @@ body {
   }
 }
 
+.user-role-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-class-badge-small {
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid var(--border-gold-glow);
+  color: var(--accent-gold);
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.25px;
+}
+
