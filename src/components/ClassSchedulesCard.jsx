@@ -147,14 +147,14 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                   {isSimulated ? 'Simulated' : 'IST Live'}
                 </span>
                 <h2>Class Timetable</h2>
-                <p className="subtitle">{course} Sem {semester} Section {section} • {dayOfWeek}</p>
+                <p className="subtitle">{course} Sem {semester} Section {section}</p>
               </div>
               <div className="tracker-time-display">
                 <span className="clock-digits">
                   {time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
                 </span>
                 <span className="clock-sec">
-                  {isWeekend ? 'Weekend' : `Period Slots Active`}
+                  {dayOfWeek.toUpperCase()}
                 </span>
               </div>
             </div>
