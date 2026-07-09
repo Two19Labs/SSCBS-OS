@@ -32,6 +32,25 @@ function App() {
   const userSemester = user.user_metadata?.semester;
   const userSection = user.user_metadata?.section;
 
+  const getRelativeGreeting = () => {
+    const now = new Date();
+    // Use local time for user greeting
+    const hours = now.getHours();
+    if (hours < 5) return 'Still up';
+    if (hours < 12) return 'Good morning';
+    if (hours < 17) return 'Good afternoon';
+    if (hours < 21) return 'Good evening';
+    return 'Good night';
+  };
+
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+    e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+  };
+
   const handleLogout = async () => {
     try {
       await signOut();
@@ -84,7 +103,7 @@ function App() {
         <main className="workspace-main">
           <section className="welcome-banner">
             <div className="banner-content">
-              <h2>Welcome, {displayName}</h2>
+              <h2>{getRelativeGreeting()}, {displayName}</h2>
               <p>SSCBS Student Dashboard is fully active.</p>
             </div>
             <div className="status-indicator">
@@ -99,7 +118,7 @@ function App() {
           {/* Student Tools Grid */}
           <section className="dashboard-grid">
             
-            <div className="dashboard-card locked">
+            <div className="dashboard-card locked spotlight-card" onMouseMove={handleMouseMove}>
               <div className="card-header">
                 <h3>Waiver Tool</h3>
               </div>
@@ -109,7 +128,7 @@ function App() {
               </div>
             </div>
 
-            <div className="dashboard-card locked">
+            <div className="dashboard-card locked spotlight-card" onMouseMove={handleMouseMove}>
               <div className="card-header">
                 <h3>GPA Calculator</h3>
               </div>
@@ -119,7 +138,7 @@ function App() {
               </div>
             </div>
 
-            <div className="dashboard-card locked">
+            <div className="dashboard-card locked spotlight-card" onMouseMove={handleMouseMove}>
               <div className="card-header">
                 <h3>PYQs & Resources</h3>
               </div>

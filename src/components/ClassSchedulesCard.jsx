@@ -32,13 +32,13 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
     return new Date(utc + (3600000 * 5.5));
   }
 
-  // Update real-time clock every 10 seconds
+  // Update real-time clock every second for live ticking countdown and sub-second progress
   useEffect(() => {
     if (isSimulated) return;
     
     const interval = setInterval(() => {
       setTime(getISTTime());
-    }, 10000);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [isSimulated]);
@@ -74,6 +74,52 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
     return hours * 60 + minutes;
   };
 
+  // Helper: Get remaining time formatted as "MMm SSs" or "HHh MMm"
+  const getFormattedRemainingTime = (periodInfo) => {
+    if (!periodInfo) return '';
+    const endMin = parseTimeToMinutes(periodInfo.end);
+    const endMs = endMin * 60 * 1000;
+    
+    const currentMs = (time.getHours() * 3600 + time.getMinutes() * 60 + time.getSeconds()) * 1000 + time.getMilliseconds();
+    const diffMs = Math.max(0, endMs - currentMs);
+    
+    const totalSeconds = Math.floor(diffMs / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    
+    if (hours > 0) {
+      return `${hours}h ${minutes}m left`;
+    } else if (minutes > 0) {
+      return `${minutes}m ${seconds}s left`;
+    } else {
+      return `${seconds}s left`;
+    }
+  };
+
+  // Helper: Get smooth progress percent
+  const getProgressPercent = (periodInfo) => {
+    if (!periodInfo) return 0;
+    const startMin = parseTimeToMinutes(periodInfo.start);
+    const endMin = parseTimeToMinutes(periodInfo.end);
+    
+    const startMs = startMin * 60 * 1000;
+    const endMs = endMin * 60 * 1000;
+    const currentMs = (time.getHours() * 3600 + time.getMinutes() * 60 + time.getSeconds()) * 1000 + time.getMilliseconds();
+    
+    const progress = ((currentMs - startMs) / (endMs - startMs)) * 100;
+    return Math.max(0, Math.min(100, progress));
+  };
+
+  // Mouse move handler for card spotlight effect
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+    e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+  };
+
   // Find active and next classes
   let activeClass = null;
   let nextClass = null;
@@ -102,22 +148,14 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
     });
   }
 
-  // Calculate remaining minutes for current class
-  const getRemainingMinutes = () => {
-    if (!activePeriodInfo) return 0;
-    const endMin = parseTimeToMinutes(activePeriodInfo.end);
-    return endMin - currentMinutes;
-  };
-
-  const remainingMinutes = getRemainingMinutes();
-  const progressPercent = activePeriodInfo ? Math.round(((60 - remainingMinutes) / 60) * 100) : 0;
+  const progressPercent = getProgressPercent(activePeriodInfo);
 
   const handleToggleSimulated = (e) => {
     setIsSimulated(e.target.checked);
   };
 
   return (
-    <div className={`schedule-card-container ${hasConfiguredProfile ? 'active-tracker' : 'configure-prompt'}`}>
+    <div className={`schedule-card-container spotlight-card ${hasConfiguredProfile ? 'active-tracker' : 'configure-prompt'}`} onMouseMove={handleMouseMove}>
       
       {/* 1. Prompt state if profile not configured */}
       {!hasConfiguredProfile ? (
@@ -162,7 +200,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
             {/* Current status display */}
             <div className="tracker-main-status">
               {isWeekend ? (
-                <div className="status-hero inactive">
+                <div className="status-hero inactive spotlight-card" onMouseMove={handleMouseMove}>
                   <div className="hero-details">
                     <span className="badge-status weekend">Break</span>
                     <h3>No Classes Today</h3>
@@ -170,7 +208,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                   </div>
                 </div>
               ) : activeClass && activeClass.subject !== 'Free / Study Slot' && !activeClass.isBreak ? (
-                <div className="status-hero ongoing">
+                <div className="status-hero ongoing spotlight-card" onMouseMove={handleMouseMove}>
                   <div className="hero-details">
                     <span className="badge-status live">Ongoing Now</span>
                     <h3>{activeClass.subject}</h3>
@@ -183,12 +221,12 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                     </div>
                     <div className="progress-details">
                       <span>{activePeriodInfo.startLabel} - {activePeriodInfo.endLabel}</span>
-                      <span className="time-remaining">{remainingMinutes} mins left</span>
+                      <span className="time-remaining">{getFormattedRemainingTime(activePeriodInfo)}</span>
                     </div>
                   </div>
                 </div>
               ) : activeClass && activeClass.isBreak ? (
-                <div className="status-hero break">
+                <div className="status-hero break spotlight-card" onMouseMove={handleMouseMove}>
                   <div className="hero-details">
                     <span className="badge-status break-badge">Infinity Hour</span>
                     <h3>Lunch / Mid-day Break</h3>
@@ -200,12 +238,12 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                     </div>
                     <div className="progress-details">
                       <span>12:00 PM - 1:00 PM</span>
-                      <span>{remainingMinutes} mins left</span>
+                      <span>{getFormattedRemainingTime(PERIODS.find(p => p.id === 0))}</span>
                     </div>
                   </div>
                 </div>
               ) : activeClass && activeClass.subject === 'Free / Study Slot' ? (
-                <div className="status-hero free-slot">
+                <div className="status-hero free-slot spotlight-card" onMouseMove={handleMouseMove}>
                   <div className="hero-details">
                     <span className="badge-status free">Study Hour</span>
                     <h3>Self Study / Free Slot</h3>
@@ -217,12 +255,12 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                     </div>
                     <div className="progress-details">
                       <span>{activePeriodInfo.startLabel} - {activePeriodInfo.endLabel}</span>
-                      <span>{remainingMinutes} mins left</span>
+                      <span>{getFormattedRemainingTime(activePeriodInfo)}</span>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="status-hero inactive">
+                <div className="status-hero inactive spotlight-card" onMouseMove={handleMouseMove}>
                   <div className="hero-details">
                     <span className="badge-status offline">Classes Completed</span>
                     <h3>Academic Slots Inactive</h3>
@@ -232,10 +270,10 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
               )}
 
               {/* Next Class Panel */}
-              <div className="tracker-next-class-panel">
+              <div className="tracker-next-class-panel spotlight-card" onMouseMove={handleMouseMove}>
                 <h4>Next Scheduled Block</h4>
                 {nextClass ? (
-                  <div className="next-class-card">
+                  <div className="next-class-card spotlight-card" onMouseMove={handleMouseMove}>
                     <div className="next-class-icon">
                       <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none">
                         <circle cx="12" cy="12" r="10" />
@@ -280,7 +318,8 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                     return (
                       <div 
                         key={cls.period} 
-                        className={`timeline-slot-card ${isActive ? 'active' : ''} ${isPast ? 'past' : ''} ${isUpcoming ? 'upcoming' : ''}`}
+                        className={`timeline-slot-card spotlight-card ${isActive ? 'active' : ''} ${isPast ? 'past' : ''} ${isUpcoming ? 'upcoming' : ''}`}
+                        onMouseMove={handleMouseMove}
                       >
                         <div className="timeline-slot-time">
                           <span>{periodInfo.startLabel}</span>
