@@ -1,0 +1,6200 @@
+{
+  "BBA FIA": {
+    "2": {
+      "A": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "Entrepreneurship Essentials 2",
+            "teacher": "Dr. Vinayak Gautam",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Entrepreneurship Essentials 2",
+            "teacher": "Dr. Vinayak Gautam",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Quantitative Techniques",
+            "teacher": "Dr. Rishi Rajan Sahay",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Quantitative Techniques",
+            "teacher": "Dr. Rishi Rajan Sahay",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "EE2",
+            "teacher": "EE2",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "General Activity / Core Seminar",
+            "teacher": "-",
+            "room": "unsupervised"
+          },
+          {
+            "period": 2,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Paridhi",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Paridhi",
+            "room": "Room 236"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Advanced Spreadsheet Tools",
+            "teacher": "Mr. Vineet and Dr Deepali Dhaka",
+            "room": "Room 203/651"
+          },
+          {
+            "period": 5,
+            "subject": "Quantitative Techniques",
+            "teacher": "Dr. Rishi Rajan Sahay",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Entrepreneurship Essentials 2",
+            "teacher": "Dr. Vinayak Gautam",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Interactive",
+            "teacher": "Prof. Poonam Verma",
+            "room": "Room 703"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Advanced Spreadsheet Tools",
+            "teacher": "Mr. Vineet and Dr Deepali Dhaka",
+            "room": "Room 203/326"
+          },
+          {
+            "period": 2,
+            "subject": "Advanced Spreadsheet Tools",
+            "teacher": "Mr. Vineet and Dr Deepali Dhaka",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Paridhi",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Paridhi",
+            "room": "Room 236"
+          },
+          {
+            "period": 5,
+            "subject": "Quantitative Techniques",
+            "teacher": "Dr. Rishi Rajan Sahay",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Hindi C (Merged with BMS 2A)",
+            "teacher": "Mr. Dinesh",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Hindi C (Merged with BMS 2A)",
+            "teacher": "Mr. Dinesh",
+            "room": "Room 703"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Hindi C (Merged with BMS 2A)",
+            "teacher": "Mr. Dinesh",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Emotional Intelligence",
+            "teacher": "Ms. Kishori Ravi Shankar",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Macro Economics",
+            "teacher": "Dr. Shalini Prakash",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Quantitative Techniques",
+            "teacher": "Dr. Rishi Rajan Sahay",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Macro Economics",
+            "teacher": "Dr. Shalini Prakash",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "Hindi C (Merged with BMS 2A)",
+            "teacher": "Mr. Dinesh",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Emotional Intelligence",
+            "teacher": "Ms. Kishori Ravi Shankar",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Macro Economics",
+            "teacher": "Dr. Shalini Prakash",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Paridhi",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Advanced Spreadsheet Tools",
+            "teacher": "Mr. Vineet and Dr Deepali Dhaka",
+            "room": "Room 203/326"
+          },
+          {
+            "period": 6,
+            "subject": "Entrepreneurship Essentials 2",
+            "teacher": "Dr. Vinayak Gautam",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Entrepreneurship Essentials 2",
+            "teacher": "Dr. Vinayak Gautam",
+            "room": "Room 703"
+          }
+        ]
+      },
+      "B": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "General Activity / Core Seminar",
+            "teacher": "-",
+            "room": "unsupervised"
+          },
+          {
+            "period": 2,
+            "subject": "Macro Economics",
+            "teacher": "Dr. Sushmita",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Quantitative Techniques",
+            "teacher": "Dr. Amrina Kausar",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Saumya Jain",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Entrepreneurship Essentials 2 (Merged with BMS 2D)",
+            "teacher": "Dr. Bharti Singh",
+            "room": "Room 737"
+          },
+          {
+            "period": 6,
+            "subject": "Entrepreneurship Essentials 2 (Merged with BMS 2D)",
+            "teacher": "Dr. Bharti Singh",
+            "room": "P"
+          },
+          {
+            "period": 7,
+            "subject": "Interactive",
+            "teacher": "Prof. Poonam Verma",
+            "room": "Room 703"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Saumya Jain",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Macro Economics",
+            "teacher": "Dr. Sushmita",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Quantitative Techniques",
+            "teacher": "Dr. Amrina Kausar",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Quantitative Techniques",
+            "teacher": "Dr. Amrina Kausar",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Macro Economics",
+            "teacher": "Dr. Sushmita",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Machine Learning and Application (Merged with BMS 2D)",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Entrepreneurship Essentials 2 (Merged with BMS 2D)",
+            "teacher": "Dr. Bharti Singh",
+            "room": "P"
+          },
+          {
+            "period": 3,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Saumya Jain",
+            "room": "Room 237"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Advanced Spreadsheet Tools",
+            "teacher": "Ms. Kajol",
+            "room": "Room 253/326"
+          },
+          {
+            "period": 5,
+            "subject": "Advanced Spreadsheet Tools",
+            "teacher": "Ms. Kajol",
+            "room": "Room 253/326"
+          },
+          {
+            "period": 6,
+            "subject": "Hindi A",
+            "teacher": "Dr. Pooja Singh",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Hindi A",
+            "teacher": "Dr. Pooja Singh",
+            "room": "Room 703"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Emotional Intelligence",
+            "teacher": "Ms. Kishori Ravi Shankar",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Hindi C",
+            "teacher": "Mr. Dinesh",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Macro Economics",
+            "teacher": "Dr. Sushmita",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Saumya Jain",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Entrepreneurship Essentials 2 (Merged with BMS 2D)",
+            "teacher": "Dr. Bharti Singh",
+            "room": "Room 737"
+          },
+          {
+            "period": 6,
+            "subject": "Advanced Spreadsheet Tools",
+            "teacher": "Ms. Kajol",
+            "room": "Room 253/326"
+          },
+          {
+            "period": 7,
+            "subject": "Advanced Spreadsheet Tools",
+            "teacher": "Ms. Kajol",
+            "room": "Room 253/326"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "Machine Learning and Application (Merged with BMS 2D)",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Hindi C",
+            "teacher": "Mr. Dinesh",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Emotional Intelligence",
+            "teacher": "Ms. Kishori Ravi Shankar",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Saumya Jain",
+            "room": "Room 237"
+          },
+          {
+            "period": 5,
+            "subject": "Entrepreneurship Essentials 2 (Merged with BMS 2D)",
+            "teacher": "Dr. Bharti Singh",
+            "room": "Room 737"
+          },
+          {
+            "period": 6,
+            "subject": "General Activity / Core Seminar",
+            "teacher": "-",
+            "room": "Unsupervised"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ]
+      }
+    },
+    "4": {
+      "A": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 2,
+            "subject": "Income Tax Law & Practice",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "EVS II",
+            "teacher": "Dr. Paritosh Ahmed",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Corporate Analysis and Valuation",
+            "teacher": "Mr. Ishant",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Basics of Econometrics",
+            "teacher": "Dr. Neeraj Kumar Sehrawat",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Financial Database Analysis and Software (Merged with BBA 4B)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 557"
+          },
+          {
+            "period": 7,
+            "subject": "Personality Development and Communication",
+            "teacher": "Dr. Ankita Arora",
+            "room": "Room 703"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 2,
+            "subject": "EVS II",
+            "teacher": "Dr. Paritosh Ahmed",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Investment Analysis and Portfolio Management",
+            "teacher": "Dr. Madhu Totla",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Corporate Analysis and Valuation",
+            "teacher": "Mr. Ishant",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Income Tax Law & Practice",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Corporate Analysis and Valuation",
+            "teacher": "Mr. Ishant",
+            "room": "Tute"
+          },
+          {
+            "period": 7,
+            "subject": "Personality Development and Communication",
+            "teacher": "Dr. Ankita Arora",
+            "room": "Room 703"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Investment Analysis and Portfolio Management",
+            "teacher": "Dr. Madhu Totla",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Basics of Econometrics",
+            "teacher": "Dr. Neeraj Kumar Sehrawat",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Income Tax Law & Practice",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Science and Society",
+            "teacher": "Dr. Guncha Sharma",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Basics of Econometrics",
+            "teacher": "Dr. Neeraj Kumar Sehrawat",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Indigenous Sports (Merge with B. Sc)",
+            "teacher": "Ms. Nisha",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Indigenous Sports (Merge with B. Sc)",
+            "teacher": "Ms. Nisha",
+            "room": "Room 703"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Financial Database Analysis and Software (Merged with BBA 4B)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 557"
+          },
+          {
+            "period": 2,
+            "subject": "Investment Analysis and Portfolio Management",
+            "teacher": "Dr. Madhu Totla",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Income Tax Law & Practice",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "P"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Basics of Econometrics",
+            "teacher": "Dr. Neeraj Kumar Sehrawat",
+            "room": "Room 534"
+          },
+          {
+            "period": 5,
+            "subject": "Personality Development and Communication",
+            "teacher": "Dr. Ankita Arora",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Science and Society",
+            "teacher": "Dr. Guncha Sharma",
+            "room": "Room 644"
+          },
+          {
+            "period": 7,
+            "subject": "Science and Society",
+            "teacher": "Dr. Guncha Sharma",
+            "room": "Room 644"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "EVS II",
+            "teacher": "Dr. Paritosh Ahmed",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Investment Analysis and Portfolio Management",
+            "teacher": "Dr. Madhu Totla",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Basics of Econometrics",
+            "teacher": "Dr. Neeraj Kumar Sehrawat",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Corporate Analysis and Valuation",
+            "teacher": "Mr. Ishant",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Income Tax Law & Practice",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "P"
+          },
+          {
+            "period": 6,
+            "subject": "Financial Database Analysis and Software (Merged with BBA 4B)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 557"
+          },
+          {
+            "period": 7,
+            "subject": "Financial Database Analysis and Software (Merged with BBA 4B)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 557"
+          }
+        ]
+      },
+      "B": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 2,
+            "subject": "Investment Analysis and Portfolio Management",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Financial Database Analysis and Software",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "BoE"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Income Tax Law & Practice",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Financial Database Analysis and Software",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "BoE"
+          },
+          {
+            "period": 6,
+            "subject": "Financial Database Analysis and Software",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Personality Development and Communication",
+            "teacher": "Ms. Monika",
+            "room": "Room 703"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 2,
+            "subject": "Investment Analysis and Portfolio Management",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "EVS II",
+            "teacher": "Dr. Paritosh Ahmed",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Corporate Analysis and Valuation",
+            "teacher": "Dr. Neeraj Kumar Sehrawat",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Financial Database Analysis and Software",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "BoE"
+          },
+          {
+            "period": 6,
+            "subject": "Income Tax Law & Practice",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Financial Database Analysis and Software",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "BoE"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "EVS II",
+            "teacher": "Dr. Paritosh Ahmed",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "EVS II",
+            "teacher": "Dr. Paritosh Ahmed",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Investment Analysis and Portfolio Management",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 236"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Corporate Analysis and Valuation",
+            "teacher": "Dr. Neeraj Kumar Sehrawat",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Income Tax Law & Practice",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "P"
+          },
+          {
+            "period": 6,
+            "subject": "Income Tax Law & Practice",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "P"
+          },
+          {
+            "period": 7,
+            "subject": "Personality Development and Communication",
+            "teacher": "Ms. Monika",
+            "room": "Room 703"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Financial Database Analysis and Software",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Indigenous Sports (Merge with B. Sc)",
+            "teacher": "Mr. Prakhar",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Indigenous Sports (Merge with B. Sc)",
+            "teacher": "Mr. Prakhar",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Investment Analysis and Portfolio Management",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Income Tax Law & Practice",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "Indigenous Sports (Merge with B. Sc)",
+            "teacher": "Mr. Prakhar",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Indigenous Sports (Merge with B. Sc)",
+            "teacher": "Mr. Prakhar",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Financial Database Analysis and Software",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "BoE"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Personality Development and Communication",
+            "teacher": "Ms. Monika",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Corporate Analysis and Valuation",
+            "teacher": "Dr. Neeraj Kumar Sehrawat",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Financial Database Analysis and Software",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Financial Database Analysis and Software",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 703"
+          }
+        ]
+      }
+    },
+    "6": {
+      "A": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "Social Enterpreneurship",
+            "teacher": "Social Enterpreneurship",
+            "room": "Unsupervised"
+          },
+          {
+            "period": 2,
+            "subject": "International Finance",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Financial Services",
+            "teacher": "Mr. Mohd. Rashid",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Strategic Corporate Finance",
+            "teacher": "Ms. Sumana Biswas",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Strategic Corporate Finance",
+            "teacher": "Ms. Sumana Biswas",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Corporate Ethics",
+            "teacher": "Mr. Priyanka Singh",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Corporate Ethics",
+            "teacher": "Mr. Priyanka Singh",
+            "room": "Room 703"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 2,
+            "subject": "Financial Services",
+            "teacher": "Mr. Mohd. Rashid",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "International Finance",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Financial Services",
+            "teacher": "Mr. Mohd. Rashid",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "App Development Using Flutter",
+            "teacher": "Ms. Rama",
+            "room": "P"
+          },
+          {
+            "period": 6,
+            "subject": "App Development Using Flutter",
+            "teacher": "Ms. Rama",
+            "room": "P"
+          },
+          {
+            "period": 7,
+            "subject": "Cyber Sphere and Security : Global concern",
+            "teacher": "Ms. Seema",
+            "room": "Room 607"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Financial Services",
+            "teacher": "Mr. Mohd. Rashid",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "International Finance",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Ms. Ritika",
+            "room": "P"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "International Finance",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 534"
+          },
+          {
+            "period": 5,
+            "subject": "MArketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 523"
+          },
+          {
+            "period": 6,
+            "subject": "MArketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 523"
+          },
+          {
+            "period": 7,
+            "subject": "MArketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 651"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Ms. Ritika",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Ms. Ritika",
+            "room": "P"
+          },
+          {
+            "period": 3,
+            "subject": "App Development Using Flutter",
+            "teacher": "Ms. Rama",
+            "room": "Room 603/326"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Corporate Ethics",
+            "teacher": "Mr. Priyanka Singh",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Corporate Ethics",
+            "teacher": "Mr. Priyanka Singh",
+            "room": "Tute"
+          },
+          {
+            "period": 6,
+            "subject": "MArketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 523"
+          },
+          {
+            "period": 7,
+            "subject": "MArketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 651"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "International Finance",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Ms. Ritika",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Ms. Ritika",
+            "room": "P"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Strategic Corporate Finance",
+            "teacher": "Ms. Sumana Biswas",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Strategic Corporate Finance",
+            "teacher": "Ms. Sumana Biswas",
+            "room": "Tute"
+          },
+          {
+            "period": 6,
+            "subject": "App Development Using Flutter",
+            "teacher": "Ms. Rama",
+            "room": "P"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ]
+      },
+      "B": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "Corporate Ethics",
+            "teacher": "Dr. Divya Jain",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Financial Services",
+            "teacher": "Mr. Mohd. Rashid",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Corporate Ethics",
+            "teacher": "Dr. Divya Jain",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "International Finance",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Research Methodology",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Shevata",
+            "teacher": "Shevata",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Shevata",
+            "teacher": "Shevata",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "RK",
+            "teacher": "RK",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "International Finance",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "App Development Using Flutter",
+            "teacher": "Ms. Rama",
+            "room": "P"
+          },
+          {
+            "period": 6,
+            "subject": "App Development Using Flutter",
+            "teacher": "Ms. Rama",
+            "room": "P"
+          },
+          {
+            "period": 7,
+            "subject": "Cyber Sphere and Security : Global concern",
+            "teacher": "Ms. Seema",
+            "room": "Room 607"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Corporate Ethics",
+            "teacher": "Dr. Divya Jain",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Corporate Ethics",
+            "teacher": "Dr. Divya Jain",
+            "room": "Tute"
+          },
+          {
+            "period": 3,
+            "subject": "International Finance",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 337"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "RK",
+            "teacher": "RK",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Marketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 523"
+          },
+          {
+            "period": 6,
+            "subject": "Marketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 523"
+          },
+          {
+            "period": 7,
+            "subject": "Research Methodology",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 651"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Financial Services",
+            "teacher": "Mr. Mohd. Rashid",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "International Finance",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 534"
+          },
+          {
+            "period": 3,
+            "subject": "App Development Using Flutter",
+            "teacher": "Ms. Rama",
+            "room": "Room 603/326"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "RK",
+            "teacher": "RK",
+            "room": "P"
+          },
+          {
+            "period": 5,
+            "subject": "Social Entp",
+            "teacher": "Social Entp",
+            "room": "Unsupervised"
+          },
+          {
+            "period": 6,
+            "subject": "Marketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 523"
+          },
+          {
+            "period": 7,
+            "subject": "Research Methodology",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 651"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "Financial Services",
+            "teacher": "Mr. Mohd. Rashid",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "International Finance",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "RK",
+            "teacher": "RK",
+            "room": "P"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "RK",
+            "teacher": "RK",
+            "room": "P"
+          },
+          {
+            "period": 5,
+            "subject": "Research Methodology",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "App Development Using Flutter",
+            "teacher": "Ms. Rama",
+            "room": "P"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ]
+      }
+    },
+    "8": {
+      "A": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 2,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 3,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 5,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Entrepreneurial Finance",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Entrepreneurial Finance",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Tute"
+          },
+          {
+            "period": 3,
+            "subject": "Environmental Finance",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Tute"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Fixed Income Securities",
+            "teacher": "Dr. Narendra Kumar Nigam",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Entrepreneurial Finance",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Environmental Finance",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Fund Raising & Management for Entrepreneurs\r\n(Merge with BMS 4B) (Room no. 523)",
+            "teacher": "Ms. Bharti Singh",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Fund Raising & Management for Entrepreneurs\r\n(Merge with BMS 4B) (Room no. 523)",
+            "teacher": "Ms. Bharti Singh",
+            "room": "P"
+          },
+          {
+            "period": 5,
+            "subject": "Fixed Income Securities",
+            "teacher": "Dr. Narendra Kumar Nigam",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Entrepreneurial Finance",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Environmental Finance",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Fixed Income Securities",
+            "teacher": "Dr. Narendra Kumar Nigam",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Fund Raising & Management for Entrepreneurs\r\n(Merge with BMS 4B) (Room no. 523)",
+            "teacher": "Ms. Bharti Singh",
+            "room": "P"
+          },
+          {
+            "period": 5,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 2,
+            "subject": "Environmental Finance",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Fund Raising & Management for Entrepreneurs\r\n(Merge with BMS 4B) (Room no. 523)",
+            "teacher": "Ms. Bharti Singh",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Fund Raising & Management for Entrepreneurs\r\n(Merge with BMS 4B) (Room no. 523)",
+            "teacher": "Ms. Bharti Singh",
+            "room": "P"
+          },
+          {
+            "period": 5,
+            "subject": "Fixed Income Securities",
+            "teacher": "Dr. Narendra Kumar Nigam",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ]
+      }
+    }
+  },
+  "BMS": {
+    "2": {
+      "A": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "Advanced Spreadsheet Tools",
+            "teacher": "Dr. Raj Kumar",
+            "room": "Room 703/326"
+          },
+          {
+            "period": 2,
+            "subject": "Entrepreneurship Essentials 2",
+            "teacher": "Ms. Krishnaveni",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Paridhi",
+            "room": "Room 236"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Principles of Marketing",
+            "teacher": "Dr. Anuja Mathur",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Micro Economics",
+            "teacher": "Dr. Shalini Prakash",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Hindi B",
+            "teacher": "Dr. Pooja Singh",
+            "room": "Hindi B"
+          },
+          {
+            "period": 7,
+            "subject": "Hindi B",
+            "teacher": "Dr. Pooja Singh",
+            "room": "Hindi B"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Emotional Intelligence",
+            "teacher": "Ms. Kishori Ravi Shankar",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Entrepreneurship Essentials 2",
+            "teacher": "Ms. Krishnaveni",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Principles of Marketing",
+            "teacher": "Dr. Anuja Mathur",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Advanced Spreadsheet Tools",
+            "teacher": "Dr. Raj Kumar",
+            "room": "Room 703/326"
+          },
+          {
+            "period": 5,
+            "subject": "Advanced Spreadsheet Tools",
+            "teacher": "Dr. Raj Kumar",
+            "room": "Room 703/326"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Entrepreneurship Essentials 2",
+            "teacher": "Ms. Krishnaveni",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Paridhi",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Entrepreneurship Essentials 2",
+            "teacher": "Ms. Krishnaveni",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Principles of Marketing",
+            "teacher": "Dr. Anuja Mathur",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Micro Economics",
+            "teacher": "Dr. Shalini Prakash",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Hindi B",
+            "teacher": "Dr. Pooja Singh",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Hindi B",
+            "teacher": "Dr. Pooja Singh",
+            "room": "Room 703"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "EE2",
+            "teacher": "EE2",
+            "room": "Unsuprvised"
+          },
+          {
+            "period": 2,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Paridhi",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Entrepreneurship Essentials 2",
+            "teacher": "Ms. Krishnaveni",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Paridhi",
+            "room": "Room 236"
+          },
+          {
+            "period": 5,
+            "subject": "Principles of Marketing",
+            "teacher": "Dr. Anuja Mathur",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "Emotional Intelligence",
+            "teacher": "Ms. Kishori Ravi Shankar",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Paridhi",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Advanced Spreadsheet Tools",
+            "teacher": "Dr. Raj Kumar",
+            "room": "Room 703/326"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "General Activity / Core Seminar",
+            "teacher": "-",
+            "room": "Unsupervised"
+          },
+          {
+            "period": 5,
+            "subject": "Micro Economics",
+            "teacher": "Dr. Shalini Prakash",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Principles of Marketing",
+            "teacher": "Dr. Anuja Mathur",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ]
+      },
+      "B": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Saumya Jain",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Saumya Jain",
+            "room": "Room 715"
+          },
+          {
+            "period": 3,
+            "subject": "Entrepreneurship Essentials 2",
+            "teacher": "Ms. Krishnaveni",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Advanced Spreadsheet Tools",
+            "teacher": "Mr. Jigmet",
+            "room": "Room 707/651"
+          },
+          {
+            "period": 5,
+            "subject": "Advanced Spreadsheet Tools",
+            "teacher": "Mr. Jigmet",
+            "room": "Room 707/651"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Entrepreneurship Essentials 2",
+            "teacher": "Ms. Krishnaveni",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Emotional Intelligence",
+            "teacher": "Ms. Kishori Ravi Shankar",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Entrepreneurship Essentials 2",
+            "teacher": "Ms. Krishnaveni",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Saumya Jain",
+            "room": "Room 715"
+          },
+          {
+            "period": 5,
+            "subject": "Principles of Marketing",
+            "teacher": "Dr. Anuja Mathur",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Hindi B",
+            "teacher": "Dr. Pooja Singh",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Hindi B",
+            "teacher": "Dr. Pooja Singh",
+            "room": "Room 703"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "EE2",
+            "teacher": "EE2",
+            "room": "Unsuprvised"
+          },
+          {
+            "period": 2,
+            "subject": "Entrepreneurship Essentials 2",
+            "teacher": "Ms. Krishnaveni",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Micro Economics",
+            "teacher": "Dr. Shalini Prakash",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Saumya Jain",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Principles of Marketing",
+            "teacher": "Dr. Anuja Mathur",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Hindi B",
+            "teacher": "Dr. Pooja Singh",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Hindi B",
+            "teacher": "Dr. Pooja Singh",
+            "room": "Room 703"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "General Activity / Core Seminar",
+            "teacher": "-",
+            "room": "Unsuprvised"
+          },
+          {
+            "period": 2,
+            "subject": "Entrepreneurship Essentials 2",
+            "teacher": "Ms. Krishnaveni",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Emotional Intelligence",
+            "teacher": "Ms. Kishori Ravi Shankar",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Principles of Marketing",
+            "teacher": "Dr. Anuja Mathur",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Kajol",
+            "teacher": "Kajol",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Saumya Jain",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Micro Economics",
+            "teacher": "Dr. Shalini Prakash",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Kajol",
+            "teacher": "Kajol",
+            "room": "Room 707/651"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Micro Economics",
+            "teacher": "Dr. Shalini Prakash",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Principles of Marketing",
+            "teacher": "Dr. Anuja Mathur",
+            "room": "G1+G2"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ]
+      },
+      "C": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "EE2",
+            "teacher": "EE2",
+            "room": "Unsuprvised"
+          },
+          {
+            "period": 2,
+            "subject": "Principles of Marketing",
+            "teacher": "Dr. Divya Jain",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Saumya Jain",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Entrepreneurship Essentials 2",
+            "teacher": "Dr. Ramesh Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Entrepreneurship Essentials 2",
+            "teacher": "Dr. Ramesh Kumar",
+            "room": "P"
+          },
+          {
+            "period": 6,
+            "subject": "Jigmet",
+            "teacher": "Jigmet",
+            "room": "Room 733/651"
+          },
+          {
+            "period": 7,
+            "subject": "Jigmet",
+            "teacher": "Jigmet",
+            "room": "Room 733/651"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Principles of Marketing",
+            "teacher": "Dr. Divya Jain",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Principles of Marketing",
+            "teacher": "Dr. Divya Jain",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Saumya Jain",
+            "room": "Room 715"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Entrepreneurship Essentials 2",
+            "teacher": "Dr. Ramesh Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "General Activity / Core Seminar",
+            "teacher": "-",
+            "room": "Unsuprvised"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Saumya Jain",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Micro Economics",
+            "teacher": "Dr. Sushmita",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Entrepreneurship Essentials 2",
+            "teacher": "Dr. Ramesh Kumar",
+            "room": "P"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Hindi D",
+            "teacher": "Dr. Puja Gupta",
+            "room": "Hin B"
+          },
+          {
+            "period": 5,
+            "subject": "Hindi D",
+            "teacher": "Dr. Puja Gupta",
+            "room": "Hin B"
+          },
+          {
+            "period": 6,
+            "subject": "Hindi A",
+            "teacher": "Dr. Pooja Singh",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Hindi A",
+            "teacher": "Dr. Pooja Singh",
+            "room": "Room 703"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Saumya Jain",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Saumya Jain",
+            "room": "Room 715"
+          },
+          {
+            "period": 3,
+            "subject": "Principles of Marketing",
+            "teacher": "Dr. Anuja Mathur",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Micro Economics",
+            "teacher": "Dr. Sushmita",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Entrepreneurship Essentials 2",
+            "teacher": "Dr. Ramesh Kumar",
+            "room": "P"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "Advanced Spreadsheet Tools",
+            "teacher": "Ms. Kajol",
+            "room": "Room 651/733"
+          },
+          {
+            "period": 2,
+            "subject": "Advanced Spreadsheet Tools",
+            "teacher": "Ms. Kajol",
+            "room": "Room 651/733"
+          },
+          {
+            "period": 3,
+            "subject": "Micro Economics",
+            "teacher": "Dr. Sushmita",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Emotional Intelligence",
+            "teacher": "Ms. Priyanka Singh",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Emotional Intelligence",
+            "teacher": "Ms. Priyanka Singh",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ]
+      },
+      "D": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "EE2",
+            "teacher": "EE2",
+            "room": "Unsuprvised"
+          },
+          {
+            "period": 2,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Paridhi",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Micro Economics",
+            "teacher": "Dr. Sushmita",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Paridhi",
+            "room": "Room 715"
+          },
+          {
+            "period": 5,
+            "subject": "Machine learning and applications (MERGED WITH BBA 2B & BMS 8A)",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "Room 253"
+          },
+          {
+            "period": 6,
+            "subject": "Machine learning and applications (MERGED WITH BBA 2B & BMS 8A)",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "P"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Hindi D",
+            "teacher": "Dr. Puja Gupta",
+            "room": "Hin B"
+          },
+          {
+            "period": 2,
+            "subject": "Hindi D",
+            "teacher": "Dr. Puja Gupta",
+            "room": "Hin B"
+          },
+          {
+            "period": 3,
+            "subject": "Principles of Marketing",
+            "teacher": "Dr. Divya Jain",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Paridhi",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Advanced Spreadsheet Tools",
+            "teacher": "Mr. Vineet",
+            "room": "Room 737/651"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Machine learning and applications (MERGED WITH BBA 2B & BMS 8A)",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "Room 253"
+          },
+          {
+            "period": 2,
+            "subject": "Machine learning and applications (MERGED WITH BBA 2B & BMS 8A)",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "P"
+          },
+          {
+            "period": 3,
+            "subject": "Principles of Marketing",
+            "teacher": "Dr. Divya Jain",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Micro Economics",
+            "teacher": "Dr. Sushmita",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Micro Economics",
+            "teacher": "Dr. Sushmita",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Hindi A",
+            "teacher": "Dr. Pooja Singh",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Hindi A",
+            "teacher": "Dr. Pooja Singh",
+            "room": "Room 703"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Principles of Marketing",
+            "teacher": "Dr. Divya Jain",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Principles of Marketing",
+            "teacher": "Dr. Divya Jain",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Paridhi",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Advanced Spreadsheet Tools",
+            "teacher": "Mr. Vineet",
+            "room": "Room 737/651"
+          },
+          {
+            "period": 5,
+            "subject": "Entrepreneurship Essentials 2  (MERGED WITH BBA 2B)",
+            "teacher": "Dr. Bharti Singh",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Advanced Spreadsheet Tools",
+            "teacher": "Mr. Vineet",
+            "room": "Room 737/651"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "Machine learning and applications (MERGED WITH BBA 2B & BMS 8A)",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "Room 253"
+          },
+          {
+            "period": 2,
+            "subject": "Micro Economics",
+            "teacher": "Dr. Sushmita",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Cost and Management Accounting",
+            "teacher": "Dr. Paridhi",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Advanced Spreadsheet Tools",
+            "teacher": "Mr. Vineet",
+            "room": "Room 737/326"
+          },
+          {
+            "period": 5,
+            "subject": "Entrepreneurship Essentials 2  (MERGED WITH BBA 2B)",
+            "teacher": "Dr. Bharti Singh",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Emotional Intelligence",
+            "teacher": "Ms. Priyanka Singh",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Emotional Intelligence",
+            "teacher": "Ms. Priyanka Singh",
+            "room": "Room 703"
+          }
+        ]
+      }
+    },
+    "4": {
+      "A": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "Financial Management",
+            "teacher": "Dr. Madhu Totla",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Financial Management",
+            "teacher": "Dr. Madhu Totla",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Human Resource Management",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Financial Database Analysis and Software (Merge with BMS 4A, 4B, 4C)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "EVS II",
+            "teacher": "Dr. Pooja",
+            "room": "S&S"
+          },
+          {
+            "period": 6,
+            "subject": "EVS II",
+            "teacher": "Dr. Pooja",
+            "room": "S&S"
+          },
+          {
+            "period": 7,
+            "subject": "Indigenous Sports (Merge with BMS 4C)",
+            "teacher": "Ms. Nisha",
+            "room": "Room 503"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Financial Management",
+            "teacher": "Dr. Madhu Totla",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Brand Management",
+            "teacher": "Dr. Bhavya Bansal",
+            "room": "Room 523"
+          },
+          {
+            "period": 3,
+            "subject": "Quantitative Techniques for Management",
+            "teacher": "Dr. Rishi Rajan Sahay",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Brand Management",
+            "teacher": "Dr. Bhavya Bansal",
+            "room": "Room 523"
+          },
+          {
+            "period": 5,
+            "subject": "EVS II",
+            "teacher": "Dr. Pooja",
+            "room": "EVS"
+          },
+          {
+            "period": 6,
+            "subject": "EVS II",
+            "teacher": "Dr. Pooja",
+            "room": "S&S"
+          },
+          {
+            "period": 7,
+            "subject": "Indigenous Sports (Merge with BMS 4C)",
+            "teacher": "Ms. Nisha",
+            "room": "Room 503"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Brand Management",
+            "teacher": "Dr. Bhavya Bansal",
+            "room": "Room 523"
+          },
+          {
+            "period": 2,
+            "subject": "Brand Management",
+            "teacher": "Dr. Bhavya Bansal",
+            "room": "Room 523"
+          },
+          {
+            "period": 3,
+            "subject": "Quantitative Techniques for Management",
+            "teacher": "Dr. Rishi Rajan Sahay",
+            "room": "Room 534"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Quantitative Techniques for Management",
+            "teacher": "Dr. Rishi Rajan Sahay",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Personality Development and Communication",
+            "teacher": "Dr. Anikta",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Human Resource Management",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 507"
+          },
+          {
+            "period": 7,
+            "subject": "Financial Database Analysis and Software (Merge with BMS 4A, 4B, 4C)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 703"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Quantitative Techniques for Management",
+            "teacher": "Dr. Rishi Rajan Sahay",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Financial Database Analysis and Software (Merge with BMS 4A, 4B, 4C)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Human Resource Management",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Personality Development and Communication",
+            "teacher": "Dr. Anikta",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 2,
+            "subject": "Human Resource Management",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Financial Management",
+            "teacher": "Dr. Madhu Totla",
+            "room": "G1"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Quantitative Techniques for Management",
+            "teacher": "Dr. Rishi Rajan Sahay",
+            "room": "Room 534"
+          },
+          {
+            "period": 5,
+            "subject": "EVS II",
+            "teacher": "Dr. Pooja",
+            "room": "EVS"
+          },
+          {
+            "period": 6,
+            "subject": "EVS II",
+            "teacher": "Dr. Pooja",
+            "room": "EVS"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ]
+      },
+      "B": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "Science and Society (Merge with BMS 4D)",
+            "teacher": "Dr. Paritosh Ahmed",
+            "room": "Room 648"
+          },
+          {
+            "period": 2,
+            "subject": "Science and Society (Merge with BMS 4D)",
+            "teacher": "Dr. Paritosh Ahmed",
+            "room": "Room 648"
+          },
+          {
+            "period": 3,
+            "subject": "Financial Management",
+            "teacher": "Dr. Madhu Totla",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Financial Database Analysis and Software (Merge with BMS 4A)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 503"
+          },
+          {
+            "period": 5,
+            "subject": "Quantitative Techniques for Management",
+            "teacher": "Dr. Rishi Rajan Sahay",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Personality Development and Communication",
+            "teacher": "Dr. Anikta",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Science and Society (Merge with BMS 4D)",
+            "teacher": "Dr. Paritosh Ahmed",
+            "room": "Room 648"
+          },
+          {
+            "period": 2,
+            "subject": "Prakhar",
+            "teacher": "Prakhar",
+            "room": "Room 648"
+          },
+          {
+            "period": 3,
+            "subject": "Human Resource Management",
+            "teacher": "Dr. Bhavya Bansal",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Quantitative Techniques for Management",
+            "teacher": "Dr. Rishi Rajan Sahay",
+            "room": "G1"
+          },
+          {
+            "period": 5,
+            "subject": "Human Resource Management",
+            "teacher": "Dr. Bhavya Bansal",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Personality Development and Communication",
+            "teacher": "Dr. Anikta",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 2,
+            "subject": "Financial Management",
+            "teacher": "Dr. Madhu Totla",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Fund Raising and Mangement of Entrepreneurs",
+            "teacher": "Ms. Bharti Singh",
+            "room": "Room 523"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Merger Acquisitions and Corporate Restructuring",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Tute"
+          },
+          {
+            "period": 5,
+            "subject": "EVS II",
+            "teacher": "Dr. Pooja",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Financial Database Analysis and Software (Merge with BMS 4A)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 503"
+          },
+          {
+            "period": 7,
+            "subject": "Merger Acquisitions and Corporate Restructuring",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 503"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Financial Management",
+            "teacher": "Dr. Madhu Totla",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Financial Database Analysis and Software (Merge with BMS 4A)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 503"
+          },
+          {
+            "period": 3,
+            "subject": "Quantitative Techniques for Management",
+            "teacher": "Dr. Rishi Rajan Sahay",
+            "room": "G1"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Merger Acquisitions and Corporate Restructuring",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "P"
+          },
+          {
+            "period": 5,
+            "subject": "EVS II",
+            "teacher": "Dr. Pooja",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "EVS II",
+            "teacher": "Dr. Pooja",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "Human Resource Management",
+            "teacher": "Dr. Bhavya Bansal",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Human Resource Management",
+            "teacher": "Dr. Bhavya Bansal",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Merger Acquisitions and Corporate Restructuring",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 523"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Merger Acquisitions and Corporate Restructuring",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "P"
+          },
+          {
+            "period": 5,
+            "subject": "Quantitative Techniques for Management",
+            "teacher": "Dr. Rishi Rajan Sahay",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Quantitative Techniques for Management",
+            "teacher": "Dr. Rishi Rajan Sahay",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ]
+      },
+      "C": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "Fund Raising and Mangement of Entrepreneurs",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Quantitative Techniques for Management",
+            "teacher": "Dr. Mona Verma",
+            "room": "G2"
+          },
+          {
+            "period": 3,
+            "subject": "Financial Management",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Financial Database Analysis and Software (Merge with BMS 4A)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 503"
+          },
+          {
+            "period": 5,
+            "subject": "Science and Society (Merge with BMS 4A)",
+            "teacher": "Dr. Pooja",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Science and Society (Merge with BMS 4A)",
+            "teacher": "Dr. Pooja",
+            "room": "Room 503"
+          },
+          {
+            "period": 7,
+            "subject": "Nisha",
+            "teacher": "Nisha",
+            "room": "Room 503"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Fund Raising and Mangement of Entrepreneurs",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Fund Raising and Mangement of Entrepreneurs",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Quantitative Techniques for Management",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "EVS II",
+            "teacher": "Dr. Guncha Sharma",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Financial Management",
+            "teacher": "Dr. Amit Kumar",
+            "room": "G1"
+          },
+          {
+            "period": 6,
+            "subject": "Science and Society (Merge with BMS 4A)",
+            "teacher": "Dr. Pooja",
+            "room": "Room 503"
+          },
+          {
+            "period": 7,
+            "subject": "Nisha",
+            "teacher": "Nisha",
+            "room": "Room 503"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Financial Management",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Human Resource Management",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Fund Raising and Mangement of Entrepreneurs",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Human Resource Management",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Quantitative Techniques for Management",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Financial Database Analysis and Software (Merge with BMS 4A)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 503"
+          },
+          {
+            "period": 7,
+            "subject": "Financial Database Analysis and Software (Merge with BMS 4A)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 503"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Fund Raising and Mangement of Entrepreneurs",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Financial Database Analysis and Software (Merge with BMS 4A)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 503"
+          },
+          {
+            "period": 3,
+            "subject": "Quantitative Techniques for Management",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Human Resource Management",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Quantitative Techniques for Management",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "EVS II",
+            "teacher": "Dr. Guncha Sharma",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "EVS II",
+            "teacher": "Dr. Guncha Sharma",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Financial Management",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Financial Management",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Personality Development and Communication",
+            "teacher": "Ms. Monika",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Personality Development and Communication",
+            "teacher": "Ms. Monika",
+            "room": "Room 703"
+          }
+        ]
+      },
+      "D": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "Science and Society (Merge with BMS 4B)",
+            "teacher": "Dr. Paritosh Ahmed",
+            "room": "Room 507"
+          },
+          {
+            "period": 2,
+            "subject": "Science and Society (Merge with BMS 4B)",
+            "teacher": "Dr. Paritosh Ahmed",
+            "room": "Room 507"
+          },
+          {
+            "period": 3,
+            "subject": "Fund Raising and Management for Entrepreneurs",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Quantitative Techniques for Management",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 534"
+          },
+          {
+            "period": 5,
+            "subject": "Personality Development and Communication",
+            "teacher": "Ms. Monika",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Financial Database Analysis and Software (Merged with BBA 4B)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 557"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Science and Society (Merge with BMS 4B)",
+            "teacher": "Dr. Paritosh Ahmed",
+            "room": "Room 507"
+          },
+          {
+            "period": 2,
+            "subject": "Indigenous Sports (Merge with BMS 4B)",
+            "teacher": "Mr. Prakhar",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Fund Raising and Management for Entrepreneurs",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Financial Management",
+            "teacher": "Dr. Amit Kumar",
+            "room": "G1"
+          },
+          {
+            "period": 5,
+            "subject": "Quantitative Techniques for Management",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Fund Raising and Management for Entrepreneurs",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "EVS II",
+            "teacher": "Dr. Guncha Sharma",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "EVS II",
+            "teacher": "Dr. Guncha Sharma",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Financial Management",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Human Resource Management",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Financial Database Analysis and Software (Merged with BBA 4B)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 557"
+          },
+          {
+            "period": 2,
+            "subject": "Fund Raising and Management for Entrepreneurs",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Fund Raising and Management for Entrepreneurs",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Quantitative Techniques for Management",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Financial Management",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Human Resource Management",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "Financial Management",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Quantitative Techniques for Management",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "EVS II",
+            "teacher": "Dr. Guncha Sharma",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Quantitative Techniques for Management",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 337"
+          },
+          {
+            "period": 5,
+            "subject": "Human Resource Management",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Financial Database Analysis and Software (Merged with BBA 4B)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 557"
+          },
+          {
+            "period": 7,
+            "subject": "Financial Database Analysis and Software (Merged with BBA 4B)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 557"
+          }
+        ]
+      }
+    },
+    "6": {
+      "A": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Ms. Abha Shukla",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Ms. Abha Shukla",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Business Strategies",
+            "teacher": "Mr. Praveen",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Operations Management",
+            "teacher": "Dr. Amrina Kausar",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Ms. Abha Shukla",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Financial Institutions & Markets",
+            "teacher": "Mr. Raj Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Business Strategies",
+            "teacher": "Mr. Praveen",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Business Strategies",
+            "teacher": "Mr. Praveen",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "International Marketing (Merge with BMS 8th)",
+            "teacher": "Mr. Tushar Marwah",
+            "room": "Room 523"
+          },
+          {
+            "period": 6,
+            "subject": "International Marketing (Merge with BMS 8th)",
+            "teacher": "Mr. Tushar Marwah",
+            "room": "Room 523"
+          },
+          {
+            "period": 7,
+            "subject": "App Development using Flutter",
+            "teacher": "Dr. Rama",
+            "room": "Room 307"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Financial Institutions & Markets",
+            "teacher": "Mr. Raj Kumar",
+            "room": "Room 338"
+          },
+          {
+            "period": 2,
+            "subject": "Business Strategies",
+            "teacher": "Mr. Praveen",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Operations Management",
+            "teacher": "Dr. Amrina Kausar",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Financial Institutions & Markets",
+            "teacher": "Mr. Raj Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Marketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 523"
+          },
+          {
+            "period": 6,
+            "subject": "Marketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 523"
+          },
+          {
+            "period": 7,
+            "subject": "Marketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 651"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Cyber Sphere and Security: Global Concern",
+            "teacher": "Ms. Seema",
+            "room": "Room 307/326"
+          },
+          {
+            "period": 2,
+            "subject": "Cyber Sphere and Security: Global Concern",
+            "teacher": "Ms. Seema",
+            "room": "Room 307/326"
+          },
+          {
+            "period": 3,
+            "subject": "International Marketing (Merge with BMS 8th)",
+            "teacher": "Mr. Tushar Marwah",
+            "room": "Room 523"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Financial Institutions & Markets",
+            "teacher": "Mr. Raj Kumar",
+            "room": "Room 337"
+          },
+          {
+            "period": 5,
+            "subject": "Operations Management",
+            "teacher": "Dr. Amrina Kausar",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Marketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 523"
+          },
+          {
+            "period": 7,
+            "subject": "Marketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 651"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Ms. Abha Shukla",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Ms. Abha Shukla",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Operations Management",
+            "teacher": "Dr. Amrina Kausar",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Financial Institutions & Markets",
+            "teacher": "Mr. Raj Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "International Marketing (Merge with BMS 8th)",
+            "teacher": "Mr. Tushar Marwah",
+            "room": "Room 523"
+          },
+          {
+            "period": 6,
+            "subject": "Social Entrepreneurship",
+            "teacher": "Social Entrepreneurship",
+            "room": "Unsupervised"
+          },
+          {
+            "period": 7,
+            "subject": "Cyber Sphere and Security: Global Concern",
+            "teacher": "Ms. Seema",
+            "room": "Room 307/326"
+          }
+        ]
+      },
+      "B": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "Business Strategies",
+            "teacher": "Mr. Tushar Marwah",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Operations Management",
+            "teacher": "Dr. Amrina Kausar",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Research Methodolgy\r\nMerge with BMS 6C",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 361"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Financial Institutions & Markets",
+            "teacher": "Mr. Raj Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Interagrated Marketing and Communications",
+            "teacher": "Dr. Anuja Mathur",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Interagrated Marketing and Communications",
+            "teacher": "Dr. Anuja Mathur",
+            "room": "Tute"
+          },
+          {
+            "period": 7,
+            "subject": "Social Entrepreneurship",
+            "teacher": "Social Entrepreneurship",
+            "room": "Unsupervised"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Ms. Ritika Aggarwal",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Ms. Ritika Aggarwal",
+            "room": "P"
+          },
+          {
+            "period": 3,
+            "subject": "Financial Institutions & Markets",
+            "teacher": "Mr. Raj Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Interagrated Marketing and Communications",
+            "teacher": "Dr. Anuja Mathur",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Operations Management",
+            "teacher": "Dr. Amrina Kausar",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Research Methodolgy\r\nMerge with BMS 6C",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 361"
+          },
+          {
+            "period": 7,
+            "subject": "App Development using Flutter",
+            "teacher": "Dr. Rama",
+            "room": "P"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Ms. Ritika Aggarwal",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Ms. Ritika Aggarwal",
+            "room": "P"
+          },
+          {
+            "period": 3,
+            "subject": "Business Strategies",
+            "teacher": "Mr. Tushar Marwah",
+            "room": "Room 338"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Operations Management",
+            "teacher": "Dr. Amrina Kausar",
+            "room": "Room 361"
+          },
+          {
+            "period": 5,
+            "subject": "Marketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 523"
+          },
+          {
+            "period": 6,
+            "subject": "Marketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 523"
+          },
+          {
+            "period": 7,
+            "subject": "Marketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 651"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Interagrated Marketing and Communications",
+            "teacher": "Dr. Anuja Mathur",
+            "room": "Room 307/326"
+          },
+          {
+            "period": 2,
+            "subject": "Interagrated Marketing and Communications",
+            "teacher": "Dr. Anuja Mathur",
+            "room": "Room 307/326"
+          },
+          {
+            "period": 3,
+            "subject": "Financial Institutions & Markets",
+            "teacher": "Mr. Raj Kumar",
+            "room": "Room 534"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Business Strategies",
+            "teacher": "Mr. Tushar Marwah",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Financial Institutions & Markets",
+            "teacher": "Mr. Raj Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Marketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 523"
+          },
+          {
+            "period": 7,
+            "subject": "Marketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 651"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Ms. Ritika Aggarwal",
+            "room": "P"
+          },
+          {
+            "period": 2,
+            "subject": "Business Strategies",
+            "teacher": "Mr. Tushar Marwah",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Research Methodolgy\r\nMerge with BMS 6C",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 361"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Interagrated Marketing and Communications",
+            "teacher": "Dr. Anuja Mathur",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Operations Management",
+            "teacher": "Dr. Amrina Kausar",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Business Strategies",
+            "teacher": "Mr. Tushar Marwah",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Interagrated Marketing and Communications",
+            "teacher": "Dr. Anuja Mathur",
+            "room": "Room 307/326"
+          }
+        ]
+      },
+      "C": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "Business Strategies",
+            "teacher": "Mr. Praveen",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Business Strategies",
+            "teacher": "Mr. Praveen",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Research Methodolgy\r\nMerge with BMS 6B",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "App Development using Flutter",
+            "teacher": "Ms. Ayushi",
+            "room": "Room 361/326"
+          },
+          {
+            "period": 5,
+            "subject": "App Development using Flutter",
+            "teacher": "Ms. Ayushi",
+            "room": "Room 361/326"
+          },
+          {
+            "period": 6,
+            "subject": "Business Analysis and Valuation",
+            "teacher": "Dr. Neeraj Kumar Sehrawat",
+            "room": "G1+G2"
+          },
+          {
+            "period": 7,
+            "subject": "Operations Management",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "Room 703"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Operations Management",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Business Strategies",
+            "teacher": "Mr. Praveen",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Financial Institutions & Markets",
+            "teacher": "Mr. Mohd. Rashid",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Research Methodolgy\r\nMerge with BMS 6B",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Dr. Ramesh kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Business Analysis and Valuation",
+            "teacher": "Dr. Neeraj Kumar Sehrawat",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Business Strategies",
+            "teacher": "Mr. Praveen",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Financial Institutions & Markets",
+            "teacher": "Mr. Mohd. Rashid",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Operations Management",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Research Methodolgy\r\nMerge with BMS 6B",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Dr. Ramesh kumar",
+            "room": "Room 523"
+          },
+          {
+            "period": 6,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Dr. Ramesh kumar",
+            "room": "Room 523"
+          },
+          {
+            "period": 7,
+            "subject": "Marketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 651"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Cyber Sphere and Security: Global Concern",
+            "teacher": "Ms. Seema",
+            "room": "Room 303"
+          },
+          {
+            "period": 2,
+            "subject": "Cyber Sphere and Security: Global Concern",
+            "teacher": "Ms. Seema",
+            "room": "Room 303"
+          },
+          {
+            "period": 3,
+            "subject": "Financial Institutions & Markets",
+            "teacher": "Mr. Mohd. Rashid",
+            "room": "Room 236"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Financial Institutions & Markets",
+            "teacher": "Mr. Mohd. Rashid",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Business Analysis and Valuation",
+            "teacher": "Dr. Neeraj Kumar Sehrawat",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Dr. Ramesh kumar",
+            "room": "Room 523"
+          },
+          {
+            "period": 7,
+            "subject": "Marketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 651"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "Social Entrepreneurship",
+            "teacher": "Social Entrepreneurship",
+            "room": "Unsupervised"
+          },
+          {
+            "period": 2,
+            "subject": "Financial Institutions & Markets",
+            "teacher": "Mr. Mohd. Rashid",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Research Methodolgy\r\nMerge with BMS 6B",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Operations Management",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Dr. Ramesh kumar",
+            "room": "P"
+          },
+          {
+            "period": 6,
+            "subject": "Business Analysis and Valuation",
+            "teacher": "Dr. Neeraj Kumar Sehrawat",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Cyber Sphere and Security: Global Concern",
+            "teacher": "Ms. Seema",
+            "room": "Room 303/326"
+          }
+        ]
+      },
+      "D": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "Financial Institutions & Markets",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Business Strategies",
+            "teacher": "Mr. Tushar Marwah",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Business Strategies",
+            "teacher": "Mr. Tushar Marwah",
+            "room": "Room 237"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Operations Management",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Business Analysis and Valuation",
+            "teacher": "Mr. Ishant",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Business Analysis and Valuation",
+            "teacher": "Mr. Ishant",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 2,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Ms. Abha Shukla",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Business Strategies",
+            "teacher": "Mr. Tushar Marwah",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Business Strategies",
+            "teacher": "Mr. Tushar Marwah",
+            "room": "Room 236"
+          },
+          {
+            "period": 5,
+            "subject": "Business Analysis and Valuation",
+            "teacher": "Mr. Ishant",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Cyber Sphere and Security: Global Concern",
+            "teacher": "Ms. Seema",
+            "room": "Room 257/651"
+          },
+          {
+            "period": 7,
+            "subject": "Cyber Sphere and Security: Global Concern",
+            "teacher": "Ms. Seema",
+            "room": "Room 257/651"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Ms. Abha Shukla",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Ms. Abha Shukla",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Social Entrepreneurship",
+            "teacher": "Social Entrepreneurship",
+            "room": "Unsupervised"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Operations Management",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Marketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 523"
+          },
+          {
+            "period": 6,
+            "subject": "Marketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 523"
+          },
+          {
+            "period": 7,
+            "subject": "Marketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 651"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Ms. Abha Shukla",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Ms. Abha Shukla",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Financial Institutions & Markets",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Financial Institutions & Markets",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 338"
+          },
+          {
+            "period": 5,
+            "subject": "Business Strategies",
+            "teacher": "Mr. Tushar Marwah",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Marketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 523"
+          },
+          {
+            "period": 7,
+            "subject": "Marketing Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 651"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 2,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 3,
+            "subject": "Operations Management",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Financial Institutions & Markets",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Business Analysis and Valuation",
+            "teacher": "Mr. Ishant",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Cyber Sphere and Security: Global Concern",
+            "teacher": "Ms. Seema",
+            "room": "Room 257/651"
+          },
+          {
+            "period": 7,
+            "subject": "App Development using Flutter",
+            "teacher": "Mr. Vineet",
+            "room": "Room 257/651"
+          }
+        ]
+      }
+    },
+    "8": {
+      "A": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 2,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 3,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 5,
+            "subject": "Machine learning and Application\r\n(Merge with BBA 2B) (Room No. 253)",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "Room 253"
+          },
+          {
+            "period": 6,
+            "subject": "Machine learning and Application\r\n(Merge with BBA 2B) (Room No. 253)",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "Room 326"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Social entrepreneurship and social Innovation\r\n(Merge with BMS 6B) (Room No. 307)",
+            "teacher": "Ms. Ritika Aggarwal",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Brand Management\r\n(Merge with BMS 4A)",
+            "teacher": "Ms. Bhavya Bansal",
+            "room": "P"
+          },
+          {
+            "period": 3,
+            "subject": "Machine learning and Application\r\n(Merge with BBA 2B) (Room No. 253)",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "MIS"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Brand Management\r\n(Merge with BMS 4A)",
+            "teacher": "Ms. Bhavya Bansal",
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "International Marketing\r\n(Merge with BMS 6A)",
+            "teacher": "Mr. Tushar Marwah",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "International Marketing\r\n(Merge with BMS 6A)",
+            "teacher": "Mr. Tushar Marwah",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Machine learning and Application\r\n(Merge with BBA 2B) (Room No. 253)",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Machine learning and Application\r\n(Merge with BBA 2B) (Room No. 253)",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "P"
+          },
+          {
+            "period": 3,
+            "subject": "Fundraising and Mangement for Entreprenuers\r\n(Merge with BMS 4B)",
+            "teacher": "Ms. Bharti Singh",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Fundraising and Mangement for Entreprenuers\r\n(Merge with BMS 4B)",
+            "teacher": "Ms. Bharti Singh",
+            "room": "P"
+          },
+          {
+            "period": 5,
+            "subject": "Marketing Analytics\r\n(Merge with BMS 6A, 6B, 6C, 6D)",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Marketing Analytics\r\n(Merge with BMS 6A, 6B, 6C, 6D)",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Marketing Analytics\r\n(Merge with BMS 6A, 6B, 6C, 6D)",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 651"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Self Study Slot",
+            "teacher": "-",
+            "room": "Social Entrepreneurship"
+          },
+          {
+            "period": 2,
+            "subject": "Machine learning and Application\r\n(Merge with BBA 2B) (Room No. 253)",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "MIS"
+          },
+          {
+            "period": 3,
+            "subject": "International Marketing\r\n(Merge with BMS 6A)",
+            "teacher": "Mr. Tushar Marwah",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Fundraising and Mangement for Entreprenuers\r\n(Merge with BMS 4B)",
+            "teacher": "Ms. Bharti Singh",
+            "room": "P"
+          },
+          {
+            "period": 5,
+            "subject": "Machine learning and Application\r\n(Merge with BBA 2B) (Room No. 253)",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "Tute"
+          },
+          {
+            "period": 6,
+            "subject": "Marketing Analytics\r\n(Merge with BMS 6A, 6B, 6C, 6D)",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Marketing Analytics\r\n(Merge with BMS 6A, 6B, 6C, 6D)",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 651"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "Machine learning and Application\r\n(Merge with BBA 2B) (Room No. 253)",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "P"
+          },
+          {
+            "period": 2,
+            "subject": "Machine learning and Application\r\n(Merge with BBA 2B) (Room No. 253)",
+            "teacher": "Dr. Satish Kumar Goel",
+            "room": "MIS"
+          },
+          {
+            "period": 3,
+            "subject": "Fundraising and Mangement for Entreprenuers\r\n(Merge with BMS 4B)",
+            "teacher": "Ms. Bharti Singh",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Fundraising and Mangement for Entreprenuers\r\n(Merge with BMS 4B)",
+            "teacher": "Ms. Bharti Singh",
+            "room": "P"
+          },
+          {
+            "period": 5,
+            "subject": "International Marketing\r\n(Merge with BMS 6A)",
+            "teacher": "Mr. Tushar Marwah",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ]
+      }
+    }
+  },
+  "Bsc Comp Sci": {
+    "2": {
+      "A": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "GE - Numerical Methods",
+            "teacher": "Ms. Monika",
+            "room": "Room 237"
+          },
+          {
+            "period": 2,
+            "subject": "SEC - Web Design and Development",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 651"
+          },
+          {
+            "period": 3,
+            "subject": "VAC - Digital Empowerment",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 644"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Data Structures",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 326"
+          },
+          {
+            "period": 5,
+            "subject": "Discrete Mathematical Structures",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 237"
+          },
+          {
+            "period": 6,
+            "subject": "Computer System Architecture",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 651"
+          },
+          {
+            "period": 7,
+            "subject": "GE - Numerical Methods",
+            "teacher": "Ms. Monika",
+            "room": "Room 644"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "SEC - Web Design and Development",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 651"
+          },
+          {
+            "period": 2,
+            "subject": "VAC - Digital Empowerment",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 644"
+          },
+          {
+            "period": 3,
+            "subject": "Data Structures",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 326"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Discrete Mathematical Structures",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 237"
+          },
+          {
+            "period": 5,
+            "subject": "Computer System Architecture",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 651"
+          },
+          {
+            "period": 6,
+            "subject": "GE - Numerical Methods",
+            "teacher": "Ms. Monika",
+            "room": "Room 644"
+          },
+          {
+            "period": 7,
+            "subject": "SEC - Web Design and Development",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 326"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "VAC - Digital Empowerment",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 644"
+          },
+          {
+            "period": 2,
+            "subject": "Data Structures",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 326"
+          },
+          {
+            "period": 3,
+            "subject": "Discrete Mathematical Structures",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 237"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Computer System Architecture",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 651"
+          },
+          {
+            "period": 5,
+            "subject": "GE - Numerical Methods",
+            "teacher": "Ms. Monika",
+            "room": "Room 644"
+          },
+          {
+            "period": 6,
+            "subject": "SEC - Web Design and Development",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 326"
+          },
+          {
+            "period": 7,
+            "subject": "VAC - Digital Empowerment",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 237"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 2,
+            "subject": "Discrete Mathematical Structures",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 237"
+          },
+          {
+            "period": 3,
+            "subject": "Computer System Architecture",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 651"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "GE - Numerical Methods",
+            "teacher": "Ms. Monika",
+            "room": "Room 644"
+          },
+          {
+            "period": 5,
+            "subject": "SEC - Web Design and Development",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 326"
+          },
+          {
+            "period": 6,
+            "subject": "VAC - Digital Empowerment",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 237"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "Discrete Mathematical Structures",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 237"
+          },
+          {
+            "period": 2,
+            "subject": "Computer System Architecture",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 651"
+          },
+          {
+            "period": 3,
+            "subject": "GE - Numerical Methods",
+            "teacher": "Ms. Monika",
+            "room": "Room 644"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "SEC - Web Design and Development",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 326"
+          },
+          {
+            "period": 5,
+            "subject": "VAC - Digital Empowerment",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 237"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Discrete Mathematical Structures",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 644"
+          }
+        ]
+      }
+    },
+    "4": {
+      "A": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "VAC - Cyber Security",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 644"
+          },
+          {
+            "period": 2,
+            "subject": "Design & Analysis of Algorithms",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 326"
+          },
+          {
+            "period": 3,
+            "subject": "Database Management Systems",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 237"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Computer Networks",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 651"
+          },
+          {
+            "period": 5,
+            "subject": "DSE - Artificial Intelligence",
+            "teacher": "Ms. Monika",
+            "room": "Room 644"
+          },
+          {
+            "period": 6,
+            "subject": "SEC - Programming with Python",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 326"
+          },
+          {
+            "period": 7,
+            "subject": "VAC - Cyber Security",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 237"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 2,
+            "subject": "Database Management Systems",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 237"
+          },
+          {
+            "period": 3,
+            "subject": "Computer Networks",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 651"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "DSE - Artificial Intelligence",
+            "teacher": "Ms. Monika",
+            "room": "Room 644"
+          },
+          {
+            "period": 5,
+            "subject": "SEC - Programming with Python",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 326"
+          },
+          {
+            "period": 6,
+            "subject": "VAC - Cyber Security",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 237"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Database Management Systems",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 237"
+          },
+          {
+            "period": 2,
+            "subject": "Computer Networks",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 651"
+          },
+          {
+            "period": 3,
+            "subject": "DSE - Artificial Intelligence",
+            "teacher": "Ms. Monika",
+            "room": "Room 644"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "SEC - Programming with Python",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 326"
+          },
+          {
+            "period": 5,
+            "subject": "VAC - Cyber Security",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 237"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Database Management Systems",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 644"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Computer Networks",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 651"
+          },
+          {
+            "period": 2,
+            "subject": "DSE - Artificial Intelligence",
+            "teacher": "Ms. Monika",
+            "room": "Room 644"
+          },
+          {
+            "period": 3,
+            "subject": "SEC - Programming with Python",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 326"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "VAC - Cyber Security",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 237"
+          },
+          {
+            "period": 5,
+            "subject": "Design & Analysis of Algorithms",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 651"
+          },
+          {
+            "period": 6,
+            "subject": "Database Management Systems",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 644"
+          },
+          {
+            "period": 7,
+            "subject": "Computer Networks",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 326"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "DSE - Artificial Intelligence",
+            "teacher": "Ms. Monika",
+            "room": "Room 644"
+          },
+          {
+            "period": 2,
+            "subject": "SEC - Programming with Python",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 326"
+          },
+          {
+            "period": 3,
+            "subject": "VAC - Cyber Security",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 237"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Design & Analysis of Algorithms",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 651"
+          },
+          {
+            "period": 5,
+            "subject": "Database Management Systems",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 644"
+          },
+          {
+            "period": 6,
+            "subject": "Computer Networks",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 326"
+          },
+          {
+            "period": 7,
+            "subject": "DSE - Artificial Intelligence",
+            "teacher": "Ms. Monika",
+            "room": "Room 237"
+          }
+        ]
+      }
+    },
+    "6": {
+      "A": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "Theory of Computation",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 237"
+          },
+          {
+            "period": 2,
+            "subject": "DSE - Machine Learning",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 651"
+          },
+          {
+            "period": 3,
+            "subject": "GE - Data Science using R",
+            "teacher": "Ms. Monika",
+            "room": "Room 644"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Software Engineering",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 326"
+          },
+          {
+            "period": 5,
+            "subject": "Operating Systems",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 237"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "DSE - Machine Learning",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 644"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "DSE - Machine Learning",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 651"
+          },
+          {
+            "period": 2,
+            "subject": "GE - Data Science using R",
+            "teacher": "Ms. Monika",
+            "room": "Room 644"
+          },
+          {
+            "period": 3,
+            "subject": "Software Engineering",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 326"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Operating Systems",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 237"
+          },
+          {
+            "period": 5,
+            "subject": "Theory of Computation",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 651"
+          },
+          {
+            "period": 6,
+            "subject": "DSE - Machine Learning",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 644"
+          },
+          {
+            "period": 7,
+            "subject": "GE - Data Science using R",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 326"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "GE - Data Science using R",
+            "teacher": "Ms. Monika",
+            "room": "Room 644"
+          },
+          {
+            "period": 2,
+            "subject": "Software Engineering",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 326"
+          },
+          {
+            "period": 3,
+            "subject": "Operating Systems",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 237"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Theory of Computation",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 651"
+          },
+          {
+            "period": 5,
+            "subject": "DSE - Machine Learning",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 644"
+          },
+          {
+            "period": 6,
+            "subject": "GE - Data Science using R",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 326"
+          },
+          {
+            "period": 7,
+            "subject": "Software Engineering",
+            "teacher": "Ms. Monika",
+            "room": "Room 237"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Software Engineering",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 326"
+          },
+          {
+            "period": 2,
+            "subject": "Operating Systems",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 237"
+          },
+          {
+            "period": 3,
+            "subject": "Theory of Computation",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 651"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "DSE - Machine Learning",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 644"
+          },
+          {
+            "period": 5,
+            "subject": "GE - Data Science using R",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 326"
+          },
+          {
+            "period": 6,
+            "subject": "Software Engineering",
+            "teacher": "Ms. Monika",
+            "room": "Room 237"
+          },
+          {
+            "period": 7,
+            "subject": "Operating Systems",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 651"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "Operating Systems",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 237"
+          },
+          {
+            "period": 2,
+            "subject": "Theory of Computation",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 651"
+          },
+          {
+            "period": 3,
+            "subject": "DSE - Machine Learning",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 644"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "GE - Data Science using R",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 326"
+          },
+          {
+            "period": 5,
+            "subject": "Software Engineering",
+            "teacher": "Ms. Monika",
+            "room": "Room 237"
+          },
+          {
+            "period": 6,
+            "subject": "Operating Systems",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 651"
+          },
+          {
+            "period": 7,
+            "subject": "Theory of Computation",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 644"
+          }
+        ]
+      }
+    },
+    "8": {
+      "A": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "DSE - Cloud Computing",
+            "teacher": "Ms. Monika",
+            "room": "Room 644"
+          },
+          {
+            "period": 2,
+            "subject": "DSE - Internet of Things (IoT)",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 326"
+          },
+          {
+            "period": 3,
+            "subject": "SEC - Capstone Project",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 237"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Information Security",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 651"
+          },
+          {
+            "period": 5,
+            "subject": "DSE - Cloud Computing",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 644"
+          },
+          {
+            "period": 6,
+            "subject": "DSE - Internet of Things (IoT)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 326"
+          },
+          {
+            "period": 7,
+            "subject": "SEC - Capstone Project",
+            "teacher": "Ms. Monika",
+            "room": "Room 237"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "DSE - Internet of Things (IoT)",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 326"
+          },
+          {
+            "period": 2,
+            "subject": "SEC - Capstone Project",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 237"
+          },
+          {
+            "period": 3,
+            "subject": "Information Security",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 651"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "DSE - Cloud Computing",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 644"
+          },
+          {
+            "period": 5,
+            "subject": "DSE - Internet of Things (IoT)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 326"
+          },
+          {
+            "period": 6,
+            "subject": "SEC - Capstone Project",
+            "teacher": "Ms. Monika",
+            "room": "Room 237"
+          },
+          {
+            "period": 7,
+            "subject": "Information Security",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 651"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "SEC - Capstone Project",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 237"
+          },
+          {
+            "period": 2,
+            "subject": "Information Security",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 651"
+          },
+          {
+            "period": 3,
+            "subject": "DSE - Cloud Computing",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 644"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "DSE - Internet of Things (IoT)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 326"
+          },
+          {
+            "period": 5,
+            "subject": "SEC - Capstone Project",
+            "teacher": "Ms. Monika",
+            "room": "Room 237"
+          },
+          {
+            "period": 6,
+            "subject": "Information Security",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 651"
+          },
+          {
+            "period": 7,
+            "subject": "DSE - Cloud Computing",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 644"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 2,
+            "subject": "DSE - Cloud Computing",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 644"
+          },
+          {
+            "period": 3,
+            "subject": "DSE - Internet of Things (IoT)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 326"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "SEC - Capstone Project",
+            "teacher": "Ms. Monika",
+            "room": "Room 237"
+          },
+          {
+            "period": 5,
+            "subject": "Information Security",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 651"
+          },
+          {
+            "period": 6,
+            "subject": "DSE - Cloud Computing",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 644"
+          },
+          {
+            "period": 7,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "DSE - Cloud Computing",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 644"
+          },
+          {
+            "period": 2,
+            "subject": "DSE - Internet of Things (IoT)",
+            "teacher": "Dr. Narander Kumar Nigam",
+            "room": "Room 326"
+          },
+          {
+            "period": 3,
+            "subject": "SEC - Capstone Project",
+            "teacher": "Ms. Monika",
+            "room": "Room 237"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Information Security",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 651"
+          },
+          {
+            "period": 5,
+            "subject": "DSE - Cloud Computing",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 644"
+          },
+          {
+            "period": 6,
+            "subject": "Free / Study Slot",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "SEC - Capstone Project",
+            "teacher": "Mr. Tatkarsh",
+            "room": "Room 237"
+          }
+        ]
+      }
+    }
+  }
+}
