@@ -296,7 +296,7 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                                 onChange={(e) => handleSubjectChange(sub.id, 'grade', e.target.value)}
                               >
                                 {Object.keys(GRADE_POINTS).map(g => (
-                                  <option key={g} value={g}>{g} ({GRADE_POINTS[g]} gpa)</option>
+                                  <option key={g} value={g}>{g} ({GRADE_POINTS[g]} GPA)</option>
                                 ))}
                               </select>
                             </td>
