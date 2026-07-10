@@ -3,12 +3,14 @@ import { useAuth } from './context/AuthContext';
 import Auth from './components/Auth';
 import ProfileModal from './components/ProfileModal';
 import ClassSchedulesCard from './components/ClassSchedulesCard';
+import FindMyProfessor from './components/FindMyProfessor';
 import './App.css';
 import { Analytics } from '@vercel/analytics/react';
 
 function App() {
   const { user, loading } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isProfTrackerOpen, setIsProfTrackerOpen] = useState(false);
 
   if (loading) {
     return (
@@ -31,10 +33,6 @@ function App() {
   const userCourse = user.user_metadata?.course;
   const userSemester = user.user_metadata?.semester;
   const userSection = user.user_metadata?.section;
-
-
-
-
 
   return (
     <>
@@ -87,13 +85,24 @@ function App() {
         {/* Main Workspace Dashboard */}
         <main className="workspace-main">
 
-
           {/* Core Feature: Timetable Schedule Tracker */}
           <ClassSchedulesCard onOpenProfile={() => setIsProfileOpen(true)} />
 
           {/* Student Tools Grid */}
           <section className="dashboard-grid">
             
+            {/* Active Feature: Find My Professor */}
+            <div className="dashboard-card active-card" onClick={() => setIsProfTrackerOpen(true)}>
+              <div className="card-header">
+                <h3>Find My Professor</h3>
+                <span className="badge-active">Track Live</span>
+              </div>
+              <p>Locate where any faculty member is teaching right now. View their current room, daily timeline, and full weekly schedule.</p>
+              <div className="card-footer">
+                <span className="btn-card-action">Launch Tracker →</span>
+              </div>
+            </div>
+
             <div className="dashboard-card locked">
               <div className="card-header">
                 <h3>Waiver Tool</h3>
@@ -132,6 +141,12 @@ function App() {
       <ProfileModal 
         isOpen={isProfileOpen} 
         onClose={() => setIsProfileOpen(false)} 
+      />
+
+      {/* Find My Professor Modal */}
+      <FindMyProfessor
+        isOpen={isProfTrackerOpen}
+        onClose={() => setIsProfTrackerOpen(false)}
       />
 
       <Analytics />
