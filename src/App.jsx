@@ -43,14 +43,6 @@ function App() {
     return 'Good night';
   };
 
-  const handleMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
-    e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
-  };
-
   const handleLogout = async () => {
     try {
       await signOut();
@@ -118,7 +110,7 @@ function App() {
           {/* Student Tools Grid */}
           <section className="dashboard-grid">
             
-            <div className="dashboard-card locked spotlight-card" onMouseMove={handleMouseMove}>
+            <div className="dashboard-card locked">
               <div className="card-header">
                 <h3>Waiver Tool</h3>
               </div>
@@ -128,7 +120,7 @@ function App() {
               </div>
             </div>
 
-            <div className="dashboard-card locked spotlight-card" onMouseMove={handleMouseMove}>
+            <div className="dashboard-card locked">
               <div className="card-header">
                 <h3>GPA Calculator</h3>
               </div>
@@ -138,7 +130,7 @@ function App() {
               </div>
             </div>
 
-            <div className="dashboard-card locked spotlight-card" onMouseMove={handleMouseMove}>
+            <div className="dashboard-card locked">
               <div className="card-header">
                 <h3>PYQs & Resources</h3>
               </div>

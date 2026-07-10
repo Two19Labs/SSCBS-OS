@@ -111,15 +111,6 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
     return Math.max(0, Math.min(100, progress));
   };
 
-  // Mouse move handler for card spotlight effect
-  const handleMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
-    e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
-  };
-
   // Find active and next classes
   let activeClass = null;
   let nextClass = null;
@@ -155,7 +146,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
   };
 
   return (
-    <div className={`schedule-card-container spotlight-card ${hasConfiguredProfile ? 'active-tracker' : 'configure-prompt'}`} onMouseMove={handleMouseMove}>
+    <div className={`schedule-card-container ${hasConfiguredProfile ? 'active-tracker' : 'configure-prompt'}`}>
       
       {/* 1. Prompt state if profile not configured */}
       {!hasConfiguredProfile ? (
@@ -200,7 +191,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
             {/* Current status display */}
             <div className="tracker-main-status">
               {isWeekend ? (
-                <div className="status-hero inactive spotlight-card" onMouseMove={handleMouseMove}>
+                <div className="status-hero inactive">
                   <div className="hero-details">
                     <span className="badge-status weekend">Break</span>
                     <h3>No Classes Today</h3>
@@ -208,7 +199,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                   </div>
                 </div>
               ) : activeClass && activeClass.subject !== 'Free / Study Slot' && !activeClass.isBreak ? (
-                <div className="status-hero ongoing spotlight-card" onMouseMove={handleMouseMove}>
+                <div className="status-hero ongoing">
                   <div className="hero-details">
                     <span className="badge-status live">Ongoing Now</span>
                     <h3>{activeClass.subject}</h3>
@@ -226,11 +217,11 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                   </div>
                 </div>
               ) : activeClass && activeClass.isBreak ? (
-                <div className="status-hero break spotlight-card" onMouseMove={handleMouseMove}>
+                <div className="status-hero break">
                   <div className="hero-details">
                     <span className="badge-status break-badge">Infinity Hour</span>
-                    <h3>Lunch / Mid-day Break</h3>
-                    <p>Relax and regroup. No unsupervised course lectures active during this block.</p>
+                    <h3>Break</h3>
+                    <p>It's Infy, go to Nescafe/Amul and chill! :)</p>
                   </div>
                   <div className="hero-progress">
                     <div className="progress-bar-container">
@@ -243,7 +234,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                   </div>
                 </div>
               ) : activeClass && activeClass.subject === 'Free / Study Slot' ? (
-                <div className="status-hero free-slot spotlight-card" onMouseMove={handleMouseMove}>
+                <div className="status-hero free-slot">
                   <div className="hero-details">
                     <span className="badge-status free">Study Hour</span>
                     <h3>Self Study / Free Slot</h3>
@@ -260,7 +251,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                   </div>
                 </div>
               ) : (
-                <div className="status-hero inactive spotlight-card" onMouseMove={handleMouseMove}>
+                <div className="status-hero inactive">
                   <div className="hero-details">
                     <span className="badge-status offline">Classes Completed</span>
                     <h3>Academic Slots Inactive</h3>
@@ -270,10 +261,10 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
               )}
 
               {/* Next Class Panel */}
-              <div className="tracker-next-class-panel spotlight-card" onMouseMove={handleMouseMove}>
+              <div className="tracker-next-class-panel">
                 <h4>Next Scheduled Block</h4>
                 {nextClass ? (
-                  <div className="next-class-card spotlight-card" onMouseMove={handleMouseMove}>
+                  <div className="next-class-card">
                     <div className="next-class-icon">
                       <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none">
                         <circle cx="12" cy="12" r="10" />
@@ -318,8 +309,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                     return (
                       <div 
                         key={cls.period} 
-                        className={`timeline-slot-card spotlight-card ${isActive ? 'active' : ''} ${isPast ? 'past' : ''} ${isUpcoming ? 'upcoming' : ''}`}
-                        onMouseMove={handleMouseMove}
+                        className={`timeline-slot-card ${isActive ? 'active' : ''} ${isPast ? 'past' : ''} ${isUpcoming ? 'upcoming' : ''}`}
                       >
                         <div className="timeline-slot-time">
                           <span>{periodInfo.startLabel}</span>
