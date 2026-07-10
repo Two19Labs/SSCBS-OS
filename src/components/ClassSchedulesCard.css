@@ -537,6 +537,7 @@
   border: 1px solid var(--border-color);
   border-radius: 10px;
   background: rgba(7, 11, 18, 0.4);
+  -webkit-overflow-scrolling: touch;
 }
 
 .weekly-timetable-table {
@@ -682,4 +683,78 @@
   0% { transform: scale(0.9); opacity: 0.6; }
   50% { transform: scale(1.15); opacity: 1; }
   100% { transform: scale(0.9); opacity: 0.6; }
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 600px) {
+  .tracker-grid {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .tracker-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .tracker-time-display {
+    align-items: flex-start;
+  }
+
+  .status-hero {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .status-hero h3 {
+    font-size: 1.1rem;
+  }
+
+  .status-hero p {
+    font-size: 0.775rem;
+  }
+
+  .timeline-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+  }
+
+  /* Weekly Modal full-screen bottom-sheet adaptation */
+  .weekly-modal-overlay {
+    padding: 0;
+  }
+
+  .weekly-modal-card {
+    max-width: 100%;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+  }
+
+  .weekly-modal-header {
+    padding: 16px;
+  }
+
+  .weekly-modal-body {
+    padding: 16px;
+  }
+
+  .weekly-modal-footer {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .btn-close-modal {
+    width: 100%;
+  }
+
+  .debugger-controls-row {
+    flex-direction: column;
+    gap: 10px;
+  }
 }

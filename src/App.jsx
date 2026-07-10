@@ -60,7 +60,6 @@ function App() {
             <img className="header-logo-img" src="/sscbs_logo.png" alt="SSCBS Crest" width="32" height="32" />
             <span className="workspace-title">
               SSCBS <span className="title-highlight">Campus OS</span>
-              <span className="version-badge">v1.0.0</span>
             </span>
           </div>
           <div className="header-right">
