@@ -3,13 +3,13 @@ import { useAuth } from '../context/AuthContext';
 import './GpaCalculatorModal.css';
 
 const DEFAULT_SLOTS = [
-  { id: 1, name: 'Discipline Specific Core 1 (DSC-1)', credits: 4, mode: 'grade', grade: 'O', theoryMarks: '', internalMarks: '' },
-  { id: 2, name: 'Discipline Specific Core 2 (DSC-2)', credits: 4, mode: 'grade', grade: 'O', theoryMarks: '', internalMarks: '' },
-  { id: 3, name: 'Discipline Specific Core 3 (DSC-3)', credits: 4, mode: 'grade', grade: 'O', theoryMarks: '', internalMarks: '' },
-  { id: 4, name: 'Generic Elective (GE)', credits: 4, mode: 'grade', grade: 'O', theoryMarks: '', internalMarks: '' },
-  { id: 5, name: 'Ability Enhancement Course (AEC)', credits: 2, mode: 'grade', grade: 'O', theoryMarks: '', internalMarks: '' },
-  { id: 6, name: 'Skill Enhancement Course (SEC)', credits: 2, mode: 'grade', grade: 'O', theoryMarks: '', internalMarks: '' },
-  { id: 7, name: 'Value Addition Course (VAC)', credits: 2, mode: 'grade', grade: 'O', theoryMarks: '', internalMarks: '' },
+  { id: 1, name: 'DSC-1', credits: 4, grade: 'O' },
+  { id: 2, name: 'DSC-2', credits: 4, grade: 'O' },
+  { id: 3, name: 'DSC-3', credits: 4, grade: 'O' },
+  { id: 4, name: 'GE', credits: 4, grade: 'O' },
+  { id: 5, name: 'AEC', credits: 2, grade: 'O' },
+  { id: 6, name: 'SEC', credits: 2, grade: 'O' },
+  { id: 7, name: 'VAC', credits: 2, grade: 'O' },
 ];
 
 const GRADE_POINTS = {
@@ -75,26 +75,7 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
 
     subjects.forEach((sub) => {
       const credits = parseFloat(sub.credits) || 0;
-      let grade = 'F';
-
-      if (sub.mode === 'grade') {
-        grade = sub.grade || 'F';
-      } else {
-        // Marks Mode conversion
-        const theory = parseFloat(sub.theoryMarks) || 0;
-        const internal = parseFloat(sub.internalMarks) || 0;
-        const totalMarks = theory + internal; // Standard sum (out of 100)
-        
-        if (totalMarks >= 90) grade = 'O';
-        else if (totalMarks >= 80) grade = 'A+';
-        else if (totalMarks >= 70) grade = 'A';
-        else if (totalMarks >= 60) grade = 'B+';
-        else if (totalMarks >= 50) grade = 'B';
-        else if (totalMarks >= 45) grade = 'C';
-        else if (totalMarks >= 40) grade = 'D';
-        else grade = 'F';
-      }
-
+      const grade = sub.grade || 'F';
       const gp = GRADE_POINTS[grade] !== undefined ? GRADE_POINTS[grade] : 0;
       totalCredits += credits;
       totalPoints += gp * credits;
@@ -167,10 +148,7 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
         id: newId,
         name: `Subject Slot ${newId}`,
         credits: 4,
-        mode: 'grade',
-        grade: 'O',
-        theoryMarks: '',
-        internalMarks: ''
+        grade: 'O'
       }
     ]);
   };
@@ -212,20 +190,7 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
     return { name: 'Fail / Essential Repeat', class: 'fail' };
   };
 
-  const getSubjectCalculatedGrade = (sub) => {
-    if (sub.mode === 'grade') return sub.grade;
-    const theory = parseFloat(sub.theoryMarks) || 0;
-    const internal = parseFloat(sub.internalMarks) || 0;
-    const total = theory + internal;
-    if (total >= 90) return 'O';
-    if (total >= 80) return 'A+';
-    if (total >= 70) return 'A';
-    if (total >= 60) return 'B+';
-    if (total >= 50) return 'B';
-    if (total >= 45) return 'C';
-    if (total >= 40) return 'D';
-    return 'F';
-  };
+
 
   if (!isOpen) return null;
 
@@ -298,8 +263,7 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                         <tr>
                           <th>Subject Name</th>
                           <th className="width-credits">Credits</th>
-                          <th className="width-mode">Input Mode</th>
-                          <th className="width-grade">Grade / Marks</th>
+                          <th className="width-grade">Grade</th>
                           <th className="width-action"></th>
                         </tr>
                       </thead>
@@ -326,62 +290,15 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                               />
                             </td>
                             <td>
-                              <div className="input-mode-toggle">
-                                <button
-                                  type="button"
-                                  className={`mode-toggle-btn ${sub.mode === 'grade' ? 'active' : ''}`}
-                                  onClick={() => handleSubjectChange(sub.id, 'mode', 'grade')}
-                                >
-                                  Grade
-                                </button>
-                                <button
-                                  type="button"
-                                  className={`mode-toggle-btn ${sub.mode === 'marks' ? 'active' : ''}`}
-                                  onClick={() => handleSubjectChange(sub.id, 'mode', 'marks')}
-                                >
-                                  Marks
-                                </button>
-                              </div>
-                            </td>
-                            <td>
-                              {sub.mode === 'grade' ? (
-                                <select
-                                  className="gpa-select-field table-select-grade"
-                                  value={sub.grade}
-                                  onChange={(e) => handleSubjectChange(sub.id, 'grade', e.target.value)}
-                                >
-                                  {Object.keys(GRADE_POINTS).map(g => (
-                                    <option key={g} value={g}>{g} ({GRADE_POINTS[g]} GP)</option>
-                                  ))}
-                                </select>
-                              ) : (
-                                <div className="table-marks-inputs">
-                                  <input
-                                    type="number"
-                                    className="gpa-input-number marks-field"
-                                    placeholder="Th /75"
-                                    min="0"
-                                    max="75"
-                                    value={sub.theoryMarks}
-                                    onChange={(e) => handleSubjectChange(sub.id, 'theoryMarks', e.target.value)}
-                                    title="Theory Marks (Out of 75)"
-                                  />
-                                  <span className="marks-separator">+</span>
-                                  <input
-                                    type="number"
-                                    className="gpa-input-number marks-field"
-                                    placeholder="Int /25"
-                                    min="0"
-                                    max="25"
-                                    value={sub.internalMarks}
-                                    onChange={(e) => handleSubjectChange(sub.id, 'internalMarks', e.target.value)}
-                                    title="Internal Marks (Out of 25)"
-                                  />
-                                  <span className="marks-total-badge" title="Calculated Grade">
-                                    = {getSubjectCalculatedGrade(sub)}
-                                  </span>
-                                </div>
-                              )}
+                              <select
+                                className="gpa-select-field table-select-grade"
+                                value={sub.grade}
+                                onChange={(e) => handleSubjectChange(sub.id, 'grade', e.target.value)}
+                              >
+                                {Object.keys(GRADE_POINTS).map(g => (
+                                  <option key={g} value={g}>{g} ({GRADE_POINTS[g]} gpa)</option>
+                                ))}
+                              </select>
                             </td>
                             <td>
                               <button
