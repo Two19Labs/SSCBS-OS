@@ -443,6 +443,10 @@
 
 /* Responsive adjustments */
 @media (max-width: 900px) {
+  .auth-container {
+    overflow-y: auto;
+  }
+
   .auth-split-wrapper {
     flex-direction: column;
   }

@@ -67,6 +67,9 @@ export default function FindMyProfessorPage({ onBack }) {
   // View mode: 'today' or 'weekly'
   const [viewMode, setViewMode] = useState('today');
 
+  // Mobile navigation mode: 'list' (show faculty sidebar) or 'details' (show professor details panel)
+  const [mobileActiveTab, setMobileActiveTab] = useState('list');
+
   // Helper: Get exact date/time in Indian Standard Time (IST = UTC+5.5)
   function getISTTime() {
     const now = new Date();
@@ -306,7 +309,7 @@ export default function FindMyProfessorPage({ onBack }) {
       <div className="prof-page-layout">
         
         {/* Left Column: Sidebar List of Faculty */}
-        <aside className="prof-page-sidebar">
+        <aside className={`prof-page-sidebar ${mobileActiveTab === 'list' ? 'show-mobile-sidebar' : 'hide-mobile-sidebar'}`}>
           <div className="sidebar-search-box">
             <h4>SSCBS Faculty List</h4>
             <p className="sidebar-description">Filter and select a professor to track</p>
@@ -337,7 +340,10 @@ export default function FindMyProfessorPage({ onBack }) {
                     <li 
                       key={prof} 
                       className={`sidebar-prof-item ${isSelected ? 'active' : ''}`}
-                      onClick={() => setSelectedProf(prof)}
+                      onClick={() => {
+                        setSelectedProf(prof);
+                        setMobileActiveTab('details');
+                      }}
                     >
                       <div className="sidebar-prof-avatar">
                         {prof.replace(/^(Dr\.|Prof\.|Mr\.|Ms\.)\s+/i, '').charAt(0).toUpperCase()}
@@ -359,9 +365,18 @@ export default function FindMyProfessorPage({ onBack }) {
         </aside>
 
         {/* Right Column: Main tracking details */}
-        <main className="prof-page-content">
+        <main className={`prof-page-content ${mobileActiveTab === 'details' ? 'show-mobile-content' : 'hide-mobile-content'}`}>
           {selectedProf ? (
             <div className="prof-details-page-grid">
+              
+              {/* Mobile Only Back Button to Faculty List */}
+              <button className="mobile-prof-back-btn" onClick={() => setMobileActiveTab('list')}>
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2.5" fill="none">
+                  <line x1="19" y1="12" x2="5" y2="12"></line>
+                  <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span>Back to Faculty List</span>
+              </button>
               
               {/* Professor Header Info Row */}
               <div className="prof-header-panel">
