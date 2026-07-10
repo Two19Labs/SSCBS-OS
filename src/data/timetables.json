@@ -30,7 +30,7 @@
           },
           {
             "period": 4,
-            "subject": "Quantitative Techniques",
+            "subject": "Quantitative Techniques (G2)",
             "teacher": "Dr. Rishi Rajan Sahay",
             "room": "Room 703"
           },
@@ -68,8 +68,8 @@
           },
           {
             "period": 3,
-            "subject": "Cost and Management Accounting",
-            "teacher": "Dr. Paridhi",
+            "subject": "G1: Cost and Management Accounting | G2: Macro Economics",
+            "teacher": "Dr. Paridhi (G1) / Dr. Shalini Prakash (G2)",
             "room": "Room 236"
           },
           {
@@ -87,7 +87,7 @@
           },
           {
             "period": 5,
-            "subject": "Quantitative Techniques",
+            "subject": "Quantitative Techniques (G1)",
             "teacher": "Dr. Rishi Rajan Sahay",
             "room": "Room 703"
           },
@@ -132,8 +132,8 @@
           },
           {
             "period": 4,
-            "subject": "Cost and Management Accounting",
-            "teacher": "Dr. Paridhi",
+            "subject": "G1: Macro Economics | G2: Cost and Management Accounting",
+            "teacher": "Dr. Shalini Prakash (G1) / Dr. Paridhi (G2)",
             "room": "Room 236"
           },
           {
@@ -293,15 +293,15 @@
           },
           {
             "period": 5,
-            "subject": "Entrepreneurship Essentials 2 (Merged with BMS 2D)",
-            "teacher": "Dr. Bharti Singh",
+            "subject": "G?: Machine Learning and Application (Merged with BMS 2D) | G?: Entrepreneurship Essentials 2 (Merged with BMS 2D)",
+            "teacher": "Dr. Satish Kumar Goel (G?) / Dr. Bharti Singh (G?)",
             "room": "Room 737"
           },
           {
             "period": 6,
-            "subject": "Entrepreneurship Essentials 2 (Merged with BMS 2D)",
-            "teacher": "Dr. Bharti Singh",
-            "room": "P"
+            "subject": "G?: Machine Learning and Application (Merged with BMS 2D) | G?: Entrepreneurship Essentials 2 (Merged with BMS 2D)",
+            "teacher": "Dr. Satish Kumar Goel (G?) / Dr. Bharti Singh (G?)",
+            "room": "G?: Room 326 / G?: P"
           },
           {
             "period": 7,
@@ -319,9 +319,9 @@
           },
           {
             "period": 2,
-            "subject": "Macro Economics",
-            "teacher": "Dr. Sushmita",
-            "room": "Room 703"
+            "subject": "G2: Quantitative Techniques | G1: Macro Economics",
+            "teacher": "Dr. Amrina Kausar (G2) / Dr. Sushmita (G1)",
+            "room": "Room 237"
           },
           {
             "period": 3,
@@ -370,14 +370,14 @@
           },
           {
             "period": 2,
-            "subject": "Entrepreneurship Essentials 2 (Merged with BMS 2D)",
-            "teacher": "Dr. Bharti Singh",
-            "room": "P"
+            "subject": "G?: Entrepreneurship Essentials 2 (Merged with BMS 2D) | G?: Machine Learning and Application (Merged with BMS 2D)",
+            "teacher": "Dr. Bharti Singh (G?) / Dr. Satish Kumar Goel (G?)",
+            "room": "G?: Room 737 / G?: P"
           },
           {
             "period": 3,
-            "subject": "Cost and Management Accounting",
-            "teacher": "Dr. Saumya Jain",
+            "subject": "G1: Cost and Management Accounting | G2: Macro Economics",
+            "teacher": "Dr. Saumya Jain (G1) / Dr. Sushmita (G2)",
             "room": "Room 237"
           },
           {
@@ -401,15 +401,15 @@
           },
           {
             "period": 6,
-            "subject": "Hindi A",
-            "teacher": "Dr. Pooja Singh",
-            "room": "Room 703"
+            "subject": "G?: Hindi A | G?: Hindi C | G?: Hindi D",
+            "teacher": "Dr. Pooja Singh (G?) / Mr. Dinesh (G?) / Dr. Puja Gupta (G?)",
+            "room": "G?: Room 703 / G?: Room 203 / G?: Room 737"
           },
           {
             "period": 7,
-            "subject": "Hindi A",
-            "teacher": "Dr. Pooja Singh",
-            "room": "Room 703"
+            "subject": "G?: Hindi A | G?: Hindi C | G?: Hindi D",
+            "teacher": "Dr. Pooja Singh (G?) / Mr. Dinesh (G?) / Dr. Puja Gupta (G?)",
+            "room": "G?: Room 703 / G?: Room 203 / G?: Room 737"
           }
         ],
         "Thursday": [
@@ -491,8 +491,8 @@
           },
           {
             "period": 4,
-            "subject": "Cost and Management Accounting",
-            "teacher": "Dr. Saumya Jain",
+            "subject": "G1: Quantitative Techniques | G2: Cost and Management Accounting",
+            "teacher": "Dr. Amrina Kausar (G1) / Dr. Saumya Jain (G2)",
             "room": "Room 237"
           },
           {
@@ -584,7 +584,7 @@
           },
           {
             "period": 3,
-            "subject": "Investment Analysis and Portfolio Management",
+            "subject": "Investment Analysis and Portfolio Management (G1)",
             "teacher": "Dr. Madhu Totla",
             "room": "Room 703"
           },
@@ -654,7 +654,7 @@
           },
           {
             "period": 5,
-            "subject": "Basics of Econometrics",
+            "subject": "Basics of Econometrics (G2)",
             "teacher": "Dr. Neeraj Kumar Sehrawat",
             "room": "Room 703"
           },
@@ -699,8 +699,8 @@
           },
           {
             "period": 4,
-            "subject": "Basics of Econometrics",
-            "teacher": "Dr. Neeraj Kumar Sehrawat",
+            "subject": "G1: Basics of Econometrics | G2: Investment Analysis and Portfolio Management",
+            "teacher": "Dr. Neeraj Kumar Sehrawat (G1) / Dr. Madhu Totla (G2)",
             "room": "Room 534"
           },
           {
@@ -711,14 +711,14 @@
           },
           {
             "period": 6,
-            "subject": "Science and Society",
-            "teacher": "Dr. Guncha Sharma",
+            "subject": "G?: Indigenous Sports (Merge with B. Sc) | G?: Science and Society",
+            "teacher": "Ms. Nisha (G?) / Dr. Guncha Sharma (G?)",
             "room": "Room 644"
           },
           {
             "period": 7,
-            "subject": "Science and Society",
-            "teacher": "Dr. Guncha Sharma",
+            "subject": "G?: Indigenous Sports (Merge with B. Sc) | G?: Science and Society",
+            "teacher": "Ms. Nisha (G?) / Dr. Guncha Sharma (G?)",
             "room": "Room 644"
           }
         ],
@@ -809,9 +809,9 @@
           },
           {
             "period": 5,
-            "subject": "Financial Database Analysis and Software",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "BoE"
+            "subject": "G1: Investment Analysis and Portfolio Management | G2: Financial Database Analysis and Software",
+            "teacher": "Dr. Amit Kumar (G1) / Dr. Narander Kumar Nigam (G2)",
+            "room": "G1: BoE / G2: Room 534"
           },
           {
             "period": 6,
@@ -860,9 +860,9 @@
           },
           {
             "period": 5,
-            "subject": "Financial Database Analysis and Software",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "BoE"
+            "subject": "G1: Financial Database Analysis and Software | G2: Corporate Analysis and Valuation",
+            "teacher": "Dr. Narander Kumar Nigam (G1) / Dr. Neeraj Kumar Sehrawat (G2)",
+            "room": "G1: BoE / G2: Room 534"
           },
           {
             "period": 6,
@@ -892,8 +892,8 @@
           },
           {
             "period": 3,
-            "subject": "Investment Analysis and Portfolio Management",
-            "teacher": "Dr. Amit Kumar",
+            "subject": "G1: Corporate Analysis and Valuation | G2: Investment Analysis and Portfolio Management",
+            "teacher": "Dr. Neeraj Kumar Sehrawat (G1) / Dr. Amit Kumar (G2)",
             "room": "Room 236"
           },
           {
@@ -1094,7 +1094,7 @@
           },
           {
             "period": 2,
-            "subject": "Financial Services",
+            "subject": "Financial Services (G1)",
             "teacher": "Mr. Mohd. Rashid",
             "room": "Room 703"
           },
@@ -1125,9 +1125,9 @@
           },
           {
             "period": 6,
-            "subject": "App Development Using Flutter",
-            "teacher": "Ms. Rama",
-            "room": "P"
+            "subject": "G?: App Development Using Flutter | G?: Cyber Sphere and Security : Global concern",
+            "teacher": "Ms. Rama (G?) / Ms. Seema (G?)",
+            "room": "G?: P / G?: Room 607"
           },
           {
             "period": 7,
@@ -1164,8 +1164,8 @@
           },
           {
             "period": 4,
-            "subject": "International Finance",
-            "teacher": "Dr. Kumar Bijoy",
+            "subject": "G1: International Finance | G2: Financial Services",
+            "teacher": "Dr. Kumar Bijoy (G1) / Mr. Mohd. Rashid (G2)",
             "room": "Room 534"
           },
           {
@@ -1241,7 +1241,7 @@
         "Friday": [
           {
             "period": 1,
-            "subject": "International Finance",
+            "subject": "International Finance (G2)",
             "teacher": "Dr. Kumar Bijoy",
             "room": "Room 703"
           },
@@ -1278,8 +1278,8 @@
           },
           {
             "period": 6,
-            "subject": "App Development Using Flutter",
-            "teacher": "Ms. Rama",
+            "subject": "G?: App Development Using Flutter | G?: Cyber Sphere and Security : Global concern | G?: 326)",
+            "teacher": "Ms. Rama (G?) / Ms. Seema (G?) / 326) (G?)",
             "room": "P"
           },
           {
@@ -1382,9 +1382,9 @@
           },
           {
             "period": 6,
-            "subject": "App Development Using Flutter",
-            "teacher": "Ms. Rama",
-            "room": "P"
+            "subject": "G?: App Development Using Flutter | G?: Cyber Sphere and Security : Global concern",
+            "teacher": "Ms. Rama (G?) / Ms. Seema (G?)",
+            "room": "G?: P / G?: Room 607"
           },
           {
             "period": 7,
@@ -1408,8 +1408,8 @@
           },
           {
             "period": 3,
-            "subject": "International Finance",
-            "teacher": "Dr. Kumar Bijoy",
+            "subject": "G2: International Finance | G1: Financial Services",
+            "teacher": "Dr. Kumar Bijoy (G2) / Mr. Mohd. Rashid (G1)",
             "room": "Room 337"
           },
           {
@@ -1453,8 +1453,8 @@
           },
           {
             "period": 2,
-            "subject": "International Finance",
-            "teacher": "Dr. Kumar Bijoy",
+            "subject": "G1: International Finance | G2: Financial Services",
+            "teacher": "Dr. Kumar Bijoy (G1) / Mr. Mohd. Rashid (G2)",
             "room": "Room 534"
           },
           {
@@ -1535,8 +1535,8 @@
           },
           {
             "period": 6,
-            "subject": "App Development Using Flutter",
-            "teacher": "Ms. Rama",
+            "subject": "G?: App Development Using Flutter | G?: Cyber Sphere and Security : Global concern | G?: 326)",
+            "teacher": "Ms. Rama (G?) / Ms. Seema (G?) / 326) (G?)",
             "room": "P"
           },
           {
@@ -1826,8 +1826,8 @@
           },
           {
             "period": 3,
-            "subject": "Cost and Management Accounting",
-            "teacher": "Dr. Paridhi",
+            "subject": "G1: Micro Economics | G2: Cost and Management Accounting",
+            "teacher": "Dr. Shalini Prakash (G1) / Dr. Paridhi (G2)",
             "room": "Room 236"
           },
           {
@@ -1953,15 +1953,15 @@
           },
           {
             "period": 6,
-            "subject": "Hindi B",
-            "teacher": "Dr. Pooja Singh",
-            "room": "Room 703"
+            "subject": "G?: Hindi B | G?: Hindi C | G?: Hindi D",
+            "teacher": "Dr. Pooja Singh (G?) / Mr. Dinesh (G?) / Dr. Puja Gupta (G?)",
+            "room": "G?: Room 703 / G?: Room 203 / G?: Room 737"
           },
           {
             "period": 7,
-            "subject": "Hindi B",
-            "teacher": "Dr. Pooja Singh",
-            "room": "Room 703"
+            "subject": "G?: Hindi B | G?: Hindi C | G?: Hindi D",
+            "teacher": "Dr. Pooja Singh (G?) / Mr. Dinesh (G?) / Dr. Puja Gupta (G?)",
+            "room": "G?: Room 703 / G?: Room 203 / G?: Room 737"
           }
         ],
         "Thursday": [
@@ -1992,13 +1992,13 @@
           },
           {
             "period": 4,
-            "subject": "Cost and Management Accounting",
-            "teacher": "Dr. Paridhi",
+            "subject": "G1: Cost and Management Accounting | G2: Micro Economics",
+            "teacher": "Dr. Paridhi (G1) / Dr. Shalini Prakash (G2)",
             "room": "Room 236"
           },
           {
             "period": 5,
-            "subject": "Principles of Marketing",
+            "subject": "Principles of Marketing (G1)",
             "teacher": "Dr. Anuja Mathur",
             "room": "Room 703"
           },
@@ -2055,7 +2055,7 @@
           },
           {
             "period": 6,
-            "subject": "Principles of Marketing",
+            "subject": "Principles of Marketing (G2)",
             "teacher": "Dr. Anuja Mathur",
             "room": "Room 703"
           },
@@ -2077,8 +2077,8 @@
           },
           {
             "period": 2,
-            "subject": "Cost and Management Accounting",
-            "teacher": "Dr. Saumya Jain",
+            "subject": "G1: Micro Economics | G2: Cost and Management Accounting",
+            "teacher": "Dr. Shalini Prakash (G1) / Dr. Saumya Jain (G2)",
             "room": "Room 715"
           },
           {
@@ -2147,8 +2147,8 @@
           },
           {
             "period": 4,
-            "subject": "Cost and Management Accounting",
-            "teacher": "Dr. Saumya Jain",
+            "subject": "G2: Micro Economics | G1: Cost and Management Accounting",
+            "teacher": "Dr. Shalini Prakash (G2) / Dr. Saumya Jain (G1)",
             "room": "Room 715"
           },
           {
@@ -2210,15 +2210,15 @@
           },
           {
             "period": 6,
-            "subject": "Hindi B",
-            "teacher": "Dr. Pooja Singh",
-            "room": "Room 703"
+            "subject": "G?: Hindi B | G?: Hindi C | G?: Puja-Hindi D",
+            "teacher": "Dr. Pooja Singh (G?) / Mr. Dinesh (G?) / Puja-Hindi D (G?)",
+            "room": "G?: Room 703 / G?: Room 203 / G?: Room 737"
           },
           {
             "period": 7,
-            "subject": "Hindi B",
-            "teacher": "Dr. Pooja Singh",
-            "room": "Room 703"
+            "subject": "G?: Hindi B | G?: Hindi C | G?: Puja-Hindi D",
+            "teacher": "Dr. Pooja Singh (G?) / Mr. Dinesh (G?) / Puja-Hindi D (G?)",
+            "room": "G?: Room 703 / G?: Room 203 / G?: Room 737"
           }
         ],
         "Thursday": [
@@ -2391,8 +2391,8 @@
           },
           {
             "period": 3,
-            "subject": "Cost and Management Accounting",
-            "teacher": "Dr. Saumya Jain",
+            "subject": "G1: Micro Economics | G2: Cost and Management Accounting",
+            "teacher": "Dr. Sushmita (G1) / Dr. Saumya Jain (G2)",
             "room": "Room 715"
           },
           {
@@ -2467,15 +2467,15 @@
           },
           {
             "period": 6,
-            "subject": "Hindi A",
-            "teacher": "Dr. Pooja Singh",
-            "room": "Room 703"
+            "subject": "G?: Hindi A | G?: Hindi C | G?: Hindi D",
+            "teacher": "Dr. Pooja Singh (G?) / Mr. Dinesh (G?) / Dr. Puja Gupta (G?)",
+            "room": "G?: Room 703 / G?: Room 203 / G?: Room 737"
           },
           {
             "period": 7,
-            "subject": "Hindi A",
-            "teacher": "Dr. Pooja Singh",
-            "room": "Room 703"
+            "subject": "G?: Hindi A | G?: Hindi C | G?: Hindi D",
+            "teacher": "Dr. Pooja Singh (G?) / Mr. Dinesh (G?) / Dr. Puja Gupta (G?)",
+            "room": "G?: Room 703 / G?: Room 203 / G?: Room 737"
           }
         ],
         "Thursday": [
@@ -2487,8 +2487,8 @@
           },
           {
             "period": 2,
-            "subject": "Cost and Management Accounting",
-            "teacher": "Dr. Saumya Jain",
+            "subject": "G1: Cost and Management Accounting | G2: Micro Economics",
+            "teacher": "Dr. Saumya Jain (G1) / Dr. Sushmita (G2)",
             "room": "Room 715"
           },
           {
@@ -2610,20 +2610,20 @@
           },
           {
             "period": 4,
-            "subject": "Cost and Management Accounting",
-            "teacher": "Dr. Paridhi",
+            "subject": "G1: Cost and Management Accounting | G2: Micro Economics",
+            "teacher": "Dr. Paridhi (G1) / Dr. Sushmita (G2)",
             "room": "Room 715"
           },
           {
             "period": 5,
-            "subject": "Machine learning and applications (MERGED WITH BBA 2B & BMS 8A)",
-            "teacher": "Dr. Satish Kumar Goel",
+            "subject": "G?: Entrepreneurship Essentials 2  (MERGED WITH BBA 2B) | G?: Machine learning and applications (MERGED WITH BBA 2B & BMS 8A)",
+            "teacher": "Dr. Bharti Singh (G?) / Dr. Satish Kumar Goel (G?)",
             "room": "Room 253"
           },
           {
             "period": 6,
-            "subject": "Machine learning and applications (MERGED WITH BBA 2B & BMS 8A)",
-            "teacher": "Dr. Satish Kumar Goel",
+            "subject": "G?: Entrepreneurship Essentials 2  (MERGED WITH BBA 2B) | G?: Machine learning and applications (MERGED WITH BBA 2B & BMS 8A)",
+            "teacher": "Dr. Bharti Singh (G?) / Dr. Satish Kumar Goel (G?)",
             "room": "P"
           },
           {
@@ -2693,9 +2693,9 @@
           },
           {
             "period": 2,
-            "subject": "Machine learning and applications (MERGED WITH BBA 2B & BMS 8A)",
-            "teacher": "Dr. Satish Kumar Goel",
-            "room": "P"
+            "subject": "G?: Machine learning and applications (MERGED WITH BBA 2B & BMS 8A) | G?: Entrepreneurship Essentials 2  (MERGED WITH BBA 2B)",
+            "teacher": "Dr. Satish Kumar Goel (G?) / Dr. Bharti Singh (G?)",
+            "room": "G?: Room 326 / G?: P"
           },
           {
             "period": 3,
@@ -2718,21 +2718,21 @@
           },
           {
             "period": 5,
-            "subject": "Micro Economics",
+            "subject": "Micro Economics (G1)",
             "teacher": "Dr. Sushmita",
             "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Hindi A",
-            "teacher": "Dr. Pooja Singh",
-            "room": "Room 703"
+            "subject": "G?: Hindi A | G?: Hindi C | G?: Hindi D",
+            "teacher": "Dr. Pooja Singh (G?) / Mr. Dinesh (G?) / Dr. Puja Gupta (G?)",
+            "room": "G?: Room 703 / G?: Room 203 / G?: Room 737"
           },
           {
             "period": 7,
-            "subject": "Hindi A",
-            "teacher": "Dr. Pooja Singh",
-            "room": "Room 703"
+            "subject": "G?: Hindi A | G?: Hindi C | G?: Hindi D",
+            "teacher": "Dr. Pooja Singh (G?) / Mr. Dinesh (G?) / Dr. Puja Gupta (G?)",
+            "room": "G?: Room 703 / G?: Room 203 / G?: Room 737"
           }
         ],
         "Thursday": [
@@ -2801,7 +2801,7 @@
           },
           {
             "period": 3,
-            "subject": "Cost and Management Accounting",
+            "subject": "Cost and Management Accounting (G2)",
             "teacher": "Dr. Paridhi",
             "room": "Room 703"
           },
@@ -2875,15 +2875,15 @@
           },
           {
             "period": 5,
-            "subject": "EVS II",
-            "teacher": "Dr. Pooja",
-            "room": "S&S"
+            "subject": "G?: EVS II | G?: Indigenous Sports (Merge with BMS 4C)",
+            "teacher": "Dr. Pooja (G?) / Ms. Nisha (G?)",
+            "room": "G?: Room 644 / G?: S&S"
           },
           {
             "period": 6,
-            "subject": "EVS II",
-            "teacher": "Dr. Pooja",
-            "room": "S&S"
+            "subject": "G?: EVS II | G?: Indigenous Sports (Merge with BMS 4C)",
+            "teacher": "Dr. Pooja (G?) / Ms. Nisha (G?)",
+            "room": "G?: Room 644 / G?: Room 503"
           },
           {
             "period": 7,
@@ -2932,9 +2932,9 @@
           },
           {
             "period": 6,
-            "subject": "EVS II",
-            "teacher": "Dr. Pooja",
-            "room": "S&S"
+            "subject": "G?: EVS II | G?: Indigenous Sports (Merge with BMS 4C)",
+            "teacher": "Dr. Pooja (G?) / Ms. Nisha (G?)",
+            "room": "G?: Room 644 / G?: Room 503"
           },
           {
             "period": 7,
@@ -2958,8 +2958,8 @@
           },
           {
             "period": 3,
-            "subject": "Quantitative Techniques for Management",
-            "teacher": "Dr. Rishi Rajan Sahay",
+            "subject": "G1: Human Resource Management | G2: Quantitative Techniques for Management",
+            "teacher": "Dr. Tarannum Ahmad (G1) / Dr. Rishi Rajan Sahay (G2)",
             "room": "Room 534"
           },
           {
@@ -2983,8 +2983,8 @@
           },
           {
             "period": 6,
-            "subject": "Human Resource Management",
-            "teacher": "Dr. Tarannum Ahmad",
+            "subject": "G?: Financial Database Analysis and Software (Merge with BMS 4A, 4B, 4C) | G?: Personality Development and Communication",
+            "teacher": "Dr. Narander Kumar Nigam (G?) / Dr. Anikta (G?)",
             "room": "Room 507"
           },
           {
@@ -3060,9 +3060,9 @@
           },
           {
             "period": 3,
-            "subject": "Financial Management",
-            "teacher": "Dr. Madhu Totla",
-            "room": "G1"
+            "subject": "G?: Financial Management | G2: Human Resource Management",
+            "teacher": "Dr. Madhu Totla (G?) / Dr. Tarannum Ahmad (G2)",
+            "room": "G?: G1 / G2: Room 534"
           },
           {
             "period": 0,
@@ -3073,8 +3073,8 @@
           },
           {
             "period": 4,
-            "subject": "Quantitative Techniques for Management",
-            "teacher": "Dr. Rishi Rajan Sahay",
+            "subject": "G1: Quantitative Techniques for Management | G2: Financial Management",
+            "teacher": "Dr. Rishi Rajan Sahay (G1) / Dr. Madhu Totla (G2)",
             "room": "Room 534"
           },
           {
@@ -3101,14 +3101,14 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "Science and Society (Merge with BMS 4D)",
-            "teacher": "Dr. Paritosh Ahmed",
+            "subject": "G?: Science and Society (Merge with BMS 4D) | G?: Prakhar",
+            "teacher": "Dr. Paritosh Ahmed (G?) / Prakhar (G?)",
             "room": "Room 648"
           },
           {
             "period": 2,
-            "subject": "Science and Society (Merge with BMS 4D)",
-            "teacher": "Dr. Paritosh Ahmed",
+            "subject": "G?: Science and Society (Merge with BMS 4D) | G?: Prakhar",
+            "teacher": "Dr. Paritosh Ahmed (G?) / Prakhar (G?)",
             "room": "Room 648"
           },
           {
@@ -3152,8 +3152,8 @@
         "Tuesday": [
           {
             "period": 1,
-            "subject": "Science and Society (Merge with BMS 4D)",
-            "teacher": "Dr. Paritosh Ahmed",
+            "subject": "G?: Science and Society (Merge with BMS 4D) | G?: Prakhar",
+            "teacher": "Dr. Paritosh Ahmed (G?) / Prakhar (G?)",
             "room": "Room 648"
           },
           {
@@ -3177,9 +3177,9 @@
           },
           {
             "period": 4,
-            "subject": "Quantitative Techniques for Management",
-            "teacher": "Dr. Rishi Rajan Sahay",
-            "room": "G1"
+            "subject": "G2: Quantitative Techniques for Management | G?: Financial Management",
+            "teacher": "Dr. Rishi Rajan Sahay (G2) / Dr. Madhu Totla (G?)",
+            "room": "G2: G1 / G?: Room 338"
           },
           {
             "period": 5,
@@ -3228,9 +3228,9 @@
           },
           {
             "period": 4,
-            "subject": "Merger Acquisitions and Corporate Restructuring",
-            "teacher": "Dr. Nidhi Kesari",
-            "room": "Tute"
+            "subject": "G?: Merger Acquisitions and Corporate Restructuring | G?: Fund Raising and Mangement of Entrepreneurs",
+            "teacher": "Dr. Nidhi Kesari (G?) / Ms. Bharti Singh (G?)",
+            "room": "G?: Tute / G?: P"
           },
           {
             "period": 5,
@@ -3246,9 +3246,9 @@
           },
           {
             "period": 7,
-            "subject": "Merger Acquisitions and Corporate Restructuring",
-            "teacher": "Dr. Nidhi Kesari",
-            "room": "Room 503"
+            "subject": "G?: Financial Database Analysis and Software (Merge with BMS 4A) | G?: Personality Development and Communication",
+            "teacher": "Dr. Narander Kumar Nigam (G?) / Dr. Anikta (G?)",
+            "room": "G?: Room 503 / G?: Room 644"
           }
         ],
         "Thursday": [
@@ -3266,9 +3266,9 @@
           },
           {
             "period": 3,
-            "subject": "Quantitative Techniques for Management",
-            "teacher": "Dr. Rishi Rajan Sahay",
-            "room": "G1"
+            "subject": "G?: Quantitative Techniques for Management | G?: Financial Management",
+            "teacher": "Dr. Rishi Rajan Sahay (G?) / Dr. Madhu Totla (G?)",
+            "room": "G?: G1 / G?: G2"
           },
           {
             "period": 0,
@@ -3279,9 +3279,9 @@
           },
           {
             "period": 4,
-            "subject": "Merger Acquisitions and Corporate Restructuring",
-            "teacher": "Dr. Nidhi Kesari",
-            "room": "P"
+            "subject": "G?: Merger Acquisitions and Corporate Restructuring | G?: Fund Raising and Mangement of Entrepreneurs",
+            "teacher": "Dr. Nidhi Kesari (G?) / Ms. Bharti Singh (G?)",
+            "room": "G?: P / G?: Room 523"
           },
           {
             "period": 5,
@@ -3317,8 +3317,8 @@
           },
           {
             "period": 3,
-            "subject": "Merger Acquisitions and Corporate Restructuring",
-            "teacher": "Dr. Nidhi Kesari",
+            "subject": "G?: Merger Acquisitions and Corporate Restructuring | G?: Fund Raising and Mangement of Entrepreneurs",
+            "teacher": "Dr. Nidhi Kesari (G?) / Ms. Bharti Singh (G?)",
             "room": "Room 523"
           },
           {
@@ -3330,9 +3330,9 @@
           },
           {
             "period": 4,
-            "subject": "Merger Acquisitions and Corporate Restructuring",
-            "teacher": "Dr. Nidhi Kesari",
-            "room": "P"
+            "subject": "G?: Merger Acquisitions and Corporate Restructuring | G?: Fund Raising and Mangement of Entrepreneurs",
+            "teacher": "Dr. Nidhi Kesari (G?) / Ms. Bharti Singh (G?)",
+            "room": "G?: P / G?: Room 523"
           },
           {
             "period": 5,
@@ -3364,9 +3364,9 @@
           },
           {
             "period": 2,
-            "subject": "Quantitative Techniques for Management",
-            "teacher": "Dr. Mona Verma",
-            "room": "G2"
+            "subject": "G?: Quantitative Techniques for Management | G?: Human Resource Management",
+            "teacher": "Dr. Mona Verma (G?) / Dr. Tarannum Ahmad (G?)",
+            "room": "G?: G2 / G?: G1"
           },
           {
             "period": 3,
@@ -3395,8 +3395,8 @@
           },
           {
             "period": 6,
-            "subject": "Science and Society (Merge with BMS 4A)",
-            "teacher": "Dr. Pooja",
+            "subject": "G?: Science and Society (Merge with BMS 4A) | G?: Nisha",
+            "teacher": "Dr. Pooja (G?) / Nisha (G?)",
             "room": "Room 503"
           },
           {
@@ -3440,14 +3440,14 @@
           },
           {
             "period": 5,
-            "subject": "Financial Management",
-            "teacher": "Dr. Amit Kumar",
-            "room": "G1"
+            "subject": "G?: Financial Management | G?: Human Resource Management",
+            "teacher": "Dr. Amit Kumar (G?) / Dr. Tarannum Ahmad (G?)",
+            "room": "G?: G1 / G?: G2"
           },
           {
             "period": 6,
-            "subject": "Science and Society (Merge with BMS 4A)",
-            "teacher": "Dr. Pooja",
+            "subject": "G?: Science and Society (Merge with BMS 4A) | G?: Nisha",
+            "teacher": "Dr. Pooja (G?) / Nisha (G?)",
             "room": "Room 503"
           },
           {
@@ -3497,8 +3497,8 @@
           },
           {
             "period": 6,
-            "subject": "Financial Database Analysis and Software (Merge with BMS 4A)",
-            "teacher": "Dr. Narander Kumar Nigam",
+            "subject": "G?: Financial Database Analysis and Software (Merge with BMS 4A) | G?: Personality Development and Communication",
+            "teacher": "Dr. Narander Kumar Nigam (G?) / Ms. Monika (G?)",
             "room": "Room 503"
           },
           {
@@ -3542,7 +3542,7 @@
           },
           {
             "period": 5,
-            "subject": "Quantitative Techniques for Management",
+            "subject": "Quantitative Techniques for Management (G1)",
             "teacher": "Dr. Mona Verma",
             "room": "Room 703"
           },
@@ -3574,7 +3574,7 @@
           },
           {
             "period": 3,
-            "subject": "Financial Management",
+            "subject": "Financial Management (G2)",
             "teacher": "Dr. Amit Kumar",
             "room": "Room 703"
           },
@@ -3615,14 +3615,14 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "Science and Society (Merge with BMS 4B)",
-            "teacher": "Dr. Paritosh Ahmed",
+            "subject": "G?: Science and Society (Merge with BMS 4B) | G?: Indigenous Sports (Merge with BMS 4B)",
+            "teacher": "Dr. Paritosh Ahmed (G?) / Mr. Prakhar (G?)",
             "room": "Room 507"
           },
           {
             "period": 2,
-            "subject": "Science and Society (Merge with BMS 4B)",
-            "teacher": "Dr. Paritosh Ahmed",
+            "subject": "G?: Science and Society (Merge with BMS 4B) | G?: Indigenous Sports (Merge with BMS 4B)",
+            "teacher": "Dr. Paritosh Ahmed (G?) / Mr. Prakhar (G?)",
             "room": "Room 507"
           },
           {
@@ -3640,8 +3640,8 @@
           },
           {
             "period": 4,
-            "subject": "Quantitative Techniques for Management",
-            "teacher": "Dr. Mona Verma",
+            "subject": "G1: Quantitative Techniques for Management | G2: Financial Management",
+            "teacher": "Dr. Mona Verma (G1) / Dr. Amit Kumar (G2)",
             "room": "Room 534"
           },
           {
@@ -3652,8 +3652,8 @@
           },
           {
             "period": 6,
-            "subject": "Financial Database Analysis and Software (Merged with BBA 4B)",
-            "teacher": "Dr. Narander Kumar Nigam",
+            "subject": "G?: Financial Database Analysis and Software (Merged with BBA 4B) | G?: Personality Development and Communication",
+            "teacher": "Dr. Narander Kumar Nigam (G?) / Ms. Monika (G?)",
             "room": "Room 557"
           },
           {
@@ -3666,8 +3666,8 @@
         "Tuesday": [
           {
             "period": 1,
-            "subject": "Science and Society (Merge with BMS 4B)",
-            "teacher": "Dr. Paritosh Ahmed",
+            "subject": "G?: Science and Society (Merge with BMS 4B) | G?: Indigenous Sports (Merge with BMS 4B)",
+            "teacher": "Dr. Paritosh Ahmed (G?) / Mr. Prakhar (G?)",
             "room": "Room 507"
           },
           {
@@ -3691,9 +3691,9 @@
           },
           {
             "period": 4,
-            "subject": "Financial Management",
-            "teacher": "Dr. Amit Kumar",
-            "room": "G1"
+            "subject": "G?: Financial Management | G?: Human Resource Management",
+            "teacher": "Dr. Amit Kumar (G?) / Dr. Tarannum Ahmad (G?)",
+            "room": "G?: G1 / G?: G2"
           },
           {
             "period": 5,
@@ -3844,8 +3844,8 @@
           },
           {
             "period": 4,
-            "subject": "Quantitative Techniques for Management",
-            "teacher": "Dr. Mona Verma",
+            "subject": "G2: Quantitative Techniques for Management | G1: Human Resource Management",
+            "teacher": "Dr. Mona Verma (G2) / Dr. Tarannum Ahmad (G1)",
             "room": "Room 337"
           },
           {
@@ -3856,8 +3856,8 @@
           },
           {
             "period": 6,
-            "subject": "Financial Database Analysis and Software (Merged with BBA 4B)",
-            "teacher": "Dr. Narander Kumar Nigam",
+            "subject": "G?: Financial Database Analysis and Software (Merged with BBA 4B) | G?: Personality Development and Communication",
+            "teacher": "Dr. Narander Kumar Nigam (G?) / Ms. Monika (G?)",
             "room": "Room 557"
           },
           {
@@ -3899,7 +3899,7 @@
           },
           {
             "period": 4,
-            "subject": "Operations Management",
+            "subject": "Operations Management (G2)",
             "teacher": "Dr. Amrina Kausar",
             "room": "Room 703"
           },
@@ -3962,7 +3962,7 @@
           },
           {
             "period": 6,
-            "subject": "International Marketing (Merge with BMS 8th)",
+            "subject": "International Marketing (Merge with BMS 8th) (G1)",
             "teacher": "Mr. Tushar Marwah",
             "room": "Room 523"
           },
@@ -3976,8 +3976,8 @@
         "Wednesday": [
           {
             "period": 1,
-            "subject": "Financial Institutions & Markets",
-            "teacher": "Mr. Raj Kumar",
+            "subject": "G1: Financial Institutions & Markets | G2: International Marketing (Merge with BMS 8th)",
+            "teacher": "Mr. Raj Kumar (G1) / Mr. Tushar Marwah (G2)",
             "room": "Room 338"
           },
           {
@@ -4027,14 +4027,14 @@
         "Thursday": [
           {
             "period": 1,
-            "subject": "Cyber Sphere and Security: Global Concern",
-            "teacher": "Ms. Seema",
+            "subject": "G?: Cyber Sphere and Security: Global Concern | G?: App Development using Flutter",
+            "teacher": "Ms. Seema (G?) / Dr. Rama (G?)",
             "room": "Room 307/326"
           },
           {
             "period": 2,
-            "subject": "Cyber Sphere and Security: Global Concern",
-            "teacher": "Ms. Seema",
+            "subject": "G?: Cyber Sphere and Security: Global Concern | G?: App Development using Flutter",
+            "teacher": "Ms. Seema (G?) / Dr. Rama (G?)",
             "room": "Room 307/326"
           },
           {
@@ -4052,8 +4052,8 @@
           },
           {
             "period": 4,
-            "subject": "Financial Institutions & Markets",
-            "teacher": "Mr. Raj Kumar",
+            "subject": "G1: Operations Management | G2: Financial Institutions & Markets",
+            "teacher": "Dr. Amrina Kausar (G1) / Mr. Raj Kumar (G2)",
             "room": "Room 337"
           },
           {
@@ -4121,8 +4121,8 @@
           },
           {
             "period": 7,
-            "subject": "Cyber Sphere and Security: Global Concern",
-            "teacher": "Ms. Seema",
+            "subject": "G?: Cyber Sphere and Security: Global Concern | G?: App Development using Flutter",
+            "teacher": "Ms. Seema (G?) / Dr. Rama (G?)",
             "room": "Room 307/326"
           }
         ]
@@ -4245,8 +4245,8 @@
           },
           {
             "period": 3,
-            "subject": "Business Strategies",
-            "teacher": "Mr. Tushar Marwah",
+            "subject": "G1: Financial Institutions & Markets | G2: Business Strategies",
+            "teacher": "Mr. Raj Kumar (G1) / Mr. Tushar Marwah (G2)",
             "room": "Room 338"
           },
           {
@@ -4258,8 +4258,8 @@
           },
           {
             "period": 4,
-            "subject": "Operations Management",
-            "teacher": "Dr. Amrina Kausar",
+            "subject": "G1: Research Methodolgy\r\nMerge with BMS 6C | G2: Operations Management",
+            "teacher": "Dr. Mona Verma (G1) / Dr. Amrina Kausar (G2)",
             "room": "Room 361"
           },
           {
@@ -4284,20 +4284,20 @@
         "Thursday": [
           {
             "period": 1,
-            "subject": "Interagrated Marketing and Communications",
-            "teacher": "Dr. Anuja Mathur",
+            "subject": "G?: Cyber Sphere and Security: Global Concern | G?: App Development using Flutter",
+            "teacher": "Ms. Seema (G?) / Dr. Rama (G?)",
             "room": "Room 307/326"
           },
           {
             "period": 2,
-            "subject": "Interagrated Marketing and Communications",
-            "teacher": "Dr. Anuja Mathur",
+            "subject": "G?: Cyber Sphere and Security: Global Concern | G?: App Development using Flutter",
+            "teacher": "Ms. Seema (G?) / Dr. Rama (G?)",
             "room": "Room 307/326"
           },
           {
             "period": 3,
-            "subject": "Financial Institutions & Markets",
-            "teacher": "Mr. Raj Kumar",
+            "subject": "G1: Operations Management | G2: Financial Institutions & Markets",
+            "teacher": "Dr. Amrina Kausar (G1) / Mr. Raj Kumar (G2)",
             "room": "Room 534"
           },
           {
@@ -4372,14 +4372,14 @@
           },
           {
             "period": 6,
-            "subject": "Business Strategies",
+            "subject": "Business Strategies (G1)",
             "teacher": "Mr. Tushar Marwah",
             "room": "Room 703"
           },
           {
             "period": 7,
-            "subject": "Interagrated Marketing and Communications",
-            "teacher": "Dr. Anuja Mathur",
+            "subject": "G?: Cyber Sphere and Security: Global Concern | G?: App Development using Flutter",
+            "teacher": "Ms. Seema (G?) / Dr. Rama (G?)",
             "room": "Room 307/326"
           }
         ]
@@ -4431,7 +4431,7 @@
           },
           {
             "period": 7,
-            "subject": "Operations Management",
+            "subject": "Operations Management (G1)",
             "teacher": "Dr. Satish Kumar Goel",
             "room": "Room 703"
           }
@@ -4521,15 +4521,15 @@
           },
           {
             "period": 5,
-            "subject": "Social Entrepreneurship and Social Innovation",
-            "teacher": "Dr. Ramesh kumar",
+            "subject": "G?: Marketing Analytics | G?: Social Entrepreneurship and Social Innovation",
+            "teacher": "Mr. Ankit Bisht (G?) / Dr. Ramesh kumar (G?)",
             "room": "Room 523"
           },
           {
             "period": 6,
-            "subject": "Social Entrepreneurship and Social Innovation",
-            "teacher": "Dr. Ramesh kumar",
-            "room": "Room 523"
+            "subject": "G?: Marketing Analytics | G?: Social Entrepreneurship and Social Innovation",
+            "teacher": "Mr. Ankit Bisht (G?) / Dr. Ramesh kumar (G?)",
+            "room": "G?: Room 523 / G?: P"
           },
           {
             "period": 7,
@@ -4541,20 +4541,20 @@
         "Thursday": [
           {
             "period": 1,
-            "subject": "Cyber Sphere and Security: Global Concern",
-            "teacher": "Ms. Seema",
+            "subject": "G?: Cyber Sphere and Security: Global Concern | G?: App Development using Flutter | G?: 651)",
+            "teacher": "Ms. Seema (G?) / Ms. Ayushi (G?) / 651) (G?)",
             "room": "Room 303"
           },
           {
             "period": 2,
-            "subject": "Cyber Sphere and Security: Global Concern",
-            "teacher": "Ms. Seema",
+            "subject": "G?: Cyber Sphere and Security: Global Concern | G?: App Development using Flutter | G?: 651)",
+            "teacher": "Ms. Seema (G?) / Ms. Ayushi (G?) / 651) (G?)",
             "room": "Room 303"
           },
           {
             "period": 3,
-            "subject": "Financial Institutions & Markets",
-            "teacher": "Mr. Mohd. Rashid",
+            "subject": "G1: Financial Institutions & Markets | G2: Operations Management",
+            "teacher": "Mr. Mohd. Rashid (G1) / Dr. Satish Kumar Goel (G2)",
             "room": "Room 236"
           },
           {
@@ -4578,9 +4578,9 @@
           },
           {
             "period": 6,
-            "subject": "Social Entrepreneurship and Social Innovation",
-            "teacher": "Dr. Ramesh kumar",
-            "room": "Room 523"
+            "subject": "G?: Marketing Analytics | G?: Social Entrepreneurship and Social Innovation",
+            "teacher": "Mr. Ankit Bisht (G?) / Dr. Ramesh kumar (G?)",
+            "room": "G?: Room 523 / G?: P"
           },
           {
             "period": 7,
@@ -4598,7 +4598,7 @@
           },
           {
             "period": 2,
-            "subject": "Financial Institutions & Markets",
+            "subject": "Financial Institutions & Markets (G2)",
             "teacher": "Mr. Mohd. Rashid",
             "room": "Room 703"
           },
@@ -4657,8 +4657,8 @@
           },
           {
             "period": 3,
-            "subject": "Business Strategies",
-            "teacher": "Mr. Tushar Marwah",
+            "subject": "G2: Financial Institutions & Markets | G1: Business Strategies",
+            "teacher": "Mr. Raj Kumar (G2) / Mr. Tushar Marwah (G1)",
             "room": "Room 237"
           },
           {
@@ -4721,8 +4721,8 @@
           },
           {
             "period": 4,
-            "subject": "Business Strategies",
-            "teacher": "Mr. Tushar Marwah",
+            "subject": "G1: Operations Management | G2: Business Strategies",
+            "teacher": "Dr. Satish Kumar Goel (G1) / Mr. Tushar Marwah (G2)",
             "room": "Room 236"
           },
           {
@@ -4733,15 +4733,15 @@
           },
           {
             "period": 6,
-            "subject": "Cyber Sphere and Security: Global Concern",
-            "teacher": "Ms. Seema",
-            "room": "Room 257/651"
+            "subject": "G?: App Development using Flutter | G?: Cyber Sphere and Security: Global Concern",
+            "teacher": "Mr. Vineet (G?) / Ms. Seema (G?)",
+            "room": "G?: Room 257/651 / G?: Room 607"
           },
           {
             "period": 7,
-            "subject": "Cyber Sphere and Security: Global Concern",
-            "teacher": "Ms. Seema",
-            "room": "Room 257/651"
+            "subject": "G?: App Development using Flutter | G?: Cyber Sphere and Security: Global Concern",
+            "teacher": "Mr. Vineet (G?) / Ms. Seema (G?)",
+            "room": "G?: Room 257/651 / G?: Room 607"
           }
         ],
         "Wednesday": [
@@ -4823,8 +4823,8 @@
           },
           {
             "period": 4,
-            "subject": "Financial Institutions & Markets",
-            "teacher": "Dr. Kumar Bijoy",
+            "subject": "G1: Financial Institutions & Markets | G2: Operations Management",
+            "teacher": "Dr. Kumar Bijoy (G1) / Dr. Satish Kumar Goel (G2)",
             "room": "Room 338"
           },
           {
@@ -4886,8 +4886,8 @@
           },
           {
             "period": 6,
-            "subject": "Cyber Sphere and Security: Global Concern",
-            "teacher": "Ms. Seema",
+            "subject": "G?: App Development using Flutter | G?: Cyber Sphere and Security: Global Concern | G?: 326)",
+            "teacher": "Mr. Vineet (G?) / Ms. Seema (G?) / 326) (G?)",
             "room": "Room 257/651"
           },
           {
@@ -4957,12 +4957,12 @@
             "period": 1,
             "subject": "Social entrepreneurship and social Innovation\r\n(Merge with BMS 6B) (Room No. 307)",
             "teacher": "Ms. Ritika Aggarwal",
-            "room": "Room 703"
+            "room": "Room 307"
           },
           {
             "period": 2,
-            "subject": "Brand Management\r\n(Merge with BMS 4A)",
-            "teacher": "Ms. Bhavya Bansal",
+            "subject": "G?: Social entrepreneurship and social Innovation\r\n(Merge with BMS 6B) (Room No. 307) | G?: Brand Management\r\n(Merge with BMS 4A)",
+            "teacher": "Ms. Ritika Aggarwal (G?) / Ms. Bhavya Bansal (G?)",
             "room": "P"
           },
           {
@@ -4992,7 +4992,7 @@
           },
           {
             "period": 6,
-            "subject": "International Marketing\r\n(Merge with BMS 6A)",
+            "subject": "International Marketing\r\n(Merge with BMS 6A) (G1)",
             "teacher": "Mr. Tushar Marwah",
             "room": "Room 703"
           },
@@ -5006,15 +5006,15 @@
         "Wednesday": [
           {
             "period": 1,
-            "subject": "Machine learning and Application\r\n(Merge with BBA 2B) (Room No. 253)",
-            "teacher": "Dr. Satish Kumar Goel",
+            "subject": "G?: Social entrepreneurship and social Innovation\r\n(Merge with BMS 6B) (Room No. 307) | G?: Machine learning and Application\r\n(Merge with BBA 2B) (Room No. 253) | G?: Brand Management\r\n(Merge with BMS 4A)",
+            "teacher": "Ms. Ritika Aggarwal (G?) / Dr. Satish Kumar Goel (G?) / Ms. Bhavya Bansal (G?)",
             "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Machine learning and Application\r\n(Merge with BBA 2B) (Room No. 253)",
-            "teacher": "Dr. Satish Kumar Goel",
-            "room": "P"
+            "subject": "G?: Social entrepreneurship and social Innovation\r\n(Merge with BMS 6B) (Room No. 307) | G?: Machine learning and Application\r\n(Merge with BBA 2B) (Room No. 253) | G?: Brand Management\r\n(Merge with BMS 4A)",
+            "teacher": "Ms. Ritika Aggarwal (G?) / Dr. Satish Kumar Goel (G?) / Ms. Bhavya Bansal (G?)",
+            "room": "G?: P / G?: Room 326 / G?: P"
           },
           {
             "period": 3,
@@ -5108,9 +5108,9 @@
         "Friday": [
           {
             "period": 1,
-            "subject": "Machine learning and Application\r\n(Merge with BBA 2B) (Room No. 253)",
-            "teacher": "Dr. Satish Kumar Goel",
-            "room": "P"
+            "subject": "G?: Social entrepreneurship and social Innovation\r\n(Merge with BMS 6B) (Room No. 307) | G?: Machine learning and Application\r\n(Merge with BBA 2B) (Room No. 253)",
+            "teacher": "Ms. Ritika Aggarwal (G?) / Dr. Satish Kumar Goel (G?)",
+            "room": "G?: P / G?: Room 253"
           },
           {
             "period": 2,
