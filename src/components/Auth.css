@@ -40,7 +40,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(12, 35, 64, 0.88) 0%, rgba(20, 42, 74, 0.82) 100%);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.55) 100%);
   z-index: 1;
 }
 
