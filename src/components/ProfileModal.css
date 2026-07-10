@@ -16,7 +16,7 @@
 .profile-modal-card {
   width: 100%;
   max-width: 480px;
-  background: #ffffff;
+  background: var(--bg-card);
   border: 1px solid rgba(12, 35, 64, 0.08);
   box-shadow: 0 20px 40px rgba(12, 35, 64, 0.08);
   border-radius: 16px;
@@ -106,7 +106,7 @@
 
 .form-item input[type="text"],
 .select-field {
-  background: #ffffff;
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 10px 14px;
@@ -122,7 +122,7 @@
   outline: none;
   border-color: var(--accent-gold);
   box-shadow: 0 0 8px rgba(155, 126, 62, 0.15);
-  background: #ffffff;
+  background: var(--bg-card);
 }
 
 .radio-card-grid {
@@ -132,7 +132,7 @@
 }
 
 .radio-card {
-  background: #faf8f5;
+  background: var(--bg-darker);
   border: 1px solid var(--border-color);
   padding: 12px 8px;
   border-radius: 10px;
@@ -148,7 +148,7 @@
 }
 
 .radio-card:hover {
-  background: #ffffff;
+  background: var(--bg-card);
   border-color: rgba(155, 126, 62, 0.3);
   transform: translateY(-1px);
 }
@@ -188,7 +188,7 @@
 }
 
 .select-field option {
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   color: var(--text-main);
 }
 

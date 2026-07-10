@@ -200,7 +200,7 @@
 
 .auth-card-inner {
   border: 1px solid var(--border-color);
-  background: #ffffff;
+  background: var(--bg-card);
   border-radius: 16px;
   padding: 36px 30px;
   box-shadow: 0 10px 30px rgba(12, 35, 64, 0.04);
@@ -286,7 +286,7 @@
 
 .input-field-wrapper input {
   width: 100%;
-  background: #ffffff;
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 11px 14px;
@@ -303,7 +303,7 @@
 
 .input-field-wrapper input:focus {
   border-color: var(--accent-gold);
-  background: #ffffff;
+  background: var(--bg-card);
   box-shadow: 0 0 0 3px var(--accent-gold-glow);
 }
 
@@ -475,7 +475,7 @@
 }
 
 .google-signin-button {
-  background: #ffffff;
+  background: var(--bg-card);
   border: 1px solid rgba(12, 35, 64, 0.12);
   border-radius: 8px;
   color: #1c1d1f;

@@ -1,19 +1,19 @@
 /* App CSS Stylesheet - SSCBS Campus OS Dashboard */
 
 :root {
-  --bg-darker: #faf8f5;
-  --bg-dark: #ffffff;
-  --bg-surface: #ffffff;
-  --border-color: rgba(12, 35, 64, 0.08);
-  --border-gold-glow: rgba(155, 126, 62, 0.25);
+  --bg-darker: #eae6dc;
+  --bg-dark: #faf8f2;
+  --bg-surface: #faf8f2;
+  --border-color: rgba(12, 35, 64, 0.12);
+  --border-gold-glow: rgba(143, 113, 53, 0.25);
   
-  --text-main: #1c1d1f;
-  --text-dim: #5e6671;
+  --text-main: #2a2a28;
+  --text-dim: #646460;
   
-  --accent-gold: #9b7e3e;
-  --accent-gold-glow: rgba(155, 126, 62, 0.08);
+  --accent-gold: #8f7135;
+  --accent-gold-glow: rgba(143, 113, 53, 0.08);
   --accent-cyan: #0284c7;
-  --accent-green: #0d8a5f;
+  --accent-green: #0b7a54;
   --accent-amber: #b45309;
 }
 
@@ -150,7 +150,7 @@ body {
 }
 
 .btn-signout {
-  background: #ffffff;
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   color: var(--text-main);
   padding: 6px 12px;
@@ -257,7 +257,7 @@ body {
 
 .dashboard-card:hover {
   border-color: var(--border-gold-glow);
-  background: #ffffff;
+  background: var(--bg-card);
   box-shadow: 0 8px 24px rgba(12, 35, 64, 0.05);
   transform: translateY(-2px);
 }
