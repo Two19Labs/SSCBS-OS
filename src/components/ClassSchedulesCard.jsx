@@ -162,6 +162,14 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
     setIsSimulated(e.target.checked);
   };
 
+  // Get time components for ticking clock with seconds
+  const hours = time.getHours();
+  const rawHours12 = hours % 12 || 12;
+  const hours12 = String(rawHours12).padStart(2, '0');
+  const minutes = String(time.getMinutes()).padStart(2, '0');
+  const seconds = String(time.getSeconds()).padStart(2, '0');
+  const amPm = hours >= 12 ? 'PM' : 'AM';
+
   return (
     <div className={`schedule-card-container ${hasConfiguredProfile ? 'active-tracker' : 'configure-prompt'}`}>
       
@@ -196,9 +204,11 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                 <p className="subtitle">{course} Sem {semester} Section {section}</p>
               </div>
               <div className="tracker-time-display">
-                <span className="clock-digits">
-                  {time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
-                </span>
+                <div className="clock-wrapper">
+                  <span className="clock-digits">{hours12}:{minutes}</span>
+                  <span className="clock-seconds">:{seconds}</span>
+                  <span className="clock-ampm">{amPm}</span>
+                </div>
                 <span className="clock-sec">
                   {dayOfWeek.toUpperCase()}
                 </span>
@@ -218,10 +228,22 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
               ) : activeClass && activeClass.subject !== 'Free' && !activeClass.isBreak ? (
                 <div className="status-hero ongoing">
                   <div className="hero-details">
-                    <span className="badge-status live">Ongoing Now</span>
+                    <div className="hero-status-row">
+                      <span className="badge-status live">Ongoing Now</span>
+                      {activeClass.room && activeClass.room !== '-' && (
+                        <span className="room-label">Room: <strong className="highlight-tag">{activeClass.room}</strong></span>
+                      )}
+                    </div>
                     <h3>{activeClass.subject}</h3>
-                    <p className="teacher-name">Instructed by: <strong>{activeClass.teacher}</strong></p>
-                    <p className="room-label">Room: <span className="highlight-tag">{activeClass.room}</span></p>
+                    {activeClass.teacher && activeClass.teacher !== '-' && (
+                      <p className="teacher-name">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2.5" fill="none" style={{ marginRight: '4px', verticalAlign: 'middle', opacity: 0.8 }}>
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                          <circle cx="12" cy="7" r="4" />
+                        </svg>
+                        {activeClass.teacher}
+                      </p>
+                    )}
                   </div>
                   <div className="hero-progress">
                     <div className="progress-bar-container">
@@ -238,7 +260,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                   <div className="hero-details">
                     <span className="badge-status break-badge">Infinity Hour</span>
                     <h3>Break</h3>
-                    <p>It's Infy, go to Nescafe/Amul and chill! :)</p>
+                    <p className="break-note">It's Infy, go to Nescafe/Amul and chill! :)</p>
                   </div>
                   <div className="hero-progress">
                     <div className="progress-bar-container">
@@ -246,7 +268,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                     </div>
                     <div className="progress-details">
                       <span>12:00 PM - 1:00 PM</span>
-                      <span>{getFormattedRemainingTime(PERIODS.find(p => p.id === 0))}</span>
+                      <span className="time-remaining">{getFormattedRemainingTime(activePeriodInfo || PERIODS.find(p => p.id === 0))}</span>
                     </div>
                   </div>
                 </div>
@@ -254,8 +276,8 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                 <div className="status-hero free-slot">
                   <div className="hero-details">
                     <span className="badge-status free">Free</span>
-                    <h3>Free</h3>
-                    <p>Use this block for coursework revision, library resources, or project collaborations.</p>
+                    <h3>Free Block</h3>
+                    <p className="free-note">Use this block for coursework revision or project collaboration.</p>
                   </div>
                   <div className="hero-progress">
                     <div className="progress-bar-container">
@@ -263,7 +285,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                     </div>
                     <div className="progress-details">
                       <span>{activePeriodInfo.startLabel} - {activePeriodInfo.endLabel}</span>
-                      <span>{getFormattedRemainingTime(activePeriodInfo)}</span>
+                      <span className="time-remaining">{getFormattedRemainingTime(activePeriodInfo)}</span>
                     </div>
                   </div>
                 </div>
@@ -272,7 +294,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                   <div className="hero-details">
                     <span className="badge-status offline">Classes Completed</span>
                     <h3>Academic Slots Inactive</h3>
-                    <p>All scheduled sessions for today have concluded. Have a great evening!</p>
+                    <p className="inactive-note">All scheduled sessions for today have concluded. Have a great evening!</p>
                   </div>
                 </div>
               )}
@@ -283,7 +305,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                 {nextClass ? (
                   <div className="next-class-card">
                     <div className="next-class-icon">
-                      <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none">
+                      <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none">
                         <circle cx="12" cy="12" r="10" />
                         <polyline points="12 6 12 12 16 14" />
                       </svg>
@@ -302,7 +324,10 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                   </div>
                 )}
                 <button className="btn-view-weekly" onClick={() => setShowWeeklyModal(true)}>
-                  📅 View Weekly Timetable
+                  <span>View Weekly Timetable</span>
+                  <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2.5" fill="none">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
                 </button>
               </div>
             </div>
@@ -311,36 +336,42 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
             {!isWeekend && (
               <div className="daily-timeline-section">
                 <h3>Today's Timeline</h3>
-                <div className="timeline-grid">
-                  {todayClasses.map((cls) => {
-                    const periodInfo = PERIODS.find(p => p.id === cls.period || (cls.isBreak && p.id === 0));
-                    if (!periodInfo) return null;
-                    
-                    const startMin = parseTimeToMinutes(periodInfo.start);
-                    const endMin = parseTimeToMinutes(periodInfo.end);
-                    
-                    const isPast = currentMinutes >= endMin;
-                    const isActive = currentMinutes >= startMin && currentMinutes < endMin;
-                    const isUpcoming = currentMinutes < startMin;
-                    
-                    return (
-                      <div 
-                        key={cls.period} 
-                        className={`timeline-slot-card ${isActive ? 'active' : ''} ${isPast ? 'past' : ''} ${isUpcoming ? 'upcoming' : ''}`}
-                      >
-                        <div className="timeline-slot-time">
-                          <span>{periodInfo.startLabel}</span>
-                          {isActive && <span className="active-glow-dot"></span>}
+                <div className="timeline-trail-container">
+                  <div className="timeline-trail">
+                    {todayClasses.map((cls) => {
+                      const periodInfo = PERIODS.find(p => p.id === cls.period || (cls.isBreak && p.id === 0));
+                      if (!periodInfo) return null;
+                      
+                      const startMin = parseTimeToMinutes(periodInfo.start);
+                      const endMin = parseTimeToMinutes(periodInfo.end);
+                      
+                      const isPast = currentMinutes >= endMin;
+                      const isActive = currentMinutes >= startMin && currentMinutes < endMin;
+                      const isUpcoming = currentMinutes < startMin;
+                      
+                      return (
+                        <div 
+                          key={cls.period} 
+                          className={`timeline-slot-card ${isActive ? 'active' : ''} ${isPast ? 'past' : ''} ${isUpcoming ? 'upcoming' : ''}`}
+                        >
+                          <div className="timeline-slot-time">
+                            <span>{periodInfo.startLabel}</span>
+                            {isActive && <span className="active-glow-dot"></span>}
+                          </div>
+                          <div className="timeline-slot-content">
+                            <h5 className="slot-subject" title={cls.isBreak ? "Break" : cls.subject}>
+                              {cls.isBreak ? "Break" : cls.subject}
+                            </h5>
+                            {!cls.isBreak && cls.subject !== 'Free' && cls.room ? (
+                              <p className="slot-meta" title={`${cls.room} • ${cls.teacher}`}>{cls.room} • {cls.teacher}</p>
+                            ) : (
+                              <p className="slot-meta-empty">-</p>
+                            )}
+                          </div>
                         </div>
-                        <div className="timeline-slot-content">
-                          <h5 className="slot-subject">{cls.isBreak ? "Break" : cls.subject}</h5>
-                          {!cls.isBreak && cls.subject !== 'Free' && (
-                            <p className="slot-meta">{cls.room} • {cls.teacher}</p>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}
