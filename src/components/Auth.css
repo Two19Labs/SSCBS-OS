@@ -238,10 +238,12 @@
 .auth-panel-right {
   flex: 0 0 50%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 40px;
   background-color: var(--bg-darker);
+  position: relative;
 }
 
 .auth-card-outer {
@@ -564,4 +566,44 @@
 
 .google-icon-svg {
   flex-shrink: 0;
+}
+
+/* Credits Footer in Auth Panel */
+.auth-credit-footer {
+  margin-top: 32px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.auth-credit-footer .heart-icon {
+  color: #e11d48;
+  display: inline-block;
+  animation: pulse 1.5s infinite;
+}
+
+.auth-credit-footer .developer-name {
+  color: var(--text-light);
+  font-weight: 600;
+  background: linear-gradient(120deg, #b45309, #d97706);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+@media (max-width: 900px) {
+  .auth-credit-footer {
+    margin-top: 24px;
+    margin-bottom: 8px;
+  }
 }

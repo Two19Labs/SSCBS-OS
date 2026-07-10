@@ -5,13 +5,14 @@ import ProfileModal from './components/ProfileModal';
 import ClassSchedulesCard from './components/ClassSchedulesCard';
 import FindMyProfessorPage from './components/FindMyProfessorPage';
 import GpaCalculatorModal from './components/GpaCalculatorModal';
+import WaiverToolPage from './components/WaiverToolPage';
 import './App.css';
 import { Analytics } from '@vercel/analytics/react';
 
 function App() {
   const { user, loading } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard' or 'prof-tracker'
+  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'prof-tracker', or 'waiver-tool'
   const [isGpaOpen, setIsGpaOpen] = useState(false);
 
   if (loading) {
@@ -88,6 +89,8 @@ function App() {
         <main className="workspace-main">
           {currentView === 'prof-tracker' ? (
             <FindMyProfessorPage onBack={() => setCurrentView('dashboard')} />
+          ) : currentView === 'waiver-tool' ? (
+            <WaiverToolPage onBack={() => setCurrentView('dashboard')} />
           ) : (
             <>
               {/* Core Feature: Timetable Schedule Tracker */}
@@ -108,13 +111,18 @@ function App() {
                   </div>
                 </div>
 
-                <div className="dashboard-card locked">
+                <div 
+                  className="dashboard-card active-card" 
+                  onClick={() => setCurrentView('waiver-tool')}
+                  style={{ cursor: 'pointer' }}
+                >
                   <div className="card-header">
                     <h3>Waiver Tool</h3>
+                    <span className="badge-active">Waivers</span>
                   </div>
-                  <p>Manage, track, and apply for college attendance/marks waivers with automated document generation.</p>
+                  <p>Optimize and recommend waiver dates to clear the 85% attendance requirement for Theory and Tutorials.</p>
                   <div className="card-footer">
-                    <span className="badge-lock">Coming Soon</span>
+                    <span className="btn-card-action">Launch Tool →</span>
                   </div>
                 </div>
 
@@ -147,6 +155,19 @@ function App() {
             </>
           )}
         </main>
+
+        {/* Workspace Footer */}
+        <footer className="workspace-footer">
+          <div className="footer-content">
+            <span className="footer-brand">SSCBS Campus OS</span>
+            <div className="footer-divider"></div>
+            <span className="footer-credits">
+              Made with <span className="heart-icon">♥</span> by{' '}
+              <span className="developer-name">Aditya Singhani</span> &amp;{' '}
+              <span className="developer-name">Manthan Kabra</span>
+            </span>
+          </div>
+        </footer>
       </div>
 
       {/* Profile Modal */}

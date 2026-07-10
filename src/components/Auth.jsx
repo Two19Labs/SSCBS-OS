@@ -296,6 +296,14 @@ export default function Auth() {
               </div>
             </div>
           </div>
+          
+          <div className="auth-credit-footer">
+            <span>
+              Made with <span className="heart-icon">♥</span> by{' '}
+              <span className="developer-name">Aditya Singhani</span> &amp;{' '}
+              <span className="developer-name">Manthan Kabra</span>
+            </span>
+          </div>
         </div>
 
       </div>
