@@ -212,10 +212,6 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
     return { name: 'Fail / Essential Repeat', class: 'fail' };
   };
 
-  const handlePrintReport = () => {
-    window.print();
-  };
-
   const getSubjectCalculatedGrade = (sub) => {
     if (sub.mode === 'grade') return sub.grade;
     const theory = parseFloat(sub.theoryMarks) || 0;
@@ -467,18 +463,7 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                       >
                         Copy to CGPA Calculator
                       </button>
-                      <button 
-                        type="button" 
-                        className="btn-secondary-gpa btn-full-width btn-icon-row"
-                        onClick={handlePrintReport}
-                      >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                          <rect x="6" y="14" width="12" height="8"></rect>
-                        </svg>
-                        Print Report Card
-                      </button>
+
                     </div>
                   </div>
                 </div>
@@ -604,18 +589,7 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                     </div>
 
                     <div className="sidebar-action-buttons">
-                      <button 
-                        type="button" 
-                        className="btn-secondary-gpa btn-full-width btn-icon-row"
-                        onClick={handlePrintReport}
-                      >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                          <rect x="6" y="14" width="12" height="8"></rect>
-                        </svg>
-                        Print CGPA Report
-                      </button>
+
                     </div>
                   </div>
                 </div>
@@ -770,137 +744,7 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
 
         </div>
         
-        {/* Printable representation for Export Report Card (Invisible on screen, styled for print) */}
-        <div className="gpa-print-only-container">
-          <div className="print-report-header">
-            <img src="/sscbs_logo.png" alt="SSCBS Crest" width="50" height="50" />
-            <div className="print-header-text">
-              <h2>SHAHEED SUKHDEV COLLEGE OF BUSINESS STUDIES</h2>
-              <h3>University of Delhi</h3>
-              <h4>Academic Performance Report Card (NEP UGCF)</h4>
-            </div>
-          </div>
 
-          <div className="print-meta-grid">
-            <div><strong>Student Name:</strong> {user?.user_metadata?.full_name || 'N/A'}</div>
-            <div><strong>Email Address:</strong> {user?.email || 'N/A'}</div>
-            <div><strong>Academic Course:</strong> {user?.user_metadata?.course || 'N/A'}</div>
-            <div><strong>Report Date:</strong> {new Date().toLocaleDateString('en-IN')}</div>
-          </div>
-
-          <hr className="print-divider" />
-
-          {activeTab === 'sgpa' ? (
-            <div className="print-main-content">
-              <h3>Semester {selectedSemester} Performance Assessment</h3>
-              <table className="print-table">
-                <thead>
-                  <tr>
-                    <th>Subject Title</th>
-                    <th className="text-center">Credits</th>
-                    <th className="text-center">Calculated Grade</th>
-                    <th className="text-center">Grade Point</th>
-                    <th className="text-center">Quality Points</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {subjects.map(sub => {
-                    const grade = getSubjectCalculatedGrade(sub);
-                    const gp = GRADE_POINTS[grade] !== undefined ? GRADE_POINTS[grade] : 0;
-                    const creds = parseFloat(sub.credits) || 0;
-                    return (
-                      <tr key={sub.id}>
-                        <td>{sub.name}</td>
-                        <td className="text-center">{creds}</td>
-                        <td className="text-center">{grade}</td>
-                        <td className="text-center">{gp}</td>
-                        <td className="text-center">{(gp * creds).toFixed(1)}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-
-              <div className="print-summary-box">
-                <div className="print-summary-row">
-                  <span>Semester SGPA:</span>
-                  <strong>{sgpaResult.toFixed(2)}</strong>
-                </div>
-                <div className="print-summary-row">
-                  <span>Total Credits Registered:</span>
-                  <strong>{totalSgpaCredits}</strong>
-                </div>
-                <div className="print-summary-row">
-                  <span>Cumulative Grade Points:</span>
-                  <strong>{totalSgpaPoints}</strong>
-                </div>
-                <div className="print-summary-row">
-                  <span>Equivalent Percentage:</span>
-                  <strong>{(sgpaResult * 10).toFixed(1)}%</strong>
-                </div>
-                <div className="print-summary-row">
-                  <span>Qualifying Division:</span>
-                  <strong>{getDivision(sgpaResult).name}</strong>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="print-main-content">
-              <h3>Cumulative Graduation CGPA Report</h3>
-              <table className="print-table">
-                <thead>
-                  <tr>
-                    <th>Semester Name</th>
-                    <th className="text-center">Semester SGPA</th>
-                    <th className="text-center">Credit Weight</th>
-                    <th className="text-center">Quality Points Contribution</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {semestersData.filter(s => s.enabled).map(sem => {
-                    const sgpa = parseFloat(sem.sgpa) || 0;
-                    const creds = parseFloat(sem.credits) || 0;
-                    return (
-                      <tr key={sem.number}>
-                        <td>Semester {sem.number}</td>
-                        <td className="text-center">{sgpa.toFixed(2)}</td>
-                        <td className="text-center">{creds}</td>
-                        <td className="text-center">{(sgpa * creds).toFixed(1)}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-
-              <div className="print-summary-box">
-                <div className="print-summary-row">
-                  <span>Grand CGPA:</span>
-                  <strong>{cgpaResult.toFixed(2)}</strong>
-                </div>
-                <div className="print-summary-row">
-                  <span>Total Completed Credits:</span>
-                  <strong>{totalCgpaCredits}</strong>
-                </div>
-                <div className="print-summary-row">
-                  <span>Degree Final Percentage:</span>
-                  <strong>{(cgpaResult * 10).toFixed(1)}%</strong>
-                </div>
-                <div className="print-summary-row">
-                  <span>Declared Class / Division:</span>
-                  <strong>{getDivision(cgpaResult).name}</strong>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="print-footer">
-            <p>Generated via SSCBS Campus OS Dashboard. This is an unofficial estimation worksheet for student advising purposes.</p>
-            <div className="print-signatures">
-              <div className="sig-line">Prepared by AI Assistant</div>
-              <div className="sig-line">Student Signature</div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
