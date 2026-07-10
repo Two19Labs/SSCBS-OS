@@ -1,20 +1,20 @@
 /* App CSS Stylesheet - SSCBS Campus OS Dashboard */
 
 :root {
-  --bg-darker: #070b12;
-  --bg-dark: #0c2340;
-  --bg-surface: rgba(12, 35, 64, 0.15);
-  --border-color: rgba(255, 255, 255, 0.05);
-  --border-gold-glow: rgba(212, 175, 55, 0.2);
+  --bg-darker: #faf8f5;
+  --bg-dark: #ffffff;
+  --bg-surface: #ffffff;
+  --border-color: rgba(12, 35, 64, 0.08);
+  --border-gold-glow: rgba(155, 126, 62, 0.25);
   
-  --text-main: #f8fafc;
-  --text-dim: #94a3b8;
+  --text-main: #1c1d1f;
+  --text-dim: #5e6671;
   
-  --accent-gold: #d4af37;
-  --accent-gold-glow: rgba(212, 175, 55, 0.1);
-  --accent-cyan: #38bdf8;
-  --accent-green: #10b981;
-  --accent-amber: #fbbf24;
+  --accent-gold: #9b7e3e;
+  --accent-gold-glow: rgba(155, 126, 62, 0.08);
+  --accent-cyan: #0284c7;
+  --accent-green: #0d8a5f;
+  --accent-amber: #b45309;
 }
 
 body {
@@ -44,7 +44,7 @@ body {
 .system-spinner {
   width: 45px;
   height: 45px;
-  border: 3px solid rgba(212, 175, 55, 0.1);
+  border: 3px solid rgba(155, 126, 62, 0.1);
   border-radius: 50%;
   border-top-color: var(--accent-gold);
   border-right-color: var(--accent-cyan);
@@ -63,7 +63,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: radial-gradient(circle at 50% 0%, rgba(20, 48, 88, 0.15) 0%, rgba(7, 11, 18, 0) 60%),
+  background: radial-gradient(circle at 50% 0%, rgba(155, 126, 62, 0.04) 0%, rgba(250, 248, 245, 0) 60%),
               var(--bg-darker);
 }
 
@@ -73,7 +73,7 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 16px 40px;
-  background: rgba(12, 35, 64, 0.1);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-color);
   z-index: 100;
@@ -89,7 +89,7 @@ body {
   border-radius: 50%;
   background: #ffffff;
   padding: 1px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 6px rgba(12, 35, 64, 0.06);
   object-fit: contain;
 }
 
@@ -125,7 +125,7 @@ body {
   height: 32px;
   border-radius: 50%;
   background: var(--accent-gold);
-  color: #070b12;
+  color: #ffffff;
   font-weight: 800;
   font-size: 0.9rem;
   display: flex;
@@ -150,7 +150,7 @@ body {
 }
 
 .btn-signout {
-  background: rgba(255, 255, 255, 0.02);
+  background: #ffffff;
   border: 1px solid var(--border-color);
   color: var(--text-main);
   padding: 6px 12px;
@@ -159,12 +159,13 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(12, 35, 64, 0.02);
 }
 
 .btn-signout:hover {
-  background: rgba(239, 68, 68, 0.08);
-  border-color: rgba(239, 68, 68, 0.2);
-  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.05);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #b91c1c;
 }
 
 /* Main Content Area */
@@ -186,9 +187,10 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 24px 30px;
-  background: rgba(12, 35, 64, 0.1);
+  background: rgba(255, 255, 255, 0.6);
   border: 1px solid var(--border-color);
   border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(12, 35, 64, 0.02);
 }
 
 .banner-content h2 {
@@ -211,7 +213,7 @@ body {
   gap: 8px;
   font-family: monospace;
   font-size: 0.75rem;
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(12, 35, 64, 0.03);
   padding: 4px 10px;
   border-radius: 20px;
   border: 1px solid var(--border-color);
@@ -226,12 +228,12 @@ body {
 
 .status-dot.online {
   background-color: var(--accent-green);
-  box-shadow: 0 0 6px var(--accent-green);
+  box-shadow: 0 0 4px rgba(13, 138, 95, 0.3);
 }
 
 .status-dot.offline {
   background-color: var(--accent-amber);
-  box-shadow: 0 0 6px var(--accent-amber);
+  box-shadow: 0 0 4px rgba(180, 83, 9, 0.3);
 }
 
 /* Grid layout */
@@ -250,11 +252,13 @@ body {
   flex-direction: column;
   gap: 12px;
   transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(12, 35, 64, 0.02);
 }
 
 .dashboard-card:hover {
   border-color: var(--border-gold-glow);
-  background: rgba(12, 35, 64, 0.25);
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(12, 35, 64, 0.05);
   transform: translateY(-2px);
 }
 
@@ -283,7 +287,7 @@ body {
   font-size: 0.65rem;
   font-weight: 700;
   color: var(--accent-gold);
-  background: rgba(212, 175, 55, 0.05);
+  background: rgba(155, 126, 62, 0.06);
   border: 1px dashed var(--border-gold-glow);
   padding: 2px 8px;
   border-radius: 4px;
@@ -366,7 +370,7 @@ body {
 }
 
 .user-class-badge-small {
-  background: rgba(212, 175, 55, 0.08);
+  background: rgba(155, 126, 62, 0.08);
   border: 1px solid var(--border-gold-glow);
   color: var(--accent-gold);
   font-size: 0.6rem;
@@ -376,4 +380,3 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.25px;
 }
-
