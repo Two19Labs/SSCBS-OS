@@ -36,13 +36,13 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: rgba(155, 126, 62, 0.06);
+  background: rgba(12, 35, 64, 0.06);
   border: 1px solid var(--border-gold-glow);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--accent-gold);
-  box-shadow: 0 4px 12px rgba(155, 126, 62, 0.08);
+  box-shadow: 0 4px 12px rgba(12, 35, 64, 0.08);
 }
 
 .setup-banner-wrapper h3 {
@@ -73,9 +73,9 @@
 }
 
 .btn-setup-action:hover {
-  background: #8a7332;
-  border-color: #8a7332;
-  box-shadow: 0 4px 12px rgba(155, 126, 62, 0.2);
+  background: #163056;
+  border-color: #163056;
+  box-shadow: 0 4px 12px rgba(12, 35, 64, 0.2);
   transform: translateY(-1px);
 }
 
@@ -232,7 +232,7 @@
   text-transform: uppercase;
 }
 
-.badge-status.live { background: rgba(155, 126, 62, 0.08); color: var(--accent-gold); border: 1px solid rgba(155, 126, 62, 0.2); }
+.badge-status.live { background: rgba(12, 35, 64, 0.08); color: var(--accent-gold); border: 1px solid rgba(12, 35, 64, 0.2); }
 .badge-status.break-badge { background: rgba(2, 132, 199, 0.08); color: var(--accent-cyan); border: 1px solid rgba(2, 132, 199, 0.2); }
 .badge-status.free { background: rgba(13, 138, 95, 0.08); color: var(--accent-green); border: 1px solid rgba(13, 138, 95, 0.2); }
 .badge-status.offline { background: rgba(94, 102, 113, 0.08); color: var(--text-dim); border: 1px solid rgba(94, 102, 113, 0.2); }
@@ -253,10 +253,10 @@
 .hero-status-row .highlight-tag {
   color: var(--accent-gold);
   font-weight: 700;
-  background: rgba(143, 113, 53, 0.06);
+  background: rgba(12, 35, 64, 0.06);
   padding: 1px 6px;
   border-radius: 4px;
-  border: 1px solid rgba(143, 113, 53, 0.15);
+  border: 1px solid rgba(12, 35, 64, 0.15);
 }
 
 .status-hero h3 {
@@ -290,7 +290,7 @@
 
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #9b7e3e, #b29454);
+  background: linear-gradient(90deg, #0c2340, #1a365d);
   border-radius: 3px;
 }
 
@@ -382,7 +382,7 @@
 }
 
 .btn-view-weekly:hover {
-  background: rgba(143, 113, 53, 0.05);
+  background: rgba(12, 35, 64, 0.05);
   transform: translateY(-1px);
 }
 
@@ -415,7 +415,7 @@
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
-  scrollbar-color: rgba(143, 113, 53, 0.2) transparent;
+  scrollbar-color: rgba(12, 35, 64, 0.2) transparent;
 }
 
 /* Custom scrollbar for webkit browsers */
@@ -428,12 +428,12 @@
 }
 
 .timeline-trail::-webkit-scrollbar-thumb {
-  background-color: rgba(143, 113, 53, 0.2);
+  background-color: rgba(12, 35, 64, 0.2);
   border-radius: 10px;
 }
 
 .timeline-trail::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(143, 113, 53, 0.4);
+  background-color: rgba(12, 35, 64, 0.4);
 }
 
 .timeline-slot-card {
@@ -473,8 +473,8 @@
 
 .timeline-slot-card.active {
   border-color: var(--accent-gold);
-  background: rgba(143, 113, 53, 0.03);
-  box-shadow: 0 4px 12px rgba(143, 113, 53, 0.08);
+  background: rgba(12, 35, 64, 0.03);
+  box-shadow: 0 4px 12px rgba(12, 35, 64, 0.08);
 }
 
 .timeline-slot-card.active::before {
@@ -663,7 +663,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 24px;
-  border-bottom: 1.5px solid rgba(223, 182, 104, 0.25);
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.15);
   background: #0c2340;
   color: #ffffff;
 }
@@ -678,7 +678,7 @@
   font-family: 'Outfit', sans-serif;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #dfb668;
+  color: #ffffff;
 }
 
 .weekly-modal-header p {
@@ -719,9 +719,9 @@
 }
 
 .btn-layout-toggle.active {
-  background: #dfb668;
+  background: #ffffff;
   color: #0c2340;
-  box-shadow: 0 2px 8px rgba(223, 182, 104, 0.2);
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.2);
 }
 
 .weekly-modal-header .close-btn {
@@ -794,7 +794,7 @@
 .weekly-day-tab.active {
   background: var(--bg-card);
   border-color: var(--accent-gold);
-  box-shadow: 0 4px 12px rgba(143, 113, 53, 0.08);
+  box-shadow: 0 4px 12px rgba(12, 35, 64, 0.08);
 }
 
 .tab-day-name {
@@ -885,7 +885,7 @@
 .list-timeline-item.active-timeline-item .timeline-time-col::after {
   background: var(--accent-gold);
   border-color: var(--accent-gold);
-  box-shadow: 0 0 0 4px rgba(143, 113, 53, 0.15);
+  box-shadow: 0 0 0 4px rgba(12, 35, 64, 0.15);
 }
 
 .timeline-period-label {
@@ -905,8 +905,8 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: rgba(143, 113, 53, 0.08);
-  border: 1px solid rgba(143, 113, 53, 0.2);
+  background: rgba(12, 35, 64, 0.08);
+  border: 1px solid rgba(12, 35, 64, 0.2);
   color: var(--accent-gold);
   font-size: 0.55rem;
   font-weight: 700;
@@ -942,8 +942,8 @@
 
 .active-timeline-item .timeline-class-card {
   border-color: var(--accent-gold);
-  background: linear-gradient(135deg, #ffffff 0%, rgba(143, 113, 53, 0.02) 100%);
-  box-shadow: 0 4px 16px rgba(143, 113, 53, 0.06);
+  background: linear-gradient(135deg, #ffffff 0%, rgba(12, 35, 64, 0.02) 100%);
+  box-shadow: 0 4px 16px rgba(12, 35, 64, 0.06);
 }
 
 .timeline-subject {
@@ -975,8 +975,8 @@
 }
 
 .timeline-meta-item.room-tag {
-  background: rgba(143, 113, 53, 0.05);
-  border: 1px solid rgba(143, 113, 53, 0.15);
+  background: rgba(12, 35, 64, 0.05);
+  border: 1px solid rgba(12, 35, 64, 0.15);
   color: var(--accent-gold);
   padding: 1px 6px;
   border-radius: 4px;
@@ -1112,7 +1112,7 @@
 
 /* Highlight today's row */
 .today-row {
-  background: rgba(143, 113, 53, 0.01);
+  background: rgba(12, 35, 64, 0.01);
 }
 
 .today-row .day-name-cell {
@@ -1214,7 +1214,7 @@
 .cell-room {
   align-self: flex-start;
   color: var(--accent-gold);
-  background: rgba(143, 113, 53, 0.05);
+  background: rgba(12, 35, 64, 0.05);
   padding: 0 4px;
   border-radius: 4px;
 }
@@ -1232,9 +1232,9 @@
 
 /* Active Highlight in Grid */
 .active-class-cell {
-  background: linear-gradient(135deg, #ffffff 0%, rgba(143, 113, 53, 0.02) 100%);
+  background: linear-gradient(135deg, #ffffff 0%, rgba(12, 35, 64, 0.02) 100%);
   border: 1px solid var(--accent-gold) !important;
-  box-shadow: 0 4px 10px rgba(143, 113, 53, 0.08);
+  box-shadow: 0 4px 10px rgba(12, 35, 64, 0.08);
 }
 
 .live-cell-badge {
@@ -1248,7 +1248,7 @@
   padding: 1px 4px;
   border-radius: 3px;
   letter-spacing: 0.5px;
-  box-shadow: 0 2px 4px rgba(143, 113, 53, 0.2);
+  box-shadow: 0 2px 4px rgba(12, 35, 64, 0.2);
 }
 
 
@@ -1282,9 +1282,9 @@
 }
 
 .btn-close-modal:hover {
-  background: #8a7332;
-  border-color: #8a7332;
-  box-shadow: 0 4px 12px rgba(155, 126, 62, 0.2);
+  background: #163056;
+  border-color: #163056;
+  box-shadow: 0 4px 12px rgba(12, 35, 64, 0.2);
 }
 
 /* Slide Down animation for Collapsible debugger */

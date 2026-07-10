@@ -10,12 +10,12 @@
   /* Brand Theme: Soft Dim Cream-Grey, Soft Warm-White & Muted Satin Gold */
   --primary-blue: #0c2340;
   --secondary-blue: #1a365d;
-  --accent-gold: #8f7135;
-  --accent-gold-glow: rgba(143, 113, 53, 0.08);
+  --accent-gold: #0c2340;
+  --accent-gold-glow: rgba(12, 35, 64, 0.08);
   --bg-dark: #eae6dc;
   --bg-card: #faf8f2;
   --border-glass: rgba(12, 35, 64, 0.12);
-  --border-gold-glass: rgba(143, 113, 53, 0.2);
+  --border-gold-glass: rgba(12, 35, 64, 0.2);
   
   --text-light: #2a2a28;
   --text-muted: #646460;
@@ -56,7 +56,7 @@ a {
 }
 
 a:hover {
-  color: #8a7332;
+  color: #163056;
 }
 
 * {

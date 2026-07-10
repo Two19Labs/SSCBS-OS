@@ -5,13 +5,13 @@
   --bg-dark: #faf8f2;
   --bg-surface: #faf8f2;
   --border-color: rgba(12, 35, 64, 0.12);
-  --border-gold-glow: rgba(143, 113, 53, 0.25);
+  --border-gold-glow: rgba(12, 35, 64, 0.25);
   
   --text-main: #2a2a28;
   --text-dim: #646460;
   
-  --accent-gold: #8f7135;
-  --accent-gold-glow: rgba(143, 113, 53, 0.08);
+  --accent-gold: #0c2340;
+  --accent-gold-glow: rgba(12, 35, 64, 0.08);
   --accent-cyan: #0284c7;
   --accent-green: #0b7a54;
   --accent-amber: #b45309;
@@ -44,7 +44,7 @@ body {
 .system-spinner {
   width: 45px;
   height: 45px;
-  border: 3px solid rgba(155, 126, 62, 0.1);
+  border: 3px solid rgba(12, 35, 64, 0.1);
   border-radius: 50%;
   border-top-color: var(--accent-gold);
   border-right-color: var(--accent-cyan);
@@ -63,7 +63,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: radial-gradient(circle at 50% 0%, rgba(155, 126, 62, 0.04) 0%, rgba(250, 248, 245, 0) 60%),
+  background: radial-gradient(circle at 50% 0%, rgba(12, 35, 64, 0.04) 0%, rgba(250, 248, 245, 0) 60%),
               var(--bg-darker);
 }
 
@@ -74,7 +74,7 @@ body {
   justify-content: space-between;
   padding: 16px 40px;
   background: linear-gradient(135deg, #0c2340 0%, #163056 100%);
-  border-bottom: 1.5px solid rgba(223, 182, 104, 0.25);
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.15);
   z-index: 100;
   box-shadow: 0 4px 20px rgba(12, 35, 64, 0.15);
 }
@@ -91,7 +91,7 @@ body {
   padding: 1px;
   box-shadow: 0 2px 6px rgba(12, 35, 64, 0.06);
   object-fit: contain;
-  border: 1.5px solid #dfb668;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
 }
 
 .workspace-title {
@@ -106,7 +106,7 @@ body {
 }
 
 .title-highlight {
-  color: #dfb668;
+  color: #ffffff;
 }
 
 .header-right {
@@ -133,7 +133,7 @@ body {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #dfb668;
+  background: #faf8f2;
   color: #0c2340;
   font-weight: 800;
   font-size: 0.9rem;
@@ -168,7 +168,7 @@ body {
 }
 
 .user-profile:hover .profile-chevron {
-  color: #dfb668;
+  color: #ffffff;
   opacity: 1;
   transform: translateY(1px);
 }
@@ -320,9 +320,9 @@ body {
 }
 
 .user-class-badge-small {
-  background: rgba(223, 182, 104, 0.15);
-  border: 1px solid rgba(223, 182, 104, 0.3);
-  color: #dfb668;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #faf8f2;
   font-size: 0.6rem;
   font-weight: 700;
   padding: 1px 6px;

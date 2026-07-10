@@ -54,7 +54,7 @@
 }
 
 .auth-panel-left .gold-text {
-  color: #dfb668 !important;
+  color: #ffffff !important;
 }
 
 .auth-panel-left .hero-subtitle {
@@ -74,11 +74,11 @@
 }
 
 .auth-panel-left .indicator-dot.active {
-  background: #dfb668 !important;
+  background: #ffffff !important;
 }
 
 .auth-panel-left .sscbs-logo-img {
-  border: 1.5px solid #dfb668 !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
   box-shadow: 0 4px 14px rgba(12, 35, 64, 0.3) !important;
 }
 
@@ -279,14 +279,14 @@
 
 /* Sandbox banner */
 .sandbox-info-banner {
-  background: rgba(155, 126, 62, 0.05);
+  background: rgba(12, 35, 64, 0.05);
   border: 1px dashed var(--border-gold-glass);
   border-radius: 8px;
   padding: 10px 14px;
   margin-bottom: 20px;
   font-size: 0.775rem;
   line-height: 1.4;
-  color: #8a7332;
+  color: var(--accent-gold);
 }
 
 .sandbox-info-banner strong {
@@ -391,7 +391,7 @@
 }
 
 .submit-button:hover:not(:disabled) {
-  background: #8a7332;
+  background: #163056;
   transform: translateY(-1px);
 }
 
@@ -454,7 +454,7 @@
     background-image: none !important;
     background-color: #0c2340;
     border-right: none;
-    border-bottom: 1.5px solid #dfb668;
+    border-bottom: 1.5px solid rgba(255, 255, 255, 0.15);
     min-height: auto;
     box-sizing: border-box;
   }
@@ -546,7 +546,7 @@
 .google-signin-button:hover:not(:disabled) {
   background: #faf8f5;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(12, 35, 64, 0.04), 0 0 0 3px rgba(155, 126, 62, 0.1);
+  box-shadow: 0 4px 12px rgba(12, 35, 64, 0.04), 0 0 0 3px rgba(12, 35, 64, 0.1);
 }
 
 .google-signin-button:active:not(:disabled) {
