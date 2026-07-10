@@ -73,10 +73,10 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 16px 40px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(135deg, #0c2340 0%, #163056 100%);
+  border-bottom: 1.5px solid rgba(223, 182, 104, 0.25);
   z-index: 100;
+  box-shadow: 0 4px 20px rgba(12, 35, 64, 0.15);
 }
 
 .header-left {
@@ -91,6 +91,7 @@ body {
   padding: 1px;
   box-shadow: 0 2px 6px rgba(12, 35, 64, 0.06);
   object-fit: contain;
+  border: 1.5px solid #dfb668;
 }
 
 .workspace-title {
@@ -98,14 +99,14 @@ body {
   font-weight: 800;
   font-size: 1.2rem;
   letter-spacing: -0.5px;
-  color: var(--text-main);
+  color: #ffffff;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .title-highlight {
-  color: var(--accent-gold);
+  color: #dfb668;
 }
 
 .header-right {
@@ -118,19 +119,29 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.user-profile:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--accent-gold);
-  color: #ffffff;
+  background: #dfb668;
+  color: #0c2340;
   font-weight: 800;
   font-size: 0.9rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 6px rgba(12, 35, 64, 0.15);
+  transition: all 0.2s ease;
 }
 
 .user-details {
@@ -141,31 +152,25 @@ body {
 .user-name {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--text-main);
+  color: #ffffff;
 }
 
 .user-role {
   font-size: 0.7rem;
-  color: var(--text-dim);
+  color: #eae6dc;
 }
 
-.btn-signout {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  color: var(--text-main);
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 0.775rem;
-  font-weight: 600;
-  cursor: pointer;
+.profile-chevron {
+  color: #ffffff;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 2px rgba(12, 35, 64, 0.02);
+  margin-left: 2px;
+  opacity: 0.7;
 }
 
-.btn-signout:hover {
-  background: rgba(239, 68, 68, 0.05);
-  border-color: rgba(239, 68, 68, 0.25);
-  color: #b91c1c;
+.user-profile:hover .profile-chevron {
+  color: #dfb668;
+  opacity: 1;
+  transform: translateY(1px);
 }
 
 /* Main Content Area */
@@ -267,6 +272,25 @@ body {
   .user-details {
     display: none;
   }
+
+  .user-profile {
+    padding: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+  }
+  .user-profile:hover {
+    background: transparent;
+    box-shadow: none;
+    transform: none;
+  }
+  .user-profile:hover .avatar {
+    box-shadow: 0 0 0 3px var(--border-gold-glow);
+    transform: scale(1.05);
+  }
+  .profile-chevron {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
@@ -287,11 +311,6 @@ body {
   .header-right {
     gap: 12px;
   }
-  .btn-signout {
-    padding: 5px 10px;
-    font-size: 0.725rem;
-  }
-
 }
 
 .user-role-badge-row {
@@ -301,9 +320,9 @@ body {
 }
 
 .user-class-badge-small {
-  background: rgba(155, 126, 62, 0.08);
-  border: 1px solid var(--border-gold-glow);
-  color: var(--accent-gold);
+  background: rgba(223, 182, 104, 0.15);
+  border: 1px solid rgba(223, 182, 104, 0.3);
+  color: #dfb668;
   font-size: 0.6rem;
   font-weight: 700;
   padding: 1px 6px;

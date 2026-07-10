@@ -29,7 +29,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 20px 24px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid rgba(223, 182, 104, 0.2);
+  background: #0c2340;
+  color: #ffffff;
 }
 
 .profile-modal-header h3 {
@@ -37,13 +39,13 @@
   font-family: 'Outfit', sans-serif;
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--accent-gold);
+  color: #dfb668;
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: var(--text-dim);
+  color: #eae6dc;
   font-size: 1.5rem;
   cursor: pointer;
   padding: 0;
@@ -52,7 +54,7 @@
 }
 
 .close-btn:hover {
-  color: var(--text-main);
+  color: #ffffff;
 }
 
 .profile-modal-form {
@@ -194,11 +196,41 @@
 
 .profile-modal-footer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   gap: 12px;
   margin-top: 10px;
   border-top: 1px solid var(--border-color);
   padding-top: 20px;
+}
+
+.footer-actions-right {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-signout-modal {
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #dc2626;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-signout-modal:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.06);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #b91c1c;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.05);
+}
+
+.btn-signout-modal:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .btn-cancel {
@@ -318,5 +350,22 @@
   .profile-modal-footer {
     margin-top: 6px;
     padding-top: 16px;
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .footer-actions-right {
+    display: flex;
+    gap: 8px;
+  }
+
+  .footer-actions-right button {
+    flex: 1;
+  }
+
+  .btn-signout-modal {
+    width: 100%;
+    text-align: center;
   }
 }

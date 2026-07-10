@@ -7,7 +7,7 @@ import './App.css';
 import { Analytics } from '@vercel/analytics/react';
 
 function App() {
-  const { user, signOut, loading } = useAuth();
+  const { user, loading } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   if (loading) {
@@ -34,13 +34,7 @@ function App() {
 
 
 
-  const handleLogout = async () => {
-    try {
-      await signOut();
-    } catch (err) {
-      console.error('Error logging out:', err);
-    }
-  };
+
 
   return (
     <>
@@ -57,8 +51,7 @@ function App() {
             <div 
               className="user-profile" 
               onClick={() => setIsProfileOpen(true)} 
-              title="Edit Profile"
-              style={{ cursor: 'pointer' }}
+              title="Profile Settings"
             >
               <div className="avatar">
                 {displayName.charAt(0).toUpperCase()}
@@ -74,10 +67,20 @@ function App() {
                   )}
                 </div>
               </div>
+              <svg 
+                className="profile-chevron" 
+                width="14" 
+                height="14" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2.5" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
             </div>
-            <button className="btn-signout" onClick={handleLogout} title="Sign Out">
-              Sign Out
-            </button>
           </div>
         </header>
 

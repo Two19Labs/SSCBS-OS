@@ -31,6 +31,7 @@
   background-position: 20% center;
   position: relative;
   border-right: 1px solid var(--border-color);
+  color: #ffffff;
 }
 
 .auth-left-image-overlay {
@@ -39,8 +40,58 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(250, 248, 245, 0.94) 0%, rgba(240, 235, 224, 0.82) 100%);
+  background: linear-gradient(135deg, rgba(12, 35, 64, 0.88) 0%, rgba(20, 42, 74, 0.82) 100%);
   z-index: 1;
+}
+
+/* Option A Custom Styling Overrides for Royal Deep Navy & Gold Contrast */
+.auth-panel-left .inst-name {
+  color: #ffffff !important;
+}
+
+.auth-panel-left .hero-title {
+  color: #ffffff !important;
+}
+
+.auth-panel-left .gold-text {
+  color: #dfb668 !important;
+}
+
+.auth-panel-left .hero-subtitle {
+  color: #eae6dc !important;
+}
+
+.auth-panel-left .slide-content h3 {
+  color: #ffffff !important;
+}
+
+.auth-panel-left .slide-content p {
+  color: #eae6dc !important;
+}
+
+.auth-panel-left .indicator-dot {
+  background: rgba(255, 255, 255, 0.25) !important;
+}
+
+.auth-panel-left .indicator-dot.active {
+  background: #dfb668 !important;
+}
+
+.auth-panel-left .sscbs-logo-img {
+  border: 1.5px solid #dfb668 !important;
+  box-shadow: 0 4px 14px rgba(12, 35, 64, 0.3) !important;
+}
+
+.auth-panel-left .carousel-container {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(12, 35, 64, 0.2);
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .left-content-wrapper {
@@ -399,11 +450,11 @@
   .auth-panel-left {
     flex: 0 0 auto;
     width: 100%;
-    padding: 30px 20px 20px 20px;
+    padding: 30px 20px 30px 20px;
     background-image: none !important;
-    background-color: var(--bg-darker);
+    background-color: #0c2340;
     border-right: none;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1.5px solid #dfb668;
     min-height: auto;
     box-sizing: border-box;
   }

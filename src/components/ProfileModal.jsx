@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import './ProfileModal.css';
 
 export default function ProfileModal({ isOpen, onClose }) {
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, signOut } = useAuth();
   
   const [fullName, setFullName] = useState('');
   const [course, setCourse] = useState('BMS');
@@ -32,7 +32,19 @@ export default function ProfileModal({ isOpen, onClose }) {
     }
   }, [course]);
 
-  if (!isOpen) return null;
+  const handleSignOut = async () => {
+    if (!window.confirm('Are you sure you want to sign out?')) return;
+    setLoading(true);
+    setStatus({ type: '', message: '' });
+    try {
+      await signOut();
+      onClose();
+    } catch (err) {
+      setStatus({ type: 'error', message: err.message || 'Failed to sign out.' });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,6 +78,8 @@ export default function ProfileModal({ isOpen, onClose }) {
     if (course === 'BBA FIA') return ['A', 'B'];
     return ['A']; // BSc Computer Science has one section
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="profile-modal-overlay" onClick={onClose}>
@@ -152,19 +166,29 @@ export default function ProfileModal({ isOpen, onClose }) {
           <footer className="profile-modal-footer">
             <button
               type="button"
-              className="btn-cancel"
-              onClick={onClose}
+              className="btn-signout-modal"
+              onClick={handleSignOut}
               disabled={loading}
             >
-              Cancel
+              Sign Out
             </button>
-            <button
-              type="submit"
-              className="btn-save"
-              disabled={loading}
-            >
-              {loading ? <span className="profile-spinner"></span> : 'Save Profile'}
-            </button>
+            <div className="footer-actions-right">
+              <button
+                type="button"
+                className="btn-cancel"
+                onClick={onClose}
+                disabled={loading}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="btn-save"
+                disabled={loading}
+              >
+                {loading ? <span className="profile-spinner"></span> : 'Save Profile'}
+              </button>
+            </div>
           </footer>
         </form>
       </div>
