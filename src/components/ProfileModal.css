@@ -262,3 +262,60 @@
   from { transform: scale(0.95); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@media (max-width: 480px) {
+  .profile-modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .profile-modal-card {
+    max-width: 100%;
+    border-radius: 16px 16px 0 0;
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .profile-modal-form {
+    padding: 20px 16px 32px 16px;
+    gap: 16px;
+  }
+
+  .radio-card-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .radio-card {
+    flex-direction: row;
+    justify-content: flex-start;
+    text-align: left;
+    padding: 10px 14px;
+    gap: 12px;
+    min-height: auto;
+  }
+
+  .radio-card-title {
+    margin-bottom: 0;
+    min-width: 90px;
+    text-align: left;
+  }
+
+  .radio-card-desc {
+    font-size: 0.7rem;
+    text-align: left;
+  }
+
+  .form-row {
+    gap: 12px;
+  }
+
+  .profile-modal-footer {
+    margin-top: 6px;
+    padding-top: 16px;
+  }
+}

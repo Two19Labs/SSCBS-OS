@@ -5,22 +5,22 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: dark;
+  color-scheme: light;
   
-  /* Brand Theme: Navy Blue & Gold */
+  /* Brand Theme: Light Cream, Deep Navy & Satin Gold */
   --primary-blue: #0c2340;
   --secondary-blue: #1a365d;
-  --accent-gold: #d4af37;
-  --accent-gold-glow: rgba(212, 175, 55, 0.2);
-  --bg-dark: #070b12;
-  --bg-card: rgba(12, 35, 64, 0.45);
-  --border-glass: rgba(255, 255, 255, 0.06);
-  --border-gold-glass: rgba(212, 175, 55, 0.15);
+  --accent-gold: #9b7e3e;
+  --accent-gold-glow: rgba(155, 126, 62, 0.08);
+  --bg-dark: #faf8f5;
+  --bg-card: #ffffff;
+  --border-glass: rgba(12, 35, 64, 0.08);
+  --border-gold-glass: rgba(155, 126, 62, 0.2);
   
-  --text-light: #f8fafc;
-  --text-muted: #94a3b8;
-  --success-color: #10b981;
-  --error-color: #ef4444;
+  --text-light: #1c1d1f;
+  --text-muted: #5e6671;
+  --success-color: #0d8a5f;
+  --error-color: #d32f2f;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -56,7 +56,7 @@ a {
 }
 
 a:hover {
-  color: #f6e05e;
+  color: #8a7332;
 }
 
 * {
