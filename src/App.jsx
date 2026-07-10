@@ -7,7 +7,7 @@ import './App.css';
 import { Analytics } from '@vercel/analytics/react';
 
 function App() {
-  const { user, signOut, loading, isConfigured } = useAuth();
+  const { user, signOut, loading } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   if (loading) {

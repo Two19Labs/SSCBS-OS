@@ -181,60 +181,7 @@ body {
   box-sizing: border-box;
 }
 
-/* Welcome Banner */
-.welcome-banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 24px 30px;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(12, 35, 64, 0.02);
-}
 
-.banner-content h2 {
-  font-family: 'Outfit', sans-serif;
-  font-size: 1.5rem;
-  font-weight: 800;
-  margin: 0 0 4px 0;
-  letter-spacing: -0.5px;
-}
-
-.banner-content p {
-  color: var(--text-dim);
-  font-size: 0.85rem;
-  margin: 0;
-}
-
-.status-indicator {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: monospace;
-  font-size: 0.75rem;
-  background: rgba(12, 35, 64, 0.03);
-  padding: 4px 10px;
-  border-radius: 20px;
-  border: 1px solid var(--border-color);
-  color: var(--text-dim);
-}
-
-.status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-}
-
-.status-dot.online {
-  background-color: var(--accent-green);
-  box-shadow: 0 0 4px rgba(13, 138, 95, 0.3);
-}
-
-.status-dot.offline {
-  background-color: var(--accent-amber);
-  box-shadow: 0 0 4px rgba(180, 83, 9, 0.3);
-}
 
 /* Grid layout */
 .dashboard-grid {
@@ -316,15 +263,7 @@ body {
     padding: 20px 16px;
     gap: 20px;
   }
-  .welcome-banner {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 20px;
-  }
-  .status-indicator {
-    align-self: flex-start;
-  }
+
   .user-details {
     display: none;
   }
@@ -352,15 +291,7 @@ body {
     padding: 5px 10px;
     font-size: 0.725rem;
   }
-  .welcome-banner {
-    padding: 16px;
-  }
-  .banner-content h2 {
-    font-size: 1.3rem;
-  }
-  .banner-content p {
-    font-size: 0.8rem;
-  }
+
 }
 
 .user-role-badge-row {
