@@ -58,14 +58,38 @@ function WaiverToolPage({ onBack }) {
 
     reader.onload = (e) => {
       try {
-        const text = e.target.result;
+        const buffer = e.target.result;
+        const arr = new Uint8Array(buffer);
         
-        // 1. Check if the file is actually an HTML table (standard format from college ERP)
-        if (text.includes("<table") || text.includes("<TABLE")) {
+        let isHtml = false;
+        let encoding = 'utf-8';
+
+        // 1. Detect UTF-16LE BOM (0xFF, 0xFE)
+        if (arr[0] === 0xFF && arr[1] === 0xFE) {
+          encoding = 'utf-16le';
+          const sample = new TextDecoder('utf-16le').decode(arr.subarray(0, Math.min(arr.length, 1000)));
+          if (sample.toLowerCase().includes('<table')) {
+            isHtml = true;
+          }
+        } else if (arr[0] === 0xFE && arr[1] === 0xFF) {
+          encoding = 'utf-16be';
+          const sample = new TextDecoder('utf-16be').decode(arr.subarray(0, Math.min(arr.length, 1000)));
+          if (sample.toLowerCase().includes('<table')) {
+            isHtml = true;
+          }
+        } else {
+          // Check standard UTF-8 / ASCII
+          const sample = new TextDecoder('utf-8').decode(arr.subarray(0, Math.min(arr.length, 1000)));
+          if (sample.toLowerCase().includes('<table')) {
+            isHtml = true;
+          }
+        }
+
+        if (isHtml) {
+          const text = new TextDecoder(encoding).decode(arr);
           parseHtmlSpreadsheet(text);
         } else {
-          // 2. Fall back to binary XLSX/XLS parser
-          parseBinarySpreadsheet(e.target.result);
+          parseBinarySpreadsheet(buffer);
         }
       } catch (err) {
         console.error(err);
@@ -74,8 +98,7 @@ function WaiverToolPage({ onBack }) {
       }
     };
 
-    // We read as text first to detect HTML.
-    reader.readAsText(file);
+    reader.readAsArrayBuffer(file);
   };
 
   // Helper to extract nested cell text
@@ -195,12 +218,7 @@ function WaiverToolPage({ onBack }) {
     };
 
     // Header cells
-    const headerCells = [];
-    const thRegex = /<th[^>]*>([\s\S]*?)<\/th>/gi;
-    let match;
-    while ((match = thRegex.exec(outerRows[0])) !== null) {
-      headerCells.push(match[1].trim());
-    }
+    const headerCells = parseCells(outerRows[0]).map(h => h.replace(/<[^>]*>/g, '').trim());
 
     if (headerCells.length < 5) {
       throw new Error("Invalid header structure.");
