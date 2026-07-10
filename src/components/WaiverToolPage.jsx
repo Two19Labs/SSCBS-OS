@@ -51,6 +51,14 @@ function WaiverToolPage({ onBack }) {
       setError("Please select or drop an attendance file first.");
       return;
     }
+
+    // Filename check: make sure it is not a timetable
+    const lowercaseName = file.name.toLowerCase();
+    if (lowercaseName.includes("time table") || lowercaseName.includes("timetable") || lowercaseName.includes("schedule")) {
+      setError(`It looks like you uploaded a Timetable file ('${file.name}') instead of your Attendance Report. Please upload your student attendance Excel sheet exported from the ERP portal (e.g. 'Student Attandance...').`);
+      return;
+    }
+
     setIsProcessing(true);
     setError(null);
 
@@ -93,7 +101,12 @@ function WaiverToolPage({ onBack }) {
         }
       } catch (err) {
         console.error(err);
-        setError("Failed to parse the file. Please ensure it is a valid attendance report exported from the college portal.");
+        const errMsg = err.message || "";
+        if (errMsg.includes("Total Present") || errMsg.includes("header structure") || errMsg.includes("table rows")) {
+          setError(`Parsing failed: ${err.message}. Please ensure this file is a valid attendance report exported from the college portal, NOT a timetable.`);
+        } else {
+          setError("Failed to parse the file. Please ensure it is a valid attendance report exported from the college portal.");
+        }
         setIsProcessing(false);
       }
     };
