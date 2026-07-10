@@ -163,8 +163,9 @@ function App() {
             <div className="footer-divider"></div>
             <span className="footer-credits">
               Made with <span className="heart-icon">♥</span> by{' '}
-              <span className="developer-name">Aditya Singhani</span> &amp;{' '}
-              <span className="developer-name">Manthan Kabra</span>
+              <a href="https://www.linkedin.com/in/aditya-singhani-69294a27a/" target="_blank" rel="noopener noreferrer" className="developer-name">Aditya Singhani</a>{' '}
+              &amp;{' '}
+              <a href="https://www.linkedin.com/in/manthan-kabra/" target="_blank" rel="noopener noreferrer" className="developer-name">Manthan Kabra</a>
             </span>
           </div>
         </footer>

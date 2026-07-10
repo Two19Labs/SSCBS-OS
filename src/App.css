@@ -427,11 +427,19 @@ body {
 }
 
 .developer-name {
-  color: var(--text-main);
+  color: #2563eb;
   font-weight: 600;
-  background: linear-gradient(120deg, #b45309, #d97706);
+  background: linear-gradient(120deg, #3b82f6, #1d4ed8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  text-decoration: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  display: inline-block;
+}
+
+.developer-name:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
 }
 
 @keyframes pulse {
