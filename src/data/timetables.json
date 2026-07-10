@@ -56,7 +56,7 @@
         "Tuesday": [
           {
             "period": 1,
-            "subject": "General Activity / Core Seminar",
+            "subject": "Unsupervised Class",
             "teacher": "-",
             "room": "unsupervised"
           },
@@ -262,7 +262,7 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "General Activity / Core Seminar",
+            "subject": "Unsupervised Class",
             "teacher": "-",
             "room": "unsupervised"
           },
@@ -503,7 +503,7 @@
           },
           {
             "period": 6,
-            "subject": "General Activity / Core Seminar",
+            "subject": "Unsupervised Class",
             "teacher": "-",
             "room": "Unsupervised"
           },
@@ -2043,7 +2043,7 @@
           },
           {
             "period": 4,
-            "subject": "General Activity / Core Seminar",
+            "subject": "Unsupervised Class",
             "teacher": "-",
             "room": "Unsupervised"
           },
@@ -2224,7 +2224,7 @@
         "Thursday": [
           {
             "period": 1,
-            "subject": "General Activity / Core Seminar",
+            "subject": "Unsupervised Class",
             "teacher": "-",
             "room": "Unsuprvised"
           },
@@ -2410,7 +2410,7 @@
           },
           {
             "period": 5,
-            "subject": "General Activity / Core Seminar",
+            "subject": "Unsupervised Class",
             "teacher": "-",
             "room": "Unsuprvised"
           },

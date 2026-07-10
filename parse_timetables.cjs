@@ -97,7 +97,7 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
           subjectName = "Free";
           teacherName = "-";
         } else if (teacherCodeLower.includes('free') || teacherCodeLower === 'ei' || teacherCodeLower === 'ee') {
-          subjectName = "General Activity / Core Seminar";
+          subjectName = "Unsupervised Class";
           teacherName = "-";
         }
       }
@@ -194,7 +194,7 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
         subjectName = "Free";
         teacherName = "-";
       } else if (teacherCodeLower.includes('free') || teacherCodeLower === 'ei' || teacherCodeLower === 'ee') {
-        subjectName = "General Activity / Core Seminar";
+        subjectName = "Unsupervised Class";
         teacherName = "-";
       }
     }
