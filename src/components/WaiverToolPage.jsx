@@ -7,6 +7,146 @@ const MONTHS = [
   "July", "August", "September", "October", "November", "December"
 ];
 
+// Pure Solver Helper
+const executeSolver = (candidatesList, groupsList, limit, targetPct) => {
+  const targetRatio = targetPct / 100;
+  const highAbsence = candidatesList.filter(c => c.totalAbsences >= 2);
+  const lowAbsence = candidatesList.filter(c => c.totalAbsences === 1);
+  
+  let bestMinRatio = -1;
+  let bestWaivers = [];
+  let solverSuccess = false;
+
+  const checkSolution = (selectedCandidates) => {
+    const adjusted = groupsList.map((g, gIdx) => {
+      let attended = g.baselineAttended;
+      let held = g.baselineHeld;
+      
+      selectedCandidates.forEach(c => {
+        const eff = c.groupEffects[gIdx];
+        if (eff) {
+          attended -= eff.attended;
+          held -= eff.held;
+        }
+      });
+      
+      const pct = held > 0 ? (attended / held) : 1.0;
+      return pct;
+    });
+    
+    const allClear = adjusted.every(pct => pct >= targetRatio);
+    const minPct = Math.min(...adjusted);
+    return { allClear, minPct };
+  };
+
+  let solvedSize = 99;
+  
+  // Backtracking solver
+  for (let size = 1; size <= limit; size++) {
+    let foundSolution = false;
+    const solutions = [];
+
+    const maxHighToCheck = Math.min(size, highAbsence.length);
+    const minHighToCheck = Math.max(0, size - lowAbsence.length);
+
+    for (let hc = maxHighToCheck; hc >= minHighToCheck; hc--) {
+      if (foundSolution) break;
+      const lc = size - hc;
+      
+      const hcCombos = [];
+      const getHcCombos = (start, curr) => {
+        if (curr.length === hc) {
+          hcCombos.push([...curr]);
+          return;
+        }
+        for (let i = start; i < highAbsence.length; i++) {
+          curr.push(highAbsence[i]);
+          getHcCombos(i + 1, curr);
+          curr.pop();
+        }
+      };
+      getHcCombos(0, []);
+
+      const lcCombos = [];
+      const getLcCombos = (start, curr) => {
+        if (curr.length === lc) {
+          lcCombos.push([...curr]);
+          return;
+        }
+        if (lcCombos.length > 5000) return; 
+        for (let i = start; i < lowAbsence.length; i++) {
+          curr.push(lowAbsence[i]);
+          getLcCombos(i + 1, curr);
+          curr.pop();
+        }
+      };
+      getLcCombos(0, []);
+
+      for (let hCombo of hcCombos) {
+        for (let lCombo of lcCombos) {
+          const selected = [...hCombo, ...lCombo];
+          const evalRes = checkSolution(selected);
+          if (evalRes.allClear) {
+            solutions.push({
+              combo: selected,
+              minPct: evalRes.minPct
+            });
+            foundSolution = true;
+          }
+        }
+      }
+    }
+
+    if (foundSolution) {
+      solutions.sort((a, b) => b.minPct - a.minPct);
+      bestWaivers = solutions[0].combo;
+      bestMinRatio = solutions[0].minPct;
+      solvedSize = size;
+      solverSuccess = true;
+      break;
+    }
+  }
+
+  // Fallback Greedy Solver
+  if (!solverSuccess) {
+    let currentSelected = [];
+    const tempCandidates = [...candidatesList];
+
+    for (let step = 0; step < limit; step++) {
+      let bestIdx = -1;
+      let highestMinPct = -1;
+      
+      for (let i = 0; i < tempCandidates.length; i++) {
+        if (currentSelected.includes(tempCandidates[i])) continue;
+        currentSelected.push(tempCandidates[i]);
+        const evalRes = checkSolution(currentSelected);
+        currentSelected.pop();
+        
+        if (evalRes.minPct > highestMinPct) {
+          highestMinPct = evalRes.minPct;
+          bestIdx = i;
+        }
+      }
+
+      if (bestIdx !== -1) {
+        currentSelected.push(tempCandidates[bestIdx]);
+      }
+    }
+    bestWaivers = currentSelected;
+    const finalEval = checkSolution(bestWaivers);
+    bestMinRatio = finalEval.minPct;
+    solvedSize = limit;
+    solverSuccess = false;
+  }
+
+  return {
+    bestWaivers,
+    solvedSize,
+    solverSuccess,
+    bestMinRatio
+  };
+};
+
 function WaiverToolPage({ onBack }) {
   const [file, setFile] = useState(null);
   const [startingMonth, setStartingMonth] = useState(0); // 0 = Jan
@@ -23,10 +163,24 @@ function WaiverToolPage({ onBack }) {
   const [recommendedWaivers, setRecommendedWaivers] = useState([]);
   const [solverResult, setSolverResult] = useState(null); // { success: boolean, waiversCount: number }
 
+  // Tabs inside results selector
+  const [activeSelectorTab, setActiveSelectorTab] = useState('list'); // 'list' | 'calendar'
+  const [activeMonthKey, setActiveMonthKey] = useState(""); // e.g. "2026-01"
+
   // Clean error on changes
   useEffect(() => {
     setError(null);
-  }, [file, startingMonth, maxWaivers, threshold]);
+  }, [file, startingMonth]);
+
+  // Set default calendar month key when data is parsed
+  useEffect(() => {
+    if (parsedData) {
+      const months = getMonthsInSheet();
+      if (months.length > 0) {
+        setActiveMonthKey(months[0]);
+      }
+    }
+  }, [parsedData]);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -120,7 +274,7 @@ function WaiverToolPage({ onBack }) {
     const cellTdRegex = /<td[^>]*>([\s\S]*?)<\/td>/gi;
     let match;
     while ((match = cellTdRegex.exec(cellHtml)) !== null) {
-      const val = match[1].replace(/<[^>]*>/g, '').trim(); // strip inner tags if any
+      const val = match[1].replace(/<[^>]*>/g, '').trim();
       if (val) list.push(val);
     }
     return list;
@@ -128,10 +282,8 @@ function WaiverToolPage({ onBack }) {
 
   // Custom HTML table parser for malformed ERP exports
   const parseHtmlSpreadsheet = (htmlText) => {
-    // Strip comments which contain commented <th> elements
     const cleanHtml = htmlText.replace(/<!--[\s\S]*?-->/g, '');
 
-    // Nesting-aware walker to find top-level TR tags
     const outerRows = [];
     let idx = 0;
     let tableNesting = 0;
@@ -179,7 +331,6 @@ function WaiverToolPage({ onBack }) {
       throw new Error("No outer table rows found in attendance file.");
     }
 
-    // Helper to parse cells from TR
     const parseCells = (rowHtml) => {
       const cells = [];
       let cIdx = 0;
@@ -230,19 +381,16 @@ function WaiverToolPage({ onBack }) {
       return cells;
     };
 
-    // Header cells
     const headerCells = parseCells(outerRows[0]).map(h => h.replace(/<[^>]*>/g, '').trim());
 
     if (headerCells.length < 5) {
       throw new Error("Invalid header structure.");
     }
 
-    // Map columns 3 to N-2 as dates (last two columns are total present/absent)
     const dateColsCount = headerCells.length - 5;
     const totalPresentIdx = headerCells.length - 2;
     const totalAbsentIdx = headerCells.length - 1;
     
-    // Reconstruct dates mapping starting from the chosen Starting Month
     let currentMonthOffset = startingMonth;
     let lastDateVal = 0;
     const parsedDates = [];
@@ -256,7 +404,6 @@ function WaiverToolPage({ onBack }) {
       }
       lastDateVal = dateVal;
 
-      // Inferred date label
       const monthLabel = MONTHS[currentMonthOffset];
       const dateStr = `2026-${String(currentMonthOffset + 1).padStart(2, '0')}-${String(dateVal).padStart(2, '0')}`;
 
@@ -267,7 +414,6 @@ function WaiverToolPage({ onBack }) {
       });
     }
 
-    // Parse subjects rows
     const parsedSubjects = [];
     for (let r = 1; r < outerRows.length; r++) {
       const cells = parseCells(outerRows[r]);
@@ -278,7 +424,6 @@ function WaiverToolPage({ onBack }) {
       const reportedPresent = parseInt(cells[totalPresentIdx], 10);
       const reportedAbsent = parseInt(cells[totalAbsentIdx], 10);
 
-      // Baseline arrays
       const dateAttendanceMap = {};
       let baselineThAttended = 0;
       let baselineThHeld = 0;
@@ -347,10 +492,8 @@ function WaiverToolPage({ onBack }) {
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
 
-    // SheetJS sheet_to_json
     const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
     
-    // We assume the first row represents headers
     if (rows.length < 2) {
       throw new Error("No attendance data rows found.");
     }
@@ -363,7 +506,6 @@ function WaiverToolPage({ onBack }) {
       throw new Error("Could not locate 'Total Present' or 'Total Absent' summary columns.");
     }
 
-    // Dates columns: index 3 to totalPresentIdx - 1
     const parsedDates = [];
     let currentMonthOffset = startingMonth;
     let lastDateVal = 0;
@@ -462,7 +604,6 @@ function WaiverToolPage({ onBack }) {
 
   // Compile final results & execute solver
   const finalizeData = (parsedDates, parsedSubjects) => {
-    // Filter out subjects that have 0 Th classes AND 0 tu classes
     const monitoredSubjects = parsedSubjects.filter(sub => 
       sub.baselineStats.Th.held > 0 || sub.baselineStats.tu.held > 0
     );
@@ -489,7 +630,6 @@ function WaiverToolPage({ onBack }) {
       }
     });
 
-    // 2. Pre-calculate date-wise stats for the groups
     const datesWithAbsences = [];
     
     parsedDates.forEach(d => {
@@ -537,142 +677,16 @@ function WaiverToolPage({ onBack }) {
       }
     });
 
-    // 3. Run Optimization Solver
-    const targetRatio = threshold / 100;
-    
-    // Sort candidate days: High absences first
-    const highAbsence = datesWithAbsences.filter(c => c.totalAbsences >= 2);
-    const lowAbsence = datesWithAbsences.filter(c => c.totalAbsences === 1);
-    
-    let bestMinRatio = -1;
-    let bestWaivers = [];
-    let solverSuccess = false;
+    // Run Optimization Solver
+    const solverRes = executeSolver(datesWithAbsences, targetGroups, maxWaivers, threshold);
+    const recDates = solverRes.bestWaivers.map(w => w.dateStr);
 
-    const checkSolution = (selectedCandidates) => {
-      const adjusted = targetGroups.map((g, gIdx) => {
-        let attended = g.baselineAttended;
-        let held = g.baselineHeld;
-        
-        selectedCandidates.forEach(c => {
-          const eff = c.groupEffects[gIdx];
-          attended -= eff.attended;
-          held -= eff.held;
-        });
-        
-        const pct = held > 0 ? (attended / held) : 1.0;
-        return pct;
-      });
-      
-      const allClear = adjusted.every(pct => pct >= targetRatio);
-      const minPct = Math.min(...adjusted);
-      return { allClear, minPct };
-    };
-
-    let solvedSize = 99;
-    
-    for (let size = 1; size <= maxWaivers; size++) {
-      let foundSolution = false;
-      const solutions = [];
-
-      const maxHighToCheck = Math.min(size, highAbsence.length);
-      const minHighToCheck = Math.max(0, size - lowAbsence.length);
-
-      for (let hc = maxHighToCheck; hc >= minHighToCheck; hc--) {
-        if (foundSolution) break;
-        const lc = size - hc;
-        
-        const hcCombos = [];
-        const getHcCombos = (start, curr) => {
-          if (curr.length === hc) {
-            hcCombos.push([...curr]);
-            return;
-          }
-          for (let i = start; i < highAbsence.length; i++) {
-            curr.push(highAbsence[i]);
-            getHcCombos(i + 1, curr);
-            curr.pop();
-          }
-        };
-        getHcCombos(0, []);
-
-        const lcCombos = [];
-        const getLcCombos = (start, curr) => {
-          if (curr.length === lc) {
-            lcCombos.push([...curr]);
-            return;
-          }
-          if (lcCombos.length > 5000) return; 
-          for (let i = start; i < lowAbsence.length; i++) {
-            curr.push(lowAbsence[i]);
-            getLcCombos(i + 1, curr);
-            curr.pop();
-          }
-        };
-        getLcCombos(0, []);
-
-        for (let hCombo of hcCombos) {
-          for (let lCombo of lcCombos) {
-            const selected = [...hCombo, ...lCombo];
-            const evalRes = checkSolution(selected);
-            if (evalRes.allClear) {
-              solutions.push({
-                combo: selected,
-                minPct: evalRes.minPct
-              });
-              foundSolution = true;
-            }
-          }
-        }
-      }
-
-      if (foundSolution) {
-        solutions.sort((a, b) => b.minPct - a.minPct);
-        bestWaivers = solutions[0].combo;
-        bestMinRatio = solutions[0].minPct;
-        solvedSize = size;
-        solverSuccess = true;
-        break;
-      }
-    }
-
-    if (!solverSuccess) {
-      let currentSelected = [];
-      const tempCandidates = [...datesWithAbsences];
-
-      for (let step = 0; step < maxWaivers; step++) {
-        let bestIdx = -1;
-        let highestMinPct = -1;
-        
-        for (let i = 0; i < tempCandidates.length; i++) {
-          if (currentSelected.includes(tempCandidates[i])) continue;
-          currentSelected.push(tempCandidates[i]);
-          const evalRes = checkSolution(currentSelected);
-          currentSelected.pop();
-          
-          if (evalRes.minPct > highestMinPct) {
-            highestMinPct = evalRes.minPct;
-            bestIdx = i;
-          }
-        }
-
-        if (bestIdx !== -1) {
-          currentSelected.push(tempCandidates[bestIdx]);
-        }
-      }
-      bestWaivers = currentSelected;
-      const finalEval = checkSolution(bestWaivers);
-      bestMinRatio = finalEval.minPct;
-      solvedSize = maxWaivers;
-      solverSuccess = false;
-    }
-
-    const recDates = bestWaivers.map(w => w.dateStr);
     setRecommendedWaivers(recDates);
     setSelectedWaivers(new Set(recDates));
     setSolverResult({
-      success: solverSuccess,
-      waiversCount: solvedSize,
-      minPctAchieved: bestMinRatio * 100
+      success: solverRes.solverSuccess,
+      waiversCount: solverRes.solvedSize,
+      minPctAchieved: solverRes.bestMinRatio * 100
     });
 
     setParsedData({
@@ -683,6 +697,27 @@ function WaiverToolPage({ onBack }) {
     });
 
     setIsProcessing(false);
+  };
+
+  // Recalculator Handler on the results page
+  const handleRecalculate = () => {
+    if (!parsedData) return;
+    setIsProcessing(true);
+    
+    // Smooth loader delay
+    setTimeout(() => {
+      const solverRes = executeSolver(parsedData.candidates, parsedData.targetGroups, maxWaivers, threshold);
+      const recDates = solverRes.bestWaivers.map(w => w.dateStr);
+      
+      setRecommendedWaivers(recDates);
+      setSelectedWaivers(new Set(recDates));
+      setSolverResult({
+        success: solverRes.solverSuccess,
+        waiversCount: solverRes.solvedSize,
+        minPctAchieved: solverRes.bestMinRatio * 100
+      });
+      setIsProcessing(false);
+    }, 150);
   };
 
   const getSimulatedStats = () => {
@@ -698,8 +733,10 @@ function WaiverToolPage({ onBack }) {
         
         const gIdx = parsedData.targetGroups.findIndex(tg => tg.key === g.key);
         const eff = cand.groupEffects[gIdx];
-        attended -= eff.attended;
-        held -= eff.held;
+        if (eff) {
+          attended -= eff.attended;
+          held -= eff.held;
+        }
       });
 
       const pct = held > 0 ? (attended / held * 100) : 100;
@@ -735,6 +772,70 @@ function WaiverToolPage({ onBack }) {
     setSelectedWaivers(new Set());
   };
 
+  // Extract months represented in sheet for calendar tabs
+  const getMonthsInSheet = () => {
+    if (!parsedData) return [];
+    const months = new Set();
+    parsedData.allDates.forEach(d => {
+      const parts = d.dateStr.split('-');
+      months.add(`${parts[0]}-${parts[1]}`); // e.g. "2026-01"
+    });
+    return Array.from(months).sort();
+  };
+
+  // Compile calendar blocks for active month key
+  const getCalendarMonthBlocks = () => {
+    if (!parsedData || !activeMonthKey) return [];
+    const [year, month] = activeMonthKey.split('-').map(Number);
+    const monthIndex = month - 1;
+
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const startDayIndex = new Date(year, monthIndex, 1).getDay(); // 0 = Sun
+
+    const blocks = [];
+
+    // Spacers for prefix
+    for (let i = 0; i < startDayIndex; i++) {
+      blocks.push({ type: 'empty', id: `empty-${i}` });
+    }
+
+    // Days blocks
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const sheetDate = parsedData.allDates.find(ad => ad.dateStr === dateStr);
+      
+      let totalAbsences = 0;
+      let totalPresents = 0;
+
+      if (sheetDate) {
+        parsedData.allSubjects.forEach(sub => {
+          const records = sub.dateAttendance[dateStr] || [];
+          records.forEach(cls => {
+            if (cls.type === 'Th' || cls.type === 'tu') {
+              if (cls.attended) {
+                totalPresents++;
+              } else {
+                totalAbsences++;
+              }
+            }
+          });
+        });
+      }
+
+      blocks.push({
+        type: 'day',
+        dayNum: d,
+        dateStr,
+        hasClasses: !!sheetDate,
+        totalAbsences,
+        totalPresents,
+        id: dateStr
+      });
+    }
+
+    return blocks;
+  };
+
   const simulatedStats = getSimulatedStats();
   const allSafe = simulatedStats.every(s => s.simPct >= threshold);
 
@@ -750,6 +851,15 @@ function WaiverToolPage({ onBack }) {
         </button>
         <h2>SSCBS Attendance Waiver Assistant</h2>
       </div>
+
+      {isProcessing && (
+        <div className="loading-screen-inline">
+          <div className="loader-container">
+            <span className="system-spinner"></span>
+            <p>Re-calculating Condonation Options...</p>
+          </div>
+        </div>
+      )}
 
       {!parsedData ? (
         <div className="upload-view-container">
@@ -896,56 +1006,179 @@ function WaiverToolPage({ onBack }) {
             </div>
           </div>
 
-          {/* Right Column: Waiver Dates Selector */}
+          {/* Right Column: Dynamic Waiver Customizer Selector */}
           <div className="results-card-glass dates-selector">
-            <div className="card-header-row">
-              <div className="title-block">
-                <h3>Recommended Waiver Dates</h3>
-                <p className="subtitle">
-                  {solverResult?.success ? (
-                    <span>Successfully cleared target requirement using <strong>{solverResult.waiversCount}</strong> waivers.</span>
-                  ) : (
-                    <span className="text-orange">Max waivers ({maxWaivers}) used. Adjusting to closest solution.</span>
-                  )}
-                </p>
+            <div className="inline-recalculator-toolbar">
+              <div className="toolbar-inputs-group">
+                <div className="toolbar-input-item">
+                  <label htmlFor="inline-max-w">Waivers</label>
+                  <input 
+                    type="number" 
+                    id="inline-max-w"
+                    min="1" 
+                    max="30"
+                    value={maxWaivers}
+                    onChange={(e) => setMaxWaivers(Math.max(1, parseInt(e.target.value) || 1))}
+                  />
+                </div>
+                <div className="toolbar-input-item">
+                  <label htmlFor="inline-thresh">Target %</label>
+                  <input 
+                    type="number" 
+                    id="inline-thresh"
+                    min="50" 
+                    max="100"
+                    value={threshold}
+                    onChange={(e) => setThreshold(Math.max(50, Math.min(100, parseInt(e.target.value) || 85)))}
+                  />
+                </div>
               </div>
-              <div className="actions-cluster">
-                <button className="btn-sec-small" onClick={resetToRecommended}>Reset</button>
-                <button className="btn-sec-small" onClick={clearAllWaivers}>Clear All</button>
-              </div>
+              <button className="btn-recalculate-glow" onClick={handleRecalculate}>
+                Recalculate
+              </button>
             </div>
 
-            <div className="dates-selector-list">
-              {parsedData.candidates
-                .sort((a, b) => b.totalAbsences - a.totalAbsences)
-                .map((cand, idx) => {
-                  const isChecked = selectedWaivers.has(cand.dateStr);
-                  const isRecommended = recommendedWaivers.includes(cand.dateStr);
-                  
-                  return (
-                    <div 
-                      key={idx} 
-                      className={`date-selection-item ${isChecked ? 'active' : ''} ${isRecommended ? 'recommended-border' : ''}`}
-                      onClick={() => handleCheckboxChange(cand.dateStr)}
-                    >
-                      <div className="checkbox-glow-wrapper">
-                        <input 
-                          type="checkbox" 
-                          checked={isChecked}
-                          onChange={() => {}} 
-                          id={`date-chk-${idx}`}
-                        />
-                        <label htmlFor={`date-chk-${idx}`} onClick={(e) => e.stopPropagation()}></label>
-                      </div>
-                      <div className="date-info">
-                        <span className="date-label">{cand.label}</span>
-                        <span className="date-sub">Absences: <strong>{cand.totalAbsences}</strong> | Presents: <strong>{cand.totalPresents}</strong></span>
-                      </div>
-                      {isRecommended && <span className="recommended-tag">Rec</span>}
-                    </div>
-                  );
-                })}
+            {/* TAB SELECTORS */}
+            <div className="selector-view-tabs">
+              <button 
+                className={`tab-btn ${activeSelectorTab === 'list' ? 'active' : ''}`}
+                onClick={() => setActiveSelectorTab('list')}
+              >
+                Recommended List
+              </button>
+              <button 
+                className={`tab-btn ${activeSelectorTab === 'calendar' ? 'active' : ''}`}
+                onClick={() => setActiveSelectorTab('calendar')}
+              >
+                Interactive Calendar
+              </button>
             </div>
+
+            {activeSelectorTab === 'list' ? (
+              <>
+                <div className="card-header-row">
+                  <div className="title-block">
+                    <h3>Recommended Dates</h3>
+                    <p className="subtitle">
+                      {solverResult?.success ? (
+                        <span>Optimal combination clears target using <strong>{solverResult.waiversCount}</strong> waivers.</span>
+                      ) : (
+                        <span className="text-orange">Max waivers used. Closest best solution shown.</span>
+                      )}
+                    </p>
+                  </div>
+                  <div className="actions-cluster">
+                    <button className="btn-sec-small" onClick={resetToRecommended}>Reset</button>
+                    <button className="btn-sec-small" onClick={clearAllWaivers}>Clear All</button>
+                  </div>
+                </div>
+
+                <div className="dates-selector-list">
+                  {parsedData.candidates
+                    .sort((a, b) => b.totalAbsences - a.totalAbsences)
+                    .map((cand, idx) => {
+                      const isChecked = selectedWaivers.has(cand.dateStr);
+                      const isRecommended = recommendedWaivers.includes(cand.dateStr);
+                      
+                      return (
+                        <div 
+                          key={idx} 
+                          className={`date-selection-item ${isChecked ? 'active' : ''} ${isRecommended ? 'recommended-border' : ''}`}
+                          onClick={() => handleCheckboxChange(cand.dateStr)}
+                        >
+                          <div className="checkbox-glow-wrapper">
+                            <input 
+                              type="checkbox" 
+                              checked={isChecked}
+                              onChange={() => {}} 
+                              id={`date-chk-${idx}`}
+                            />
+                            <label htmlFor={`date-chk-${idx}`} onClick={(e) => e.stopPropagation()}></label>
+                          </div>
+                          <div className="date-info">
+                            <span className="date-label">{cand.label}</span>
+                            <span className="date-sub">Absences: <strong>{cand.totalAbsences}</strong> | Presents: <strong>{cand.totalPresents}</strong></span>
+                          </div>
+                          {isRecommended && <span className="recommended-tag">Rec</span>}
+                        </div>
+                      );
+                    })}
+                </div>
+              </>
+            ) : (
+              <div className="calendar-simulation-view">
+                {/* Month key selectors */}
+                <div className="calendar-month-tabs">
+                  {getMonthsInSheet().map(mKey => {
+                    const [yr, mn] = mKey.split('-');
+                    const label = MONTHS[parseInt(mn, 10) - 1].substring(0, 3);
+                    return (
+                      <button 
+                        key={mKey}
+                        className={`month-tab-btn ${activeMonthKey === mKey ? 'active' : ''}`}
+                        onClick={() => setActiveMonthKey(mKey)}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Weekday headers */}
+                <div className="calendar-week-headers">
+                  <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+                </div>
+
+                {/* Calendar Days Grid */}
+                <div className="calendar-days-grid">
+                  {getCalendarMonthBlocks().map((block) => {
+                    if (block.type === 'empty') {
+                      return <div key={block.id} className="calendar-day-cell empty"></div>;
+                    }
+
+                    const isChecked = selectedWaivers.has(block.dateStr);
+                    const isRecommended = recommendedWaivers.includes(block.dateStr);
+                    
+                    let cellClass = "calendar-day-cell";
+                    if (!block.hasClasses) {
+                      cellClass += " inactive";
+                    } else {
+                      cellClass += " active-day";
+                      if (isChecked) cellClass += " waived";
+                      if (isRecommended) cellClass += " recommended-cell";
+                    }
+
+                    return (
+                      <div 
+                        key={block.id}
+                        className={cellClass}
+                        onClick={() => block.hasClasses && handleCheckboxChange(block.dateStr)}
+                        title={block.hasClasses ? `${block.dateStr}: ${block.totalAbsences} Abs, ${block.totalPresents} Pres` : "No classes held"}
+                      >
+                        <span className="day-number">{block.dayNum}</span>
+                        {block.hasClasses && (
+                          <div className="day-dot-indicators">
+                            {block.totalAbsences > 0 && (
+                              <span className="abs-dot-count">{block.totalAbsences}</span>
+                            )}
+                            {block.totalPresents > 0 && (
+                              <span className="pres-dot-count">{block.totalPresents}</span>
+                            )}
+                          </div>
+                        )}
+                        {isChecked && <span className="waived-cell-indicator"></span>}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="calendar-legend-row">
+                  <div className="legend-item"><span className="legend-dot red"></span>Absence</div>
+                  <div className="legend-item"><span className="legend-dot green"></span>Present</div>
+                  <div className="legend-item"><span className="legend-dot blue"></span>Waived</div>
+                </div>
+              </div>
+            )}
 
             <div className="control-stats-footer">
               <div className="totals-row">
