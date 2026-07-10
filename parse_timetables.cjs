@@ -208,7 +208,7 @@ sheetsToParse.forEach(({ name, defaultCourse, defaultSem }) => {
         const cellValue = clean(row[col]);
         
         if (!cellValue) {
-          dayClasses.push({ period: id, subject: "Free / Study Slot", teacher: "-", room: "-" });
+          dayClasses.push({ period: id, subject: "Free", teacher: "-", room: "-" });
           return;
         }
 
@@ -249,7 +249,7 @@ sheetsToParse.forEach(({ name, defaultCourse, defaultSem }) => {
         } else {
           // Fallbacks for general/unsupervised activities
           if (teacherCodeLower.includes('unsupervised') || teacherCodeLower.includes('unsuprvised')) {
-            matchedSubject = "Self Study Slot";
+            matchedSubject = "Free";
             matchedTeacher = "-";
           } else if (teacherCodeLower.includes('free') || teacherCodeLower === 'ei' || teacherCodeLower === 'ee') {
             matchedSubject = "General Activity / Core Seminar";
@@ -339,7 +339,7 @@ const csRooms = ["Room 651", "Room 644", "Room 326", "Room 237"];
       const isFree = (classSeed % 6 === 0) && (id > 5 || id === 1);
       
       if (isFree) {
-        dayClasses.push({ period: id, subject: "Free / Study Slot", teacher: "-", room: "-" });
+        dayClasses.push({ period: id, subject: "Free", teacher: "-", room: "-" });
       } else {
         const subIndex = classSeed % subjects.length;
         const teachIndex = (classSeed + 2) % csTeachers.length;

@@ -42,13 +42,13 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -195,13 +195,13 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -350,13 +350,13 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -509,7 +509,7 @@
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -521,7 +521,7 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
@@ -572,7 +572,7 @@
         "Tuesday": [
           {
             "period": 1,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
@@ -778,7 +778,7 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
@@ -829,7 +829,7 @@
         "Tuesday": [
           {
             "period": 1,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
@@ -968,13 +968,13 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -1088,7 +1088,7 @@
         "Tuesday": [
           {
             "period": 1,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
@@ -1284,7 +1284,7 @@
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -1331,13 +1331,13 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -1541,7 +1541,7 @@
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -1553,19 +1553,19 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 2,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 3,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
@@ -1578,25 +1578,25 @@
           },
           {
             "period": 4,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 5,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -1635,19 +1635,19 @@
           },
           {
             "period": 5,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -1692,13 +1692,13 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -1737,19 +1737,19 @@
           },
           {
             "period": 5,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -1757,7 +1757,7 @@
         "Friday": [
           {
             "period": 1,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
@@ -1794,13 +1794,13 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -1902,13 +1902,13 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -2004,13 +2004,13 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -2061,7 +2061,7 @@
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -2108,13 +2108,13 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -2261,13 +2261,13 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -2312,13 +2312,13 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -2416,13 +2416,13 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -2518,13 +2518,13 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -2569,13 +2569,13 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -2628,7 +2628,7 @@
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -2673,13 +2673,13 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -2781,7 +2781,7 @@
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -3028,19 +3028,19 @@
           },
           {
             "period": 5,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -3048,7 +3048,7 @@
         "Friday": [
           {
             "period": 1,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
@@ -3091,7 +3091,7 @@
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -3144,7 +3144,7 @@
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -3195,7 +3195,7 @@
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -3203,7 +3203,7 @@
         "Wednesday": [
           {
             "period": 1,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
@@ -3297,7 +3297,7 @@
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -3348,7 +3348,7 @@
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -3548,13 +3548,13 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -3599,7 +3599,7 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
@@ -3658,7 +3658,7 @@
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -3703,13 +3703,13 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -3754,13 +3754,13 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -3811,7 +3811,7 @@
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -3905,19 +3905,19 @@
           },
           {
             "period": 5,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -4482,7 +4482,7 @@
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -4688,7 +4688,7 @@
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -4696,7 +4696,7 @@
         "Tuesday": [
           {
             "period": 1,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
@@ -4849,13 +4849,13 @@
         "Friday": [
           {
             "period": 1,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 2,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
@@ -4904,19 +4904,19 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 2,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 3,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
@@ -4929,7 +4929,7 @@
           },
           {
             "period": 4,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
@@ -4947,7 +4947,7 @@
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -4998,7 +4998,7 @@
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -5057,7 +5057,7 @@
         "Thursday": [
           {
             "period": 1,
-            "subject": "Self Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "Social Entrepreneurship"
           },
@@ -5145,13 +5145,13 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -5318,7 +5318,7 @@
         "Thursday": [
           {
             "period": 1,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
@@ -5361,7 +5361,7 @@
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -5406,7 +5406,7 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
@@ -5475,7 +5475,7 @@
         "Tuesday": [
           {
             "period": 1,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
@@ -5518,7 +5518,7 @@
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -5563,7 +5563,7 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
@@ -5720,7 +5720,7 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
@@ -6095,7 +6095,7 @@
         "Thursday": [
           {
             "period": 1,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },
@@ -6138,7 +6138,7 @@
           },
           {
             "period": 7,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           }
@@ -6183,7 +6183,7 @@
           },
           {
             "period": 6,
-            "subject": "Free / Study Slot",
+            "subject": "Free",
             "teacher": "-",
             "room": "-"
           },

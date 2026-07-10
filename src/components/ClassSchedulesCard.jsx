@@ -198,7 +198,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                     <p>It's the weekend. Relax, catch up on projects, and enjoy your free time!</p>
                   </div>
                 </div>
-              ) : activeClass && activeClass.subject !== 'Free / Study Slot' && !activeClass.isBreak ? (
+              ) : activeClass && activeClass.subject !== 'Free' && !activeClass.isBreak ? (
                 <div className="status-hero ongoing">
                   <div className="hero-details">
                     <span className="badge-status live">Ongoing Now</span>
@@ -233,11 +233,11 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                     </div>
                   </div>
                 </div>
-              ) : activeClass && activeClass.subject === 'Free / Study Slot' ? (
+              ) : activeClass && activeClass.subject === 'Free' ? (
                 <div className="status-hero free-slot">
                   <div className="hero-details">
-                    <span className="badge-status free">Study Hour</span>
-                    <h3>Self Study / Free Slot</h3>
+                    <span className="badge-status free">Free</span>
+                    <h3>Free</h3>
                     <p>Use this block for coursework revision, library resources, or project collaborations.</p>
                   </div>
                   <div className="hero-progress">
@@ -317,7 +317,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                         </div>
                         <div className="timeline-slot-content">
                           <h5 className="slot-subject">{cls.isBreak ? "Break" : cls.subject}</h5>
-                          {!cls.isBreak && cls.subject !== 'Free / Study Slot' && (
+                          {!cls.isBreak && cls.subject !== 'Free' && (
                             <p className="slot-meta">{cls.room} • {cls.teacher}</p>
                           )}
                         </div>
@@ -414,10 +414,10 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                           {PERIODS.filter(p => !p.isBreak).map((period) => {
                             const matchClass = dayCls.find(c => c.period === period.id);
                             return (
-                              <td key={period.id} className={`weekly-class-cell ${matchClass?.subject === 'Free / Study Slot' ? 'free' : ''}`}>
+                              <td key={period.id} className={`weekly-class-cell ${matchClass?.subject === 'Free' ? 'free' : ''}`}>
                                 {matchClass ? (
-                                  matchClass.subject === 'Free / Study Slot' ? (
-                                    <div className="cell-free">Study Hour</div>
+                                  matchClass.subject === 'Free' ? (
+                                    <div className="cell-free">Free</div>
                                   ) : (
                                     <>
                                       <div className="cell-subject">{matchClass.subject}</div>
