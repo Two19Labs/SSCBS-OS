@@ -1,0 +1,1054 @@
+/* GPA Calculator Modal CSS Stylesheet - Sand/Charcoal Theme */
+
+.gpa-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  padding: 20px;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.gpa-modal-card {
+  background-color: var(--bg-surface);
+  border: 2px solid var(--accent-gold);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 1000px;
+  height: 90vh;
+  max-height: 750px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Header */
+.gpa-modal-header {
+  background: linear-gradient(135deg, #000000 0%, #1a1a18 100%);
+  color: #ffffff;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-title-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gpa-header-icon {
+  color: #eae6dc;
+}
+
+.gpa-modal-header h3 {
+  margin: 0;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: #ffffff;
+}
+
+.gpa-close-btn {
+  background: transparent;
+  border: none;
+  color: #eae6dc;
+  font-size: 1.75rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.gpa-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* Tabs */
+.gpa-modal-tabs {
+  display: flex;
+  background-color: var(--bg-dark);
+  border-bottom: 1.5px solid var(--border-color);
+  padding: 0 16px;
+}
+
+.gpa-tab-btn {
+  background: transparent;
+  border: none;
+  padding: 14px 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.gpa-tab-btn:hover {
+  color: var(--text-main);
+}
+
+.gpa-tab-btn.active {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.gpa-tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1.5px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: var(--accent-gold);
+}
+
+/* Content Container */
+.gpa-modal-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.gpa-tab-pane {
+  height: 100%;
+}
+
+/* 2-Column Dashboard Layout */
+.pane-main-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .pane-main-layout {
+    grid-template-columns: 1fr;
+  }
+  .gpa-modal-card {
+    height: 95vh;
+    max-height: none;
+  }
+}
+
+/* Semester selection bar */
+.semester-selection-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.semester-selection-bar label {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+
+.semester-help-text {
+  margin: 0;
+  font-size: 0.775rem;
+  color: var(--text-dim);
+  flex: 1;
+  min-width: 200px;
+}
+
+.gpa-select-field {
+  background-color: var(--bg-surface);
+  border: 1.5px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-weight: 600;
+  color: var(--text-main);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.gpa-select-field:focus {
+  border-color: var(--accent-gold);
+}
+
+/* Table styling */
+.table-responsive {
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background-color: var(--bg-surface);
+}
+
+.gpa-calc-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.gpa-calc-table th {
+  background-color: var(--bg-dark);
+  padding: 12px 16px;
+  font-weight: 700;
+  color: var(--text-main);
+  border-bottom: 1.5px solid var(--border-color);
+}
+
+.gpa-calc-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.gpa-calc-table tr:last-child td {
+  border-bottom: none;
+}
+
+.width-credits { width: 90px; }
+.width-mode { width: 140px; }
+.width-grade { width: 180px; }
+.width-action { width: 45px; }
+
+/* Custom Inputs in Table */
+.gpa-input-text {
+  width: 100%;
+  background-color: transparent;
+  border: 1px dashed transparent;
+  border-bottom: 1px solid var(--border-color);
+  padding: 6px 4px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.gpa-input-text:focus {
+  border-color: var(--accent-gold);
+  border-style: solid;
+  background-color: var(--bg-dark);
+  padding-left: 8px;
+}
+
+.gpa-input-number {
+  background-color: var(--bg-dark);
+  border: 1.5px solid var(--border-color);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  outline: none;
+  text-align: center;
+  transition: border-color 0.2s ease;
+}
+
+.gpa-input-number:focus {
+  border-color: var(--accent-gold);
+}
+
+.table-input-credits {
+  width: 60px;
+}
+
+/* Input Mode Toggle */
+.input-mode-toggle {
+  display: flex;
+  background-color: var(--bg-dark);
+  border: 1.5px solid var(--border-color);
+  border-radius: 6px;
+  padding: 2px;
+  width: fit-content;
+}
+
+.mode-toggle-btn {
+  background: transparent;
+  border: none;
+  padding: 4px 10px;
+  font-size: 0.725rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mode-toggle-btn.active {
+  background-color: var(--accent-gold);
+  color: #ffffff;
+}
+
+/* Marks input layouts */
+.table-marks-inputs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.marks-field {
+  width: 54px;
+  font-size: 0.75rem;
+  padding: 4px;
+}
+
+.marks-separator {
+  color: var(--text-dim);
+  font-weight: bold;
+}
+
+.marks-total-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  background-color: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  padding: 4px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+.table-select-grade {
+  width: 100%;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+}
+
+/* Delete Row */
+.gpa-delete-row-btn {
+  background: transparent;
+  border: none;
+  color: #991b1b;
+  font-size: 1.4rem;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.gpa-delete-row-btn:hover {
+  background-color: rgba(153, 27, 27, 0.08);
+}
+
+/* Table Bottom Actions */
+.table-bottom-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  align-items: center;
+}
+
+.btn-secondary-gpa {
+  background-color: var(--bg-surface);
+  border: 1.5px solid var(--accent-gold);
+  color: var(--text-main);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-secondary-gpa:hover {
+  background-color: var(--bg-dark);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.btn-danger-gpa {
+  background: transparent;
+  border: 1.5px solid rgba(153, 27, 27, 0.3);
+  color: #991b1b;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-danger-gpa:hover {
+  background-color: rgba(153, 27, 27, 0.05);
+  border-color: #991b1b;
+}
+
+.btn-primary-gpa {
+  background-color: var(--accent-gold);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.btn-primary-gpa:hover:not(:disabled) {
+  opacity: 0.9;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary-gpa:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-full-width {
+  width: 100%;
+}
+
+.btn-icon-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Results Sidebar Panel */
+.results-sidebar {
+  position: sticky;
+  top: 0;
+}
+
+.result-card {
+  background-color: var(--bg-dark);
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+}
+
+.result-card-title {
+  margin: 0;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* SVG circular progress ring */
+.progress-ring-container {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-ring {
+  transform: rotate(-90deg);
+}
+
+.progress-ring-bg {
+  fill: none;
+  stroke: var(--border-color);
+  stroke-width: 10;
+}
+
+.progress-ring-fill {
+  fill: none;
+  stroke: var(--accent-cyan);
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.35s ease;
+}
+
+.progress-ring-fill.fill-cgpa {
+  stroke: var(--accent-green);
+}
+
+.ring-text-overlay {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.gpa-value-large {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1;
+}
+
+.gpa-label-small {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.result-stats-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1.5px solid var(--border-color);
+  border-bottom: 1.5px solid var(--border-color);
+  padding: 16px 0;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.stat-val {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+/* Division Badges */
+.division-badge-card {
+  width: 100%;
+  text-align: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.775rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.division-badge-card.distinction {
+  background-color: rgba(11, 122, 84, 0.08);
+  border: 1px solid rgba(11, 122, 84, 0.2);
+  color: var(--accent-green);
+}
+
+.division-badge-card.first {
+  background-color: rgba(2, 132, 199, 0.08);
+  border: 1px solid rgba(2, 132, 199, 0.2);
+  color: var(--accent-cyan);
+}
+
+.division-badge-card.second {
+  background-color: rgba(180, 83, 9, 0.08);
+  border: 1px solid rgba(180, 83, 9, 0.2);
+  color: var(--accent-amber);
+}
+
+.division-badge-card.third {
+  background-color: rgba(100, 100, 96, 0.08);
+  border: 1px solid rgba(100, 100, 96, 0.2);
+  color: var(--text-dim);
+}
+
+.division-badge-card.fail {
+  background-color: rgba(153, 27, 27, 0.08);
+  border: 1px solid rgba(153, 27, 27, 0.2);
+  color: #991b1b;
+}
+
+.sidebar-action-buttons {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* TAB 2: CGPA CALCULATOR SPECIFICS */
+.section-title-small {
+  margin: 0 0 6px 0;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.section-desc-small {
+  margin: 0 0 20px 0;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+
+.cgpa-semester-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.cgpa-sem-card {
+  border: 1.5px solid var(--border-color);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.2s ease;
+  background-color: var(--bg-surface);
+}
+
+.cgpa-sem-card.disabled {
+  opacity: 0.55;
+  background-color: var(--bg-dark);
+}
+
+.cgpa-sem-card.enabled {
+  border-color: var(--border-gold-glow);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+}
+
+.sem-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sem-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.btn-tiny-copy {
+  background-color: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-tiny-copy:hover {
+  background-color: var(--accent-gold);
+  color: #ffffff;
+  border-color: var(--accent-gold);
+}
+
+.sem-card-inputs {
+  display: flex;
+  gap: 12px;
+}
+
+.sem-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.sem-input-group label {
+  font-size: 0.725rem;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.sem-gpa-input, .sem-credits-input {
+  width: 100%;
+  text-align: left;
+  padding: 5px 8px;
+}
+
+/* TAB 3: TARGET GPA PLANNER SPECIFICS */
+.planner-grid-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .planner-grid-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.planner-inputs-card, .planner-results-card {
+  background-color: var(--bg-surface);
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.01);
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+}
+
+.planner-results-card {
+  background-color: var(--bg-dark);
+}
+
+.planner-heading {
+  margin: 0 0 6px 0;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.planner-subheading {
+  margin: 0 0 20px 0;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  line-height: 1.45;
+}
+
+.planner-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 20px;
+}
+
+@media (max-width: 480px) {
+  .planner-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-item label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.input-helper {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+
+.planner-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  text-align: center;
+  color: var(--text-dim);
+  padding: 40px;
+}
+
+.empty-state-icon {
+  margin-bottom: 12px;
+  opacity: 0.6;
+}
+
+.planner-empty-state p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* Planner alert boxes */
+.planner-alert {
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.planner-alert.success {
+  background-color: rgba(11, 122, 84, 0.06);
+  border: 1.5px solid rgba(11, 122, 84, 0.2);
+}
+
+.planner-alert.danger {
+  background-color: rgba(153, 27, 27, 0.06);
+  border: 1.5px solid rgba(153, 27, 27, 0.2);
+}
+
+.alert-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.alert-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.2px;
+}
+
+.alert-badge.success {
+  background-color: rgba(11, 122, 84, 0.15);
+  color: var(--accent-green);
+}
+
+.alert-badge.danger {
+  background-color: rgba(153, 27, 27, 0.15);
+  color: #991b1b;
+}
+
+.alert-header h5 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.alert-message {
+  margin: 0 0 10px 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--text-main);
+}
+
+.planner-micro-tip {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.planner-stats-box {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.planner-stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.planner-stat-row strong {
+  color: var(--text-main);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(16px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* PRINT REPORT STYLING (Screen: Hidden) */
+.gpa-print-only-container {
+  display: none;
+}
+
+/* PRINT MEDIA QUERIES */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  
+  .gpa-modal-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto;
+    background-color: #ffffff;
+    backdrop-filter: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .gpa-modal-card {
+    border: none;
+    box-shadow: none;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    background: #ffffff;
+    overflow: visible;
+  }
+
+  /* Hide normal elements */
+  .gpa-modal-header,
+  .gpa-modal-tabs,
+  .gpa-modal-content {
+    display: none !important;
+  }
+
+  /* Show print container */
+  .gpa-print-only-container {
+    display: block !important;
+    visibility: visible;
+    width: 100%;
+    background-color: #ffffff;
+    color: #000000;
+    padding: 20px;
+    font-family: 'Times New Roman', Times, serif;
+  }
+  
+  .gpa-print-only-container * {
+    visibility: visible;
+  }
+
+  .print-report-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 24px;
+    border-bottom: 2px double #000000;
+    padding-bottom: 12px;
+  }
+  
+  .print-header-text {
+    flex: 1;
+  }
+
+  .print-header-text h2 {
+    font-size: 1.4rem;
+    margin: 0 0 4px 0;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+  }
+
+  .print-header-text h3 {
+    font-size: 1.15rem;
+    margin: 0 0 4px 0;
+    font-weight: 500;
+  }
+
+  .print-header-text h4 {
+    font-size: 0.95rem;
+    margin: 0;
+    font-style: italic;
+  }
+
+  .print-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 24px;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+  }
+
+  .print-divider {
+    border: 0.5px solid #000000;
+    margin: 16px 0;
+  }
+
+  .print-main-content h3 {
+    font-size: 1.1rem;
+    margin: 0 0 12px 0;
+    text-transform: uppercase;
+  }
+
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+    font-size: 0.85rem;
+  }
+
+  .print-table th {
+    border: 1px solid #000000;
+    background-color: #f2f2f2;
+    padding: 8px 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  .print-table td {
+    border: 1px solid #000000;
+    padding: 8px 12px;
+  }
+  
+  .text-center {
+    text-align: center;
+  }
+
+  .print-summary-box {
+    border: 1.5px solid #000000;
+    padding: 16px;
+    background-color: #fafafa;
+    width: 50%;
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.9rem;
+  }
+
+  .print-summary-row {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .print-summary-row strong {
+    font-size: 1rem;
+  }
+
+  .print-footer {
+    margin-top: 40px;
+    font-size: 0.75rem;
+    font-style: italic;
+    color: #444444;
+  }
+
+  .print-signatures {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 60px;
+    padding: 0 20px;
+  }
+
+  .sig-line {
+    border-top: 1px solid #000000;
+    width: 200px;
+    text-align: center;
+    padding-top: 8px;
+    font-size: 0.85rem;
+  }
+}

@@ -4,6 +4,7 @@ import Auth from './components/Auth';
 import ProfileModal from './components/ProfileModal';
 import ClassSchedulesCard from './components/ClassSchedulesCard';
 import FindMyProfessor from './components/FindMyProfessor';
+import GpaCalculatorModal from './components/GpaCalculatorModal';
 import './App.css';
 import { Analytics } from '@vercel/analytics/react';
 
@@ -11,6 +12,7 @@ function App() {
   const { user, loading } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isProfTrackerOpen, setIsProfTrackerOpen] = useState(false);
+  const [isGpaOpen, setIsGpaOpen] = useState(false);
 
   if (loading) {
     return (
@@ -113,13 +115,18 @@ function App() {
               </div>
             </div>
 
-            <div className="dashboard-card locked">
+            <div 
+              className="dashboard-card active-card" 
+              onClick={() => setIsGpaOpen(true)}
+              style={{ cursor: 'pointer' }}
+            >
               <div className="card-header">
                 <h3>GPA Calculator</h3>
+                <span className="badge-active">Calculator</span>
               </div>
               <p>Calculate your SGPA and CGPA dynamically using official Delhi University credit schemas.</p>
               <div className="card-footer">
-                <span className="badge-lock">Coming Soon</span>
+                <span className="btn-card-action">Launch Calculator →</span>
               </div>
             </div>
 
@@ -141,6 +148,12 @@ function App() {
       <ProfileModal 
         isOpen={isProfileOpen} 
         onClose={() => setIsProfileOpen(false)} 
+      />
+
+      {/* GPA Calculator Modal */}
+      <GpaCalculatorModal 
+        isOpen={isGpaOpen} 
+        onClose={() => setIsGpaOpen(false)} 
       />
 
       {/* Find My Professor Modal */}
