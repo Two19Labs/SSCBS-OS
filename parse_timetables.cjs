@@ -34,44 +34,33 @@ const timetables = {};
 const clean = (s) => String(s || '').trim();
 
 // Parses a cell value into a unified class slot, handling G1/G2 splits
-function parseUnifiedCell(cellValue, periodId, facultyMap) {
+function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
   if (!cellValue) {
     return { period: periodId, subject: "Free", teacher: "-", room: "-" };
   }
 
-  // 1. Extract room from parentheses, e.g. (703) or (236)
-  let room = "Room 703"; // Default room if not specified
-  let cellText = cellValue;
-  
-  const roomMatch = cellValue.match(/\(([^)]+)\)/);
-  if (roomMatch) {
-    const roomVal = roomMatch[1];
-    room = roomVal.match(/^\d+/) ? `Room ${roomVal}` : roomVal;
-    cellText = cellValue.replace(/\([^)]+\)/, '').trim();
-  } else {
-    // Check if room is at the end without parentheses, e.g. "AK G2/Sushmita G1 237"
-    const endRoomMatch = cellValue.match(/\s+(\d{3})$/);
-    if (endRoomMatch) {
-      room = `Room ${endRoomMatch[1]}`;
-      cellText = cellValue.replace(/\s+\d{3}$/, '').trim();
-    }
-  }
-
-  // 2. Handle split groups by slash /
-  if (cellText.includes('/')) {
-    const parts = cellText.split('/');
+  // 1. Handle split groups by slash /
+  if (cellValue.includes('/')) {
+    const parts = cellValue.split('/');
     const parsedParts = [];
 
     parts.forEach(part => {
       let partText = part.trim();
-      let partRoom = room;
+      let partRoom = defaultRoom; // Fallback to defaultRoom if no room specified for this part
 
-      // Check for part-specific room inside part, e.g., "Sushmita G1(715)"
+      // Extract room for this part if specified in parentheses (e.g. (236))
       const partRoomMatch = partText.match(/\(([^)]+)\)/);
       if (partRoomMatch) {
         const roomVal = partRoomMatch[1];
         partRoom = roomVal.match(/^\d+/) ? `Room ${roomVal}` : roomVal;
         partText = partText.replace(/\([^)]+\)/, '').trim();
+      } else {
+        // Check for room number at the end without parentheses, e.g. "G1 237"
+        const endRoomMatch = partText.match(/\s+(\d{3})$/);
+        if (endRoomMatch) {
+          partRoom = `Room ${endRoomMatch[1]}`;
+          partText = partText.replace(/\s+\d{3}$/, '').trim();
+        }
       }
 
       // Detect group
@@ -151,9 +140,24 @@ function parseUnifiedCell(cellValue, periodId, facultyMap) {
     };
   } else {
     // Single part
-    let text = cellText.trim();
+    let text = cellValue.trim();
+    let room = defaultRoom; // Fallback to defaultRoom
+
+    // Extract room in parentheses if specified
+    const roomMatch = text.match(/\(([^)]+)\)/);
+    if (roomMatch) {
+      const roomVal = roomMatch[1];
+      room = roomVal.match(/^\d+/) ? `Room ${roomVal}` : roomVal;
+      text = text.replace(/\([^)]+\)/, '').trim();
+    } else {
+      const endRoomMatch = text.match(/\s+(\d{3})$/);
+      if (endRoomMatch) {
+        room = `Room ${endRoomMatch[1]}`;
+        text = text.replace(/\s+\d{3}$/, '').trim();
+      }
+    }
+
     let groupLabel = "";
-    
     // Check if it's G1+G2
     if (text.match(/G1\s*\+\s*G2/i) || text.includes('G1+G2')) {
       groupLabel = "G1+G2";
@@ -242,6 +246,7 @@ sheetsToParse.forEach(({ name, defaultCourse, defaultSem }) => {
     let course = defaultCourse;
     let sem = defaultSem;
     let section = 'A';
+    let defaultRoom = 'Room 703'; // Default fallback
     
     // Inspect next 5 rows for metadata
     for (let i = 1; i < 5; i++) {
@@ -265,6 +270,12 @@ sheetsToParse.forEach(({ name, defaultCourse, defaultSem }) => {
       const secMatch = rowStr.match(/Section\s*([A-D])/i) || rowStr.match(/Sec\s*([A-D])/i) || rowStr.match(/\b([A-D])\b/);
       if (secMatch) {
         section = secMatch[1];
+      }
+
+      // Room check
+      const roomMatch = rowStr.match(/Room\s*No\.?\s*(\d{3})/i) || rowStr.match(/Room\s*No\.?\s*([A-Za-z0-9]+)/i);
+      if (roomMatch) {
+        defaultRoom = `Room ${roomMatch[1].trim()}`;
       }
     }
 
@@ -383,7 +394,7 @@ sheetsToParse.forEach(({ name, defaultCourse, defaultSem }) => {
         }
 
         const cellValue = clean(row[col]);
-        const parsedCell = parseUnifiedCell(cellValue, id, facultyMap);
+        const parsedCell = parseUnifiedCell(cellValue, id, facultyMap, defaultRoom);
         dayClasses.push(parsedCell);
       });
 
