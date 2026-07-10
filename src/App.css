@@ -4,14 +4,14 @@
   --bg-darker: #eae6dc;
   --bg-dark: #faf8f2;
   --bg-surface: #faf8f2;
-  --border-color: rgba(12, 35, 64, 0.12);
-  --border-gold-glow: rgba(12, 35, 64, 0.25);
+  --border-color: rgba(0, 0, 0, 0.12);
+  --border-gold-glow: rgba(0, 0, 0, 0.25);
   
   --text-main: #2a2a28;
   --text-dim: #646460;
   
-  --accent-gold: #0c2340;
-  --accent-gold-glow: rgba(12, 35, 64, 0.08);
+  --accent-gold: #000000;
+  --accent-gold-glow: rgba(0, 0, 0, 0.08);
   --accent-cyan: #0284c7;
   --accent-green: #0b7a54;
   --accent-amber: #b45309;
@@ -44,7 +44,7 @@ body {
 .system-spinner {
   width: 45px;
   height: 45px;
-  border: 3px solid rgba(12, 35, 64, 0.1);
+  border: 3px solid rgba(0, 0, 0, 0.1);
   border-radius: 50%;
   border-top-color: var(--accent-gold);
   border-right-color: var(--accent-cyan);
@@ -63,7 +63,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: radial-gradient(circle at 50% 0%, rgba(12, 35, 64, 0.04) 0%, rgba(250, 248, 245, 0) 60%),
+  background: radial-gradient(circle at 50% 0%, rgba(0, 0, 0, 0.04) 0%, rgba(250, 248, 245, 0) 60%),
               var(--bg-darker);
 }
 
@@ -73,10 +73,10 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 16px 40px;
-  background: linear-gradient(135deg, #0c2340 0%, #163056 100%);
+  background: linear-gradient(135deg, #000000 0%, #000000 100%);
   border-bottom: 1.5px solid rgba(255, 255, 255, 0.15);
   z-index: 100;
-  box-shadow: 0 4px 20px rgba(12, 35, 64, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .header-left {
@@ -89,7 +89,7 @@ body {
   border-radius: 50%;
   background: #ffffff;
   padding: 1px;
-  box-shadow: 0 2px 6px rgba(12, 35, 64, 0.06);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
   object-fit: contain;
   border: 1.5px solid rgba(255, 255, 255, 0.3);
 }
@@ -134,13 +134,13 @@ body {
   height: 32px;
   border-radius: 50%;
   background: #faf8f2;
-  color: #0c2340;
+  color: #000000;
   font-weight: 800;
   font-size: 0.9rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(12, 35, 64, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   transition: all 0.2s ease;
 }
 
@@ -204,13 +204,13 @@ body {
   flex-direction: column;
   gap: 12px;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(12, 35, 64, 0.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
 }
 
 .dashboard-card:hover {
   border-color: var(--border-gold-glow);
   background: var(--bg-card);
-  box-shadow: 0 8px 24px rgba(12, 35, 64, 0.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
   transform: translateY(-2px);
 }
 
