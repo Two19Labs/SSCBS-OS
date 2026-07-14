@@ -85,10 +85,22 @@ export default function AdminConsolePage({ onBack }) {
         .from('notices')
         .select('*')
         .order('created_at', { ascending: false });
-      if (error) console.error('Error fetching admin notices:', error);
-      else setNoticesList(data || []);
+      if (error) {
+        console.error('Error fetching admin notices:', error);
+        if (error.message && error.message.includes('schema cache')) {
+          setSaveStatus({
+            type: 'error',
+            message: "The 'notices' table does not exist in your Supabase database. Please run the SQL migration in your Supabase SQL Editor to create it."
+          });
+        } else {
+          setSaveStatus({ type: 'error', message: error.message || 'Failed to load notices.' });
+        }
+      } else {
+        setNoticesList(data || []);
+      }
     } catch (err) {
       console.error('Failed to load notices:', err);
+      setSaveStatus({ type: 'error', message: err.message || 'Failed to load notices.' });
     } finally {
       setLoadingNotices(false);
     }
@@ -141,7 +153,14 @@ export default function AdminConsolePage({ onBack }) {
       setNoticeForm({ title: '', category: 'Event', society: '', content: '', link_url: '' });
       fetchAdminNotices();
     } catch (err) {
-      setSaveStatus({ type: 'error', message: err.message || 'Failed to publish notice.' });
+      if (err.message && err.message.includes('schema cache')) {
+        setSaveStatus({
+          type: 'error',
+          message: "The 'notices' table does not exist in your Supabase database. Please run the SQL migration in your Supabase SQL Editor to create it."
+        });
+      } else {
+        setSaveStatus({ type: 'error', message: err.message || 'Failed to publish notice.' });
+      }
     } finally {
       setIsSaving(false);
     }

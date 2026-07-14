@@ -9,39 +9,40 @@ export default function NoticeBoard() {
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('All');
 
+  const getMockNotices = () => [
+    {
+      id: '1',
+      title: 'HackSSCBS 2026 Registration Open',
+      content: 'Register for the premier hackathon of SSCBS. Open to all students. Cash prizes up for grabs!',
+      category: 'Event',
+      society: 'Kronos',
+      link_url: 'https://hacksscbs.tech',
+      created_at: new Date(Date.now() - 3600000 * 24).toISOString()
+    },
+    {
+      id: '2',
+      title: 'Mock Placement Drive',
+      content: 'Get corporate-ready with our mock group discussions and personal interviews. Compulsory for 3rd years.',
+      category: 'Session',
+      society: 'Career Development Centre',
+      link_url: 'https://cdc.sscbs.du.ac.in',
+      created_at: new Date(Date.now() - 3600000 * 48).toISOString()
+    },
+    {
+      id: '3',
+      title: 'Introductory Photography Workshop',
+      content: 'Learn camera exposure, composition rules, and editing basics from industry mentors.',
+      category: 'Society',
+      society: 'Macula',
+      created_at: new Date(Date.now() - 3600000 * 72).toISOString()
+    }
+  ];
+
   const fetchNotices = async () => {
     try {
       setLoading(true);
       if (!hasValidCredentials) {
-        // Fallback mock notices for local development if DB is not configured
-        setNotices([
-          {
-            id: '1',
-            title: 'HackSSCBS 2026 Registration Open',
-            content: 'Register for the premier hackathon of SSCBS. Open to all students. Cash prizes up for grabs!',
-            category: 'Event',
-            society: 'Kronos',
-            link_url: 'https://hacksscbs.tech',
-            created_at: new Date(Date.now() - 3600000 * 24).toISOString()
-          },
-          {
-            id: '2',
-            title: 'Mock Placement Drive',
-            content: 'Get corporate-ready with our mock group discussions and personal interviews. Compulsory for 3rd years.',
-            category: 'Session',
-            society: 'Career Development Centre',
-            link_url: 'https://cdc.sscbs.du.ac.in',
-            created_at: new Date(Date.now() - 3600000 * 48).toISOString()
-          },
-          {
-            id: '3',
-            title: 'Introductory Photography Workshop',
-            content: 'Learn camera exposure, composition rules, and editing basics from industry mentors.',
-            category: 'Society',
-            society: 'Macula',
-            created_at: new Date(Date.now() - 3600000 * 72).toISOString()
-          }
-        ]);
+        setNotices(getMockNotices());
         setLoading(false);
         return;
       }
@@ -52,12 +53,15 @@ export default function NoticeBoard() {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error loading notices:', error);
+        console.error('Error loading notices from Supabase:', error);
+        // Fallback to mock notices if table not found or missing
+        setNotices(getMockNotices());
       } else {
         setNotices(data || []);
       }
     } catch (err) {
       console.error('Failed to fetch notices:', err);
+      setNotices(getMockNotices());
     } finally {
       setLoading(false);
     }
