@@ -26,6 +26,7 @@ export default function NoticeBoard() {
       category: 'Session',
       society: 'Career Development Centre',
       link_url: 'https://cdc.sscbs.du.ac.in',
+      event_date: new Date(Date.now() + 3600000 * 24 * 3).toISOString(),
       created_at: new Date(Date.now() - 3600000 * 48).toISOString()
     },
     {
@@ -34,6 +35,7 @@ export default function NoticeBoard() {
       content: 'Learn camera exposure, composition rules, and editing basics from industry mentors.',
       category: 'Society',
       society: 'Macula',
+      event_date: new Date(Date.now() + 3600000 * 24 * 5).toISOString(),
       created_at: new Date(Date.now() - 3600000 * 72).toISOString()
     }
   ];

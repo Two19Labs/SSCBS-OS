@@ -3,6 +3,7 @@ import * as XLSX from 'xlsx';
 import { useTimetable } from '../context/TimetableContext';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import DateTimePicker from './DateTimePicker';
 import './AdminConsolePage.css';
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
@@ -57,31 +58,7 @@ export default function AdminConsolePage({ onBack }) {
 
   const isAdmin = user?.email === 'aditya.25015@sscbs.du.ac.in';
 
-  if (!isAdmin) {
-    return (
-      <div className="admin-console-container" style={{ padding: '3rem', textAlign: 'center', color: '#ef4444' }}>
-        <h2>Access Denied</h2>
-        <p style={{ marginTop: '1rem', color: '#888' }}>
-          You do not have administrative privileges to access the SSCBS OS Admin Workspace.
-        </p>
-        <button 
-          onClick={onBack} 
-          style={{ 
-            marginTop: '2rem', 
-            padding: '0.6rem 1.2rem', 
-            background: '#8b5cf6', 
-            color: '#fff', 
-            border: 'none', 
-            borderRadius: '6px', 
-            cursor: 'pointer',
-            fontWeight: '600'
-          }}
-        >
-          Go Back to Dashboard
-        </button>
-      </div>
-    );
-  }
+
   
   // Notices manager states
   const [noticesList, setNoticesList] = useState([]);
@@ -92,6 +69,7 @@ export default function AdminConsolePage({ onBack }) {
     society: '',
     content: '',
     link_url: '',
+    event_date: '',
     active_from: '',
     active_to: ''
   });
@@ -161,6 +139,7 @@ export default function AdminConsolePage({ onBack }) {
 
     const activeFromVal = noticeForm.active_from ? new Date(noticeForm.active_from).toISOString() : null;
     const activeToVal = noticeForm.active_to ? new Date(noticeForm.active_to).toISOString() : null;
+    const eventDateVal = noticeForm.event_date ? new Date(noticeForm.event_date).toISOString() : null;
 
     if (activeFromVal && activeToVal && new Date(activeFromVal) >= new Date(activeToVal)) {
       setSaveStatus({ type: 'error', message: 'The expiry date ("Hide After") must be later than the display start date ("Show From").' });
@@ -179,13 +158,14 @@ export default function AdminConsolePage({ onBack }) {
           category: noticeForm.category,
           society: noticeForm.society || null,
           link_url: noticeForm.link_url || null,
+          event_date: eventDateVal,
           active_from: activeFromVal,
           active_to: activeToVal,
           created_at: new Date().toISOString()
         };
         setNoticesList(prev => [newMockNotice, ...prev]);
         setSaveStatus({ type: 'success', message: 'Notice created successfully (local mock)!' });
-        setNoticeForm({ title: '', category: 'Event', society: '', content: '', link_url: '', active_from: '', active_to: '' });
+        setNoticeForm({ title: '', category: 'Event', society: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
         setIsSaving(false);
         return;
       }
@@ -198,6 +178,7 @@ export default function AdminConsolePage({ onBack }) {
           category: noticeForm.category,
           society: noticeForm.society || null,
           link_url: noticeForm.link_url || null,
+          event_date: eventDateVal,
           active_from: activeFromVal,
           active_to: activeToVal
         }]);
@@ -205,7 +186,7 @@ export default function AdminConsolePage({ onBack }) {
       if (error) throw error;
       
       setSaveStatus({ type: 'success', message: 'Notice published successfully onto the Campus Notice Board!' });
-      setNoticeForm({ title: '', category: 'Event', society: '', content: '', link_url: '', active_from: '', active_to: '' });
+      setNoticeForm({ title: '', category: 'Event', society: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
       fetchAdminNotices();
     } catch (err) {
       if (err.message && err.message.includes('schema cache')) {
@@ -829,6 +810,32 @@ export default function AdminConsolePage({ onBack }) {
     }
   };
 
+  if (!isAdmin) {
+    return (
+      <div className="admin-console-container" style={{ padding: '3rem', textAlign: 'center', color: '#ef4444' }}>
+        <h2>Access Denied</h2>
+        <p style={{ marginTop: '1rem', color: '#888' }}>
+          You do not have administrative privileges to access the SSCBS OS Admin Workspace.
+        </p>
+        <button 
+          onClick={onBack} 
+          style={{ 
+            marginTop: '2rem', 
+            padding: '0.6rem 1.2rem', 
+            background: '#8b5cf6', 
+            color: '#fff', 
+            border: 'none', 
+            borderRadius: '6px', 
+            cursor: 'pointer',
+            fontWeight: '600'
+          }}
+        >
+          Go Back to Dashboard
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="admin-console-container">
       {/* Header */}
@@ -1114,26 +1121,34 @@ export default function AdminConsolePage({ onBack }) {
                   />
                 </div>
 
+                <div className="form-item-admin">
+                  <label htmlFor="notice-event-date">Session / Event Date & Time (Optional)</label>
+                  <DateTimePicker
+                    id="notice-event-date"
+                    label="Select Date & Time of the event/session"
+                    value={noticeForm.event_date}
+                    onChange={(val) => setNoticeForm(prev => ({ ...prev, event_date: val }))}
+                  />
+                </div>
+
                 <div className="form-row-admin">
                   <div className="form-item-admin flex-1">
                     <label htmlFor="notice-active-from">Show From (Start Date/Time - Optional)</label>
-                    <input
-                      type="datetime-local"
+                    <DateTimePicker
                       id="notice-active-from"
+                      label="Select show start time"
                       value={noticeForm.active_from}
-                      onChange={(e) => setNoticeForm(prev => ({ ...prev, active_from: e.target.value }))}
-                      className="admin-input-field"
+                      onChange={(val) => setNoticeForm(prev => ({ ...prev, active_from: val }))}
                     />
                   </div>
                   
                   <div className="form-item-admin flex-1">
                     <label htmlFor="notice-active-to">Hide After (Auto-Expire Date/Time - Optional)</label>
-                    <input
-                      type="datetime-local"
+                    <DateTimePicker
                       id="notice-active-to"
+                      label="Select auto-delete time"
                       value={noticeForm.active_to}
-                      onChange={(e) => setNoticeForm(prev => ({ ...prev, active_to: e.target.value }))}
-                      className="admin-input-field"
+                      onChange={(val) => setNoticeForm(prev => ({ ...prev, active_to: val }))}
                     />
                   </div>
                 </div>
@@ -1185,8 +1200,9 @@ export default function AdminConsolePage({ onBack }) {
                           <h4 className="notice-item-title">{notice.title}</h4>
                           <p className="notice-item-desc">{notice.content.substring(0, 80)}{notice.content.length > 80 ? '...' : ''}</p>
                           
-                          {(notice.active_from || notice.active_to) && (
+                          {(notice.event_date || notice.active_from || notice.active_to) && (
                             <div className="notice-item-schedule-info">
+                              {notice.event_date && <div style={{ color: '#000000', fontWeight: 'bold' }}>📅 Event: {new Date(notice.event_date).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>}
                               {notice.active_from && <div>🟢 Start: {new Date(notice.active_from).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>}
                               {notice.active_to && <div>🔴 Expire: {new Date(notice.active_to).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>}
                             </div>

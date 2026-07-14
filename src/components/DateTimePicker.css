@@ -1,0 +1,363 @@
+/* Custom DateTimePicker Stylesheet */
+
+.dtpicker-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.dtpicker-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.dtpicker-trigger-input {
+  cursor: pointer !important;
+  user-select: none;
+  padding-right: 2.5rem !important;
+}
+
+.dtpicker-icons {
+  position: absolute;
+  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dtpicker-clear-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0.2rem;
+  font-size: 0.8rem;
+  transition: color 0.15s ease;
+  line-height: 1;
+}
+
+.dtpicker-clear-btn:hover {
+  color: #ef4444;
+}
+
+.dtpicker-calendar-icon {
+  font-size: 0.95rem;
+  opacity: 0.6;
+}
+
+/* Popover Panel */
+.dtpicker-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 999;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  color: #1e293b;
+  width: auto;
+  overflow: hidden;
+  animation: dtpicker-fade-in 0.15s ease-out;
+}
+
+@keyframes dtpicker-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dtpicker-panes {
+  display: flex;
+  padding: 1rem;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+.dtpicker-divider {
+  width: 1px;
+  background: #e2e8f0;
+  align-self: stretch;
+}
+
+/* Calendar Section */
+.dtpicker-calendar-pane {
+  width: 230px;
+}
+
+.calendar-nav-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.calendar-nav-btn {
+  background: transparent;
+  border: none;
+  color: #1e293b;
+  font-size: 1.25rem;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+
+.calendar-nav-btn:hover {
+  background: #f1f5f9;
+}
+
+.calendar-month-year {
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: #0f172a;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.calendar-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.calendar-day-btn {
+  background: transparent;
+  border: none;
+  height: 30px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #1e293b;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.calendar-day-btn:hover {
+  background: #f1f5f9;
+}
+
+.calendar-day-btn.padding-day {
+  color: #cbd5e1;
+}
+
+.calendar-day-btn.today-day {
+  border: 1px solid #000000;
+  font-weight: 700;
+}
+
+.calendar-day-btn.selected-day {
+  background: #000000 !important;
+  color: #ffffff !important;
+  font-weight: 700;
+}
+
+/* Clock Section */
+.dtpicker-clock-pane {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 200px;
+}
+
+.clock-time-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  gap: 0.25rem;
+  border: 1px solid #e2e8f0;
+}
+
+.time-display-num {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #64748b;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.time-display-num.active {
+  color: #000000;
+  background: #e2e8f0;
+}
+
+.time-display-colon {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.clock-ampm-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 0.5rem;
+}
+
+.ampm-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #94a3b8;
+  padding: 2px 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.ampm-btn.active {
+  background: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+/* Dial face */
+.clock-face-outer {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  background: #f8fafc;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  user-select: none;
+  touch-action: none;
+}
+
+.clock-face-center {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #000000;
+  border-radius: 50%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+}
+
+.clock-face-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.clock-hand-line {
+  stroke: #000000;
+  stroke-width: 2;
+}
+
+.clock-hand-joint {
+  fill: #000000;
+}
+
+.clock-center-pin {
+  fill: #ffffff;
+}
+
+.clock-number {
+  position: absolute;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  z-index: 1;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.15s, color 0.15s;
+}
+
+.clock-number.selected {
+  color: #ffffff;
+}
+
+.clock-number.minute-number {
+  font-size: 0.75rem;
+}
+
+.clock-mode-indicator {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #94a3b8;
+  margin-top: 0.5rem;
+}
+
+/* Footer buttons */
+.dtpicker-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.dtpicker-footer-btn {
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.35rem 0.85rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dtpicker-footer-btn.clear {
+  background: transparent;
+  color: #64748b;
+}
+
+.dtpicker-footer-btn.clear:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.dtpicker-footer-btn.ok {
+  background: #000000;
+  color: #ffffff;
+}
+
+.dtpicker-footer-btn.ok:hover {
+  background: #1e293b;
+}
