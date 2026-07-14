@@ -115,7 +115,7 @@ function App() {
             <FindMyProfessorPage onBack={() => setCurrentView('dashboard')} />
           ) : currentView === 'waiver-tool' ? (
             <WaiverToolPage onBack={() => setCurrentView('dashboard')} />
-          ) : currentView === 'admin-console' ? (
+          ) : (currentView === 'admin-console' && isAdmin) ? (
             <AdminConsolePage onBack={() => setCurrentView('dashboard')} />
           ) : (
             <>
