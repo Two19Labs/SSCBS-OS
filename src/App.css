@@ -320,6 +320,8 @@
 @media (max-width: 480px) {
   .workspace-header {
     padding: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
   }
   .header-left {
     gap: 8px;
@@ -333,7 +335,14 @@
     gap: 4px;
   }
   .header-right {
-    gap: 12px;
+    gap: 8px;
+    width: 100%;
+    justify-content: flex-end;
+  }
+  .admin-header-btn {
+    margin-right: 0;
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
   }
   .dashboard-grid {
     grid-template-columns: 1fr;
@@ -468,9 +477,9 @@
 
 .admin-header-btn {
   margin-right: 1rem;
-  background: transparent;
-  border: 1px solid var(--border-color);
-  color: var(--text-main);
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: #c084fc;
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
   font-weight: 600;
@@ -480,8 +489,8 @@
 }
 
 .admin-header-btn:hover {
-  background: #000000;
-  border-color: #000000;
+  background: rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.5);
   color: #ffffff;
 }
 

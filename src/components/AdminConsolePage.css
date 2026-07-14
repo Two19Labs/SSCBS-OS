@@ -737,4 +737,96 @@
   border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
+/* Mobile responsive adjustments */
+@media (max-width: 900px) {
+  .admin-console-container {
+    height: auto;
+    min-height: calc(100vh - 64px);
+    overflow: visible;
+  }
+  
+  .admin-console-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+    gap: 12px;
+  }
+  
+  .header-left-admin {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+  }
+  
+  .admin-tag-container {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .admin-console-content {
+    padding: 1rem;
+    gap: 1rem;
+    overflow: visible;
+  }
+  
+  .admin-tabs {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  
+  .admin-tab-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    flex: 1;
+    text-align: center;
+  }
+  
+  .tab-pane {
+    flex-direction: column;
+    height: auto;
+    gap: 1.5rem;
+  }
+  
+  .upload-pane, .notices-pane {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .pane-left, .pane-right {
+    padding: 1.25rem;
+    min-height: auto;
+  }
+  
+  .editor-pane {
+    padding: 1.25rem;
+  }
+  
+  .editor-controls-row {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0.75rem;
+  }
+  
+  .control-item {
+    width: 100%;
+  }
+  
+  .schedule-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .admin-schedule-table {
+    min-width: 600px;
+  }
+  
+  .form-row-admin {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+
 

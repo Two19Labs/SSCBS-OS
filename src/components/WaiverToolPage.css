@@ -934,3 +934,93 @@
   color: #9b2c2c;
   border-color: #fca5a5;
 }
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .settings-glass-panel {
+    padding: 1.25rem;
+  }
+  
+  .dropzone-area {
+    padding: 2rem 1rem;
+  }
+
+  .results-card-glass {
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .page-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .page-header-row h2 {
+    font-size: 1.4rem;
+  }
+
+  .form-group-row {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+
+  .selector-view-tabs {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  
+  .selector-view-tabs .tab-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .calendar-legend-row {
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    justify-content: flex-start;
+  }
+
+  .totals-row {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar-week-headers {
+    font-size: 0.7rem;
+  }
+
+  .calendar-days-grid {
+    gap: 0.25rem;
+  }
+
+  .calendar-day-cell {
+    padding: 0.2rem;
+    aspect-ratio: 1 / 1;
+  }
+
+  .calendar-day-cell .day-number {
+    font-size: 0.75rem;
+  }
+
+  .abs-dot-count, .pres-dot-count {
+    width: 12px;
+    height: 12px;
+    font-size: 0.55rem;
+  }
+
+  .waived-cell-indicator {
+    width: 4px;
+    height: 4px;
+    top: 2px;
+    right: 2px;
+  }
+}
+

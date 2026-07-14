@@ -57,18 +57,6 @@ function App() {
               <button 
                 className="admin-header-btn" 
                 onClick={() => setCurrentView('admin-console')}
-                style={{
-                  marginRight: '1rem',
-                  background: 'rgba(139, 92, 246, 0.15)',
-                  border: '1px solid rgba(139, 92, 246, 0.3)',
-                  color: '#c084fc',
-                  padding: '0.4rem 0.8rem',
-                  borderRadius: '6px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  fontSize: '0.85rem',
-                  transition: 'all 0.2s'
-                }}
               >
                 Admin Console
               </button>
