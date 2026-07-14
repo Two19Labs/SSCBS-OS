@@ -61,7 +61,9 @@ export default function AdminConsolePage({ onBack }) {
     category: 'Event',
     society: '',
     content: '',
-    link_url: ''
+    link_url: '',
+    active_from: '',
+    active_to: ''
   });
 
   const fetchAdminNotices = async () => {
@@ -81,6 +83,17 @@ export default function AdminConsolePage({ onBack }) {
     }
     try {
       setLoadingNotices(true);
+
+      // Housekeeping: delete expired notices from the database
+      try {
+        await supabase
+          .from('notices')
+          .delete()
+          .lt('active_to', new Date().toISOString());
+      } catch (err) {
+        console.warn('Housekeeping failed:', err);
+      }
+
       const { data, error } = await supabase
         .from('notices')
         .select('*')
@@ -115,7 +128,15 @@ export default function AdminConsolePage({ onBack }) {
   const handleCreateNotice = async (e) => {
     e.preventDefault();
     if (!noticeForm.title || !noticeForm.content) return;
-    
+
+    const activeFromVal = noticeForm.active_from ? new Date(noticeForm.active_from).toISOString() : null;
+    const activeToVal = noticeForm.active_to ? new Date(noticeForm.active_to).toISOString() : null;
+
+    if (activeFromVal && activeToVal && new Date(activeFromVal) >= new Date(activeToVal)) {
+      setSaveStatus({ type: 'error', message: 'The expiry date ("Hide After") must be later than the display start date ("Show From").' });
+      return;
+    }
+
     setIsSaving(true);
     setSaveStatus({ type: '', message: '' });
     
@@ -128,11 +149,13 @@ export default function AdminConsolePage({ onBack }) {
           category: noticeForm.category,
           society: noticeForm.society || null,
           link_url: noticeForm.link_url || null,
+          active_from: activeFromVal,
+          active_to: activeToVal,
           created_at: new Date().toISOString()
         };
         setNoticesList(prev => [newMockNotice, ...prev]);
         setSaveStatus({ type: 'success', message: 'Notice created successfully (local mock)!' });
-        setNoticeForm({ title: '', category: 'Event', society: '', content: '', link_url: '' });
+        setNoticeForm({ title: '', category: 'Event', society: '', content: '', link_url: '', active_from: '', active_to: '' });
         setIsSaving(false);
         return;
       }
@@ -145,12 +168,14 @@ export default function AdminConsolePage({ onBack }) {
           category: noticeForm.category,
           society: noticeForm.society || null,
           link_url: noticeForm.link_url || null,
+          active_from: activeFromVal,
+          active_to: activeToVal
         }]);
 
       if (error) throw error;
       
       setSaveStatus({ type: 'success', message: 'Notice published successfully onto the Campus Notice Board!' });
-      setNoticeForm({ title: '', category: 'Event', society: '', content: '', link_url: '' });
+      setNoticeForm({ title: '', category: 'Event', society: '', content: '', link_url: '', active_from: '', active_to: '' });
       fetchAdminNotices();
     } catch (err) {
       if (err.message && err.message.includes('schema cache')) {
@@ -1059,6 +1084,30 @@ export default function AdminConsolePage({ onBack }) {
                   />
                 </div>
 
+                <div className="form-row-admin">
+                  <div className="form-item-admin flex-1">
+                    <label htmlFor="notice-active-from">Show From (Start Date/Time - Optional)</label>
+                    <input
+                      type="datetime-local"
+                      id="notice-active-from"
+                      value={noticeForm.active_from}
+                      onChange={(e) => setNoticeForm(prev => ({ ...prev, active_from: e.target.value }))}
+                      className="admin-input-field"
+                    />
+                  </div>
+                  
+                  <div className="form-item-admin flex-1">
+                    <label htmlFor="notice-active-to">Hide After (Auto-Expire Date/Time - Optional)</label>
+                    <input
+                      type="datetime-local"
+                      id="notice-active-to"
+                      value={noticeForm.active_to}
+                      onChange={(e) => setNoticeForm(prev => ({ ...prev, active_to: e.target.value }))}
+                      className="admin-input-field"
+                    />
+                  </div>
+                </div>
+
                 <button 
                   type="submit" 
                   className="btn-publish-timetable" 
@@ -1083,26 +1132,49 @@ export default function AdminConsolePage({ onBack }) {
                   <div className="no-logs">No active notices found. Publish one to get started!</div>
                 ) : (
                   <div className="admin-notices-grid">
-                    {noticesList.map((notice) => (
-                      <div key={notice.id} className="admin-notice-item">
-                        <div className="notice-item-meta">
-                          <span className={`category-tag tag-${notice.category.toLowerCase()}`}>{notice.category}</span>
-                          {notice.society && <span className="notice-item-society">@{notice.society}</span>}
+                    {noticesList.map((notice) => {
+                      const getNoticeStatus = (n) => {
+                        const now = new Date();
+                        if (n.active_from && new Date(n.active_from) > now) {
+                          return { label: 'Scheduled', class: 'status-scheduled' };
+                        }
+                        if (n.active_to && new Date(n.active_to) < now) {
+                          return { label: 'Expired', class: 'status-expired' };
+                        }
+                        return { label: 'Active', class: 'status-active' };
+                      };
+                      const status = getNoticeStatus(notice);
+
+                      return (
+                        <div key={notice.id} className="admin-notice-item">
+                          <div className="notice-item-meta">
+                            <span className={`category-tag tag-${notice.category.toLowerCase()}`}>{notice.category}</span>
+                            {notice.society && <span className="notice-item-society">@{notice.society}</span>}
+                            <span className={`admin-status-badge ${status.class}`}>{status.label}</span>
+                          </div>
+                          <h4 className="notice-item-title">{notice.title}</h4>
+                          <p className="notice-item-desc">{notice.content.substring(0, 80)}{notice.content.length > 80 ? '...' : ''}</p>
+                          
+                          {(notice.active_from || notice.active_to) && (
+                            <div className="notice-item-schedule-info">
+                              {notice.active_from && <div>🟢 Start: {new Date(notice.active_from).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>}
+                              {notice.active_to && <div>🔴 Expire: {new Date(notice.active_to).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>}
+                            </div>
+                          )}
+
+                          <div className="notice-item-actions">
+                            <span className="notice-item-date">{new Date(notice.created_at).toLocaleDateString()}</span>
+                            <button 
+                              className="btn-delete-notice"
+                              onClick={() => handleDeleteNotice(notice.id)}
+                              disabled={isSaving}
+                            >
+                              Delete
+                            </button>
+                          </div>
                         </div>
-                        <h4 className="notice-item-title">{notice.title}</h4>
-                        <p className="notice-item-desc">{notice.content.substring(0, 80)}{notice.content.length > 80 ? '...' : ''}</p>
-                        <div className="notice-item-actions">
-                          <span className="notice-item-date">{new Date(notice.created_at).toLocaleDateString()}</span>
-                          <button 
-                            className="btn-delete-notice"
-                            onClick={() => handleDeleteNotice(notice.id)}
-                            disabled={isSaving}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>

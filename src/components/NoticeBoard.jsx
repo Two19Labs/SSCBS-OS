@@ -38,11 +38,24 @@ export default function NoticeBoard() {
     }
   ];
 
+  const filterActiveNotices = (rawNotices) => {
+    const now = new Date();
+    return (rawNotices || []).filter(notice => {
+      if (notice.active_from && new Date(notice.active_from) > now) {
+        return false;
+      }
+      if (notice.active_to && new Date(notice.active_to) < now) {
+        return false;
+      }
+      return true;
+    });
+  };
+
   const fetchNotices = async () => {
     try {
       setLoading(true);
       if (!hasValidCredentials) {
-        setNotices(getMockNotices());
+        setNotices(filterActiveNotices(getMockNotices()));
         setLoading(false);
         return;
       }
@@ -54,14 +67,13 @@ export default function NoticeBoard() {
 
       if (error) {
         console.error('Error loading notices from Supabase:', error);
-        // Fallback to mock notices if table not found or missing
-        setNotices(getMockNotices());
+        setNotices(filterActiveNotices(getMockNotices()));
       } else {
-        setNotices(data || []);
+        setNotices(filterActiveNotices(data || []));
       }
     } catch (err) {
       console.error('Failed to fetch notices:', err);
-      setNotices(getMockNotices());
+      setNotices(filterActiveNotices(getMockNotices()));
     } finally {
       setLoading(false);
     }

@@ -119,11 +119,15 @@ function App() {
             <AdminConsolePage onBack={() => setCurrentView('dashboard')} />
           ) : (
             <>
-              {/* Core Feature: Timetable Schedule Tracker */}
-              <ClassSchedulesCard onOpenProfile={() => setIsProfileOpen(true)} />
-
-              {/* Campus Notice Board */}
-              <NoticeBoard />
+              {/* Split layout: Schedule Tracker (Left) & Campus Notice Board (Right) */}
+              <div className="home-split-layout">
+                <div className="home-layout-left">
+                  <ClassSchedulesCard onOpenProfile={() => setIsProfileOpen(true)} />
+                </div>
+                <div className="home-layout-right">
+                  <NoticeBoard />
+                </div>
+              </div>
 
               {/* Student Tools Grid */}
               <section className="dashboard-grid">

@@ -695,3 +695,46 @@
   box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
 }
 
+/* Notice Scheduling & Expiry Status Styles */
+.admin-status-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: auto;
+}
+
+.admin-status-badge.status-active {
+  background: rgba(16, 185, 129, 0.1);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.admin-status-badge.status-scheduled {
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.admin-status-badge.status-expired {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.notice-item-schedule-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.7rem;
+  color: #94a3b8;
+  background: rgba(0, 0, 0, 0.15);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-family: monospace;
+  margin-top: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+

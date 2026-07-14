@@ -109,6 +109,8 @@ CREATE TABLE IF NOT EXISTS public.notices (
     category TEXT NOT NULL,     -- 'Society', 'Session', 'Event', 'Academic'
     society TEXT,               -- e.g. 'Kronos', 'Macula' (Optional)
     link_url TEXT,              -- Registration link (Optional)
+    active_from TIMESTAMP WITH TIME ZONE, -- Display notice start date (Optional)
+    active_to TIMESTAMP WITH TIME ZONE,   -- Display notice end date (Optional)
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL
 );
