@@ -466,3 +466,23 @@
   }
 }
 
+.admin-header-btn {
+  margin-right: 1rem;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.admin-header-btn:hover {
+  background: #000000;
+  border-color: #000000;
+  color: #ffffff;
+}
+
+

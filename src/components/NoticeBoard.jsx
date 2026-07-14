@@ -107,6 +107,19 @@ export default function NoticeBoard() {
     return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
   };
 
+  const formatEventDate = (isoString) => {
+    if (!isoString) return '';
+    const d = new Date(isoString);
+    return d.toLocaleString('en-US', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
   return (
     <section className="notice-board-container">
       <div className="notice-board-header">
@@ -158,6 +171,13 @@ export default function NoticeBoard() {
                     {notice.society.charAt(0).toUpperCase()}
                   </span>
                   <span className="society-name">{notice.society}</span>
+                </div>
+              )}
+              
+              {notice.event_date && (
+                <div className="notice-event-time">
+                  <span className="event-time-icon">📅</span>
+                  <span className="event-time-value">{formatEventDate(notice.event_date)}</span>
                 </div>
               )}
               
