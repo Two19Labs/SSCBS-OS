@@ -6,7 +6,6 @@ import ClassSchedulesCard from './components/ClassSchedulesCard';
 import FindMyProfessorPage from './components/FindMyProfessorPage';
 import GpaCalculatorModal from './components/GpaCalculatorModal';
 import WaiverToolPage from './components/WaiverToolPage';
-import AdminConsolePage from './components/AdminConsolePage';
 import NoticeBoard from './components/NoticeBoard';
 import './App.css';
 import { Analytics } from '@vercel/analytics/react';
@@ -14,7 +13,7 @@ import { Analytics } from '@vercel/analytics/react';
 function App() {
   const { user, loading } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'prof-tracker', 'waiver-tool', or 'admin-console'
+  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'prof-tracker', or 'waiver-tool'
   const [isGpaOpen, setIsGpaOpen] = useState(false);
 
   if (loading) {
@@ -39,8 +38,6 @@ function App() {
   const userSemester = user.user_metadata?.semester;
   const userSection = user.user_metadata?.section;
 
-  const isAdmin = userEmail === 'aditya.25015@sscbs.du.ac.in';
-
   return (
     <>
       <div className="workspace-container">
@@ -53,26 +50,6 @@ function App() {
             </span>
           </div>
           <div className="header-right">
-            {isAdmin && (
-              <button 
-                className="admin-header-btn" 
-                onClick={() => setCurrentView('admin-console')}
-                style={{
-                  marginRight: '1rem',
-                  background: 'rgba(139, 92, 246, 0.15)',
-                  border: '1px solid rgba(139, 92, 246, 0.3)',
-                  color: '#c084fc',
-                  padding: '0.4rem 0.8rem',
-                  borderRadius: '6px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  fontSize: '0.85rem',
-                  transition: 'all 0.2s'
-                }}
-              >
-                Admin Console
-              </button>
-            )}
             <div 
               className="user-profile" 
               onClick={() => setIsProfileOpen(true)} 
@@ -115,8 +92,6 @@ function App() {
             <FindMyProfessorPage onBack={() => setCurrentView('dashboard')} />
           ) : currentView === 'waiver-tool' ? (
             <WaiverToolPage onBack={() => setCurrentView('dashboard')} />
-          ) : (currentView === 'admin-console' && isAdmin) ? (
-            <AdminConsolePage onBack={() => setCurrentView('dashboard')} />
           ) : (
             <>
               {/* Split layout: Schedule Tracker (Left) & Campus Notice Board (Right) */}
@@ -171,26 +146,6 @@ function App() {
                     <span className="btn-card-action">Launch Calculator →</span>
                   </div>
                 </div>
-
-                {isAdmin && (
-                  <div 
-                    className="dashboard-card active-card admin-card" 
-                    onClick={() => setCurrentView('admin-console')}
-                    style={{
-                      border: '1px solid rgba(139, 92, 246, 0.4)',
-                      background: 'rgba(139, 92, 246, 0.05)'
-                    }}
-                  >
-                    <div className="card-header">
-                      <h3 style={{ color: '#c084fc' }}>Admin Console</h3>
-                      <span className="badge-active" style={{ background: '#ef4444' }}>System Control</span>
-                    </div>
-                    <p>Manage college timetables, upload new schedule Excel files, and make manual scheduling adjustments dynamically.</p>
-                    <div className="card-footer">
-                      <span className="btn-card-action" style={{ color: '#a78bfa' }}>Launch Admin Console →</span>
-                    </div>
-                  </div>
-                )}
 
                 <div className="dashboard-card locked">
                   <div className="card-header">
