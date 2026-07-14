@@ -108,7 +108,7 @@ export default function AdminConsolePage({ onBack }) {
         .order('created_at', { ascending: false });
       if (error) {
         console.error('Error fetching admin notices:', error);
-        if (error.message && error.message.includes('schema cache')) {
+        if (error.message && (error.message.includes('schema cache') || error.message.includes('does not exist') || error.code === '42P01')) {
           setSaveStatus({
             type: 'error',
             message: "The 'notices' table does not exist in your Supabase database. Please run the SQL migration in your Supabase SQL Editor to create it."
@@ -121,7 +121,14 @@ export default function AdminConsolePage({ onBack }) {
       }
     } catch (err) {
       console.error('Failed to load notices:', err);
-      setSaveStatus({ type: 'error', message: err.message || 'Failed to load notices.' });
+      if (err.message && err.message.includes('Failed to fetch')) {
+        setSaveStatus({
+          type: 'error',
+          message: 'Connection Failed (Failed to fetch): Please disable any ad blockers, privacy extensions, or Brave Shields blocking supabase.co and try again.'
+        });
+      } else {
+        setSaveStatus({ type: 'error', message: err.message || 'Failed to load notices.' });
+      }
     } finally {
       setLoadingNotices(false);
     }
@@ -189,10 +196,15 @@ export default function AdminConsolePage({ onBack }) {
       setNoticeForm({ title: '', category: 'Event', society: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
       fetchAdminNotices();
     } catch (err) {
-      if (err.message && err.message.includes('schema cache')) {
+      if (err.message && (err.message.includes('schema cache') || err.message.includes('does not exist') || err.code === '42P01')) {
         setSaveStatus({
           type: 'error',
           message: "The 'notices' table does not exist in your Supabase database. Please run the SQL migration in your Supabase SQL Editor to create it."
+        });
+      } else if (err.message && err.message.includes('Failed to fetch')) {
+        setSaveStatus({
+          type: 'error',
+          message: 'Connection Failed (Failed to fetch): Please disable any ad blockers, privacy extensions, or Brave Shields blocking supabase.co and try again.'
         });
       } else {
         setSaveStatus({ type: 'error', message: err.message || 'Failed to publish notice.' });
@@ -225,7 +237,14 @@ export default function AdminConsolePage({ onBack }) {
       setSaveStatus({ type: 'success', message: 'Notice removed from board successfully.' });
       fetchAdminNotices();
     } catch (err) {
-      setSaveStatus({ type: 'error', message: err.message || 'Failed to delete notice.' });
+      if (err.message && err.message.includes('Failed to fetch')) {
+        setSaveStatus({
+          type: 'error',
+          message: 'Connection Failed (Failed to fetch): Please disable any ad blockers, privacy extensions, or Brave Shields blocking supabase.co and try again.'
+        });
+      } else {
+        setSaveStatus({ type: 'error', message: err.message || 'Failed to delete notice.' });
+      }
     } finally {
       setIsSaving(false);
     }
