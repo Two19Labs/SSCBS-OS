@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import * as XLSX from 'xlsx';
 import { useTimetable } from '../context/TimetableContext';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
+import { useAuth } from '../context/AuthContext';
 import './AdminConsolePage.css';
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
@@ -50,8 +51,37 @@ const csTeachers = ["Dr. Mona Verma", "Dr. Amit Kumar", "Dr. Tarannum Ahmad", "M
 const csRooms = ["Room 651", "Room 644", "Room 326", "Room 237"];
 
 export default function AdminConsolePage({ onBack }) {
+  const { user } = useAuth();
   const { timetable, updateTimetable } = useTimetable();
   const [activeTab, setActiveTab] = useState('upload'); // 'upload', 'editor', 'notices'
+
+  const isAdmin = user?.email === 'aditya.25015@sscbs.du.ac.in';
+
+  if (!isAdmin) {
+    return (
+      <div className="admin-console-container" style={{ padding: '3rem', textAlign: 'center', color: '#ef4444' }}>
+        <h2>Access Denied</h2>
+        <p style={{ marginTop: '1rem', color: '#888' }}>
+          You do not have administrative privileges to access the SSCBS OS Admin Workspace.
+        </p>
+        <button 
+          onClick={onBack} 
+          style={{ 
+            marginTop: '2rem', 
+            padding: '0.6rem 1.2rem', 
+            background: '#8b5cf6', 
+            color: '#fff', 
+            border: 'none', 
+            borderRadius: '6px', 
+            cursor: 'pointer',
+            fontWeight: '600'
+          }}
+        >
+          Go Back to Dashboard
+        </button>
+      </div>
+    );
+  }
   
   // Notices manager states
   const [noticesList, setNoticesList] = useState([]);
