@@ -1,30 +1,5 @@
 /* App CSS Stylesheet - SSCBS Campus OS Dashboard */
 
-:root {
-  --bg-darker: #eae6dc;
-  --bg-dark: #faf8f2;
-  --bg-surface: #faf8f2;
-  --border-color: rgba(0, 0, 0, 0.12);
-  --border-gold-glow: rgba(0, 0, 0, 0.25);
-  
-  --text-main: #2a2a28;
-  --text-dim: #646460;
-  
-  --accent-gold: #000000;
-  --accent-gold-glow: rgba(0, 0, 0, 0.08);
-  --accent-cyan: #0284c7;
-  --accent-green: #0b7a54;
-  --accent-amber: #b45309;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  background-color: var(--bg-darker);
-  color: var(--text-main);
-  font-family: 'Inter', -apple-system, sans-serif;
-}
-
 /* Loading Screen styling */
 .loading-screen {
   min-height: 100vh;
@@ -344,7 +319,7 @@ body {
 
 @media (max-width: 480px) {
   .workspace-header {
-    padding: 12px 12px;
+    padding: 12px;
   }
   .header-left {
     gap: 8px;
@@ -359,6 +334,9 @@ body {
   }
   .header-right {
     gap: 12px;
+  }
+  .dashboard-grid {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -74,3 +74,30 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE TRIGGER enforce_sscbs_email
     BEFORE INSERT ON auth.users
     FOR EACH ROW EXECUTE FUNCTION public.check_sscbs_email();
+
+-- 5. Create a table to store system configurations (e.g. timetables)
+CREATE TABLE IF NOT EXISTS public.system_configs (
+    key TEXT PRIMARY KEY,
+    value JSONB NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable Row Level Security (RLS)
+ALTER TABLE public.system_configs ENABLE ROW LEVEL SECURITY;
+
+-- Setup Security Policies
+-- Anyone authenticated can read
+CREATE POLICY "Enable read access for all authenticated users" 
+    ON public.system_configs 
+    FOR SELECT 
+    TO authenticated 
+    USING (true);
+
+-- Only aditya.25015 can write (insert, update, delete)
+CREATE POLICY "Enable write access for aditya.25015" 
+    ON public.system_configs 
+    FOR ALL 
+    TO authenticated 
+    USING (auth.jwt() ->> 'email' = 'aditya.25015@sscbs.du.ac.in')
+    WITH CHECK (auth.jwt() ->> 'email' = 'aditya.25015@sscbs.du.ac.in');
+

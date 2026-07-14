@@ -1289,18 +1289,22 @@
 
 /* Slide Down animation for Collapsible debugger */
 @keyframes slideDown {
-  from { height: 0; opacity: 0; }
-  to { height: auto; opacity: 1; }
+  from { max-height: 0; opacity: 0; overflow: hidden; }
+  to { max-height: 200px; opacity: 1; overflow: visible; }
 }
 
 .animate-slide-down {
   animation: slideDown 0.2s ease-out forwards;
 }
 
-@keyframes pulse {
-  0% { transform: scale(0.9); opacity: 0.6; }
-  50% { transform: scale(1.15); opacity: 1; }
-  100% { transform: scale(0.9); opacity: 0.6; }
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes pulse-border {

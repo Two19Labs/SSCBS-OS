@@ -6,19 +6,33 @@
   font-weight: 400;
 
   color-scheme: light;
-  
-  /* Brand Theme: Soft Dim Cream-Grey, Soft Warm-White & Muted Satin Gold */
-  --primary-blue: #000000;
-  --secondary-blue: #000000;
+
+  /* ── Background Colors ── */
+  --bg-darker: #eae6dc;
+  --bg-dark: #eae6dc;
+  --bg-surface: #faf8f2;
+  --bg-card: #faf8f2;
+
+  /* ── Text Colors ── */
+  --text-main: #2a2a28;
+  --text-light: #2a2a28;
+  --text-dim: #646460;
+  --text-muted: #646460;
+
+  /* ── Accent Colors ── */
   --accent-gold: #000000;
   --accent-gold-glow: rgba(0, 0, 0, 0.08);
-  --bg-dark: #eae6dc;
-  --bg-card: #faf8f2;
+  --accent-cyan: #0284c7;
+  --accent-green: #0b7a54;
+  --accent-amber: #b45309;
+
+  /* ── Border Colors ── */
+  --border-color: rgba(0, 0, 0, 0.12);
   --border-glass: rgba(0, 0, 0, 0.12);
+  --border-gold-glow: rgba(0, 0, 0, 0.25);
   --border-gold-glass: rgba(0, 0, 0, 0.2);
-  
-  --text-light: #2a2a28;
-  --text-muted: #646460;
+
+  /* ── Status Colors ── */
   --success-color: #0b7a54;
   --error-color: #b91c1c;
 
@@ -28,12 +42,16 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  background-color: var(--bg-dark);
-  color: var(--text-light);
+  background-color: var(--bg-darker);
+  color: var(--text-main);
   overflow-x: hidden;
 }
 
@@ -56,10 +74,9 @@ a {
 }
 
 a:hover {
-  color: #000000;
+  color: var(--accent-gold);
 }
 
 * {
   box-sizing: border-box;
 }
-

@@ -44,42 +44,30 @@
   z-index: 1;
 }
 
-/* Option A Custom Styling Overrides for Royal Deep Navy & Gold Contrast */
-.auth-panel-left .inst-name {
-  color: #ffffff !important;
-}
-
-.auth-panel-left .hero-title {
-  color: #ffffff !important;
-}
-
-.auth-panel-left .gold-text {
-  color: #ffffff !important;
-}
-
-.auth-panel-left .hero-subtitle {
-  color: #eae6dc !important;
-}
-
+/* Left Panel Color Overrides — scoped with higher specificity */
+.auth-panel-left .inst-name,
+.auth-panel-left .hero-title,
+.auth-panel-left .gold-text,
 .auth-panel-left .slide-content h3 {
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
+.auth-panel-left .hero-subtitle,
 .auth-panel-left .slide-content p {
-  color: #eae6dc !important;
+  color: #eae6dc;
 }
 
 .auth-panel-left .indicator-dot {
-  background: rgba(255, 255, 255, 0.25) !important;
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .auth-panel-left .indicator-dot.active {
-  background: #ffffff !important;
+  background: #ffffff;
 }
 
 .auth-panel-left .sscbs-logo-img {
-  border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
 }
 
 .auth-panel-left .carousel-container {
@@ -307,13 +295,13 @@
 .error-alert {
   background: rgba(211, 47, 47, 0.05);
   border: 1px solid rgba(211, 47, 47, 0.15);
-  color: #c62828;
+  color: var(--error-color);
 }
 
 .success-alert {
   background: rgba(13, 138, 95, 0.05);
   border: 1px solid rgba(13, 138, 95, 0.15);
-  color: #0d8a5f;
+  color: var(--success-color);
 }
 
 /* Form controls */
@@ -504,6 +492,11 @@
   }
 }
 
+  .auth-credit-footer {
+    margin-top: 24px;
+    margin-bottom: 8px;
+  }
+
 /* Google Sign-In Button & Divider */
 .auth-divider {
   display: flex;
@@ -603,15 +596,3 @@
   transform: translateY(-1px);
 }
 
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
-
-@media (max-width: 900px) {
-  .auth-credit-footer {
-    margin-top: 24px;
-    margin-bottom: 8px;
-  }
-}

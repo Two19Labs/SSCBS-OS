@@ -1,0 +1,103 @@
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase, hasValidCredentials } from '../lib/supabaseClient';
+import timetablesData from '../data/timetables.json';
+
+const TimetableContext = createContext({
+  timetable: timetablesData,
+  loading: true,
+  updateTimetable: async () => {},
+  getTimetable: () => null,
+});
+
+export const TimetableProvider = ({ children }) => {
+  const [timetable, setTimetable] = useState(timetablesData);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch timetable configuration on load
+  useEffect(() => {
+    async function fetchTimetable() {
+      if (!hasValidCredentials) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('system_configs')
+          .select('value')
+          .eq('key', 'timetable')
+          .maybeSingle();
+
+        if (error) {
+          console.error('Error fetching timetable from Supabase:', error);
+        } else if (data && data.value) {
+          setTimetable(data.value);
+        }
+      } catch (err) {
+        console.error('Failed to connect to Supabase timetable storage:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchTimetable();
+  }, []);
+
+  // Update timetable function (Admin only)
+  const updateTimetable = async (newTimetable) => {
+    setTimetable(newTimetable);
+
+    if (!hasValidCredentials) {
+      console.warn('Supabase not configured. Timetable updated in-memory only.');
+      return;
+    }
+
+    const { error } = await supabase
+      .from('system_configs')
+      .upsert({
+        key: 'timetable',
+        value: newTimetable,
+        updated_at: new Date().toISOString(),
+      });
+
+    if (error) {
+      console.error('Error saving timetable to Supabase:', error);
+      throw error;
+    }
+  };
+
+  // Helper to extract timetable dynamically
+  const getTimetable = (course, semester, section) => {
+    if (!timetable) return null;
+    const cData = timetable[course];
+    if (!cData) return null;
+    const sData = cData[semester];
+    if (!sData) {
+      const firstSemKey = Object.keys(cData)[0];
+      const firstSemData = cData[firstSemKey];
+      const firstSecKey = Object.keys(firstSemData)[0];
+      return firstSemData[section] || firstSemData[firstSecKey] || null;
+    }
+    const secData = sData[section];
+    if (!secData) {
+      const firstSecKey = Object.keys(sData)[0];
+      return sData[firstSecKey] || null;
+    }
+    return secData;
+  };
+
+  return (
+    <TimetableContext.Provider
+      value={{
+        timetable,
+        loading,
+        updateTimetable,
+        getTimetable,
+      }}
+    >
+      {children}
+    </TimetableContext.Provider>
+  );
+};
+
+export const useTimetable = () => useContext(TimetableContext);

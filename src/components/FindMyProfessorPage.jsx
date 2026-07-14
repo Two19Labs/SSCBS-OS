@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import timetablesData from '../data/timetables.json';
+import React, { useState, useEffect } from 'react';
+import { useTimetable } from '../context/TimetableContext';
 import { PERIODS, DAYS } from '../data/timetables';
 import './FindMyProfessorPage.css';
 
@@ -53,6 +53,7 @@ const parseTimeToMinutes = (timeStr) => {
 };
 
 export default function FindMyProfessorPage({ onBack }) {
+  const { timetable: timetablesData } = useTimetable();
   const [professorsList, setProfessorsList] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProf, setSelectedProf] = useState('');

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { getTimetable, PERIODS, DAYS } from '../data/timetables';
+import { useTimetable } from '../context/TimetableContext';
+import { PERIODS, DAYS } from '../data/timetables';
 import './ClassSchedulesCard.css';
 
 export default function ClassSchedulesCard({ onOpenProfile }) {
   const { user } = useAuth();
+  const { getTimetable } = useTimetable();
   
   // Profile settings
   const course = user?.user_metadata?.course;
