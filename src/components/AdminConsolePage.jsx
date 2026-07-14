@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import * as XLSX from 'xlsx';
 import { useTimetable } from '../context/TimetableContext';
+import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import './AdminConsolePage.css';
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
@@ -50,7 +51,130 @@ const csRooms = ["Room 651", "Room 644", "Room 326", "Room 237"];
 
 export default function AdminConsolePage({ onBack }) {
   const { timetable, updateTimetable } = useTimetable();
-  const [activeTab, setActiveTab] = useState('upload'); // 'upload', 'editor'
+  const [activeTab, setActiveTab] = useState('upload'); // 'upload', 'editor', 'notices'
+  
+  // Notices manager states
+  const [noticesList, setNoticesList] = useState([]);
+  const [loadingNotices, setLoadingNotices] = useState(false);
+  const [noticeForm, setNoticeForm] = useState({
+    title: '',
+    category: 'Event',
+    society: '',
+    content: '',
+    link_url: ''
+  });
+
+  const fetchAdminNotices = async () => {
+    if (!hasValidCredentials) {
+      setNoticesList([
+        {
+          id: '1',
+          title: 'HackSSCBS 2026 Registration Open',
+          category: 'Event',
+          society: 'Kronos',
+          content: 'Register for the premier hackathon of SSCBS. Open to all students. Cash prizes up for grabs!',
+          link_url: 'https://hacksscbs.tech',
+          created_at: new Date().toISOString()
+        }
+      ]);
+      return;
+    }
+    try {
+      setLoadingNotices(true);
+      const { data, error } = await supabase
+        .from('notices')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) console.error('Error fetching admin notices:', error);
+      else setNoticesList(data || []);
+    } catch (err) {
+      console.error('Failed to load notices:', err);
+    } finally {
+      setLoadingNotices(false);
+    }
+  };
+
+  React.useEffect(() => {
+    if (activeTab === 'notices') {
+      fetchAdminNotices();
+    }
+  }, [activeTab]);
+
+  const handleCreateNotice = async (e) => {
+    e.preventDefault();
+    if (!noticeForm.title || !noticeForm.content) return;
+    
+    setIsSaving(true);
+    setSaveStatus({ type: '', message: '' });
+    
+    try {
+      if (!hasValidCredentials) {
+        const newMockNotice = {
+          id: String(Date.now()),
+          title: noticeForm.title,
+          content: noticeForm.content,
+          category: noticeForm.category,
+          society: noticeForm.society || null,
+          link_url: noticeForm.link_url || null,
+          created_at: new Date().toISOString()
+        };
+        setNoticesList(prev => [newMockNotice, ...prev]);
+        setSaveStatus({ type: 'success', message: 'Notice created successfully (local mock)!' });
+        setNoticeForm({ title: '', category: 'Event', society: '', content: '', link_url: '' });
+        setIsSaving(false);
+        return;
+      }
+
+      const { error } = await supabase
+        .from('notices')
+        .insert([{
+          title: noticeForm.title,
+          content: noticeForm.content,
+          category: noticeForm.category,
+          society: noticeForm.society || null,
+          link_url: noticeForm.link_url || null,
+        }]);
+
+      if (error) throw error;
+      
+      setSaveStatus({ type: 'success', message: 'Notice published successfully onto the Campus Notice Board!' });
+      setNoticeForm({ title: '', category: 'Event', society: '', content: '', link_url: '' });
+      fetchAdminNotices();
+    } catch (err) {
+      setSaveStatus({ type: 'error', message: err.message || 'Failed to publish notice.' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteNotice = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this notice?')) return;
+    setIsSaving(true);
+    setSaveStatus({ type: '', message: '' });
+
+    try {
+      if (!hasValidCredentials) {
+        setNoticesList(prev => prev.filter(n => n.id !== id));
+        setSaveStatus({ type: 'success', message: 'Notice deleted successfully (local mock)!' });
+        setIsSaving(false);
+        return;
+      }
+
+      const { error } = await supabase
+        .from('notices')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setSaveStatus({ type: 'success', message: 'Notice removed from board successfully.' });
+      fetchAdminNotices();
+    } catch (err) {
+      setSaveStatus({ type: 'error', message: err.message || 'Failed to delete notice.' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
   
   // Upload states
   const [file, setFile] = useState(null);
@@ -668,6 +792,12 @@ export default function AdminConsolePage({ onBack }) {
           >
             Live Schedule Editor
           </button>
+          <button 
+            className={`admin-tab-btn ${activeTab === 'notices' ? 'active' : ''}`}
+            onClick={() => setActiveTab('notices')}
+          >
+            Campus Notice Board Manager
+          </button>
         </nav>
 
         {saveStatus.message && (
@@ -732,7 +862,7 @@ export default function AdminConsolePage({ onBack }) {
               </div>
             </div>
           </div>
-        ) : (
+        ) : activeTab === 'editor' ? (
           <div className="tab-pane editor-pane">
             <div className="editor-controls-row">
               <div className="control-item">
@@ -834,6 +964,129 @@ export default function AdminConsolePage({ onBack }) {
                   })}
                 </tbody>
               </table>
+            </div>
+          </div>
+        ) : (
+          <div className="tab-pane notices-pane">
+            <div className="pane-left notice-creator-card">
+              <h3>Publish New Notice</h3>
+              <p className="subtitle-admin">Create announcements for events, society updates, guest lectures, and other college activities.</p>
+              
+              <form onSubmit={handleCreateNotice} className="admin-notice-form">
+                <div className="form-item-admin">
+                  <label htmlFor="notice-title">Notice Title</label>
+                  <input
+                    type="text"
+                    id="notice-title"
+                    placeholder="e.g. HackSSCBS 2026 Registration Open"
+                    value={noticeForm.title}
+                    onChange={(e) => setNoticeForm(prev => ({ ...prev, title: e.target.value }))}
+                    required
+                    className="admin-input-field"
+                  />
+                </div>
+                
+                <div className="form-row-admin">
+                  <div className="form-item-admin flex-1">
+                    <label htmlFor="notice-category">Category</label>
+                    <select
+                      id="notice-category"
+                      value={noticeForm.category}
+                      onChange={(e) => setNoticeForm(prev => ({ ...prev, category: e.target.value }))}
+                      className="admin-select"
+                    >
+                      <option value="Event">Event</option>
+                      <option value="Session">Session</option>
+                      <option value="Society">Society</option>
+                      <option value="Academic">Academic</option>
+                    </select>
+                  </div>
+                  
+                  <div className="form-item-admin flex-1">
+                    <label htmlFor="notice-society">Organising Society</label>
+                    <input
+                      type="text"
+                      id="notice-society"
+                      placeholder="e.g. Kronos (Optional)"
+                      value={noticeForm.society}
+                      onChange={(e) => setNoticeForm(prev => ({ ...prev, society: e.target.value }))}
+                      className="admin-input-field"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-item-admin">
+                  <label htmlFor="notice-content">Notice Description</label>
+                  <textarea
+                    id="notice-content"
+                    rows="4"
+                    placeholder="Describe the notice or event details in full..."
+                    value={noticeForm.content}
+                    onChange={(e) => setNoticeForm(prev => ({ ...prev, content: e.target.value }))}
+                    required
+                    className="admin-textarea-field"
+                  />
+                </div>
+
+                <div className="form-item-admin">
+                  <label htmlFor="notice-link">Registration / Info Link (Optional)</label>
+                  <input
+                    type="url"
+                    id="notice-link"
+                    placeholder="e.g. https://forms.gle/... or website link"
+                    value={noticeForm.link_url}
+                    onChange={(e) => setNoticeForm(prev => ({ ...prev, link_url: e.target.value }))}
+                    className="admin-input-field"
+                  />
+                </div>
+
+                <button 
+                  type="submit" 
+                  className="btn-publish-timetable" 
+                  disabled={isSaving}
+                  style={{ marginTop: '0.5rem' }}
+                >
+                  {isSaving ? 'Publishing Notice...' : 'Publish Campus Notice'}
+                </button>
+              </form>
+            </div>
+
+            <div className="pane-right notices-list-card">
+              <h3>Active Notices Board ({noticesList.length})</h3>
+              
+              <div className="notices-manager-list">
+                {loadingNotices ? (
+                  <div className="notices-manager-loading">
+                    <span className="console-spinner"></span>
+                    <p>Loading notices...</p>
+                  </div>
+                ) : noticesList.length === 0 ? (
+                  <div className="no-logs">No active notices found. Publish one to get started!</div>
+                ) : (
+                  <div className="admin-notices-grid">
+                    {noticesList.map((notice) => (
+                      <div key={notice.id} className="admin-notice-item">
+                        <div className="notice-item-meta">
+                          <span className={`category-tag tag-${notice.category.toLowerCase()}`}>{notice.category}</span>
+                          {notice.society && <span className="notice-item-society">@{notice.society}</span>}
+                        </div>
+                        <h4 className="notice-item-title">{notice.title}</h4>
+                        <p className="notice-item-desc">{notice.content.substring(0, 80)}{notice.content.length > 80 ? '...' : ''}</p>
+                        <div className="notice-item-actions">
+                          <span className="notice-item-date">{new Date(notice.created_at).toLocaleDateString()}</span>
+                          <button 
+                            className="btn-delete-notice"
+                            onClick={() => handleDeleteNotice(notice.id)}
+                            disabled={isSaving}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

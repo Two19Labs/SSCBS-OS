@@ -101,3 +101,35 @@ CREATE POLICY "Enable write access for aditya.25015"
     USING (auth.jwt() ->> 'email' = 'aditya.25015@sscbs.du.ac.in')
     WITH CHECK (auth.jwt() ->> 'email' = 'aditya.25015@sscbs.du.ac.in');
 
+-- 6. Create a table to store campus notices / events
+CREATE TABLE IF NOT EXISTS public.notices (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    category TEXT NOT NULL,     -- 'Society', 'Session', 'Event', 'Academic'
+    society TEXT,               -- e.g. 'Kronos', 'Macula' (Optional)
+    link_url TEXT,              -- Registration link (Optional)
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL
+);
+
+-- Enable Row Level Security (RLS)
+ALTER TABLE public.notices ENABLE ROW LEVEL SECURITY;
+
+-- Setup Security Policies
+-- Anyone authenticated can read notices
+CREATE POLICY "Enable read access for all authenticated users on notices" 
+    ON public.notices 
+    FOR SELECT 
+    TO authenticated 
+    USING (true);
+
+-- Only aditya.25015 can write (insert, update, delete) notices
+CREATE POLICY "Enable write access for aditya.25015 on notices" 
+    ON public.notices 
+    FOR ALL 
+    TO authenticated 
+    USING (auth.jwt() ->> 'email' = 'aditya.25015@sscbs.du.ac.in')
+    WITH CHECK (auth.jwt() ->> 'email' = 'aditya.25015@sscbs.du.ac.in');
+
+

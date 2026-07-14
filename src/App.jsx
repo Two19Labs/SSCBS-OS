@@ -7,6 +7,7 @@ import FindMyProfessorPage from './components/FindMyProfessorPage';
 import GpaCalculatorModal from './components/GpaCalculatorModal';
 import WaiverToolPage from './components/WaiverToolPage';
 import AdminConsolePage from './components/AdminConsolePage';
+import NoticeBoard from './components/NoticeBoard';
 import './App.css';
 import { Analytics } from '@vercel/analytics/react';
 
@@ -120,6 +121,9 @@ function App() {
             <>
               {/* Core Feature: Timetable Schedule Tracker */}
               <ClassSchedulesCard onOpenProfile={() => setIsProfileOpen(true)} />
+
+              {/* Campus Notice Board */}
+              <NoticeBoard />
 
               {/* Student Tools Grid */}
               <section className="dashboard-grid">
