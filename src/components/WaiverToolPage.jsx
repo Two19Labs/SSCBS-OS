@@ -164,7 +164,7 @@ function WaiverToolPage({ onBack }) {
   const [solverResult, setSolverResult] = useState(null); // { success: boolean, waiversCount: number }
 
   // Tabs inside results selector
-  const [activeSelectorTab, setActiveSelectorTab] = useState('list'); // 'list' | 'calendar'
+  const [activeSelectorTab, setActiveSelectorTab] = useState('grid'); // 'grid' | 'calendar' | 'list'
   const [activeMonthKey, setActiveMonthKey] = useState(""); // e.g. "2026-01"
 
   // Clean error on changes
@@ -754,6 +754,53 @@ function WaiverToolPage({ onBack }) {
     });
   };
 
+  const getSimulatedSubjectStats = () => {
+    if (!parsedData) return [];
+
+    return parsedData.allSubjects.map(sub => {
+      const stats = {
+        Th: { attended: sub.baselineStats.Th.attended, held: sub.baselineStats.Th.held },
+        tu: { attended: sub.baselineStats.tu.attended, held: sub.baselineStats.tu.held },
+        PR: { attended: sub.baselineStats.PR.attended, held: sub.baselineStats.PR.held }
+      };
+
+      selectedWaivers.forEach(dateStr => {
+        const dayRecord = sub.dateAttendance[dateStr] || [];
+        dayRecord.forEach(cls => {
+          if (cls.attended) {
+            if (cls.type === 'Th') stats.Th.attended--;
+            if (cls.type === 'tu') stats.tu.attended--;
+            if (cls.type === 'PR') stats.PR.attended--;
+          }
+          if (cls.type === 'Th') stats.Th.held--;
+          if (cls.type === 'tu') stats.tu.held--;
+          if (cls.type === 'PR') stats.PR.held--;
+        });
+      });
+
+      const baselineTotalHeld = sub.baselineStats.Th.held + sub.baselineStats.tu.held + sub.baselineStats.PR.held;
+      const baselineTotalAtt = sub.baselineStats.Th.attended + sub.baselineStats.tu.attended + sub.baselineStats.PR.attended;
+      const baselinePct = baselineTotalHeld > 0 ? (baselineTotalAtt / baselineTotalHeld * 100) : 100;
+
+      const simTotalHeld = stats.Th.held + stats.tu.held + stats.PR.held;
+      const simTotalAtt = stats.Th.attended + stats.tu.attended + stats.PR.attended;
+      const simPct = simTotalHeld > 0 ? (simTotalAtt / simTotalHeld * 100) : 100;
+
+      return {
+        name: sub.name,
+        rollNo: sub.rollNo,
+        baselinePct,
+        simPct,
+        stats,
+        baselineStats: sub.baselineStats,
+        simTotalAtt,
+        simTotalHeld,
+        baselineTotalAtt,
+        baselineTotalHeld
+      };
+    });
+  };
+
   const handleCheckboxChange = (dateStr) => {
     const updated = new Set(selectedWaivers);
     if (updated.has(dateStr)) {
@@ -811,12 +858,10 @@ function WaiverToolPage({ onBack }) {
         parsedData.allSubjects.forEach(sub => {
           const records = sub.dateAttendance[dateStr] || [];
           records.forEach(cls => {
-            if (cls.type === 'Th' || cls.type === 'tu') {
-              if (cls.attended) {
-                totalPresents++;
-              } else {
-                totalAbsences++;
-              }
+            if (cls.attended) {
+              totalPresents++;
+            } else {
+              totalAbsences++;
             }
           });
         });
@@ -834,6 +879,94 @@ function WaiverToolPage({ onBack }) {
     }
 
     return blocks;
+  };
+
+  const renderAttendanceGrid = () => {
+    if (!parsedData) return null;
+
+    const subjectStats = getSimulatedSubjectStats();
+
+    return (
+      <div className="attendance-grid-container">
+        <div className="grid-scroll-wrapper">
+          <table className="attendance-spreadsheet-table">
+            <thead>
+              <tr>
+                <th className="sticky-col subject-header">Subject Name</th>
+                {parsedData.allDates.map((d) => {
+                  const isChecked = selectedWaivers.has(d.dateStr);
+                  const isRecommended = recommendedWaivers.includes(d.dateStr);
+                  return (
+                    <th 
+                      key={d.dateStr} 
+                      className={`date-header-cell ${isChecked ? 'waived' : ''} ${isRecommended ? 'recommended' : ''}`}
+                      onClick={() => handleCheckboxChange(d.dateStr)}
+                      title="Click to toggle waiver for this date"
+                    >
+                      <div className="header-date-label">{d.label.split(' ')[0]}</div>
+                      <div className="header-month-label">{d.label.split(' ')[1]}</div>
+                      {isChecked && <span className="waiver-pill-indicator">W</span>}
+                    </th>
+                  );
+                })}
+                <th className="sticky-col-right stats-header">Simulated Pres/Held</th>
+                <th className="sticky-col-right pct-header">%</th>
+              </tr>
+            </thead>
+            <tbody>
+              {subjectStats.map((sub, sIdx) => {
+                const originalSubject = parsedData.allSubjects[sIdx];
+                return (
+                  <tr key={sIdx}>
+                    <td className="sticky-col subject-cell">
+                      <div className="sub-name">{sub.name}</div>
+                      <div className="sub-roll txt-muted">Roll: {sub.rollNo}</div>
+                    </td>
+                    {parsedData.allDates.map((d) => {
+                      const dayRecord = originalSubject.dateAttendance[d.dateStr] || [];
+                      const isChecked = selectedWaivers.has(d.dateStr);
+                      
+                      return (
+                        <td 
+                          key={d.dateStr} 
+                          className={`attendance-cell ${isChecked ? 'waived-cell' : ''}`}
+                          onClick={() => handleCheckboxChange(d.dateStr)}
+                        >
+                          {dayRecord.length === 0 ? (
+                            <span className="no-class">-</span>
+                          ) : (
+                            <div className="cell-classes-stack">
+                              {dayRecord.map((cls, cIdx) => (
+                                <span 
+                                  key={cIdx} 
+                                  className={`class-badge ${cls.attended ? 'present' : 'absent'} ${cls.type.toLowerCase()}`}
+                                  title={`${cls.type === 'Th' ? 'Theory' : cls.type === 'tu' ? 'Tutorial' : 'Practical'}: ${cls.attended ? 'Present' : 'Absent'}`}
+                                >
+                                  {cls.attended ? 'P' : 'A'}
+                                  <sub className="type-sub">{cls.type}</sub>
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </td>
+                      );
+                    })}
+                    <td className="sticky-col-right stats-cell">
+                      <span className="bold">{sub.simTotalAtt}/{sub.simTotalHeld}</span>
+                      <span className="txt-muted block-size">({sub.baselineTotalAtt}/{sub.baselineTotalHeld})</span>
+                    </td>
+                    <td className={`sticky-col-right pct-cell bold ${sub.simPct < threshold ? 'text-red' : 'text-green'}`}>
+                      <span>{sub.simPct.toFixed(1)}%</span>
+                      <span className="txt-muted block-size font-normal">({sub.baselinePct.toFixed(1)}%)</span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
   };
 
   const simulatedStats = getSimulatedStats();
@@ -1039,22 +1172,36 @@ function WaiverToolPage({ onBack }) {
             </div>
 
             {/* TAB SELECTORS */}
-            <div className="selector-view-tabs">
-              <button 
-                className={`tab-btn ${activeSelectorTab === 'list' ? 'active' : ''}`}
-                onClick={() => setActiveSelectorTab('list')}
-              >
-                Recommended List
-              </button>
-              <button 
-                className={`tab-btn ${activeSelectorTab === 'calendar' ? 'active' : ''}`}
-                onClick={() => setActiveSelectorTab('calendar')}
-              >
-                Interactive Calendar
-              </button>
+            <div className="selector-view-tabs-row">
+              <div className="selector-view-tabs">
+                <button 
+                  className={`tab-btn ${activeSelectorTab === 'grid' ? 'active' : ''}`}
+                  onClick={() => setActiveSelectorTab('grid')}
+                >
+                  Attendance Grid
+                </button>
+                <button 
+                  className={`tab-btn ${activeSelectorTab === 'calendar' ? 'active' : ''}`}
+                  onClick={() => setActiveSelectorTab('calendar')}
+                >
+                  Interactive Calendar
+                </button>
+                <button 
+                  className={`tab-btn ${activeSelectorTab === 'list' ? 'active' : ''}`}
+                  onClick={() => setActiveSelectorTab('list')}
+                >
+                  Recommended List
+                </button>
+              </div>
+              <div className="actions-cluster">
+                <button className="btn-sec-small" onClick={resetToRecommended} title="Reset to auto-recommended optimal waivers">Reset</button>
+                <button className="btn-sec-small" onClick={clearAllWaivers} title="Clear all active waivers">Clear All</button>
+              </div>
             </div>
 
-            {activeSelectorTab === 'list' ? (
+            {activeSelectorTab === 'grid' ? (
+              renderAttendanceGrid()
+            ) : activeSelectorTab === 'list' ? (
               <>
                 <div className="card-header-row">
                   <div className="title-block">
@@ -1066,10 +1213,6 @@ function WaiverToolPage({ onBack }) {
                         <span className="text-orange">Max waivers used. Closest best solution shown.</span>
                       )}
                     </p>
-                  </div>
-                  <div className="actions-cluster">
-                    <button className="btn-sec-small" onClick={resetToRecommended}>Reset</button>
-                    <button className="btn-sec-small" onClick={clearAllWaivers}>Clear All</button>
                   </div>
                 </div>
 
