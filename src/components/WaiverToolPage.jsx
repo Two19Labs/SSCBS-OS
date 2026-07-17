@@ -1058,16 +1058,23 @@ function WaiverToolPage({ onBack }) {
   const allSafe = simulatedStats.every(s => s.simPct >= threshold);
 
   return (
-    <div className="waiver-tool-page">
-      <div className="page-header-row">
-        <button className="btn-back-glow" onClick={onBack}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+    <div className="waiver-tool-fullpage">
+      {/* Standalone Navigation Navbar Header */}
+      <div className="fullpage-navbar">
+        <button className="btn-back-portal" onClick={onBack} title="Back to main OS dashboard">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
-          Back to Workspace
+          Back to Campus OS
         </button>
-        <h2>SSCBS Attendance Waiver Assistant</h2>
+        <div className="navbar-logo-area">
+          <img src="/sscbs_logo.png" alt="SSCBS Crest" width="28" height="28" />
+          <span className="navbar-logo-text">SSCBS <span className="logo-accent">Waiver Assistant</span></span>
+        </div>
+        <div className="navbar-badge-area">
+          <span className="navbar-portal-badge">Interactive Simulation Mode</span>
+        </div>
       </div>
 
       {isProcessing && (
@@ -1173,12 +1180,83 @@ function WaiverToolPage({ onBack }) {
           </button>
         </div>
       ) : (
-        <div className="results-layout-container">
-          {/* Top Row: Left Summary + Right Controls */}
-          <div className="results-top-row">
-            
-            {/* Left Column: Adjusted statistics dashboard */}
-            <div className="results-card-glass stats-dashboard">
+        <div className="fullpage-workspace-layout">
+          {/* Left Sidebar: Settings, solver status, and triggers */}
+          <aside className="workspace-sidebar">
+            <div className="sidebar-section-card">
+              <h4>Waiver Parameters</h4>
+              <div className="sidebar-inputs-group">
+                <div className="sidebar-input-item">
+                  <label htmlFor="sidebar-max-w">Max Waivers Allowed</label>
+                  <input 
+                    type="number" 
+                    id="sidebar-max-w"
+                    min="1" 
+                    max="30"
+                    value={maxWaivers}
+                    onChange={(e) => setMaxWaivers(Math.max(1, parseInt(e.target.value) || 1))}
+                  />
+                </div>
+                <div className="sidebar-input-item">
+                  <label htmlFor="sidebar-thresh">Target Percentage (%)</label>
+                  <input 
+                    type="number" 
+                    id="sidebar-thresh"
+                    min="50" 
+                    max="100"
+                    value={threshold}
+                    onChange={(e) => setThreshold(Math.max(50, Math.min(100, parseInt(e.target.value) || 85)))}
+                  />
+                </div>
+              </div>
+              <button className="btn-recalculate-sidebar-glow" onClick={handleRecalculate}>
+                Recalculate Suggestion
+              </button>
+            </div>
+
+            <div className="sidebar-section-card solver-status-card">
+              <h4>Solver Output</h4>
+              <div className="solver-status-rows">
+                <div className="solver-row">
+                  <span>Optimizer Status:</span>
+                  <span className={`status-label ${solverResult?.success ? "safe-text" : "alert-text"}`}>
+                    {solverResult?.success ? "OPTIMAL" : "SHORTAGE"}
+                  </span>
+                </div>
+                <div className="solver-row">
+                  <span>Selected / Max:</span>
+                  <strong>{selectedWaivers.size} / {maxWaivers}</strong>
+                </div>
+                <div className="solver-row">
+                  <span>Min Attendance:</span>
+                  <strong className={allSafe ? "safe-text" : "alert-text"}>
+                    {solverResult?.minPctAchieved ? `${solverResult.minPctAchieved.toFixed(1)}%` : "N/A"}
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="sidebar-section-card actions-card">
+              <h4>Quick Actions</h4>
+              <div className="sidebar-action-buttons">
+                <button className="btn-sidebar-primary" onClick={resetToRecommended}>
+                  Apply Suggested
+                </button>
+                <button className="btn-sidebar-secondary" onClick={clearAllWaivers}>
+                  Clear All
+                </button>
+              </div>
+            </div>
+
+            <button className="btn-sidebar-upload-new" onClick={() => setParsedData(null)}>
+              Upload New Sheet
+            </button>
+          </aside>
+
+          {/* Right Main Pane: Contents */}
+          <main className="workspace-main-content">
+            {/* Top Row: Attendance Summary Table */}
+            <div className="results-card-glass fullwidth-summary-card">
               <div className="card-header-row">
                 <div className="title-block">
                   <h3>Adjusted Attendance Summary</h3>
@@ -1230,156 +1308,91 @@ function WaiverToolPage({ onBack }) {
               </div>
             </div>
 
-            {/* Right Column: Optimization settings and solvers */}
-            <div className="results-card-glass condonation-controls-card">
-              <div className="card-header-row">
-                <div className="title-block">
-                  <h3>Condonation Optimizer</h3>
-                  <p className="subtitle">Configure parameters and auto-suggest</p>
+            {/* Bottom Row: Tabs Detailed Customizer (Full width!) */}
+            <div className="results-card-glass detailed-tabs-card fullwidth-customizer-card">
+              
+              {/* TAB SELECTORS ROW */}
+              <div className="selector-view-tabs-row">
+                <div className="selector-view-tabs">
+                  <button 
+                    className={`tab-btn ${activeSelectorTab === 'grid' ? 'active' : ''}`}
+                    onClick={() => setActiveSelectorTab('grid')}
+                  >
+                    Interactive Customizer
+                  </button>
+                  <button 
+                    className={`tab-btn ${activeSelectorTab === 'list' ? 'active' : ''}`}
+                    onClick={() => setActiveSelectorTab('list')}
+                  >
+                    Recommended List
+                  </button>
+                </div>
+                <div className="actions-cluster">
+                  <button className="btn-suggest-apply" onClick={resetToRecommended} title="Apply auto-recommended optimal waivers">Apply Recommended</button>
+                  <button className="btn-sec-small" onClick={clearAllWaivers} title="Clear all active waivers">Clear All</button>
                 </div>
               </div>
 
-              <div className="controls-inputs-layout">
-                <div className="control-input-group">
-                  <div className="control-input-item">
-                    <label htmlFor="inline-max-w">Max Available Waivers</label>
-                    <input 
-                      type="number" 
-                      id="inline-max-w"
-                      min="1" 
-                      max="30"
-                      value={maxWaivers}
-                      onChange={(e) => setMaxWaivers(Math.max(1, parseInt(e.target.value) || 1))}
-                    />
+              {/* TAB CONTENT PANELS */}
+              {activeSelectorTab === 'grid' ? (
+                <div className="customizer-split-layout">
+                  <div className="customizer-grid-pane">
+                    {renderAttendanceGrid()}
                   </div>
-                  <div className="control-input-item">
-                    <label htmlFor="inline-thresh">Target Attendance %</label>
-                    <input 
-                      type="number" 
-                      id="inline-thresh"
-                      min="50" 
-                      max="100"
-                      value={threshold}
-                      onChange={(e) => setThreshold(Math.max(50, Math.min(100, parseInt(e.target.value) || 85)))}
-                    />
-                  </div>
-                </div>
-
-                <button className="btn-recalculate-glow" onClick={handleRecalculate}>
-                  Auto-Suggest Optimal Waivers
-                </button>
-              </div>
-
-              <div className="solver-results-summary">
-                <div className="summary-stat-row">
-                  <span>Optimization Solver:</span>
-                  <strong className={solverResult?.success ? "text-green" : "text-orange"}>
-                    {solverResult?.success ? "OPTIMAL SOLUTION" : "CLOSEST CAP REACHED"}
-                  </strong>
-                </div>
-                <div className="summary-stat-row">
-                  <span>Selected / Max Limit:</span>
-                  <strong>{selectedWaivers.size} / {maxWaivers} waivers</strong>
-                </div>
-                <div className="summary-stat-row">
-                  <span>Lowest Subject Attendance:</span>
-                  <strong className={allSafe ? "text-green" : "text-red"}>
-                    {solverResult?.minPctAchieved ? `${solverResult.minPctAchieved.toFixed(1)}%` : "N/A"}
-                  </strong>
-                </div>
-              </div>
-
-              <button className="btn-reoptimize-back" onClick={() => setParsedData(null)}>
-                Upload New Sheet
-              </button>
-            </div>
-
-          </div>
-
-          {/* Bottom Row: Detailed Tab Customizer (Full width!) */}
-          <div className="results-card-glass detailed-tabs-card">
-            
-            {/* TAB SELECTORS ROW */}
-            <div className="selector-view-tabs-row">
-              <div className="selector-view-tabs">
-                <button 
-                  className={`tab-btn ${activeSelectorTab === 'grid' ? 'active' : ''}`}
-                  onClick={() => setActiveSelectorTab('grid')}
-                >
-                  Interactive Customizer
-                </button>
-                <button 
-                  className={`tab-btn ${activeSelectorTab === 'list' ? 'active' : ''}`}
-                  onClick={() => setActiveSelectorTab('list')}
-                >
-                  Recommended List
-                </button>
-              </div>
-              <div className="actions-cluster">
-                <button className="btn-suggest-apply" onClick={resetToRecommended} title="Apply auto-recommended optimal waivers">Apply Recommended</button>
-                <button className="btn-sec-small" onClick={clearAllWaivers} title="Clear all active waivers">Clear All</button>
-              </div>
-            </div>
-
-            {/* TAB CONTENT PANELS */}
-            {activeSelectorTab === 'grid' ? (
-              <div className="customizer-split-layout">
-                <div className="customizer-grid-pane">
-                  {renderAttendanceGrid()}
-                </div>
-                <div className="customizer-calendar-pane">
-                  {renderCalendarView()}
-                </div>
-              </div>
-            ) : (
-              <div className="recommended-list-view">
-                <div className="card-header-row pt-0">
-                  <div className="title-block">
-                    <h3>Recommended Dates</h3>
-                    <p className="subtitle">
-                      {solverResult?.success ? (
-                        <span>Optimal combination clears target using <strong>{solverResult.waiversCount}</strong> waivers.</span>
-                      ) : (
-                        <span className="text-orange">Max waivers used. Closest best solution shown.</span>
-                      )}
-                    </p>
+                  <div className="customizer-calendar-pane">
+                    {renderCalendarView()}
                   </div>
                 </div>
+              ) : (
+                <div className="recommended-list-view">
+                  <div className="card-header-row pt-0">
+                    <div className="title-block">
+                      <h3>Recommended Dates</h3>
+                      <p className="subtitle">
+                        {solverResult?.success ? (
+                          <span>Optimal combination clears target using <strong>{solverResult.waiversCount}</strong> waivers.</span>
+                        ) : (
+                          <span className="text-orange">Max waivers used. Closest best solution shown.</span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
 
-                <div className="dates-selector-list">
-                  {parsedData.candidates
-                    .sort((a, b) => b.totalAbsences - a.totalAbsences)
-                    .map((cand, idx) => {
-                      const isChecked = selectedWaivers.has(cand.dateStr);
-                      const isRecommended = recommendedWaivers.includes(cand.dateStr);
-                      
-                      return (
-                        <div 
-                          key={idx} 
-                          className={`date-selection-item ${isChecked ? 'active' : ''} ${isRecommended ? 'recommended-border' : ''}`}
-                          onClick={() => handleCheckboxChange(cand.dateStr)}
-                        >
-                          <div className="checkbox-glow-wrapper">
-                            <input 
-                              type="checkbox" 
-                              checked={isChecked}
-                              onChange={() => {}} 
-                              id={`date-chk-${idx}`}
-                            />
-                            <label htmlFor={`date-chk-${idx}`} onClick={(e) => e.stopPropagation()}></label>
+                  <div className="dates-selector-list">
+                    {parsedData.candidates
+                      .sort((a, b) => b.totalAbsences - a.totalAbsences)
+                      .map((cand, idx) => {
+                        const isChecked = selectedWaivers.has(cand.dateStr);
+                        const isRecommended = recommendedWaivers.includes(cand.dateStr);
+                        
+                        return (
+                          <div 
+                            key={idx} 
+                            className={`date-selection-item ${isChecked ? 'active' : ''} ${isRecommended ? 'recommended-border' : ''}`}
+                            onClick={() => handleCheckboxChange(cand.dateStr)}
+                          >
+                            <div className="checkbox-glow-wrapper">
+                              <input 
+                                type="checkbox" 
+                                checked={isChecked}
+                                onChange={() => {}} 
+                                id={`date-chk-${idx}`}
+                              />
+                              <label htmlFor={`date-chk-${idx}`} onClick={(e) => e.stopPropagation()}></label>
+                            </div>
+                            <div className="date-info">
+                              <span className="date-label">{cand.label}</span>
+                              <span className="date-sub">Absences: <strong>{cand.totalAbsences}</strong> | Presents: <strong>{cand.totalPresents}</strong></span>
+                            </div>
+                            {isRecommended && <span className="recommended-tag">Rec</span>}
                           </div>
-                          <div className="date-info">
-                            <span className="date-label">{cand.label}</span>
-                            <span className="date-sub">Absences: <strong>{cand.totalAbsences}</strong> | Presents: <strong>{cand.totalPresents}</strong></span>
-                          </div>
-                          {isRecommended && <span className="recommended-tag">Rec</span>}
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          </main>
         </div>
       )}
     </div>

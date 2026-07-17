@@ -41,6 +41,10 @@ function App() {
 
   const isAdmin = userEmail === 'aditya.25015@sscbs.du.ac.in';
 
+  if (currentView === 'waiver-tool') {
+    return <WaiverToolPage onBack={() => setCurrentView('dashboard')} />;
+  }
+
   return (
     <>
       <div className="workspace-container">
@@ -101,8 +105,6 @@ function App() {
         <main className="workspace-main">
           {currentView === 'prof-tracker' ? (
             <FindMyProfessorPage onBack={() => setCurrentView('dashboard')} />
-          ) : currentView === 'waiver-tool' ? (
-            <WaiverToolPage onBack={() => setCurrentView('dashboard')} />
           ) : (currentView === 'admin-console' && isAdmin) ? (
             <AdminConsolePage onBack={() => setCurrentView('dashboard')} />
           ) : (

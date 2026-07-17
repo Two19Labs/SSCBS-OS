@@ -1,16 +1,83 @@
 /* WaiverToolPage Stylesheet - Clean, High-Contrast Modern Theme */
 
-.waiver-tool-page {
+.waiver-tool-fullpage {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  min-height: 100vh;
   width: 100%;
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 1.5rem;
-  box-sizing: border-box;
+  background: #f8fafc;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  position: relative;
+  box-sizing: border-box;
+}
+
+/* Standalone Full-Page Navbar Header */
+.fullpage-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.85rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+}
+
+.btn-back-portal {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #475569;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.5rem 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-back-portal:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #94a3b8;
+  transform: translateX(-2px);
+}
+
+.navbar-logo-area {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.navbar-logo-text {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.navbar-logo-text .logo-accent {
+  color: #4f46e5;
+  font-weight: 850;
+}
+
+.navbar-badge-area {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-portal-badge {
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  color: #1e40af;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
 }
 
 /* Inline Loading Screen Overlay */
@@ -290,26 +357,230 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  max-width: 680px;
+  width: 100%;
+  margin: 3rem auto;
+  padding: 0 1.5rem;
+  box-sizing: border-box;
 }
 
-/* Results Layout Container & Grid Structure */
-.results-layout-container {
-  display: flex;
-  flex-direction: column;
+/* Full-Page Workspace Layout Structure */
+.fullpage-workspace-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
   gap: 1.5rem;
+  padding: 1.5rem 2rem;
+  align-items: start;
+  box-sizing: border-box;
   width: 100%;
 }
 
-.results-top-row {
-  display: grid;
-  grid-template-columns: 1.4fr 1fr;
+.workspace-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.sidebar-section-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.sidebar-section-card h4 {
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #475569;
+  letter-spacing: 0.05em;
+  border-bottom: 1.5px solid #f1f5f9;
+  padding-bottom: 0.5rem;
+  margin: 0;
+}
+
+.sidebar-inputs-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.sidebar-input-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.sidebar-input-item label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.sidebar-input-item input {
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  width: 100%;
+  box-sizing: border-box;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.sidebar-input-item input:focus {
+  border-color: #4f46e5;
+  background: #ffffff;
+}
+
+.btn-recalculate-sidebar-glow {
+  background: #4f46e5;
+  border: none;
+  border-radius: 6px;
+  color: #ffffff;
+  padding: 0.6rem;
+  font-size: 0.82rem;
+  font-weight: 750;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.15);
+}
+
+.btn-recalculate-sidebar-glow:hover {
+  background: #3730a3;
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+}
+
+.solver-status-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.solver-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+.solver-row strong {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.status-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+}
+
+.status-label.safe-text {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.status-label.alert-text {
+  background: #fff5f5;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.safe-text {
+  color: #16a34a;
+}
+
+.alert-text {
+  color: #dc2626;
+}
+
+.sidebar-action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.btn-sidebar-primary {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+  border-radius: 6px;
+  padding: 0.55rem;
+  font-weight: 750;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.btn-sidebar-primary:hover {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+.btn-sidebar-secondary {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  border-radius: 6px;
+  padding: 0.55rem;
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.btn-sidebar-secondary:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.btn-sidebar-upload-new {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #475569;
+  padding: 0.6rem;
+  font-weight: 600;
+  font-size: 0.82rem;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-sidebar-upload-new:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+.workspace-main-content {
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
-  align-items: stretch;
+  flex-grow: 1;
+  min-width: 0;
 }
 
 @media (max-width: 1024px) {
-  .results-top-row {
+  .fullpage-workspace-layout {
     grid-template-columns: 1fr;
+    padding: 1.5rem 1rem;
   }
 }
 
