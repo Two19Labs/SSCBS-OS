@@ -72,7 +72,7 @@ export default function Auth() {
     try {
       if (isSignUp) {
         await signUp(email, password, { full_name: fullName });
-        setSuccessMsg('Registration successful! Please check your email for a confirmation link.');
+        setSuccessMsg('Registration successful! Please check your email for a confirmation link. (Be sure to check your spam or junk folder if you do not see it in a few minutes).');
         setEmail('');
         setPassword('');
         setFullName('');
