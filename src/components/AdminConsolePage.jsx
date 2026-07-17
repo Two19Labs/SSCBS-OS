@@ -54,7 +54,7 @@ const csRooms = ["Room 651", "Room 644", "Room 326", "Room 237"];
 export default function AdminConsolePage({ onBack }) {
   const { user } = useAuth();
   const { timetable, updateTimetable } = useTimetable();
-  const [activeTab, setActiveTab] = useState('upload'); // 'upload', 'editor', 'notices'
+  const [activeTab, setActiveTab] = useState('upload'); // 'upload', 'editor', 'notices', 'analytics'
 
   const isAdmin = user?.email === 'aditya.25015@sscbs.du.ac.in';
 
@@ -137,6 +137,8 @@ export default function AdminConsolePage({ onBack }) {
   React.useEffect(() => {
     if (activeTab === 'notices') {
       fetchAdminNotices();
+    } else if (activeTab === 'analytics') {
+      fetchDemographicsData();
     }
   }, [activeTab]);
 
@@ -247,6 +249,93 @@ export default function AdminConsolePage({ onBack }) {
       }
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // Analytics states
+  const [analyticsUsers, setAnalyticsUsers] = useState([]);
+  const [loadingAnalytics, setLoadingAnalytics] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterCourse, setFilterCourse] = useState('All');
+  const [filterSem, setFilterSem] = useState('All');
+
+  const fetchDemographicsData = async () => {
+    setLoadingAnalytics(true);
+    setSaveStatus({ type: '', message: '' });
+
+    if (!hasValidCredentials) {
+      // Mock demographic data for sandbox mode
+      const mockUsers = [
+        { id: 'm1', name: 'Aditya Singhani', email: 'aditya.25015@sscbs.du.ac.in', course: 'BMS', semester: '2', section: 'A', lastActive: 'Online' },
+        { id: 'm2', name: 'Manthan Kabra', email: 'manthan.25042@sscbs.du.ac.in', course: 'BMS', semester: '2', section: 'B', lastActive: '5 mins ago' },
+        { id: 'm3', name: 'Kunal Sharma', email: 'kunal.25055@sscbs.du.ac.in', course: 'BBA FIA', semester: '2', section: 'A', lastActive: '2 hours ago' },
+        { id: 'm4', name: 'Riya Gupta', email: 'riya.25078@sscbs.du.ac.in', course: 'BBA FIA', semester: '4', section: 'B', lastActive: 'Online' },
+        { id: 'm5', name: 'Arjun Verma', email: 'arjun.25091@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '6', section: 'A', lastActive: '1 day ago' },
+        { id: 'm6', name: 'Divya Sen', email: 'divya.25102@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '4', section: 'A', lastActive: '3 mins ago' },
+        { id: 'm7', name: 'Siddharth Jain', email: 'sid.25114@sscbs.du.ac.in', course: 'BMS', semester: '6', section: 'A', lastActive: 'Offline' },
+        { id: 'm8', name: 'Pooja Rawat', email: 'pooja.25123@sscbs.du.ac.in', course: 'BBA FIA', semester: '6', section: 'B', lastActive: 'Online' },
+        { id: 'm9', name: 'Ishaan Malhotra', email: 'ishaan.25145@sscbs.du.ac.in', course: 'BMS', semester: '4', section: 'D', lastActive: '12 mins ago' },
+        { id: 'm10', name: 'Ananya Roy', email: 'ananya.25156@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '2', section: 'A', lastActive: 'Offline' },
+        { id: 'm11', name: 'Kabir Dev', email: 'kabir.25178@sscbs.du.ac.in', course: 'BMS', semester: '8', section: 'A', lastActive: 'Online' },
+        { id: 'm12', name: 'Mehak Preet', email: 'mehak.25189@sscbs.du.ac.in', course: 'BMS', semester: '8', section: 'C', lastActive: '3 days ago' },
+        { id: 'm13', name: 'Neil Dsouza', email: 'neil.25199@sscbs.du.ac.in', course: 'BBA FIA', semester: '2', section: 'A', lastActive: 'Offline' },
+        { id: 'm14', name: 'Pranav Shah', email: 'pranav.25201@sscbs.du.ac.in', course: 'BMS', semester: '4', section: 'A', lastActive: '1 hour ago' },
+        { id: 'm15', name: 'Sanya Mirza', email: 'sanya.25220@sscbs.du.ac.in', course: 'BBA FIA', semester: '8', section: 'B', lastActive: 'Online' },
+        { id: 'm16', name: 'Tushar Mehta', email: 'tushar.25244@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '8', section: 'A', lastActive: '5 mins ago' },
+        { id: 'm17', name: 'Vanshika Goel', email: 'vansh.25255@sscbs.du.ac.in', course: 'BMS', semester: '6', section: 'C', lastActive: 'Offline' },
+        { id: 'm18', name: 'Yash Vardhan', email: 'yash.25266@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '6', section: 'A', lastActive: '4 hours ago' },
+        { id: 'm19', name: 'Zara Khan', email: 'zara.25277@sscbs.du.ac.in', course: 'BBA FIA', semester: '4', section: 'A', lastActive: 'Online' },
+        { id: 'm20', name: 'Rohan Mehra', email: 'rohan.25288@sscbs.du.ac.in', course: 'BMS', semester: '2', section: 'C', lastActive: 'Online' }
+      ];
+      setAnalyticsUsers(mockUsers);
+      setLoadingAnalytics(false);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('user_progress')
+        .select('user_id, settings, updated_at')
+        .order('updated_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching demographics:', error);
+        setSaveStatus({ type: 'error', message: error.message || 'Failed to load student demographics.' });
+      } else {
+        const formatted = (data || []).map(row => {
+          const profile = row.settings || {};
+          const now = new Date();
+          const updated = new Date(row.updated_at);
+          const diffMs = now - updated;
+          let lastActive = 'Offline';
+
+          if (diffMs < 60000 * 5) {
+            lastActive = 'Online';
+          } else if (diffMs < 60000 * 60) {
+            lastActive = `${Math.floor(diffMs / 60000)} mins ago`;
+          } else if (diffMs < 60000 * 60 * 24) {
+            lastActive = `${Math.floor(diffMs / (60000 * 60))} hours ago`;
+          } else {
+            lastActive = `${Math.floor(diffMs / (60000 * 60 * 24))} days ago`;
+          }
+
+          return {
+            id: row.user_id,
+            name: profile.full_name || 'Anonymous Student',
+            email: profile.email || 'No Email Sync',
+            course: profile.course || 'Unset',
+            semester: profile.semester ? String(profile.semester) : 'Unset',
+            section: profile.section || 'Unset',
+            lastActive
+          };
+        });
+        setAnalyticsUsers(formatted);
+      }
+    } catch (err) {
+      console.error('Failed to load user demographics:', err);
+      setSaveStatus({ type: 'error', message: err.message || 'Failed to load user demographics.' });
+    } finally {
+      setLoadingAnalytics(false);
     }
   };
   
@@ -898,6 +987,12 @@ export default function AdminConsolePage({ onBack }) {
           >
             Campus Notice Board Manager
           </button>
+          <button 
+            className={`admin-tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
+            onClick={() => setActiveTab('analytics')}
+          >
+            Student Demographics
+          </button>
         </nav>
 
         {saveStatus.message && (
@@ -1066,7 +1161,7 @@ export default function AdminConsolePage({ onBack }) {
               </table>
             </div>
           </div>
-        ) : (
+        ) : activeTab === 'notices' ? (
           <div className="tab-pane notices-pane">
             <div className="pane-left notice-creator-card">
               <h3>Publish New Notice</h3>
@@ -1243,6 +1338,295 @@ export default function AdminConsolePage({ onBack }) {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        ) : (
+          /* Student Demographics Analytics Tab */
+          <div className="tab-pane analytics-pane">
+            <div className="analytics-stats-grid">
+              <div className="stat-card-admin">
+                <div className="card-icon">👥</div>
+                <h4>Total Students</h4>
+                <p className="stat-number">{analyticsUsers.length}</p>
+                <p className="stat-subtitle">Registered on SSCBS OS</p>
+              </div>
+              <div className="stat-card-admin">
+                <div className="card-icon">💼</div>
+                <h4>BMS Enrolled</h4>
+                <p className="stat-number">{analyticsUsers.filter(u => u.course === 'BMS').length}</p>
+                <p className="stat-subtitle">Bachelor of Management Studies</p>
+              </div>
+              <div className="stat-card-admin">
+                <div className="card-icon">📈</div>
+                <h4>BBA FIA Enrolled</h4>
+                <p className="stat-number">{analyticsUsers.filter(u => u.course === 'BBA FIA').length}</p>
+                <p className="stat-subtitle">Financial Investment Analysis</p>
+              </div>
+              <div className="stat-card-admin">
+                <div className="card-icon">💻</div>
+                <h4>BSc CS Enrolled</h4>
+                <p className="stat-number">{analyticsUsers.filter(u => u.course === 'Bsc Comp Sci').length}</p>
+                <p className="stat-subtitle">Computer Science Honours</p>
+              </div>
+            </div>
+
+            {/* Visual Charts */}
+            <div className="analytics-charts-row">
+              {/* Course Donut Chart */}
+              <div className="chart-container-admin">
+                <div className="chart-header-admin">
+                  <h3>Course Distribution</h3>
+                </div>
+                {(() => {
+                  const bmsCount = analyticsUsers.filter(u => u.course === 'BMS').length;
+                  const fiaCount = analyticsUsers.filter(u => u.course === 'BBA FIA').length;
+                  const csCount = analyticsUsers.filter(u => u.course === 'Bsc Comp Sci').length;
+                  const total = bmsCount + fiaCount + csCount;
+
+                  const bmsPct = total > 0 ? Math.round((bmsCount / total) * 100) : 0;
+                  const fiaPct = total > 0 ? Math.round((fiaCount / total) * 100) : 0;
+                  const csPct = total > 0 ? 100 - bmsPct - fiaPct : 0;
+
+                  const circ = 314.15;
+                  const bmsStroke = (bmsPct / 100) * circ;
+                  const fiaStroke = (fiaPct / 100) * circ;
+                  const csStroke = (csPct / 100) * circ;
+
+                  return (
+                    <div className="donut-chart-wrapper">
+                      <div className="donut-svg-container">
+                        <svg viewBox="0 0 120 120" style={{ width: '100%', height: '100%' }}>
+                          <circle cx="60" cy="60" r="50" fill="transparent" stroke="rgba(255,255,255,0.04)" strokeWidth="10" />
+                          {bmsPct > 0 && (
+                            <circle cx="60" cy="60" r="50" fill="transparent" stroke="#8b5cf6" strokeWidth="10"
+                              strokeDasharray={`${bmsStroke} ${circ - bmsStroke}`}
+                              strokeDashoffset={0}
+                              transform="rotate(-90 60 60)"
+                              strokeLinecap="round"
+                            />
+                          )}
+                          {fiaPct > 0 && (
+                            <circle cx="60" cy="60" r="50" fill="transparent" stroke="#ec4899" strokeWidth="10"
+                              strokeDasharray={`${fiaStroke} ${circ - fiaStroke}`}
+                              strokeDashoffset={-bmsStroke}
+                              transform="rotate(-90 60 60)"
+                              strokeLinecap="round"
+                            />
+                          )}
+                          {csPct > 0 && (
+                            <circle cx="60" cy="60" r="50" fill="transparent" stroke="#3b82f6" strokeWidth="10"
+                              strokeDasharray={`${csStroke} ${circ - csStroke}`}
+                              strokeDashoffset={-(bmsStroke + fiaStroke)}
+                              transform="rotate(-90 60 60)"
+                              strokeLinecap="round"
+                            />
+                          )}
+                        </svg>
+                        <div className="donut-center-text">
+                          <span className="donut-center-num">{total}</span>
+                          <span className="donut-center-lbl">Users</span>
+                        </div>
+                      </div>
+                      <div className="chart-legend-admin">
+                        <div className="legend-item-admin">
+                          <span className="legend-color-dot" style={{ backgroundColor: '#8b5cf6' }}></span>
+                          <span className="legend-label-text">BMS</span>
+                          <span className="legend-val-text">{bmsPct}% ({bmsCount})</span>
+                        </div>
+                        <div className="legend-item-admin">
+                          <span className="legend-color-dot" style={{ backgroundColor: '#ec4899' }}></span>
+                          <span className="legend-label-text">BBA FIA</span>
+                          <span className="legend-val-text">{fiaPct}% ({fiaCount})</span>
+                        </div>
+                        <div className="legend-item-admin">
+                          <span className="legend-color-dot" style={{ backgroundColor: '#3b82f6' }}></span>
+                          <span className="legend-label-text">BSc CS</span>
+                          <span className="legend-val-text">{csPct}% ({csCount})</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Semester Distribution Bar Chart */}
+              <div className="chart-container-admin">
+                <div className="chart-header-admin">
+                  <h3>Semester Enrollment</h3>
+                </div>
+                {(() => {
+                  const sem2 = analyticsUsers.filter(u => u.semester === '2').length;
+                  const sem4 = analyticsUsers.filter(u => u.semester === '4').length;
+                  const sem6 = analyticsUsers.filter(u => u.semester === '6').length;
+                  const sem8 = analyticsUsers.filter(u => u.semester === '8').length;
+                  const maxVal = Math.max(sem2, sem4, sem6, sem8, 1);
+
+                  const s2Pct = (sem2 / maxVal) * 100;
+                  const s4Pct = (sem4 / maxVal) * 100;
+                  const s6Pct = (sem6 / maxVal) * 100;
+                  const s8Pct = (sem8 / maxVal) * 100;
+
+                  return (
+                    <div className="bar-chart-wrapper">
+                      <div className="bar-item-admin">
+                        <div className="bar-item-label-row">
+                          <span>Semester 2 (1st Year)</span>
+                          <span>{sem2} Students</span>
+                        </div>
+                        <div className="bar-track-admin">
+                          <div className="bar-fill-admin" style={{ width: `${s2Pct}%`, background: 'linear-gradient(90deg, #8b5cf6, #c084fc)' }} />
+                        </div>
+                      </div>
+                      <div className="bar-item-admin">
+                        <div className="bar-item-label-row">
+                          <span>Semester 4 (2nd Year)</span>
+                          <span>{sem4} Students</span>
+                        </div>
+                        <div className="bar-track-admin">
+                          <div className="bar-fill-admin" style={{ width: `${s4Pct}%`, background: 'linear-gradient(90deg, #8b5cf6, #c084fc)' }} />
+                        </div>
+                      </div>
+                      <div className="bar-item-admin">
+                        <div className="bar-item-label-row">
+                          <span>Semester 6 (3rd Year)</span>
+                          <span>{sem6} Students</span>
+                        </div>
+                        <div className="bar-track-admin">
+                          <div className="bar-fill-admin" style={{ width: `${s6Pct}%`, background: 'linear-gradient(90deg, #8b5cf6, #c084fc)' }} />
+                        </div>
+                      </div>
+                      <div className="bar-item-admin">
+                        <div className="bar-item-label-row">
+                          <span>Semester 8 (4th Year)</span>
+                          <span>{sem8} Students</span>
+                        </div>
+                        <div className="bar-track-admin">
+                          <div className="bar-fill-admin" style={{ width: `${s8Pct}%`, background: 'linear-gradient(90deg, #8b5cf6, #c084fc)' }} />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+
+            {/* Searchable Student Directory Card */}
+            <div className="registry-card-admin">
+              <div className="chart-header-admin">
+                <h3>Registered Students Directory</h3>
+              </div>
+              
+              <div className="registry-filters-bar">
+                <div className="search-input-wrapper-admin">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <input
+                    type="text"
+                    placeholder="Search by student name or email..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="search-input-admin"
+                  />
+                </div>
+                
+                <div className="registry-filters-selects">
+                  <select
+                    value={filterCourse}
+                    onChange={(e) => setFilterCourse(e.target.value)}
+                    className="admin-select"
+                    style={{ minWidth: '120px' }}
+                  >
+                    <option value="All">All Courses</option>
+                    <option value="BMS">BMS</option>
+                    <option value="BBA FIA">BBA FIA</option>
+                    <option value="Bsc Comp Sci">BSc CS</option>
+                  </select>
+
+                  <select
+                    value={filterSem}
+                    onChange={(e) => setFilterSem(e.target.value)}
+                    className="admin-select"
+                    style={{ minWidth: '120px' }}
+                  >
+                    <option value="All">All Semesters</option>
+                    <option value="2">Semester 2</option>
+                    <option value="4">Semester 4</option>
+                    <option value="6">Semester 6</option>
+                    <option value="8">Semester 8</option>
+                  </select>
+                </div>
+              </div>
+
+              {loadingAnalytics ? (
+                <div className="notices-manager-loading">
+                  <span className="console-spinner"></span>
+                  <p>Loading student directory...</p>
+                </div>
+              ) : (() => {
+                const filtered = analyticsUsers.filter(u => {
+                  const matchSearch = u.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      u.email.toLowerCase().includes(searchQuery.toLowerCase());
+                  const matchCourse = filterCourse === 'All' || u.course === filterCourse;
+                  const matchSem = filterSem === 'All' || u.semester === filterSem;
+                  return matchSearch && matchCourse && matchSem;
+                });
+
+                if (filtered.length === 0) {
+                  return (
+                    <div className="no-registry-results">
+                      <p>No student profiles match the filter criteria.</p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="table-scroll-container-admin">
+                    <table className="registry-table-admin">
+                      <thead>
+                        <tr>
+                          <th>Student Name</th>
+                          <th>Email Address</th>
+                          <th>Course</th>
+                          <th>Class</th>
+                          <th>Last Activity</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filtered.map(student => (
+                          <tr key={student.id}>
+                            <td>
+                              <span className="registry-user-avatar">
+                                {student.name.charAt(0).toUpperCase()}
+                              </span>
+                              <strong>{student.name}</strong>
+                            </td>
+                            <td>{student.email}</td>
+                            <td>
+                              <span className="registry-badge-course">
+                                {student.course}
+                              </span>
+                            </td>
+                            <td>
+                              <span className="registry-badge-class">
+                                Sem {student.semester} - {student.section}
+                              </span>
+                            </td>
+                            <td>
+                              {student.lastActive === 'Online' ? (
+                                <span className="registry-status-online">Online</span>
+                              ) : (
+                                <span className="registry-status-offline">{student.lastActive}</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}

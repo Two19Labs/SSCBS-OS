@@ -135,4 +135,12 @@ CREATE POLICY "Enable write access for aditya.25015 on notices"
     USING (auth.jwt() ->> 'email' = 'aditya.25015@sscbs.du.ac.in')
     WITH CHECK (auth.jwt() ->> 'email' = 'aditya.25015@sscbs.du.ac.in');
 
+-- Only aditya.25015 can view all student progress for demographics/analytics
+CREATE POLICY "Enable read access for admin on user progress" 
+    ON public.user_progress 
+    FOR SELECT 
+    TO authenticated 
+    USING (auth.jwt() ->> 'email' = 'aditya.25015@sscbs.du.ac.in');
+
+
 

@@ -144,7 +144,7 @@ export const AuthProvider = ({ children }) => {
 
       if (!selectError) {
         const existingSettings = progressData?.settings || {};
-        const newSettings = { ...existingSettings, ...profileData };
+        const newSettings = { ...existingSettings, ...profileData, email: data.user.email };
 
         await supabase
           .from('user_progress')
