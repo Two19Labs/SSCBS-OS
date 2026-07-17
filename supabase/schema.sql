@@ -41,8 +41,11 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-    INSERT INTO public.user_progress (user_id)
-    VALUES (new.id);
+    INSERT INTO public.user_progress (user_id, settings)
+    VALUES (
+        new.id,
+        jsonb_build_object('email', new.email, 'theme', 'dark', 'sound', true)
+    );
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
