@@ -682,7 +682,7 @@ function WaiverToolPage({ onBack }) {
     const recDates = solverRes.bestWaivers.map(w => w.dateStr);
 
     setRecommendedWaivers(recDates);
-    setSelectedWaivers(new Set(recDates));
+    setSelectedWaivers(new Set());
     setSolverResult({
       success: solverRes.solverSuccess,
       waiversCount: solverRes.solvedSize,
@@ -969,6 +969,91 @@ function WaiverToolPage({ onBack }) {
     );
   };
 
+  const renderCalendarView = () => {
+    if (!parsedData) return null;
+    return (
+      <div className="calendar-simulation-view">
+        <div className="card-header-row pt-0">
+          <div className="title-block">
+            <h3>Interactive Calendar</h3>
+            <p className="subtitle">Toggle waivers by clicking days</p>
+          </div>
+        </div>
+        
+        {/* Month key selectors */}
+        <div className="calendar-month-tabs">
+          {getMonthsInSheet().map(mKey => {
+            const [yr, mn] = mKey.split('-');
+            const label = MONTHS[parseInt(mn, 10) - 1].substring(0, 3);
+            return (
+              <button 
+                key={mKey}
+                className={`month-tab-btn ${activeMonthKey === mKey ? 'active' : ''}`}
+                onClick={() => setActiveMonthKey(mKey)}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Weekday headers */}
+        <div className="calendar-week-headers">
+          <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+        </div>
+
+        {/* Calendar Days Grid */}
+        <div className="calendar-days-grid">
+          {getCalendarMonthBlocks().map((block) => {
+            if (block.type === 'empty') {
+              return <div key={block.id} className="calendar-day-cell empty"></div>;
+            }
+
+            const isChecked = selectedWaivers.has(block.dateStr);
+            const isRecommended = recommendedWaivers.includes(block.dateStr);
+            
+            let cellClass = "calendar-day-cell";
+            if (!block.hasClasses) {
+              cellClass += " inactive";
+            } else {
+              cellClass += " active-day";
+              if (isChecked) cellClass += " waived";
+              if (isRecommended) cellClass += " recommended-cell";
+            }
+
+            return (
+              <div 
+                key={block.id}
+                className={cellClass}
+                onClick={() => block.hasClasses && handleCheckboxChange(block.dateStr)}
+                title={block.hasClasses ? `${block.dateStr}: ${block.totalAbsences} Abs, ${block.totalPresents} Pres` : "No classes held"}
+              >
+                <span className="day-number">{block.dayNum}</span>
+                {block.hasClasses && (
+                  <div className="day-dot-indicators">
+                    {block.totalAbsences > 0 && (
+                      <span className="abs-dot-count">{block.totalAbsences}</span>
+                    )}
+                    {block.totalPresents > 0 && (
+                      <span className="pres-dot-count">{block.totalPresents}</span>
+                    )}
+                  </div>
+                )}
+                {isChecked && <span className="waived-cell-indicator"></span>}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="calendar-legend-row">
+          <div className="legend-item"><span className="legend-dot red"></span>Absence</div>
+          <div className="legend-item"><span className="legend-dot green"></span>Present</div>
+          <div className="legend-item"><span className="legend-dot blue"></span>Waived</div>
+        </div>
+      </div>
+    );
+  };
+
   const simulatedStats = getSimulatedStats();
   const allSafe = simulatedStats.every(s => s.simPct >= threshold);
 
@@ -1221,13 +1306,7 @@ function WaiverToolPage({ onBack }) {
                   className={`tab-btn ${activeSelectorTab === 'grid' ? 'active' : ''}`}
                   onClick={() => setActiveSelectorTab('grid')}
                 >
-                  Attendance Grid
-                </button>
-                <button 
-                  className={`tab-btn ${activeSelectorTab === 'calendar' ? 'active' : ''}`}
-                  onClick={() => setActiveSelectorTab('calendar')}
-                >
-                  Interactive Calendar
+                  Interactive Customizer
                 </button>
                 <button 
                   className={`tab-btn ${activeSelectorTab === 'list' ? 'active' : ''}`}
@@ -1237,15 +1316,22 @@ function WaiverToolPage({ onBack }) {
                 </button>
               </div>
               <div className="actions-cluster">
-                <button className="btn-sec-small" onClick={resetToRecommended} title="Reset to auto-recommended optimal waivers">Reset</button>
+                <button className="btn-suggest-apply" onClick={resetToRecommended} title="Apply auto-recommended optimal waivers">Apply Recommended</button>
                 <button className="btn-sec-small" onClick={clearAllWaivers} title="Clear all active waivers">Clear All</button>
               </div>
             </div>
 
             {/* TAB CONTENT PANELS */}
             {activeSelectorTab === 'grid' ? (
-              renderAttendanceGrid()
-            ) : activeSelectorTab === 'list' ? (
+              <div className="customizer-split-layout">
+                <div className="customizer-grid-pane">
+                  {renderAttendanceGrid()}
+                </div>
+                <div className="customizer-calendar-pane">
+                  {renderCalendarView()}
+                </div>
+              </div>
+            ) : (
               <div className="recommended-list-view">
                 <div className="card-header-row pt-0">
                   <div className="title-block">
@@ -1290,79 +1376,6 @@ function WaiverToolPage({ onBack }) {
                         </div>
                       );
                     })}
-                </div>
-              </div>
-            ) : (
-              <div className="calendar-simulation-view">
-                {/* Month key selectors */}
-                <div className="calendar-month-tabs">
-                  {getMonthsInSheet().map(mKey => {
-                    const [yr, mn] = mKey.split('-');
-                    const label = MONTHS[parseInt(mn, 10) - 1].substring(0, 3);
-                    return (
-                      <button 
-                        key={mKey}
-                        className={`month-tab-btn ${activeMonthKey === mKey ? 'active' : ''}`}
-                        onClick={() => setActiveMonthKey(mKey)}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Weekday headers */}
-                <div className="calendar-week-headers">
-                  <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
-                </div>
-
-                {/* Calendar Days Grid */}
-                <div className="calendar-days-grid">
-                  {getCalendarMonthBlocks().map((block) => {
-                    if (block.type === 'empty') {
-                      return <div key={block.id} className="calendar-day-cell empty"></div>;
-                    }
-
-                    const isChecked = selectedWaivers.has(block.dateStr);
-                    const isRecommended = recommendedWaivers.includes(block.dateStr);
-                    
-                    let cellClass = "calendar-day-cell";
-                    if (!block.hasClasses) {
-                      cellClass += " inactive";
-                    } else {
-                      cellClass += " active-day";
-                      if (isChecked) cellClass += " waived";
-                      if (isRecommended) cellClass += " recommended-cell";
-                    }
-
-                    return (
-                      <div 
-                        key={block.id}
-                        className={cellClass}
-                        onClick={() => block.hasClasses && handleCheckboxChange(block.dateStr)}
-                        title={block.hasClasses ? `${block.dateStr}: ${block.totalAbsences} Abs, ${block.totalPresents} Pres` : "No classes held"}
-                      >
-                        <span className="day-number">{block.dayNum}</span>
-                        {block.hasClasses && (
-                          <div className="day-dot-indicators">
-                            {block.totalAbsences > 0 && (
-                              <span className="abs-dot-count">{block.totalAbsences}</span>
-                            )}
-                            {block.totalPresents > 0 && (
-                              <span className="pres-dot-count">{block.totalPresents}</span>
-                            )}
-                          </div>
-                        )}
-                        {isChecked && <span className="waived-cell-indicator"></span>}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className="calendar-legend-row">
-                  <div className="legend-item"><span className="legend-dot red"></span>Absence</div>
-                  <div className="legend-item"><span className="legend-dot green"></span>Present</div>
-                  <div className="legend-item"><span className="legend-dot blue"></span>Waived</div>
                 </div>
               </div>
             )}

@@ -5,7 +5,7 @@
   flex-direction: column;
   gap: 1.5rem;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 1.5rem;
   box-sizing: border-box;
@@ -1444,5 +1444,66 @@
     justify-content: flex-start;
   }
 }
+
+/* Side-by-Side Split Customizer Layout */
+.customizer-split-layout {
+  display: grid;
+  grid-template-columns: 1.85fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.customizer-grid-pane {
+  overflow: hidden;
+  width: 100%;
+}
+
+.customizer-calendar-pane {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+.customizer-calendar-pane .calendar-simulation-view {
+  background: none;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+}
+
+/* Button style for Apply Recommended */
+.btn-suggest-apply {
+  background: #eff6ff;
+  border: 1.5px solid #bfdbfe;
+  border-radius: 6px;
+  color: #1d4ed8;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-suggest-apply:hover {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
+}
+
+@media (max-width: 1180px) {
+  .customizer-split-layout {
+    grid-template-columns: 1fr;
+  }
+  .customizer-calendar-pane {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+}
+
 
 
