@@ -1088,90 +1088,133 @@ function WaiverToolPage({ onBack }) {
           </button>
         </div>
       ) : (
-        <div className="results-view-grid">
-          {/* Left Column: Adjusted statistics dashboard */}
-          <div className="results-card-glass stats-dashboard">
-            <div className="card-header-row">
-              <h3>Adjusted Attendance Summary</h3>
-              <div className={`status-pill ${allSafe ? 'safe' : 'alert'}`}>
-                {allSafe ? "ALL SAFE (≥85%)" : "SHORTAGE DETECTED"}
+        <div className="results-layout-container">
+          {/* Top Row: Left Summary + Right Controls */}
+          <div className="results-top-row">
+            
+            {/* Left Column: Adjusted statistics dashboard */}
+            <div className="results-card-glass stats-dashboard">
+              <div className="card-header-row">
+                <div className="title-block">
+                  <h3>Adjusted Attendance Summary</h3>
+                  <p className="subtitle">Real-time simulator of waivers impact</p>
+                </div>
+                <div className={`status-pill ${allSafe ? 'safe' : 'alert'}`}>
+                  {allSafe ? "ALL SAFE (≥85%)" : "SHORTAGE DETECTED"}
+                </div>
+              </div>
+
+              <div className="stats-comparison-table-wrapper">
+                <table className="stats-comparison-table">
+                  <thead>
+                    <tr>
+                      <th>Subject Name</th>
+                      <th>Type</th>
+                      <th className="center">Original</th>
+                      <th className="center">Simulated</th>
+                      <th className="right">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {simulatedStats.map((s, idx) => {
+                      const isShort = s.simPct < threshold;
+                      return (
+                        <tr key={idx} className={isShort ? "row-alert" : ""}>
+                          <td className="subject-name">{s.subjectName}</td>
+                          <td className="subject-type-badge">{s.type}</td>
+                          <td className="center txt-muted">
+                            {s.baselineAttended}/{s.baselineHeld} <span className="pct-small">({s.baselinePct.toFixed(1)}%)</span>
+                          </td>
+                          <td className="center bold">
+                            {s.simAttended}/{s.simHeld} <span className={isShort ? "text-red" : "text-green"}>({s.simPct.toFixed(1)}%)</span>
+                          </td>
+                          <td className="right">
+                            <span className={`status-badge-mini ${isShort ? 'badge-short' : 'badge-safe'}`}>
+                              {isShort ? 'SHORT' : 'SAFE'}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="subjects-note-container">
+                <p>📌 <strong>Theory & Tutorial Monitored Separately:</strong> Theory (`Th`) and Tutorial (`tu`) are independent requirements. Practical (`PR`) classes are completely ignored.</p>
               </div>
             </div>
 
-            <div className="stats-comparison-table-wrapper">
-              <table className="stats-comparison-table">
-                <thead>
-                  <tr>
-                    <th>Subject Name</th>
-                    <th>Type</th>
-                    <th className="center">Baseline</th>
-                    <th className="center">Adjusted</th>
-                    <th className="right">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {simulatedStats.map((s, idx) => {
-                    const isShort = s.simPct < threshold;
-                    return (
-                      <tr key={idx} className={isShort ? "row-alert" : ""}>
-                        <td className="subject-name">{s.subjectName}</td>
-                        <td className="subject-type-badge">{s.type}</td>
-                        <td className="center txt-muted">
-                          {s.baselineAttended}/{s.baselineHeld} ({s.baselinePct.toFixed(1)}%)
-                        </td>
-                        <td className="center bold">
-                          {s.simAttended}/{s.simHeld} <span className={isShort ? "text-red" : "text-green"}>({s.simPct.toFixed(1)}%)</span>
-                        </td>
-                        <td className="right">
-                          <span className={`status-badge-mini ${isShort ? 'badge-short' : 'badge-safe'}`}>
-                            {isShort ? 'SHORT' : 'SAFE'}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="subjects-note-container">
-              <p>📌 <strong>Theory & Tutorial Monitored Separately:</strong> Theory (`Th`) and Tutorial (`tu`) are independent requirements. Practical (`PR`) classes are completely ignored.</p>
-            </div>
-          </div>
-
-          {/* Right Column: Dynamic Waiver Customizer Selector */}
-          <div className="results-card-glass dates-selector">
-            <div className="inline-recalculator-toolbar">
-              <div className="toolbar-inputs-group">
-                <div className="toolbar-input-item">
-                  <label htmlFor="inline-max-w">Waivers</label>
-                  <input 
-                    type="number" 
-                    id="inline-max-w"
-                    min="1" 
-                    max="30"
-                    value={maxWaivers}
-                    onChange={(e) => setMaxWaivers(Math.max(1, parseInt(e.target.value) || 1))}
-                  />
-                </div>
-                <div className="toolbar-input-item">
-                  <label htmlFor="inline-thresh">Target %</label>
-                  <input 
-                    type="number" 
-                    id="inline-thresh"
-                    min="50" 
-                    max="100"
-                    value={threshold}
-                    onChange={(e) => setThreshold(Math.max(50, Math.min(100, parseInt(e.target.value) || 85)))}
-                  />
+            {/* Right Column: Optimization settings and solvers */}
+            <div className="results-card-glass condonation-controls-card">
+              <div className="card-header-row">
+                <div className="title-block">
+                  <h3>Condonation Optimizer</h3>
+                  <p className="subtitle">Configure parameters and auto-suggest</p>
                 </div>
               </div>
-              <button className="btn-recalculate-glow" onClick={handleRecalculate}>
-                Recalculate
+
+              <div className="controls-inputs-layout">
+                <div className="control-input-group">
+                  <div className="control-input-item">
+                    <label htmlFor="inline-max-w">Max Available Waivers</label>
+                    <input 
+                      type="number" 
+                      id="inline-max-w"
+                      min="1" 
+                      max="30"
+                      value={maxWaivers}
+                      onChange={(e) => setMaxWaivers(Math.max(1, parseInt(e.target.value) || 1))}
+                    />
+                  </div>
+                  <div className="control-input-item">
+                    <label htmlFor="inline-thresh">Target Attendance %</label>
+                    <input 
+                      type="number" 
+                      id="inline-thresh"
+                      min="50" 
+                      max="100"
+                      value={threshold}
+                      onChange={(e) => setThreshold(Math.max(50, Math.min(100, parseInt(e.target.value) || 85)))}
+                    />
+                  </div>
+                </div>
+
+                <button className="btn-recalculate-glow" onClick={handleRecalculate}>
+                  Auto-Suggest Optimal Waivers
+                </button>
+              </div>
+
+              <div className="solver-results-summary">
+                <div className="summary-stat-row">
+                  <span>Optimization Solver:</span>
+                  <strong className={solverResult?.success ? "text-green" : "text-orange"}>
+                    {solverResult?.success ? "OPTIMAL SOLUTION" : "CLOSEST CAP REACHED"}
+                  </strong>
+                </div>
+                <div className="summary-stat-row">
+                  <span>Selected / Max Limit:</span>
+                  <strong>{selectedWaivers.size} / {maxWaivers} waivers</strong>
+                </div>
+                <div className="summary-stat-row">
+                  <span>Lowest Subject Attendance:</span>
+                  <strong className={allSafe ? "text-green" : "text-red"}>
+                    {solverResult?.minPctAchieved ? `${solverResult.minPctAchieved.toFixed(1)}%` : "N/A"}
+                  </strong>
+                </div>
+              </div>
+
+              <button className="btn-reoptimize-back" onClick={() => setParsedData(null)}>
+                Upload New Sheet
               </button>
             </div>
 
-            {/* TAB SELECTORS */}
+          </div>
+
+          {/* Bottom Row: Detailed Tab Customizer (Full width!) */}
+          <div className="results-card-glass detailed-tabs-card">
+            
+            {/* TAB SELECTORS ROW */}
             <div className="selector-view-tabs-row">
               <div className="selector-view-tabs">
                 <button 
@@ -1199,11 +1242,12 @@ function WaiverToolPage({ onBack }) {
               </div>
             </div>
 
+            {/* TAB CONTENT PANELS */}
             {activeSelectorTab === 'grid' ? (
               renderAttendanceGrid()
             ) : activeSelectorTab === 'list' ? (
-              <>
-                <div className="card-header-row">
+              <div className="recommended-list-view">
+                <div className="card-header-row pt-0">
                   <div className="title-block">
                     <h3>Recommended Dates</h3>
                     <p className="subtitle">
@@ -1247,7 +1291,7 @@ function WaiverToolPage({ onBack }) {
                       );
                     })}
                 </div>
-              </>
+              </div>
             ) : (
               <div className="calendar-simulation-view">
                 {/* Month key selectors */}
@@ -1322,15 +1366,6 @@ function WaiverToolPage({ onBack }) {
                 </div>
               </div>
             )}
-
-            <div className="control-stats-footer">
-              <div className="totals-row">
-                <span>Selected Waivers: <strong>{selectedWaivers.size}</strong> / {maxWaivers}</span>
-                <button className="btn-reoptimize-back" onClick={() => setParsedData(null)}>
-                  Upload New Sheet
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       )}
