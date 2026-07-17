@@ -56,7 +56,7 @@ export default function AdminConsolePage({ onBack }) {
   const { timetable, updateTimetable } = useTimetable();
   const [activeTab, setActiveTab] = useState('upload'); // 'upload', 'editor', 'notices', 'analytics'
 
-  const isAdmin = user?.email === 'aditya.25015@sscbs.du.ac.in';
+  const isAdmin = user?.email === 'aditya.25015@sscbs.du.ac.in' || user?.email === 'manthan.25138@sscbs.du.ac.in';
 
 
   
@@ -960,7 +960,7 @@ export default function AdminConsolePage({ onBack }) {
         </div>
         <div className="admin-tag-container">
           <span className="admin-badge-indicator">System Admin</span>
-          <span className="admin-email">aditya.25015@sscbs.du.ac.in</span>
+          <span className="admin-email">{user?.email}</span>
         </div>
       </header>
 

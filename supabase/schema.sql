@@ -96,13 +96,13 @@ CREATE POLICY "Enable read access for all authenticated users"
     TO authenticated 
     USING (true);
 
--- Only aditya.25015 can write (insert, update, delete)
-CREATE POLICY "Enable write access for aditya.25015" 
+-- Only admins can write (insert, update, delete)
+CREATE POLICY "Enable write access for admins" 
     ON public.system_configs 
     FOR ALL 
     TO authenticated 
-    USING (auth.jwt() ->> 'email' = 'aditya.25015@sscbs.du.ac.in')
-    WITH CHECK (auth.jwt() ->> 'email' = 'aditya.25015@sscbs.du.ac.in');
+    USING (auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'))
+    WITH CHECK (auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'));
 
 -- 6. Create a table to store campus notices / events
 CREATE TABLE IF NOT EXISTS public.notices (
@@ -130,20 +130,20 @@ CREATE POLICY "Enable read access for all authenticated users on notices"
     TO authenticated 
     USING (true);
 
--- Only aditya.25015 can write (insert, update, delete) notices
-CREATE POLICY "Enable write access for aditya.25015 on notices" 
+-- Only admins can write (insert, update, delete) notices
+CREATE POLICY "Enable write access for admins on notices" 
     ON public.notices 
     FOR ALL 
     TO authenticated 
-    USING (auth.jwt() ->> 'email' = 'aditya.25015@sscbs.du.ac.in')
-    WITH CHECK (auth.jwt() ->> 'email' = 'aditya.25015@sscbs.du.ac.in');
+    USING (auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'))
+    WITH CHECK (auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'));
 
--- Only aditya.25015 can view all student progress for demographics/analytics
+-- Only admins can view all student progress for demographics/analytics
 CREATE POLICY "Enable read access for admin on user progress" 
     ON public.user_progress 
     FOR SELECT 
     TO authenticated 
-    USING (auth.jwt() ->> 'email' = 'aditya.25015@sscbs.du.ac.in');
+    USING (auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'));
 
 
 

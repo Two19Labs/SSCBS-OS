@@ -39,7 +39,7 @@ function App() {
   const userSemester = user.user_metadata?.semester;
   const userSection = user.user_metadata?.section;
 
-  const isAdmin = userEmail === 'aditya.25015@sscbs.du.ac.in';
+  const isAdmin = userEmail === 'aditya.25015@sscbs.du.ac.in' || userEmail === 'manthan.25138@sscbs.du.ac.in';
 
   if (currentView === 'waiver-tool') {
     return <WaiverToolPage onBack={() => setCurrentView('dashboard')} />;
