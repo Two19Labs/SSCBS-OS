@@ -33,8 +33,8 @@
 
 /* Header */
 .gpa-modal-header {
-  background: linear-gradient(135deg, #000000 0%, #1a1a18 100%);
-  color: #ffffff;
+  background: var(--ink);
+  color: var(--surface);
   padding: 16px 24px;
   display: flex;
   align-items: center;
@@ -49,22 +49,22 @@
 }
 
 .gpa-header-icon {
-  color: #eae6dc;
+  color: var(--bg);
 }
 
 .gpa-modal-header h3 {
   margin: 0;
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: -0.3px;
-  color: #ffffff;
+  color: var(--surface);
 }
 
 .gpa-close-btn {
   background: transparent;
   border: none;
-  color: #eae6dc;
+  color: var(--bg);
   font-size: 1.75rem;
   cursor: pointer;
   line-height: 1;
@@ -80,7 +80,7 @@
 
 .gpa-close-btn:hover {
   background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  color: var(--surface);
 }
 
 /* Tabs */
@@ -95,7 +95,7 @@
   background: transparent;
   border: none;
   padding: 14px 20px;
-  font-family: 'Inter', sans-serif;
+  font-family: inherit;
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--text-dim);
@@ -297,7 +297,7 @@
 
 .mode-toggle-btn.active {
   background-color: var(--accent-gold);
-  color: #ffffff;
+  color: var(--surface);
 }
 
 /* Marks input layouts */
@@ -339,7 +339,7 @@
 .gpa-delete-row-btn {
   background: transparent;
   border: none;
-  color: #991b1b;
+  color: var(--danger);
   font-size: 1.4rem;
   font-weight: bold;
   cursor: pointer;
@@ -388,7 +388,7 @@
 .btn-danger-gpa {
   background: transparent;
   border: 1.5px solid rgba(153, 27, 27, 0.3);
-  color: #991b1b;
+  color: var(--danger);
   border-radius: 8px;
   padding: 8px 16px;
   font-weight: 700;
@@ -399,12 +399,12 @@
 
 .btn-danger-gpa:hover {
   background-color: rgba(153, 27, 27, 0.05);
-  border-color: #991b1b;
+  border-color: var(--danger);
 }
 
 .btn-primary-gpa {
   background-color: var(--accent-gold);
-  color: #ffffff;
+  color: var(--surface);
   border: none;
   border-radius: 8px;
   padding: 10px 20px;
@@ -456,7 +456,7 @@
 
 .result-card-title {
   margin: 0;
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--text-main);
@@ -504,7 +504,7 @@
 }
 
 .gpa-value-large {
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   font-size: 2.2rem;
   font-weight: 800;
   color: var(--text-main);
@@ -580,7 +580,7 @@
 .division-badge-card.fail {
   background-color: rgba(153, 27, 27, 0.08);
   border: 1px solid rgba(153, 27, 27, 0.2);
-  color: #991b1b;
+  color: var(--danger);
 }
 
 .sidebar-action-buttons {
@@ -593,7 +593,7 @@
 /* TAB 2: CGPA CALCULATOR SPECIFICS */
 .section-title-small {
   margin: 0 0 6px 0;
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   font-size: 1rem;
   font-weight: 700;
 }
@@ -660,7 +660,7 @@
 
 .btn-tiny-copy:hover {
   background-color: var(--accent-gold);
-  color: #ffffff;
+  color: var(--surface);
   border-color: var(--accent-gold);
 }
 
@@ -713,7 +713,7 @@
 
 .planner-heading {
   margin: 0 0 6px 0;
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   font-size: 1.05rem;
   font-weight: 700;
 }
@@ -876,7 +876,7 @@
 
 .alert-badge.danger {
   background-color: rgba(153, 27, 27, 0.15);
-  color: #991b1b;
+  color: var(--danger);
 }
 
 .alert-header h5 {

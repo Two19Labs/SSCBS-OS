@@ -6,7 +6,7 @@
   width: 100%;
   display: flex;
   background-color: var(--bg-darker);
-  font-family: 'Inter', -apple-system, sans-serif;
+  font-family: inherit;
   overflow: hidden;
   color: var(--text-light);
 }
@@ -31,7 +31,7 @@
   background-position: 20% center;
   position: relative;
   border-right: 1px solid var(--border-color);
-  color: #ffffff;
+  color: var(--surface);
 }
 
 .auth-left-image-overlay {
@@ -49,12 +49,12 @@
 .auth-panel-left .hero-title,
 .auth-panel-left .gold-text,
 .auth-panel-left .slide-content h3 {
-  color: #ffffff;
+  color: var(--surface);
 }
 
 .auth-panel-left .hero-subtitle,
 .auth-panel-left .slide-content p {
-  color: #eae6dc;
+  color: var(--bg);
 }
 
 .auth-panel-left .indicator-dot {
@@ -62,7 +62,7 @@
 }
 
 .auth-panel-left .indicator-dot.active {
-  background: #ffffff;
+  background: var(--surface);
 }
 
 .auth-panel-left .sscbs-logo-img {
@@ -100,7 +100,7 @@
 
 .sscbs-logo-img {
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--surface);
   padding: 1px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
   object-fit: contain;
@@ -112,7 +112,7 @@
 }
 
 .inst-name {
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   font-size: 1.05rem;
   font-weight: 800;
   letter-spacing: 0.5px;
@@ -120,11 +120,11 @@
 }
 
 .inst-sub {
-  font-family: 'Inter', sans-serif;
+  font-family: inherit;
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 1px;
-  color: #ffffff;
+  color: var(--surface);
   margin-top: 1px;
 }
 
@@ -135,7 +135,7 @@
 }
 
 .hero-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   font-size: 3rem;
   font-weight: 800;
   line-height: 1.1;
@@ -252,7 +252,7 @@
 }
 
 .card-header h2 {
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   font-size: 1.6rem;
   font-weight: 800;
   letter-spacing: -0.5px;
@@ -339,7 +339,7 @@
 }
 
 .input-field-wrapper input::placeholder {
-  color: #a1a1aa;
+  color: var(--ink-faint);
 }
 
 .input-field-wrapper input:focus {
@@ -351,7 +351,7 @@
 /* Warning badges */
 .email-warning-tag {
   font-size: 0.7rem;
-  color: #b45309;
+  color: var(--amber);
   margin-top: 4px;
 }
 
@@ -367,7 +367,7 @@
   background: var(--accent-gold);
   border: none;
   border-radius: 8px;
-  color: #ffffff;
+  color: var(--surface);
   font-size: 0.9rem;
   font-weight: 700;
   padding: 12px;
@@ -381,7 +381,7 @@
 }
 
 .submit-button:hover:not(:disabled) {
-  background: #000000;
+  background: var(--ink);
   transform: translateY(-1px);
 }
 
@@ -395,7 +395,7 @@
   height: 16px;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  border-top-color: #ffffff;
+  border-top-color: var(--surface);
   animation: spin 0.8s linear infinite;
 }
 
@@ -446,7 +446,7 @@
     width: 100%;
     padding: 30px 20px 30px 20px;
     background-image: none !important;
-    background-color: #000000;
+    background-color: var(--ink);
     border-right: none;
     border-bottom: 1.5px solid rgba(255, 255, 255, 0.15);
     min-height: auto;
@@ -528,7 +528,7 @@
   background: var(--bg-card);
   border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 8px;
-  color: #1c1d1f;
+  color: var(--ink);
   font-size: 0.9rem;
   font-weight: 700;
   padding: 12px;
@@ -543,7 +543,7 @@
 }
 
 .google-signin-button:hover:not(:disabled) {
-  background: #faf8f5;
+  background: var(--bg);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04), 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
@@ -575,15 +575,15 @@
 }
 
 .auth-credit-footer .heart-icon {
-  color: #e11d48;
+  color: var(--danger);
   display: inline-block;
   animation: pulse 1.5s infinite;
 }
 
 .auth-credit-footer .developer-name {
-  color: #2563eb;
+  color: var(--accent);
   font-weight: 600;
-  background: linear-gradient(120deg, #3b82f6, #1d4ed8);
+  background: var(--accent);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-decoration: none;

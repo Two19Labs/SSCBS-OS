@@ -1,29 +1,44 @@
 import React, { useState } from 'react';
 import { useAuth } from './context/AuthContext';
 import Auth from './components/Auth';
-import ProfileModal from './components/ProfileModal';
+import HomeDashboard from './components/HomeDashboard';
+import ProfilePage from './components/ProfilePage';
 import ClassSchedulesCard from './components/ClassSchedulesCard';
 import FindMyProfessorPage from './components/FindMyProfessorPage';
 import GpaCalculatorModal from './components/GpaCalculatorModal';
 import WaiverToolPage from './components/WaiverToolPage';
 import AdminConsolePage from './components/AdminConsolePage';
 import NoticeBoard from './components/NoticeBoard';
+import { isAdminEmail } from './lib/admin';
+import {
+  HomeIcon,
+  CalendarIcon,
+  GridIcon,
+  UserIcon,
+  SearchIcon,
+  PercentIcon,
+  CalculatorIcon,
+  FileIcon,
+  MegaphoneIcon,
+  ShieldIcon,
+  BackIcon,
+} from './components/icons';
 import './App.css';
 import { Analytics } from '@vercel/analytics/react';
 
+const TOOL_VIEWS = ['find-prof', 'waiver', 'admin'];
+
 function App() {
   const { user, loading } = useAuth();
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'prof-tracker', 'waiver-tool', or 'admin-console'
+  const [view, setView] = useState('home');
+  const [returnView, setReturnView] = useState('home');
   const [isGpaOpen, setIsGpaOpen] = useState(false);
 
   if (loading) {
     return (
       <div className="loading-screen">
-        <div className="loader-container">
-          <span className="system-spinner"></span>
-          <p className="loading-text">Loading SSCBS Campus Workspace...</p>
-        </div>
+        <span className="system-spinner"></span>
+        <p className="loading-text">Loading SSCBS Campus OS…</p>
       </div>
     );
   }
@@ -32,186 +47,192 @@ function App() {
     return <Auth />;
   }
 
-  // Extract user info
   const displayName = user.user_metadata?.full_name || user.email.split('@')[0];
-  const userEmail = user.email;
-  const userCourse = user.user_metadata?.course;
-  const userSemester = user.user_metadata?.semester;
-  const userSection = user.user_metadata?.section;
+  const isAdmin = isAdminEmail(user.email);
 
-  const isAdmin = userEmail === 'aditya.25015@sscbs.du.ac.in' || userEmail === 'manthan.25138@sscbs.du.ac.in';
+  const openTool = (id) => {
+    if (id === 'gpa') {
+      setIsGpaOpen(true);
+      return;
+    }
+    setReturnView(TOOL_VIEWS.includes(view) ? 'home' : view);
+    setView(id);
+  };
 
-  if (currentView === 'waiver-tool') {
-    return <WaiverToolPage onBack={() => setCurrentView('dashboard')} />;
+  const goBack = () => setView(returnView);
+
+  // Waiver tool ships its own full-page layout
+  if (view === 'waiver') {
+    return <WaiverToolPage onBack={goBack} />;
   }
+
+  const navItems = [
+    { id: 'home', label: 'Home', Icon: HomeIcon },
+    { id: 'timetable', label: 'Timetable', Icon: CalendarIcon },
+    { id: 'find-prof', label: 'Find My Professor', Icon: SearchIcon },
+    { id: 'waiver', label: 'Waiver Tool', Icon: PercentIcon },
+    { id: 'gpa', label: 'GPA Calculator', Icon: CalculatorIcon },
+    { id: 'pyqs', label: 'PYQs & Resources', Icon: FileIcon, locked: true },
+    { id: 'buzz', label: 'Campus Buzz', Icon: MegaphoneIcon },
+  ];
+
+  const tabs = [
+    { id: 'home', label: 'Home', Icon: HomeIcon },
+    { id: 'timetable', label: 'Timetable', Icon: CalendarIcon },
+    { id: 'tools', label: 'Tools', Icon: GridIcon },
+    { id: 'profile', label: 'Profile', Icon: UserIcon },
+  ];
+
+  const activeTab = TOOL_VIEWS.includes(view) || view === 'tools' ? 'tools' : view === 'buzz' ? 'home' : view;
+
+  const pageTitle = {
+    timetable: 'Timetable',
+    tools: 'Tools',
+    'find-prof': 'Find My Professor',
+    admin: 'Admin Console',
+    buzz: 'Campus Buzz',
+    profile: 'Profile',
+  }[view];
+
+  const renderView = () => {
+    switch (view) {
+      case 'timetable':
+        return <ClassSchedulesCard onOpenProfile={() => setView('profile')} />;
+      case 'find-prof':
+        return <FindMyProfessorPage onBack={goBack} />;
+      case 'admin':
+        return isAdmin ? <AdminConsolePage onBack={goBack} /> : <HomeDashboard onNavigate={openTool} onOpenProfile={() => setView('profile')} />;
+      case 'buzz':
+        return (
+          <div className="buzz-page">
+            <NoticeBoard />
+          </div>
+        );
+      case 'profile':
+        return <ProfilePage onNavigate={openTool} />;
+      case 'tools':
+        return (
+          <div className="tools-hub">
+            {[
+              { id: 'find-prof', micro: 'LIVE', microClass: 'success', title: 'Find My Professor', desc: "Who's teaching where, right now", Icon: SearchIcon },
+              { id: 'waiver', micro: '85%', microClass: 'gold', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon },
+              { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon },
+              { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: true },
+            ].map(({ id, micro, microClass, title, desc, Icon, locked }) => (
+              <button
+                key={id}
+                className={`tools-hub-row ${locked ? 'locked' : ''}`}
+                onClick={() => !locked && openTool(id)}
+                disabled={locked}
+              >
+                <span className="tools-hub-icon"><Icon size={20} /></span>
+                <span className="tools-hub-text">
+                  <span className="tools-hub-title">{title}</span>
+                  <span className="tools-hub-desc">{desc}</span>
+                </span>
+                <span className={`micro-label ${microClass}`}>{micro}</span>
+              </button>
+            ))}
+          </div>
+        );
+      default:
+        return <HomeDashboard onNavigate={openTool} onOpenProfile={() => setView('profile')} />;
+    }
+  };
 
   return (
     <>
-      <div className="workspace-container">
-        {/* Top Header Navigation */}
-        <header className="workspace-header">
-          <div className="header-left">
-            <img className="header-logo-img" src="/sscbs_logo.png" alt="SSCBS Crest" width="32" height="32" />
-            <span className="workspace-title">
-              SSCBS <span className="title-highlight">Campus OS</span>
-            </span>
-          </div>
-          <div className="header-right">
-            {isAdmin && (
-              <button 
-                className="admin-header-btn" 
-                onClick={() => setCurrentView('admin-console')}
-              >
-                Admin Console
-              </button>
-            )}
-            <div 
-              className="user-profile" 
-              onClick={() => setIsProfileOpen(true)} 
-              title="Profile Settings"
-            >
-              <div className="avatar">
-                {displayName.charAt(0).toUpperCase()}
-              </div>
-              <div className="user-details">
-                <span className="user-name">{displayName}</span>
-                <div className="user-role-badge-row">
-                  <span className="user-role">{userEmail}</span>
-                  {userCourse && (
-                    <span className="user-class-badge-small">
-                      {userCourse} {userSemester}{userSection}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <svg 
-                className="profile-chevron" 
-                width="14" 
-                height="14" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="2.5" 
-                strokeLinecap="round" 
-                strokeLinejoin="round"
-              >
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
+      <div className="app-shell">
+        {/* ── Desktop sidebar ── */}
+        <aside className="app-sidebar">
+          <div className="sidebar-brand" onClick={() => setView('home')}>
+            <img src="/sscbs_logo.png" alt="" width="30" height="30" />
+            <div className="sidebar-brand-text">
+              <span className="sidebar-brand-name">SSCBS OS</span>
+              <span className="sidebar-brand-sub">CAMPUS WORKSPACE</span>
             </div>
           </div>
+
+          <nav className="sidebar-nav">
+            {navItems.map(({ id, label, Icon, locked }) => (
+              <button
+                key={id}
+                className={`sidebar-item ${view === id ? 'active' : ''} ${locked ? 'locked' : ''}`}
+                onClick={() => !locked && openTool(id)}
+                disabled={locked}
+              >
+                <Icon filled={view === id} />
+                <span>{label}</span>
+                {locked && <span className="sidebar-soon">SOON</span>}
+              </button>
+            ))}
+            {isAdmin && (
+              <button
+                className={`sidebar-item ${view === 'admin' ? 'active' : ''}`}
+                onClick={() => openTool('admin')}
+              >
+                <ShieldIcon filled={view === 'admin'} />
+                <span>Admin Console</span>
+              </button>
+            )}
+          </nav>
+
+          <button
+            className={`sidebar-user ${view === 'profile' ? 'active' : ''}`}
+            onClick={() => setView('profile')}
+          >
+            <span className="sidebar-avatar">{displayName.charAt(0).toUpperCase()}</span>
+            <span className="sidebar-user-text">
+              <span className="sidebar-user-name">{displayName}</span>
+              <span className="sidebar-user-email">{user.email}</span>
+            </span>
+          </button>
+        </aside>
+
+        {/* ── Mobile top bar ── */}
+        <header className="app-topbar">
+          {view !== 'home' && activeTab !== view ? (
+            <button className="topbar-back" onClick={goBack} aria-label="Back">
+              <BackIcon />
+            </button>
+          ) : (
+            <img src="/sscbs_logo.png" alt="" width="26" height="26" />
+          )}
+          <span className="topbar-title">{pageTitle || 'SSCBS OS'}</span>
+          <button className="topbar-avatar" onClick={() => setView('profile')} aria-label="Profile">
+            {displayName.charAt(0).toUpperCase()}
+          </button>
         </header>
 
-        {/* Main Workspace Dashboard */}
-        <main className="workspace-main">
-          {currentView === 'prof-tracker' ? (
-            <FindMyProfessorPage onBack={() => setCurrentView('dashboard')} />
-          ) : (currentView === 'admin-console' && isAdmin) ? (
-            <AdminConsolePage onBack={() => setCurrentView('dashboard')} />
-          ) : (
-            <>
-              {/* Split layout: Schedule Tracker (Left) & Campus Notice Board (Right) */}
-              <div className="home-split-layout">
-                <div className="home-layout-left">
-                  <ClassSchedulesCard onOpenProfile={() => setIsProfileOpen(true)} />
-                </div>
-                <div className="home-layout-right">
-                  <NoticeBoard />
-                </div>
-              </div>
-
-              {/* Student Tools Grid */}
-              <section className="dashboard-grid">
-                
-                {/* Active Feature: Find My Professor */}
-                <div className="dashboard-card active-card" onClick={() => setCurrentView('prof-tracker')}>
-                  <div className="card-header">
-                    <h3>Find My Professor</h3>
-                    <span className="badge-active">Track Live</span>
-                  </div>
-                  <p>Locate where any faculty member is teaching right now. View their current room, daily timeline, and full weekly schedule.</p>
-                  <div className="card-footer">
-                    <span className="btn-card-action">Launch Tracker →</span>
-                  </div>
-                </div>
-
-                <div 
-                  className="dashboard-card active-card" 
-                  onClick={() => setCurrentView('waiver-tool')}
-                >
-                  <div className="card-header">
-                    <h3>Waiver Tool</h3>
-                    <span className="badge-active">Waivers</span>
-                  </div>
-                  <p>Optimize and recommend waiver dates to clear the 85% attendance requirement for Theory and Tutorials.</p>
-                  <div className="card-footer">
-                    <span className="btn-card-action">Launch Tool →</span>
-                  </div>
-                </div>
-
-                <div 
-                  className="dashboard-card active-card" 
-                  onClick={() => setIsGpaOpen(true)}
-                >
-                  <div className="card-header">
-                    <h3>GPA Calculator</h3>
-                    <span className="badge-active">Calculator</span>
-                  </div>
-                  <p>Calculate your SGPA and CGPA dynamically using official Delhi University credit schemas.</p>
-                  <div className="card-footer">
-                    <span className="btn-card-action">Launch Calculator →</span>
-                  </div>
-                </div>
-
-
-
-                <div className="dashboard-card locked">
-                  <div className="card-header">
-                    <h3>PYQs & Resources</h3>
-                  </div>
-                  <p>Search and download previous years' examination papers, syllabus, and study notes.</p>
-                  <div className="card-footer">
-                    <span className="badge-lock">Coming Soon</span>
-                  </div>
-                </div>
-
-              </section>
-            </>
+        {/* ── Main content ── */}
+        <main className="app-main">
+          {pageTitle && (
+            <div className="page-heading-desktop">
+              <h1>{pageTitle}</h1>
+            </div>
           )}
+          {renderView()}
         </main>
 
-
-        {/* Workspace Footer */}
-        <footer className="workspace-footer">
-          <div className="footer-content">
-            <span className="footer-brand">SSCBS Campus OS</span>
-            <div className="footer-divider"></div>
-            <span className="footer-credits">
-              Made with <span className="heart-icon">♥</span> by{' '}
-              <a href="https://www.linkedin.com/in/aditya-singhani-69294a27a/" target="_blank" rel="noopener noreferrer" className="developer-name">Aditya Singhani</a>{' '}
-              &amp;{' '}
-              <a href="https://www.linkedin.com/in/manthan-kabra/" target="_blank" rel="noopener noreferrer" className="developer-name">Manthan Kabra</a>
-            </span>
-          </div>
-        </footer>
+        {/* ── Mobile bottom tabs ── */}
+        <nav className="app-tabbar">
+          {tabs.map(({ id, label, Icon }) => (
+            <button
+              key={id}
+              className={`tabbar-item ${activeTab === id ? 'active' : ''}`}
+              onClick={() => setView(id)}
+            >
+              <Icon filled={activeTab === id} size={20} />
+              <span>{label}</span>
+            </button>
+          ))}
+        </nav>
       </div>
 
-      {/* Profile Modal */}
-      <ProfileModal 
-        isOpen={isProfileOpen} 
-        onClose={() => setIsProfileOpen(false)} 
-      />
-
-      {/* GPA Calculator Modal */}
-      <GpaCalculatorModal 
-        isOpen={isGpaOpen} 
-        onClose={() => setIsGpaOpen(false)} 
-      />
-
+      <GpaCalculatorModal isOpen={isGpaOpen} onClose={() => setIsGpaOpen(false)} />
       <Analytics />
     </>
   );
 }
 
 export default App;
-
-

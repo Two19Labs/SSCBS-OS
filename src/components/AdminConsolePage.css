@@ -2,9 +2,9 @@
   display: flex;
   flex-direction: column;
   height: calc(100vh - 64px); /* Subtract header height */
-  background: radial-gradient(circle at 50% 0%, #1a1528 0%, #0d0b13 100%);
-  color: #e2e8f0;
-  font-family: 'Outfit', sans-serif;
+  background: var(--ink);
+  color: var(--border);
+  font-family: inherit;
   overflow: hidden;
 }
 
@@ -28,7 +28,7 @@
 .header-left-admin h2 {
   font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+  background: var(--accent);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin: 0;
@@ -41,7 +41,7 @@
   gap: 0.5rem;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #94a3b8;
+  color: var(--ink-faint);
   padding: 0.5rem 1rem;
   border-radius: 8px;
   font-weight: 600;
@@ -51,7 +51,7 @@
 
 .btn-back-admin:hover {
   background: rgba(255, 255, 255, 0.1);
-  color: #f1f5f9;
+  color: var(--bg);
 }
 
 .admin-tag-container {
@@ -61,8 +61,8 @@
 }
 
 .admin-badge-indicator {
-  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-  color: #fff;
+  background: var(--danger);
+  color: var(--surface);
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -73,7 +73,7 @@
 }
 
 .admin-email {
-  color: #94a3b8;
+  color: var(--ink-faint);
   font-size: 0.9rem;
   font-weight: 500;
 }
@@ -100,7 +100,7 @@
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
-  color: #64748b;
+  color: var(--ink-dim);
   font-size: 1rem;
   font-weight: 600;
   padding: 0.75rem 1.5rem;
@@ -109,12 +109,12 @@
 }
 
 .admin-tab-btn:hover {
-  color: #a78bfa;
+  color: var(--accent);
 }
 
 .admin-tab-btn.active {
-  color: #a78bfa;
-  border-bottom-color: #8b5cf6;
+  color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
 /* Status Banner */
@@ -131,13 +131,13 @@
 .admin-status-banner.success {
   background: rgba(16, 185, 129, 0.15);
   border: 1px solid rgba(16, 185, 129, 0.3);
-  color: #34d399;
+  color: var(--success);
 }
 
 .admin-status-banner.error {
   background: rgba(239, 68, 68, 0.15);
   border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #f87171;
+  color: var(--danger);
 }
 
 /* Pane Layouts */
@@ -167,12 +167,12 @@
 .pane-left h3, .pane-right h3 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--bg);
   margin: 0;
 }
 
 .subtitle-admin {
-  color: #64748b;
+  color: var(--ink-dim);
   font-size: 0.9rem;
   line-height: 1.5;
   margin: 0;
@@ -195,13 +195,13 @@
 }
 
 .dropzone:hover {
-  border-color: #8b5cf6;
+  border-color: var(--accent);
   background: rgba(139, 92, 246, 0.05);
 }
 
 .dropzone.has-file {
   border-style: solid;
-  border-color: #10b981;
+  border-color: var(--success);
   background: rgba(16, 185, 129, 0.05);
 }
 
@@ -211,12 +211,12 @@
 }
 
 .dropzone-text {
-  color: #94a3b8;
+  color: var(--ink-faint);
   font-size: 0.95rem;
 }
 
 .file-input-label {
-  color: #a78bfa;
+  color: var(--accent);
   font-weight: 700;
   text-decoration: underline;
   cursor: pointer;
@@ -235,13 +235,13 @@
 .file-name-label {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--bg);
   word-break: break-all;
 }
 
 .file-size-label {
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--ink-dim);
 }
 
 /* Publish Buttons */
@@ -253,8 +253,8 @@
 
 .btn-publish-timetable {
   flex: 1;
-  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
-  color: #fff;
+  background: var(--accent);
+  color: var(--surface);
   border: none;
   font-size: 1rem;
   font-weight: 700;
@@ -280,7 +280,7 @@
 .btn-discard {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #ef4444;
+  color: var(--danger);
   font-weight: 600;
   padding: 0.85rem 1.5rem;
   border-radius: 8px;
@@ -295,7 +295,7 @@
 /* Logging Console */
 .console-logs-window {
   flex: 1;
-  background: #06040a;
+  background: var(--ink);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   padding: 1rem;
@@ -309,7 +309,7 @@
 }
 
 .no-logs {
-  color: #475569;
+  color: var(--ink-dim);
   text-align: center;
   margin-top: 4rem;
 }
@@ -320,24 +320,24 @@
 }
 
 .log-time {
-  color: #64748b;
+  color: var(--ink-dim);
   margin-right: 0.5rem;
 }
 
 .log-line.info {
-  color: #e2e8f0;
+  color: var(--border);
 }
 
 .log-line.success {
-  color: #10b981;
+  color: var(--success);
 }
 
 .log-line.warning {
-  color: #f59e0b;
+  color: var(--amber);
 }
 
 .log-line.error {
-  color: #ef4444;
+  color: var(--danger);
   font-weight: bold;
 }
 
@@ -351,7 +351,7 @@
   width: 14px;
   height: 14px;
   border: 2px solid rgba(255, 255, 255, 0.1);
-  border-top-color: #8b5cf6;
+  border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -390,14 +390,14 @@
   font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: #64748b;
+  color: var(--ink-dim);
   letter-spacing: 0.5px;
 }
 
 .admin-select {
   background: rgba(15, 23, 42, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #f1f5f9;
+  color: var(--bg);
   padding: 0.65rem 1rem;
   border-radius: 6px;
   font-size: 0.95rem;
@@ -406,7 +406,7 @@
 }
 
 .admin-select:focus {
-  border-color: #8b5cf6;
+  border-color: var(--accent);
   outline: none;
 }
 
@@ -432,7 +432,7 @@
 
 .admin-schedule-table th {
   background: rgba(18, 16, 28, 0.6);
-  color: #94a3b8;
+  color: var(--ink-faint);
   font-weight: 600;
   text-transform: uppercase;
   font-size: 0.8rem;
@@ -448,20 +448,20 @@
 }
 
 .break-row-admin td {
-  color: #64748b;
+  color: var(--ink-dim);
   font-style: italic;
 }
 
 .period-col-admin {
-  color: #a78bfa;
+  color: var(--accent);
 }
 
 /* Edit Cell Inputs */
 .admin-edit-input {
   width: 100%;
   background: rgba(15, 23, 42, 0.8);
-  border: 1px solid #8b5cf6;
-  color: #f1f5f9;
+  border: 1px solid var(--accent);
+  color: var(--bg);
   padding: 0.45rem 0.75rem;
   border-radius: 4px;
   font-size: 0.9rem;
@@ -480,7 +480,7 @@
 .btn-action-edit {
   background: rgba(139, 92, 246, 0.1);
   border: 1px solid rgba(139, 92, 246, 0.3);
-  color: #a78bfa;
+  color: var(--accent);
   padding: 0.35rem 0.85rem;
   border-radius: 4px;
   cursor: pointer;
@@ -490,8 +490,8 @@
 }
 
 .btn-action-edit:hover {
-  background: #8b5cf6;
-  color: #fff;
+  background: var(--accent);
+  color: var(--surface);
 }
 
 .edit-btn-row {
@@ -500,8 +500,8 @@
 }
 
 .btn-action-save {
-  background: #10b981;
-  color: #fff;
+  background: var(--success);
+  color: var(--surface);
   border: none;
   padding: 0.35rem 0.75rem;
   border-radius: 4px;
@@ -511,13 +511,13 @@
 }
 
 .btn-action-save:hover {
-  background: #059669;
+  background: var(--success);
 }
 
 .btn-action-cancel {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #94a3b8;
+  color: var(--ink-faint);
   padding: 0.35rem 0.75rem;
   border-radius: 4px;
   cursor: pointer;
@@ -527,7 +527,7 @@
 
 .btn-action-cancel:hover {
   background: rgba(255, 255, 255, 0.1);
-  color: #f1f5f9;
+  color: var(--bg);
 }
 
 @keyframes spin {
@@ -568,14 +568,14 @@
   font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: #64748b;
+  color: var(--ink-dim);
   letter-spacing: 0.5px;
 }
 
 .admin-input-field, .admin-textarea-field {
   background: rgba(15, 23, 42, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #f1f5f9;
+  color: var(--bg);
   padding: 0.75rem 1rem;
   border-radius: 6px;
   font-size: 0.95rem;
@@ -585,7 +585,7 @@
 }
 
 .admin-input-field:focus, .admin-textarea-field:focus {
-  border-color: #8b5cf6;
+  border-color: var(--accent);
   outline: none;
   box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
 }
@@ -611,7 +611,7 @@
   align-items: center;
   justify-content: center;
   padding: 4rem;
-  color: #94a3b8;
+  color: var(--ink-faint);
   gap: 1rem;
 }
 
@@ -645,20 +645,20 @@
 
 .notice-item-society {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--ink-faint);
   font-weight: 600;
 }
 
 .notice-item-title {
   font-size: 1rem;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--bg);
   margin: 0;
 }
 
 .notice-item-desc {
   font-size: 0.85rem;
-  color: #cbd5e1;
+  color: var(--border-strong);
   margin: 0;
   line-height: 1.4;
 }
@@ -674,13 +674,13 @@
 
 .notice-item-date {
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--ink-dim);
 }
 
 .btn-delete-notice {
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #f87171;
+  color: var(--danger);
   font-size: 0.75rem;
   font-weight: 700;
   padding: 0.3rem 0.75rem;
@@ -690,8 +690,8 @@
 }
 
 .btn-delete-notice:hover {
-  background: #ef4444;
-  color: #fff;
+  background: var(--danger);
+  color: var(--surface);
   box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
 }
 
@@ -707,19 +707,19 @@
 
 .admin-status-badge.status-active {
   background: rgba(16, 185, 129, 0.1);
-  color: #34d399;
+  color: var(--success);
   border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
 .admin-status-badge.status-scheduled {
   background: rgba(59, 130, 246, 0.1);
-  color: #60a5fa;
+  color: var(--gold-text);
   border: 1px solid rgba(59, 130, 246, 0.25);
 }
 
 .admin-status-badge.status-expired {
   background: rgba(239, 68, 68, 0.1);
-  color: #f87171;
+  color: var(--danger);
   border: 1px solid rgba(239, 68, 68, 0.25);
 }
 
@@ -728,11 +728,11 @@
   flex-direction: column;
   gap: 4px;
   font-size: 0.7rem;
-  color: #94a3b8;
+  color: var(--ink-faint);
   background: rgba(0, 0, 0, 0.15);
   padding: 6px 10px;
   border-radius: 6px;
-  font-family: monospace;
+  font-family: var(--mono);
   margin-top: 4px;
   border: 1px solid rgba(255, 255, 255, 0.03);
 }
@@ -868,7 +868,7 @@
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, #8b5cf6, #ec4899);
+  background: var(--accent);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -892,7 +892,7 @@
 .stat-card-admin h4 {
   font-size: 0.85rem;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: var(--ink-faint);
   margin: 0;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -901,16 +901,16 @@
 .stat-card-admin .stat-number {
   font-size: 2.25rem;
   font-weight: 800;
-  color: #f1f5f9;
+  color: var(--bg);
   margin: 0;
-  background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--border-strong) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .stat-card-admin .stat-subtitle {
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--ink-dim);
   margin: 0;
 }
 
@@ -949,7 +949,7 @@
 .chart-header-admin h3 {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--bg);
   margin: 0;
 }
 
@@ -986,14 +986,14 @@
 .donut-center-num {
   font-size: 1.5rem;
   font-weight: 800;
-  color: #f1f5f9;
+  color: var(--bg);
   display: block;
   line-height: 1;
 }
 
 .donut-center-lbl {
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--ink-dim);
   text-transform: uppercase;
 }
 
@@ -1008,7 +1008,7 @@
   align-items: center;
   gap: 0.75rem;
   font-size: 0.9rem;
-  color: #cbd5e1;
+  color: var(--border-strong);
 }
 
 .legend-color-dot {
@@ -1023,7 +1023,7 @@
 
 .legend-val-text {
   margin-left: auto;
-  color: #94a3b8;
+  color: var(--ink-faint);
   font-weight: 600;
 }
 
@@ -1047,7 +1047,7 @@
   justify-content: space-between;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #cbd5e1;
+  color: var(--border-strong);
 }
 
 .bar-track-admin {
@@ -1061,7 +1061,7 @@
 .bar-fill-admin {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #8b5cf6, #c084fc);
+  background: var(--accent);
   transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -1097,7 +1097,7 @@
   left: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #64748b;
+  color: var(--ink-dim);
   pointer-events: none;
 }
 
@@ -1106,7 +1106,7 @@
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
-  color: #f1f5f9;
+  color: var(--bg);
   padding: 0.6rem 1rem 0.6rem 2.5rem;
   font-family: inherit;
   font-size: 0.9rem;
@@ -1114,7 +1114,7 @@
 }
 
 .search-input-admin:focus {
-  border-color: #8b5cf6;
+  border-color: var(--accent);
   outline: none;
   background: rgba(255, 255, 255, 0.05);
   box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
@@ -1141,7 +1141,7 @@
 
 .registry-table-admin th {
   background: rgba(18, 16, 28, 0.6);
-  color: #94a3b8;
+  color: var(--ink-faint);
   font-weight: 600;
   padding: 0.85rem 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -1150,7 +1150,7 @@
 .registry-table-admin td {
   padding: 0.85rem 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  color: #cbd5e1;
+  color: var(--border-strong);
 }
 
 .registry-table-admin tr:last-child td {
@@ -1165,8 +1165,8 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-  color: #fff;
+  background: var(--accent);
+  color: var(--surface);
   font-size: 0.8rem;
   font-weight: 700;
   display: inline-flex;
@@ -1178,7 +1178,7 @@
 .registry-badge-course {
   background: rgba(139, 92, 246, 0.15);
   border: 1px solid rgba(139, 92, 246, 0.25);
-  color: #a78bfa;
+  color: var(--accent);
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.15rem 0.5rem;
@@ -1189,7 +1189,7 @@
 .registry-badge-class {
   background: rgba(59, 130, 246, 0.12);
   border: 1px solid rgba(59, 130, 246, 0.2);
-  color: #60a5fa;
+  color: var(--gold-text);
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.15rem 0.5rem;
@@ -1201,7 +1201,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  color: #34d399;
+  color: var(--success);
   font-size: 0.8rem;
   font-weight: 600;
 }
@@ -1210,19 +1210,19 @@
   content: '';
   width: 6px;
   height: 6px;
-  background: #10b981;
+  background: var(--success);
   border-radius: 50%;
-  box-shadow: 0 0 8px #10b981;
+  box-shadow: 0 0 8px var(--success);
 }
 
 .registry-status-offline {
-  color: #64748b;
+  color: var(--ink-dim);
   font-size: 0.8rem;
 }
 
 .no-registry-results {
   text-align: center;
-  color: #64748b;
+  color: var(--ink-dim);
   padding: 3rem 1rem;
 }
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTimetable } from '../context/TimetableContext';
 import { PERIODS, DAYS } from '../data/timetables';
+import { isAdminEmail, isTimeWarpEnabled } from '../lib/admin';
 import './ClassSchedulesCard.css';
 
 export default function ClassSchedulesCard({ onOpenProfile }) {
@@ -14,6 +15,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
   const section = user?.user_metadata?.section;
   
   const hasConfiguredProfile = course && semester && section;
+  const canTimeWarp = isAdminEmail(user?.email) && isTimeWarpEnabled();
 
   // Real-time & Debug states
   const [time, setTime] = useState(getISTTime());
@@ -315,7 +317,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                     <div className="next-class-info">
                       <p className="next-sub">{nextClass.subject}</p>
                       <p className="next-details">
-                        {nextClass.room && `Room ${nextClass.room} • `} 
+                        {nextClass.room && `${nextClass.room} • `} 
                         {PERIODS.find(p => p.id === nextClass.period || (nextClass.isBreak && p.id === 0))?.startLabel}
                       </p>
                     </div>
@@ -380,7 +382,8 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
             
           </div>
 
-          {/* Time Warp Testing Debugger */}
+          {/* Time Warp Testing Debugger — admins only, toggled from Profile */}
+          {canTimeWarp && (
           <div className="debugger-collapsible">
             <button className="btn-toggle-debugger" onClick={() => setShowDebugger(!showDebugger)}>
               {showDebugger ? 'Hide Time Warp Controls ▲' : 'Show Time Warp Controls (Test timewarp/weekends) ▼'}
@@ -426,6 +429,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
               </div>
             )}
           </div>
+          )}
         </>
       )}
 

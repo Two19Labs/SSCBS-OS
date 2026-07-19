@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useTimetable } from '../context/TimetableContext';
+import { useAuth } from '../context/AuthContext';
 import { PERIODS, DAYS } from '../data/timetables';
+import { isAdminEmail, isTimeWarpEnabled } from '../lib/admin';
 import './FindMyProfessorPage.css';
 
 // Normalize teacher name by removing titles, group markers, and converting to lowercase
@@ -54,6 +56,8 @@ const parseTimeToMinutes = (timeStr) => {
 
 export default function FindMyProfessorPage({ onBack }) {
   const { timetable: timetablesData } = useTimetable();
+  const { user } = useAuth();
+  const canTimeWarp = isAdminEmail(user?.email) && isTimeWarpEnabled();
   const [professorsList, setProfessorsList] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProf, setSelectedProf] = useState('');
@@ -633,7 +637,8 @@ export default function FindMyProfessorPage({ onBack }) {
 
               </div>
 
-              {/* Time Warp testing controls inside Find My Professor */}
+              {/* Time Warp testing controls — admins only, toggled from Profile */}
+              {canTimeWarp && (
               <div className="prof-page-debugger">
                 <button className="btn-toggle-debugger-page" onClick={() => setShowDebugger(!showDebugger)}>
                   {showDebugger ? 'Hide Time Warp Controls ▲' : 'Show Time Warp Controls (Test weekends/timewarp) ▼'}
@@ -681,6 +686,7 @@ export default function FindMyProfessorPage({ onBack }) {
                   </div>
                 )}
               </div>
+              )}
 
             </div>
           ) : (

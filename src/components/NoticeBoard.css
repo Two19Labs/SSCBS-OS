@@ -22,7 +22,7 @@
 }
 
 .title-area h3 {
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   font-size: 1.2rem;
   font-weight: 800;
   color: var(--text-main);
@@ -62,9 +62,9 @@
 }
 
 .filter-badge.active {
-  background: #000000;
-  border-color: #000000;
-  color: #ffffff;
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--surface);
 }
 
 /* Loading & Empty State */
@@ -143,7 +143,7 @@
 
 /* Minimalist Notice Card */
 .notice-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 16px;
@@ -181,11 +181,11 @@
 .notice-date {
   font-size: 0.65rem;
   color: var(--text-dim);
-  font-family: monospace;
+  font-family: var(--mono);
 }
 
 .notice-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--text-main);
@@ -203,8 +203,8 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #000000;
-  color: #ffffff;
+  background: var(--ink);
+  color: var(--surface);
   font-size: 0.6rem;
   font-weight: 800;
   display: flex;
@@ -237,9 +237,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #000000;
-  border: 1px solid #000000;
-  color: #ffffff;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  color: var(--surface);
   font-size: 0.725rem;
   font-weight: 600;
   padding: 6px 12px;
@@ -250,8 +250,8 @@
 }
 
 .btn-notice-action:hover {
-  background: #2a2a28;
-  border-color: #2a2a28;
+  background: var(--ink);
+  border-color: var(--ink);
 }
 
 .arrow-icon {
@@ -283,6 +283,6 @@
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--text-main);
-  font-family: monospace;
+  font-family: var(--mono);
 }
 

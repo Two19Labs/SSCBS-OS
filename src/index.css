@@ -1,45 +1,97 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+/* ═══════════════════════════════════════════════════════════
+   SSCBS Campus OS — design tokens (Manrope · maroon & gold)
+   Light is the default; dark via [data-theme="dark"].
+   Rules: maroon = primary in light; gold takes over in dark.
+   One accent per card. Borders over shadows. No gradients.
+   ═══════════════════════════════════════════════════════════ */
 
 :root {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light;
 
-  /* ── Background Colors ── */
-  --bg-darker: #eae6dc;
-  --bg-dark: #eae6dc;
-  --bg-surface: #faf8f2;
-  --bg-card: #faf8f2;
+  /* ── Core palette ── */
+  --bg: #f7f3ec;
+  --surface: #fffdf9;
+  --ink: #241a14;
+  --ink-dim: #7a6d5f;
+  --ink-faint: #a89a90;
+  --maroon: #71222c;
+  --gold: #b08d3e;
+  --gold-text: #8a6c2a;       /* gold used as text on light surfaces */
+  --success: #0b7a54;
+  --danger: #b91c1c;
+  --amber: #b45309;
 
-  /* ── Text Colors ── */
-  --text-main: #2a2a28;
-  --text-light: #2a2a28;
-  --text-dim: #646460;
-  --text-muted: #646460;
+  /* ── Derived ── */
+  --accent: var(--maroon);            /* primary accent (maroon light / gold dark) */
+  --on-accent: #f7ead9;               /* text on accent-filled elements */
+  --on-ink: #f7f3ec;                  /* text on ink-filled buttons */
+  --accent-tint: rgba(113, 34, 44, 0.08);
+  --gold-tint: rgba(176, 141, 62, 0.12);
+  --success-tint: rgba(11, 122, 84, 0.09);
+  --tint: rgba(36, 26, 20, 0.05);     /* neutral tile fill */
+  --border: rgba(36, 26, 20, 0.1);
+  --border-strong: rgba(36, 26, 20, 0.14);
+  --track: rgba(36, 26, 20, 0.08);    /* progress-bar track */
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  /* ── Accent Colors ── */
-  --accent-gold: #000000;
-  --accent-gold-glow: rgba(0, 0, 0, 0.08);
-  --accent-cyan: #0284c7;
-  --accent-green: #0b7a54;
-  --accent-amber: #b45309;
-
-  /* ── Border Colors ── */
-  --border-color: rgba(0, 0, 0, 0.12);
-  --border-glass: rgba(0, 0, 0, 0.12);
-  --border-gold-glow: rgba(0, 0, 0, 0.25);
-  --border-gold-glass: rgba(0, 0, 0, 0.2);
-
-  /* ── Status Colors ── */
-  --success-color: #0b7a54;
-  --error-color: #b91c1c;
+  /* ── Legacy aliases (older component CSS reads these) ── */
+  --bg-darker: var(--bg);
+  --bg-dark: var(--bg);
+  --bg-surface: var(--surface);
+  --bg-card: var(--surface);
+  --text-main: var(--ink);
+  --text-light: var(--ink);
+  --text-dim: var(--ink-dim);
+  --text-muted: var(--ink-dim);
+  --accent-gold: var(--accent);
+  --accent-gold-glow: var(--accent-tint);
+  --accent-cyan: var(--gold-text);
+  --accent-green: var(--success);
+  --accent-amber: var(--amber);
+  --border-color: var(--border);
+  --border-glass: var(--border);
+  --border-gold-glow: var(--border-strong);
+  --border-gold-glass: var(--border-strong);
+  --success-color: var(--success);
+  --error-color: var(--danger);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #181114;
+  --surface: #231a1d;
+  --ink: #f2e8e2;
+  --ink-dim: #a89a90;
+  --ink-faint: #7d716b;
+  --maroon: #d98a94;          /* lifted — labels only */
+  --gold: #c9a558;
+  --gold-text: #c9a558;
+  --success: #57c896;
+  --danger: #e57373;
+  --amber: #e8a355;
+
+  --accent: var(--gold);      /* gold takes over as primary */
+  --on-accent: #181114;
+  --on-ink: #181114;
+  --accent-tint: rgba(201, 165, 88, 0.12);
+  --gold-tint: rgba(201, 165, 88, 0.1);
+  --success-tint: rgba(87, 200, 150, 0.12);
+  --tint: rgba(242, 232, 226, 0.06);
+  --border: rgba(242, 232, 226, 0.1);
+  --border-strong: rgba(242, 232, 226, 0.14);
+  --track: rgba(242, 232, 226, 0.1);
 }
 
 html {
@@ -50,9 +102,10 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  background-color: var(--bg-darker);
-  color: var(--text-main);
+  background-color: var(--bg);
+  color: var(--ink);
   overflow-x: hidden;
+  font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 #root {
@@ -64,17 +117,22 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Manrope', system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
 }
 
 a {
-  color: var(--accent-gold);
+  color: var(--accent);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 a:hover {
-  color: var(--accent-gold);
+  color: var(--accent);
 }
 
 * {

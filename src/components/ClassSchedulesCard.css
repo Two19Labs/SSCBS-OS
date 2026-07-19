@@ -46,7 +46,7 @@
 }
 
 .setup-banner-wrapper h3 {
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0;
@@ -63,7 +63,7 @@
 .btn-setup-action {
   background: var(--accent-gold);
   border: 1px solid var(--accent-gold);
-  color: #ffffff;
+  color: var(--surface);
   font-weight: 700;
   padding: 10px 24px;
   border-radius: 8px;
@@ -73,8 +73,8 @@
 }
 
 .btn-setup-action:hover {
-  background: #000000;
-  border-color: #000000;
+  background: var(--ink);
+  border-color: var(--ink);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transform: translateY(-1px);
 }
@@ -96,7 +96,7 @@
 }
 
 .tracker-title-group h2 {
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   font-size: 1.35rem;
   font-weight: 800;
   margin: 4px 0;
@@ -123,7 +123,7 @@
   padding: 2px 8px;
   border-radius: 20px;
   text-transform: uppercase;
-  font-family: monospace;
+  font-family: var(--mono);
 }
 
 .live-dot-pulse {
@@ -148,14 +148,14 @@
 }
 
 .clock-digits {
-  font-family: 'Fira Code', monospace;
+  font-family: var(--mono);
   font-size: 1.65rem;
   font-weight: 700;
   letter-spacing: -0.5px;
 }
 
 .clock-seconds {
-  font-family: 'Fira Code', monospace;
+  font-family: var(--mono);
   font-size: 1.05rem;
   font-weight: 500;
   opacity: 0.8;
@@ -260,7 +260,7 @@
 }
 
 .status-hero h3 {
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   font-size: 1.25rem;
   font-weight: 700;
   margin: 4px 0 6px 0;
@@ -290,19 +290,19 @@
 
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #000000, #000000);
+  background: var(--ink);
   border-radius: 3px;
 }
 
-.progress-bar-fill.break { background: linear-gradient(90deg, #0284c7, #38bdf8); }
-.progress-bar-fill.free { background: linear-gradient(90deg, #0d8a5f, #10b981); }
+.progress-bar-fill.break { background: var(--accent); }
+.progress-bar-fill.free { background: var(--success); }
 
 .progress-details {
   display: flex;
   justify-content: space-between;
   font-size: 0.725rem;
   color: var(--text-dim);
-  font-family: monospace;
+  font-family: var(--mono);
 }
 
 /* Next Class Panel */
@@ -394,7 +394,7 @@
 }
 
 .daily-timeline-section h3 {
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   font-size: 1rem;
   font-weight: 700;
   margin: 0;
@@ -648,7 +648,7 @@
   width: 100%;
   max-width: 950px;
   max-height: 90%;
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
   border-radius: 16px;
@@ -664,8 +664,8 @@
   justify-content: space-between;
   padding: 16px 24px;
   border-bottom: 1.5px solid rgba(255, 255, 255, 0.15);
-  background: #000000;
-  color: #ffffff;
+  background: var(--ink);
+  color: var(--surface);
 }
 
 .header-meta-group {
@@ -675,16 +675,16 @@
 
 .weekly-modal-header h3 {
   margin: 0;
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--surface);
 }
 
 .weekly-modal-header p {
   margin: 4px 0 0 0;
   font-size: 0.725rem;
-  color: #eae6dc;
+  color: var(--bg);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -709,25 +709,25 @@
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #eae6dc;
+  color: var(--bg);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .btn-layout-toggle:hover {
-  color: #ffffff;
+  color: var(--surface);
 }
 
 .btn-layout-toggle.active {
-  background: #ffffff;
-  color: #000000;
+  background: var(--surface);
+  color: var(--ink);
   box-shadow: 0 2px 8px rgba(255, 255, 255, 0.2);
 }
 
 .weekly-modal-header .close-btn {
   background: none;
   border: none;
-  color: #eae6dc;
+  color: var(--bg);
   font-size: 1.5rem;
   cursor: pointer;
   padding: 0;
@@ -736,7 +736,7 @@
 }
 
 .weekly-modal-header .close-btn:hover {
-  color: #ffffff;
+  color: var(--surface);
 }
 
 .btn-layout-toggle svg {
@@ -778,7 +778,7 @@
   flex-direction: column;
   align-items: center;
   padding: 8px;
-  background: #faf8f5;
+  background: var(--bg);
   border: 1px solid var(--border-color);
   border-radius: 10px;
   cursor: pointer;
@@ -787,7 +787,7 @@
 }
 
 .weekly-day-tab:hover {
-  background: #ffffff;
+  background: var(--surface);
   border-color: var(--border-gold-glow);
 }
 
@@ -897,7 +897,7 @@
 .timeline-time-label {
   font-size: 0.65rem;
   color: var(--text-dim);
-  font-family: monospace;
+  font-family: var(--mono);
   margin-top: 2px;
 }
 
@@ -926,7 +926,7 @@
 .timeline-free-card,
 .timeline-break-card,
 .timeline-empty-card {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 12px 16px;
@@ -942,12 +942,12 @@
 
 .active-timeline-item .timeline-class-card {
   border-color: var(--accent-gold);
-  background: linear-gradient(135deg, #ffffff 0%, rgba(0, 0, 0, 0.02) 100%);
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(0, 0, 0, 0.02) 100%);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
 .timeline-subject {
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--text-main);
@@ -1062,7 +1062,7 @@
   overflow-x: auto;
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  background: #ffffff;
+  background: var(--surface);
   -webkit-overflow-scrolling: touch;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
 }
@@ -1077,7 +1077,7 @@
 }
 
 .weekly-timetable-table th {
-  background: #faf8f5;
+  background: var(--bg);
   padding: 10px 12px;
   border-bottom: 1px solid var(--border-color);
   font-weight: normal;
@@ -1088,7 +1088,7 @@
   position: sticky;
   left: 0;
   z-index: 10;
-  background: #faf8f5;
+  background: var(--bg);
   border-right: 1px solid var(--border-color);
   box-shadow: 2px 0 5px rgba(0,0,0,0.02);
 }
@@ -1097,8 +1097,8 @@
   position: sticky;
   left: 0;
   z-index: 5;
-  background: #faf8f5;
-  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  font-family: inherit;
   color: var(--text-main);
   text-align: center;
   vertical-align: middle !important;
@@ -1116,7 +1116,7 @@
 }
 
 .today-row .day-name-cell {
-  background: #fdfaf2;
+  background: var(--bg);
   color: var(--accent-gold);
 }
 
@@ -1124,7 +1124,7 @@
   display: block;
   font-size: 0.55rem;
   background: var(--accent-gold);
-  color: #ffffff;
+  color: var(--surface);
   padding: 1px 4px;
   border-radius: 4px;
   margin-top: 4px;
@@ -1232,7 +1232,7 @@
 
 /* Active Highlight in Grid */
 .active-class-cell {
-  background: linear-gradient(135deg, #ffffff 0%, rgba(0, 0, 0, 0.02) 100%);
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(0, 0, 0, 0.02) 100%);
   border: 1px solid var(--accent-gold) !important;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
@@ -1244,7 +1244,7 @@
   font-size: 0.5rem;
   font-weight: 800;
   background: var(--accent-gold);
-  color: #ffffff;
+  color: var(--surface);
   padding: 1px 4px;
   border-radius: 3px;
   letter-spacing: 0.5px;
@@ -1261,7 +1261,7 @@
   justify-content: space-between;
   padding: 16px 24px;
   border-top: 1px solid var(--border-color);
-  background: #faf8f5;
+  background: var(--bg);
 }
 
 .break-info-note {
@@ -1272,7 +1272,7 @@
 .btn-close-modal {
   background: var(--accent-gold);
   border: 1px solid var(--accent-gold);
-  color: #ffffff;
+  color: var(--surface);
   font-weight: 700;
   padding: 8px 18px;
   border-radius: 8px;
@@ -1282,8 +1282,8 @@
 }
 
 .btn-close-modal:hover {
-  background: #000000;
-  border-color: #000000;
+  background: var(--ink);
+  border-color: var(--ink);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 

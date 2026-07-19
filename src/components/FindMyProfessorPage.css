@@ -57,7 +57,7 @@
   padding: 2px 8px;
   border-radius: 20px;
   text-transform: uppercase;
-  font-family: monospace;
+  font-family: var(--mono);
 }
 
 .live-dot-pulse-green {
@@ -69,7 +69,7 @@
 }
 
 .header-clock-digits {
-  font-family: 'Fira Code', monospace;
+  font-family: var(--mono);
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--text-main);
@@ -108,7 +108,7 @@
   margin: 0;
   font-size: 1rem;
   font-weight: 800;
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   color: var(--text-main);
 }
 
@@ -148,7 +148,7 @@
 .sidebar-search-input:focus {
   outline: none;
   border-color: var(--accent-gold);
-  background: #ffffff;
+  background: var(--surface);
 }
 
 .sidebar-clear-btn {
@@ -200,7 +200,7 @@
   height: 28px;
   border-radius: 50%;
   background: var(--accent-gold);
-  color: #ffffff;
+  color: var(--surface);
   font-weight: 800;
   font-size: 0.8rem;
   display: flex;
@@ -257,7 +257,7 @@
 
 .prof-empty-details-state h3 {
   margin: 0;
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   font-size: 1.25rem;
   font-weight: 800;
   color: var(--text-main);
@@ -290,7 +290,7 @@
   height: 56px;
   border-radius: 50%;
   background: var(--accent-gold);
-  color: #ffffff;
+  color: var(--surface);
   font-weight: 800;
   font-size: 1.5rem;
   display: flex;
@@ -301,7 +301,7 @@
 
 .prof-header-meta h2 {
   margin: 0;
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   font-size: 1.45rem;
   font-weight: 800;
   color: var(--text-main);
@@ -354,7 +354,7 @@
 
 .day-badge-large {
   background: var(--accent-gold);
-  color: #ffffff;
+  color: var(--surface);
   font-size: 0.65rem;
   font-weight: 700;
   padding: 2px 10px;
@@ -403,7 +403,7 @@
 
 .badge-live-teaching {
   background: var(--accent-green);
-  color: #ffffff;
+  color: var(--surface);
   font-size: 0.625rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -414,7 +414,7 @@
 .room-label-badge {
   font-size: 0.75rem;
   color: var(--text-main);
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--border-color);
   padding: 2px 8px;
   border-radius: 4px;
@@ -488,17 +488,17 @@
 
 .badge-generic.break {
   background: var(--accent-amber);
-  color: #ffffff;
+  color: var(--surface);
 }
 
 .badge-generic.free {
   background: var(--accent-cyan);
-  color: #ffffff;
+  color: var(--surface);
 }
 
 .badge-generic.weekend, .badge-generic.completed {
   background: var(--text-dim);
-  color: #ffffff;
+  color: var(--surface);
 }
 
 .current-slot-time-desc {
@@ -613,7 +613,7 @@
   font-weight: 750;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
 }
 
 .view-tab-btn:hover {
@@ -692,7 +692,7 @@
 
 .live-label-glow {
   background: var(--accent-green);
-  color: #ffffff;
+  color: var(--surface);
   font-size: 0.55rem;
   font-weight: 800;
   padding: 1px 6px;
@@ -708,7 +708,7 @@
 }
 
 .timeline-class-card-spacious {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 12px 18px;
@@ -791,7 +791,7 @@
   overflow-x: auto;
   border: 1px solid var(--border-color);
   border-radius: 10px;
-  background: #ffffff;
+  background: var(--surface);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.01);
 }
 
@@ -919,7 +919,7 @@
 
 .live-bubble {
   background: var(--accent-green);
-  color: #ffffff;
+  color: var(--surface);
   font-size: 0.525rem;
   font-weight: 800;
   padding: 1px 4px;
@@ -995,7 +995,7 @@
 
 .select-debugger-input, .time-debugger-input {
   padding: 8px;
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 0.775rem;

@@ -30,22 +30,22 @@
   justify-content: space-between;
   padding: 20px 24px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-  background: #000000;
-  color: #ffffff;
+  background: var(--ink);
+  color: var(--surface);
 }
 
 .profile-modal-header h3 {
   margin: 0;
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--surface);
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: #eae6dc;
+  color: var(--bg);
   font-size: 1.5rem;
   cursor: pointer;
   padding: 0;
@@ -54,7 +54,7 @@
 }
 
 .close-btn:hover {
-  color: #ffffff;
+  color: var(--surface);
 }
 
 .profile-modal-form {
@@ -74,13 +74,13 @@
 .status-banner.success {
   background: rgba(13, 138, 95, 0.05);
   border: 1px solid rgba(13, 138, 95, 0.15);
-  color: #0d8a5f;
+  color: var(--success);
 }
 
 .status-banner.error {
   background: rgba(211, 47, 47, 0.05);
   border: 1px solid rgba(211, 47, 47, 0.15);
-  color: #c62828;
+  color: var(--danger);
 }
 
 .form-item {
@@ -212,7 +212,7 @@
 .btn-signout-modal {
   background: transparent;
   border: 1px solid rgba(239, 68, 68, 0.25);
-  color: #dc2626;
+  color: var(--danger);
   padding: 8px 16px;
   border-radius: 8px;
   font-size: 0.85rem;
@@ -224,7 +224,7 @@
 .btn-signout-modal:hover:not(:disabled) {
   background: rgba(239, 68, 68, 0.06);
   border-color: rgba(239, 68, 68, 0.45);
-  color: #b91c1c;
+  color: var(--danger);
   box-shadow: 0 2px 8px rgba(239, 68, 68, 0.05);
 }
 
@@ -253,7 +253,7 @@
 .btn-save {
   background: var(--accent-gold);
   border: 1px solid var(--accent-gold);
-  color: #ffffff;
+  color: var(--surface);
   padding: 8px 20px;
   border-radius: 8px;
   font-size: 0.85rem;
@@ -267,8 +267,8 @@
 }
 
 .btn-save:hover {
-  background: #000000;
-  border-color: #000000;
+  background: var(--ink);
+  border-color: var(--ink);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
@@ -281,7 +281,7 @@
   width: 16px;
   height: 16px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #ffffff;
+  border-top-color: var(--surface);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
