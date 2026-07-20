@@ -138,9 +138,13 @@ export default function ProfileModal({ isOpen, onClose }) {
                 onChange={(e) => setSemester(e.target.value)}
                 className="select-field"
               >
+                <option value="1">Sem 1 (1st Yr)</option>
                 <option value="2">Sem 2 (1st Yr)</option>
+                <option value="3">Sem 3 (2nd Yr)</option>
                 <option value="4">Sem 4 (2nd Yr)</option>
+                <option value="5">Sem 5 (3rd Yr)</option>
                 <option value="6">Sem 6 (3rd Yr)</option>
+                <option value="7">Sem 7 (4th Yr)</option>
                 <option value="8">Sem 8 (4th Yr)</option>
               </select>
             </div>

@@ -18,6 +18,14 @@ const FULL_DAYS = {
 
 // Course subjects database for CS fallbacks
 const csSubjects = {
+  1: [
+    { name: "Programming Fundamentals using C++", code: "Core" },
+    { name: "Computer System Architecture", code: "Core" },
+    { name: "GE - Mathematics I", code: "GE" },
+    { name: "AEC - Environmental Science", code: "AEC" },
+    { name: "SEC - Basic IT Tools", code: "SEC" },
+    { name: "VAC - Digital Empowerment", code: "VAC" }
+  ],
   2: [
     { name: "Data Structures", code: "Core" },
     { name: "Discrete Mathematical Structures", code: "Core" },
@@ -25,6 +33,14 @@ const csSubjects = {
     { name: "GE - Numerical Methods", code: "GE" },
     { name: "SEC - Web Design and Development", code: "SEC" },
     { name: "VAC - Digital Empowerment", code: "VAC" }
+  ],
+  3: [
+    { name: "Data Structures", code: "Core" },
+    { name: "Operating Systems", code: "Core" },
+    { name: "Discrete Mathematical Structures", code: "Core" },
+    { name: "GE - Data Analysis", code: "GE" },
+    { name: "SEC - Web Designing", code: "SEC" },
+    { name: "VAC - Ethics and Values", code: "VAC" }
   ],
   4: [
     { name: "Design & Analysis of Algorithms", code: "Core" },
@@ -34,12 +50,25 @@ const csSubjects = {
     { name: "SEC - Programming with Python", code: "SEC" },
     { name: "VAC - Cyber Security", code: "VAC" }
   ],
+  5: [
+    { name: "Design & Analysis of Algorithms", code: "Core" },
+    { name: "Software Engineering", code: "Core" },
+    { name: "DSE - Artificial Intelligence", code: "DSE" },
+    { name: "DSE - Web Technology", code: "DSE" },
+    { name: "GE - Computer Graphics", code: "GE" }
+  ],
   6: [
     { name: "Software Engineering", code: "Core" },
     { name: "Operating Systems", code: "Core" },
     { name: "Theory of Computation", code: "Core" },
     { name: "DSE - Machine Learning", code: "DSE" },
     { name: "GE - Data Science using R", code: "GE" }
+  ],
+  7: [
+    { name: "Theory of Computation", code: "Core" },
+    { name: "Machine Learning", code: "Core" },
+    { name: "DSE - Cloud Computing", code: "DSE" },
+    { name: "DSE - Data Science", code: "DSE" }
   ],
   8: [
     { name: "Information Security", code: "Core" },
@@ -356,11 +385,14 @@ export default function AdminConsolePage({ onBack }) {
     }
   };
   
-  // Upload states
-  const [file, setFile] = useState(null);
+  // Dual Upload states
+  const [mgmtFile, setMgmtFile] = useState(null);
+  const [csFile, setCsFile] = useState(null);
+  const [mgmtParsedData, setMgmtParsedData] = useState(null);
+  const [csParsedData, setCsParsedData] = useState(null);
   const [parsingLogs, setParsingLogs] = useState([]);
-  const [parsedData, setParsedData] = useState(null);
-  const [isParsing, setIsParsing] = useState(false);
+  const [isParsingMgmt, setIsParsingMgmt] = useState(false);
+  const [isParsingCs, setIsParsingCs] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState({ type: '', message: '' });
 
@@ -586,36 +618,151 @@ export default function AdminConsolePage({ onBack }) {
     }
   }
 
-  // File Drag-Drop triggers
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
-
-  const handleFileDrop = (e) => {
-    e.preventDefault();
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      selectAndParseFile(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleFileSelect = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      selectAndParseFile(e.target.files[0]);
-    }
-  };
-
   const addLog = (msg, type = 'info') => {
     setParsingLogs(prev => [...prev, { text: msg, type, timestamp: new Date().toLocaleTimeString() }]);
   };
 
-  // Main Parser adapted from parse_timetables.cjs
-  const selectAndParseFile = (selectedFile) => {
-    setFile(selectedFile);
-    setParsingLogs([]);
-    setParsedData(null);
+  // Generic block parser for sheets
+  const parseSheetBlock = (sheetData, startRow, defaultCourse, defaultSem) => {
+    let course = defaultCourse;
+    let sem = defaultSem;
+    let section = 'A';
+    let defaultRoom = 'Room 651';
+
+    // Look ahead 5 rows for metadata
+    for (let i = 1; i < 5; i++) {
+      const row = sheetData[startRow + i] || [];
+      const rowStr = row.map(c => clean(c)).join(' ');
+      
+      if (rowStr.match(/BBA\s*\(?FIA\)?/i)) {
+        course = 'BBA FIA';
+      } else if (rowStr.match(/\bBMS\b/i)) {
+        course = 'BMS';
+      } else if (rowStr.match(/B\.?Sc\.?\s*(?:CS|Comp|Computer)/i) || rowStr.match(/\bCS\b/i)) {
+        course = 'Bsc Comp Sci';
+      }
+      
+      const semMatch = rowStr.match(/(\d+)(?:st|nd|rd|th)?\s*Sem/i) || rowStr.match(/Sem\s*[-]?\s*(\d+)/i) || rowStr.match(/(\d+)\s*Year/i);
+      if (semMatch) {
+        sem = semMatch[1];
+      }
+      
+      const secMatch = rowStr.match(/Section\s*([A-D])/i) || rowStr.match(/Sec\s*[-]?\s*([A-D])/i) || rowStr.match(/\b([A-D])\b/);
+      if (secMatch) {
+        section = secMatch[1];
+      }
+
+      const roomMatch = rowStr.match(/Room\s*No\.?\s*(\d{3})/i) || rowStr.match(/Room\s*No\.?\s*([A-Za-z0-9]+)/i);
+      if (roomMatch) {
+        defaultRoom = `Room ${roomMatch[1].trim()}`;
+      }
+    }
+
+    // Find timings row
+    let periodRowIdx = -1;
+    let timingsRowIdx = -1;
+
+    for (let i = 2; i < 8; i++) {
+      const row = sheetData[startRow + i] || [];
+      const rowStr = row.map(c => clean(c)).join(' ');
+      if (rowStr.includes('Infinity Hour') || (rowStr.includes('I') && rowStr.includes('II') && rowStr.includes('III'))) {
+        periodRowIdx = startRow + i;
+        timingsRowIdx = periodRowIdx + 1;
+        break;
+      }
+    }
+
+    if (periodRowIdx === -1) return null;
+
+    // Read classes for Monday to Friday
+    const dayRows = {};
+    for (let i = 1; i <= 8; i++) {
+      const row = sheetData[timingsRowIdx + i] || [];
+      const dayLabel = clean(row[0]);
+      if (DAYS.includes(dayLabel)) {
+        dayRows[dayLabel] = row;
+      }
+    }
+
+    // Find paper mapping
+    const facultyMap = {};
+    for (let r = timingsRowIdx + 7; r < timingsRowIdx + 32; r++) {
+      const row = sheetData[r] || [];
+      const rowStr = row.map(c => clean(c)).join(' ');
+
+      if (rowStr.includes('SHAHEED SUKHDEV COLLEGE OF BUSINESS STUDIES') || rowStr.includes('SHAHEED SUKHDEV COLLEGE OF')) {
+        break;
+      }
+
+      const nonEmpties = row.map(c => clean(c)).filter(Boolean);
+      if (nonEmpties.length >= 3) {
+        const paperName = clean(row[1]);
+        let facultyName = '';
+        let facultyCode = '';
+
+        for (let c = 2; c < row.length; c++) {
+          const val = clean(row[c]);
+          if (val.startsWith('Dr.') || val.startsWith('Mr.') || val.startsWith('Ms.') || val.startsWith('Prof.')) {
+            facultyName = val;
+            for (let c2 = c + 1; c2 < row.length; c2++) {
+              const codeVal = clean(row[c2]);
+              if (codeVal && !codeVal.includes('Th') && !codeVal.includes('Prac') && !codeVal.includes('Tute')) {
+                facultyCode = codeVal;
+                break;
+              }
+            }
+            break;
+          }
+        }
+
+        if (facultyCode && paperName) {
+          facultyMap[facultyCode.toLowerCase()] = { facultyName, paperName };
+        }
+      }
+    }
+
+    // Generate daily schedules
+    const weekSchedule = {};
+    DAYS.forEach(day => {
+      const fullDayName = FULL_DAYS[day];
+      const row = dayRows[day] || [];
+      const dayClasses = [];
+
+      const periodColumns = [
+        { id: 1, col: 1 },
+        { id: 2, col: 2 },
+        { id: 3, col: 3 },
+        { id: 0, col: 4, isBreak: true },
+        { id: 4, col: 5 },
+        { id: 5, col: 6 },
+        { id: 6, col: 7 },
+        { id: 7, col: 8 }
+      ];
+
+      periodColumns.forEach(({ id, col, isBreak }) => {
+        if (isBreak) {
+          dayClasses.push({ period: 0, isBreak: true, subject: "Infinity Hour (Break)", teacher: "", room: "" });
+          return;
+        }
+
+        const cellValue = clean(row[col]);
+        const parsedCell = parseUnifiedCell(cellValue, id, facultyMap, defaultRoom);
+        dayClasses.push(parsedCell);
+      });
+
+      weekSchedule[fullDayName] = dayClasses;
+    });
+
+    return { course, sem, section, defaultRoom, weekSchedule };
+  };
+
+  // Parser for Management (BBA FIA & BMS) Excel
+  const selectAndParseMgmtFile = (selectedFile) => {
+    setMgmtFile(selectedFile);
+    setMgmtParsedData(null);
     setSaveStatus({ type: '', message: '' });
-    setIsParsing(true);
-    addLog(`Selected file: ${selectedFile.name} (${Math.round(selectedFile.size / 1024)} KB)`, 'info');
+    setIsParsingMgmt(true);
+    addLog(`[Management Upload] Selected file: ${selectedFile.name} (${Math.round(selectedFile.size / 1024)} KB)`, 'info');
 
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -623,30 +770,20 @@ export default function AdminConsolePage({ onBack }) {
         const data = new Uint8Array(e.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
         
-        addLog(`Successfully read binary Excel. Sheets present: ${workbook.SheetNames.join(', ')}`, 'success');
-
-        const sheetsToParse = [
-          { name: 'BBA(FIA) Sem2', defaultCourse: 'BBA FIA', defaultSem: '2' },
-          { name: 'BMS Sem2', defaultCourse: 'BMS', defaultSem: '2' },
-          { name: 'BBA(FIA) Sem4', defaultCourse: 'BBA FIA', defaultSem: '4' },
-          { name: 'BMS Sem-4', defaultCourse: 'BMS', defaultSem: '4' },
-          { name: 'BBA(FIA) Sem6', defaultCourse: 'BBA FIA', defaultSem: '6' },
-          { name: 'BMS Sem6', defaultCourse: 'BMS', defaultSem: '6' },
-          { name: 'BMS BBA Sem8', defaultCourse: 'BMS', defaultSem: '8' }
-        ];
+        addLog(`[Management Upload] Excel read successfully. Sheets: ${workbook.SheetNames.join(', ')}`, 'success');
 
         const timetables = {};
 
-        sheetsToParse.forEach(({ name, defaultCourse, defaultSem }) => {
-          const sheet = workbook.Sheets[name];
-          if (!sheet) {
-            addLog(`⚠️ Sheet "${name}" not found. Skipping.`, 'warning');
-            return;
-          }
+        workbook.SheetNames.forEach(sheetName => {
+          // Check if sheet belongs to BBA / BMS
+          const isMgmtSheet = sheetName.match(/BBA|BMS|Sem/i);
+          if (!isMgmtSheet) return;
+
+          const sheet = workbook.Sheets[sheetName];
+          if (!sheet) return;
 
           const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-          addLog(`Parsing sheet: "${name}" (${sheetData.length} rows found)`, 'info');
-
+          
           // Find start indices of timetables
           const blockStarts = [];
           sheetData.forEach((row, idx) => {
@@ -656,223 +793,199 @@ export default function AdminConsolePage({ onBack }) {
             }
           });
 
-          if (blockStarts.length === 0) {
-            addLog(`❌ Could not find any timetable block markers in sheet "${name}".`, 'error');
-            return;
-          }
+          if (blockStarts.length === 0) return;
 
-          addLog(`Found ${blockStarts.length} timetable block(s) in sheet "${name}".`, 'success');
+          addLog(`[Management Upload] Parsing sheet "${sheetName}": Found ${blockStarts.length} timetable block(s)`, 'info');
+
+          // Default sem from sheet name if present
+          let defaultSem = '2';
+          const semInSheetName = sheetName.match(/Sem\s*[-]?\s*(\d+)/i) || sheetName.match(/(\d+)/);
+          if (semInSheetName) defaultSem = semInSheetName[1];
+
+          let defaultCourse = sheetName.toUpperCase().includes('BBA') ? 'BBA FIA' : 'BMS';
 
           blockStarts.forEach((startRow, bIdx) => {
-            let course = defaultCourse;
-            let sem = defaultSem;
-            let section = 'A';
-            let defaultRoom = 'Room 703';
-
-            // Look ahead 5 rows for metadata
-            for (let i = 1; i < 5; i++) {
-              const row = sheetData[startRow + i] || [];
-              const rowStr = row.map(c => clean(c)).join(' ');
+            const result = parseSheetBlock(sheetData, startRow, defaultCourse, defaultSem);
+            if (result) {
+              const { course, sem, section, defaultRoom, weekSchedule } = result;
+              addLog(`  -> [Mgmt Block ${bIdx}] Mapped to ${course} Sem ${sem} Section ${section} (${defaultRoom})`, 'info');
               
-              if (rowStr.includes('BBA(FIA)') || rowStr.includes('BBA (FIA)')) {
-                course = 'BBA FIA';
-              } else if (rowStr.includes('BMS')) {
-                course = 'BMS';
-              }
-              
-              const semMatch = rowStr.match(/(\d+)(?:st|nd|rd|th)?\s*Sem/i) || rowStr.match(/Sem\s*[-]?\s*(\d+)/i) || rowStr.match(/(\d+)\s*Year/i);
-              if (semMatch) {
-                sem = semMatch[1];
-              }
-              
-              const secMatch = rowStr.match(/Section\s*([A-D])/i) || rowStr.match(/Sec\s*([A-D])/i) || rowStr.match(/\b([A-D])\b/);
-              if (secMatch) {
-                section = secMatch[1];
-              }
-
-              const roomMatch = rowStr.match(/Room\s*No\.?\s*(\d{3})/i) || rowStr.match(/Room\s*No\.?\s*([A-Za-z0-9]+)/i);
-              if (roomMatch) {
-                defaultRoom = `Room ${roomMatch[1].trim()}`;
-              }
+              if (!timetables[course]) timetables[course] = {};
+              if (!timetables[course][sem]) timetables[course][sem] = {};
+              timetables[course][sem][section] = weekSchedule;
             }
-
-            addLog(`  -> Block ${bIdx}: Mapped to ${course} Sem ${sem} Section ${section} (Room: ${defaultRoom})`, 'info');
-
-            // Find timings row
-            let periodRowIdx = -1;
-            let timingsRowIdx = -1;
-
-            for (let i = 2; i < 8; i++) {
-              const row = sheetData[startRow + i] || [];
-              const rowStr = row.map(c => clean(c)).join(' ');
-              if (rowStr.includes('Infinity Hour') || (rowStr.includes('I') && rowStr.includes('II') && rowStr.includes('III'))) {
-                periodRowIdx = startRow + i;
-                timingsRowIdx = periodRowIdx + 1;
-                break;
-              }
-            }
-
-            if (periodRowIdx === -1) {
-              addLog(`  ❌ Could not find period header row for Block ${bIdx}`, 'error');
-              return;
-            }
-
-            // Read classes for Monday to Friday
-            const dayRows = {};
-            for (let i = 1; i <= 8; i++) {
-              const row = sheetData[timingsRowIdx + i] || [];
-              const dayLabel = clean(row[0]);
-              if (DAYS.includes(dayLabel)) {
-                dayRows[dayLabel] = row;
-              }
-            }
-
-            // Find paper mapping (typically starts within 8-32 rows after timingsRowIdx)
-            const facultyMap = {};
-            for (let r = timingsRowIdx + 7; r < timingsRowIdx + 32; r++) {
-              const row = sheetData[r] || [];
-              const rowStr = row.map(c => clean(c)).join(' ');
-
-              if (rowStr.includes('SHAHEED SUKHDEV COLLEGE OF BUSINESS STUDIES') || rowStr.includes('SHAHEED SUKHDEV COLLEGE OF')) {
-                break;
-              }
-
-              const nonEmpties = row.map(c => clean(c)).filter(Boolean);
-              if (nonEmpties.length >= 3) {
-                const paperName = clean(row[1]);
-                let facultyName = '';
-                let facultyCode = '';
-
-                for (let c = 2; c < row.length; c++) {
-                  const val = clean(row[c]);
-                  if (val.startsWith('Dr.') || val.startsWith('Mr.') || val.startsWith('Ms.') || val.startsWith('Prof.')) {
-                    facultyName = val;
-                    for (let c2 = c + 1; c2 < row.length; c2++) {
-                      const codeVal = clean(row[c2]);
-                      if (codeVal && !codeVal.includes('Th') && !codeVal.includes('Prac') && !codeVal.includes('Tute')) {
-                        facultyCode = codeVal;
-                        break;
-                      }
-                    }
-                    break;
-                  }
-                }
-
-                if (facultyCode && paperName) {
-                  facultyMap[facultyCode.toLowerCase()] = { facultyName, paperName };
-                }
-              }
-            }
-
-            // Generate daily schedules
-            const weekSchedule = {};
-            DAYS.forEach(day => {
-              const fullDayName = FULL_DAYS[day];
-              const row = dayRows[day] || [];
-              const dayClasses = [];
-
-              const periodColumns = [
-                { id: 1, col: 1 },
-                { id: 2, col: 2 },
-                { id: 3, col: 3 },
-                { id: 0, col: 4, isBreak: true },
-                { id: 4, col: 5 },
-                { id: 5, col: 6 },
-                { id: 6, col: 7 },
-                { id: 7, col: 8 }
-              ];
-
-              periodColumns.forEach(({ id, col, isBreak }) => {
-                if (isBreak) {
-                  dayClasses.push({ period: 0, isBreak: true, subject: "Infinity Hour (Break)", teacher: "", room: "" });
-                  return;
-                }
-
-                const cellValue = clean(row[col]);
-                const parsedCell = parseUnifiedCell(cellValue, id, facultyMap, defaultRoom);
-                dayClasses.push(parsedCell);
-              });
-
-              weekSchedule[fullDayName] = dayClasses;
-            });
-
-            if (!timetables[course]) timetables[course] = {};
-            if (!timetables[course][sem]) timetables[course][sem] = {};
-            timetables[course][sem][section] = weekSchedule;
           });
         });
 
-        // Add BSc Computer Science fallback generator
-        addLog("Injecting BSc Computer Science fallback schedules...", "info");
-        timetables["Bsc Comp Sci"] = {};
-        ["2", "4", "6", "8"].forEach(sem => {
-          timetables["Bsc Comp Sci"][sem] = {};
-          const weekSchedule = {};
-          const subjects = csSubjects[sem];
-          
-          ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].forEach((day, dIdx) => {
-            const dayClasses = [];
-            const seed = parseInt(sem) + dIdx;
-            
-            const periodColumns = [
-              { id: 1 }, { id: 2 }, { id: 3 }, { id: 0, isBreak: true }, { id: 4 }, { id: 5 }, { id: 6 }, { id: 7 }
-            ];
-
-            periodColumns.forEach(({ id, isBreak }) => {
-              if (isBreak) {
-                dayClasses.push({ period: 0, isBreak: true, subject: "Infinity Hour (Break)", teacher: "", room: "" });
-                return;
-              }
-
-              const classSeed = seed + id;
-              const isFree = (classSeed % 6 === 0) && (id > 5 || id === 1);
-              
-              if (isFree) {
-                dayClasses.push({ period: id, subject: "Free", teacher: "-", room: "-" });
-              } else {
-                const subIndex = classSeed % subjects.length;
-                const teachIndex = (classSeed + 2) % csTeachers.length;
-                const roomIndex = (classSeed + 4) % csRooms.length;
-                
-                dayClasses.push({
-                  period: id,
-                  subject: subjects[subIndex].name,
-                  teacher: csTeachers[teachIndex],
-                  room: csRooms[roomIndex]
-                });
-              }
-            });
-
-            weekSchedule[day] = dayClasses;
-          });
-
-          timetables["Bsc Comp Sci"][sem]["A"] = weekSchedule;
-        });
-
-        addLog("BSc Computer Science mock schedule injected successfully.", "success");
-        setParsedData(timetables);
-        addLog("All parsing checks passed! Timetable is ready to be published.", "success");
+        if (Object.keys(timetables).length === 0) {
+          addLog('[Management Upload] ⚠️ No Management timetable blocks recognized. Please ensure sheet headers contain college title.', 'warning');
+        } else {
+          setMgmtParsedData(timetables);
+          addLog('[Management Upload] ✓ Successfully parsed Management timetables!', 'success');
+        }
       } catch (err) {
-        addLog(`Parsing Exception: ${err.message}`, 'error');
+        addLog(`[Management Upload] Parsing Error: ${err.message}`, 'error');
         console.error(err);
       } finally {
-        setIsParsing(false);
+        setIsParsingMgmt(false);
       }
     };
     reader.readAsArrayBuffer(selectedFile);
   };
 
-  // Push to Supabase config
-  const handlePublishTimetable = async () => {
-    if (!parsedData) return;
+  // Helper generator for CS semesters
+  const generateCsFallbackSchedule = (semestersToGen) => {
+    const csData = {};
+    semestersToGen.forEach(sem => {
+      csData[sem] = {};
+      const weekSchedule = {};
+      const subjects = csSubjects[sem] || csSubjects[2];
+      
+      ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].forEach((day, dIdx) => {
+        const dayClasses = [];
+        const seed = parseInt(sem) + dIdx;
+        
+        const periodColumns = [
+          { id: 1 }, { id: 2 }, { id: 3 }, { id: 0, isBreak: true }, { id: 4 }, { id: 5 }, { id: 6 }, { id: 7 }
+        ];
+
+        periodColumns.forEach(({ id, isBreak }) => {
+          if (isBreak) {
+            dayClasses.push({ period: 0, isBreak: true, subject: "Infinity Hour (Break)", teacher: "", room: "" });
+            return;
+          }
+
+          const classSeed = seed + id;
+          const isFree = (classSeed % 6 === 0) && (id > 5 || id === 1);
+          
+          if (isFree) {
+            dayClasses.push({ period: id, subject: "Free", teacher: "-", room: "-" });
+          } else {
+            const subIndex = classSeed % subjects.length;
+            const teachIndex = (classSeed + 2) % csTeachers.length;
+            const roomIndex = (classSeed + 4) % csRooms.length;
+            
+            dayClasses.push({
+              period: id,
+              subject: subjects[subIndex].name,
+              teacher: csTeachers[teachIndex],
+              room: csRooms[roomIndex]
+            });
+          }
+        });
+
+        weekSchedule[day] = dayClasses;
+      });
+
+      csData[sem]["A"] = weekSchedule;
+    });
+    return csData;
+  };
+
+  // Parser for B.Sc. Computer Science Excel
+  const selectAndParseCsFile = (selectedFile) => {
+    setCsFile(selectedFile);
+    setCsParsedData(null);
+    setSaveStatus({ type: '', message: '' });
+    setIsParsingCs(true);
+    addLog(`[B.Sc. CS Upload] Selected file: ${selectedFile.name} (${Math.round(selectedFile.size / 1024)} KB)`, 'info');
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        
+        addLog(`[B.Sc. CS Upload] Excel read successfully. Sheets: ${workbook.SheetNames.join(', ')}`, 'success');
+
+        const timetables = { "Bsc Comp Sci": {} };
+        let parsedBlocksCount = 0;
+
+        workbook.SheetNames.forEach(sheetName => {
+          const sheet = workbook.Sheets[sheetName];
+          if (!sheet) return;
+
+          const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+          const blockStarts = [];
+          sheetData.forEach((row, idx) => {
+            const rowStr = row.map(c => clean(c)).join(' ');
+            if (rowStr.includes('SHAHEED SUKHDEV COLLEGE OF BUSINESS STUDIES') || rowStr.includes('SHAHEED SUKHDEV COLLEGE OF')) {
+              blockStarts.push(idx);
+            }
+          });
+
+          if (blockStarts.length === 0) return;
+
+          let defaultSem = '2';
+          const semInSheetName = sheetName.match(/Sem\s*[-]?\s*(\d+)/i) || sheetName.match(/(\d+)/);
+          if (semInSheetName) defaultSem = semInSheetName[1];
+
+          blockStarts.forEach((startRow, bIdx) => {
+            const result = parseSheetBlock(sheetData, startRow, 'Bsc Comp Sci', defaultSem);
+            if (result) {
+              const { course, sem, section, defaultRoom, weekSchedule } = result;
+              addLog(`  -> [CS Block ${bIdx}] Parsed ${course} Sem ${sem} Section ${section} (${defaultRoom})`, 'info');
+              
+              if (!timetables["Bsc Comp Sci"][sem]) timetables["Bsc Comp Sci"][sem] = {};
+              timetables["Bsc Comp Sci"][sem][section] = weekSchedule;
+              parsedBlocksCount++;
+            }
+          });
+        });
+
+        // Determine which semesters were parsed vs missing
+        const parsedSems = Object.keys(timetables["Bsc Comp Sci"]);
+        addLog(`[B.Sc. CS Upload] Extracted timetables for semesters: ${parsedSems.length > 0 ? parsedSems.join(', ') : 'None'}`, 'info');
+
+        // Fill remaining active semesters with structured CS fallbacks so no student is left without a schedule
+        const targetSems = parsedSems.some(s => ['1', '3', '5', '7'].includes(s)) ? ['1', '3', '5', '7'] : ['2', '4', '6', '8'];
+        const missingSems = targetSems.filter(s => !parsedSems.includes(s));
+        
+        if (missingSems.length > 0) {
+          addLog(`[B.Sc. CS Upload] Injecting curriculum fallback schedules for missing term(s): ${missingSems.join(', ')}`, 'info');
+          const fallbackData = generateCsFallbackSchedule(missingSems);
+          Object.keys(fallbackData).forEach(s => {
+            timetables["Bsc Comp Sci"][s] = fallbackData[s];
+          });
+        }
+
+        setCsParsedData(timetables);
+        addLog(`[B.Sc. CS Upload] ✓ Successfully parsed B.Sc. CS timetables (${parsedBlocksCount} explicit block(s) processed)!`, 'success');
+      } catch (err) {
+        addLog(`[B.Sc. CS Upload] Parsing Error: ${err.message}`, 'error');
+        console.error(err);
+      } finally {
+        setIsParsingCs(false);
+      }
+    };
+    reader.readAsArrayBuffer(selectedFile);
+  };
+
+  // Push combined parsed timetables to Supabase config
+  const handlePublishCombinedTimetables = async () => {
+    if (!mgmtParsedData && !csParsedData) return;
     setIsSaving(true);
     setSaveStatus({ type: '', message: '' });
-    addLog("Saving new timetable data to Supabase configurations...", "info");
+    addLog("Merging and publishing combined timetable data to Supabase...", "info");
 
     try {
-      await updateTimetable(parsedData);
-      setSaveStatus({ type: 'success', message: 'Timetable published successfully! All student dashboards have been updated.' });
-      addLog("Successfully published timetable to database!", "success");
+      const mergedTimetable = JSON.parse(JSON.stringify(timetable || {}));
+
+      if (mgmtParsedData) {
+        Object.keys(mgmtParsedData).forEach(cKey => {
+          mergedTimetable[cKey] = mgmtParsedData[cKey];
+        });
+      }
+
+      if (csParsedData) {
+        Object.keys(csParsedData).forEach(cKey => {
+          mergedTimetable[cKey] = csParsedData[cKey];
+        });
+      }
+
+      await updateTimetable(mergedTimetable);
+      setSaveStatus({ type: 'success', message: 'Combined timetable published successfully! All student dashboards have been updated.' });
+      addLog("Successfully saved and published updated master timetable!", "success");
     } catch (err) {
       setSaveStatus({ type: 'error', message: err.message || 'Failed to save timetable to Supabase.' });
       addLog(`Failed to save to database: ${err.message}`, "error");
@@ -1021,43 +1134,161 @@ export default function AdminConsolePage({ onBack }) {
 
         {/* Tab contents */}
         {activeTab === 'upload' ? (
-          <div className="tab-pane upload-pane">
-            <div className="pane-left">
-              <h3>Upload Master Timetable</h3>
-              <p className="subtitle-admin">Upload the official SSCBS Student Timetable Excel file (`.xlsx`) to parse schedules for BMS and BBA FIA. Computer Science schedules are automatically updated with fallback configurations.</p>
+          <div className="tab-pane upload-pane-dual">
+            <div className="upload-header-banner">
+              <h3>Schedule Upload Center</h3>
+              <p className="subtitle-admin">
+                Upload timetables separately for <strong>Management (BBA FIA & BMS)</strong> and <strong>B.Sc. Computer Science</strong>. Both Odd (1, 3, 5, 7) and Even (2, 4, 6, 8) semesters are fully supported.
+              </p>
+            </div>
 
-              {/* Drag/Drop Box */}
-              <div 
-                className={`dropzone ${file ? 'has-file' : ''}`}
-                onDragOver={handleDragOver}
-                onDrop={handleFileDrop}
-              >
-                <div className="dropzone-icon">📁</div>
-                {file ? (
-                  <div className="file-info-box">
-                    <span className="file-name-label">{file.name}</span>
-                    <span className="file-size-label">{Math.round(file.size / 1024)} KB</span>
+            <div className="upload-dual-grid">
+              {/* Card 1: Management (BBA FIA / BMS) */}
+              <div className="upload-card mgmt-card">
+                <div className="upload-card-header">
+                  <div className="card-title-group">
+                    <span className="card-icon">📊</span>
+                    <div>
+                      <h4>Management Timetable</h4>
+                      <span className="card-subtitle">BBA (FIA) & BMS • Semesters 1–8</span>
+                    </div>
                   </div>
-                ) : (
-                  <p className="dropzone-text">Drag & drop timetable Excel file here or <label className="file-input-label">browse<input type="file" onChange={handleFileSelect} accept=".xlsx" className="hidden-file-input" /></label></p>
+                  {mgmtParsedData ? (
+                    <span className="upload-status-badge success">✓ Ready to Publish</span>
+                  ) : mgmtFile ? (
+                    <span className="upload-status-badge warning">Parsing...</span>
+                  ) : (
+                    <span className="upload-status-badge neutral">Awaiting File</span>
+                  )}
+                </div>
+
+                <div 
+                  className={`dropzone ${mgmtFile ? 'has-file' : ''}`}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                      selectAndParseMgmtFile(e.dataTransfer.files[0]);
+                    }
+                  }}
+                >
+                  <div className="dropzone-icon">💼</div>
+                  {mgmtFile ? (
+                    <div className="file-info-box">
+                      <span className="file-name-label">{mgmtFile.name}</span>
+                      <span className="file-size-label">{Math.round(mgmtFile.size / 1024)} KB</span>
+                    </div>
+                  ) : (
+                    <p className="dropzone-text">
+                      Drag & drop Management Excel file here or <label className="file-input-label">browse<input type="file" onChange={(e) => e.target.files && e.target.files[0] && selectAndParseMgmtFile(e.target.files[0])} accept=".xlsx" className="hidden-file-input" /></label>
+                    </p>
+                  )}
+                </div>
+
+                {mgmtParsedData && (
+                  <div className="parsed-summary-chip-row">
+                    {Object.keys(mgmtParsedData).map(course => (
+                      <span key={course} className="summary-chip">
+                        <strong>{course}</strong>: Sem {Object.keys(mgmtParsedData[course]).join(', ')}
+                      </span>
+                    ))}
+                  </div>
                 )}
               </div>
 
-              {parsedData && (
-                <div className="publish-actions">
-                  <button 
-                    className="btn-publish-timetable" 
-                    onClick={handlePublishTimetable}
-                    disabled={isSaving}
-                  >
-                    {isSaving ? 'Publishing to OS...' : 'Save & Publish Dynamic Timetable'}
-                  </button>
-                  <button className="btn-discard" onClick={() => { setFile(null); setParsedData(null); setParsingLogs([]); }} disabled={isSaving}>Discard</button>
+              {/* Card 2: B.Sc. Computer Science */}
+              <div className="upload-card cs-card">
+                <div className="upload-card-header">
+                  <div className="card-title-group">
+                    <span className="card-icon">💻</span>
+                    <div>
+                      <h4>B.Sc. Computer Science</h4>
+                      <span className="card-subtitle">Computer Science • Semesters 1–8</span>
+                    </div>
+                  </div>
+                  {csParsedData ? (
+                    <span className="upload-status-badge success">✓ Ready to Publish</span>
+                  ) : csFile ? (
+                    <span className="upload-status-badge warning">Parsing...</span>
+                  ) : (
+                    <span className="upload-status-badge neutral">Awaiting File</span>
+                  )}
                 </div>
-              )}
+
+                <div 
+                  className={`dropzone ${csFile ? 'has-file' : ''}`}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                      selectAndParseCsFile(e.dataTransfer.files[0]);
+                    }
+                  }}
+                >
+                  <div className="dropzone-icon">⚡</div>
+                  {csFile ? (
+                    <div className="file-info-box">
+                      <span className="file-name-label">{csFile.name}</span>
+                      <span className="file-size-label">{Math.round(csFile.size / 1024)} KB</span>
+                    </div>
+                  ) : (
+                    <p className="dropzone-text">
+                      Drag & drop B.Sc. CS Excel file here or <label className="file-input-label">browse<input type="file" onChange={(e) => e.target.files && e.target.files[0] && selectAndParseCsFile(e.target.files[0])} accept=".xlsx" className="hidden-file-input" /></label>
+                    </p>
+                  )}
+                </div>
+
+                {csParsedData && (
+                  <div className="parsed-summary-chip-row">
+                    {Object.keys(csParsedData).map(course => (
+                      <span key={course} className="summary-chip">
+                        <strong>{course}</strong>: Sem {Object.keys(csParsedData[course]).join(', ')}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="pane-right">
+            {/* Combined Publish Bar */}
+            {(mgmtParsedData || csParsedData) && (
+              <div className="combined-publish-bar">
+                <div className="publish-summary-text">
+                  <span>✓ Ready to publish changes for: </span>
+                  <strong>
+                    {[
+                      mgmtParsedData ? 'Management (BBA/BMS)' : null,
+                      csParsedData ? 'B.Sc. Computer Science' : null
+                    ].filter(Boolean).join(' & ')}
+                  </strong>
+                </div>
+                <div className="publish-btn-group">
+                  <button 
+                    className="btn-publish-timetable"
+                    onClick={handlePublishCombinedTimetables}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? 'Publishing to OS...' : 'Save & Publish Combined Timetables'}
+                  </button>
+                  <button 
+                    className="btn-discard"
+                    onClick={() => {
+                      setMgmtFile(null);
+                      setCsFile(null);
+                      setMgmtParsedData(null);
+                      setCsParsedData(null);
+                      setParsingLogs([]);
+                    }}
+                    disabled={isSaving}
+                  >
+                    Reset All
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Console Log Output Window */}
+            <div className="pane-right-full">
               <h3>Parsing Operations Console</h3>
               <div className="console-logs-window">
                 {parsingLogs.length === 0 ? (
@@ -1070,7 +1301,11 @@ export default function AdminConsolePage({ onBack }) {
                     </div>
                   ))
                 )}
-                {isParsing && <div className="log-line info loader-log">Parsing spreadsheet rows... <span className="console-spinner"></span></div>}
+                {(isParsingMgmt || isParsingCs) && (
+                  <div className="log-line info loader-log">
+                    Parsing spreadsheet rows... <span className="console-spinner"></span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -1568,9 +1803,13 @@ export default function AdminConsolePage({ onBack }) {
                     style={{ minWidth: '120px' }}
                   >
                     <option value="All">All Semesters</option>
+                    <option value="1">Semester 1</option>
                     <option value="2">Semester 2</option>
+                    <option value="3">Semester 3</option>
                     <option value="4">Semester 4</option>
+                    <option value="5">Semester 5</option>
                     <option value="6">Semester 6</option>
+                    <option value="7">Semester 7</option>
                     <option value="8">Semester 8</option>
                   </select>
                 </div>

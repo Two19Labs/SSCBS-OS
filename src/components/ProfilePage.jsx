@@ -7,9 +7,13 @@ import './ProfilePage.css';
 
 const COURSES = ['BMS', 'BBA FIA', 'Bsc Comp Sci'];
 const SEMESTERS = [
+  { value: '1', label: 'Sem 1 (1st Yr)' },
   { value: '2', label: 'Sem 2 (1st Yr)' },
+  { value: '3', label: 'Sem 3 (2nd Yr)' },
   { value: '4', label: 'Sem 4 (2nd Yr)' },
+  { value: '5', label: 'Sem 5 (3rd Yr)' },
   { value: '6', label: 'Sem 6 (3rd Yr)' },
+  { value: '7', label: 'Sem 7 (4th Yr)' },
   { value: '8', label: 'Sem 8 (4th Yr)' },
 ];
 
