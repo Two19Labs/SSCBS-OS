@@ -267,7 +267,6 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
 
       <div className="home-buzz-col">
         <NoticeBoard />
-        <div className="footer-credit">Made with ♥ by Two19 Labs</div>
       </div>
     </div>
   );

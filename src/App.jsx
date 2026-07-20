@@ -25,6 +25,7 @@ import {
 } from './components/icons';
 import './App.css';
 import InstallPwaPrompt from './components/InstallPwaPrompt';
+import FooterCredit from './components/FooterCredit';
 import { Analytics } from '@vercel/analytics/react';
 
 const TOOL_VIEWS = ['find-prof', 'waiver', 'admin'];
@@ -213,6 +214,7 @@ function App() {
             </div>
           )}
           {renderView()}
+          <FooterCredit />
         </main>
 
         {/* ── Mobile bottom tabs ── */}

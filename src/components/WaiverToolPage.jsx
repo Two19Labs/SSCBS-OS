@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
+import FooterCredit from './FooterCredit';
 import './WaiverToolPage.css';
 
 const MONTHS = [
@@ -1395,6 +1396,7 @@ function WaiverToolPage({ onBack }) {
           </main>
         </div>
       )}
+      <FooterCredit />
     </div>
   );
 }
