@@ -191,9 +191,9 @@ export default function ProfilePage({ onNavigate }) {
 
       <div className="footer-credit">
         Made with ♥ by{' '}
-        <a href="https://www.linkedin.com/in/aditya-singhani-69294a27a/" target="_blank" rel="noopener noreferrer">Aditya Singhani</a>
+        <a href="https://www.linkedin.com/in/aditya-singhani-69294a27a/" target="_blank" rel="noopener noreferrer" className="linkedin-link">Aditya Singhani</a>
         {' '}&amp;{' '}
-        <a href="https://www.linkedin.com/in/manthan-kabra/" target="_blank" rel="noopener noreferrer">Manthan Kabra</a>
+        <a href="https://www.linkedin.com/in/manthan-kabra/" target="_blank" rel="noopener noreferrer" className="linkedin-link">Manthan Kabra</a>
       </div>
     </div>
   );

@@ -1,0 +1,18 @@
+{
+  "name": "SSCBS Campus OS",
+  "short_name": "SSCBS OS",
+  "description": "Your all-in-one student workspace for timetables, professor tracking, GPA calculation, and attendance waivers.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#181114",
+  "theme_color": "#71222c",
+  "icons": [
+    {
+      "src": "/sscbs_logo.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

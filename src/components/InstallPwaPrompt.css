@@ -1,0 +1,256 @@
+/* ── PWA Install Banner & iOS Modal ── */
+
+.pwa-prompt-banner {
+  position: fixed;
+  bottom: 68px; /* sits right above mobile bottom tabbar */
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 24px);
+  max-width: 520px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  z-index: 999;
+  animation: slideUpPrompt 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUpPrompt {
+  from {
+    transform: translate(-50%, 20px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+@media (min-width: 768px) {
+  .pwa-prompt-banner {
+    bottom: 24px;
+    left: auto;
+    right: 24px;
+    transform: none;
+    width: 400px;
+  }
+
+  @keyframes slideUpPrompt {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
+
+.pwa-prompt-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pwa-prompt-icon {
+  border-radius: 8px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.pwa-prompt-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pwa-prompt-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pwa-prompt-desc {
+  font-size: 0.75rem;
+  color: var(--ink-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pwa-prompt-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.pwa-prompt-btn-primary {
+  background: var(--accent);
+  color: var(--on-accent);
+  border: none;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+}
+
+.pwa-prompt-btn-primary:active {
+  transform: scale(0.97);
+}
+
+.pwa-prompt-btn-dismiss {
+  background: transparent;
+  border: none;
+  color: var(--ink-dim);
+  font-size: 1rem;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: color 0.2s ease;
+}
+
+.pwa-prompt-btn-dismiss:hover {
+  color: var(--ink);
+}
+
+/* ── iOS Instruction Modal ── */
+
+.pwa-ios-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+.pwa-ios-modal {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 20px;
+  padding: 24px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.94); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.pwa-ios-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.pwa-ios-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--ink);
+  padding-right: 24px;
+}
+
+.pwa-ios-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--ink-dim);
+  cursor: pointer;
+}
+
+.pwa-ios-subtitle {
+  margin: 0 0 16px 0;
+  font-size: 0.88rem;
+  color: var(--ink-dim);
+}
+
+.pwa-ios-steps {
+  margin: 0 0 20px 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pwa-ios-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.88rem;
+  color: var(--ink);
+  background: var(--bg);
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.step-num {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 800;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.step-text {
+  line-height: 1.4;
+}
+
+.share-icon-glyph,
+.add-icon-glyph {
+  display: inline-block;
+  padding: 0 4px;
+  font-weight: bold;
+}
+
+.pwa-ios-done {
+  width: 100%;
+  background: var(--accent);
+  color: var(--on-accent);
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+}

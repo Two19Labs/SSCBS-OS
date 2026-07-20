@@ -24,6 +24,7 @@ import {
   BackIcon,
 } from './components/icons';
 import './App.css';
+import InstallPwaPrompt from './components/InstallPwaPrompt';
 import { Analytics } from '@vercel/analytics/react';
 
 const TOOL_VIEWS = ['find-prof', 'waiver', 'admin'];
@@ -230,6 +231,7 @@ function App() {
       </div>
 
       <GpaCalculatorModal isOpen={isGpaOpen} onClose={() => setIsGpaOpen(false)} />
+      <InstallPwaPrompt />
       <Analytics />
     </>
   );

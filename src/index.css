@@ -61,6 +61,9 @@
   --success-color: var(--success);
   --error-color: var(--danger);
 
+  /* ── Special Brand Tokens ── */
+  --linkedin-blue: #0a66c2;
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -92,6 +95,8 @@
   --border: rgba(242, 232, 226, 0.1);
   --border-strong: rgba(242, 232, 226, 0.14);
   --track: rgba(242, 232, 226, 0.1);
+
+  --linkedin-blue: #38bdf8;
 }
 
 html {
@@ -123,6 +128,12 @@ h1, h2, h3, h4, h5, h6 {
 
 button, input, select, textarea {
   font-family: inherit;
+  color: inherit;
+}
+
+select option {
+  background-color: var(--surface);
+  color: var(--ink);
 }
 
 a {
@@ -133,6 +144,21 @@ a {
 
 a:hover {
   color: var(--accent);
+}
+
+/* ── Always LinkedIn Blue & Underlined links for developers ── */
+.linkedin-link,
+a.developer-name {
+  color: var(--linkedin-blue) !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+  font-weight: 600;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.linkedin-link:hover,
+a.developer-name:hover {
+  opacity: 0.85;
 }
 
 * {
