@@ -3,6 +3,7 @@ import * as XLSX from 'xlsx';
 import { useTimetable } from '../context/TimetableContext';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import { isAdminEmail } from '../lib/admin';
 import DateTimePicker from './DateTimePicker';
 import './AdminConsolePage.css';
 
@@ -56,7 +57,23 @@ export default function AdminConsolePage({ onBack }) {
   const { timetable, updateTimetable } = useTimetable();
   const [activeTab, setActiveTab] = useState('upload'); // 'upload', 'editor', 'notices', 'analytics'
 
-  const isAdmin = user?.email === 'aditya.25015@sscbs.du.ac.in' || user?.email === 'manthan.25138@sscbs.du.ac.in';
+  const isAdmin = isAdminEmail(user?.email);
+
+  if (!isAdmin) {
+    return (
+      <div className="admin-access-denied-wrapper">
+        <div className="admin-access-denied-card">
+          <span className="access-denied-icon">🔒</span>
+          <h2>Access Denied</h2>
+          <p>You do not have administrative privileges to access the SSCBS OS Admin Console.</p>
+          <p className="access-denied-sub">Only authorized administrator accounts can manage campus timetables, notices, and analytics.</p>
+          <button className="btn-access-denied-back" onClick={onBack}>
+            Return to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
 
 
   
