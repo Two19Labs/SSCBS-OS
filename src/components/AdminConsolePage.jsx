@@ -527,7 +527,7 @@ export default function AdminConsolePage({ onBack }) {
   // Generic block parser for sheets
   const parseSheetBlock = (sheetData, startRow, defaultCourse, defaultSem) => {
     let course = defaultCourse;
-    let sem = defaultSem;
+    let sem = null;
     let section = 'A';
     let defaultRoom = 'Room 651';
 
@@ -563,6 +563,8 @@ export default function AdminConsolePage({ onBack }) {
         defaultRoom = `Room ${roomMatch[1].trim()}`;
       }
     }
+
+    if (!sem) sem = defaultSem;
 
     // Find timings row
     let periodRowIdx = -1;
@@ -792,6 +794,33 @@ export default function AdminConsolePage({ onBack }) {
     reader.readAsArrayBuffer(selectedFile);
   };
 
+  // Scrap / Wipe all active timetables
+  const handleScrapActiveTimetables = async () => {
+    if (!window.confirm("Are you sure you want to scrap and wipe all active timetables across the entire SSCBS OS? This action resets the master timetable storage.")) {
+      return;
+    }
+    try {
+      setIsSaving(true);
+      setSaveStatus({ type: '', message: '' });
+      addLog("[System Admin] Scrapping and clearing all active timetables from storage...", "warning");
+
+      await updateTimetable({});
+
+      setMgmtFile(null);
+      setCsFile(null);
+      setMgmtParsedData(null);
+      setCsParsedData(null);
+
+      setSaveStatus({ type: 'success', message: 'All active timetables have been scrapped and reset across the entire OS!' });
+      addLog("[System Admin] ✓ Successfully scrapped and cleared all active timetables!", "success");
+    } catch (err) {
+      setSaveStatus({ type: 'error', message: err.message || 'Failed to scrap timetables.' });
+      addLog(`[System Admin] Error scrapping timetables: ${err.message}`, "error");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   // Push combined parsed timetables to Supabase config
   const handlePublishCombinedTimetables = async () => {
     if (!mgmtParsedData && !csParsedData) return;
@@ -966,11 +995,21 @@ export default function AdminConsolePage({ onBack }) {
         {/* Tab contents */}
         {activeTab === 'upload' ? (
           <div className="tab-pane upload-pane-dual">
-            <div className="upload-header-banner">
-              <h3>Schedule Upload Center</h3>
-              <p className="subtitle-admin">
-                Upload timetables separately for <strong>Management (BBA FIA & BMS)</strong> and <strong>B.Sc. Computer Science</strong>. Both Odd (1, 3, 5, 7) and Even (2, 4, 6, 8) semesters are fully supported.
-              </p>
+            <div className="upload-header-banner" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h3>Schedule Upload Center</h3>
+                <p className="subtitle-admin">
+                  Upload timetables separately for <strong>Management (BBA FIA & BMS)</strong> and <strong>B.Sc. Computer Science</strong>. Both Odd (1, 3, 5, 7) and Even (2, 4, 6, 8) semesters are fully supported.
+                </p>
+              </div>
+              <button 
+                className="btn-scrap-timetables"
+                onClick={handleScrapActiveTimetables}
+                disabled={isSaving}
+                title="Wipe all active timetables across the entire OS"
+              >
+                🗑️ Scrap & Clear All Active Timetables
+              </button>
             </div>
 
             <div className="upload-dual-grid">
