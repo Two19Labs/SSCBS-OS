@@ -549,9 +549,13 @@ export default function AdminConsolePage({ onBack }) {
         sem = semMatch[1];
       }
       
-      const secMatch = rowStr.match(/Section\s*([A-D])/i) || rowStr.match(/Sec\s*[-]?\s*([A-D])/i) || rowStr.match(/\b([A-D])\b/);
-      if (secMatch) {
-        section = secMatch[1];
+      if (course === 'Bsc Comp Sci') {
+        section = 'A';
+      } else {
+        const secMatch = rowStr.match(/Section\s*([A-D])/i) || rowStr.match(/Sec\s*[-]?\s*([A-D])/i);
+        if (secMatch) {
+          section = secMatch[1].toUpperCase();
+        }
       }
 
       const roomMatch = rowStr.match(/Room\s*No\.?\s*(\d{3})/i) || rowStr.match(/Room\s*No\.?\s*([A-Za-z0-9]+)/i);
