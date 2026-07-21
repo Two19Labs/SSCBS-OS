@@ -220,7 +220,7 @@ export default function ProfilePage({ onNavigate }) {
                 className={`switch ${timeWarp ? 'on' : ''}`}
                 role="switch"
                 aria-checked={timeWarp}
-                onClick={toggleTimeWarp}
+                onClick={handleTimeWarpToggle}
               >
                 <span className="switch-knob" />
               </button>
