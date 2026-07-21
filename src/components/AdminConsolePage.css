@@ -1495,12 +1495,34 @@
   gap: 0.35rem;
 }
 
+.active-os-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
 .active-os-label {
   font-size: 0.72rem;
   font-weight: 800;
   color: var(--ink-dim);
   text-transform: uppercase;
   letter-spacing: 0.4px;
+}
+
+.active-file-pill {
+  font-size: 0.73rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-tint);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  padding: 0.18rem 0.5rem;
+  border-radius: 6px;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .active-chips-row {

@@ -807,6 +807,10 @@ export default function AdminConsolePage({ onBack }) {
       const updated = JSON.parse(JSON.stringify(timetable || {}));
       delete updated['BBA FIA'];
       delete updated['BMS'];
+      if (updated._meta) {
+        delete updated._meta.mgmtFileName;
+        delete updated._meta.mgmtUploadTime;
+      }
 
       await updateTimetable(updated);
 
@@ -835,6 +839,10 @@ export default function AdminConsolePage({ onBack }) {
 
       const updated = JSON.parse(JSON.stringify(timetable || {}));
       delete updated['Bsc Comp Sci'];
+      if (updated._meta) {
+        delete updated._meta.csFileName;
+        delete updated._meta.csUploadTime;
+      }
 
       await updateTimetable(updated);
 
@@ -887,17 +895,28 @@ export default function AdminConsolePage({ onBack }) {
 
     try {
       const mergedTimetable = JSON.parse(JSON.stringify(timetable || {}));
+      const nowStr = new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+
+      if (!mergedTimetable._meta) mergedTimetable._meta = {};
 
       if (mgmtParsedData) {
         Object.keys(mgmtParsedData).forEach(cKey => {
           mergedTimetable[cKey] = mgmtParsedData[cKey];
         });
+        if (mgmtFile) {
+          mergedTimetable._meta.mgmtFileName = mgmtFile.name;
+          mergedTimetable._meta.mgmtUploadTime = nowStr;
+        }
       }
 
       if (csParsedData) {
         Object.keys(csParsedData).forEach(cKey => {
           mergedTimetable[cKey] = csParsedData[cKey];
         });
+        if (csFile) {
+          mergedTimetable._meta.csFileName = csFile.name;
+          mergedTimetable._meta.csUploadTime = nowStr;
+        }
       }
 
       await updateTimetable(mergedTimetable);
@@ -1101,7 +1120,14 @@ export default function AdminConsolePage({ onBack }) {
 
                 {/* Active in OS indicator */}
                 <div className="active-os-status-box">
-                  <span className="active-os-label">Active Published OS Timetable:</span>
+                  <div className="active-os-header">
+                    <span className="active-os-label">Active Published OS Schedule File:</span>
+                    {timetable?._meta?.mgmtFileName && (
+                      <span className="active-file-pill">
+                        📄 {timetable._meta.mgmtFileName} {timetable._meta.mgmtUploadTime ? `(${timetable._meta.mgmtUploadTime})` : ''}
+                      </span>
+                    )}
+                  </div>
                   {timetable && (timetable['BMS'] || timetable['BBA FIA']) ? (
                     <div className="active-chips-row">
                       {timetable['BMS'] && (
@@ -1186,7 +1212,14 @@ export default function AdminConsolePage({ onBack }) {
 
                 {/* Active in OS indicator */}
                 <div className="active-os-status-box">
-                  <span className="active-os-label">Active Published OS Timetable:</span>
+                  <div className="active-os-header">
+                    <span className="active-os-label">Active Published OS Schedule File:</span>
+                    {timetable?._meta?.csFileName && (
+                      <span className="active-file-pill">
+                        📄 {timetable._meta.csFileName} {timetable._meta.csUploadTime ? `(${timetable._meta.csUploadTime})` : ''}
+                      </span>
+                    )}
+                  </div>
                   {timetable && timetable['Bsc Comp Sci'] ? (
                     <span className="active-chip green">
                       B.Sc. CS: Sems [{Object.keys(timetable['Bsc Comp Sci']).join(', ')}]
