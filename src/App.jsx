@@ -55,21 +55,15 @@ function App() {
 
   // 🟢 Real-Time Presence & Feature Usage Logger across SSCBS OS
   useEffect(() => {
-    if (user) {
-      logFeatureView(view, user);
-      const unsubscribe = subscribeToPresence(user, view);
-      return () => unsubscribe();
+    if (user && user.email) {
+      const activeViewName = isGpaOpen ? 'gpa' : view;
+      logFeatureView(activeViewName, user);
+      const unsubscribe = subscribeToPresence(user, activeViewName);
+      return () => {
+        if (typeof unsubscribe === 'function') unsubscribe();
+      };
     }
-  }, [user, view]);
-
-  // Log GPA calculator opens separately
-  useEffect(() => {
-    if (isGpaOpen && user) {
-      logFeatureView('gpa', user);
-      const unsubscribe = subscribeToPresence(user, 'gpa');
-      return () => unsubscribe();
-    }
-  }, [isGpaOpen, user]);
+  }, [user, view, isGpaOpen]);
 
   const openTool = (id) => {
     if (id === 'gpa') {

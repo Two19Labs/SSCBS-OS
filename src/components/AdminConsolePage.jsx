@@ -329,9 +329,13 @@ export default function AdminConsolePage({ onBack }) {
   // 🟢 Real-Time Presence Subscription across all active connected students
   useEffect(() => {
     const unsubscribe = subscribeToPresence(user, 'admin', (presenceList) => {
-      setOnlinePresence(presenceList);
+      if (Array.isArray(presenceList)) {
+        setOnlinePresence(presenceList);
+      }
     });
-    return () => unsubscribe();
+    return () => {
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
   }, [user]);
 
   // 📈 Fetch REAL Analytics event series from Supabase

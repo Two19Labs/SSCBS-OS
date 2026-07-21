@@ -11,22 +11,21 @@ export const FEATURE_NAMES = {
   admin: 'Admin Console'
 };
 
-let globalPresenceChannel = null;
-
 /**
  * 🟢 Real-Time Presence Subscription via Supabase WebSockets
- * Tracks active users live across all devices and browsers globally
+ * Completely safe, non-blocking presence tracker
  */
 export function subscribeToPresence(user, currentView, onPresenceSync) {
-  if (!user || !hasValidCredentials) {
+  if (!user || !user.email || !hasValidCredentials) {
     if (onPresenceSync) onPresenceSync([]);
     return () => {};
   }
 
-  const isMobile = window.innerWidth <= 768;
+  const userId = String(user.id || user.email || 'anon');
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
   const userPayload = {
-    id: user.id || user.email,
-    name: user.user_metadata?.full_name || user.email.split('@')[0],
+    id: userId,
+    name: user.user_metadata?.full_name || user.email.split('@')[0] || 'Student',
     email: user.email,
     course: user.user_metadata?.course || 'N/A',
     semester: user.user_metadata?.semester ? String(user.user_metadata.semester) : 'N/A',
@@ -37,44 +36,50 @@ export function subscribeToPresence(user, currentView, onPresenceSync) {
     lastPing: Date.now()
   };
 
-  try {
-    // If channel exists, track updated payload (e.g. view changed)
-    if (globalPresenceChannel) {
-      globalPresenceChannel.track(userPayload);
-      return () => {};
-    }
+  let channel = null;
 
-    globalPresenceChannel = supabase.channel('sscbs-online-presence-v1', {
-      config: { presence: { key: userPayload.id } }
+  try {
+    channel = supabase.channel('sscbs-online-presence-v2', {
+      config: { presence: { key: userId } }
     });
 
-    globalPresenceChannel
+    channel
       .on('presence', { event: 'sync' }, () => {
-        const state = globalPresenceChannel.presenceState();
-        const onlineList = [];
-        Object.values(state).forEach((presences) => {
-          presences.forEach((p) => onlineList.push(p));
-        });
-
-        if (onPresenceSync) {
-          onPresenceSync(onlineList);
+        try {
+          const state = channel.presenceState();
+          const onlineList = [];
+          if (state) {
+            Object.values(state).forEach((presences) => {
+              if (Array.isArray(presences)) {
+                presences.forEach((p) => {
+                  if (p && p.name) onlineList.push(p);
+                });
+              }
+            });
+          }
+          if (onPresenceSync) onPresenceSync(onlineList);
+        } catch (e) {
+          // ignore sync errors
         }
       })
-      .subscribe(async (status) => {
-        if (status === 'SUBSCRIBED') {
-          await globalPresenceChannel.track(userPayload);
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED' && channel) {
+          channel.track(userPayload).catch(() => {});
         }
       });
 
     return () => {
-      if (globalPresenceChannel) {
-        globalPresenceChannel.untrack();
-        supabase.removeChannel(globalPresenceChannel);
-        globalPresenceChannel = null;
+      try {
+        if (channel) {
+          channel.untrack().catch(() => {});
+          supabase.removeChannel(channel).catch(() => {});
+        }
+      } catch (e) {
+        // ignore cleanup errors
       }
     };
   } catch (err) {
-    console.error('Supabase Realtime Presence Error:', err);
+    console.warn('Presence subscription non-blocking warning:', err);
     if (onPresenceSync) onPresenceSync([]);
     return () => {};
   }
@@ -82,46 +87,50 @@ export function subscribeToPresence(user, currentView, onPresenceSync) {
 
 /**
  * 📊 Log a real feature view/launch event to Supabase
+ * Completely non-blocking and safe
  */
 export async function logFeatureView(featureId, user) {
-  if (!featureId || !hasValidCredentials) return;
-
-  const dateStr = new Date().toISOString().split('T')[0];
+  if (!featureId || !hasValidCredentials || !user) return;
 
   try {
-    // 1. Log individual event to analytics_events if table exists
-    await supabase.from('analytics_events').insert([{
-      user_id: user?.id || null,
-      feature_id: featureId,
-      created_at: new Date().toISOString()
-    }]);
-  } catch (e) {
-    // Non-blocking fallback
-  }
+    const dateStr = new Date().toISOString().split('T')[0];
 
-  try {
-    // 2. Also aggregate into system_configs for instant queries
-    const { data } = await supabase
+    // Safely attempt logging to analytics_events
+    supabase
+      .from('analytics_events')
+      .insert([{
+        user_id: user.id || null,
+        feature_id: featureId,
+        created_at: new Date().toISOString()
+      }])
+      .then(() => {})
+      .catch(() => {});
+
+    // Safely attempt logging aggregate to system_configs
+    supabase
       .from('system_configs')
       .select('value')
       .eq('key', 'analytics_events_daily')
-      .maybeSingle();
+      .maybeSingle()
+      .then(async ({ data }) => {
+        let eventsMap = data?.value || {};
+        if (typeof eventsMap !== 'object') eventsMap = {};
+        if (!eventsMap[dateStr]) {
+          eventsMap[dateStr] = { timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, total: 0 };
+        }
 
-    let eventsMap = data?.value || {};
-    if (!eventsMap[dateStr]) {
-      eventsMap[dateStr] = { timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, total: 0 };
-    }
+        eventsMap[dateStr][featureId] = (eventsMap[dateStr][featureId] || 0) + 1;
+        eventsMap[dateStr].total = (eventsMap[dateStr].total || 0) + 1;
 
-    eventsMap[dateStr][featureId] = (eventsMap[dateStr][featureId] || 0) + 1;
-    eventsMap[dateStr].total = (eventsMap[dateStr].total || 0) + 1;
-
-    await supabase.from('system_configs').upsert({
-      key: 'analytics_events_daily',
-      value: eventsMap,
-      updated_at: new Date().toISOString()
-    });
+        await supabase.from('system_configs').upsert({
+          key: 'analytics_events_daily',
+          value: eventsMap,
+          updated_at: new Date().toISOString()
+        }).catch(() => {});
+      })
+      .catch(() => {});
   } catch (e) {
-    // Fallback quietly if write permissions constrained
+    // Completely non-blocking
   }
 }
 
@@ -157,23 +166,23 @@ export async function fetchAnalyticsData(daysCount = 7) {
         .eq('key', 'analytics_events_daily')
         .maybeSingle();
 
-      if (data?.value) {
+      if (data?.value && typeof data.value === 'object') {
         const eventsMap = data.value;
         dateList.forEach(({ dateStr }) => {
           if (eventsMap[dateStr]) {
             dateMap[dateStr] = {
-              timetable: eventsMap[dateStr].timetable || 0,
-              'find-prof': eventsMap[dateStr]['find-prof'] || 0,
-              waiver: eventsMap[dateStr].waiver || 0,
-              gpa: eventsMap[dateStr].gpa || 0,
-              buzz: eventsMap[dateStr].buzz || 0,
-              total: eventsMap[dateStr].total || 0
+              timetable: Number(eventsMap[dateStr].timetable) || 0,
+              'find-prof': Number(eventsMap[dateStr]['find-prof']) || 0,
+              waiver: Number(eventsMap[dateStr].waiver) || 0,
+              gpa: Number(eventsMap[dateStr].gpa) || 0,
+              buzz: Number(eventsMap[dateStr].buzz) || 0,
+              total: Number(eventsMap[dateStr].total) || 0
             };
           }
         });
       }
     } catch (e) {
-      console.error('Failed to fetch analytics from Supabase:', e);
+      console.warn('Analytics fetch notice:', e);
     }
   }
 
