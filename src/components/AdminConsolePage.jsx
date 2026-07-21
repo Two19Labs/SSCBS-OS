@@ -430,191 +430,87 @@ export default function AdminConsolePage({ onBack }) {
     return parts;
   }
 
-  function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
-    if (!cellValue) {
-      return { period: periodId, subject: "Free", teacher: "-", room: "-" };
+  function parseSinglePart(text, defaultRoom, facultyMap) {
+    let partText = text.trim();
+    let partRoom = defaultRoom;
+    let groupLabel = '';
+
+    const parenGroupMatch = partText.match(/\(((?:G1\s*\+\s*G2)|G1|G2)\)/i) || partText.match(/\b((?:G1\s*\+\s*G2)|G1|G2)\b/i);
+    if (parenGroupMatch) {
+      groupLabel = parenGroupMatch[1].toUpperCase().replace(/\s+/g, '');
+      partText = partText.replace(parenGroupMatch[0], '').trim();
     }
 
-    const parts = splitOutsideParentheses(cellValue);
+    const roomMatch = partText.match(/\(([^)]+)\)/);
+    if (roomMatch) {
+      const roomVal = roomMatch[1];
+      partRoom = roomVal.split('/').map(r => r.trim().match(/^\d+/) ? 'Room ' + r.trim() : r.trim()).join(' / ');
+      partText = partText.replace(/\([^)]+\)/, '').trim();
+    } else {
+      const endRoomMatch = partText.match(/\b(?:L|R|Room)?\s*(\d{3})\b/i);
+      if (endRoomMatch) {
+        partRoom = 'Room ' + endRoomMatch[1];
+        partText = partText.replace(endRoomMatch[0], '').trim();
+      }
+    }
+
+    let teacherCodeLower = partText.trim().toLowerCase();
+    let subjectName = partText.trim();
+    let teacherName = partText.trim();
+
+    const codeParenMatch = partText.match(/^([A-Za-z0-9\s]+)\s*\(([^)]+)\)$/);
+    if (codeParenMatch) {
+      const c1 = codeParenMatch[1].trim().toLowerCase();
+      const c2 = codeParenMatch[2].trim().toLowerCase();
+      if (facultyMap[c1]) {
+        teacherName = facultyMap[c1].facultyName;
+        subjectName = facultyMap[c2] ? facultyMap[c2].paperName : (facultyMap[c1].paperName || codeParenMatch[2]);
+      } else if (facultyMap[c2]) {
+        teacherName = facultyMap[c2].facultyName;
+        subjectName = facultyMap[c2].paperName;
+      }
+    } else if (facultyMap[teacherCodeLower]) {
+      subjectName = facultyMap[teacherCodeLower].paperName;
+      teacherName = facultyMap[teacherCodeLower].facultyName;
+    } else {
+      const keys = Object.keys(facultyMap);
+      for (let k of keys) {
+        if (teacherCodeLower && (teacherCodeLower.includes(k) || k.includes(teacherCodeLower))) {
+          subjectName = facultyMap[k].paperName;
+          teacherName = facultyMap[k].facultyName;
+          break;
+        }
+      }
+    }
+
+    if (teacherCodeLower.includes('unsupervised')) { subjectName = 'Free'; teacherName = '-'; }
+    else if (teacherCodeLower === 'free' || teacherCodeLower === 'ei' || teacherCodeLower === 'ee') { subjectName = 'Unsupervised Class'; teacherName = '-'; }
+
+    return { group: groupLabel, subject: subjectName || partText, teacher: teacherName || partText, room: partRoom };
+  }
+
+  function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
+    if (!cellValue) return { period: periodId, subject: 'Free', teacher: '-', room: '-' };
+    const raw = clean(cellValue);
+    if (!raw) return { period: periodId, subject: 'Free', teacher: '-', room: '-' };
+
+    const parts = splitOutsideParentheses(raw);
     if (parts.length > 1) {
-      const parsedParts = [];
-
-      parts.forEach(part => {
-        let partText = part.trim();
-        let partRoom = defaultRoom;
-
-        let groupLabel = "";
-        const parenGroupMatch = partText.match(/\(((?:G1\s*\+\s*G2)|G1|G2)\)/i);
-        if (parenGroupMatch) {
-          groupLabel = parenGroupMatch[1].toUpperCase().replace(/\s+/g, '');
-          partText = partText.replace(/\(((?:G1\s*\+\s*G2)|G1|G2)\)/i, '').trim();
-        } else {
-          const rawGroupMatch = partText.match(/\b((?:G1\s*\+\s*G2)|G1|G2)\b/i);
-          if (rawGroupMatch) {
-            groupLabel = rawGroupMatch[1].toUpperCase().replace(/\s+/g, '');
-            partText = partText.replace(/\b((?:G1\s*\+\s*G2)|G1|G2)\b/i, '').trim();
-          }
-        }
-
-        const partRoomMatch = partText.match(/\(([^)]+)\)/);
-        if (partRoomMatch) {
-          const roomVal = partRoomMatch[1];
-          partRoom = roomVal.split('/').map(r => {
-            let rClean = r.trim();
-            return rClean.match(/^\d+/) ? `Room ${rClean}` : rClean;
-          }).join(' / ');
-          partText = partText.replace(/\([^)]+\)/, '').trim();
-        } else {
-          const endRoomMatch = partText.match(/\s+(\d{3})$/);
-          if (endRoomMatch) {
-            partRoom = `Room ${endRoomMatch[1]}`;
-            partText = partText.replace(/\s+\d{3}$/, '').trim();
-          }
-        }
-
-        const teacherCodeLower = partText.trim().toLowerCase();
-        let subjectName = partText.trim();
-        let teacherName = partText.trim();
-
-        let found = facultyMap[teacherCodeLower];
-        if (!found) {
-          const keys = Object.keys(facultyMap);
-          for (let k of keys) {
-            if (teacherCodeLower.includes(k) || k.includes(teacherCodeLower)) {
-              found = facultyMap[k];
-              break;
-            }
-          }
-        }
-
-        if (found) {
-          subjectName = found.paperName;
-          teacherName = found.facultyName;
-        } else {
-          if (teacherCodeLower.includes('unsupervised') || teacherCodeLower.includes('unsuprvised')) {
-            subjectName = "Free";
-            teacherName = "-";
-          } else if (teacherCodeLower.includes('free') || teacherCodeLower === 'ei' || teacherCodeLower === 'ee') {
-            subjectName = "Unsupervised Class";
-            teacherName = "-";
-          }
-        }
-
-        parsedParts.push({
-          group: groupLabel,
-          subject: subjectName,
-          teacher: teacherName,
-          room: partRoom
-        });
-      });
-
-      let subjectMerged = "";
-      let teacherMerged = "";
-      let roomMerged = "";
-
+      const parsedParts = parts.map(part => parseSinglePart(part, defaultRoom, facultyMap));
       const allSubjectsSame = parsedParts.every(p => p.subject === parsedParts[0].subject);
       const allRoomsSame = parsedParts.every(p => p.room === parsedParts[0].room);
-      const hasAnyGroup = parsedParts.some(p => p.group);
+      const hasGroup = parsedParts.some(p => p.group);
 
-      if (allSubjectsSame) {
-        subjectMerged = parsedParts[0].subject;
-        teacherMerged = parsedParts.map(p => {
-          return hasAnyGroup ? `${p.teacher} (${p.group || 'G?'})` : p.teacher;
-        }).join(' / ');
-      } else {
-        subjectMerged = parsedParts.map(p => {
-          return hasAnyGroup ? `${p.group || 'G?'}: ${p.subject}` : p.subject;
-        }).join(' | ');
-        teacherMerged = parsedParts.map(p => {
-          return hasAnyGroup ? `${p.teacher} (${p.group || 'G?'})` : p.teacher;
-        }).join(' / ');
-      }
+      let subjectMerged = allSubjectsSame ? parsedParts[0].subject : parsedParts.map(p => hasGroup ? `${p.group || 'G?'}: ${p.subject}` : p.subject).join(' | ');
+      let teacherMerged = parsedParts.map(p => hasGroup ? `${p.teacher} (${p.group || 'G?'})` : p.teacher).join(' / ');
+      let roomMerged = allRoomsSame ? parsedParts[0].room : parsedParts.map(p => hasGroup ? `${p.group || 'G?'}: ${p.room}` : p.room).join(' / ');
 
-      if (allRoomsSame) {
-        roomMerged = parsedParts[0].room;
-      } else {
-        roomMerged = parsedParts.map(p => {
-          return hasAnyGroup ? `${p.group || 'G?'}: ${p.room}` : p.room;
-        }).join(' / ');
-      }
-
-      return {
-        period: periodId,
-        subject: subjectMerged,
-        teacher: teacherMerged,
-        room: roomMerged
-      };
+      return { period: periodId, subject: subjectMerged, teacher: teacherMerged, room: roomMerged };
     } else {
-      let text = cellValue.trim();
-      let room = defaultRoom;
-
-      let groupLabel = "";
-      const parenGroupMatch = text.match(/\(((?:G1\s*\+\s*G2)|G1|G2)\)/i);
-      if (parenGroupMatch) {
-        groupLabel = parenGroupMatch[1].toUpperCase().replace(/\s+/g, '');
-        text = text.replace(/\(((?:G1\s*\+\s*G2)|G1|G2)\)/i, '').trim();
-      } else {
-        const rawGroupMatch = text.match(/\b((?:G1\s*\+\s*G2)|G1|G2)\b/i);
-        if (rawGroupMatch) {
-          groupLabel = rawGroupMatch[1].toUpperCase().replace(/\s+/g, '');
-          text = text.replace(/\b((?:G1\s*\+\s*G2)|G1|G2)\b/i, '').trim();
-        }
-      }
-
-      const roomMatch = text.match(/\(([^)]+)\)/);
-      if (roomMatch) {
-        const roomVal = roomMatch[1];
-        room = roomVal.split('/').map(r => {
-          let rClean = r.trim();
-          return rClean.match(/^\d+/) ? `Room ${rClean}` : rClean;
-        }).join(' / ');
-        text = text.replace(/\([^)]+\)/, '').trim();
-      } else {
-        const endRoomMatch = text.match(/\s+(\d{3})$/);
-        if (endRoomMatch) {
-          room = `Room ${endRoomMatch[1]}`;
-          text = text.replace(/\s+\d{3}$/, '').trim();
-        }
-      }
-
-      const teacherCodeLower = text.toLowerCase();
-      let subjectName = text;
-      let teacherName = text;
-
-      let found = facultyMap[teacherCodeLower];
-      if (!found) {
-        const keys = Object.keys(facultyMap);
-        for (let k of keys) {
-          if (teacherCodeLower.includes(k) || k.includes(teacherCodeLower)) {
-            found = facultyMap[k];
-            break;
-          }
-        }
-      }
-
-      if (found) {
-        subjectName = found.paperName;
-        teacherName = found.facultyName;
-      } else {
-        if (teacherCodeLower.includes('unsupervised') || teacherCodeLower.includes('unsuprvised')) {
-          subjectName = "Free";
-          teacherName = "-";
-        } else if (teacherCodeLower.includes('free') || teacherCodeLower === 'ei' || teacherCodeLower === 'ee') {
-          subjectName = "Unsupervised Class";
-          teacherName = "-";
-        }
-      }
-
-      if (groupLabel) {
-        subjectName = `${subjectName} (${groupLabel})`;
-      }
-
-      return {
-        period: periodId,
-        subject: subjectName,
-        teacher: teacherName,
-        room: room
-      };
+      const single = parseSinglePart(raw, defaultRoom, facultyMap);
+      let sub = single.subject;
+      if (single.group) sub = `${sub} (${single.group})`;
+      return { period: periodId, subject: sub, teacher: single.teacher, room: single.room };
     }
   }
 
@@ -622,15 +518,13 @@ export default function AdminConsolePage({ onBack }) {
     setParsingLogs(prev => [...prev, { text: msg, type, timestamp: new Date().toLocaleTimeString() }]);
   };
 
-  // Generic block parser for sheets
   const parseSheetBlock = (sheetData, startRow, defaultCourse, defaultSem) => {
     let course = defaultCourse;
     let sem = defaultSem;
     let section = 'A';
     let defaultRoom = 'Room 651';
 
-    // Look ahead 5 rows for metadata
-    for (let i = 1; i < 5; i++) {
+    for (let i = 1; i < 6; i++) {
       const row = sheetData[startRow + i] || [];
       const rowStr = row.map(c => clean(c)).join(' ');
       
@@ -642,8 +536,8 @@ export default function AdminConsolePage({ onBack }) {
         course = 'Bsc Comp Sci';
       }
       
-      const semMatch = rowStr.match(/(\d+)(?:st|nd|rd|th)?\s*Sem/i) || rowStr.match(/Sem\s*[-]?\s*(\d+)/i) || rowStr.match(/(\d+)\s*Year/i);
-      if (semMatch) {
+      const semMatch = rowStr.match(/Sem[^\d]*(\d+)/i) || rowStr.match(/(\d+)(?:st|nd|rd|th)?\s*Sem/i) || rowStr.match(/Year[^\d]*(\d+)/i);
+      if (semMatch && !sem) {
         sem = semMatch[1];
       }
       
@@ -658,11 +552,10 @@ export default function AdminConsolePage({ onBack }) {
       }
     }
 
-    // Find timings row
     let periodRowIdx = -1;
     let timingsRowIdx = -1;
 
-    for (let i = 2; i < 8; i++) {
+    for (let i = 2; i < 10; i++) {
       const row = sheetData[startRow + i] || [];
       const rowStr = row.map(c => clean(c)).join(' ');
       if (rowStr.includes('Infinity Hour') || (rowStr.includes('I') && rowStr.includes('II') && rowStr.includes('III'))) {
@@ -674,7 +567,6 @@ export default function AdminConsolePage({ onBack }) {
 
     if (periodRowIdx === -1) return null;
 
-    // Read classes for Monday to Friday
     const dayRows = {};
     for (let i = 1; i <= 8; i++) {
       const row = sheetData[timingsRowIdx + i] || [];
@@ -684,44 +576,28 @@ export default function AdminConsolePage({ onBack }) {
       }
     }
 
-    // Find paper mapping
     const facultyMap = {};
-    for (let r = timingsRowIdx + 7; r < timingsRowIdx + 32; r++) {
+    for (let r = timingsRowIdx + 6; r < timingsRowIdx + 30; r++) {
       const row = sheetData[r] || [];
       const rowStr = row.map(c => clean(c)).join(' ');
 
-      if (rowStr.includes('SHAHEED SUKHDEV COLLEGE OF BUSINESS STUDIES') || rowStr.includes('SHAHEED SUKHDEV COLLEGE OF')) {
+      if (rowStr.includes('SHAHEED SUKHDEV') || rowStr.includes('CLASS TIME TABLE')) {
         break;
       }
 
-      const nonEmpties = row.map(c => clean(c)).filter(Boolean);
-      if (nonEmpties.length >= 3) {
-        const paperName = clean(row[1]);
-        let facultyName = '';
-        let facultyCode = '';
+      const paperName = clean(row[1]);
+      const paperCode = clean(row[4]);
+      const facultyName = clean(row[5]);
+      const facultyCode = clean(row[7]);
 
-        for (let c = 2; c < row.length; c++) {
-          const val = clean(row[c]);
-          if (val.startsWith('Dr.') || val.startsWith('Mr.') || val.startsWith('Ms.') || val.startsWith('Prof.')) {
-            facultyName = val;
-            for (let c2 = c + 1; c2 < row.length; c2++) {
-              const codeVal = clean(row[c2]);
-              if (codeVal && !codeVal.includes('Th') && !codeVal.includes('Prac') && !codeVal.includes('Tute')) {
-                facultyCode = codeVal;
-                break;
-              }
-            }
-            break;
-          }
-        }
-
-        if (facultyCode && paperName) {
-          facultyMap[facultyCode.toLowerCase()] = { facultyName, paperName };
-        }
+      if (facultyCode && paperName) {
+        facultyMap[facultyCode.toLowerCase()] = { facultyName: facultyName || facultyCode, paperName };
+      }
+      if (paperCode && paperName) {
+        facultyMap[paperCode.toLowerCase()] = { facultyName: facultyName || paperCode, paperName };
       }
     }
 
-    // Generate daily schedules
     const weekSchedule = {};
     DAYS.forEach(day => {
       const fullDayName = FULL_DAYS[day];
@@ -729,14 +605,9 @@ export default function AdminConsolePage({ onBack }) {
       const dayClasses = [];
 
       const periodColumns = [
-        { id: 1, col: 1 },
-        { id: 2, col: 2 },
-        { id: 3, col: 3 },
+        { id: 1, col: 1 }, { id: 2, col: 2 }, { id: 3, col: 3 },
         { id: 0, col: 4, isBreak: true },
-        { id: 4, col: 5 },
-        { id: 5, col: 6 },
-        { id: 6, col: 7 },
-        { id: 7, col: 8 }
+        { id: 4, col: 5 }, { id: 5, col: 6 }, { id: 6, col: 7 }, { id: 7, col: 8 }
       ];
 
       periodColumns.forEach(({ id, col, isBreak }) => {
@@ -756,78 +627,42 @@ export default function AdminConsolePage({ onBack }) {
     return { course, sem, section, defaultRoom, weekSchedule };
   };
 
-  // Parser for Management (BBA FIA & BMS) Excel
   const selectAndParseMgmtFile = (selectedFile) => {
     setMgmtFile(selectedFile);
     setMgmtParsedData(null);
     setSaveStatus({ type: '', message: '' });
     setIsParsingMgmt(true);
-    addLog(`[Management Upload] Selected file: ${selectedFile.name} (${Math.round(selectedFile.size / 1024)} KB)`, 'info');
+    addLog(`[Management Upload] Selected file: ${selectedFile.name}`, 'info');
 
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        
-        addLog(`[Management Upload] Excel read successfully. Sheets: ${workbook.SheetNames.join(', ')}`, 'success');
-
+        const workbook = XLSX.read(e.target.result, { type: 'array' });
         const timetables = {};
 
         workbook.SheetNames.forEach(sheetName => {
-          // Check if sheet belongs to BBA / BMS
-          const isMgmtSheet = sheetName.match(/BBA|BMS|Sem/i);
-          if (!isMgmtSheet) return;
-
           const sheet = workbook.Sheets[sheetName];
-          if (!sheet) return;
-
           const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
           
-          // Find start indices of timetables
           const blockStarts = [];
           sheetData.forEach((row, idx) => {
             const rowStr = row.map(c => clean(c)).join(' ').toUpperCase();
-            if (
-              rowStr.includes('SHAHEED SUKHDEV') || 
-              rowStr.includes('BBA') ||
-              rowStr.includes('BMS') ||
-              rowStr.includes('TIME TABLE') ||
-              rowStr.includes('TIMETABLE')
-            ) {
+            if (rowStr.includes('SHAHEED SUKHDEV') || rowStr.includes('BBA') || rowStr.includes('BMS') || rowStr.includes('TIME TABLE')) {
               blockStarts.push(idx);
             }
           });
 
-          // Fallback: If no header markers, look for period timing rows directly
-          if (blockStarts.length === 0) {
-            sheetData.forEach((row, idx) => {
-              const rowStr = row.map(c => clean(c)).join(' ');
-              if (rowStr.includes('Infinity Hour') || (rowStr.includes('I') && rowStr.includes('II') && rowStr.includes('III'))) {
-                blockStarts.push(Math.max(0, idx - 2));
-              }
-            });
-          }
-
           if (blockStarts.length === 0) return;
 
-          addLog(`[Management Upload] Parsing sheet "${sheetName}": Found ${blockStarts.length} timetable block(s)`, 'info');
-
-          // Default sem from sheet name if present
           let defaultSem = '2';
-          const semInSheetName = sheetName.match(/Sem\s*[-]?\s*(\d+)/i) || 
-                                 sheetName.match(/(\d+)(?:st|nd|rd|th)?\s*Sem/i) || 
-                                 sheetName.match(/\b([1-8])\b/);
+          const semInSheetName = sheetName.match(/Sem[^\d]*(\d+)/i) || sheetName.match(/(\d+)(?:st|nd|rd|th)?\s*Sem/i) || sheetName.match(/\b([1-8])\b/);
           if (semInSheetName) defaultSem = semInSheetName[1];
-
           let defaultCourse = sheetName.toUpperCase().includes('BBA') ? 'BBA FIA' : 'BMS';
 
-          blockStarts.forEach((startRow, bIdx) => {
+          blockStarts.forEach((startRow) => {
             const result = parseSheetBlock(sheetData, startRow, defaultCourse, defaultSem);
             if (result) {
-              const { course, sem, section, defaultRoom, weekSchedule } = result;
-              addLog(`  -> [Mgmt Block ${bIdx}] Mapped to ${course} Sem ${sem} Section ${section} (${defaultRoom})`, 'info');
-              
+              const { course, sem, section, weekSchedule } = result;
               if (!timetables[course]) timetables[course] = {};
               if (!timetables[course][sem]) timetables[course][sem] = {};
               timetables[course][sem][section] = weekSchedule;
@@ -836,14 +671,13 @@ export default function AdminConsolePage({ onBack }) {
         });
 
         if (Object.keys(timetables).length === 0) {
-          addLog('[Management Upload] ⚠️ No Management timetable blocks recognized. Please ensure sheet headers contain college title.', 'warning');
+          addLog('[Management Upload] ⚠️ No Management timetable blocks recognized.', 'warning');
         } else {
           setMgmtParsedData(timetables);
-          addLog('[Management Upload] ✓ Successfully parsed Management timetables!', 'success');
+          addLog('[Management Upload] ✓ Successfully parsed!', 'success');
         }
       } catch (err) {
-        addLog(`[Management Upload] Parsing Error: ${err.message}`, 'error');
-        console.error(err);
+        addLog(`[Management Upload] Error: ${err.message}`, 'error');
       } finally {
         setIsParsingMgmt(false);
       }
@@ -851,123 +685,40 @@ export default function AdminConsolePage({ onBack }) {
     reader.readAsArrayBuffer(selectedFile);
   };
 
-  // Helper generator for CS semesters
-  const generateCsFallbackSchedule = (semestersToGen) => {
-    const csData = {};
-    semestersToGen.forEach(sem => {
-      csData[sem] = {};
-      const weekSchedule = {};
-      const subjects = csSubjects[sem] || csSubjects[2];
-      
-      ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].forEach((day, dIdx) => {
-        const dayClasses = [];
-        const seed = parseInt(sem) + dIdx;
-        
-        const periodColumns = [
-          { id: 1 }, { id: 2 }, { id: 3 }, { id: 0, isBreak: true }, { id: 4 }, { id: 5 }, { id: 6 }, { id: 7 }
-        ];
-
-        periodColumns.forEach(({ id, isBreak }) => {
-          if (isBreak) {
-            dayClasses.push({ period: 0, isBreak: true, subject: "Infinity Hour (Break)", teacher: "", room: "" });
-            return;
-          }
-
-          const classSeed = seed + id;
-          const isFree = (classSeed % 6 === 0) && (id > 5 || id === 1);
-          
-          if (isFree) {
-            dayClasses.push({ period: id, subject: "Free", teacher: "-", room: "-" });
-          } else {
-            const subIndex = classSeed % subjects.length;
-            const teachIndex = (classSeed + 2) % csTeachers.length;
-            const roomIndex = (classSeed + 4) % csRooms.length;
-            
-            dayClasses.push({
-              period: id,
-              subject: subjects[subIndex].name,
-              teacher: csTeachers[teachIndex],
-              room: csRooms[roomIndex]
-            });
-          }
-        });
-
-        weekSchedule[day] = dayClasses;
-      });
-
-      csData[sem]["A"] = weekSchedule;
-    });
-    return csData;
-  };
-
-  // Parser for B.Sc. Computer Science Excel
   const selectAndParseCsFile = (selectedFile) => {
     setCsFile(selectedFile);
     setCsParsedData(null);
     setSaveStatus({ type: '', message: '' });
     setIsParsingCs(true);
-    addLog(`[B.Sc. CS Upload] Selected file: ${selectedFile.name} (${Math.round(selectedFile.size / 1024)} KB)`, 'info');
+    addLog(`[B.Sc. CS Upload] Selected file: ${selectedFile.name}`, 'info');
 
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        
-        addLog(`[B.Sc. CS Upload] Excel read successfully. Sheets: ${workbook.SheetNames.join(', ')}`, 'success');
-
+        const workbook = XLSX.read(e.target.result, { type: 'array' });
         const timetables = { "Bsc Comp Sci": {} };
         let parsedBlocksCount = 0;
 
         workbook.SheetNames.forEach(sheetName => {
           const sheet = workbook.Sheets[sheetName];
-          if (!sheet) return;
-
           const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
           const blockStarts = [];
 
           sheetData.forEach((row, idx) => {
             const rowStr = row.map(c => clean(c)).join(' ').toUpperCase();
-            if (
-              rowStr.includes('SHAHEED SUKHDEV') || 
-              rowStr.includes('DEPARTMENT OF COMPUTER') ||
-              rowStr.includes('COMPUTER SCIENCE') ||
-              rowStr.includes('B.SC') ||
-              rowStr.includes('BSCCS') ||
-              rowStr.includes('TIME TABLE') ||
-              rowStr.includes('TIMETABLE')
-            ) {
+            if (rowStr.includes('COMPUTER SCIENCE') || rowStr.includes('B.SC') || rowStr.includes('BSCCS')) {
               blockStarts.push(idx);
             }
           });
 
-          // Fallback: If no header markers, look for period timing rows directly
-          if (blockStarts.length === 0) {
-            sheetData.forEach((row, idx) => {
-              const rowStr = row.map(c => clean(c)).join(' ');
-              if (rowStr.includes('Infinity Hour') || (rowStr.includes('I') && rowStr.includes('II') && rowStr.includes('III'))) {
-                blockStarts.push(Math.max(0, idx - 2));
-              }
-            });
-          }
-
-          if (blockStarts.length === 0) return;
-
-          // Derive default semester from sheet name if present
           let defaultSem = '2';
-          const semMatch = sheetName.match(/Sem\s*[-]?\s*(\d+)/i) || 
-                           sheetName.match(/(\d+)(?:st|nd|rd|th)?\s*Sem/i) || 
-                           sheetName.match(/\b([1-8])\b/);
-          if (semMatch) {
-            defaultSem = semMatch[1];
-          }
+          const semMatch = sheetName.match(/Sem[^\d]*(\d+)/i) || sheetName.match(/(\d+)(?:st|nd|rd|th)?\s*Sem/i) || sheetName.match(/\b([1-8])\b/);
+          if (semMatch) defaultSem = semMatch[1];
 
-          blockStarts.forEach((startRow, bIdx) => {
+          blockStarts.forEach((startRow) => {
             const result = parseSheetBlock(sheetData, startRow, 'Bsc Comp Sci', defaultSem);
             if (result) {
-              const { course, sem, section, defaultRoom, weekSchedule } = result;
-              addLog(`  -> [CS Block ${bIdx}] Mapped ${course} Sem ${sem} Section ${section} (${defaultRoom})`, 'info');
-              
+              const { sem, section, weekSchedule } = result;
               if (!timetables["Bsc Comp Sci"][sem]) timetables["Bsc Comp Sci"][sem] = {};
               timetables["Bsc Comp Sci"][sem][section] = weekSchedule;
               parsedBlocksCount++;
@@ -975,18 +726,14 @@ export default function AdminConsolePage({ onBack }) {
           });
         });
 
-        // Determine which semesters were derived cleanly from the file
-        const parsedSems = Object.keys(timetables["Bsc Comp Sci"]);
-
-        if (parsedBlocksCount === 0 || parsedSems.length === 0) {
-          addLog(`[B.Sc. CS Upload] ⚠️ Could not find timetable blocks in sheet(s). Ensure rows contain class timings.`, 'warning');
+        if (parsedBlocksCount === 0) {
+          addLog(`[B.Sc. CS Upload] ⚠️ Could not find timetable blocks.`, 'warning');
         } else {
           setCsParsedData(timetables);
-          addLog(`[B.Sc. CS Upload] ✓ Successfully derived B.Sc. CS timetables for semester(s): ${parsedSems.join(', ')} (${parsedBlocksCount} block(s) parsed)!`, 'success');
+          addLog(`[B.Sc. CS Upload] ✓ Parsed!`, 'success');
         }
       } catch (err) {
-        addLog(`[B.Sc. CS Upload] Parsing Error: ${err.message}`, 'error');
-        console.error(err);
+        addLog(`[B.Sc. CS Upload] Error: ${err.message}`, 'error');
       } finally {
         setIsParsingCs(false);
       }

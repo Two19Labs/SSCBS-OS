@@ -1357,8 +1357,8 @@
           },
           {
             "period": 3,
-            "subject": "RK",
-            "teacher": "RK",
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Dr Ramesh Kumar",
             "room": "Room 607"
           },
           {
@@ -1421,8 +1421,8 @@
           },
           {
             "period": 4,
-            "subject": "RK",
-            "teacher": "RK",
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Dr Ramesh Kumar",
             "room": "Room 607"
           },
           {
@@ -1472,8 +1472,8 @@
           },
           {
             "period": 4,
-            "subject": "RK",
-            "teacher": "RK",
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Dr Ramesh Kumar",
             "room": "P"
           },
           {
@@ -1510,8 +1510,8 @@
           },
           {
             "period": 3,
-            "subject": "RK",
-            "teacher": "RK",
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Dr Ramesh Kumar",
             "room": "P"
           },
           {
@@ -1523,8 +1523,8 @@
           },
           {
             "period": 4,
-            "subject": "RK",
-            "teacher": "RK",
+            "subject": "Social Entrepreneurship and Social Innovation",
+            "teacher": "Dr Ramesh Kumar",
             "room": "P"
           },
           {
@@ -1814,21 +1814,21 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "Advanced Spreadsheet Tools",
-            "teacher": "Dr. Raj Kumar",
-            "room": "Room 703 / Room 326"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 2,
-            "subject": "Entrepreneurship Essentials 2",
-            "teacher": "Ms. Krishnaveni",
-            "room": "Room 703"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 3,
-            "subject": "G1: Micro Economics | G2: Cost and Management Accounting",
-            "teacher": "Dr. Shalini Prakash (G1) / Dr. Paridhi (G2)",
-            "room": "G1: Room 703 / G2: Room 236"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 0,
@@ -1839,47 +1839,47 @@
           },
           {
             "period": 4,
-            "subject": "Principles of Marketing",
-            "teacher": "Dr. Anuja Mathur",
+            "subject": "BMS3B (G1)",
+            "teacher": "BMS3B",
             "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Micro Economics",
-            "teacher": "Dr. Shalini Prakash",
+            "subject": "BMS3B",
+            "teacher": "BMS3B",
             "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Hindi B",
-            "teacher": "Dr. Pooja Singh",
-            "room": "Hindi B"
+            "subject": "BMS3C",
+            "teacher": "BMS3C",
+            "room": "Room 703"
           },
           {
             "period": 7,
-            "subject": "Hindi B",
-            "teacher": "Dr. Pooja Singh",
-            "room": "Hindi B"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           }
         ],
         "Tuesday": [
           {
             "period": 1,
-            "subject": "Emotional Intelligence",
-            "teacher": "Ms. Kishori Ravi Shankar",
-            "room": "Room 703"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 2,
-            "subject": "Entrepreneurship Essentials 2",
-            "teacher": "Ms. Krishnaveni",
-            "room": "Room 703"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 3,
-            "subject": "Principles of Marketing",
-            "teacher": "Dr. Anuja Mathur",
-            "room": "Room 703"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 0,
@@ -1890,15 +1890,15 @@
           },
           {
             "period": 4,
-            "subject": "Advanced Spreadsheet Tools",
-            "teacher": "Dr. Raj Kumar",
-            "room": "Room 703 / Room 326"
+            "subject": "BMS3C (G2)",
+            "teacher": "BMS3C",
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Advanced Spreadsheet Tools",
-            "teacher": "Dr. Raj Kumar",
-            "room": "Room 703 / Room 326"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 6,
@@ -1916,21 +1916,21 @@
         "Wednesday": [
           {
             "period": 1,
-            "subject": "Entrepreneurship Essentials 2",
-            "teacher": "Ms. Krishnaveni",
-            "room": "Room 703"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 2,
-            "subject": "Cost and Management Accounting",
-            "teacher": "Dr. Paridhi",
-            "room": "Room 703"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 3,
-            "subject": "Entrepreneurship Essentials 2",
-            "teacher": "Ms. Krishnaveni",
-            "room": "Room 703"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 0,
@@ -1941,46 +1941,46 @@
           },
           {
             "period": 4,
-            "subject": "Principles of Marketing",
-            "teacher": "Dr. Anuja Mathur",
+            "subject": "BMS3B (G2)",
+            "teacher": "BMS3B",
             "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Micro Economics",
-            "teacher": "Dr. Shalini Prakash",
+            "subject": "BMS3B",
+            "teacher": "BMS3B",
             "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Hindi B | Hindi C | Hindi D",
-            "teacher": "Dr. Pooja Singh / Mr. Dinesh / Dr. Puja Gupta",
-            "room": "Room 703 / Room 203 / Room 737"
+            "subject": "BMS3C",
+            "teacher": "BMS3C",
+            "room": "Room 703"
           },
           {
             "period": 7,
-            "subject": "Hindi B | Hindi C | Hindi D",
-            "teacher": "Dr. Pooja Singh / Mr. Dinesh / Dr. Puja Gupta",
-            "room": "Room 703 / Room 203 / Room 737"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           }
         ],
         "Thursday": [
           {
             "period": 1,
-            "subject": "EE2",
-            "teacher": "EE2",
-            "room": "Unsuprvised"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 2,
-            "subject": "Cost and Management Accounting",
-            "teacher": "Dr. Paridhi",
-            "room": "Room 703"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 3,
-            "subject": "Entrepreneurship Essentials 2",
-            "teacher": "Ms. Krishnaveni",
+            "subject": "BMS3B",
+            "teacher": "BMS3B",
             "room": "Room 703"
           },
           {
@@ -1992,14 +1992,14 @@
           },
           {
             "period": 4,
-            "subject": "G1: Cost and Management Accounting | G2: Micro Economics",
-            "teacher": "Dr. Paridhi (G1) / Dr. Shalini Prakash (G2)",
-            "room": "G1: Room 236 / G2: Room 703"
+            "subject": "BMS3C (G1)",
+            "teacher": "BMS3C",
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Principles of Marketing (G1)",
-            "teacher": "Dr. Anuja Mathur",
+            "subject": "BMS3C",
+            "teacher": "BMS3C",
             "room": "Room 703"
           },
           {
@@ -2018,21 +2018,21 @@
         "Friday": [
           {
             "period": 1,
-            "subject": "Emotional Intelligence",
-            "teacher": "Ms. Kishori Ravi Shankar",
-            "room": "Room 703"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 2,
-            "subject": "Cost and Management Accounting",
-            "teacher": "Dr. Paridhi",
-            "room": "Room 703"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 3,
-            "subject": "Advanced Spreadsheet Tools",
-            "teacher": "Dr. Raj Kumar",
-            "room": "Room 703 / Room 326"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 0,
@@ -2043,21 +2043,21 @@
           },
           {
             "period": 4,
-            "subject": "Unsupervised Class",
+            "subject": "Free",
             "teacher": "-",
-            "room": "Unsupervised"
+            "room": "-"
           },
           {
             "period": 5,
-            "subject": "Micro Economics",
-            "teacher": "Dr. Shalini Prakash",
-            "room": "Room 703"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 6,
-            "subject": "Principles of Marketing (G2)",
-            "teacher": "Dr. Anuja Mathur",
-            "room": "Room 703"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 7,
@@ -2328,21 +2328,21 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "EE2",
-            "teacher": "EE2",
-            "room": "Unsuprvised"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 2,
-            "subject": "Principles of Marketing",
-            "teacher": "Dr. Divya Jain",
-            "room": "Room 733"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 3,
-            "subject": "Cost and Management Accounting",
-            "teacher": "Dr. Saumya Jain",
-            "room": "Room 733"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 0,
@@ -2353,47 +2353,47 @@
           },
           {
             "period": 4,
-            "subject": "Entrepreneurship Essentials 2",
-            "teacher": "Dr. Ramesh Kumar",
-            "room": "Room 733"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 5,
-            "subject": "Entrepreneurship Essentials 2",
-            "teacher": "Dr. Ramesh Kumar",
-            "room": "P"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 6,
-            "subject": "Jigmet",
-            "teacher": "Jigmet",
-            "room": "Room 733 / Room 651"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 7,
-            "subject": "Jigmet",
-            "teacher": "Jigmet",
-            "room": "Room 733 / Room 651"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           }
         ],
         "Tuesday": [
           {
             "period": 1,
-            "subject": "Principles of Marketing",
-            "teacher": "Dr. Divya Jain",
-            "room": "Room 733"
+            "subject": "Financial Institutions & Markets",
+            "teacher": "6th",
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Principles of Marketing",
-            "teacher": "Dr. Divya Jain",
-            "room": "Room 733"
+            "subject": "Financial Institutions & Markets",
+            "teacher": "6th",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "G1: Micro Economics | G2: Cost and Management Accounting",
-            "teacher": "Dr. Sushmita (G1) / Dr. Saumya Jain (G2)",
-            "room": "G1: Room 715 / G2: Room 733"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 0,
@@ -2404,15 +2404,15 @@
           },
           {
             "period": 4,
-            "subject": "Entrepreneurship Essentials 2",
-            "teacher": "Dr. Ramesh Kumar",
-            "room": "Room 733"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 5,
-            "subject": "Unsupervised Class",
+            "subject": "Free",
             "teacher": "-",
-            "room": "Unsuprvised"
+            "room": "-"
           },
           {
             "period": 6,
@@ -2430,21 +2430,21 @@
         "Wednesday": [
           {
             "period": 1,
-            "subject": "Cost and Management Accounting",
-            "teacher": "Dr. Saumya Jain",
-            "room": "Room 733"
+            "subject": "Financial Institutions & Markets",
+            "teacher": "6th",
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Micro Economics",
-            "teacher": "Dr. Sushmita",
-            "room": "Room 733"
+            "subject": "Financial Institutions & Markets",
+            "teacher": "6th",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Entrepreneurship Essentials 2",
-            "teacher": "Dr. Ramesh Kumar",
-            "room": "P"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 0,
@@ -2455,47 +2455,47 @@
           },
           {
             "period": 4,
-            "subject": "Hindi D",
-            "teacher": "Dr. Puja Gupta",
-            "room": "Hin B"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 5,
-            "subject": "Hindi D",
-            "teacher": "Dr. Puja Gupta",
-            "room": "Hin B"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 6,
-            "subject": "Hindi A | Hindi C | Hindi D",
-            "teacher": "Dr. Pooja Singh / Mr. Dinesh / Dr. Puja Gupta",
-            "room": "Room 703 / Room 203 / Room 737"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 7,
-            "subject": "Hindi A | Hindi C | Hindi D",
-            "teacher": "Dr. Pooja Singh / Mr. Dinesh / Dr. Puja Gupta",
-            "room": "Room 703 / Room 203 / Room 737"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           }
         ],
         "Thursday": [
           {
             "period": 1,
-            "subject": "Cost and Management Accounting",
-            "teacher": "Dr. Saumya Jain",
-            "room": "Room 733"
+            "subject": "Financial Institutions & Markets",
+            "teacher": "6th",
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "G1: Cost and Management Accounting | G2: Micro Economics",
-            "teacher": "Dr. Saumya Jain (G1) / Dr. Sushmita (G2)",
-            "room": "G1: Room 733 / G2: Room 715"
+            "subject": "Financial Institutions & Markets",
+            "teacher": "6th",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Principles of Marketing",
-            "teacher": "Dr. Anuja Mathur",
-            "room": "Room 733"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 0,
@@ -2506,15 +2506,15 @@
           },
           {
             "period": 4,
-            "subject": "Micro Economics",
-            "teacher": "Dr. Sushmita",
-            "room": "Room 733"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 5,
-            "subject": "Entrepreneurship Essentials 2",
-            "teacher": "Dr. Ramesh Kumar",
-            "room": "P"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 6,
@@ -2532,21 +2532,21 @@
         "Friday": [
           {
             "period": 1,
-            "subject": "Advanced Spreadsheet Tools",
-            "teacher": "Ms. Kajol",
-            "room": "Room 651 / Room 733"
+            "subject": "Financial Institutions & Markets",
+            "teacher": "6th",
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Advanced Spreadsheet Tools",
-            "teacher": "Ms. Kajol",
-            "room": "Room 651 / Room 733"
+            "subject": "Financial Institutions & Markets",
+            "teacher": "6th",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Micro Economics",
-            "teacher": "Dr. Sushmita",
-            "room": "Room 733"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 0,
@@ -2557,15 +2557,15 @@
           },
           {
             "period": 4,
-            "subject": "Emotional Intelligence",
-            "teacher": "Ms. Priyanka Singh",
-            "room": "Room 733"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 5,
-            "subject": "Emotional Intelligence",
-            "teacher": "Ms. Priyanka Singh",
-            "room": "Room 733"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 6,
@@ -5161,25 +5161,25 @@
   },
   "Bsc Comp Sci": {
     "2": {
-      "A": {
+      "B": {
         "Monday": [
           {
             "period": 1,
-            "subject": "GE - Numerical Methods",
-            "teacher": "Ms. Monika",
-            "room": "Room 237"
+            "subject": "Programming with C++",
+            "teacher": "Kavita Rastogi",
+            "room": "BP"
           },
           {
             "period": 2,
-            "subject": "SEC - Web Design and Development",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 651"
+            "subject": "Ethics and Governance in Management",
+            "teacher": "Monu Chaudhary",
+            "room": "EI"
           },
           {
             "period": 3,
-            "subject": "VAC - Digital Empowerment",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 644"
+            "subject": "Ethics and Governance in Management | Entrepreneurship Essential 2",
+            "teacher": "Monu Chaudhary / Vinayak Gautam",
+            "room": "Room 435 / Room 403"
           },
           {
             "period": 0,
@@ -5190,47 +5190,47 @@
           },
           {
             "period": 4,
-            "subject": "Data Structures",
-            "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 326"
+            "subject": "Ethics and Governance in Management | Entrepreneurship Essential 2",
+            "teacher": "Monu Chaudhary / Vinayak Gautam",
+            "room": "T / Room 403"
           },
           {
             "period": 5,
-            "subject": "Discrete Mathematical Structures",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 237"
+            "subject": "Entrepreneurship Essential 2",
+            "teacher": "Vinayak Gautam",
+            "room": "Room 403"
           },
           {
             "period": 6,
-            "subject": "Computer System Architecture",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 651"
+            "subject": "Discrete Structures (G2)",
+            "teacher": "Sonika Thakral",
+            "room": "Room 403"
           },
           {
             "period": 7,
-            "subject": "GE - Numerical Methods",
-            "teacher": "Ms. Monika",
-            "room": "Room 644"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           }
         ],
         "Tuesday": [
           {
             "period": 1,
-            "subject": "SEC - Web Design and Development",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 651"
+            "subject": "Programming with C++",
+            "teacher": "Kavita Rastogi",
+            "room": "BP"
           },
           {
             "period": 2,
-            "subject": "VAC - Digital Empowerment",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 644"
+            "subject": "Programming with C++",
+            "teacher": "Kavita Rastogi",
+            "room": "Room 403"
           },
           {
             "period": 3,
-            "subject": "Data Structures",
-            "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 326"
+            "subject": "Programming with C++ | Discrete Structures",
+            "teacher": "Kavita Rastogi / Sonika Thakral",
+            "room": "Room 403"
           },
           {
             "period": 0,
@@ -5241,47 +5241,47 @@
           },
           {
             "period": 4,
-            "subject": "Discrete Mathematical Structures",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 237"
+            "subject": "Ethics and Governance in Management | Entrepreneurship Essential 2",
+            "teacher": "Monu Chaudhary / Vinayak Gautam",
+            "room": "Room 435 / Room 403"
           },
           {
             "period": 5,
-            "subject": "Computer System Architecture",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 651"
+            "subject": "Probability for Computing",
+            "teacher": "Neha Bhatia",
+            "room": "Room 403"
           },
           {
             "period": 6,
-            "subject": "GE - Numerical Methods",
-            "teacher": "Ms. Monika",
-            "room": "Room 644"
+            "subject": "Probability for Computing",
+            "teacher": "Neha Bhatia",
+            "room": "Room 426"
           },
           {
             "period": 7,
-            "subject": "SEC - Web Design and Development",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 326"
+            "subject": "Probability for Computing",
+            "teacher": "Neha Bhatia",
+            "room": "Room 403"
           }
         ],
         "Wednesday": [
           {
             "period": 1,
-            "subject": "VAC - Digital Empowerment",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 644"
+            "subject": "Programming with C++ (G1)",
+            "teacher": "Kavita Rastogi",
+            "room": "Room 403"
           },
           {
             "period": 2,
-            "subject": "Data Structures",
-            "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 326"
+            "subject": "Programming with C++",
+            "teacher": "Kavita Rastogi",
+            "room": "BP"
           },
           {
             "period": 3,
-            "subject": "Discrete Mathematical Structures",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 237"
+            "subject": "Discrete Structures | Programming with C++",
+            "teacher": "Sonika Thakral / Kavita Rastogi",
+            "room": "Room 403"
           },
           {
             "period": 0,
@@ -5292,47 +5292,47 @@
           },
           {
             "period": 4,
-            "subject": "Computer System Architecture",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 651"
+            "subject": "Discrete Structures",
+            "teacher": "Sonika Thakral",
+            "room": "Room 403"
           },
           {
             "period": 5,
-            "subject": "GE - Numerical Methods",
-            "teacher": "Ms. Monika",
-            "room": "Room 644"
+            "subject": "Discrete Structures",
+            "teacher": "Sonika Thakral",
+            "room": "Room 403"
           },
           {
             "period": 6,
-            "subject": "SEC - Web Design and Development",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 326"
+            "subject": "Hindi A/C/D (Rooms 703/203/737)",
+            "teacher": "Pooja Singh/Dinesh/Puja Gupta / Pooja Singh/Dinesh/Puja Gupta / Pooja Singh/Dinesh/Puja Gupta",
+            "room": "Room 403"
           },
           {
             "period": 7,
-            "subject": "VAC - Digital Empowerment",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 237"
+            "subject": "Hindi A/C/D (Rooms 703/203/737)",
+            "teacher": "Pooja Singh/Dinesh/Puja Gupta / Pooja Singh/Dinesh/Puja Gupta / Pooja Singh/Dinesh/Puja Gupta",
+            "room": "Room 403"
           }
         ],
         "Thursday": [
           {
             "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
+            "subject": "Probability for Computing",
+            "teacher": "Neha Bhatia",
+            "room": "Room 403"
           },
           {
             "period": 2,
-            "subject": "Discrete Mathematical Structures",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 237"
+            "subject": "Probability for Computing",
+            "teacher": "Neha Bhatia",
+            "room": "Room 403"
           },
           {
             "period": 3,
-            "subject": "Computer System Architecture",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 651"
+            "subject": "Programming with C++",
+            "teacher": "Kavita Rastogi",
+            "room": "Room 403"
           },
           {
             "period": 0,
@@ -5343,21 +5343,21 @@
           },
           {
             "period": 4,
-            "subject": "GE - Numerical Methods",
-            "teacher": "Ms. Monika",
-            "room": "Room 644"
+            "subject": "Discrete Structures | Programming with C++",
+            "teacher": "Sonika Thakral / Kavita Rastogi",
+            "room": "Room 403"
           },
           {
             "period": 5,
-            "subject": "SEC - Web Design and Development",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 326"
+            "subject": "Discrete Structures",
+            "teacher": "Sonika Thakral",
+            "room": "Room 403"
           },
           {
             "period": 6,
-            "subject": "VAC - Digital Empowerment",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 237"
+            "subject": "Emotional Intelligence",
+            "teacher": "Monu Chaudhary",
+            "room": "U"
           },
           {
             "period": 7,
@@ -5369,21 +5369,21 @@
         "Friday": [
           {
             "period": 1,
-            "subject": "Discrete Mathematical Structures",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 237"
+            "subject": "Programming with C++",
+            "teacher": "Kavita Rastogi",
+            "room": "BP"
           },
           {
             "period": 2,
-            "subject": "Computer System Architecture",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 651"
+            "subject": "Programming with C++",
+            "teacher": "Kavita Rastogi",
+            "room": "Room 403"
           },
           {
             "period": 3,
-            "subject": "GE - Numerical Methods",
-            "teacher": "Ms. Monika",
-            "room": "Room 644"
+            "subject": "Ethics and Governance in Management | Entrepreneurship Essential 2",
+            "teacher": "Monu Chaudhary / Vinayak Gautam",
+            "room": "Room 435 / Room 403"
           },
           {
             "period": 0,
@@ -5394,15 +5394,68 @@
           },
           {
             "period": 4,
-            "subject": "SEC - Web Design and Development",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 326"
+            "subject": "Ethics and Governance in Management",
+            "teacher": "Monu Chaudhary",
+            "room": "EI"
           },
           {
             "period": 5,
-            "subject": "VAC - Digital Empowerment",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 237"
+            "subject": "Hindi B",
+            "teacher": "Pooja Singh",
+            "room": "HNB"
+          },
+          {
+            "period": 6,
+            "subject": "Hindi B",
+            "teacher": "Pooja Singh",
+            "room": "HNB"
+          },
+          {
+            "period": 7,
+            "subject": "EE L",
+            "teacher": "EE L",
+            "room": "U"
+          }
+        ]
+      },
+      "A": {
+        "Monday": [
+          {
+            "period": 1,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 2,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 3,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 5,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 6,
@@ -5412,33 +5465,237 @@
           },
           {
             "period": 7,
-            "subject": "Discrete Mathematical Structures",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 644"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 2,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 3,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 5,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 6,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 2,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 3,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 5,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 6,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 2,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 3,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 5,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 6,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Friday": [
+          {
+            "period": 1,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 2,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 3,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 5,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 6,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          },
+          {
+            "period": 7,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           }
         ]
       }
     },
     "4": {
-      "A": {
+      "B": {
         "Monday": [
           {
             "period": 1,
-            "subject": "VAC - Cyber Security",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 644"
+            "subject": "Computer Networks (G2)",
+            "teacher": "Onkar Singh",
+            "room": "Room 407"
           },
           {
             "period": 2,
-            "subject": "Design & Analysis of Algorithms",
-            "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 326"
+            "subject": "Design and Analysis of Algorithms | Computer Networks",
+            "teacher": "Kavita Rastogi / Onkar Singh",
+            "room": "Room 407"
           },
           {
             "period": 3,
-            "subject": "Database Management Systems",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 237"
+            "subject": "Data Analysis and Visualization",
+            "teacher": "Anamika Gupta",
+            "room": "Room 407"
           },
           {
             "period": 0,
@@ -5449,47 +5706,47 @@
           },
           {
             "period": 4,
-            "subject": "Computer Networks",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 651"
+            "subject": "Design and Analysis of Algorithms",
+            "teacher": "Sonika Thakral",
+            "room": "Room 407"
           },
           {
             "period": 5,
-            "subject": "DSE - Artificial Intelligence",
-            "teacher": "Ms. Monika",
-            "room": "Room 644"
+            "subject": "Database Management Systems",
+            "teacher": "Shikha Gupta",
+            "room": "Room 407"
           },
           {
             "period": 6,
-            "subject": "SEC - Programming with Python",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 326"
+            "subject": "App Development using Flutter",
+            "teacher": "Rama Bansal",
+            "room": "Room 407"
           },
           {
             "period": 7,
-            "subject": "VAC - Cyber Security",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 237"
+            "subject": "App Development using Flutter",
+            "teacher": "Rama Bansal",
+            "room": "Room 407"
           }
         ],
         "Tuesday": [
           {
             "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
+            "subject": "EVS II",
+            "teacher": "Sonam Taneja",
+            "room": "Room 407"
           },
           {
             "period": 2,
-            "subject": "Database Management Systems",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 237"
+            "subject": "Computer Networks",
+            "teacher": "Onkar Singh",
+            "room": "Room 407"
           },
           {
             "period": 3,
-            "subject": "Computer Networks",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 651"
+            "subject": "Data Analysis and Visualization | Database Management Systems",
+            "teacher": "Anamika Gupta / Shikha Gupta",
+            "room": "Room 407"
           },
           {
             "period": 0,
@@ -5500,21 +5757,21 @@
           },
           {
             "period": 4,
-            "subject": "DSE - Artificial Intelligence",
-            "teacher": "Ms. Monika",
-            "room": "Room 644"
+            "subject": "Design and Analysis of Algorithms",
+            "teacher": "Sonika Thakral",
+            "room": "Room 407"
           },
           {
             "period": 5,
-            "subject": "SEC - Programming with Python",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 326"
+            "subject": "Design and Analysis of Algorithms | Data Analysis and Visualization",
+            "teacher": "Sonika Thakral / Anamika Gupta",
+            "room": "Room 407"
           },
           {
             "period": 6,
-            "subject": "VAC - Cyber Security",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 237"
+            "subject": "Data Analysis and Visualization",
+            "teacher": "Anamika Gupta",
+            "room": "Room 407"
           },
           {
             "period": 7,
@@ -5526,21 +5783,21 @@
         "Wednesday": [
           {
             "period": 1,
-            "subject": "Database Management Systems",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 237"
+            "subject": "Computer Networks",
+            "teacher": "Onkar Singh",
+            "room": "Room 407"
           },
           {
             "period": 2,
             "subject": "Computer Networks",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 651"
+            "teacher": "Onkar Singh",
+            "room": "ADF"
           },
           {
             "period": 3,
-            "subject": "DSE - Artificial Intelligence",
-            "teacher": "Ms. Monika",
-            "room": "Room 644"
+            "subject": "Computer Networks",
+            "teacher": "Onkar Singh",
+            "room": "Room 407"
           },
           {
             "period": 0,
@@ -5551,47 +5808,47 @@
           },
           {
             "period": 4,
-            "subject": "SEC - Programming with Python",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 326"
+            "subject": "Science and Society (Merged with BBA 4A Room 603)",
+            "teacher": "Guncha Sharma",
+            "room": "Room 603"
           },
           {
             "period": 5,
-            "subject": "VAC - Cyber Security",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 237"
+            "subject": "Database Management Systems",
+            "teacher": "Shikha Gupta",
+            "room": "Room 407"
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
+            "subject": "Indegeneous Sport (Merged with BBA 4A Room 553)",
+            "teacher": "Nisha",
+            "room": "Room 553"
           },
           {
             "period": 7,
-            "subject": "Database Management Systems",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 644"
+            "subject": "Indegeneous Sport (Merged with BBA 4A Room 553)",
+            "teacher": "Nisha",
+            "room": "Room 553"
           }
         ],
         "Thursday": [
           {
             "period": 1,
-            "subject": "Computer Networks",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 651"
+            "subject": "Computer Networks | Design and Analysis of Algorithms",
+            "teacher": "Onkar Singh / Kavita Rastogi",
+            "room": "Room 407"
           },
           {
             "period": 2,
-            "subject": "DSE - Artificial Intelligence",
-            "teacher": "Ms. Monika",
-            "room": "Room 644"
+            "subject": "Design and Analysis of Algorithms",
+            "teacher": "Kavita Rastogi",
+            "room": "Room 407"
           },
           {
             "period": 3,
-            "subject": "SEC - Programming with Python",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 326"
+            "subject": "Computer Networks | Database Management Systems",
+            "teacher": "Onkar Singh / Shikha Gupta",
+            "room": "Room 407"
           },
           {
             "period": 0,
@@ -5602,47 +5859,47 @@
           },
           {
             "period": 4,
-            "subject": "VAC - Cyber Security",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 237"
+            "subject": "Data Analysis and Visualization",
+            "teacher": "Anamika Gupta",
+            "room": "Room 407"
           },
           {
             "period": 5,
-            "subject": "Design & Analysis of Algorithms",
-            "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 651"
+            "subject": "Data Analysis and Visualization (G1)",
+            "teacher": "Anamika Gupta",
+            "room": "Room 407"
           },
           {
             "period": 6,
-            "subject": "Database Management Systems",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 644"
+            "subject": "Science and Society (Merged with BBA 4A Room 603) | Indegeneous Sport (Merged with BBA 4A Room 553)",
+            "teacher": "Guncha Sharma / Nisha",
+            "room": "Room 603 / Room 553"
           },
           {
             "period": 7,
-            "subject": "Computer Networks",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 326"
+            "subject": "Science and Society (Merged with BBA 4A Room 603) | Indegeneous Sport (Merged with BBA 4A Room 553)",
+            "teacher": "Guncha Sharma / Nisha",
+            "room": "Room 603 / Room 553"
           }
         ],
         "Friday": [
           {
             "period": 1,
-            "subject": "DSE - Artificial Intelligence",
-            "teacher": "Ms. Monika",
-            "room": "Room 644"
+            "subject": "EVS II",
+            "teacher": "Sonam Taneja",
+            "room": "Room 407"
           },
           {
             "period": 2,
-            "subject": "SEC - Programming with Python",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 326"
+            "subject": "EVS II",
+            "teacher": "Sonam Taneja",
+            "room": "Room 407"
           },
           {
             "period": 3,
-            "subject": "VAC - Cyber Security",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 237"
+            "subject": "Computer Networks",
+            "teacher": "Onkar Singh",
+            "room": "ADF"
           },
           {
             "period": 0,
@@ -5653,51 +5910,51 @@
           },
           {
             "period": 4,
-            "subject": "Design & Analysis of Algorithms",
-            "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 651"
+            "subject": "Database Management Systems | Design and Analysis of Algorithms",
+            "teacher": "Shikha Gupta / Sonika Thakral",
+            "room": "Room 407"
           },
           {
             "period": 5,
-            "subject": "Database Management Systems",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 644"
+            "subject": "Database Management Systems | Data Analysis and Visualization",
+            "teacher": "Shikha Gupta / Anamika Gupta",
+            "room": "Room 407"
           },
           {
             "period": 6,
-            "subject": "Computer Networks",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 326"
+            "subject": "Database Management Systems",
+            "teacher": "Shikha Gupta",
+            "room": "Room 407"
           },
           {
             "period": 7,
-            "subject": "DSE - Artificial Intelligence",
-            "teacher": "Ms. Monika",
-            "room": "Room 237"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           }
         ]
       }
     },
     "6": {
-      "A": {
+      "B": {
         "Monday": [
           {
             "period": 1,
-            "subject": "Theory of Computation",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 237"
+            "subject": "Basics of Human Resource Management",
+            "teacher": "Shweta Marwaha",
+            "room": "Room 457"
           },
           {
             "period": 2,
-            "subject": "DSE - Machine Learning",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 651"
+            "subject": "Basics of Human Resource Management",
+            "teacher": "Shweta Marwaha",
+            "room": "Room 457"
           },
           {
             "period": 3,
-            "subject": "GE - Data Science using R",
-            "teacher": "Ms. Monika",
-            "room": "Room 644"
+            "subject": "Artificial Intelligence",
+            "teacher": "Onkar Singh",
+            "room": "Room 457"
           },
           {
             "period": 0,
@@ -5708,15 +5965,117 @@
           },
           {
             "period": 4,
-            "subject": "Software Engineering",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 326"
+            "subject": "Social Network Analysis | Machine Learning",
+            "teacher": "Shikha Gupta / Anamika Gupta",
+            "room": "Room 457"
           },
           {
             "period": 5,
-            "subject": "Operating Systems",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 237"
+            "subject": "Advanced spreadsheet tools",
+            "teacher": "Sonika Thakral",
+            "room": "Room 460"
+          },
+          {
+            "period": 6,
+            "subject": "Social Network Analysis",
+            "teacher": "Shikha Gupta",
+            "room": "Room 457"
+          },
+          {
+            "period": 7,
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
+          }
+        ],
+        "Tuesday": [
+          {
+            "period": 1,
+            "subject": "Artificial Intelligence (G1)",
+            "teacher": "Onkar Singh",
+            "room": "Room 457"
+          },
+          {
+            "period": 2,
+            "subject": "Cloud Computing",
+            "teacher": "Mogana Neelkandan",
+            "room": "Room 460"
+          },
+          {
+            "period": 3,
+            "subject": "Cloud Computing",
+            "teacher": "Mogana Neelkandan",
+            "room": "Room 457"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Machine Learning | Social Network Analysis",
+            "teacher": "Anamika Gupta / Shikha Gupta",
+            "room": "Room 457"
+          },
+          {
+            "period": 5,
+            "subject": "Social Network Analysis",
+            "teacher": "Shikha Gupta",
+            "room": "Room 457"
+          },
+          {
+            "period": 6,
+            "subject": "Basics of Human Resource Management",
+            "teacher": "Shweta Marwaha",
+            "room": "Room 457"
+          },
+          {
+            "period": 7,
+            "subject": "Basics of Human Resource Management",
+            "teacher": "Shweta Marwaha",
+            "room": "T"
+          }
+        ],
+        "Wednesday": [
+          {
+            "period": 1,
+            "subject": "Cloud Computing",
+            "teacher": "Mogana Neelkandan",
+            "room": "Room 460"
+          },
+          {
+            "period": 2,
+            "subject": "Cloud Computing",
+            "teacher": "Mogana Neelkandan",
+            "room": "Room 457"
+          },
+          {
+            "period": 3,
+            "subject": "Cloud Computing",
+            "teacher": "Mogana Neelkandan",
+            "room": "Room 457"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Machine Learning | Social Network Analysis",
+            "teacher": "Anamika Gupta / Shikha Gupta",
+            "room": "Room 457"
+          },
+          {
+            "period": 5,
+            "subject": "Machine Learning",
+            "teacher": "Anamika Gupta",
+            "room": "Room 457"
           },
           {
             "period": 6,
@@ -5726,131 +6085,29 @@
           },
           {
             "period": 7,
-            "subject": "DSE - Machine Learning",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 644"
-          }
-        ],
-        "Tuesday": [
-          {
-            "period": 1,
-            "subject": "DSE - Machine Learning",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 651"
-          },
-          {
-            "period": 2,
-            "subject": "GE - Data Science using R",
-            "teacher": "Ms. Monika",
-            "room": "Room 644"
-          },
-          {
-            "period": 3,
-            "subject": "Software Engineering",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 326"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Operating Systems",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 237"
-          },
-          {
-            "period": 5,
-            "subject": "Theory of Computation",
-            "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 651"
-          },
-          {
-            "period": 6,
-            "subject": "DSE - Machine Learning",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 644"
-          },
-          {
-            "period": 7,
-            "subject": "GE - Data Science using R",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 326"
-          }
-        ],
-        "Wednesday": [
-          {
-            "period": 1,
-            "subject": "GE - Data Science using R",
-            "teacher": "Ms. Monika",
-            "room": "Room 644"
-          },
-          {
-            "period": 2,
-            "subject": "Software Engineering",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 326"
-          },
-          {
-            "period": 3,
-            "subject": "Operating Systems",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 237"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Theory of Computation",
-            "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 651"
-          },
-          {
-            "period": 5,
-            "subject": "DSE - Machine Learning",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 644"
-          },
-          {
-            "period": 6,
-            "subject": "GE - Data Science using R",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 326"
-          },
-          {
-            "period": 7,
-            "subject": "Software Engineering",
-            "teacher": "Ms. Monika",
-            "room": "Room 237"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           }
         ],
         "Thursday": [
           {
             "period": 1,
-            "subject": "Software Engineering",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 326"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 2,
-            "subject": "Operating Systems",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 237"
+            "subject": "Artificial Intelligence",
+            "teacher": "Onkar Singh",
+            "room": "Room 457"
           },
           {
             "period": 3,
-            "subject": "Theory of Computation",
-            "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 651"
+            "subject": "Machine Learning",
+            "teacher": "Anamika Gupta",
+            "room": "Room 457"
           },
           {
             "period": 0,
@@ -5861,47 +6118,47 @@
           },
           {
             "period": 4,
-            "subject": "DSE - Machine Learning",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 644"
+            "subject": "Social Network Analysis | Artificial Intelligence",
+            "teacher": "Shikha Gupta / Onkar Singh",
+            "room": "Room 457"
           },
           {
             "period": 5,
-            "subject": "GE - Data Science using R",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 326"
+            "subject": "Social Network Analysis",
+            "teacher": "Shikha Gupta",
+            "room": "Room 457"
           },
           {
             "period": 6,
-            "subject": "Software Engineering",
-            "teacher": "Ms. Monika",
-            "room": "Room 237"
+            "subject": "Advanced spreadsheet tools",
+            "teacher": "Sonika Thakral",
+            "room": "Room 460"
           },
           {
             "period": 7,
-            "subject": "Operating Systems",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 651"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           }
         ],
         "Friday": [
           {
             "period": 1,
-            "subject": "Operating Systems",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 237"
+            "subject": "Artificial Intelligence (G2)",
+            "teacher": "Onkar Singh",
+            "room": "Room 457"
           },
           {
             "period": 2,
-            "subject": "Theory of Computation",
-            "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 651"
+            "subject": "Artificial Intelligence",
+            "teacher": "Onkar Singh",
+            "room": "Room 457"
           },
           {
             "period": 3,
-            "subject": "DSE - Machine Learning",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 644"
+            "subject": "Machine Learning",
+            "teacher": "Anamika Gupta",
+            "room": "Room 457"
           },
           {
             "period": 0,
@@ -5912,51 +6169,51 @@
           },
           {
             "period": 4,
-            "subject": "GE - Data Science using R",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 326"
+            "subject": "Artificial Intelligence | Machine Learning",
+            "teacher": "Onkar Singh / Anamika Gupta",
+            "room": "Room 457"
           },
           {
             "period": 5,
-            "subject": "Software Engineering",
-            "teacher": "Ms. Monika",
-            "room": "Room 237"
+            "subject": "Advanced spreadsheet tools",
+            "teacher": "Sonika Thakral",
+            "room": "Room 457"
           },
           {
             "period": 6,
-            "subject": "Operating Systems",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 651"
+            "subject": "Advanced spreadsheet tools",
+            "teacher": "Sonika Thakral",
+            "room": "Room 460"
           },
           {
             "period": 7,
-            "subject": "Theory of Computation",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 644"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           }
         ]
       }
     },
     "8": {
-      "A": {
+      "B": {
         "Monday": [
           {
             "period": 1,
-            "subject": "DSE - Cloud Computing",
-            "teacher": "Ms. Monika",
-            "room": "Room 644"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 2,
-            "subject": "DSE - Internet of Things (IoT)",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 326"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 3,
-            "subject": "SEC - Capstone Project",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 237"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 0,
@@ -5967,47 +6224,47 @@
           },
           {
             "period": 4,
-            "subject": "Information Security",
-            "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 651"
+            "subject": "RK L",
+            "teacher": "RK L",
+            "room": "Room 453"
           },
           {
             "period": 5,
-            "subject": "DSE - Cloud Computing",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 644"
+            "subject": "Integrated Marketing and Communication | RKL",
+            "teacher": "Anuja Mathur (AM) / RKL",
+            "room": "Room 453"
           },
           {
             "period": 6,
-            "subject": "DSE - Internet of Things (IoT)",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 326"
+            "subject": "Integrated Marketing and Communication",
+            "teacher": "Anuja Mathur (AM)",
+            "room": "Room 453"
           },
           {
             "period": 7,
-            "subject": "SEC - Capstone Project",
-            "teacher": "Ms. Monika",
-            "room": "Room 237"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           }
         ],
         "Tuesday": [
           {
             "period": 1,
-            "subject": "DSE - Internet of Things (IoT)",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 326"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 2,
-            "subject": "SEC - Capstone Project",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 237"
+            "subject": "Cloud Computing (Merged with B.Sc. 3)",
+            "teacher": "Mogana Neelkandan (MN)",
+            "room": "Room 460"
           },
           {
             "period": 3,
-            "subject": "Information Security",
-            "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 651"
+            "subject": "Cloud Computing (Merged with B.Sc. 3)",
+            "teacher": "Mogana Neelkandan (MN)",
+            "room": "Room 453"
           },
           {
             "period": 0,
@@ -6018,47 +6275,47 @@
           },
           {
             "period": 4,
-            "subject": "DSE - Cloud Computing",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 644"
+            "subject": "Integrated Marketing and Communication | RK",
+            "teacher": "Anuja Mathur (AM) / RK",
+            "room": "Room 453"
           },
           {
             "period": 5,
-            "subject": "DSE - Internet of Things (IoT)",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 326"
+            "subject": "Information Security",
+            "teacher": "Dr. Sumit Agarwal (SA)",
+            "room": "Room 453"
           },
           {
             "period": 6,
-            "subject": "SEC - Capstone Project",
-            "teacher": "Ms. Monika",
-            "room": "Room 237"
+            "subject": "Information Security",
+            "teacher": "Dr. Sumit Agarwal (SA)",
+            "room": "Room 453"
           },
           {
             "period": 7,
-            "subject": "Information Security",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 651"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           }
         ],
         "Wednesday": [
           {
             "period": 1,
-            "subject": "SEC - Capstone Project",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 237"
+            "subject": "Cloud Computing (Merged with B.Sc. 3)",
+            "teacher": "Mogana Neelkandan (MN)",
+            "room": "Room 460"
           },
           {
             "period": 2,
-            "subject": "Information Security",
-            "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 651"
+            "subject": "Cloud Computing (Merged with B.Sc. 3)",
+            "teacher": "Mogana Neelkandan (MN)",
+            "room": "Room 453"
           },
           {
             "period": 3,
-            "subject": "DSE - Cloud Computing",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 644"
+            "subject": "Cloud Computing (Merged with B.Sc. 3)",
+            "teacher": "Mogana Neelkandan (MN)",
+            "room": "Room 453"
           },
           {
             "period": 0,
@@ -6069,27 +6326,27 @@
           },
           {
             "period": 4,
-            "subject": "DSE - Internet of Things (IoT)",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 326"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 5,
-            "subject": "SEC - Capstone Project",
-            "teacher": "Ms. Monika",
-            "room": "Room 237"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 6,
-            "subject": "Information Security",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 651"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 7,
-            "subject": "DSE - Cloud Computing",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 644"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           }
         ],
         "Thursday": [
@@ -6101,15 +6358,15 @@
           },
           {
             "period": 2,
-            "subject": "DSE - Cloud Computing",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 644"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 3,
-            "subject": "DSE - Internet of Things (IoT)",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 326"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 0,
@@ -6120,21 +6377,21 @@
           },
           {
             "period": 4,
-            "subject": "SEC - Capstone Project",
-            "teacher": "Ms. Monika",
-            "room": "Room 237"
+            "subject": "RK",
+            "teacher": "RK",
+            "room": "Room 453"
           },
           {
             "period": 5,
-            "subject": "Information Security",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 651"
+            "subject": "RK  L",
+            "teacher": "RK  L",
+            "room": "Room 453"
           },
           {
             "period": 6,
-            "subject": "DSE - Cloud Computing",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 644"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 7,
@@ -6146,21 +6403,21 @@
         "Friday": [
           {
             "period": 1,
-            "subject": "DSE - Cloud Computing",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 644"
+            "subject": "Reinforcement Learning",
+            "teacher": "Deepali Dhaka (DD)",
+            "room": "Room 453"
           },
           {
             "period": 2,
-            "subject": "DSE - Internet of Things (IoT)",
-            "teacher": "Dr. Narander Kumar Nigam",
-            "room": "Room 326"
+            "subject": "Reinforcement Learning",
+            "teacher": "Deepali Dhaka (DD)",
+            "room": "Room 453"
           },
           {
             "period": 3,
-            "subject": "SEC - Capstone Project",
-            "teacher": "Ms. Monika",
-            "room": "Room 237"
+            "subject": "Entrepreneurship Essential 2 (Merged with B.Sc. 1)",
+            "teacher": "Dr. Ramesh Kumar (RK)",
+            "room": "U"
           },
           {
             "period": 0,
@@ -6171,27 +6428,27 @@
           },
           {
             "period": 4,
-            "subject": "Information Security",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 651"
+            "subject": "Integrated Marketing and Communication",
+            "teacher": "Anuja Mathur (AM)",
+            "room": "Room 453"
           },
           {
             "period": 5,
-            "subject": "DSE - Cloud Computing",
-            "teacher": "Dr. Amit Kumar",
-            "room": "Room 644"
+            "subject": "Information Security",
+            "teacher": "Dr. Sumit Agarwal (SA)",
+            "room": "Room 453"
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
+            "subject": "Information Security",
+            "teacher": "Dr. Sumit Agarwal (SA)",
+            "room": "Room 453"
           },
           {
             "period": 7,
-            "subject": "SEC - Capstone Project",
-            "teacher": "Mr. Tatkarsh",
-            "room": "Room 237"
+            "subject": "Information Security",
+            "teacher": "Dr. Sumit Agarwal (SA)",
+            "room": "Room 453"
           }
         ]
       }
