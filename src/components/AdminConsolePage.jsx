@@ -794,6 +794,63 @@ export default function AdminConsolePage({ onBack }) {
     reader.readAsArrayBuffer(selectedFile);
   };
 
+  // Scrap / Wipe only Management timetables (BBA FIA & BMS)
+  const handleScrapMgmtTimetable = async () => {
+    if (!window.confirm("Are you sure you want to scrap and remove all active Management timetables (BBA FIA & BMS) from the OS?")) {
+      return;
+    }
+    try {
+      setIsSaving(true);
+      setSaveStatus({ type: '', message: '' });
+      addLog("[System Admin] Scrapping Management timetables from active storage...", "warning");
+
+      const updated = JSON.parse(JSON.stringify(timetable || {}));
+      delete updated['BBA FIA'];
+      delete updated['BMS'];
+
+      await updateTimetable(updated);
+
+      setMgmtFile(null);
+      setMgmtParsedData(null);
+
+      setSaveStatus({ type: 'success', message: 'Management timetables (BBA FIA & BMS) scrapped successfully!' });
+      addLog("[System Admin] ✓ Scrapped Management timetables from active storage.", "success");
+    } catch (err) {
+      setSaveStatus({ type: 'error', message: err.message || 'Failed to scrap Management timetables.' });
+      addLog(`[System Admin] Error scrapping Management timetables: ${err.message}`, "error");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Scrap / Wipe only B.Sc. Computer Science timetables
+  const handleScrapCsTimetable = async () => {
+    if (!window.confirm("Are you sure you want to scrap and remove all active B.Sc. Computer Science timetables from the OS?")) {
+      return;
+    }
+    try {
+      setIsSaving(true);
+      setSaveStatus({ type: '', message: '' });
+      addLog("[System Admin] Scrapping B.Sc. Computer Science timetables from active storage...", "warning");
+
+      const updated = JSON.parse(JSON.stringify(timetable || {}));
+      delete updated['Bsc Comp Sci'];
+
+      await updateTimetable(updated);
+
+      setCsFile(null);
+      setCsParsedData(null);
+
+      setSaveStatus({ type: 'success', message: 'B.Sc. Computer Science timetables scrapped successfully!' });
+      addLog("[System Admin] ✓ Scrapped B.Sc. Computer Science timetables from active storage.", "success");
+    } catch (err) {
+      setSaveStatus({ type: 'error', message: err.message || 'Failed to scrap B.Sc. CS timetables.' });
+      addLog(`[System Admin] Error scrapping B.Sc. CS timetables: ${err.message}`, "error");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   // Scrap / Wipe all active timetables
   const handleScrapActiveTimetables = async () => {
     if (!window.confirm("Are you sure you want to scrap and wipe all active timetables across the entire SSCBS OS? This action resets the master timetable storage.")) {
@@ -1023,12 +1080,43 @@ export default function AdminConsolePage({ onBack }) {
                       <span className="card-subtitle">BBA (FIA) & BMS • Semesters 1–8</span>
                     </div>
                   </div>
-                  {mgmtParsedData ? (
-                    <span className="upload-status-badge success">✓ Ready to Publish</span>
-                  ) : mgmtFile ? (
-                    <span className="upload-status-badge warning">Parsing...</span>
+                  <div className="card-header-actions">
+                    <button 
+                      className="btn-card-action-scrap"
+                      onClick={handleScrapMgmtTimetable}
+                      disabled={isSaving || (!timetable?.['BMS'] && !timetable?.['BBA FIA'])}
+                      title="Scrap active Management timetables only"
+                    >
+                      🗑️ Scrap Mgmt
+                    </button>
+                    {mgmtParsedData ? (
+                      <span className="upload-status-badge success">✓ Ready to Publish</span>
+                    ) : mgmtFile ? (
+                      <span className="upload-status-badge warning">Parsing...</span>
+                    ) : (
+                      <span className="upload-status-badge neutral">Awaiting File</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Active in OS indicator */}
+                <div className="active-os-status-box">
+                  <span className="active-os-label">Active Published OS Timetable:</span>
+                  {timetable && (timetable['BMS'] || timetable['BBA FIA']) ? (
+                    <div className="active-chips-row">
+                      {timetable['BMS'] && (
+                        <span className="active-chip green">
+                          BMS: Sems [{Object.keys(timetable['BMS']).join(', ')}]
+                        </span>
+                      )}
+                      {timetable['BBA FIA'] && (
+                        <span className="active-chip green">
+                          BBA FIA: Sems [{Object.keys(timetable['BBA FIA']).join(', ')}]
+                        </span>
+                      )}
+                    </div>
                   ) : (
-                    <span className="upload-status-badge neutral">Awaiting File</span>
+                    <span className="active-chip muted">No active Management timetable published</span>
                   )}
                 </div>
 
@@ -1057,6 +1145,7 @@ export default function AdminConsolePage({ onBack }) {
 
                 {mgmtParsedData && (
                   <div className="parsed-summary-chip-row">
+                    <span className="staged-label">Staged Upload File:</span>
                     {Object.keys(mgmtParsedData).map(course => (
                       <span key={course} className="summary-chip">
                         <strong>{course}</strong>: Sem {Object.keys(mgmtParsedData[course]).join(', ')}
@@ -1076,12 +1165,34 @@ export default function AdminConsolePage({ onBack }) {
                       <span className="card-subtitle">Computer Science • Semesters 1–8</span>
                     </div>
                   </div>
-                  {csParsedData ? (
-                    <span className="upload-status-badge success">✓ Ready to Publish</span>
-                  ) : csFile ? (
-                    <span className="upload-status-badge warning">Parsing...</span>
+                  <div className="card-header-actions">
+                    <button 
+                      className="btn-card-action-scrap"
+                      onClick={handleScrapCsTimetable}
+                      disabled={isSaving || !timetable?.['Bsc Comp Sci']}
+                      title="Scrap active B.Sc. CS timetables only"
+                    >
+                      🗑️ Scrap CS
+                    </button>
+                    {csParsedData ? (
+                      <span className="upload-status-badge success">✓ Ready to Publish</span>
+                    ) : csFile ? (
+                      <span className="upload-status-badge warning">Parsing...</span>
+                    ) : (
+                      <span className="upload-status-badge neutral">Awaiting File</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Active in OS indicator */}
+                <div className="active-os-status-box">
+                  <span className="active-os-label">Active Published OS Timetable:</span>
+                  {timetable && timetable['Bsc Comp Sci'] ? (
+                    <span className="active-chip green">
+                      B.Sc. CS: Sems [{Object.keys(timetable['Bsc Comp Sci']).join(', ')}]
+                    </span>
                   ) : (
-                    <span className="upload-status-badge neutral">Awaiting File</span>
+                    <span className="active-chip muted">No active B.Sc. CS timetable published</span>
                   )}
                 </div>
 
@@ -1110,6 +1221,7 @@ export default function AdminConsolePage({ onBack }) {
 
                 {csParsedData && (
                   <div className="parsed-summary-chip-row">
+                    <span className="staged-label">Staged Upload File:</span>
                     {Object.keys(csParsedData).map(course => (
                       <span key={course} className="summary-chip">
                         <strong>{course}</strong>: Sem {Object.keys(csParsedData[course]).join(', ')}

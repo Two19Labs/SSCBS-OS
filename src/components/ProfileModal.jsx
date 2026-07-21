@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTimetable } from '../context/TimetableContext';
 import './ProfileModal.css';
+
+const ALL_SEMESTERS = [
+  { value: '1', label: 'Sem 1 (1st Yr)' },
+  { value: '2', label: 'Sem 2 (1st Yr)' },
+  { value: '3', label: 'Sem 3 (2nd Yr)' },
+  { value: '4', label: 'Sem 4 (2nd Yr)' },
+  { value: '5', label: 'Sem 5 (3rd Yr)' },
+  { value: '6', label: 'Sem 6 (3rd Yr)' },
+  { value: '7', label: 'Sem 7 (4th Yr)' },
+  { value: '8', label: 'Sem 8 (4th Yr)' },
+];
 
 export default function ProfileModal({ isOpen, onClose }) {
   const { user, updateProfile, signOut } = useAuth();
+  const { getActiveSemesters } = useTimetable();
   
   const [fullName, setFullName] = useState('');
   const [course, setCourse] = useState('BMS');
@@ -12,6 +25,16 @@ export default function ProfileModal({ isOpen, onClose }) {
   
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState({ type: '', message: '' });
+
+  const activeSemKeys = getActiveSemesters(course);
+  const availableSemesters = ALL_SEMESTERS.filter(s => activeSemKeys.includes(s.value));
+
+  // Keep semester valid if active semesters change
+  useEffect(() => {
+    if (availableSemesters.length > 0 && !availableSemesters.some(s => s.value === semester)) {
+      setSemester(availableSemesters[0].value);
+    }
+  }, [course, activeSemKeys.join(',')]);
 
   // Load initial user details
   useEffect(() => {
@@ -138,14 +161,9 @@ export default function ProfileModal({ isOpen, onClose }) {
                 onChange={(e) => setSemester(e.target.value)}
                 className="select-field"
               >
-                <option value="1">Sem 1 (1st Yr)</option>
-                <option value="2">Sem 2 (1st Yr)</option>
-                <option value="3">Sem 3 (2nd Yr)</option>
-                <option value="4">Sem 4 (2nd Yr)</option>
-                <option value="5">Sem 5 (3rd Yr)</option>
-                <option value="6">Sem 6 (3rd Yr)</option>
-                <option value="7">Sem 7 (4th Yr)</option>
-                <option value="8">Sem 8 (4th Yr)</option>
+                {availableSemesters.map((s) => (
+                  <option key={s.value} value={s.value}>{s.label}</option>
+                ))}
               </select>
             </div>
 

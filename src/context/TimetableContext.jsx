@@ -104,6 +104,28 @@ export const TimetableProvider = ({ children }) => {
     return secData;
   };
 
+  // Helper to get active semesters dynamically for a course or across all courses
+  const getActiveSemesters = (course) => {
+    if (!timetable || Object.keys(timetable).length === 0) return ['2', '4', '6', '8'];
+    
+    if (course && timetable[course]) {
+      const sems = Object.keys(timetable[course]);
+      if (sems.length > 0) return sems.sort((a, b) => parseInt(a) - parseInt(b));
+    }
+    
+    // Gather all semesters across all available courses
+    const set = new Set();
+    Object.keys(timetable).forEach(c => {
+      if (timetable[c]) {
+        Object.keys(timetable[c]).forEach(s => set.add(s));
+      }
+    });
+    
+    const sems = Array.from(set);
+    if (sems.length === 0) return ['2', '4', '6', '8'];
+    return sems.sort((a, b) => parseInt(a) - parseInt(b));
+  };
+
   return (
     <TimetableContext.Provider
       value={{
@@ -111,6 +133,7 @@ export const TimetableProvider = ({ children }) => {
         loading,
         updateTimetable,
         getTimetable,
+        getActiveSemesters,
       }}
     >
       {children}

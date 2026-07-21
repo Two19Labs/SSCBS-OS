@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useTimetable } from '../context/TimetableContext';
 import { isAdminEmail, isTimeWarpEnabled, setTimeWarpEnabled } from '../lib/admin';
 import { ChevronRight } from './icons';
 import './ProfilePage.css';
 
 const COURSES = ['BMS', 'BBA FIA', 'Bsc Comp Sci'];
-const SEMESTERS = [
+const ALL_SEMESTERS = [
   { value: '1', label: 'Sem 1 (1st Yr)' },
   { value: '2', label: 'Sem 2 (1st Yr)' },
   { value: '3', label: 'Sem 3 (2nd Yr)' },
@@ -26,6 +27,7 @@ const sectionOptionsFor = (course) => {
 export default function ProfilePage({ onNavigate }) {
   const { user, updateProfile, signOut } = useAuth();
   const { preference, setPreference } = useTheme();
+  const { getActiveSemesters } = useTimetable();
 
   const [fullName, setFullName] = useState(user?.user_metadata?.full_name || '');
   const [course, setCourse] = useState(user?.user_metadata?.course || 'BMS');
@@ -35,6 +37,16 @@ export default function ProfilePage({ onNavigate }) {
   const [timeWarp, setTimeWarp] = useState(isTimeWarpEnabled());
   const saveTimer = useRef(null);
   const dirty = useRef(false);
+
+  const activeSemKeys = getActiveSemesters(course);
+  const availableSemesters = ALL_SEMESTERS.filter(s => activeSemKeys.includes(s.value));
+
+  // Keep semester valid if active semesters change
+  useEffect(() => {
+    if (availableSemesters.length > 0 && !availableSemesters.some(s => s.value === semester)) {
+      setSemester(availableSemesters[0].value);
+    }
+  }, [course, activeSemKeys.join(',')]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const email = user?.email || '';
   const isAdmin = isAdminEmail(email);
@@ -50,22 +62,37 @@ export default function ProfilePage({ onNavigate }) {
   useEffect(() => {
     if (!dirty.current) return;
     setSaveState('saving');
-    clearTimeout(saveTimer.current);
+    if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(async () => {
       try {
-        await updateProfile({ full_name: fullName, course, semester, section });
+        await updateProfile({
+          full_name: fullName,
+          course,
+          semester,
+          section,
+        });
         setSaveState('saved');
-        setTimeout(() => setSaveState('idle'), 2000);
-      } catch {
+        dirty.current = false;
+        setTimeout(() => setSaveState('idle'), 2500);
+      } catch (e) {
+        console.error('Failed auto-saving profile:', e);
         setSaveState('error');
       }
-    }, 700);
-    return () => clearTimeout(saveTimer.current);
-  }, [fullName, course, semester, section]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, 800);
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+    };
+  }, [fullName, course, semester, section, updateProfile]);
 
-  const markDirty = (setter) => (value) => {
+  const markDirty = (setter) => (val) => {
     dirty.current = true;
-    setter(value);
+    setter(val);
+  };
+
+  const handleTimeWarpToggle = () => {
+    const next = !timeWarp;
+    setTimeWarp(next);
+    setTimeWarpEnabled(next);
   };
 
   const handleSignOut = async () => {
@@ -77,35 +104,46 @@ export default function ProfilePage({ onNavigate }) {
     }
   };
 
-  const toggleTimeWarp = () => {
-    const next = !timeWarp;
-    setTimeWarp(next);
-    setTimeWarpEnabled(next);
-  };
-
   return (
     <div className="profile-page">
-      <div className="profile-identity-card">
-        <div className="profile-avatar">{displayName.charAt(0).toUpperCase()}</div>
-        <div className="profile-identity-text">
-          <input
-            className="profile-name-input"
-            value={fullName}
-            placeholder="Your name"
-            onChange={(e) => markDirty(setFullName)(e.target.value)}
-            aria-label="Full name"
-          />
-          <span className="profile-email">{email}</span>
+      <header className="profile-header">
+        <button className="btn-back" onClick={() => onNavigate('home')}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+        </button>
+        <h2>Student Profile</h2>
+        <div className="profile-header-status">
+          {saveState === 'saving' && <span className="status-badge saving">Saving...</span>}
+          {saveState === 'saved' && <span className="status-badge saved">✓ Saved</span>}
+          {saveState === 'error' && <span className="status-badge error">Error</span>}
         </div>
-        <span className={`profile-save-state ${saveState}`}>
-          {saveState === 'saving' && 'Saving…'}
-          {saveState === 'saved' && '✓ Saved'}
-          {saveState === 'error' && 'Save failed'}
-        </span>
+      </header>
+
+      <div className="profile-hero">
+        <div className="profile-avatar-large">
+          {displayName.charAt(0).toUpperCase()}
+        </div>
+        <div className="profile-hero-info">
+          <h3>{displayName}</h3>
+          <span className="profile-email-sub">{email}</span>
+        </div>
       </div>
 
-      <div className="profile-group-label">MY CLASS</div>
+      <div className="profile-group-label">ACADEMIC INFO</div>
       <div className="profile-group">
+        <label className="profile-row">
+          <span className="profile-row-label">Full Name</span>
+          <span className="profile-row-value">
+            <input 
+              type="text" 
+              value={fullName} 
+              onChange={(e) => markDirty(setFullName)(e.target.value)} 
+              placeholder="Enter your name"
+            />
+          </span>
+        </label>
         <label className="profile-row">
           <span className="profile-row-label">Course</span>
           <span className="profile-row-value">
@@ -121,7 +159,7 @@ export default function ProfilePage({ onNavigate }) {
           <span className="profile-row-label">Semester</span>
           <span className="profile-row-value">
             <select value={semester} onChange={(e) => markDirty(setSemester)(e.target.value)}>
-              {SEMESTERS.map((s) => (
+              {availableSemesters.map((s) => (
                 <option key={s.value} value={s.value}>{s.label}</option>
               ))}
             </select>
