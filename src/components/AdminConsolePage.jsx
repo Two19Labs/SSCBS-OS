@@ -4,7 +4,7 @@ import { useTimetable } from '../context/TimetableContext';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { isAdminEmail } from '../lib/admin';
-import { getOnlinePresence, getAnalyticsSummary } from '../lib/analytics';
+import { subscribeToPresence, fetchAnalyticsData } from '../lib/analytics';
 import DateTimePicker from './DateTimePicker';
 import './AdminConsolePage.css';
 
@@ -309,7 +309,13 @@ export default function AdminConsolePage({ onBack }) {
   // Real-Time Online Presence & Time-Series Graph States
   const [onlinePresence, setOnlinePresence] = useState([]);
   const [analyticsTimeRange, setAnalyticsTimeRange] = useState(7); // 7, 30, 90
-  const [analyticsSummary, setAnalyticsSummary] = useState(() => getAnalyticsSummary(7));
+  const [analyticsSummary, setAnalyticsSummary] = useState({
+    dateLabels: [],
+    series: { timetable: [], 'find-prof': [], waiver: [], gpa: [], buzz: [], total: [] },
+    totals: { timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, grandTotal: 0 },
+    topFeatureName: 'Timetable',
+    topFeatureCount: 0
+  });
   const [enabledSeries, setEnabledSeries] = useState({
     total: true,
     timetable: true,
@@ -320,19 +326,19 @@ export default function AdminConsolePage({ onBack }) {
   });
   const [hoveredPoint, setHoveredPoint] = useState(null);
 
+  // 🟢 Real-Time Presence Subscription across all active connected students
   useEffect(() => {
-    const updatePresenceData = () => {
-      const live = getOnlinePresence();
-      setOnlinePresence(live);
-    };
+    const unsubscribe = subscribeToPresence(user, 'admin', (presenceList) => {
+      setOnlinePresence(presenceList);
+    });
+    return () => unsubscribe();
+  }, [user]);
 
-    updatePresenceData();
-    const interval = setInterval(updatePresenceData, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
+  // 📈 Fetch REAL Analytics event series from Supabase
   useEffect(() => {
-    setAnalyticsSummary(getAnalyticsSummary(analyticsTimeRange));
+    fetchAnalyticsData(analyticsTimeRange).then(summary => {
+      if (summary) setAnalyticsSummary(summary);
+    });
   }, [analyticsTimeRange]);
 
   const toggleSeries = (seriesKey) => {

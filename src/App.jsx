@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
-import { logFeatureView, updatePresence } from './lib/analytics';
+import { logFeatureView, subscribeToPresence } from './lib/analytics';
 import Auth from './components/Auth';
 import HomeDashboard from './components/HomeDashboard';
 import ProfilePage from './components/ProfilePage';
@@ -52,6 +52,24 @@ function App() {
 
   const displayName = user.user_metadata?.full_name || user.email.split('@')[0];
   const isAdmin = isAdminEmail(user.email);
+
+  // 🟢 Real-Time Presence & Feature Usage Logger across SSCBS OS
+  useEffect(() => {
+    if (user) {
+      logFeatureView(view, user);
+      const unsubscribe = subscribeToPresence(user, view);
+      return () => unsubscribe();
+    }
+  }, [user, view]);
+
+  // Log GPA calculator opens separately
+  useEffect(() => {
+    if (isGpaOpen && user) {
+      logFeatureView('gpa', user);
+      const unsubscribe = subscribeToPresence(user, 'gpa');
+      return () => unsubscribe();
+    }
+  }, [isGpaOpen, user]);
 
   const openTool = (id) => {
     if (id === 'gpa') {
