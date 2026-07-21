@@ -668,22 +668,32 @@ export default function AdminConsolePage({ onBack }) {
           const blockStarts = [];
           sheetData.forEach((row, idx) => {
             const rowStr = row.map(c => clean(c)).join(' ').toUpperCase();
-            if (rowStr.includes('SHAHEED SUKHDEV') || rowStr.includes('BBA') || rowStr.includes('BMS') || rowStr.includes('TIME TABLE')) {
-              blockStarts.push(idx);
+            if (
+              rowStr.includes('SHAHEED SUKHDEV') || 
+              rowStr.includes('CLASS TIME TABLE') ||
+              (rowStr.includes('PROGRAMME') && (rowStr.includes('B.SC') || rowStr.includes('BBA') || rowStr.includes('BMS')))
+            ) {
+              if (blockStarts.length === 0 || idx - blockStarts[blockStarts.length - 1] > 15) {
+                blockStarts.push(idx);
+              }
             }
           });
 
           if (blockStarts.length === 0) return;
+
+          addLog(`[Management Upload] Sheet "${sheetName}": Found ${blockStarts.length} block(s) at rows ${blockStarts.join(', ')}`, 'info');
 
           let defaultSem = '2';
           const semInSheetName = sheetName.match(/Sem[^\d]*(\d+)/i) || sheetName.match(/(\d+)(?:st|nd|rd|th)?\s*Sem/i) || sheetName.match(/\b([1-8])\b/);
           if (semInSheetName) defaultSem = semInSheetName[1];
           let defaultCourse = sheetName.toUpperCase().includes('BBA') ? 'BBA FIA' : 'BMS';
 
-          blockStarts.forEach((startRow) => {
+          blockStarts.forEach((startRow, bIdx) => {
             const result = parseSheetBlock(sheetData, startRow, defaultCourse, defaultSem);
             if (result) {
-              const { course, sem, section, weekSchedule } = result;
+              const { course, sem, section, defaultRoom, weekSchedule } = result;
+              addLog(`  -> [Mgmt Block ${bIdx + 1}] Mapped to ${course} Sem ${sem} Section ${section} (${defaultRoom})`, 'info');
+              
               if (!timetables[course]) timetables[course] = {};
               if (!timetables[course][sem]) timetables[course][sem] = {};
               timetables[course][sem][section] = weekSchedule;
@@ -695,7 +705,8 @@ export default function AdminConsolePage({ onBack }) {
           addLog('[Management Upload] ⚠️ No Management timetable blocks recognized.', 'warning');
         } else {
           setMgmtParsedData(timetables);
-          addLog('[Management Upload] ✓ Successfully parsed Management timetables!', 'success');
+          const summaryList = Object.keys(timetables).map(c => `${c}: Sems [${Object.keys(timetables[c]).join(', ')}]`).join(' | ');
+          addLog(`[Management Upload] ✓ Successfully parsed Management timetables (${summaryList})!`, 'success');
         }
       } catch (err) {
         addLog(`[Management Upload] Error: ${err.message}`, 'error');
@@ -732,19 +743,31 @@ export default function AdminConsolePage({ onBack }) {
 
           sheetData.forEach((row, idx) => {
             const rowStr = row.map(c => clean(c)).join(' ').toUpperCase();
-            if (rowStr.includes('SHAHEED SUKHDEV') || rowStr.includes('COMPUTER SCIENCE') || rowStr.includes('B.SC') || rowStr.includes('BSCCS') || rowStr.includes('TIME TABLE')) {
-              blockStarts.push(idx);
+            if (
+              rowStr.includes('SHAHEED SUKHDEV') || 
+              rowStr.includes('CLASS TIME TABLE') ||
+              (rowStr.includes('PROGRAMME') && (rowStr.includes('B.SC') || rowStr.includes('COMPUTER SCIENCE')))
+            ) {
+              if (blockStarts.length === 0 || idx - blockStarts[blockStarts.length - 1] > 15) {
+                blockStarts.push(idx);
+              }
             }
           });
+
+          if (blockStarts.length === 0) return;
+
+          addLog(`[B.Sc. CS Upload] Sheet "${sheetName}": Found ${blockStarts.length} block(s) at rows ${blockStarts.join(', ')}`, 'info');
 
           let defaultSem = '2';
           const semMatch = sheetName.match(/Sem[^\d]*(\d+)/i) || sheetName.match(/(\d+)(?:st|nd|rd|th)?\s*Sem/i) || sheetName.match(/\b([1-8])\b/);
           if (semMatch) defaultSem = semMatch[1];
 
-          blockStarts.forEach((startRow) => {
+          blockStarts.forEach((startRow, bIdx) => {
             const result = parseSheetBlock(sheetData, startRow, 'Bsc Comp Sci', defaultSem);
             if (result) {
-              const { sem, section, weekSchedule } = result;
+              const { sem, section, defaultRoom, weekSchedule } = result;
+              addLog(`  -> [CS Block ${bIdx + 1}] Mapped B.Sc. CS Sem ${sem} Section ${section} (${defaultRoom})`, 'info');
+              
               if (!timetables["Bsc Comp Sci"][sem]) timetables["Bsc Comp Sci"][sem] = {};
               timetables["Bsc Comp Sci"][sem][section] = weekSchedule;
               parsedBlocksCount++;
