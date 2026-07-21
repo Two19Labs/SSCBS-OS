@@ -27,7 +27,7 @@ const GRADE_POINTS = {
 export default function GpaCalculatorModal({ isOpen, onClose }) {
   const { user } = useAuth();
   
-  // Tabs: 'sgpa' | 'cgpa' | 'planner'
+  // Tabs: 'sgpa' | 'cgpa'
   const [activeTab, setActiveTab] = useState('sgpa');
   
   // SGPA Tab states
@@ -50,13 +50,6 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
   );
   const [cgpaResult, setCgpaResult] = useState(0);
   const [totalCgpaCredits, setTotalCgpaCredits] = useState(0);
-
-  // Target Planner states
-  const [currentCgpa, setCurrentCgpa] = useState('');
-  const [currentCredits, setCurrentCredits] = useState('');
-  const [targetCgpa, setTargetCgpa] = useState('');
-  const [remainingCredits, setRemainingCredits] = useState('');
-  const [plannerOutput, setPlannerOutput] = useState(null);
 
   // Auto-detect user course and semester on open to prefill
   useEffect(() => {
@@ -105,33 +98,6 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
     setCgpaResult(parseFloat(cgpa.toFixed(2)));
     setTotalCgpaCredits(totalCredits);
   }, [semestersData]);
-
-  // Planner Logic
-  useEffect(() => {
-    const currCgpa = parseFloat(currentCgpa);
-    const currCreds = parseFloat(currentCredits);
-    const tarCgpa = parseFloat(targetCgpa);
-    const remCreds = parseFloat(remainingCredits);
-
-    if (!isNaN(currCgpa) && !isNaN(currCreds) && !isNaN(tarCgpa) && !isNaN(remCreds) && remCreds > 0 && currCreds >= 0) {
-      const currentQualityPoints = currCgpa * currCreds;
-      const totalFutureCredits = currCreds + remCreds;
-      const targetQualityPoints = tarCgpa * totalFutureCredits;
-      const qualityPointsNeeded = targetQualityPoints - currentQualityPoints;
-      const requiredSgpa = qualityPointsNeeded / remCreds;
-
-      // Max achievable CGPA if student gets a perfect 10 in future semesters
-      const maxCgpa = ((currCgpa * currCreds) + (10 * remCreds)) / totalFutureCredits;
-
-      setPlannerOutput({
-        requiredSgpa: parseFloat(requiredSgpa.toFixed(2)),
-        maxCgpa: parseFloat(maxCgpa.toFixed(2)),
-        isPossible: requiredSgpa <= 10.0
-      });
-    } else {
-      setPlannerOutput(null);
-    }
-  }, [currentCgpa, currentCredits, targetCgpa, remainingCredits]);
 
   // Helper functions
   const handleSubjectChange = (id, field, value) => {
@@ -223,12 +189,6 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
           >
             CGPA Calculator
           </button>
-          <button 
-            className={`gpa-tab-btn ${activeTab === 'planner' ? 'active' : ''}`}
-            onClick={() => setActiveTab('planner')}
-          >
-            Target CGPA Planner
-          </button>
         </nav>
 
         {/* Modal Scrollable Content */}
@@ -253,7 +213,7 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                       ))}
                     </select>
                     <p className="semester-help-text">
-                      Pre-populated with standard 22-credit NEP slot layout (7 subjects). Feel free to customize.
+                      Pre-populated with standard 22-credit NEP slot layout (7 subjects). Custom slots supported.
                     </p>
                   </div>
 
@@ -270,7 +230,7 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                       <tbody>
                         {subjects.map((sub) => (
                           <tr key={sub.id}>
-                            <td>
+                            <td data-label="Subject Name">
                               <input
                                 type="text"
                                 className="gpa-input-text table-input-name"
@@ -279,7 +239,7 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                                 placeholder="Enter subject name..."
                               />
                             </td>
-                            <td>
+                            <td data-label="Credits">
                               <input
                                 type="number"
                                 className="gpa-input-number table-input-credits"
@@ -289,7 +249,7 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                                 onChange={(e) => handleSubjectChange(sub.id, 'credits', e.target.value)}
                               />
                             </td>
-                            <td>
+                            <td data-label="Grade">
                               <select
                                 className="gpa-select-field table-select-grade"
                                 value={sub.grade}
@@ -300,7 +260,7 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                                 ))}
                               </select>
                             </td>
-                            <td>
+                            <td className="cell-action">
                               <button
                                 type="button"
                                 className="gpa-delete-row-btn"
@@ -333,7 +293,7 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                     
                     {/* SVG Progress Ring */}
                     <div className="progress-ring-container">
-                      <svg className="progress-ring" width="160" height="160">
+                      <svg className="progress-ring" width="160" height="160" viewBox="0 0 160 160">
                         <circle className="progress-ring-bg" cx="80" cy="80" r="70" />
                         <circle 
                           className="progress-ring-fill" 
@@ -380,7 +340,6 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                       >
                         Copy to CGPA Calculator
                       </button>
-
                     </div>
                   </div>
                 </div>
@@ -396,8 +355,7 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                 <div className="inputs-section">
                   <h4 className="section-title-small">Enter SGPA for Completed Semesters</h4>
                   <p className="section-desc-small">
-                    Toggle checkboxes to include semesters in the cumulative CGPA. 
-                    If you calculated your SGPA in the first tab, use the <strong>"Copy Current"</strong> button next to the semester.
+                    Toggle checkboxes to include semesters in the cumulative CGPA calculation.
                   </p>
 
                   <div className="cgpa-semester-grid">
@@ -419,7 +377,7 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                               onClick={() => handleSemesterDataChange(sem.number, 'sgpa', sgpaResult.toString())}
                               title="Copy SGPA from the SGPA calculator tab"
                             >
-                              Copy Current ({sgpaResult})
+                              ⚡ Copy SGPA ({sgpaResult})
                             </button>
                           )}
                         </div>
@@ -467,7 +425,7 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                     
                     {/* SVG Progress Ring */}
                     <div className="progress-ring-container">
-                      <svg className="progress-ring" width="160" height="160">
+                      <svg className="progress-ring" width="160" height="160" viewBox="0 0 160 160">
                         <circle className="progress-ring-bg" cx="80" cy="80" r="70" />
                         <circle 
                           className="progress-ring-fill fill-cgpa" 
@@ -506,154 +464,8 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                     </div>
 
                     <div className="sidebar-action-buttons">
-
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 3: TARGET PLANNER */}
-          {activeTab === 'planner' && (
-            <div className="gpa-tab-pane pane-planner">
-              <div className="planner-grid-layout">
-                {/* Inputs Panel */}
-                <div className="planner-inputs-card">
-                  <h4 className="planner-heading">Target CGPA Goal Settings</h4>
-                  <p className="planner-subheading">
-                    Determine the average GPA you must achieve in your upcoming semesters to hit a target graduation CGPA.
-                  </p>
-
-                  <div className="planner-form-grid">
-                    <div className="form-item">
-                      <label htmlFor="planner-current-cgpa">Current CGPA</label>
-                      <input
-                        type="number"
-                        id="planner-current-cgpa"
-                        className="gpa-input-number"
-                        placeholder="e.g. 7.85"
-                        min="0"
-                        max="10"
-                        step="0.01"
-                        value={currentCgpa}
-                        onChange={(e) => setCurrentCgpa(e.target.value)}
-                      />
-                      <span className="input-helper">Your CGPA up to this point.</span>
-                    </div>
-
-                    <div className="form-item">
-                      <label htmlFor="planner-current-credits">Credits Earned So Far</label>
-                      <input
-                        type="number"
-                        id="planner-current-credits"
-                        className="gpa-input-number"
-                        placeholder="e.g. 44 (2 semesters)"
-                        min="0"
-                        value={currentCredits}
-                        onChange={(e) => setCurrentCredits(e.target.value)}
-                      />
-                      <span className="input-helper">Total credits completed.</span>
-                    </div>
-
-                    <div className="form-item">
-                      <label htmlFor="planner-target-cgpa">Target CGPA Goal</label>
-                      <input
-                        type="number"
-                        id="planner-target-cgpa"
-                        className="gpa-input-number"
-                        placeholder="e.g. 8.50"
-                        min="0"
-                        max="10"
-                        step="0.01"
-                        value={targetCgpa}
-                        onChange={(e) => setTargetCgpa(e.target.value)}
-                      />
-                      <span className="input-helper">The CGPA you want to graduate with.</span>
-                    </div>
-
-                    <div className="form-item">
-                      <label htmlFor="planner-remaining-credits">Remaining Credits</label>
-                      <input
-                        type="number"
-                        id="planner-remaining-credits"
-                        className="gpa-input-number"
-                        placeholder="e.g. 88 (4 semesters)"
-                        min="0"
-                        value={remainingCredits}
-                        onChange={(e) => setRemainingCredits(e.target.value)}
-                      />
-                      <span className="input-helper">Credits you will study in future.</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Outputs Panel */}
-                <div className="planner-results-card">
-                  <h4 className="planner-heading">Feasibility Assessment</h4>
-                  
-                  {!plannerOutput ? (
-                    <div className="planner-empty-state">
-                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="empty-state-icon">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="8" x2="12" y2="12"></line>
-                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                      </svg>
-                      <p>Please enter your academic metrics on the left to calculate your planning goals.</p>
-                    </div>
-                  ) : (
-                    <div className="planner-output-content">
-                      {plannerOutput.isPossible ? (
-                        <div className="planner-alert success">
-                          <div className="alert-header">
-                            <span className="alert-badge success">Goal Achievable</span>
-                            <h5>SGPA Required: <strong>{plannerOutput.requiredSgpa.toFixed(2)}</strong></h5>
-                          </div>
-                          <p className="alert-message">
-                            To achieve your target CGPA of <strong>{targetCgpa}</strong>, you need to maintain an average SGPA of <strong>{plannerOutput.requiredSgpa.toFixed(2)}</strong> across your remaining <strong>{remainingCredits}</strong> credits.
-                          </p>
-                          {plannerOutput.requiredSgpa <= parseFloat(currentCgpa) ? (
-                            <div className="planner-micro-tip">
-                              💡 Tip: This target SGPA is lower than your current performance ({currentCgpa}). Keep up your current pace and you will comfortably hit your target!
-                            </div>
-                          ) : (
-                            <div className="planner-micro-tip">
-                              📈 Note: This target SGPA is higher than your current performance ({currentCgpa}). You'll need to step up your marks slightly in future classes.
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="planner-alert danger">
-                          <div className="alert-header">
-                            <span className="alert-badge danger">Goal Out of Reach</span>
-                            <h5>Required SGPA: <strong>{plannerOutput.requiredSgpa.toFixed(2)}</strong></h5>
-                          </div>
-                          <p className="alert-message">
-                            Mathematically, you cannot hit a target CGPA of <strong>{targetCgpa}</strong>. 
-                            Even if you secure a perfect <strong>10.00 SGPA</strong> in all remaining classes, your maximum possible graduating CGPA is <strong>{plannerOutput.maxCgpa.toFixed(2)}</strong>.
-                          </p>
-                          <div className="planner-micro-tip">
-                            💡 Suggestion: Consider lowering your target CGPA goal to <strong>{plannerOutput.maxCgpa.toFixed(2)}</strong> or below to make it achievable.
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="planner-stats-box">
-                        <div className="planner-stat-row">
-                          <span>Total Cumulative Credits:</span>
-                          <strong>{parseFloat(currentCredits) + parseFloat(remainingCredits)}</strong>
-                        </div>
-                        <div className="planner-stat-row">
-                          <span>Maximum Possible CGPA:</span>
-                          <strong>{plannerOutput.maxCgpa.toFixed(2)}</strong>
-                        </div>
-                        <div className="planner-stat-row">
-                          <span>Quality Points Needed:</span>
-                          <strong>{((targetCgpa * (parseFloat(currentCredits) + parseFloat(remainingCredits))) - (currentCgpa * currentCredits)).toFixed(1)}</strong>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
