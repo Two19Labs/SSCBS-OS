@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { useTimetable } from '../context/TimetableContext';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { isAdminEmail } from '../lib/admin';
+import { getOnlinePresence, getAnalyticsSummary } from '../lib/analytics';
 import DateTimePicker from './DateTimePicker';
 import './AdminConsolePage.css';
 
@@ -298,12 +299,45 @@ export default function AdminConsolePage({ onBack }) {
     }
   };
 
-  // Analytics states
+  // Analytics & Real-time Presence states
   const [analyticsUsers, setAnalyticsUsers] = useState([]);
   const [loadingAnalytics, setLoadingAnalytics] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCourse, setFilterCourse] = useState('All');
   const [filterSem, setFilterSem] = useState('All');
+
+  // Real-Time Online Presence & Time-Series Graph States
+  const [onlinePresence, setOnlinePresence] = useState([]);
+  const [analyticsTimeRange, setAnalyticsTimeRange] = useState(7); // 7, 30, 90
+  const [analyticsSummary, setAnalyticsSummary] = useState(() => getAnalyticsSummary(7));
+  const [enabledSeries, setEnabledSeries] = useState({
+    total: true,
+    timetable: true,
+    'find-prof': true,
+    waiver: true,
+    gpa: true,
+    buzz: true
+  });
+  const [hoveredPoint, setHoveredPoint] = useState(null);
+
+  useEffect(() => {
+    const updatePresenceData = () => {
+      const live = getOnlinePresence();
+      setOnlinePresence(live);
+    };
+
+    updatePresenceData();
+    const interval = setInterval(updatePresenceData, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    setAnalyticsSummary(getAnalyticsSummary(analyticsTimeRange));
+  }, [analyticsTimeRange]);
+
+  const toggleSeries = (seriesKey) => {
+    setEnabledSeries(prev => ({ ...prev, [seriesKey]: !prev[seriesKey] }));
+  };
 
   const fetchDemographicsData = async () => {
     setLoadingAnalytics(true);
@@ -1611,33 +1645,270 @@ export default function AdminConsolePage({ onBack }) {
           /* Student Demographics Analytics Tab */
           <div className="tab-pane analytics-pane">
             <div className="analytics-stats-grid">
+              <div className="stat-card-admin highlight-online">
+                <div className="card-icon">🟢</div>
+                <h4>Online Right Now</h4>
+                <p className="stat-number live-pulse-text">{onlinePresence.length}</p>
+                <p className="stat-subtitle">Students active on OS shell</p>
+              </div>
               <div className="stat-card-admin">
                 <div className="card-icon">👥</div>
                 <h4>Total Students</h4>
                 <p className="stat-number">{analyticsUsers.length}</p>
-                <p className="stat-subtitle">Registered on SSCBS OS</p>
+                <p className="stat-subtitle">Registered profiles</p>
               </div>
               <div className="stat-card-admin">
-                <div className="card-icon">💼</div>
-                <h4>BMS Enrolled</h4>
-                <p className="stat-number">{analyticsUsers.filter(u => u.course === 'BMS').length}</p>
-                <p className="stat-subtitle">Bachelor of Management Studies</p>
+                <div className="card-icon">🏆</div>
+                <h4>Top Feature</h4>
+                <p className="stat-number text-truncate" style={{ fontSize: '1.25rem' }}>
+                  {analyticsSummary.topFeatureName}
+                </p>
+                <p className="stat-subtitle">{analyticsSummary.topFeatureCount} engagements</p>
               </div>
               <div className="stat-card-admin">
-                <div className="card-icon">📈</div>
-                <h4>BBA FIA Enrolled</h4>
-                <p className="stat-number">{analyticsUsers.filter(u => u.course === 'BBA FIA').length}</p>
-                <p className="stat-subtitle">Financial Investment Analysis</p>
-              </div>
-              <div className="stat-card-admin">
-                <div className="card-icon">💻</div>
-                <h4>BSc CS Enrolled</h4>
-                <p className="stat-number">{analyticsUsers.filter(u => u.course === 'Bsc Comp Sci').length}</p>
-                <p className="stat-subtitle">Computer Science Honours</p>
+                <div className="card-icon">📊</div>
+                <h4>Total Platform Events</h4>
+                <p className="stat-number">{analyticsSummary.totals.grandTotal}</p>
+                <p className="stat-subtitle">Views & clicks in window</p>
               </div>
             </div>
 
-            {/* Visual Charts */}
+            {/* REAL-TIME ONLINE PRESENCE ROSTER CARD */}
+            <div className="registry-card-admin presence-card-container">
+              <div className="chart-header-admin flex-between">
+                <div>
+                  <h3>🟢 Real-Time Online Presence Roster</h3>
+                  <p className="section-desc-small">
+                    Active students currently connected to SSCBS OS shell & features (refreshes live every 3s).
+                  </p>
+                </div>
+                <span className="live-presence-indicator">
+                  <span className="pulse-dot-green"></span> {onlinePresence.length} Active Now
+                </span>
+              </div>
+
+              {onlinePresence.length === 0 ? (
+                <div className="no-registry-results">
+                  <p>No other active students connected right now. Perform actions in the OS shell to trigger real-time presence.</p>
+                </div>
+              ) : (
+                <div className="table-scroll-container-admin">
+                  <table className="registry-table-admin presence-table-admin">
+                    <thead>
+                      <tr>
+                        <th>Student</th>
+                        <th>Course & Section</th>
+                        <th>Active Feature / Page</th>
+                        <th>Device Shell</th>
+                        <th>Last Ping</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {onlinePresence.map((user) => (
+                        <tr key={user.id}>
+                          <td>
+                            <div className="student-name-cell">
+                              <span className="online-avatar-badge">{user.name.charAt(0).toUpperCase()}</span>
+                              <div>
+                                <strong className="student-name-text">{user.name}</strong>
+                                <span className="student-email-text">{user.email}</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <span className="course-sem-chip">
+                              {user.course} • Sem {user.semester} {user.section !== 'N/A' ? `(${user.section})` : ''}
+                            </span>
+                          </td>
+                          <td>
+                            <span className="active-view-chip">
+                              ⚡ {user.viewLabel}
+                            </span>
+                          </td>
+                          <td>
+                            <span className="device-chip">{user.device}</span>
+                          </td>
+                          <td>
+                            <span className="ping-time-chip">🟢 Live</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* INTERACTIVE TIME-SERIES LINE GRAPH CARD */}
+            <div className="registry-card-admin line-graph-card-admin">
+              <div className="chart-header-admin flex-between flex-wrap">
+                <div>
+                  <h3>📈 Feature Usage & Click Analytics (Time-Series)</h3>
+                  <p className="section-desc-small">
+                    Daily engagement trends across SSCBS OS tools over time. Click legend items below to toggle feature lines.
+                  </p>
+                </div>
+                
+                <div className="graph-time-selectors">
+                  {[
+                    { days: 7, label: 'Last 7 Days' },
+                    { days: 30, label: 'Last 30 Days' },
+                    { days: 90, label: 'Last 90 Days' }
+                  ].map(({ days, label }) => (
+                    <button
+                      key={days}
+                      className={`btn-time-range ${analyticsTimeRange === days ? 'active' : ''}`}
+                      onClick={() => setAnalyticsTimeRange(days)}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Interactive Series Legend Toggles */}
+              <div className="graph-legend-toggles">
+                {[
+                  { key: 'total', label: 'All Platform Views', color: '#eab308' },
+                  { key: 'timetable', label: 'Timetable', color: '#8b5cf6' },
+                  { key: 'find-prof', label: 'Find My Professor', color: '#10b981' },
+                  { key: 'waiver', label: 'Waiver Tool', color: '#06b6d4' },
+                  { key: 'gpa', label: 'GPA Calculator', color: '#f59e0b' },
+                  { key: 'buzz', label: 'Campus Buzz', color: '#ec4899' }
+                ].map(({ key, label, color }) => (
+                  <button
+                    key={key}
+                    className={`legend-toggle-item ${enabledSeries[key] ? 'active' : 'disabled'}`}
+                    onClick={() => toggleSeries(key)}
+                  >
+                    <span className="legend-dot" style={{ backgroundColor: color }}></span>
+                    <span className="legend-name">{label}</span>
+                    <span className="legend-count">({analyticsSummary.totals[key] || analyticsSummary.totals.grandTotal})</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* SVG Line Graph Render */}
+              <div className="line-graph-wrapper">
+                {(() => {
+                  const { dateLabels, series } = analyticsSummary;
+                  if (!dateLabels || dateLabels.length === 0) return null;
+
+                  const width = 800;
+                  const height = 240;
+                  const paddingLeft = 45;
+                  const paddingRight = 20;
+                  const paddingTop = 20;
+                  const paddingBottom = 40;
+                  const graphWidth = width - paddingLeft - paddingRight;
+                  const graphHeight = height - paddingTop - paddingBottom;
+
+                  const seriesColors = {
+                    total: '#eab308',
+                    timetable: '#8b5cf6',
+                    'find-prof': '#10b981',
+                    waiver: '#06b6d4',
+                    gpa: '#f59e0b',
+                    buzz: '#ec4899'
+                  };
+
+                  let maxVal = 10;
+                  Object.keys(series).forEach(key => {
+                    if (enabledSeries[key]) {
+                      const maxInSeries = Math.max(...series[key]);
+                      if (maxInSeries > maxVal) maxVal = maxInSeries;
+                    }
+                  });
+
+                  const getX = (idx) => paddingLeft + (idx / Math.max(1, dateLabels.length - 1)) * graphWidth;
+                  const getY = (val) => paddingTop + graphHeight - (val / maxVal) * graphHeight;
+
+                  return (
+                    <div className="svg-container-rel">
+                      <svg viewBox={`0 0 ${width} ${height}`} className="line-graph-svg">
+                        {/* Gridlines */}
+                        {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
+                          const val = Math.round(ratio * maxVal);
+                          const y = paddingTop + graphHeight - ratio * graphHeight;
+                          return (
+                            <g key={ratio} className="graph-grid-group">
+                              <line x1={paddingLeft} y1={y} x2={width - paddingRight} y2={y} stroke="rgba(255,255,255,0.06)" strokeDasharray="3 3" />
+                              <text x={paddingLeft - 8} y={y + 4} fill="var(--ink-dim)" fontSize="10" textAnchor="end" fontWeight="700">{val}</text>
+                            </g>
+                          );
+                        })}
+
+                        {/* Date Axis Labels */}
+                        {dateLabels.map((label, idx) => {
+                          const step = Math.max(1, Math.ceil(dateLabels.length / 8));
+                          if (idx % step !== 0 && idx !== dateLabels.length - 1) return null;
+                          const x = getX(idx);
+                          return (
+                            <text key={idx} x={x} y={height - 10} fill="var(--ink-dim)" fontSize="10" textAnchor="middle" fontWeight="700">
+                              {label}
+                            </text>
+                          );
+                        })}
+
+                        {/* Line Series */}
+                        {Object.keys(series).map((seriesKey) => {
+                          if (!enabledSeries[seriesKey]) return null;
+                          const points = series[seriesKey];
+                          const pathData = points.map((val, idx) => `${idx === 0 ? 'M' : 'L'} ${getX(idx)} ${getY(val)}`).join(' ');
+                          const color = seriesColors[seriesKey] || '#8b5cf6';
+
+                          return (
+                            <g key={seriesKey}>
+                              <path
+                                d={pathData}
+                                fill="none"
+                                stroke={color}
+                                strokeWidth={seriesKey === 'total' ? '3.5' : '2.5'}
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                opacity={seriesKey === 'total' ? 0.7 : 0.9}
+                              />
+                              {points.map((val, idx) => (
+                                <circle
+                                  key={idx}
+                                  cx={getX(idx)}
+                                  cy={getY(val)}
+                                  r={seriesKey === 'total' ? '4.5' : '3.5'}
+                                  fill={color}
+                                  stroke="var(--surface)"
+                                  strokeWidth="1.5"
+                                  className="graph-point-circle"
+                                  onMouseEnter={() => setHoveredPoint({ date: dateLabels[idx], seriesKey, val, x: getX(idx), y: getY(val) })}
+                                  onMouseLeave={() => setHoveredPoint(null)}
+                                />
+                              ))}
+                            </g>
+                          );
+                        })}
+                      </svg>
+
+                      {/* Hover Tooltip */}
+                      {hoveredPoint && (
+                        <div
+                          className="graph-hover-tooltip"
+                          style={{
+                            left: `${(hoveredPoint.x / width) * 100}%`,
+                            top: `${(hoveredPoint.y / height) * 100}%`
+                          }}
+                        >
+                          <span className="tooltip-date">{hoveredPoint.date}</span>
+                          <span className="tooltip-val">
+                            <strong>{hoveredPoint.seriesKey.toUpperCase()}</strong>: {hoveredPoint.val} views
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+
+            {/* Visual Charts Row */}
             <div className="analytics-charts-row">
               {/* Course Donut Chart */}
               <div className="chart-container-admin">

@@ -1558,3 +1558,274 @@
   display: flex;
   align-items: center;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   REAL-TIME ONLINE PRESENCE & LINE GRAPH ANALYTICS STYLES
+   ═══════════════════════════════════════════════════════════ */
+
+/* Highlight Online Stat Card */
+.stat-card-admin.highlight-online {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, var(--surface), rgba(16, 185, 129, 0.05));
+}
+
+.live-pulse-text {
+  color: #10b981 !important;
+}
+
+/* Presence Indicator Badge */
+.live-presence-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+
+.pulse-dot-green {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: pulseGreen 1.8s infinite;
+}
+
+@keyframes pulseGreen {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+/* Presence Roster Table */
+.presence-table-admin td {
+  vertical-align: middle;
+}
+
+.student-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.online-avatar-badge {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.student-name-text {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.student-email-text {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--ink-dim);
+}
+
+.course-sem-chip {
+  background: var(--tint);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.active-view-chip {
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: var(--accent);
+  font-size: 0.76rem;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.device-chip {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink-dim);
+}
+
+.ping-time-chip {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+/* Line Graph Styles */
+.line-graph-card-admin {
+  position: relative;
+  overflow: hidden;
+}
+
+.graph-time-selectors {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg);
+  padding: 3px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.btn-time-range {
+  background: transparent;
+  border: none;
+  padding: 5px 12px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink-dim);
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-time-range:hover {
+  color: var(--ink);
+}
+
+.btn-time-range.active {
+  background: var(--surface);
+  color: var(--accent);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.graph-legend-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 16px;
+}
+
+.legend-toggle-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.legend-toggle-item.disabled {
+  opacity: 0.4;
+  border-color: transparent;
+  background: var(--tint);
+}
+
+.legend-toggle-item:hover {
+  transform: translateY(-1px);
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.legend-count {
+  font-size: 0.72rem;
+  color: var(--ink-dim);
+}
+
+/* SVG Container */
+.line-graph-wrapper {
+  width: 100%;
+  border-radius: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 16px 12px 10px;
+}
+
+.svg-container-rel {
+  position: relative;
+  width: 100%;
+}
+
+.line-graph-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.graph-point-circle {
+  cursor: pointer;
+  transition: transform 0.15s ease, r 0.15s ease;
+}
+
+.graph-point-circle:hover {
+  r: 6px;
+  stroke-width: 2.5px;
+}
+
+/* Hover Tooltip */
+.graph-hover-tooltip {
+  position: absolute;
+  transform: translate(-50%, -120%);
+  background: var(--ink);
+  color: var(--surface);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  pointer-events: none;
+  z-index: 20;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.tooltip-date {
+  font-size: 0.68rem;
+  color: var(--ink-dim);
+  font-weight: 700;
+}
+
+.tooltip-val {
+  font-size: 0.78rem;
+}
+
