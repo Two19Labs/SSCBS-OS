@@ -28,21 +28,40 @@ export const AuthProvider = ({ children }) => {
       return;
     }
 
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    // Get initial session with safety timeout and catch
+    let sessionResolved = false;
+    const timeout = setTimeout(() => {
+      if (!sessionResolved) {
+        setLoading(false);
+      }
+    }, 4000);
+
+    supabase.auth.getSession()
+      .then(({ data: { session } = {} }) => {
+        sessionResolved = true;
+        clearTimeout(timeout);
+        setSession(session ?? null);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.warn('Auth getSession notice:', err);
+        sessionResolved = true;
+        clearTimeout(timeout);
+        setLoading(false);
+      });
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+      sessionResolved = true;
+      clearTimeout(timeout);
+      setSession(session ?? null);
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
     return () => {
+      clearTimeout(timeout);
       subscription.unsubscribe();
     };
   }, []);

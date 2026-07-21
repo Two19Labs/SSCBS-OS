@@ -1,14 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useAuth } from './context/AuthContext';
 import { logFeatureView, subscribeToPresence } from './lib/analytics';
 import Auth from './components/Auth';
 import HomeDashboard from './components/HomeDashboard';
 import ProfilePage from './components/ProfilePage';
 import ClassSchedulesCard from './components/ClassSchedulesCard';
-import FindMyProfessorPage from './components/FindMyProfessorPage';
-import GpaCalculatorModal from './components/GpaCalculatorModal';
-import WaiverToolPage from './components/WaiverToolPage';
-import AdminConsolePage from './components/AdminConsolePage';
 import NoticeBoard from './components/NoticeBoard';
 import { isAdminEmail } from './lib/admin';
 import {
@@ -29,6 +25,19 @@ import InstallPwaPrompt from './components/InstallPwaPrompt';
 import FooterCredit from './components/FooterCredit';
 import { Analytics } from '@vercel/analytics/react';
 
+// Lazy-loaded heavy page & tool chunks for fast initial app shell booting
+const WaiverToolPage = lazy(() => import('./components/WaiverToolPage'));
+const FindMyProfessorPage = lazy(() => import('./components/FindMyProfessorPage'));
+const AdminConsolePage = lazy(() => import('./components/AdminConsolePage'));
+const GpaCalculatorModal = lazy(() => import('./components/GpaCalculatorModal'));
+
+const PageLoader = () => (
+  <div className="loading-screen" style={{ minHeight: '300px' }}>
+    <span className="system-spinner"></span>
+    <p className="loading-text">Loading...</p>
+  </div>
+);
+
 const TOOL_VIEWS = ['find-prof', 'waiver', 'admin'];
 
 function App() {
@@ -36,6 +45,18 @@ function App() {
   const [view, setView] = useState('home');
   const [returnView, setReturnView] = useState('home');
   const [isGpaOpen, setIsGpaOpen] = useState(false);
+
+  // 🟢 Real-Time Presence & Feature Usage Logger across SSCBS OS
+  useEffect(() => {
+    if (user && user.email) {
+      const activeViewName = isGpaOpen ? 'gpa' : view;
+      logFeatureView(activeViewName, user);
+      const unsubscribe = subscribeToPresence(user, activeViewName);
+      return () => {
+        if (typeof unsubscribe === 'function') unsubscribe();
+      };
+    }
+  }, [user, view, isGpaOpen]);
 
   if (loading) {
     return (
@@ -53,18 +74,6 @@ function App() {
   const displayName = user.user_metadata?.full_name || user.email.split('@')[0];
   const isAdmin = isAdminEmail(user.email);
 
-  // 🟢 Real-Time Presence & Feature Usage Logger across SSCBS OS
-  useEffect(() => {
-    if (user && user.email) {
-      const activeViewName = isGpaOpen ? 'gpa' : view;
-      logFeatureView(activeViewName, user);
-      const unsubscribe = subscribeToPresence(user, activeViewName);
-      return () => {
-        if (typeof unsubscribe === 'function') unsubscribe();
-      };
-    }
-  }, [user, view, isGpaOpen]);
-
   const openTool = (id) => {
     if (id === 'gpa') {
       setIsGpaOpen(true);
@@ -78,7 +87,11 @@ function App() {
 
   // Waiver tool ships its own full-page layout
   if (view === 'waiver') {
-    return <WaiverToolPage onBack={goBack} />;
+    return (
+      <Suspense fallback={<PageLoader />}>
+        <WaiverToolPage onBack={goBack} />
+      </Suspense>
+    );
   }
 
   const navItems = [
@@ -114,9 +127,17 @@ function App() {
       case 'timetable':
         return <ClassSchedulesCard onOpenProfile={() => setView('profile')} />;
       case 'find-prof':
-        return <FindMyProfessorPage onBack={goBack} />;
+        return (
+          <Suspense fallback={<PageLoader />}>
+            <FindMyProfessorPage onBack={goBack} />
+          </Suspense>
+        );
       case 'admin':
-        return isAdmin ? <AdminConsolePage onBack={goBack} /> : <HomeDashboard onNavigate={openTool} onOpenProfile={() => setView('profile')} />;
+        return isAdmin ? (
+          <Suspense fallback={<PageLoader />}>
+            <AdminConsolePage onBack={goBack} />
+          </Suspense>
+        ) : <HomeDashboard onNavigate={openTool} onOpenProfile={() => setView('profile')} />;
       case 'buzz':
         return (
           <div className="buzz-page">
@@ -245,7 +266,9 @@ function App() {
         </nav>
       </div>
 
-      <GpaCalculatorModal isOpen={isGpaOpen} onClose={() => setIsGpaOpen(false)} />
+      <Suspense fallback={null}>
+        {isGpaOpen && <GpaCalculatorModal isOpen={isGpaOpen} onClose={() => setIsGpaOpen(false)} />}
+      </Suspense>
       <InstallPwaPrompt />
       <Analytics />
     </>
