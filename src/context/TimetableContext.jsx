@@ -10,7 +10,18 @@ const TimetableContext = createContext({
 });
 
 export const TimetableProvider = ({ children }) => {
-  const [timetable, setTimetable] = useState(timetablesData);
+  const [timetable, setTimetable] = useState(() => {
+    try {
+      const cached = localStorage.getItem('sscbs_os_timetable');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && typeof parsed === 'object') return parsed;
+      }
+    } catch (e) {
+      console.warn('Could not read cached timetable from localStorage:', e);
+    }
+    return timetablesData;
+  });
   const [loading, setLoading] = useState(true);
 
   // Fetch timetable configuration on load
@@ -32,6 +43,9 @@ export const TimetableProvider = ({ children }) => {
           console.error('Error fetching timetable from Supabase:', error);
         } else if (data && data.value) {
           setTimetable(data.value);
+          try {
+            localStorage.setItem('sscbs_os_timetable', JSON.stringify(data.value));
+          } catch (e) {}
         }
       } catch (err) {
         console.error('Failed to connect to Supabase timetable storage:', err);
@@ -46,9 +60,12 @@ export const TimetableProvider = ({ children }) => {
   // Update timetable function (Admin only)
   const updateTimetable = async (newTimetable) => {
     setTimetable(newTimetable);
+    try {
+      localStorage.setItem('sscbs_os_timetable', JSON.stringify(newTimetable));
+    } catch (e) {}
 
     if (!hasValidCredentials) {
-      console.warn('Supabase not configured. Timetable updated in-memory only.');
+      console.warn('Supabase not configured. Timetable updated in-memory and localStorage only.');
       return;
     }
 
@@ -75,6 +92,7 @@ export const TimetableProvider = ({ children }) => {
     if (!sData) {
       const firstSemKey = Object.keys(cData)[0];
       const firstSemData = cData[firstSemKey];
+      if (!firstSemData) return null;
       const firstSecKey = Object.keys(firstSemData)[0];
       return firstSemData[section] || firstSemData[firstSecKey] || null;
     }

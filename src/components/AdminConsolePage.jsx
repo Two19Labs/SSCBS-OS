@@ -518,13 +518,21 @@ export default function AdminConsolePage({ onBack }) {
     setParsingLogs(prev => [...prev, { text: msg, type, timestamp: new Date().toLocaleTimeString() }]);
   };
 
+  // Helper to ignore non-timetable reference sheets (e.g. Teacherwise, Lab, Visiting)
+  const isIgnoredSheet = (sheetName) => {
+    const name = sheetName.toLowerCase();
+    return name.includes('teacher') || name.includes('lab') || name.includes('visiting') || name.includes('faculty');
+  };
+
+  // Generic block parser for sheets
   const parseSheetBlock = (sheetData, startRow, defaultCourse, defaultSem) => {
     let course = defaultCourse;
     let sem = defaultSem;
     let section = 'A';
     let defaultRoom = 'Room 651';
 
-    for (let i = 1; i < 6; i++) {
+    // Scan metadata rows from startRow to startRow + 6
+    for (let i = 0; i <= 6; i++) {
       const row = sheetData[startRow + i] || [];
       const rowStr = row.map(c => clean(c)).join(' ');
       
@@ -552,6 +560,7 @@ export default function AdminConsolePage({ onBack }) {
       }
     }
 
+    // Find timings row
     let periodRowIdx = -1;
     let timingsRowIdx = -1;
 
@@ -567,6 +576,7 @@ export default function AdminConsolePage({ onBack }) {
 
     if (periodRowIdx === -1) return null;
 
+    // Read classes for Monday to Friday
     const dayRows = {};
     for (let i = 1; i <= 8; i++) {
       const row = sheetData[timingsRowIdx + i] || [];
@@ -576,6 +586,7 @@ export default function AdminConsolePage({ onBack }) {
       }
     }
 
+    // Find paper & faculty code mapping table below block
     const facultyMap = {};
     for (let r = timingsRowIdx + 6; r < timingsRowIdx + 30; r++) {
       const row = sheetData[r] || [];
@@ -598,6 +609,7 @@ export default function AdminConsolePage({ onBack }) {
       }
     }
 
+    // Generate daily schedules
     const weekSchedule = {};
     DAYS.forEach(day => {
       const fullDayName = FULL_DAYS[day];
@@ -627,6 +639,7 @@ export default function AdminConsolePage({ onBack }) {
     return { course, sem, section, defaultRoom, weekSchedule };
   };
 
+  // Parser for Management (BBA FIA & BMS) Excel
   const selectAndParseMgmtFile = (selectedFile) => {
     setMgmtFile(selectedFile);
     setMgmtParsedData(null);
@@ -641,7 +654,11 @@ export default function AdminConsolePage({ onBack }) {
         const timetables = {};
 
         workbook.SheetNames.forEach(sheetName => {
+          if (isIgnoredSheet(sheetName)) return;
+
           const sheet = workbook.Sheets[sheetName];
+          if (!sheet) return;
+
           const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
           
           const blockStarts = [];
@@ -674,7 +691,7 @@ export default function AdminConsolePage({ onBack }) {
           addLog('[Management Upload] ⚠️ No Management timetable blocks recognized.', 'warning');
         } else {
           setMgmtParsedData(timetables);
-          addLog('[Management Upload] ✓ Successfully parsed!', 'success');
+          addLog('[Management Upload] ✓ Successfully parsed Management timetables!', 'success');
         }
       } catch (err) {
         addLog(`[Management Upload] Error: ${err.message}`, 'error');
@@ -685,6 +702,7 @@ export default function AdminConsolePage({ onBack }) {
     reader.readAsArrayBuffer(selectedFile);
   };
 
+  // Parser for B.Sc. Computer Science Excel
   const selectAndParseCsFile = (selectedFile) => {
     setCsFile(selectedFile);
     setCsParsedData(null);
@@ -700,13 +718,17 @@ export default function AdminConsolePage({ onBack }) {
         let parsedBlocksCount = 0;
 
         workbook.SheetNames.forEach(sheetName => {
+          if (isIgnoredSheet(sheetName)) return;
+
           const sheet = workbook.Sheets[sheetName];
+          if (!sheet) return;
+
           const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
           const blockStarts = [];
 
           sheetData.forEach((row, idx) => {
             const rowStr = row.map(c => clean(c)).join(' ').toUpperCase();
-            if (rowStr.includes('COMPUTER SCIENCE') || rowStr.includes('B.SC') || rowStr.includes('BSCCS')) {
+            if (rowStr.includes('SHAHEED SUKHDEV') || rowStr.includes('COMPUTER SCIENCE') || rowStr.includes('B.SC') || rowStr.includes('BSCCS') || rowStr.includes('TIME TABLE')) {
               blockStarts.push(idx);
             }
           });
@@ -726,11 +748,13 @@ export default function AdminConsolePage({ onBack }) {
           });
         });
 
-        if (parsedBlocksCount === 0) {
+        const derivedSems = Object.keys(timetables["Bsc Comp Sci"]);
+
+        if (parsedBlocksCount === 0 || derivedSems.length === 0) {
           addLog(`[B.Sc. CS Upload] ⚠️ Could not find timetable blocks.`, 'warning');
         } else {
           setCsParsedData(timetables);
-          addLog(`[B.Sc. CS Upload] ✓ Parsed!`, 'success');
+          addLog(`[B.Sc. CS Upload] ✓ Derived semester(s): ${derivedSems.join(', ')} (${parsedBlocksCount} block(s) parsed)!`, 'success');
         }
       } catch (err) {
         addLog(`[B.Sc. CS Upload] Error: ${err.message}`, 'error');
