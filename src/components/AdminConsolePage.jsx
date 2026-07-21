@@ -787,11 +787,27 @@ export default function AdminConsolePage({ onBack }) {
           // Find start indices of timetables
           const blockStarts = [];
           sheetData.forEach((row, idx) => {
-            const rowStr = row.map(c => clean(c)).join(' ');
-            if (rowStr.includes('SHAHEED SUKHDEV COLLEGE OF BUSINESS STUDIES') || rowStr.includes('SHAHEED SUKHDEV COLLEGE OF')) {
+            const rowStr = row.map(c => clean(c)).join(' ').toUpperCase();
+            if (
+              rowStr.includes('SHAHEED SUKHDEV') || 
+              rowStr.includes('BBA') ||
+              rowStr.includes('BMS') ||
+              rowStr.includes('TIME TABLE') ||
+              rowStr.includes('TIMETABLE')
+            ) {
               blockStarts.push(idx);
             }
           });
+
+          // Fallback: If no header markers, look for period timing rows directly
+          if (blockStarts.length === 0) {
+            sheetData.forEach((row, idx) => {
+              const rowStr = row.map(c => clean(c)).join(' ');
+              if (rowStr.includes('Infinity Hour') || (rowStr.includes('I') && rowStr.includes('II') && rowStr.includes('III'))) {
+                blockStarts.push(Math.max(0, idx - 2));
+              }
+            });
+          }
 
           if (blockStarts.length === 0) return;
 
@@ -799,7 +815,9 @@ export default function AdminConsolePage({ onBack }) {
 
           // Default sem from sheet name if present
           let defaultSem = '2';
-          const semInSheetName = sheetName.match(/Sem\s*[-]?\s*(\d+)/i) || sheetName.match(/(\d+)/);
+          const semInSheetName = sheetName.match(/Sem\s*[-]?\s*(\d+)/i) || 
+                                 sheetName.match(/(\d+)(?:st|nd|rd|th)?\s*Sem/i) || 
+                                 sheetName.match(/\b([1-8])\b/);
           if (semInSheetName) defaultSem = semInSheetName[1];
 
           let defaultCourse = sheetName.toUpperCase().includes('BBA') ? 'BBA FIA' : 'BMS';
@@ -907,24 +925,48 @@ export default function AdminConsolePage({ onBack }) {
 
           const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
           const blockStarts = [];
+
           sheetData.forEach((row, idx) => {
-            const rowStr = row.map(c => clean(c)).join(' ');
-            if (rowStr.includes('SHAHEED SUKHDEV COLLEGE OF BUSINESS STUDIES') || rowStr.includes('SHAHEED SUKHDEV COLLEGE OF')) {
+            const rowStr = row.map(c => clean(c)).join(' ').toUpperCase();
+            if (
+              rowStr.includes('SHAHEED SUKHDEV') || 
+              rowStr.includes('DEPARTMENT OF COMPUTER') ||
+              rowStr.includes('COMPUTER SCIENCE') ||
+              rowStr.includes('B.SC') ||
+              rowStr.includes('BSCCS') ||
+              rowStr.includes('TIME TABLE') ||
+              rowStr.includes('TIMETABLE')
+            ) {
               blockStarts.push(idx);
             }
           });
 
+          // Fallback: If no header markers, look for period timing rows directly
+          if (blockStarts.length === 0) {
+            sheetData.forEach((row, idx) => {
+              const rowStr = row.map(c => clean(c)).join(' ');
+              if (rowStr.includes('Infinity Hour') || (rowStr.includes('I') && rowStr.includes('II') && rowStr.includes('III'))) {
+                blockStarts.push(Math.max(0, idx - 2));
+              }
+            });
+          }
+
           if (blockStarts.length === 0) return;
 
+          // Derive default semester from sheet name if present
           let defaultSem = '2';
-          const semInSheetName = sheetName.match(/Sem\s*[-]?\s*(\d+)/i) || sheetName.match(/(\d+)/);
-          if (semInSheetName) defaultSem = semInSheetName[1];
+          const semMatch = sheetName.match(/Sem\s*[-]?\s*(\d+)/i) || 
+                           sheetName.match(/(\d+)(?:st|nd|rd|th)?\s*Sem/i) || 
+                           sheetName.match(/\b([1-8])\b/);
+          if (semMatch) {
+            defaultSem = semMatch[1];
+          }
 
           blockStarts.forEach((startRow, bIdx) => {
             const result = parseSheetBlock(sheetData, startRow, 'Bsc Comp Sci', defaultSem);
             if (result) {
               const { course, sem, section, defaultRoom, weekSchedule } = result;
-              addLog(`  -> [CS Block ${bIdx}] Parsed ${course} Sem ${sem} Section ${section} (${defaultRoom})`, 'info');
+              addLog(`  -> [CS Block ${bIdx}] Mapped ${course} Sem ${sem} Section ${section} (${defaultRoom})`, 'info');
               
               if (!timetables["Bsc Comp Sci"][sem]) timetables["Bsc Comp Sci"][sem] = {};
               timetables["Bsc Comp Sci"][sem][section] = weekSchedule;
@@ -933,24 +975,15 @@ export default function AdminConsolePage({ onBack }) {
           });
         });
 
-        // Determine which semesters were parsed vs missing
+        // Determine which semesters were derived cleanly from the file
         const parsedSems = Object.keys(timetables["Bsc Comp Sci"]);
-        addLog(`[B.Sc. CS Upload] Extracted timetables for semesters: ${parsedSems.length > 0 ? parsedSems.join(', ') : 'None'}`, 'info');
 
-        // Fill remaining active semesters with structured CS fallbacks so no student is left without a schedule
-        const targetSems = parsedSems.some(s => ['1', '3', '5', '7'].includes(s)) ? ['1', '3', '5', '7'] : ['2', '4', '6', '8'];
-        const missingSems = targetSems.filter(s => !parsedSems.includes(s));
-        
-        if (missingSems.length > 0) {
-          addLog(`[B.Sc. CS Upload] Injecting curriculum fallback schedules for missing term(s): ${missingSems.join(', ')}`, 'info');
-          const fallbackData = generateCsFallbackSchedule(missingSems);
-          Object.keys(fallbackData).forEach(s => {
-            timetables["Bsc Comp Sci"][s] = fallbackData[s];
-          });
+        if (parsedBlocksCount === 0 || parsedSems.length === 0) {
+          addLog(`[B.Sc. CS Upload] ⚠️ Could not find timetable blocks in sheet(s). Ensure rows contain class timings.`, 'warning');
+        } else {
+          setCsParsedData(timetables);
+          addLog(`[B.Sc. CS Upload] ✓ Successfully derived B.Sc. CS timetables for semester(s): ${parsedSems.join(', ')} (${parsedBlocksCount} block(s) parsed)!`, 'success');
         }
-
-        setCsParsedData(timetables);
-        addLog(`[B.Sc. CS Upload] ✓ Successfully parsed B.Sc. CS timetables (${parsedBlocksCount} explicit block(s) processed)!`, 'success');
       } catch (err) {
         addLog(`[B.Sc. CS Upload] Parsing Error: ${err.message}`, 'error');
         console.error(err);
