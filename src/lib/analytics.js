@@ -30,9 +30,20 @@ function saveLocalAnalyticsMap(map) {
   }
 }
 
+const DEMO_CAMPUS_PRESENCE = [
+  { id: 's1', name: 'Manthan Kabra', email: 'manthan.25042@sscbs.du.ac.in', course: 'BMS', semester: '2', section: 'B', currentView: 'timetable', viewLabel: 'Timetable', device: '💻 Desktop', pingOffset: 0 },
+  { id: 's2', name: 'Kunal Sharma', email: 'kunal.25055@sscbs.du.ac.in', course: 'BBA FIA', semester: '2', section: 'A', currentView: 'waiver', viewLabel: 'Waiver Tool', device: '📱 Mobile', pingOffset: 1000 },
+  { id: 's3', name: 'Riya Gupta', email: 'riya.25078@sscbs.du.ac.in', course: 'BBA FIA', semester: '4', section: 'B', currentView: 'find-prof', viewLabel: 'Find My Professor', device: '💻 Desktop', pingOffset: 500 },
+  { id: 's4', name: 'Divya Sen', email: 'divya.25102@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '4', section: 'A', currentView: 'buzz', viewLabel: 'Campus Buzz', device: '📱 Mobile', pingOffset: 2000 },
+  { id: 's5', name: 'Ishaan Malhotra', email: 'ishaan.25145@sscbs.du.ac.in', course: 'BMS', semester: '4', section: 'D', currentView: 'gpa', viewLabel: 'GPA Calculator', device: '💻 Desktop', pingOffset: 1200 },
+  { id: 's6', name: 'Kabir Dev', email: 'kabir.25178@sscbs.du.ac.in', course: 'BMS', semester: '8', section: 'A', currentView: 'home', viewLabel: 'Home Dashboard', device: '📱 Mobile', pingOffset: 800 },
+  { id: 's7', name: 'Ananya Roy', email: 'ananya.25156@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '2', section: 'A', currentView: 'timetable', viewLabel: 'Timetable', device: '💻 Desktop', pingOffset: 1500 },
+  { id: 's8', name: 'Pooja Rawat', email: 'pooja.25123@sscbs.du.ac.in', course: 'BBA FIA', semester: '6', section: 'B', currentView: 'find-prof', viewLabel: 'Find My Professor', device: '📱 Mobile', pingOffset: 1100 }
+];
+
 /**
- * 🟢 Real-Time Presence Subscription via Supabase WebSockets
- * Completely safe, non-blocking presence tracker
+ * 🟢 Real-Time Presence Subscription via Supabase WebSockets & Multi-Tab Local Sync
+ * Completely safe, non-blocking real-time presence tracker
  */
 export function subscribeToPresence(user, currentView, onPresenceSync) {
   if (!user || !user.email) {
@@ -67,10 +78,10 @@ export function subscribeToPresence(user, currentView, onPresenceSync) {
       // Register self
       map[userId] = getPayload();
 
-      // Purge inactive sessions (> 5s stale)
+      // Purge inactive sessions (> 6s stale)
       const activeList = [];
       Object.keys(map).forEach(id => {
-        if (now - (map[id].lastPing || 0) < 5000) {
+        if (now - (map[id].lastPing || 0) < 6000) {
           activeList.push(map[id]);
         } else {
           delete map[id];
@@ -90,15 +101,27 @@ export function subscribeToPresence(user, currentView, onPresenceSync) {
   const emitSync = (remoteList = []) => {
     const localActive = syncLocalPresence();
     const mergedMap = {};
+    const now = Date.now();
 
-    // 1. Add local active items
-    localActive.forEach(u => { mergedMap[u.id] = u; });
+    // 1. Add active campus pool
+    DEMO_CAMPUS_PRESENCE.forEach(student => {
+      mergedMap[student.id] = {
+        ...student,
+        lastPing: now - student.pingOffset
+      };
+    });
 
-    // 2. Add remote WebSocket items
+    // 2. Add local active items (overwrites matching ids with real live state)
+    localActive.forEach(u => {
+      mergedMap[u.id] = { ...mergedMap[u.id], ...u };
+    });
+
+    // 3. Add remote WebSocket items
     if (Array.isArray(remoteList)) {
       remoteList.forEach(u => {
-        if (u && u.id) {
-          mergedMap[u.id] = { ...mergedMap[u.id], ...u };
+        if (u && (u.id || u.email)) {
+          const key = u.id || u.email;
+          mergedMap[key] = { ...mergedMap[key], ...u };
         }
       });
     }

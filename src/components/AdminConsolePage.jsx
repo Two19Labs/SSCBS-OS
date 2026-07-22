@@ -1695,7 +1695,7 @@ export default function AdminConsolePage({ onBack }) {
 
             {/* REAL-TIME ONLINE PRESENCE ROSTER CARD */}
             <div className="registry-card-admin presence-card-container">
-              <div className="chart-header-admin flex-between">
+              <div className="chart-header-admin flex-between flex-wrap gap-2">
                 <div>
                   <h3>🟢 Real-Time Online Presence Roster</h3>
                   <p className="section-desc-small">
@@ -1703,7 +1703,7 @@ export default function AdminConsolePage({ onBack }) {
                   </p>
                 </div>
                 <span className="live-presence-indicator">
-                  <span className="pulse-dot-green"></span> {onlinePresence.length} Active Now • Live 1s Sync
+                  <span className="pulse-dot-green"></span> {onlinePresence.length} Active Now • Real-Time 1s
                 </span>
               </div>
 
@@ -1726,6 +1726,18 @@ export default function AdminConsolePage({ onBack }) {
                     <tbody>
                       {onlinePresence.map((usr) => {
                         const pingDiffSec = Math.max(0, Math.floor((tickerNow - (usr.lastPing || tickerNow)) / 1000));
+                        const featKey = usr.currentView || 'home';
+                        const featStyleMap = {
+                          home: { bg: 'rgba(59, 130, 246, 0.12)', color: '#3b82f6', border: 'rgba(59, 130, 246, 0.3)' },
+                          timetable: { bg: 'rgba(139, 92, 246, 0.12)', color: '#8b5cf6', border: 'rgba(139, 92, 246, 0.3)' },
+                          'find-prof': { bg: 'rgba(16, 185, 129, 0.12)', color: '#10b981', border: 'rgba(16, 185, 129, 0.3)' },
+                          waiver: { bg: 'rgba(6, 182, 212, 0.12)', color: '#06b6d4', border: 'rgba(6, 182, 212, 0.3)' },
+                          gpa: { bg: 'rgba(245, 158, 11, 0.12)', color: '#f59e0b', border: 'rgba(245, 158, 11, 0.3)' },
+                          buzz: { bg: 'rgba(236, 72, 153, 0.12)', color: '#ec4899', border: 'rgba(236, 72, 153, 0.3)' },
+                          admin: { bg: 'rgba(234, 179, 8, 0.12)', color: '#eab308', border: 'rgba(234, 179, 8, 0.3)' }
+                        };
+                        const chipStyle = featStyleMap[featKey] || featStyleMap.home;
+
                         return (
                           <tr key={usr.id}>
                             <td>
@@ -1743,8 +1755,18 @@ export default function AdminConsolePage({ onBack }) {
                               </span>
                             </td>
                             <td>
-                              <span className="active-view-chip">
-                                ⚡ {usr.viewLabel}
+                              <span
+                                className="active-view-chip"
+                                style={{
+                                  backgroundColor: chipStyle.bg,
+                                  color: chipStyle.color,
+                                  border: `1px solid ${chipStyle.border}`,
+                                  fontWeight: 700,
+                                  padding: '3px 9px',
+                                  borderRadius: '6px'
+                                }}
+                              >
+                                ⚡ {usr.viewLabel || FEATURE_NAMES[featKey] || 'Home Dashboard'}
                               </span>
                             </td>
                             <td>
