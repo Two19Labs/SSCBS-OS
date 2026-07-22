@@ -4,7 +4,7 @@ import { useTimetable } from '../context/TimetableContext';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { isAdminEmail } from '../lib/admin';
-import { subscribeToPresence, fetchAnalyticsData } from '../lib/analytics';
+import { subscribeToPresence, fetchAnalyticsData, FEATURE_NAMES } from '../lib/analytics';
 import DateTimePicker from './DateTimePicker';
 import './AdminConsolePage.css';
 
@@ -311,13 +311,14 @@ export default function AdminConsolePage({ onBack }) {
   const [analyticsTimeRange, setAnalyticsTimeRange] = useState(7); // 7, 30, 90
   const [analyticsSummary, setAnalyticsSummary] = useState({
     dateLabels: [],
-    series: { timetable: [], 'find-prof': [], waiver: [], gpa: [], buzz: [], total: [] },
-    totals: { timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, grandTotal: 0 },
+    series: { total: [], home: [], timetable: [], 'find-prof': [], waiver: [], gpa: [], buzz: [] },
+    totals: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, grandTotal: 0 },
     topFeatureName: 'Timetable',
     topFeatureCount: 0
   });
   const [enabledSeries, setEnabledSeries] = useState({
     total: true,
+    home: true,
     timetable: true,
     'find-prof': true,
     waiver: true,
@@ -325,6 +326,15 @@ export default function AdminConsolePage({ onBack }) {
     buzz: true
   });
   const [hoveredPoint, setHoveredPoint] = useState(null);
+  const [tickerNow, setTickerNow] = useState(Date.now());
+
+  // ⏱️ 1-second ticker for real-time live ping rendering
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTickerNow(Date.now());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // 🟢 Real-Time Presence Subscription across all active connected students
   useEffect(() => {
@@ -1689,17 +1699,17 @@ export default function AdminConsolePage({ onBack }) {
                 <div>
                   <h3>🟢 Real-Time Online Presence Roster</h3>
                   <p className="section-desc-small">
-                    Active students currently connected to SSCBS OS shell & features (refreshes live every 3s).
+                    Active students currently connected to SSCBS OS shell & features (refreshes live every 1s).
                   </p>
                 </div>
                 <span className="live-presence-indicator">
-                  <span className="pulse-dot-green"></span> {onlinePresence.length} Active Now
+                  <span className="pulse-dot-green"></span> {onlinePresence.length} Active Now • Live 1s Sync
                 </span>
               </div>
 
               {onlinePresence.length === 0 ? (
                 <div className="no-registry-results">
-                  <p>No other active students connected right now. Perform actions in the OS shell to trigger real-time presence.</p>
+                  <p>No active students connected right now. Perform actions in the OS shell to trigger real-time presence.</p>
                 </div>
               ) : (
                 <div className="table-scroll-container-admin">
@@ -1714,35 +1724,41 @@ export default function AdminConsolePage({ onBack }) {
                       </tr>
                     </thead>
                     <tbody>
-                      {onlinePresence.map((user) => (
-                        <tr key={user.id}>
-                          <td>
-                            <div className="student-name-cell">
-                              <span className="online-avatar-badge">{user.name.charAt(0).toUpperCase()}</span>
-                              <div>
-                                <strong className="student-name-text">{user.name}</strong>
-                                <span className="student-email-text">{user.email}</span>
+                      {onlinePresence.map((usr) => {
+                        const pingDiffSec = Math.max(0, Math.floor((tickerNow - (usr.lastPing || tickerNow)) / 1000));
+                        return (
+                          <tr key={usr.id}>
+                            <td>
+                              <div className="student-name-cell">
+                                <span className="online-avatar-badge">{usr.name ? usr.name.charAt(0).toUpperCase() : 'S'}</span>
+                                <div>
+                                  <strong className="student-name-text">{usr.name}</strong>
+                                  <span className="student-email-text">{usr.email}</span>
+                                </div>
                               </div>
-                            </div>
-                          </td>
-                          <td>
-                            <span className="course-sem-chip">
-                              {user.course} • Sem {user.semester} {user.section !== 'N/A' ? `(${user.section})` : ''}
-                            </span>
-                          </td>
-                          <td>
-                            <span className="active-view-chip">
-                              ⚡ {user.viewLabel}
-                            </span>
-                          </td>
-                          <td>
-                            <span className="device-chip">{user.device}</span>
-                          </td>
-                          <td>
-                            <span className="ping-time-chip">🟢 Live</span>
-                          </td>
-                        </tr>
-                      ))}
+                            </td>
+                            <td>
+                              <span className="course-sem-chip">
+                                {usr.course} • Sem {usr.semester} {usr.section && usr.section !== 'N/A' ? `(${usr.section})` : ''}
+                              </span>
+                            </td>
+                            <td>
+                              <span className="active-view-chip">
+                                ⚡ {usr.viewLabel}
+                              </span>
+                            </td>
+                            <td>
+                              <span className="device-chip">{usr.device}</span>
+                            </td>
+                            <td>
+                              <span className="ping-time-chip" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                                <span className="pulse-dot-green" style={{ width: '6px', height: '6px' }}></span>
+                                {pingDiffSec === 0 ? 'Live (Just now)' : `${pingDiffSec}s ago`}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -1780,22 +1796,28 @@ export default function AdminConsolePage({ onBack }) {
               <div className="graph-legend-toggles">
                 {[
                   { key: 'total', label: 'All Platform Views', color: '#eab308' },
+                  { key: 'home', label: 'Home Dashboard', color: '#3b82f6' },
                   { key: 'timetable', label: 'Timetable', color: '#8b5cf6' },
                   { key: 'find-prof', label: 'Find My Professor', color: '#10b981' },
                   { key: 'waiver', label: 'Waiver Tool', color: '#06b6d4' },
                   { key: 'gpa', label: 'GPA Calculator', color: '#f59e0b' },
                   { key: 'buzz', label: 'Campus Buzz', color: '#ec4899' }
-                ].map(({ key, label, color }) => (
-                  <button
-                    key={key}
-                    className={`legend-toggle-item ${enabledSeries[key] ? 'active' : 'disabled'}`}
-                    onClick={() => toggleSeries(key)}
-                  >
-                    <span className="legend-dot" style={{ backgroundColor: color }}></span>
-                    <span className="legend-name">{label}</span>
-                    <span className="legend-count">({analyticsSummary.totals[key] || analyticsSummary.totals.grandTotal})</span>
-                  </button>
-                ))}
+                ].map(({ key, label, color }) => {
+                  const count = key === 'total'
+                    ? (analyticsSummary.totals.grandTotal || 0)
+                    : (analyticsSummary.totals[key] ?? 0);
+                  return (
+                    <button
+                      key={key}
+                      className={`legend-toggle-item ${enabledSeries[key] ? 'active' : 'disabled'}`}
+                      onClick={() => toggleSeries(key)}
+                    >
+                      <span className="legend-dot" style={{ backgroundColor: color }}></span>
+                      <span className="legend-name">{label}</span>
+                      <span className="legend-count">({count})</span>
+                    </button>
+                  );
+                })}
               </div>
 
               {/* SVG Line Graph Render */}
@@ -1815,6 +1837,7 @@ export default function AdminConsolePage({ onBack }) {
 
                   const seriesColors = {
                     total: '#eab308',
+                    home: '#3b82f6',
                     timetable: '#8b5cf6',
                     'find-prof': '#10b981',
                     waiver: '#06b6d4',
@@ -1825,7 +1848,7 @@ export default function AdminConsolePage({ onBack }) {
                   let maxVal = 10;
                   Object.keys(series).forEach(key => {
                     if (enabledSeries[key]) {
-                      const maxInSeries = Math.max(...series[key]);
+                      const maxInSeries = Math.max(...(series[key] || [0]));
                       if (maxInSeries > maxVal) maxVal = maxInSeries;
                     }
                   });
@@ -1863,7 +1886,8 @@ export default function AdminConsolePage({ onBack }) {
                         {/* Line Series */}
                         {Object.keys(series).map((seriesKey) => {
                           if (!enabledSeries[seriesKey]) return null;
-                          const points = series[seriesKey];
+                          const points = series[seriesKey] || [];
+                          if (points.length === 0) return null;
                           const pathData = points.map((val, idx) => `${idx === 0 ? 'M' : 'L'} ${getX(idx)} ${getY(val)}`).join(' ');
                           const color = seriesColors[seriesKey] || '#8b5cf6';
 
@@ -1908,7 +1932,7 @@ export default function AdminConsolePage({ onBack }) {
                         >
                           <span className="tooltip-date">{hoveredPoint.date}</span>
                           <span className="tooltip-val">
-                            <strong>{hoveredPoint.seriesKey.toUpperCase()}</strong>: {hoveredPoint.val} views
+                            <strong>{FEATURE_NAMES[hoveredPoint.seriesKey] || (hoveredPoint.seriesKey === 'total' ? 'All Platform Views' : hoveredPoint.seriesKey.toUpperCase())}</strong>: {hoveredPoint.val} views
                           </span>
                         </div>
                       )}

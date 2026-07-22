@@ -145,5 +145,31 @@ CREATE POLICY "Enable read access for admin on user progress"
     TO authenticated 
     USING (auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'));
 
+-- 7. Create a table to store feature usage analytics events
+CREATE TABLE IF NOT EXISTS public.analytics_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    feature_id TEXT NOT NULL,
+    user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable Row Level Security (RLS)
+ALTER TABLE public.analytics_events ENABLE ROW LEVEL SECURITY;
+
+-- Allow all authenticated users to log usage events
+CREATE POLICY "Enable insert access for authenticated users on analytics_events" 
+    ON public.analytics_events 
+    FOR INSERT 
+    TO authenticated 
+    WITH CHECK (true);
+
+-- Allow all authenticated users to read analytics events for dashboards
+CREATE POLICY "Enable read access for authenticated users on analytics_events" 
+    ON public.analytics_events 
+    FOR SELECT 
+    TO authenticated 
+    USING (true);
+
+
 
 
