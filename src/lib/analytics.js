@@ -137,25 +137,31 @@ export function subscribeToPresence(user, currentView, onPresenceSync) {
     updateLocalAndState([]);
 
     if (hasValidCredentials) {
-      // Upsert DB active_presence row for persistence
-      supabase.from('active_presence').upsert({
-        session_id: sessionId,
-        user_id: userId,
-        name: payload.name,
-        email: payload.email,
-        course: payload.course,
-        semester: payload.semester,
-        section: payload.section,
-        current_view: payload.currentView,
-        view_label: payload.viewLabel,
-        device: payload.device,
-        last_ping: new Date().toISOString()
-      }).catch(() => {});
+      // Upsert DB active_presence row for persistence (completely safe and optional)
+      try {
+        supabase.from('active_presence').upsert({
+          session_id: sessionId,
+          user_id: userId,
+          name: payload.name,
+          email: payload.email,
+          course: payload.course,
+          semester: payload.semester,
+          section: payload.section,
+          current_view: payload.currentView,
+          view_label: payload.viewLabel,
+          device: payload.device,
+          last_ping: new Date().toISOString()
+        }).then(() => {}).catch(() => {});
+      } catch (e) {
+        // ignore DB presence error if table not yet created
+      }
 
       // Track payload over Realtime WebSocket
-      if (activePresenceChannel && activePresenceChannel.state === 'joined') {
-        activePresenceChannel.track(payload).catch(() => {});
-      }
+      try {
+        if (activePresenceChannel && activePresenceChannel.state === 'joined') {
+          activePresenceChannel.track(payload).catch(() => {});
+        }
+      } catch (e) {}
     }
   };
 

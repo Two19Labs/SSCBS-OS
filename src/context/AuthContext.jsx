@@ -18,51 +18,75 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!hasValidCredentials) {
-      // In sandbox mode, load mock user from local storage
-      const savedUser = localStorage.getItem('sandbox_user');
-      if (savedUser) {
-        setUser(JSON.parse(savedUser));
+    let isMounted = true;
+    let sessionResolved = false;
+
+    // Hard fallback timeout (2 seconds max) so the app NEVER hangs on loading screen
+    const fallbackTimeout = setTimeout(() => {
+      if (isMounted && !sessionResolved) {
+        setLoading(false);
       }
-      setLoading(false);
+    }, 2000);
+
+    if (!hasValidCredentials) {
+      try {
+        const savedUser = localStorage.getItem('sandbox_user');
+        if (savedUser) {
+          setUser(JSON.parse(savedUser));
+        }
+      } catch (e) {
+        // ignore JSON parse error
+      }
+      if (isMounted) setLoading(false);
+      clearTimeout(fallbackTimeout);
       return;
     }
 
-    // Get initial session with safety timeout and catch
-    let sessionResolved = false;
-    const timeout = setTimeout(() => {
-      if (!sessionResolved) {
-        setLoading(false);
-      }
-    }, 4000);
+    let subscription = null;
 
-    supabase.auth.getSession()
-      .then(({ data: { session } = {} }) => {
+    try {
+      // Get initial auth session from Supabase
+      supabase.auth.getSession()
+        .then(({ data: { session } = {} }) => {
+          if (!isMounted) return;
+          sessionResolved = true;
+          clearTimeout(fallbackTimeout);
+          setSession(session ?? null);
+          setUser(session?.user ?? null);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.warn('Auth getSession notice:', err);
+          if (!isMounted) return;
+          sessionResolved = true;
+          clearTimeout(fallbackTimeout);
+          setLoading(false);
+        });
+
+      // Listen for real-time auth state changes (sign in, sign out, token refresh)
+      const res = supabase.auth.onAuthStateChange((_event, session) => {
+        if (!isMounted) return;
         sessionResolved = true;
-        clearTimeout(timeout);
+        clearTimeout(fallbackTimeout);
         setSession(session ?? null);
         setUser(session?.user ?? null);
         setLoading(false);
-      })
-      .catch((err) => {
-        console.warn('Auth getSession notice:', err);
-        sessionResolved = true;
-        clearTimeout(timeout);
-        setLoading(false);
       });
-
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      sessionResolved = true;
-      clearTimeout(timeout);
-      setSession(session ?? null);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+      subscription = res?.data?.subscription;
+    } catch (err) {
+      console.warn('Auth initialization non-blocking notice:', err);
+      if (isMounted) {
+        sessionResolved = true;
+        setLoading(false);
+      }
+    }
 
     return () => {
-      clearTimeout(timeout);
-      subscription.unsubscribe();
+      isMounted = false;
+      clearTimeout(fallbackTimeout);
+      if (subscription && typeof subscription.unsubscribe === 'function') {
+        try { subscription.unsubscribe(); } catch (e) {}
+      }
     };
   }, []);
 

@@ -386,16 +386,21 @@ export default function AdminConsolePage({ onBack }) {
 
       fetchDbPresence();
 
-      const dbChannel = supabase
-        .channel('db-active-presence-changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'active_presence' }, () => {
-          fetchDbPresence();
-        })
-        .subscribe();
+      let dbChannel = null;
+      try {
+        dbChannel = supabase
+          .channel('db-active-presence-changes')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'active_presence' }, () => {
+            fetchDbPresence();
+          })
+          .subscribe();
+      } catch (e) {}
 
       return () => {
         if (typeof unsubscribe === 'function') unsubscribe();
-        supabase.removeChannel(dbChannel).catch(() => {});
+        try {
+          if (dbChannel) supabase.removeChannel(dbChannel).catch(() => {});
+        } catch (e) {}
       };
     }
 
