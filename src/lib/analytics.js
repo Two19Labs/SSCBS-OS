@@ -46,6 +46,7 @@ let activePresenceChannel = null;
 const presenceSubscribers = new Set();
 let latestPresenceMap = {};
 let presenceHeartbeatTimer = null;
+let dbPresencePollingTimer = null;
 
 function broadcastPresenceToSubscribers() {
   const list = Object.values(latestPresenceMap);
@@ -76,11 +77,39 @@ function getPresencePayload() {
   };
 }
 
-function updateLocalAndState(remoteList = []) {
+async function fetchActivePresenceFromDB() {
+  if (!hasValidCredentials) return [];
+  try {
+    const cutoff = new Date(Date.now() - 15000).toISOString();
+    const { data, error } = await supabase
+      .from('active_presence')
+      .select('*')
+      .gte('last_ping', cutoff);
+
+    if (!error && Array.isArray(data)) {
+      return data.map(item => ({
+        id: item.user_id || item.session_id,
+        session_id: item.session_id,
+        name: item.name,
+        email: item.email,
+        course: item.course || 'N/A',
+        semester: item.semester || 'N/A',
+        section: item.section || 'N/A',
+        currentView: item.current_view,
+        viewLabel: item.view_label || FEATURE_NAMES[item.current_view] || 'Home Dashboard',
+        device: item.device,
+        lastPing: new Date(item.last_ping).getTime()
+      }));
+    }
+  } catch (e) {}
+  return [];
+}
+
+async function updateLocalAndState(remoteList = []) {
   try {
     const payload = getPresencePayload();
     const now = Date.now();
-    const raw = localStorage.getItem('sscbs_online_presence_v3');
+    const raw = localStorage.getItem('sscbs_online_presence_v4');
     let map = raw ? JSON.parse(raw) : {};
     if (typeof map !== 'object' || !map) map = {};
 
@@ -88,34 +117,49 @@ function updateLocalAndState(remoteList = []) {
       map[payload.session_id] = payload;
     }
 
-    // 1. Purge local storage sessions inactive for > 12 seconds
+    // 1. Local Storage active sessions
     const cleanMap = {};
     Object.keys(map).forEach(sid => {
-      if (now - (map[sid].lastPing || 0) < 12000) {
+      if (now - (map[sid].lastPing || 0) < 15000) {
         cleanMap[sid] = map[sid];
       }
     });
-    localStorage.setItem('sscbs_online_presence_v3', JSON.stringify(cleanMap));
+    localStorage.setItem('sscbs_online_presence_v4', JSON.stringify(cleanMap));
 
-    // 2. Merge active remote connections from Supabase Realtime WebSockets
     const merged = { ...cleanMap };
+
+    // 2. Merge active WebSocket presence
     if (Array.isArray(remoteList)) {
       remoteList.forEach(item => {
         if (item && item.email) {
           const sid = item.session_id || item.id || item.email;
-          // Active WebSocket presence connections from Supabase are live right now
           merged[sid] = {
             ...item,
-            lastPing: item.lastPing && (now - item.lastPing < 30000) ? item.lastPing : now
+            lastPing: now
           };
         }
       });
     }
 
-    // 3. Group by user email so each online student has 1 card showing their latest active page
+    // 3. Merge active DB presence rows
+    if (hasValidCredentials) {
+      const dbList = await fetchActivePresenceFromDB();
+      dbList.forEach(item => {
+        if (item && item.email) {
+          const sid = item.session_id || item.id || item.email;
+          if (!merged[sid] || (item.lastPing || 0) >= (merged[sid].lastPing || 0)) {
+            merged[sid] = item;
+          }
+        }
+      });
+    }
+
+    // 4. Group by user email (1 active card per student showing latest page)
     const userMap = {};
     Object.values(merged).forEach(p => {
       if (!p || !p.email) return;
+      if (now - (p.lastPing || 0) > 15000) return;
+
       const existing = userMap[p.email];
       if (!existing || (p.lastPing || 0) >= (existing.lastPing || 0)) {
         userMap[p.email] = p;
@@ -133,17 +177,17 @@ function sendPresencePing() {
   const payload = getPresencePayload();
   if (!payload) return;
 
-  // 1. Update local storage & broadcast to React subscribers
+  // 1. Local memory & storage update
   updateLocalAndState([]);
 
-  // 2. Track payload over Realtime WebSocket
+  // 2. WebSocket presence track
   if (hasValidCredentials && activePresenceChannel) {
     try {
       activePresenceChannel.track(payload).catch(() => {});
     } catch (e) {}
   }
 
-  // 3. Upsert DB active_presence row for persistence
+  // 3. Database HTTP active_presence upsert
   if (hasValidCredentials) {
     try {
       supabase.from('active_presence').upsert({
@@ -164,18 +208,25 @@ function sendPresencePing() {
 }
 
 function initGlobalPresenceTracker() {
-  // Start heartbeat interval if not running (3 seconds)
+  // Start heartbeat interval every 2 seconds
   if (!presenceHeartbeatTimer) {
     presenceHeartbeatTimer = setInterval(() => {
       sendPresencePing();
-    }, 3000);
+    }, 2000);
+  }
+
+  // Start DB polling interval every 2.5 seconds
+  if (!dbPresencePollingTimer) {
+    dbPresencePollingTimer = setInterval(() => {
+      updateLocalAndState([]);
+    }, 2500);
   }
 
   // Setup Singleton Supabase Realtime Channel if not yet created
   if (hasValidCredentials && !activePresenceChannel) {
     try {
       const sid = getTabSessionId();
-      activePresenceChannel = supabase.channel('sscbs-online-presence-v4', {
+      activePresenceChannel = supabase.channel('sscbs-online-presence-v5', {
         config: { presence: { key: sid } }
       });
 
@@ -230,7 +281,6 @@ export function subscribeToPresence(user, currentView, onPresenceSync) {
 
   if (onPresenceSync) {
     presenceSubscribers.add(onPresenceSync);
-    // Send immediate sync to subscriber with current presence map
     try { onPresenceSync(Object.values(latestPresenceMap)); } catch (e) {}
   }
 
