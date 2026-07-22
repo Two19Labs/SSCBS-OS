@@ -150,6 +150,7 @@ CREATE TABLE IF NOT EXISTS public.analytics_events (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     feature_id TEXT NOT NULL,
     user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    event_type TEXT DEFAULT 'visit',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 

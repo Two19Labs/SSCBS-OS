@@ -80,7 +80,7 @@ function getPresencePayload() {
 async function fetchActivePresenceFromDB() {
   if (!hasValidCredentials) return [];
   try {
-    const cutoff = new Date(Date.now() - 15000).toISOString();
+    const cutoff = new Date(Date.now() - 60000).toISOString();
     const { data, error } = await supabase
       .from('active_presence')
       .select('*')
@@ -117,10 +117,10 @@ function updateLocalAndState(remoteList = []) {
       map[payload.session_id] = payload;
     }
 
-    // 1. Local Storage active sessions
+    // 1. Local Storage active sessions (60s drift tolerance)
     const cleanMap = {};
     Object.keys(map).forEach(sid => {
-      if (now - (map[sid].lastPing || 0) < 15000) {
+      if (Math.abs(now - (map[sid].lastPing || 0)) < 60000) {
         cleanMap[sid] = map[sid];
       }
     });
@@ -145,7 +145,7 @@ function updateLocalAndState(remoteList = []) {
     const userMap = {};
     Object.values(merged).forEach(p => {
       if (!p || !p.email) return;
-      if (now - (p.lastPing || 0) > 15000) return;
+      if (Math.abs(now - (p.lastPing || 0)) > 60000) return;
 
       const existing = userMap[p.email];
       if (!existing || (p.lastPing || 0) >= (existing.lastPing || 0)) {
@@ -179,21 +179,29 @@ function updateLocalAndState(remoteList = []) {
   }
 }
 
+let lastTrackedView = null;
+let lastTrackTime = 0;
+
 function sendPresencePing() {
   const payload = getPresencePayload();
   if (!payload) return;
 
-  // 1. Local memory & storage update
+  // 1. Immediate local memory & storage update
   updateLocalAndState([]);
 
-  // 2. WebSocket presence track
+  // 2. Track over WebSocket ONLY on view change or every 25 seconds (prevents socket drops)
+  const now = Date.now();
   if (hasValidCredentials && activePresenceChannel) {
-    try {
-      activePresenceChannel.track(payload).catch(() => {});
-    } catch (e) {}
+    if (lastTrackedView !== payload.currentView || (now - lastTrackTime) > 25000) {
+      lastTrackedView = payload.currentView;
+      lastTrackTime = now;
+      try {
+        activePresenceChannel.track(payload).catch(() => {});
+      } catch (e) {}
+    }
   }
 
-  // 3. Database HTTP active_presence upsert
+  // 3. Database HTTP active_presence upsert every 1 second
   if (hasValidCredentials) {
     try {
       supabase.from('active_presence').upsert({
@@ -214,25 +222,25 @@ function sendPresencePing() {
 }
 
 function initGlobalPresenceTracker() {
-  // Start heartbeat interval every 2 seconds
+  // Start heartbeat interval every 1000ms (1 second)
   if (!presenceHeartbeatTimer) {
     presenceHeartbeatTimer = setInterval(() => {
       sendPresencePing();
-    }, 2000);
+    }, 1000);
   }
 
-  // Start DB polling interval every 2.5 seconds
+  // Start DB polling interval every 1000ms (1 second)
   if (!dbPresencePollingTimer) {
     dbPresencePollingTimer = setInterval(() => {
       updateLocalAndState([]);
-    }, 2500);
+    }, 1000);
   }
 
   // Setup Singleton Supabase Realtime Channel if not yet created
   if (hasValidCredentials && !activePresenceChannel) {
     try {
       const sid = getTabSessionId();
-      activePresenceChannel = supabase.channel('sscbs-online-presence-v5', {
+      activePresenceChannel = supabase.channel('sscbs-online-presence-v6', {
         config: { presence: { key: sid } }
       });
 
@@ -301,10 +309,10 @@ export function subscribeToPresence(user, currentView, onPresenceSync) {
 }
 
 /**
- * 📊 Log a real feature view/launch event to local storage & Supabase
+ * 📊 Log a real feature view/launch or click event to local storage & Supabase
  * Completely non-blocking and safe
  */
-export async function logFeatureView(featureId, user) {
+export async function logFeatureView(featureId, user, eventType = 'visit') {
   if (!featureId) return;
 
   const dateStr = new Date().toISOString().split('T')[0];
@@ -325,12 +333,13 @@ export async function logFeatureView(featureId, user) {
   // 2. Attempt remote Supabase insertion if configured and user logged in
   if (hasValidCredentials && user) {
     try {
-      // Safely attempt logging individual event row to analytics_events table
+      // Safely attempt logging individual event row to analytics_events table with event_type
       supabase
         .from('analytics_events')
         .insert([{
           user_id: user.id || null,
           feature_id: featureId,
+          event_type: eventType,
           created_at: new Date().toISOString()
         }])
         .then(() => {})
