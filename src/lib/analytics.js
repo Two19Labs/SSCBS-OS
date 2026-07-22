@@ -105,7 +105,7 @@ async function fetchActivePresenceFromDB() {
   return [];
 }
 
-async function updateLocalAndState(remoteList = []) {
+function updateLocalAndState(remoteList = []) {
   try {
     const payload = getPresencePayload();
     const now = Date.now();
@@ -141,20 +141,7 @@ async function updateLocalAndState(remoteList = []) {
       });
     }
 
-    // 3. Merge active DB presence rows
-    if (hasValidCredentials) {
-      const dbList = await fetchActivePresenceFromDB();
-      dbList.forEach(item => {
-        if (item && item.email) {
-          const sid = item.session_id || item.id || item.email;
-          if (!merged[sid] || (item.lastPing || 0) >= (merged[sid].lastPing || 0)) {
-            merged[sid] = item;
-          }
-        }
-      });
-    }
-
-    // 4. Group by user email (1 active card per student showing latest page)
+    // 3. Group by user email (1 active card per student showing latest page)
     const userMap = {};
     Object.values(merged).forEach(p => {
       if (!p || !p.email) return;
@@ -168,6 +155,25 @@ async function updateLocalAndState(remoteList = []) {
 
     latestPresenceMap = userMap;
     broadcastPresenceToSubscribers();
+
+    // 4. Asynchronously fetch DB presence rows in background without blocking
+    if (hasValidCredentials) {
+      fetchActivePresenceFromDB().then(dbList => {
+        if (Array.isArray(dbList) && dbList.length > 0) {
+          let updated = false;
+          dbList.forEach(item => {
+            if (item && item.email) {
+              const existing = latestPresenceMap[item.email];
+              if (!existing || (item.lastPing || 0) > (existing.lastPing || 0)) {
+                latestPresenceMap[item.email] = item;
+                updated = true;
+              }
+            }
+          });
+          if (updated) broadcastPresenceToSubscribers();
+        }
+      }).catch(() => {});
+    }
   } catch (e) {
     // ignore sync errors
   }
@@ -340,7 +346,7 @@ export async function logFeatureView(featureId, user) {
           let eventsMap = data?.value || {};
           if (typeof eventsMap !== 'object' || !eventsMap) eventsMap = {};
           if (!eventsMap[dateStr]) {
-            eventsMap[dateStr] = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, total: 0 };
+            eventsMap[dateStr] = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, total: 0 };
           }
 
           eventsMap[dateStr][featureId] = (eventsMap[dateStr][featureId] || 0) + 1;
@@ -361,6 +367,7 @@ export async function logFeatureView(featureId, user) {
 
 /**
  * 📈 Fetch REAL analytics data combining Supabase DB events, system_configs, and local logs
+ * NO DEMO / SEED CURVES. 100% REAL RECORDED DATA.
  */
 export async function fetchAnalyticsData(daysCount = 7) {
   const dateList = [];
@@ -380,6 +387,8 @@ export async function fetchAnalyticsData(daysCount = 7) {
       waiver: 0,
       gpa: 0,
       buzz: 0,
+      profile: 0,
+      admin: 0,
       total: 0
     };
   }
@@ -395,6 +404,8 @@ export async function fetchAnalyticsData(daysCount = 7) {
       dateMap[dateStr].waiver += Number(day.waiver) || 0;
       dateMap[dateStr].gpa += Number(day.gpa) || 0;
       dateMap[dateStr].buzz += Number(day.buzz) || 0;
+      dateMap[dateStr].profile += Number(day.profile) || 0;
+      dateMap[dateStr].admin += Number(day.admin) || 0;
       dateMap[dateStr].total += Number(day.total) || 0;
     }
   });
@@ -420,6 +431,8 @@ export async function fetchAnalyticsData(daysCount = 7) {
             dateMap[dateStr].waiver = Math.max(dateMap[dateStr].waiver, Number(day.waiver) || 0);
             dateMap[dateStr].gpa = Math.max(dateMap[dateStr].gpa, Number(day.gpa) || 0);
             dateMap[dateStr].buzz = Math.max(dateMap[dateStr].buzz, Number(day.buzz) || 0);
+            dateMap[dateStr].profile = Math.max(dateMap[dateStr].profile, Number(day.profile) || 0);
+            dateMap[dateStr].admin = Math.max(dateMap[dateStr].admin, Number(day.admin) || 0);
             dateMap[dateStr].total = Math.max(dateMap[dateStr].total, Number(day.total) || 0);
           }
         });
@@ -451,14 +464,12 @@ export async function fetchAnalyticsData(daysCount = 7) {
     }
   }
 
-  // C. Calculate Totals & check if data is completely zero
-  const totals = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, grandTotal: 0 };
-  let hasAnyData = false;
+  // C. Calculate Totals
+  const totals = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, grandTotal: 0 };
 
   dateList.forEach(({ dateStr }) => {
     const dayData = dateMap[dateStr];
-    // Re-verify total sum per date
-    const calculatedDayTotal = dayData.home + dayData.timetable + dayData['find-prof'] + dayData.waiver + dayData.gpa + dayData.buzz;
+    const calculatedDayTotal = dayData.home + dayData.timetable + dayData['find-prof'] + dayData.waiver + dayData.gpa + dayData.buzz + dayData.profile + dayData.admin;
     if (dayData.total < calculatedDayTotal) dayData.total = calculatedDayTotal;
 
     totals.home += dayData.home;
@@ -467,40 +478,10 @@ export async function fetchAnalyticsData(daysCount = 7) {
     totals.waiver += dayData.waiver;
     totals.gpa += dayData.gpa;
     totals.buzz += dayData.buzz;
+    totals.profile += dayData.profile;
+    totals.admin += dayData.admin;
     totals.grandTotal += dayData.total;
-
-    if (dayData.total > 0) hasAnyData = true;
   });
-
-  // D. Baseline seed data if environment has zero recorded events yet
-  if (!hasAnyData) {
-    // Generate realistic activity curve for visualization until real clicks accumulate
-    dateList.forEach(({ dateStr }, idx) => {
-      const base = 4 + (idx * 2) % 7;
-      dateMap[dateStr] = {
-        home: base + 3,
-        timetable: base + 6,
-        'find-prof': base + 2,
-        waiver: base + 1,
-        gpa: base + 4,
-        buzz: base + 2,
-        total: (base + 3) + (base + 6) + (base + 2) + (base + 1) + (base + 4) + (base + 2)
-      };
-    });
-
-    // Reset totals
-    totals.home = 0; totals.timetable = 0; totals['find-prof'] = 0; totals.waiver = 0; totals.gpa = 0; totals.buzz = 0; totals.grandTotal = 0;
-    dateList.forEach(({ dateStr }) => {
-      const dayData = dateMap[dateStr];
-      totals.home += dayData.home;
-      totals.timetable += dayData.timetable;
-      totals['find-prof'] += dayData['find-prof'];
-      totals.waiver += dayData.waiver;
-      totals.gpa += dayData.gpa;
-      totals.buzz += dayData.buzz;
-      totals.grandTotal += dayData.total;
-    });
-  }
 
   const series = {
     home: dateList.map(d => dateMap[d.dateStr].home),
@@ -509,6 +490,8 @@ export async function fetchAnalyticsData(daysCount = 7) {
     waiver: dateList.map(d => dateMap[d.dateStr].waiver),
     gpa: dateList.map(d => dateMap[d.dateStr].gpa),
     buzz: dateList.map(d => dateMap[d.dateStr].buzz),
+    profile: dateList.map(d => dateMap[d.dateStr].profile),
+    admin: dateList.map(d => dateMap[d.dateStr].admin),
     total: dateList.map(d => dateMap[d.dateStr].total)
   };
 

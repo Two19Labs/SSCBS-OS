@@ -311,8 +311,8 @@ export default function AdminConsolePage({ onBack }) {
   const [analyticsTimeRange, setAnalyticsTimeRange] = useState(7); // 7, 30, 90
   const [analyticsSummary, setAnalyticsSummary] = useState({
     dateLabels: [],
-    series: { total: [], home: [], timetable: [], 'find-prof': [], waiver: [], gpa: [], buzz: [] },
-    totals: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, grandTotal: 0 },
+    series: { total: [], home: [], timetable: [], 'find-prof': [], waiver: [], gpa: [], buzz: [], profile: [], admin: [] },
+    totals: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, grandTotal: 0 },
     topFeatureName: 'Timetable',
     topFeatureCount: 0
   });
@@ -323,7 +323,9 @@ export default function AdminConsolePage({ onBack }) {
     'find-prof': true,
     waiver: true,
     gpa: true,
-    buzz: true
+    buzz: true,
+    profile: true,
+    admin: true
   });
   const [hoveredPoint, setHoveredPoint] = useState(null);
   const [tickerNow, setTickerNow] = useState(Date.now());
@@ -1735,6 +1737,7 @@ export default function AdminConsolePage({ onBack }) {
                           waiver: { bg: 'rgba(6, 182, 212, 0.12)', color: '#06b6d4', border: 'rgba(6, 182, 212, 0.3)' },
                           gpa: { bg: 'rgba(245, 158, 11, 0.12)', color: '#f59e0b', border: 'rgba(245, 158, 11, 0.3)' },
                           buzz: { bg: 'rgba(236, 72, 153, 0.12)', color: '#ec4899', border: 'rgba(236, 72, 153, 0.3)' },
+                          profile: { bg: 'rgba(20, 184, 166, 0.12)', color: '#14b8a6', border: 'rgba(20, 184, 166, 0.3)' },
                           admin: { bg: 'rgba(234, 179, 8, 0.12)', color: '#eab308', border: 'rgba(234, 179, 8, 0.3)' }
                         };
                         const chipStyle = featStyleMap[featKey] || featStyleMap.home;
@@ -1824,7 +1827,9 @@ export default function AdminConsolePage({ onBack }) {
                   { key: 'find-prof', label: 'Find My Professor', color: '#10b981' },
                   { key: 'waiver', label: 'Waiver Tool', color: '#06b6d4' },
                   { key: 'gpa', label: 'GPA Calculator', color: '#f59e0b' },
-                  { key: 'buzz', label: 'Campus Buzz', color: '#ec4899' }
+                  { key: 'buzz', label: 'Campus Buzz', color: '#ec4899' },
+                  { key: 'profile', label: 'Profile Page', color: '#14b8a6' },
+                  { key: 'admin', label: 'Admin Console', color: '#f43f5e' }
                 ].map(({ key, label, color }) => {
                   const count = key === 'total'
                     ? (analyticsSummary.totals.grandTotal || 0)
@@ -1865,7 +1870,9 @@ export default function AdminConsolePage({ onBack }) {
                     'find-prof': '#10b981',
                     waiver: '#06b6d4',
                     gpa: '#f59e0b',
-                    buzz: '#ec4899'
+                    buzz: '#ec4899',
+                    profile: '#14b8a6',
+                    admin: '#f43f5e'
                   };
 
                   let maxVal = 10;
