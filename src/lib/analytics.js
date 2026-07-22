@@ -40,9 +40,12 @@ function getTabSessionId() {
   return sid;
 }
 
+let globalCurrentUser = null;
+let globalCurrentView = 'home';
 let activePresenceChannel = null;
 const presenceSubscribers = new Set();
 let latestPresenceMap = {};
+let presenceHeartbeatTimer = null;
 
 function broadcastPresenceToSubscribers() {
   const list = Object.values(latestPresenceMap);
@@ -51,128 +54,128 @@ function broadcastPresenceToSubscribers() {
   });
 }
 
-/**
- * 🟢 Real-Time Presence Subscription via Supabase WebSockets, Database & Tab Sync
- * Pure, 100% real-time tracker for actual connected users
- */
-export function subscribeToPresence(user, currentView, onPresenceSync) {
-  if (!user || !user.email) {
-    if (onPresenceSync) onPresenceSync([]);
-    return () => {};
-  }
+function getPresencePayload() {
+  if (!globalCurrentUser || !globalCurrentUser.email) return null;
 
-  const userId = String(user.id || user.email || 'anon');
+  const userId = String(globalCurrentUser.id || globalCurrentUser.email || 'anon');
   const sessionId = getTabSessionId();
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
 
-  const getPayload = () => ({
+  return {
     id: userId,
     session_id: sessionId,
-    name: user.user_metadata?.full_name || user.email.split('@')[0] || 'Student',
-    email: user.email,
-    course: user.user_metadata?.course || 'N/A',
-    semester: user.user_metadata?.semester ? String(user.user_metadata.semester) : 'N/A',
-    section: user.user_metadata?.section || 'N/A',
-    currentView: currentView || 'home',
-    viewLabel: FEATURE_NAMES[currentView] || 'Home Dashboard',
+    name: globalCurrentUser.user_metadata?.full_name || globalCurrentUser.email.split('@')[0] || 'Student',
+    email: globalCurrentUser.email,
+    course: globalCurrentUser.user_metadata?.course || 'N/A',
+    semester: globalCurrentUser.user_metadata?.semester ? String(globalCurrentUser.user_metadata.semester) : 'N/A',
+    section: globalCurrentUser.user_metadata?.section || 'N/A',
+    currentView: globalCurrentView || 'home',
+    viewLabel: FEATURE_NAMES[globalCurrentView] || 'Home Dashboard',
     device: isMobile ? '📱 Mobile' : '💻 Desktop',
     lastPing: Date.now()
-  });
+  };
+}
 
-  if (onPresenceSync) {
-    presenceSubscribers.add(onPresenceSync);
+function updateLocalAndState(remoteList = []) {
+  try {
+    const payload = getPresencePayload();
+    const now = Date.now();
+    const raw = localStorage.getItem('sscbs_online_presence_v3');
+    let map = raw ? JSON.parse(raw) : {};
+    if (typeof map !== 'object' || !map) map = {};
+
+    if (payload) {
+      map[payload.session_id] = payload;
+    }
+
+    // Purge sessions older than 12 seconds
+    const cleanMap = {};
+    Object.keys(map).forEach(sid => {
+      if (now - (map[sid].lastPing || 0) < 12000) {
+        cleanMap[sid] = map[sid];
+      }
+    });
+    localStorage.setItem('sscbs_online_presence_v3', JSON.stringify(cleanMap));
+
+    // Merge local sessions + WebSocket remote presence list
+    const merged = { ...cleanMap };
+    if (Array.isArray(remoteList)) {
+      remoteList.forEach(item => {
+        if (item && item.email) {
+          const sid = item.session_id || item.id || item.email;
+          merged[sid] = { ...merged[sid], ...item };
+        }
+      });
+    }
+
+    // Group by user email so each online student has 1 card showing their latest active page
+    const userMap = {};
+    Object.values(merged).forEach(p => {
+      if (!p || !p.email) return;
+      const existing = userMap[p.email];
+      if (!existing || (p.lastPing || 0) >= (existing.lastPing || 0)) {
+        userMap[p.email] = p;
+      }
+    });
+
+    latestPresenceMap = userMap;
+    broadcastPresenceToSubscribers();
+  } catch (e) {
+    // ignore sync errors
+  }
+}
+
+function sendPresencePing() {
+  const payload = getPresencePayload();
+  if (!payload) return;
+
+  // 1. Update local storage & broadcast to React subscribers
+  updateLocalAndState([]);
+
+  // 2. Track payload over Realtime WebSocket
+  if (hasValidCredentials && activePresenceChannel) {
+    try {
+      activePresenceChannel.track(payload).catch(() => {});
+    } catch (e) {}
   }
 
-  // 1. Local Storage & Memory Sync
-  const updateLocalAndState = (remoteList = []) => {
+  // 3. Upsert DB active_presence row for persistence
+  if (hasValidCredentials) {
     try {
-      const now = Date.now();
-      const raw = localStorage.getItem('sscbs_online_presence_v2');
-      let map = raw ? JSON.parse(raw) : {};
-      if (typeof map !== 'object' || !map) map = {};
+      supabase.from('active_presence').upsert({
+        session_id: payload.session_id,
+        user_id: payload.id,
+        name: payload.name,
+        email: payload.email,
+        course: payload.course,
+        semester: payload.semester,
+        section: payload.section,
+        current_view: payload.currentView,
+        view_label: payload.viewLabel,
+        device: payload.device,
+        last_ping: new Date().toISOString()
+      }).then(() => {}).catch(() => {});
+    } catch (e) {}
+  }
+}
 
-      const currentPayload = getPayload();
-      map[sessionId] = currentPayload;
-
-      // Purge sessions older than 10 seconds
-      const cleanMap = {};
-      Object.keys(map).forEach(sid => {
-        if (now - (map[sid].lastPing || 0) < 10000) {
-          cleanMap[sid] = map[sid];
-        }
-      });
-      localStorage.setItem('sscbs_online_presence_v2', JSON.stringify(cleanMap));
-
-      // Merge local sessions + WebSocket remote list
-      const merged = { ...cleanMap };
-      if (Array.isArray(remoteList)) {
-        remoteList.forEach(item => {
-          if (item && item.email) {
-            const sid = item.session_id || item.id || item.email;
-            merged[sid] = { ...merged[sid], ...item };
-          }
-        });
-      }
-
-      // Group by user email so each online user has 1 active entry (their most recent active page)
-      const userMap = {};
-      Object.values(merged).forEach(p => {
-        if (!p || !p.email) return;
-        const existing = userMap[p.email];
-        if (!existing || (p.lastPing || 0) >= (existing.lastPing || 0)) {
-          userMap[p.email] = p;
-        }
-      });
-
-      latestPresenceMap = userMap;
-      broadcastPresenceToSubscribers();
-    } catch (e) {
-      // ignore sync errors
-    }
-  };
-
-  // 2. Supabase Database & WebSocket Ping
-  const sendPresencePing = () => {
-    const payload = getPayload();
-    updateLocalAndState([]);
-
-    if (hasValidCredentials) {
-      // Upsert DB active_presence row for persistence (completely safe and optional)
-      try {
-        supabase.from('active_presence').upsert({
-          session_id: sessionId,
-          user_id: userId,
-          name: payload.name,
-          email: payload.email,
-          course: payload.course,
-          semester: payload.semester,
-          section: payload.section,
-          current_view: payload.currentView,
-          view_label: payload.viewLabel,
-          device: payload.device,
-          last_ping: new Date().toISOString()
-        }).then(() => {}).catch(() => {});
-      } catch (e) {
-        // ignore DB presence error if table not yet created
-      }
-
-      // Track payload over Realtime WebSocket
-      try {
-        if (activePresenceChannel && activePresenceChannel.state === 'joined') {
-          activePresenceChannel.track(payload).catch(() => {});
-        }
-      } catch (e) {}
-    }
-  };
+function initGlobalPresenceTracker() {
+  // Start heartbeat interval if not running (3 seconds)
+  if (!presenceHeartbeatTimer) {
+    presenceHeartbeatTimer = setInterval(() => {
+      sendPresencePing();
+    }, 3000);
+  }
 
   // Setup Singleton Supabase Realtime Channel if not yet created
   if (hasValidCredentials && !activePresenceChannel) {
     try {
-      activePresenceChannel = supabase.channel('sscbs-online-presence-v3', {
-        config: { presence: { key: sessionId } }
+      const sid = getTabSessionId();
+      activePresenceChannel = supabase.channel('sscbs-online-presence-v4', {
+        config: { presence: { key: sid } }
       });
 
-      const handlePresenceChange = () => {
+      const handlePresenceSync = () => {
         try {
           const state = activePresenceChannel.presenceState();
           const onlineList = [];
@@ -190,9 +193,9 @@ export function subscribeToPresence(user, currentView, onPresenceSync) {
       };
 
       activePresenceChannel
-        .on('presence', { event: 'sync' }, handlePresenceChange)
-        .on('presence', { event: 'join' }, handlePresenceChange)
-        .on('presence', { event: 'leave' }, handlePresenceChange)
+        .on('presence', { event: 'sync' }, handlePresenceSync)
+        .on('presence', { event: 'join' }, handlePresenceSync)
+        .on('presence', { event: 'leave' }, handlePresenceSync)
         .subscribe(status => {
           if (status === 'SUBSCRIBED') {
             sendPresencePing();
@@ -201,23 +204,39 @@ export function subscribeToPresence(user, currentView, onPresenceSync) {
     } catch (err) {
       console.warn('Realtime presence notice:', err);
     }
-  } else if (activePresenceChannel && activePresenceChannel.state === 'joined') {
-    sendPresencePing();
+  }
+}
+
+/**
+ * 🟢 Real-Time Presence Subscription via Supabase WebSockets, Database & Tab Sync
+ * Pure, 100% real-time tracker for actual connected users
+ */
+export function subscribeToPresence(user, currentView, onPresenceSync) {
+  if (!user || !user.email) {
+    if (onPresenceSync) onPresenceSync([]);
+    return () => {};
   }
 
-  // Initial ping
-  sendPresencePing();
+  if (user && user.email) {
+    globalCurrentUser = user;
+  }
+  if (currentView) {
+    globalCurrentView = currentView;
+  }
 
-  // Heartbeat interval every 4 seconds
-  const heartbeatTimer = setInterval(() => {
-    sendPresencePing();
-  }, 4000);
+  if (onPresenceSync) {
+    presenceSubscribers.add(onPresenceSync);
+    // Send immediate sync to subscriber with current presence map
+    try { onPresenceSync(Object.values(latestPresenceMap)); } catch (e) {}
+  }
+
+  initGlobalPresenceTracker();
+  sendPresencePing();
 
   return () => {
     if (onPresenceSync) {
       presenceSubscribers.delete(onPresenceSync);
     }
-    clearInterval(heartbeatTimer);
   };
 }
 
