@@ -30,8 +30,29 @@ function saveLocalAnalyticsMap(map) {
   }
 }
 
+function getTabSessionId() {
+  if (typeof window === 'undefined') return 'server_session';
+  let sid = sessionStorage.getItem('sscbs_tab_session_id');
+  if (!sid) {
+    sid = 'tab_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now();
+    sessionStorage.setItem('sscbs_tab_session_id', sid);
+  }
+  return sid;
+}
+
+let activePresenceChannel = null;
+const presenceSubscribers = new Set();
+let latestPresenceMap = {};
+
+function broadcastPresenceToSubscribers() {
+  const list = Object.values(latestPresenceMap);
+  presenceSubscribers.forEach(cb => {
+    try { cb(list); } catch (e) {}
+  });
+}
+
 /**
- * 🟢 Real-Time Presence Subscription via Supabase WebSockets & Multi-Tab Sync
+ * 🟢 Real-Time Presence Subscription via Supabase WebSockets, Database & Tab Sync
  * Pure, 100% real-time tracker for actual connected users
  */
 export function subscribeToPresence(user, currentView, onPresenceSync) {
@@ -41,10 +62,12 @@ export function subscribeToPresence(user, currentView, onPresenceSync) {
   }
 
   const userId = String(user.id || user.email || 'anon');
+  const sessionId = getTabSessionId();
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
 
   const getPayload = () => ({
     id: userId,
+    session_id: sessionId,
     name: user.user_metadata?.full_name || user.email.split('@')[0] || 'Student',
     email: user.email,
     course: user.user_metadata?.course || 'N/A',
@@ -56,128 +79,139 @@ export function subscribeToPresence(user, currentView, onPresenceSync) {
     lastPing: Date.now()
   });
 
-  // Local Storage Presence sync (for multi-tab / local window real-time sync)
-  const syncLocalPresence = () => {
+  if (onPresenceSync) {
+    presenceSubscribers.add(onPresenceSync);
+  }
+
+  // 1. Local Storage & Memory Sync
+  const updateLocalAndState = (remoteList = []) => {
     try {
       const now = Date.now();
-      const raw = localStorage.getItem('sscbs_online_presence_v1');
+      const raw = localStorage.getItem('sscbs_online_presence_v2');
       let map = raw ? JSON.parse(raw) : {};
       if (typeof map !== 'object' || !map) map = {};
 
-      // Register current user session payload
-      map[userId] = getPayload();
+      const currentPayload = getPayload();
+      map[sessionId] = currentPayload;
 
-      // Purge sessions inactive for > 6 seconds
-      const activeList = [];
-      Object.keys(map).forEach(id => {
-        if (now - (map[id].lastPing || 0) < 6000) {
-          activeList.push(map[id]);
-        } else {
-          delete map[id];
+      // Purge sessions older than 10 seconds
+      const cleanMap = {};
+      Object.keys(map).forEach(sid => {
+        if (now - (map[sid].lastPing || 0) < 10000) {
+          cleanMap[sid] = map[sid];
         }
       });
+      localStorage.setItem('sscbs_online_presence_v2', JSON.stringify(cleanMap));
 
-      localStorage.setItem('sscbs_online_presence_v1', JSON.stringify(map));
-      return activeList;
-    } catch (e) {
-      return [getPayload()];
-    }
-  };
-
-  let channel = null;
-  let heartbeatTimer = null;
-
-  const emitSync = (remoteList = []) => {
-    const localActive = syncLocalPresence();
-    const mergedMap = {};
-
-    // 1. Local active tabs/sessions for this user/device
-    localActive.forEach(u => {
-      if (u && u.id) mergedMap[u.id] = u;
-    });
-
-    // 2. Real remote WebSocket connections from Supabase Realtime
-    if (Array.isArray(remoteList)) {
-      remoteList.forEach(u => {
-        if (u && (u.id || u.email)) {
-          const key = u.id || u.email;
-          mergedMap[key] = { ...mergedMap[key], ...u };
-        }
-      });
-    }
-
-    const result = Object.values(mergedMap);
-    if (onPresenceSync) onPresenceSync(result);
-  };
-
-  // Immediate sync on load
-  emitSync([]);
-
-  // Supabase Realtime channel setup
-  if (hasValidCredentials) {
-    try {
-      channel = supabase.channel('sscbs-online-presence-v2', {
-        config: { presence: { key: userId } }
-      });
-
-      channel
-        .on('presence', { event: 'sync' }, () => {
-          try {
-            const state = channel.presenceState();
-            const onlineList = [];
-            if (state) {
-              Object.values(state).forEach((presences) => {
-                if (Array.isArray(presences)) {
-                  presences.forEach((p) => {
-                    if (p && p.name && p.email) onlineList.push(p);
-                  });
-                }
-              });
-            }
-            emitSync(onlineList);
-          } catch (e) {
-            emitSync([]);
+      // Merge local sessions + WebSocket remote list
+      const merged = { ...cleanMap };
+      if (Array.isArray(remoteList)) {
+        remoteList.forEach(item => {
+          if (item && item.email) {
+            const sid = item.session_id || item.id || item.email;
+            merged[sid] = { ...merged[sid], ...item };
           }
-        })
-        .subscribe((status) => {
-          if (status === 'SUBSCRIBED' && channel) {
-            channel.track(getPayload()).catch(() => {});
+        });
+      }
+
+      // Group by user email so each online user has 1 active entry (their most recent active page)
+      const userMap = {};
+      Object.values(merged).forEach(p => {
+        if (!p || !p.email) return;
+        const existing = userMap[p.email];
+        if (!existing || (p.lastPing || 0) >= (existing.lastPing || 0)) {
+          userMap[p.email] = p;
+        }
+      });
+
+      latestPresenceMap = userMap;
+      broadcastPresenceToSubscribers();
+    } catch (e) {
+      // ignore sync errors
+    }
+  };
+
+  // 2. Supabase Database & WebSocket Ping
+  const sendPresencePing = () => {
+    const payload = getPayload();
+    updateLocalAndState([]);
+
+    if (hasValidCredentials) {
+      // Upsert DB active_presence row for persistence
+      supabase.from('active_presence').upsert({
+        session_id: sessionId,
+        user_id: userId,
+        name: payload.name,
+        email: payload.email,
+        course: payload.course,
+        semester: payload.semester,
+        section: payload.section,
+        current_view: payload.currentView,
+        view_label: payload.viewLabel,
+        device: payload.device,
+        last_ping: new Date().toISOString()
+      }).catch(() => {});
+
+      // Track payload over Realtime WebSocket
+      if (activePresenceChannel && activePresenceChannel.state === 'joined') {
+        activePresenceChannel.track(payload).catch(() => {});
+      }
+    }
+  };
+
+  // Setup Singleton Supabase Realtime Channel if not yet created
+  if (hasValidCredentials && !activePresenceChannel) {
+    try {
+      activePresenceChannel = supabase.channel('sscbs-online-presence-v3', {
+        config: { presence: { key: sessionId } }
+      });
+
+      const handlePresenceChange = () => {
+        try {
+          const state = activePresenceChannel.presenceState();
+          const onlineList = [];
+          if (state) {
+            Object.values(state).forEach(presences => {
+              if (Array.isArray(presences)) {
+                presences.forEach(p => {
+                  if (p && p.name && p.email) onlineList.push(p);
+                });
+              }
+            });
+          }
+          updateLocalAndState(onlineList);
+        } catch (e) {}
+      };
+
+      activePresenceChannel
+        .on('presence', { event: 'sync' }, handlePresenceChange)
+        .on('presence', { event: 'join' }, handlePresenceChange)
+        .on('presence', { event: 'leave' }, handlePresenceChange)
+        .subscribe(status => {
+          if (status === 'SUBSCRIBED') {
+            sendPresencePing();
           }
         });
     } catch (err) {
-      console.warn('Presence subscription non-blocking warning:', err);
+      console.warn('Realtime presence notice:', err);
     }
+  } else if (activePresenceChannel && activePresenceChannel.state === 'joined') {
+    sendPresencePing();
   }
 
-  // ⏱️ High-frequency heartbeat timer running every 1000ms (1 second)
-  heartbeatTimer = setInterval(() => {
-    const updatedPayload = getPayload();
-    if (channel && channel.state === 'joined') {
-      channel.track(updatedPayload).catch(() => {});
-    }
-    emitSync([]);
-  }, 1000);
+  // Initial ping
+  sendPresencePing();
+
+  // Heartbeat interval every 4 seconds
+  const heartbeatTimer = setInterval(() => {
+    sendPresencePing();
+  }, 4000);
 
   return () => {
-    if (heartbeatTimer) clearInterval(heartbeatTimer);
-    try {
-      if (channel) {
-        channel.untrack().catch(() => {});
-        supabase.removeChannel(channel).catch(() => {});
-      }
-    } catch (e) {
-      // ignore cleanup errors
+    if (onPresenceSync) {
+      presenceSubscribers.delete(onPresenceSync);
     }
-
-    // Cleanup self from local presence map on unmount
-    try {
-      const raw = localStorage.getItem('sscbs_online_presence_v1');
-      if (raw) {
-        const map = JSON.parse(raw);
-        delete map[userId];
-        localStorage.setItem('sscbs_online_presence_v1', JSON.stringify(map));
-      }
-    } catch (e) {}
+    clearInterval(heartbeatTimer);
   };
 }
 

@@ -170,6 +170,33 @@ CREATE POLICY "Enable read access for authenticated users on analytics_events"
     TO authenticated 
     USING (true);
 
+-- 8. Create a table to track real-time active student presence
+CREATE TABLE IF NOT EXISTS public.active_presence (
+    session_id TEXT PRIMARY KEY,
+    user_id TEXT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    course TEXT DEFAULT 'N/A',
+    semester TEXT DEFAULT 'N/A',
+    section TEXT DEFAULT 'N/A',
+    current_view TEXT DEFAULT 'home',
+    view_label TEXT DEFAULT 'Home Dashboard',
+    device TEXT DEFAULT '💻 Desktop',
+    last_ping TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable Row Level Security (RLS)
+ALTER TABLE public.active_presence ENABLE ROW LEVEL SECURITY;
+
+-- Security Policies for active_presence
+CREATE POLICY "Enable all access for authenticated users on active_presence" 
+    ON public.active_presence 
+    FOR ALL 
+    TO authenticated 
+    USING (true)
+    WITH CHECK (true);
+
+
 
 
 
