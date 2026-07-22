@@ -40,12 +40,62 @@ const PageLoader = () => (
 );
 
 const TOOL_VIEWS = ['find-prof', 'waiver', 'admin'];
+const VALID_VIEWS = ['home', 'timetable', 'find-prof', 'waiver', 'tools', 'buzz', 'profile', 'admin'];
+
+const getInitialView = () => {
+  if (typeof window !== 'undefined') {
+    const hash = window.location.hash.replace(/^#\/?/, '').trim();
+    if (hash && VALID_VIEWS.includes(hash)) {
+      return hash;
+    }
+    const saved = localStorage.getItem('sscbs_active_view');
+    if (saved && VALID_VIEWS.includes(saved)) {
+      return saved;
+    }
+  }
+  return 'home';
+};
 
 function App() {
   const { user, loading } = useAuth();
-  const [view, setView] = useState('home');
+  const [view, setViewState] = useState(getInitialView);
   const [returnView, setReturnView] = useState('home');
   const [isGpaOpen, setIsGpaOpen] = useState(false);
+
+  const setView = (newView) => {
+    if (VALID_VIEWS.includes(newView)) {
+      setViewState(newView);
+      if (typeof window !== 'undefined') {
+        window.location.hash = newView === 'home' ? '' : newView;
+        localStorage.setItem('sscbs_active_view', newView);
+      }
+    }
+  };
+
+  // Sync state with browser hash navigation (back/forward & initial load)
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace(/^#\/?/, '').trim();
+      if (hash && VALID_VIEWS.includes(hash)) {
+        setViewState(hash);
+        localStorage.setItem('sscbs_active_view', hash);
+      } else if (!hash) {
+        setViewState('home');
+        localStorage.setItem('sscbs_active_view', 'home');
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  // Ensure current view is recorded in URL hash & localStorage on mount
+  useEffect(() => {
+    if (view && view !== 'home' && typeof window !== 'undefined') {
+      window.location.hash = view;
+      localStorage.setItem('sscbs_active_view', view);
+    }
+  }, []);
 
   // Check if profile setup is required (missing name, course/class, or section)
   const hasCompletedProfile = Boolean(
