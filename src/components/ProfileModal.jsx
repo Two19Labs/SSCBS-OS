@@ -14,7 +14,7 @@ const ALL_SEMESTERS = [
   { value: '8', label: 'Sem 8 (4th Yr)' },
 ];
 
-export default function ProfileModal({ isOpen, onClose }) {
+export default function ProfileModal({ isOpen, onClose, isFirstTimeSetup = false }) {
   const { user, updateProfile, signOut } = useAuth();
   const { getActiveSemesters } = useTimetable();
   
@@ -61,7 +61,7 @@ export default function ProfileModal({ isOpen, onClose }) {
     setStatus({ type: '', message: '' });
     try {
       await signOut();
-      onClose();
+      if (onClose) onClose();
     } catch (err) {
       setStatus({ type: 'error', message: err.message || 'Failed to sign out.' });
     } finally {
@@ -71,23 +71,28 @@ export default function ProfileModal({ isOpen, onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!fullName.trim()) {
+      setStatus({ type: 'error', message: 'Please enter your full name.' });
+      return;
+    }
     setLoading(true);
     setStatus({ type: '', message: '' });
 
     try {
       await updateProfile({
-        full_name: fullName,
+        full_name: fullName.trim(),
         course,
         semester,
-        section
+        section,
+        profile_completed: true,
       });
-      setStatus({ type: 'success', message: 'Profile updated successfully!' });
+      setStatus({ type: 'success', message: 'Profile set up successfully!' });
       
       // Close after delay
       setTimeout(() => {
         setStatus({ type: '', message: '' });
-        onClose();
-      }, 1000);
+        if (onClose) onClose();
+      }, 800);
     } catch (err) {
       setStatus({ type: 'error', message: err.message || 'Failed to update profile.' });
     } finally {
@@ -105,11 +110,20 @@ export default function ProfileModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <div className="profile-modal-overlay" onClick={onClose}>
+    <div className="profile-modal-overlay" onClick={isFirstTimeSetup ? undefined : onClose}>
       <div className="profile-modal-card" onClick={(e) => e.stopPropagation()}>
         <header className="profile-modal-header">
-          <h3>Configure Profile</h3>
-          <button className="close-btn" onClick={onClose} aria-label="Close modal">×</button>
+          <div>
+            <h3>{isFirstTimeSetup ? 'Welcome to SSCBS OS! 👋' : 'Configure Profile'}</h3>
+            {isFirstTimeSetup && (
+              <p className="profile-modal-subtitle">
+                Please set up your student profile to customize your workspace, timetables, and class schedules.
+              </p>
+            )}
+          </div>
+          {!isFirstTimeSetup && (
+            <button className="close-btn" onClick={onClose} aria-label="Close modal">×</button>
+          )}
         </header>
 
         <form onSubmit={handleSubmit} className="profile-modal-form">
@@ -125,7 +139,7 @@ export default function ProfileModal({ isOpen, onClose }) {
             <input
               type="text"
               id="fullName"
-              placeholder="Enter your name"
+              placeholder="e.g. Aditya Vardhan"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
@@ -133,7 +147,7 @@ export default function ProfileModal({ isOpen, onClose }) {
           </div>
 
           <div className="form-item">
-            <label>College Course</label>
+            <label>College Course / Class</label>
             <div className="radio-card-grid">
               {['BMS', 'BBA FIA', 'Bsc Comp Sci'].map((c) => (
                 <div
@@ -195,20 +209,28 @@ export default function ProfileModal({ isOpen, onClose }) {
               Sign Out
             </button>
             <div className="footer-actions-right">
-              <button
-                type="button"
-                className="btn-cancel"
-                onClick={onClose}
-                disabled={loading}
-              >
-                Cancel
-              </button>
+              {!isFirstTimeSetup && (
+                <button
+                  type="button"
+                  className="btn-cancel"
+                  onClick={onClose}
+                  disabled={loading}
+                >
+                  Cancel
+                </button>
+              )}
               <button
                 type="submit"
                 className="btn-save"
                 disabled={loading}
               >
-                {loading ? <span className="profile-spinner"></span> : 'Save Profile'}
+                {loading ? (
+                  <span className="profile-spinner"></span>
+                ) : isFirstTimeSetup ? (
+                  'Complete Setup'
+                ) : (
+                  'Save Profile'
+                )}
               </button>
             </div>
           </footer>

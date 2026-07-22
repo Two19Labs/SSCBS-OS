@@ -4,6 +4,7 @@ import { logFeatureView, subscribeToPresence } from './lib/analytics';
 import Auth from './components/Auth';
 import HomeDashboard from './components/HomeDashboard';
 import ProfilePage from './components/ProfilePage';
+import ProfileModal from './components/ProfileModal';
 import ClassSchedulesCard from './components/ClassSchedulesCard';
 import NoticeBoard from './components/NoticeBoard';
 import { isAdminEmail } from './lib/admin';
@@ -45,6 +46,13 @@ function App() {
   const [view, setView] = useState('home');
   const [returnView, setReturnView] = useState('home');
   const [isGpaOpen, setIsGpaOpen] = useState(false);
+
+  // Check if profile setup is required (missing name, course/class, or section)
+  const hasCompletedProfile = Boolean(
+    user?.user_metadata?.profile_completed ||
+    (user?.user_metadata?.full_name && user?.user_metadata?.course && user?.user_metadata?.section)
+  );
+  const needsProfileSetup = Boolean(user && !hasCompletedProfile);
 
   // 🟢 Real-Time Presence & Feature Usage Logger across SSCBS OS
   useEffect(() => {
@@ -266,6 +274,7 @@ function App() {
         </nav>
       </div>
 
+      <ProfileModal isOpen={needsProfileSetup} isFirstTimeSetup={needsProfileSetup} />
       <Suspense fallback={null}>
         {isGpaOpen && <GpaCalculatorModal isOpen={isGpaOpen} onClose={() => setIsGpaOpen(false)} />}
       </Suspense>
