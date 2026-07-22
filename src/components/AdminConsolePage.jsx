@@ -344,66 +344,6 @@ export default function AdminConsolePage({ onBack }) {
       }
     });
 
-    // Also fetch DB presence table directly & subscribe to Postgres Realtime
-    if (hasValidCredentials) {
-      const fetchDbPresence = async () => {
-        try {
-          const cutoff = new Date(Date.now() - 30000).toISOString();
-          const { data } = await supabase
-            .from('active_presence')
-            .select('*')
-            .gte('last_ping', cutoff);
-
-          if (Array.isArray(data) && data.length > 0) {
-            const dbList = data.map(item => ({
-              id: item.user_id || item.session_id,
-              name: item.name,
-              email: item.email,
-              course: item.course,
-              semester: item.semester,
-              section: item.section,
-              currentView: item.current_view,
-              viewLabel: item.view_label || FEATURE_NAMES[item.current_view] || 'Home Dashboard',
-              device: item.device,
-              lastPing: new Date(item.last_ping).getTime()
-            }));
-
-            setOnlinePresence(prev => {
-              const map = {};
-              (prev || []).forEach(p => { if (p && p.email) map[p.email] = p; });
-              dbList.forEach(p => {
-                if (p && p.email) {
-                  if (!map[p.email] || (p.lastPing > (map[p.email].lastPing || 0))) {
-                    map[p.email] = p;
-                  }
-                }
-              });
-              return Object.values(map);
-            });
-          }
-        } catch (e) {}
-      };
-
-      fetchDbPresence();
-
-      let dbChannel = null;
-      try {
-        dbChannel = supabase
-          .channel('db-active-presence-changes')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'active_presence' }, () => {
-            fetchDbPresence();
-          })
-          .subscribe();
-      } catch (e) {}
-
-      return () => {
-        if (typeof unsubscribe === 'function') unsubscribe();
-        try {
-          if (dbChannel) supabase.removeChannel(dbChannel).catch(() => {});
-        } catch (e) {}
-      };
-    }
-
     return () => {
       if (typeof unsubscribe === 'function') unsubscribe();
     };
@@ -1800,7 +1740,7 @@ export default function AdminConsolePage({ onBack }) {
                         const chipStyle = featStyleMap[featKey] || featStyleMap.home;
 
                         return (
-                          <tr key={usr.id}>
+                          <tr key={usr.session_id || usr.id || usr.email}>
                             <td>
                               <div className="student-name-cell">
                                 <span className="online-avatar-badge">{usr.name ? usr.name.charAt(0).toUpperCase() : 'S'}</span>

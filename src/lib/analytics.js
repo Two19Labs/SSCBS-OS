@@ -88,7 +88,7 @@ function updateLocalAndState(remoteList = []) {
       map[payload.session_id] = payload;
     }
 
-    // Purge sessions older than 12 seconds
+    // 1. Purge local storage sessions inactive for > 12 seconds
     const cleanMap = {};
     Object.keys(map).forEach(sid => {
       if (now - (map[sid].lastPing || 0) < 12000) {
@@ -97,18 +97,22 @@ function updateLocalAndState(remoteList = []) {
     });
     localStorage.setItem('sscbs_online_presence_v3', JSON.stringify(cleanMap));
 
-    // Merge local sessions + WebSocket remote presence list
+    // 2. Merge active remote connections from Supabase Realtime WebSockets
     const merged = { ...cleanMap };
     if (Array.isArray(remoteList)) {
       remoteList.forEach(item => {
         if (item && item.email) {
           const sid = item.session_id || item.id || item.email;
-          merged[sid] = { ...merged[sid], ...item };
+          // Active WebSocket presence connections from Supabase are live right now
+          merged[sid] = {
+            ...item,
+            lastPing: item.lastPing && (now - item.lastPing < 30000) ? item.lastPing : now
+          };
         }
       });
     }
 
-    // Group by user email so each online student has 1 card showing their latest active page
+    // 3. Group by user email so each online student has 1 card showing their latest active page
     const userMap = {};
     Object.values(merged).forEach(p => {
       if (!p || !p.email) return;
