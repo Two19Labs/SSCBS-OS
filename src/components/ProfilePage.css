@@ -56,6 +56,14 @@
   border-bottom: 1px solid var(--border-strong);
 }
 
+.profile-name-title {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
 .profile-email {
   font-size: 12.5px;
   color: var(--ink-dim);
@@ -161,6 +169,40 @@
 .profile-row-value select:disabled {
   color: var(--ink-faint);
   cursor: default;
+}
+
+.profile-row-input {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid var(--border);
+  background: var(--tint);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: right;
+  padding: 6px 12px;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.15s ease;
+  min-width: 160px;
+  max-width: 260px;
+}
+
+.profile-row-input:hover {
+  background: var(--surface);
+  border-color: var(--border-strong);
+}
+
+.profile-row-input:focus {
+  background: var(--surface);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.profile-row-input::placeholder {
+  color: var(--ink-faint);
+  font-weight: 500;
 }
 
 /* Theme segmented control */

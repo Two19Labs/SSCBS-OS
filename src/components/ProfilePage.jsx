@@ -121,6 +121,14 @@ export default function ProfilePage({ onNavigate }) {
         </div>
       </header>
 
+      <div className="profile-identity-card">
+        <div className="profile-avatar">{displayName.charAt(0).toUpperCase()}</div>
+        <div className="profile-identity-text">
+          <span className="profile-name-title">{displayName}</span>
+          <span className="profile-email">{email}</span>
+        </div>
+      </div>
+
       <div className="profile-group-label">ACADEMIC INFO</div>
       <div className="profile-group">
         <label className="profile-row">
@@ -128,9 +136,10 @@ export default function ProfilePage({ onNavigate }) {
           <span className="profile-row-value">
             <input 
               type="text" 
+              className="profile-row-input"
               value={fullName} 
               onChange={(e) => markDirty(setFullName)(e.target.value)} 
-              placeholder="Enter your name"
+              placeholder="Enter full name"
             />
           </span>
         </label>
