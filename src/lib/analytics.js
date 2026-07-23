@@ -7,7 +7,8 @@ export const FEATURE_NAMES = {
   waiver: 'Waiver Tool',
   gpa: 'GPA Calculator',
   buzz: 'Campus Buzz',
-  profile: 'Profile Page'
+  profile: 'Profile Page',
+  admin: 'Admin Console'
 };
 
 const LOCAL_ANALYTICS_KEY = 'sscbs_analytics_daily_v5';
@@ -203,7 +204,7 @@ function updateLocalAndState(remoteList = []) {
           dbList.forEach(item => {
             if (item && item.email) {
               const existing = latestPresenceMap[item.email];
-              if (!existing || (item.lastPing || 0) > (existing.lastPing || 0)) {
+              if (!existing || (item.lastPing || 0) >= (existing.lastPing || 0) || item.currentView !== existing.currentView) {
                 latestPresenceMap[item.email] = item;
                 updated = true;
               }
