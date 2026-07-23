@@ -1645,13 +1645,13 @@ function AdminConsoleContent({ onBack }) {
                 <p className="stat-number text-truncate" style={{ fontSize: '1.25rem' }}>
                   {analyticsSummary.topFeatureName}
                 </p>
-                <p className="stat-subtitle">{analyticsSummary.topFeatureCount} engagements</p>
+                <p className="stat-subtitle">{analyticsSummary.topFeatureCount} visits</p>
               </div>
               <div className="stat-card-admin">
                 <div className="card-icon">📊</div>
-                <h4>Total Platform Events</h4>
-                <p className="stat-number">{analyticsSummary.totals.grandTotal}</p>
-                <p className="stat-subtitle">Views & clicks in window</p>
+                <h4>Total Page Visits</h4>
+                <p className="stat-number">{analyticsSummary.totals?.grandTotal || 0}</p>
+                <p className="stat-subtitle">Visits in window</p>
               </div>
             </div>
 
@@ -1756,9 +1756,9 @@ function AdminConsoleContent({ onBack }) {
             <div className="registry-card-admin line-graph-card-admin">
               <div className="chart-header-admin flex-between flex-wrap">
                 <div>
-                  <h3>📈 Feature Usage & Click Analytics (Time-Series)</h3>
+                  <h3>📈 Feature Visit Analytics (Time-Series)</h3>
                   <p className="section-desc-small">
-                    Daily engagement trends across student OS tools over time. Toggle student features below to inspect page metrics.
+                    Daily visit trends across student OS tools over time. Toggle student features below to inspect page metrics.
                   </p>
                 </div>
                 
@@ -1779,39 +1779,10 @@ function AdminConsoleContent({ onBack }) {
                 </div>
               </div>
 
-              {/* Metric Type Selector Bar (Visits vs Clicks vs Combined) */}
-              <div className="analytics-metric-bar" style={{ display: 'flex', gap: '8px', margin: '14px 0 10px' }}>
-                {[
-                  { id: 'combined', label: '📊 All Engagement (Visits + Clicks)' },
-                  { id: 'visits', label: '👁️ Page Visits Only' },
-                  { id: 'clicks', label: '🖱️ Feature Clicks Only' }
-                ].map(({ id, label }) => (
-                  <button
-                    key={id}
-                    className={`btn-metric-type ${analyticsMetric === id ? 'active' : ''}`}
-                    onClick={() => setAnalyticsMetric(id)}
-                    style={{
-                      padding: '6px 14px',
-                      borderRadius: '8px',
-                      fontSize: '0.8rem',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      border: '1.5px solid var(--border)',
-                      backgroundColor: analyticsMetric === id ? 'var(--accent)' : 'var(--bg)',
-                      color: analyticsMetric === id ? '#ffffff' : 'var(--ink-dim)',
-                      transition: 'all 0.15s ease'
-                    }}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-
               {/* Interactive Series Legend Toggles */}
-              <div className="graph-legend-toggles">
+              <div className="graph-legend-toggles" style={{ marginTop: '14px' }}>
                 {(() => {
-                  const activeMetricObj = analyticsSummary[analyticsMetric] || analyticsSummary.combined || analyticsSummary;
-                  const activeTotals = activeMetricObj.totals || analyticsSummary.totals;
+                  const activeTotals = analyticsSummary.totals || {};
 
                   const legendItems = [
                     { key: 'home', label: 'Home Dashboard', color: '#3b82f6' },
@@ -1833,7 +1804,7 @@ function AdminConsoleContent({ onBack }) {
                       >
                         <span className="legend-dot" style={{ backgroundColor: color }}></span>
                         <span className="legend-name">{label}</span>
-                        <span className="legend-count">({count})</span>
+                        <span className="legend-count">({count} visits)</span>
                       </button>
                     );
                   });
@@ -1843,8 +1814,7 @@ function AdminConsoleContent({ onBack }) {
               {/* SVG Line Graph Render */}
               <div className="line-graph-wrapper">
                 {(() => {
-                  const activeMetricObj = analyticsSummary[analyticsMetric] || analyticsSummary.combined || analyticsSummary;
-                  const series = activeMetricObj.series || analyticsSummary.series || {};
+                  const series = analyticsSummary.series || {};
                   const dateLabels = analyticsSummary.dateLabels || [];
                   if (!dateLabels || dateLabels.length === 0) return null;
 
@@ -1954,7 +1924,7 @@ function AdminConsoleContent({ onBack }) {
                         >
                           <span className="tooltip-date">{hoveredPoint.date}</span>
                           <span className="tooltip-val">
-                            <strong>{FEATURE_NAMES[hoveredPoint.seriesKey] || hoveredPoint.seriesKey.toUpperCase()}</strong>: {hoveredPoint.val} {analyticsMetric === 'clicks' ? 'clicks' : analyticsMetric === 'visits' ? 'visits' : 'events'}
+                            <strong>{FEATURE_NAMES[hoveredPoint.seriesKey] || hoveredPoint.seriesKey.toUpperCase()}</strong>: {hoveredPoint.val} visits
                           </span>
                         </div>
                       )}
@@ -1966,27 +1936,23 @@ function AdminConsoleContent({ onBack }) {
               {/* Detailed Tool Analytics Breakdown Table */}
               <div className="feature-breakdown-card" style={{ marginTop: '20px' }}>
                 <h4 style={{ margin: '0 0 10px', fontSize: '0.95rem', fontWeight: 800, color: 'var(--ink)' }}>
-                  📊 Detailed Tool Breakdown (Visits vs Clicks)
+                  📊 Detailed Tool Breakdown (Page & Function Visits)
                 </h4>
                 <div className="table-responsive-admin">
                   <table className="registry-table-admin feature-breakdown-table">
                     <thead>
                       <tr>
                         <th>Feature / Tool</th>
-                        <th>👁️ Page Visits</th>
-                        <th>🖱️ Action Clicks</th>
-                        <th>⚡ Total Engagement</th>
+                        <th>👁️ Page & Function Visits</th>
                         <th>Share %</th>
                       </tr>
                     </thead>
                     <tbody>
                       {(() => {
-                        const vTotals = analyticsSummary.visits?.totals || {};
-                        const cTotals = analyticsSummary.clicks?.totals || {};
-                        const combTotals = analyticsSummary.combined?.totals || {};
-                        const grandTotal = Object.keys(combTotals)
-                          .filter(k => k !== 'total' && k !== 'admin')
-                          .reduce((acc, k) => acc + (combTotals[k] || 0), 0) || 1;
+                        const vTotals = analyticsSummary.totals || {};
+                        const grandTotal = Object.keys(vTotals)
+                          .filter(k => k !== 'total' && k !== 'admin' && k !== 'grandTotal')
+                          .reduce((acc, k) => acc + (vTotals[k] || 0), 0) || 1;
 
                         const toolsList = [
                           { id: 'home', name: 'Home Dashboard' },
@@ -2000,16 +1966,12 @@ function AdminConsoleContent({ onBack }) {
 
                         return toolsList.map(({ id, name }) => {
                           const visits = vTotals[id] || 0;
-                          const clicks = cTotals[id] || 0;
-                          const total = combTotals[id] || (visits + clicks);
-                          const sharePct = grandTotal > 0 ? Math.round((total / grandTotal) * 100) : 0;
+                          const sharePct = grandTotal > 0 ? Math.round((visits / grandTotal) * 100) : 0;
 
                           return (
                             <tr key={id}>
                               <td><strong style={{ color: 'var(--ink)' }}>{name}</strong></td>
                               <td><span className="metric-badge-visit">{visits} visits</span></td>
-                              <td><span className="metric-badge-click">{clicks} clicks</span></td>
-                              <td><span className="metric-badge-total">{total} total</span></td>
                               <td>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                   <div style={{ flex: 1, height: '6px', background: 'var(--border)', borderRadius: '3px', overflow: 'hidden' }}>

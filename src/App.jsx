@@ -137,7 +137,7 @@ function App() {
   const isAdmin = isAdminEmail(user.email);
 
   const openTool = (id) => {
-    logFeatureClick(id, user);
+    logFeatureView(id, user);
     if (id === 'gpa') {
       setIsGpaOpen(true);
       return;

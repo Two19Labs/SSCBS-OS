@@ -333,32 +333,40 @@ export function subscribeToPresence(user, currentView, onPresenceSync) {
   };
 }
 
-export async function logFeatureView(featureId, user, eventType = 'visit') {
-  if (!featureId || featureId === 'admin') return;
+const recentLogMap = new Map();
+
+export async function logFeatureView(featureId, user) {
+  if (!featureId || featureId === 'admin' || !FEATURE_NAMES[featureId]) return;
+
+  const now = Date.now();
+  const lastTime = recentLogMap.get(featureId) || 0;
+  if (now - lastTime < 3000) {
+    // Session debounce: prevent double logging within 3 seconds for exact same feature
+    return;
+  }
+  recentLogMap.set(featureId, now);
 
   const dateStr = new Date().toISOString().split('T')[0];
 
-  // 1. Always record in client LocalStorage immediately so local views register instantly
+  // 1. Record in client LocalStorage immediately
   try {
     const localMap = getLocalAnalyticsMap();
     if (!localMap[dateStr]) {
       localMap[dateStr] = {
-        visits: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 },
-        clicks: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 }
+        visits: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 }
       };
     }
-    const typeKey = eventType === 'click' ? 'clicks' : 'visits';
-    if (!localMap[dateStr][typeKey]) {
-      localMap[dateStr][typeKey] = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 };
+    if (!localMap[dateStr].visits) {
+      localMap[dateStr].visits = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 };
     }
-    localMap[dateStr][typeKey][featureId] = (localMap[dateStr][typeKey][featureId] || 0) + 1;
-    localMap[dateStr][typeKey].total = (localMap[dateStr][typeKey].total || 0) + 1;
+    localMap[dateStr].visits[featureId] = (localMap[dateStr].visits[featureId] || 0) + 1;
+    localMap[dateStr].visits.total = (localMap[dateStr].visits.total || 0) + 1;
     saveLocalAnalyticsMap(localMap);
   } catch (e) {
     // Non-blocking
   }
 
-  // 2. Attempt remote Supabase insertion if configured
+  // 2. Attempt remote Supabase insertion
   if (hasValidCredentials) {
     try {
       supabase
@@ -366,7 +374,7 @@ export async function logFeatureView(featureId, user, eventType = 'visit') {
         .insert([{
           user_id: user?.id || null,
           feature_id: featureId,
-          event_type: eventType,
+          event_type: 'visit',
           created_at: new Date().toISOString()
         }])
         .then(() => {})
@@ -382,17 +390,15 @@ export async function logFeatureView(featureId, user, eventType = 'visit') {
           if (typeof eventsMap !== 'object' || !eventsMap) eventsMap = {};
           if (!eventsMap[dateStr]) {
             eventsMap[dateStr] = {
-              visits: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 },
-              clicks: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 }
+              visits: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 }
             };
           }
-          const typeKey = eventType === 'click' ? 'clicks' : 'visits';
-          if (!eventsMap[dateStr][typeKey]) {
-            eventsMap[dateStr][typeKey] = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 };
+          if (!eventsMap[dateStr].visits) {
+            eventsMap[dateStr].visits = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 };
           }
 
-          eventsMap[dateStr][typeKey][featureId] = (eventsMap[dateStr][typeKey][featureId] || 0) + 1;
-          eventsMap[dateStr][typeKey].total = (eventsMap[dateStr][typeKey].total || 0) + 1;
+          eventsMap[dateStr].visits[featureId] = (eventsMap[dateStr].visits[featureId] || 0) + 1;
+          eventsMap[dateStr].visits.total = (eventsMap[dateStr].visits.total || 0) + 1;
 
           await supabase.from('system_configs').upsert({
             key: 'analytics_events_v2',
@@ -408,24 +414,25 @@ export async function logFeatureView(featureId, user, eventType = 'visit') {
 }
 
 /**
- * 🖱️ Log a feature click action
+ * Log a feature action - mapped to logFeatureView for visit-only tracking
  */
 export async function logFeatureClick(featureId, user) {
   if (featureId === 'admin') return;
-  return logFeatureView(featureId, user, 'click');
+  return logFeatureView(featureId, user);
 }
 
 /**
- * 📈 Fetch REAL analytics data combining Supabase DB events, system_configs, and local logs
- * NO ADMIN / NO TOTAL LINES. TRACKS ONLY THE 7 STUDENT-FACING PAGES.
+ * 📈 Fetch REAL analytics data combining Supabase DB events, system_configs, and local logs.
+ * Tracks ONLY Visits for the 7 student-facing pages/tools with zero double-counting.
  */
 export async function fetchAnalyticsData(daysCount = 7) {
   const dateList = [];
   const emptyFeatureSet = () => ({ home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 });
 
   const dateMapVisits = {};
-  const dateMapClicks = {};
-  const dateMapCombined = {};
+  const localCounts = {};
+  const configCounts = {};
+  const dbCounts = {};
   const now = new Date();
 
   for (let i = daysCount - 1; i >= 0; i--) {
@@ -435,8 +442,9 @@ export async function fetchAnalyticsData(daysCount = 7) {
     const monthDay = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     dateList.push({ dateStr, label: monthDay });
     dateMapVisits[dateStr] = emptyFeatureSet();
-    dateMapClicks[dateStr] = emptyFeatureSet();
-    dateMapCombined[dateStr] = emptyFeatureSet();
+    localCounts[dateStr] = emptyFeatureSet();
+    configCounts[dateStr] = emptyFeatureSet();
+    dbCounts[dateStr] = emptyFeatureSet();
   }
 
   // A. Load from LocalStorage
@@ -445,38 +453,32 @@ export async function fetchAnalyticsData(daysCount = 7) {
     if (localMap[dateStr]) {
       const day = localMap[dateStr];
       const v = day.visits || day;
-      const c = day.clicks || {};
-
-      Object.keys(dateMapVisits[dateStr]).forEach(feat => {
-        if (feat !== 'admin') {
-          dateMapVisits[dateStr][feat] += Number(v[feat]) || 0;
-          dateMapClicks[dateStr][feat] += Number(c[feat]) || 0;
+      Object.keys(localCounts[dateStr]).forEach(feat => {
+        if (feat !== 'admin' && feat !== 'total') {
+          localCounts[dateStr][feat] = Number(v[feat]) || 0;
         }
       });
     }
   });
 
-  // B. Load from Supabase system_configs or analytics_events
+  // B. Load from Supabase system_configs & analytics_events
   if (hasValidCredentials) {
     try {
-      const { data } = await supabase
+      const { data: configData } = await supabase
         .from('system_configs')
         .select('value')
         .eq('key', 'analytics_events_v2')
         .maybeSingle();
 
-      if (data?.value && typeof data.value === 'object') {
-        const eventsMap = data.value;
+      if (configData?.value && typeof configData.value === 'object') {
+        const eventsMap = configData.value;
         dateList.forEach(({ dateStr }) => {
           if (eventsMap[dateStr]) {
             const day = eventsMap[dateStr];
             const v = day.visits || day;
-            const c = day.clicks || {};
-
-            Object.keys(dateMapVisits[dateStr]).forEach(feat => {
-              if (feat !== 'admin') {
-                dateMapVisits[dateStr][feat] = Math.max(dateMapVisits[dateStr][feat], Number(v[feat]) || 0);
-                dateMapClicks[dateStr][feat] = Math.max(dateMapClicks[dateStr][feat], Number(c[feat]) || 0);
+            Object.keys(configCounts[dateStr]).forEach(feat => {
+              if (feat !== 'admin' && feat !== 'total') {
+                configCounts[dateStr][feat] = Number(v[feat]) || 0;
               }
             });
           }
@@ -488,20 +490,15 @@ export async function fetchAnalyticsData(daysCount = 7) {
       if (startDateStr) {
         const { data: dbEvents } = await supabase
           .from('analytics_events')
-          .select('feature_id, event_type, created_at')
+          .select('feature_id, created_at')
           .gte('created_at', `${startDateStr}T00:00:00.000Z`);
 
         if (Array.isArray(dbEvents) && dbEvents.length > 0) {
           dbEvents.forEach(evt => {
             const evtDate = evt.created_at?.split('T')[0];
             const feat = evt.feature_id;
-            const type = evt.event_type === 'click' ? 'click' : 'visit';
-            if (evtDate && dateMapVisits[evtDate] && feat !== 'admin') {
-              const targetMap = type === 'click' ? dateMapClicks[evtDate] : dateMapVisits[evtDate];
-              if (feat && targetMap[feat] !== undefined) {
-                targetMap[feat] += 1;
-              }
-              targetMap.total += 1;
+            if (evtDate && dbCounts[evtDate] && feat && feat !== 'admin' && dbCounts[evtDate][feat] !== undefined) {
+              dbCounts[evtDate][feat] += 1;
             }
           });
         }
@@ -511,31 +508,32 @@ export async function fetchAnalyticsData(daysCount = 7) {
     }
   }
 
-  // Calculate Combined DateMap & Totals
-  const totalsVisits = emptyFeatureSet();
-  const totalsClicks = emptyFeatureSet();
-  const totalsCombined = emptyFeatureSet();
+  // Aggregate single accurate visit count using Math.max(db, local, config) per date/feature
+  dateList.forEach(({ dateStr }) => {
+    const dayVisits = dateMapVisits[dateStr];
+    let dayTotal = 0;
+    Object.keys(dayVisits).forEach(feat => {
+      if (feat !== 'total') {
+        const dbVal = dbCounts[dateStr]?.[feat] || 0;
+        const localVal = localCounts[dateStr]?.[feat] || 0;
+        const configVal = configCounts[dateStr]?.[feat] || 0;
+        const finalVal = Math.max(dbVal, localVal, configVal);
+        dayVisits[feat] = finalVal;
+        dayTotal += finalVal;
+      }
+    });
+    dayVisits.total = dayTotal;
+  });
 
+  const totalsVisits = emptyFeatureSet();
   dateList.forEach(({ dateStr }) => {
     const vDay = dateMapVisits[dateStr];
-    const cDay = dateMapClicks[dateStr];
-    const combDay = dateMapCombined[dateStr];
-
-    const vSum = vDay.home + vDay.timetable + vDay['find-prof'] + vDay.waiver + vDay.gpa + vDay.buzz + vDay.profile;
-    if (vDay.total < vSum) vDay.total = vSum;
-
-    const cSum = cDay.home + cDay.timetable + cDay['find-prof'] + cDay.waiver + cDay.gpa + cDay.buzz + cDay.profile;
-    if (cDay.total < cSum) cDay.total = cSum;
-
-    Object.keys(combDay).forEach(feat => {
-      combDay[feat] = vDay[feat] + cDay[feat];
-    });
-
     Object.keys(totalsVisits).forEach(feat => {
-      totalsVisits[feat] += vDay[feat];
-      totalsClicks[feat] += cDay[feat];
-      totalsCombined[feat] += combDay[feat];
+      if (feat !== 'total') {
+        totalsVisits[feat] += vDay[feat];
+      }
     });
+    totalsVisits.total += vDay.total;
   });
 
   const buildSeries = (dMap) => ({
@@ -553,28 +551,18 @@ export async function fetchAnalyticsData(daysCount = 7) {
     series: buildSeries(dateMapVisits)
   };
 
-  const clicks = {
-    totals: { ...totalsClicks, grandTotal: totalsClicks.total },
-    series: buildSeries(dateMapClicks)
-  };
-
-  const combined = {
-    totals: { ...totalsCombined, grandTotal: totalsCombined.total },
-    series: buildSeries(dateMapCombined)
-  };
-
-  const topKey = Object.keys(totalsCombined)
+  const topKey = Object.keys(totalsVisits)
     .filter(k => k !== 'total' && k !== 'admin')
-    .sort((a, b) => totalsCombined[b] - totalsCombined[a])[0] || 'timetable';
+    .sort((a, b) => totalsVisits[b] - totalsVisits[a])[0] || 'timetable';
 
   return {
     dateLabels: dateList.map(d => d.label),
     visits,
-    clicks,
-    combined,
-    series: combined.series,
-    totals: combined.totals,
+    clicks: visits,
+    combined: visits,
+    series: visits.series,
+    totals: visits.totals,
     topFeatureName: FEATURE_NAMES[topKey] || 'Timetable',
-    topFeatureCount: totalsCombined[topKey] || 0
+    topFeatureCount: totalsVisits[topKey] || 0
   };
 }
