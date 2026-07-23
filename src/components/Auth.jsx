@@ -23,15 +23,24 @@ const slides = [
 ];
 
 export default function Auth() {
-  const { signIn, signUp, directStudentAccess, isConfigured } = useAuth();
-  const [isSignUp, setIsSignUp] = useState(false);
+  const { signIn, signUp, resetPassword, updatePassword, isPasswordRecovery, setIsPasswordRecovery, directStudentAccess, isConfigured } = useAuth();
+  
+  // mode: 'signin' | 'signup' | 'forgot' | 'update_password'
+  const [mode, setMode] = useState(() => isPasswordRecovery ? 'update_password' : 'signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [activeSlide, setActiveSlide] = useState(0);
+
+  useEffect(() => {
+    if (isPasswordRecovery) {
+      setMode('update_password');
+    }
+  }, [isPasswordRecovery]);
 
   const handleInstantAccess = () => {
     const targetEmail = email && email.includes('@') ? email : 'aditya.25015@sscbs.du.ac.in';
@@ -57,10 +66,50 @@ export default function Auth() {
     setSuccessMsg('');
     setLoading(true);
 
+    if (mode === 'forgot') {
+      try {
+        await resetPassword(email);
+        setSuccessMsg('Password reset instructions have been sent to your email! (Please check your inbox & spam folder).');
+      } catch (err) {
+        setError(err.message || 'Failed to send password reset email.');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    if (mode === 'update_password') {
+      if (password.length < 6) {
+        setError('Password must be at least 6 characters long.');
+        setLoading(false);
+        return;
+      }
+      if (password !== confirmPassword) {
+        setError('Passwords do not match. Please verify.');
+        setLoading(false);
+        return;
+      }
+      try {
+        await updatePassword(password);
+        setSuccessMsg('Your password has been updated successfully! You can now sign in with your new password.');
+        setPassword('');
+        setConfirmPassword('');
+        if (setIsPasswordRecovery) setIsPasswordRecovery(false);
+        setTimeout(() => {
+          setMode('signin');
+        }, 2000);
+      } catch (err) {
+        setError(err.message || 'Failed to update password.');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     if (!isConfigured) {
       setTimeout(async () => {
         try {
-          if (isSignUp) {
+          if (mode === 'signup') {
             await signUp(email, password, { full_name: fullName });
           } else {
             await signIn(email, password);
@@ -75,7 +124,7 @@ export default function Auth() {
     }
 
     try {
-      if (isSignUp) {
+      if (mode === 'signup') {
         await signUp(email, password, { full_name: fullName });
         setSuccessMsg('Registration successful! Please check your email for a confirmation link. (Be sure to check your spam or junk folder if you do not see it in a few minutes).');
         setEmail('');
@@ -123,6 +172,24 @@ export default function Auth() {
     } catch (err) {
       setError(err.message || 'An error occurred during Google Sign-In.');
       setLoading(false);
+    }
+  };
+
+  const getHeaderTitle = () => {
+    switch (mode) {
+      case 'signup': return 'Create Account';
+      case 'forgot': return 'Reset Password';
+      case 'update_password': return 'Set New Password';
+      default: return 'Sign In';
+    }
+  };
+
+  const getHeaderDesc = () => {
+    switch (mode) {
+      case 'signup': return 'Enter your credentials to register.';
+      case 'forgot': return 'Enter your registered college email to receive a reset link.';
+      case 'update_password': return 'Enter your new password below to update your account.';
+      default: return 'Sign in to access your student dashboard.';
     }
   };
 
@@ -185,13 +252,8 @@ export default function Auth() {
           <div className="auth-card-outer">
             <div className="auth-card-inner">
               <div className="card-header">
-                <h2>{isSignUp ? 'Create Account' : 'Sign In'}</h2>
-                <p>
-                  {isSignUp 
-                    ? 'Enter your credentials to register.' 
-                    : 'Sign in to access your student dashboard.'
-                  }
-                </p>
+                <h2>{getHeaderTitle()}</h2>
+                <p>{getHeaderDesc()}</p>
               </div>
 
               {!isConfigured && (
@@ -206,7 +268,7 @@ export default function Auth() {
               {successMsg && <div className="feedback-alert success-alert">{successMsg}</div>}
 
               <form onSubmit={handleSubmit} className="auth-form">
-                {isSignUp && (
+                {mode === 'signup' && (
                   <div className="form-input-group">
                     <label htmlFor="fullName">Full Name</label>
                     <div className="input-field-wrapper">
@@ -216,96 +278,158 @@ export default function Auth() {
                         placeholder="Aditya Vardhan"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        required={isSignUp}
+                        required
                       />
                     </div>
                   </div>
                 )}
 
-                <div className="form-input-group">
-                  <label htmlFor="email">College Email</label>
-                  <div className="input-field-wrapper">
-                    <input
-                      type="email"
-                      id="email"
-                      placeholder="name@sscbs.du.ac.in"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
+                {mode !== 'update_password' && (
+                  <div className="form-input-group">
+                    <label htmlFor="email">College Email</label>
+                    <div className="input-field-wrapper">
+                      <input
+                        type="email"
+                        id="email"
+                        placeholder="name@sscbs.du.ac.in"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+                    {email && !isCollegeEmail(email) && (
+                      <div className="email-warning-tag">
+                        ⚠️ Real student features require an @sscbs.du.ac.in email
+                      </div>
+                    )}
+                    {email && isCollegeEmail(email) && (
+                      <div className="email-success-tag">
+                        ✓ Verified SSCBS Student Email
+                      </div>
+                    )}
                   </div>
-                  {email && !isCollegeEmail(email) && (
-                    <div className="email-warning-tag">
-                      ⚠️ Real student features require an @sscbs.du.ac.in email
-                    </div>
-                  )}
-                  {email && isCollegeEmail(email) && (
-                    <div className="email-success-tag">
-                      ✓ Verified SSCBS Student Email
-                    </div>
-                  )}
-                </div>
+                )}
 
-                <div className="form-input-group">
-                  <label htmlFor="password">Password</label>
-                  <div className="input-field-wrapper">
-                    <input
-                      type="password"
-                      id="password"
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
+                {mode !== 'forgot' && (
+                  <div className="form-input-group">
+                    <div className="label-row">
+                      <label htmlFor="password">
+                        {mode === 'update_password' ? 'New Password' : 'Password'}
+                      </label>
+                      {mode === 'signin' && (
+                        <button
+                          type="button"
+                          className="forgot-password-link"
+                          onClick={() => {
+                            setMode('forgot');
+                            setError('');
+                            setSuccessMsg('');
+                          }}
+                        >
+                          Forgot Password?
+                        </button>
+                      )}
+                    </div>
+                    <div className="input-field-wrapper">
+                      <input
+                        type="password"
+                        id="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
+
+                {mode === 'update_password' && (
+                  <div className="form-input-group">
+                    <label htmlFor="confirmPassword">Confirm New Password</label>
+                    <div className="input-field-wrapper">
+                      <input
+                        type="password"
+                        id="confirmPassword"
+                        placeholder="••••••••"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+                )}
 
                 <button type="submit" className="submit-button" disabled={loading}>
                   {loading ? (
                     <span className="loading-spinner"></span>
                   ) : (
-                    <span>{isSignUp ? 'Create Account' : 'Sign In'}</span>
+                    <span>
+                      {mode === 'signup' && 'Create Account'}
+                      {mode === 'signin' && 'Sign In'}
+                      {mode === 'forgot' && 'Send Reset Link'}
+                      {mode === 'update_password' && 'Update Password'}
+                    </span>
                   )}
                 </button>
               </form>
 
-              <div className="auth-divider">
-                <span>OR</span>
-              </div>
+              {mode !== 'forgot' && mode !== 'update_password' && (
+                <>
+                  <div className="auth-divider">
+                    <span>OR</span>
+                  </div>
 
-              <button type="button" className="google-signin-button" onClick={handleGoogleSignIn} disabled={loading}>
-                <svg className="google-icon-svg" viewBox="0 0 24 24" width="18" height="18">
-                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05" />
-                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335" />
-                </svg>
-                <span>Continue with Google</span>
-              </button>
+                  <button type="button" className="google-signin-button" onClick={handleGoogleSignIn} disabled={loading}>
+                    <svg className="google-icon-svg" viewBox="0 0 24 24" width="18" height="18">
+                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05" />
+                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335" />
+                    </svg>
+                    <span>Continue with Google</span>
+                  </button>
 
-              <button 
-                type="button" 
-                className="google-signin-button" 
-                style={{ marginTop: '10px', background: 'var(--accent-gradient, linear-gradient(135deg, #1e293b, #0f172a))', border: '1px solid rgba(255,255,255,0.15)', color: '#fff' }} 
-                onClick={handleInstantAccess}
-              >
-                <span>Instant Student Access ⚡</span>
-              </button>
+                  <button 
+                    type="button" 
+                    className="google-signin-button" 
+                    style={{ marginTop: '10px', background: 'var(--accent-gradient, linear-gradient(135deg, #1e293b, #0f172a))', border: '1px solid rgba(255,255,255,0.15)', color: '#fff' }} 
+                    onClick={handleInstantAccess}
+                  >
+                    <span>Instant Student Access ⚡</span>
+                  </button>
+                </>
+              )}
 
               <div className="card-footer">
                 <p>
-                  {isSignUp ? 'Already registered?' : 'New to Campus OS?'}
-                  <button
-                    type="button"
-                    className="toggle-auth-mode"
-                    onClick={() => {
-                      setIsSignUp(!isSignUp);
-                      setError('');
-                      setSuccessMsg('');
-                    }}
-                  >
-                    {isSignUp ? 'Sign In' : 'Register'}
-                  </button>
+                  {mode === 'forgot' || mode === 'update_password' ? (
+                    <button
+                      type="button"
+                      className="toggle-auth-mode"
+                      onClick={() => {
+                        setMode('signin');
+                        setError('');
+                        setSuccessMsg('');
+                      }}
+                    >
+                      ← Back to Sign In
+                    </button>
+                  ) : (
+                    <>
+                      {mode === 'signup' ? 'Already registered?' : 'New to Campus OS?'}
+                      <button
+                        type="button"
+                        className="toggle-auth-mode"
+                        onClick={() => {
+                          setMode(mode === 'signup' ? 'signin' : 'signup');
+                          setError('');
+                          setSuccessMsg('');
+                        }}
+                      >
+                        {mode === 'signup' ? 'Sign In' : 'Register'}
+                      </button>
+                    </>
+                  )}
                 </p>
               </div>
             </div>

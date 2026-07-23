@@ -17,9 +17,16 @@ export const AuthProvider = ({ children }) => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
+
   useEffect(() => {
     let isMounted = true;
     let sessionResolved = false;
+
+    // Check if URL hash indicates password recovery link
+    if (typeof window !== 'undefined' && window.location.hash.includes('type=recovery')) {
+      setIsPasswordRecovery(true);
+    }
 
     // Hard fallback timeout (2 seconds max) so the app NEVER hangs on loading screen
     const fallbackTimeout = setTimeout(() => {
@@ -63,11 +70,14 @@ export const AuthProvider = ({ children }) => {
           setLoading(false);
         });
 
-      // Listen for real-time auth state changes (sign in, sign out, token refresh)
-      const res = supabase.auth.onAuthStateChange((_event, session) => {
+      // Listen for real-time auth state changes (sign in, sign out, token refresh, password recovery)
+      const res = supabase.auth.onAuthStateChange((event, session) => {
         if (!isMounted) return;
         sessionResolved = true;
         clearTimeout(fallbackTimeout);
+        if (event === 'PASSWORD_RECOVERY') {
+          setIsPasswordRecovery(true);
+        }
         setSession(session ?? null);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -141,6 +151,32 @@ export const AuthProvider = ({ children }) => {
       password,
     });
     if (error) throw error;
+    return data;
+  };
+
+  const resetPassword = async (email) => {
+    if (!hasValidCredentials) {
+      // Sandbox mode
+      return { message: 'Password reset link sent (Sandbox mode).' };
+    }
+    const redirectUrl = `${window.location.origin}/#reset-password`;
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectUrl,
+    });
+    if (error) throw error;
+    return data;
+  };
+
+  const updatePassword = async (newPassword) => {
+    if (!hasValidCredentials) {
+      // Sandbox mode
+      return { message: 'Password updated successfully (Sandbox mode).' };
+    }
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+    if (error) throw error;
+    setIsPasswordRecovery(false);
     return data;
   };
 
@@ -237,6 +273,10 @@ export const AuthProvider = ({ children }) => {
         signUp,
         signIn,
         signOut,
+        resetPassword,
+        updatePassword,
+        isPasswordRecovery,
+        setIsPasswordRecovery,
         updateProfile,
         directStudentAccess,
         isConfigured: hasValidCredentials,
