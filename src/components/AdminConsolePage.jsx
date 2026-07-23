@@ -321,17 +321,13 @@ export default function AdminConsolePage({ onBack }) {
     topFeatureCount: 0
   });
   const [enabledSeries, setEnabledSeries] = useState({
-    total_visits: true,
-    total_clicks: true,
-    total_combined: true,
     home: true,
     timetable: true,
     'find-prof': true,
     waiver: true,
     gpa: true,
     buzz: true,
-    profile: true,
-    admin: true
+    profile: true
   });
   const [hoveredPoint, setHoveredPoint] = useState(null);
   const [tickerNow, setTickerNow] = useState(Date.now());
@@ -1733,64 +1729,66 @@ export default function AdminConsolePage({ onBack }) {
                       </tr>
                     </thead>
                     <tbody>
-                      {onlinePresence.map((usr) => {
-                        const pingDiffSec = Math.max(0, Math.floor((tickerNow - (usr.lastPing || tickerNow)) / 1000));
-                        const featKey = usr.currentView || 'home';
-                        const featStyleMap = {
-                          home: { bg: 'rgba(59, 130, 246, 0.12)', color: '#3b82f6', border: 'rgba(59, 130, 246, 0.3)' },
-                          timetable: { bg: 'rgba(139, 92, 246, 0.12)', color: '#8b5cf6', border: 'rgba(139, 92, 246, 0.3)' },
-                          'find-prof': { bg: 'rgba(16, 185, 129, 0.12)', color: '#10b981', border: 'rgba(16, 185, 129, 0.3)' },
-                          waiver: { bg: 'rgba(6, 182, 212, 0.12)', color: '#06b6d4', border: 'rgba(6, 182, 212, 0.3)' },
-                          gpa: { bg: 'rgba(245, 158, 11, 0.12)', color: '#f59e0b', border: 'rgba(245, 158, 11, 0.3)' },
-                          buzz: { bg: 'rgba(236, 72, 153, 0.12)', color: '#ec4899', border: 'rgba(236, 72, 153, 0.3)' },
-                          profile: { bg: 'rgba(20, 184, 166, 0.12)', color: '#14b8a6', border: 'rgba(20, 184, 166, 0.3)' },
-                          admin: { bg: 'rgba(234, 179, 8, 0.12)', color: '#eab308', border: 'rgba(234, 179, 8, 0.3)' }
-                        };
-                        const chipStyle = featStyleMap[featKey] || featStyleMap.home;
+                      {[...onlinePresence]
+                        .sort((a, b) => (b.lastPing || 0) - (a.lastPing || 0))
+                        .map((usr) => {
+                          const pingDiffSec = Math.max(0, Math.floor((tickerNow - (usr.lastPing || tickerNow)) / 1000));
+                          const featKey = usr.currentView || 'home';
+                          const featStyleMap = {
+                            home: { bg: 'rgba(59, 130, 246, 0.12)', color: '#3b82f6', border: 'rgba(59, 130, 246, 0.3)' },
+                            timetable: { bg: 'rgba(139, 92, 246, 0.12)', color: '#8b5cf6', border: 'rgba(139, 92, 246, 0.3)' },
+                            'find-prof': { bg: 'rgba(16, 185, 129, 0.12)', color: '#10b981', border: 'rgba(16, 185, 129, 0.3)' },
+                            waiver: { bg: 'rgba(6, 182, 212, 0.12)', color: '#06b6d4', border: 'rgba(6, 182, 212, 0.3)' },
+                            gpa: { bg: 'rgba(245, 158, 11, 0.12)', color: '#f59e0b', border: 'rgba(245, 158, 11, 0.3)' },
+                            buzz: { bg: 'rgba(236, 72, 153, 0.12)', color: '#ec4899', border: 'rgba(236, 72, 153, 0.3)' },
+                            profile: { bg: 'rgba(20, 184, 166, 0.12)', color: '#14b8a6', border: 'rgba(20, 184, 166, 0.3)' },
+                            admin: { bg: 'rgba(234, 179, 8, 0.12)', color: '#eab308', border: 'rgba(234, 179, 8, 0.3)' }
+                          };
+                          const chipStyle = featStyleMap[featKey] || featStyleMap.home;
 
-                        return (
-                          <tr key={usr.session_id || usr.id || usr.email}>
-                            <td>
-                              <div className="student-name-cell">
-                                <span className="online-avatar-badge">{usr.name ? usr.name.charAt(0).toUpperCase() : 'S'}</span>
-                                <div>
-                                  <strong className="student-name-text">{usr.name}</strong>
-                                  <span className="student-email-text">{usr.email}</span>
+                          return (
+                            <tr key={usr.session_id || usr.id || usr.email}>
+                              <td>
+                                <div className="student-name-cell">
+                                  <span className="online-avatar-badge">{usr.name ? usr.name.charAt(0).toUpperCase() : 'S'}</span>
+                                  <div>
+                                    <strong className="student-name-text">{usr.name}</strong>
+                                    <span className="student-email-text">{usr.email}</span>
+                                  </div>
                                 </div>
-                              </div>
-                            </td>
-                            <td>
-                              <span className="course-sem-chip">
-                                {usr.course} • Sem {usr.semester} {usr.section && usr.section !== 'N/A' ? `(${usr.section})` : ''}
-                              </span>
-                            </td>
-                            <td>
-                              <span
-                                className="active-view-chip"
-                                style={{
-                                  backgroundColor: chipStyle.bg,
-                                  color: chipStyle.color,
-                                  border: `1px solid ${chipStyle.border}`,
-                                  fontWeight: 700,
-                                  padding: '3px 9px',
-                                  borderRadius: '6px'
-                                }}
-                              >
-                                ⚡ {usr.viewLabel || FEATURE_NAMES[featKey] || 'Home Dashboard'}
-                              </span>
-                            </td>
-                            <td>
-                              <span className="device-chip">{usr.device}</span>
-                            </td>
-                            <td>
-                              <span className="ping-time-chip" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                                <span className="pulse-dot-green" style={{ width: '6px', height: '6px' }}></span>
-                                {pingDiffSec === 0 ? 'Live (Just now)' : `${pingDiffSec}s ago`}
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                              </td>
+                              <td>
+                                <span className="course-sem-chip">
+                                  {usr.course} • Sem {usr.semester} {usr.section && usr.section !== 'N/A' ? `(${usr.section})` : ''}
+                                </span>
+                              </td>
+                              <td>
+                                <span
+                                  className="active-view-chip"
+                                  style={{
+                                    backgroundColor: chipStyle.bg,
+                                    color: chipStyle.color,
+                                    border: `1px solid ${chipStyle.border}`,
+                                    fontWeight: 700,
+                                    padding: '3px 9px',
+                                    borderRadius: '6px'
+                                  }}
+                                >
+                                  ⚡ {usr.viewLabel || FEATURE_NAMES[featKey] || 'Home Dashboard'}
+                                </span>
+                              </td>
+                              <td>
+                                <span className="device-chip">{usr.device}</span>
+                              </td>
+                              <td>
+                                <span className="ping-time-chip" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                                  <span className="pulse-dot-green" style={{ width: '6px', height: '6px' }}></span>
+                                  {pingDiffSec === 0 ? 'Live (Just now)' : `${pingDiffSec}s ago`}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
                     </tbody>
                   </table>
                 </div>
@@ -1803,7 +1801,7 @@ export default function AdminConsolePage({ onBack }) {
                 <div>
                   <h3>📈 Feature Usage & Click Analytics (Time-Series)</h3>
                   <p className="section-desc-small">
-                    Daily engagement trends across SSCBS OS tools over time. Filter by page visits or feature clicks.
+                    Daily engagement trends across student OS tools over time. Toggle student features below to inspect page metrics.
                   </p>
                 </div>
                 
@@ -1859,26 +1857,17 @@ export default function AdminConsolePage({ onBack }) {
                   const activeTotals = activeMetricObj.totals || analyticsSummary.totals;
 
                   const legendItems = [
-                    { key: 'total_visits', label: '👁️ Total Page Visits', color: '#3b82f6' },
-                    { key: 'total_clicks', label: '🖱️ Total Feature Clicks', color: '#10b981' },
-                    { key: 'total_combined', label: '📊 Total Activity (Combined)', color: '#eab308' },
-                    { key: 'home', label: 'Home Dashboard', color: '#8b5cf6' },
-                    { key: 'timetable', label: 'Timetable', color: '#a855f7' },
-                    { key: 'find-prof', label: 'Find My Professor', color: '#06b6d4' },
-                    { key: 'waiver', label: 'Waiver Tool', color: '#38bdf8' },
+                    { key: 'home', label: 'Home Dashboard', color: '#3b82f6' },
+                    { key: 'timetable', label: 'Timetable', color: '#8b5cf6' },
+                    { key: 'find-prof', label: 'Find My Professor', color: '#10b981' },
+                    { key: 'waiver', label: 'Waiver Tool', color: '#06b6d4' },
                     { key: 'gpa', label: 'GPA Calculator', color: '#f59e0b' },
                     { key: 'buzz', label: 'Campus Buzz', color: '#ec4899' },
-                    { key: 'profile', label: 'Profile Page', color: '#14b8a6' },
-                    { key: 'admin', label: 'Admin Console', color: '#f43f5e' }
+                    { key: 'profile', label: 'Profile Page', color: '#14b8a6' }
                   ];
 
                   return legendItems.map(({ key, label, color }) => {
-                    let count = 0;
-                    if (key === 'total_visits') count = analyticsSummary.totals?.total_visits || activeTotals.grandTotal || 0;
-                    else if (key === 'total_clicks') count = analyticsSummary.totals?.total_clicks || 0;
-                    else if (key === 'total_combined') count = analyticsSummary.totals?.total_combined || activeTotals.grandTotal || 0;
-                    else count = activeTotals[key] ?? 0;
-
+                    const count = activeTotals[key] ?? 0;
                     return (
                       <button
                         key={key}
@@ -1897,7 +1886,8 @@ export default function AdminConsolePage({ onBack }) {
               {/* SVG Line Graph Render */}
               <div className="line-graph-wrapper">
                 {(() => {
-                  const series = analyticsSummary.series || {};
+                  const activeMetricObj = analyticsSummary[analyticsMetric] || analyticsSummary.combined || analyticsSummary;
+                  const series = activeMetricObj.series || analyticsSummary.series || {};
                   const dateLabels = analyticsSummary.dateLabels || [];
                   if (!dateLabels || dateLabels.length === 0) return null;
 
@@ -1911,18 +1901,13 @@ export default function AdminConsolePage({ onBack }) {
                   const graphHeight = height - paddingTop - paddingBottom;
 
                   const seriesColors = {
-                    total_visits: '#3b82f6',
-                    total_clicks: '#10b981',
-                    total_combined: '#eab308',
-                    total: '#eab308',
-                    home: '#8b5cf6',
-                    timetable: '#a855f7',
-                    'find-prof': '#06b6d4',
-                    waiver: '#38bdf8',
+                    home: '#3b82f6',
+                    timetable: '#8b5cf6',
+                    'find-prof': '#10b981',
+                    waiver: '#06b6d4',
                     gpa: '#f59e0b',
                     buzz: '#ec4899',
-                    profile: '#14b8a6',
-                    admin: '#f43f5e'
+                    profile: '#14b8a6'
                   };
 
                   let maxVal = 10;
@@ -1965,12 +1950,11 @@ export default function AdminConsolePage({ onBack }) {
 
                         {/* Line Series */}
                         {Object.keys(series).map((seriesKey) => {
-                          if (!enabledSeries[seriesKey]) return null;
+                          if (!enabledSeries[seriesKey] || seriesKey === 'admin' || seriesKey.startsWith('total')) return null;
                           const points = series[seriesKey] || [];
                           if (points.length === 0) return null;
                           const pathData = points.map((val, idx) => `${idx === 0 ? 'M' : 'L'} ${getX(idx)} ${getY(val)}`).join(' ');
                           const color = seriesColors[seriesKey] || '#8b5cf6';
-                          const isBoldLine = seriesKey.startsWith('total');
 
                           return (
                             <g key={seriesKey}>
@@ -1978,18 +1962,17 @@ export default function AdminConsolePage({ onBack }) {
                                 d={pathData}
                                 fill="none"
                                 stroke={color}
-                                strokeWidth={isBoldLine ? '3.5' : '2'}
-                                strokeDasharray={seriesKey === 'total_clicks' ? '5 3' : 'none'}
+                                strokeWidth="2.5"
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
-                                opacity={isBoldLine ? 0.95 : 0.75}
+                                opacity={0.85}
                               />
                               {points.map((val, idx) => (
                                 <circle
                                   key={idx}
                                   cx={getX(idx)}
                                   cy={getY(val)}
-                                  r={isBoldLine ? '4.5' : '3.5'}
+                                  r="3.5"
                                   fill={color}
                                   stroke="var(--surface)"
                                   strokeWidth="1.5"
@@ -2014,7 +1997,7 @@ export default function AdminConsolePage({ onBack }) {
                         >
                           <span className="tooltip-date">{hoveredPoint.date}</span>
                           <span className="tooltip-val">
-                            <strong>{FEATURE_NAMES[hoveredPoint.seriesKey] || (hoveredPoint.seriesKey === 'total' ? 'All Platform Views' : hoveredPoint.seriesKey.toUpperCase())}</strong>: {hoveredPoint.val} {analyticsMetric === 'clicks' ? 'clicks' : analyticsMetric === 'visits' ? 'visits' : 'events'}
+                            <strong>{FEATURE_NAMES[hoveredPoint.seriesKey] || hoveredPoint.seriesKey.toUpperCase()}</strong>: {hoveredPoint.val} {analyticsMetric === 'clicks' ? 'clicks' : analyticsMetric === 'visits' ? 'visits' : 'events'}
                           </span>
                         </div>
                       )}
@@ -2044,7 +2027,9 @@ export default function AdminConsolePage({ onBack }) {
                         const vTotals = analyticsSummary.visits?.totals || {};
                         const cTotals = analyticsSummary.clicks?.totals || {};
                         const combTotals = analyticsSummary.combined?.totals || {};
-                        const grandTotal = combTotals.grandTotal || combTotals.total || 1;
+                        const grandTotal = Object.keys(combTotals)
+                          .filter(k => k !== 'total' && k !== 'admin')
+                          .reduce((acc, k) => acc + (combTotals[k] || 0), 0) || 1;
 
                         const toolsList = [
                           { id: 'home', name: 'Home Dashboard' },
@@ -2053,8 +2038,7 @@ export default function AdminConsolePage({ onBack }) {
                           { id: 'waiver', name: 'Waiver Tool' },
                           { id: 'gpa', name: 'GPA Calculator' },
                           { id: 'buzz', name: 'Campus Buzz' },
-                          { id: 'profile', name: 'Profile Page' },
-                          { id: 'admin', name: 'Admin Console' }
+                          { id: 'profile', name: 'Profile Page' }
                         ];
 
                         return toolsList.map(({ id, name }) => {

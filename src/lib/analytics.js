@@ -7,8 +7,7 @@ export const FEATURE_NAMES = {
   waiver: 'Waiver Tool',
   gpa: 'GPA Calculator',
   buzz: 'Campus Buzz',
-  profile: 'Profile',
-  admin: 'Admin Console'
+  profile: 'Profile Page'
 };
 
 const LOCAL_ANALYTICS_KEY = 'sscbs_analytics_daily_v5';
@@ -335,7 +334,7 @@ export function subscribeToPresence(user, currentView, onPresenceSync) {
 }
 
 export async function logFeatureView(featureId, user, eventType = 'visit') {
-  if (!featureId) return;
+  if (!featureId || featureId === 'admin') return;
 
   const dateStr = new Date().toISOString().split('T')[0];
 
@@ -344,13 +343,13 @@ export async function logFeatureView(featureId, user, eventType = 'visit') {
     const localMap = getLocalAnalyticsMap();
     if (!localMap[dateStr]) {
       localMap[dateStr] = {
-        visits: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, total: 0 },
-        clicks: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, total: 0 }
+        visits: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 },
+        clicks: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 }
       };
     }
     const typeKey = eventType === 'click' ? 'clicks' : 'visits';
     if (!localMap[dateStr][typeKey]) {
-      localMap[dateStr][typeKey] = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, total: 0 };
+      localMap[dateStr][typeKey] = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 };
     }
     localMap[dateStr][typeKey][featureId] = (localMap[dateStr][typeKey][featureId] || 0) + 1;
     localMap[dateStr][typeKey].total = (localMap[dateStr][typeKey].total || 0) + 1;
@@ -383,13 +382,13 @@ export async function logFeatureView(featureId, user, eventType = 'visit') {
           if (typeof eventsMap !== 'object' || !eventsMap) eventsMap = {};
           if (!eventsMap[dateStr]) {
             eventsMap[dateStr] = {
-              visits: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, total: 0 },
-              clicks: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, total: 0 }
+              visits: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 },
+              clicks: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 }
             };
           }
           const typeKey = eventType === 'click' ? 'clicks' : 'visits';
           if (!eventsMap[dateStr][typeKey]) {
-            eventsMap[dateStr][typeKey] = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, total: 0 };
+            eventsMap[dateStr][typeKey] = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 };
           }
 
           eventsMap[dateStr][typeKey][featureId] = (eventsMap[dateStr][typeKey][featureId] || 0) + 1;
@@ -412,15 +411,17 @@ export async function logFeatureView(featureId, user, eventType = 'visit') {
  * 🖱️ Log a feature click action
  */
 export async function logFeatureClick(featureId, user) {
+  if (featureId === 'admin') return;
   return logFeatureView(featureId, user, 'click');
 }
 
 /**
  * 📈 Fetch REAL analytics data combining Supabase DB events, system_configs, and local logs
+ * NO ADMIN / NO TOTAL LINES. TRACKS ONLY THE 7 STUDENT-FACING PAGES.
  */
 export async function fetchAnalyticsData(daysCount = 7) {
   const dateList = [];
-  const emptyFeatureSet = () => ({ home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, total: 0 });
+  const emptyFeatureSet = () => ({ home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 });
 
   const dateMapVisits = {};
   const dateMapClicks = {};
@@ -447,8 +448,10 @@ export async function fetchAnalyticsData(daysCount = 7) {
       const c = day.clicks || {};
 
       Object.keys(dateMapVisits[dateStr]).forEach(feat => {
-        dateMapVisits[dateStr][feat] += Number(v[feat]) || 0;
-        dateMapClicks[dateStr][feat] += Number(c[feat]) || 0;
+        if (feat !== 'admin') {
+          dateMapVisits[dateStr][feat] += Number(v[feat]) || 0;
+          dateMapClicks[dateStr][feat] += Number(c[feat]) || 0;
+        }
       });
     }
   });
@@ -471,8 +474,10 @@ export async function fetchAnalyticsData(daysCount = 7) {
             const c = day.clicks || {};
 
             Object.keys(dateMapVisits[dateStr]).forEach(feat => {
-              dateMapVisits[dateStr][feat] = Math.max(dateMapVisits[dateStr][feat], Number(v[feat]) || 0);
-              dateMapClicks[dateStr][feat] = Math.max(dateMapClicks[dateStr][feat], Number(c[feat]) || 0);
+              if (feat !== 'admin') {
+                dateMapVisits[dateStr][feat] = Math.max(dateMapVisits[dateStr][feat], Number(v[feat]) || 0);
+                dateMapClicks[dateStr][feat] = Math.max(dateMapClicks[dateStr][feat], Number(c[feat]) || 0);
+              }
             });
           }
         });
@@ -491,7 +496,7 @@ export async function fetchAnalyticsData(daysCount = 7) {
             const evtDate = evt.created_at?.split('T')[0];
             const feat = evt.feature_id;
             const type = evt.event_type === 'click' ? 'click' : 'visit';
-            if (evtDate && dateMapVisits[evtDate]) {
+            if (evtDate && dateMapVisits[evtDate] && feat !== 'admin') {
               const targetMap = type === 'click' ? dateMapClicks[evtDate] : dateMapVisits[evtDate];
               if (feat && targetMap[feat] !== undefined) {
                 targetMap[feat] += 1;
@@ -516,10 +521,10 @@ export async function fetchAnalyticsData(daysCount = 7) {
     const cDay = dateMapClicks[dateStr];
     const combDay = dateMapCombined[dateStr];
 
-    const vSum = vDay.home + vDay.timetable + vDay['find-prof'] + vDay.waiver + vDay.gpa + vDay.buzz + vDay.profile + vDay.admin;
+    const vSum = vDay.home + vDay.timetable + vDay['find-prof'] + vDay.waiver + vDay.gpa + vDay.buzz + vDay.profile;
     if (vDay.total < vSum) vDay.total = vSum;
 
-    const cSum = cDay.home + cDay.timetable + cDay['find-prof'] + cDay.waiver + cDay.gpa + cDay.buzz + cDay.profile + cDay.admin;
+    const cSum = cDay.home + cDay.timetable + cDay['find-prof'] + cDay.waiver + cDay.gpa + cDay.buzz + cDay.profile;
     if (cDay.total < cSum) cDay.total = cSum;
 
     Object.keys(combDay).forEach(feat => {
@@ -540,9 +545,7 @@ export async function fetchAnalyticsData(daysCount = 7) {
     waiver: dateList.map(d => dMap[d.dateStr].waiver),
     gpa: dateList.map(d => dMap[d.dateStr].gpa),
     buzz: dateList.map(d => dMap[d.dateStr].buzz),
-    profile: dateList.map(d => dMap[d.dateStr].profile),
-    admin: dateList.map(d => dMap[d.dateStr].admin),
-    total: dateList.map(d => dMap[d.dateStr].total)
+    profile: dateList.map(d => dMap[d.dateStr].profile)
   });
 
   const visits = {
@@ -561,30 +564,16 @@ export async function fetchAnalyticsData(daysCount = 7) {
   };
 
   const topKey = Object.keys(totalsCombined)
-    .filter(k => k !== 'total')
+    .filter(k => k !== 'total' && k !== 'admin')
     .sort((a, b) => totalsCombined[b] - totalsCombined[a])[0] || 'timetable';
-
-  // Overall series containing both total_visits and total_clicks for direct dual-line plotting
-  const dualSeries = {
-    total_visits: dateList.map(d => dateMapVisits[d.dateStr].total),
-    total_clicks: dateList.map(d => dateMapClicks[d.dateStr].total),
-    total_combined: dateList.map(d => dateMapCombined[d.dateStr].total),
-    total: dateList.map(d => dateMapCombined[d.dateStr].total),
-    ...combined.series
-  };
 
   return {
     dateLabels: dateList.map(d => d.label),
     visits,
     clicks,
     combined,
-    series: dualSeries,
-    totals: {
-      ...totalsCombined,
-      total_visits: totalsVisits.total,
-      total_clicks: totalsClicks.total,
-      total_combined: totalsCombined.total
-    },
+    series: combined.series,
+    totals: combined.totals,
     topFeatureName: FEATURE_NAMES[topKey] || 'Timetable',
     topFeatureCount: totalsCombined[topKey] || 0
   };
