@@ -23,7 +23,7 @@ const slides = [
 ];
 
 export default function Auth() {
-  const { signIn, signUp, resetPassword, updatePassword, isPasswordRecovery, setIsPasswordRecovery, directStudentAccess, isConfigured } = useAuth();
+  const { signIn, signUp, resetPassword, updatePassword, isPasswordRecovery, setIsPasswordRecovery } = useAuth();
   
   // mode: 'signin' | 'signup' | 'forgot' | 'update_password'
   const [mode, setMode] = useState(() => isPasswordRecovery ? 'update_password' : 'signin');
@@ -41,11 +41,6 @@ export default function Auth() {
       setMode('update_password');
     }
   }, [isPasswordRecovery]);
-
-  const handleInstantAccess = () => {
-    const targetEmail = email && email.includes('@') ? email : 'aditya.25015@sscbs.du.ac.in';
-    directStudentAccess(targetEmail);
-  };
 
   // Carousel auto-play
   useEffect(() => {
@@ -106,23 +101,6 @@ export default function Auth() {
       return;
     }
 
-    if (!isConfigured) {
-      setTimeout(async () => {
-        try {
-          if (mode === 'signup') {
-            await signUp(email, password, { full_name: fullName });
-          } else {
-            await signIn(email, password);
-          }
-          setLoading(false);
-        } catch (err) {
-          setError(err.message || 'An error occurred.');
-          setLoading(false);
-        }
-      }, 800);
-      return;
-    }
-
     try {
       if (mode === 'signup') {
         await signUp(email, password, { full_name: fullName });
@@ -145,17 +123,6 @@ export default function Auth() {
     setError('');
     setSuccessMsg('');
     setLoading(true);
-
-    if (!isConfigured) {
-      setTimeout(() => {
-        setLoading(false);
-        setSuccessMsg(
-          'Offline Mode: Direct authentication enabled. ' +
-          'Configure your Supabase environment keys to sync with DU Cloud.'
-        );
-      }, 1000);
-      return;
-    }
 
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -255,14 +222,6 @@ export default function Auth() {
                 <h2>{getHeaderTitle()}</h2>
                 <p>{getHeaderDesc()}</p>
               </div>
-
-              {!isConfigured && (
-                <div className="sandbox-info-banner">
-                  <p>
-                    <strong>Offline Sandbox:</strong> Supabase keys not set. Enter any email and password to log in.
-                  </p>
-                </div>
-              )}
 
               {error && <div className="feedback-alert error-alert">{error}</div>}
               {successMsg && <div className="feedback-alert success-alert">{successMsg}</div>}
@@ -387,15 +346,6 @@ export default function Auth() {
                       <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335" />
                     </svg>
                     <span>Continue with Google</span>
-                  </button>
-
-                  <button 
-                    type="button" 
-                    className="google-signin-button" 
-                    style={{ marginTop: '10px', background: 'var(--accent-gradient, linear-gradient(135deg, #1e293b, #0f172a))', border: '1px solid rgba(255,255,255,0.15)', color: '#fff' }} 
-                    onClick={handleInstantAccess}
-                  >
-                    <span>Instant Student Access ⚡</span>
                   </button>
                 </>
               )}
