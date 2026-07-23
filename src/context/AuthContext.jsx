@@ -15,24 +15,14 @@ const AuthContext = createContext({
 const checkIsRecovery = () => {
   if (typeof window === 'undefined') return false;
   try {
-    if (sessionStorage.getItem('sscbs_password_recovery') === 'true') {
-      return true;
-    }
     const href = window.location.href;
     const hash = window.location.hash;
     const search = window.location.search;
-    const isRecovery = (
+    return (
       hash.includes('type=recovery') ||
       search.includes('type=recovery') ||
-      hash.includes('reset-password') ||
-      search.includes('reset-password') ||
-      href.includes('type=recovery') ||
-      href.includes('reset-password')
+      href.includes('type=recovery')
     );
-    if (isRecovery) {
-      sessionStorage.setItem('sscbs_password_recovery', 'true');
-      return true;
-    }
   } catch (e) {}
   return false;
 };
@@ -42,18 +32,7 @@ export const AuthProvider = ({ children }) => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [isPasswordRecovery, setIsPasswordRecoveryState] = useState(checkIsRecovery);
-
-  const setIsPasswordRecovery = (val) => {
-    try {
-      if (val) {
-        sessionStorage.setItem('sscbs_password_recovery', 'true');
-      } else {
-        sessionStorage.removeItem('sscbs_password_recovery');
-      }
-    } catch (e) {}
-    setIsPasswordRecoveryState(Boolean(val));
-  };
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(checkIsRecovery);
 
   useEffect(() => {
     let isMounted = true;
@@ -149,7 +128,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const resetPassword = async (email) => {
-    const redirectUrl = `${window.location.origin}/#reset-password`;
+    const redirectUrl = window.location.origin;
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl,
     });
