@@ -1026,32 +1026,6 @@ function AdminConsoleContent({ onBack }) {
     }
   };
 
-  if (!isAdmin) {
-    return (
-      <div className="admin-console-container" style={{ padding: '3rem', textAlign: 'center', color: '#ef4444' }}>
-        <h2>Access Denied</h2>
-        <p style={{ marginTop: '1rem', color: '#888' }}>
-          You do not have administrative privileges to access the SSCBS OS Admin Workspace.
-        </p>
-        <button 
-          onClick={onBack} 
-          style={{ 
-            marginTop: '2rem', 
-            padding: '0.6rem 1.2rem', 
-            background: '#8b5cf6', 
-            color: '#fff', 
-            border: 'none', 
-            borderRadius: '6px', 
-            cursor: 'pointer',
-            fontWeight: '600'
-          }}
-        >
-          Go Back to Dashboard
-        </button>
-      </div>
-    );
-  }
-
   return (
     <div className="admin-console-container">
       {/* Header */}
