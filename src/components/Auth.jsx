@@ -233,7 +233,35 @@ export default function Auth({ forceMode }) {
                 <p>{getHeaderDesc()}</p>
               </div>
 
-              {error && <div className="feedback-alert error-alert">{error}</div>}
+              {error && (
+                <div className="feedback-alert error-alert">
+                  <div>{error}</div>
+                  {(error.toLowerCase().includes('expired') || error.toLowerCase().includes('session') || error.toLowerCase().includes('invalid')) && (
+                    <button
+                      type="button"
+                      style={{
+                        marginTop: '10px',
+                        background: 'var(--accent-gold, #c28e2b)',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '6px 14px',
+                        color: '#000',
+                        fontSize: '0.75rem',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        display: 'inline-block'
+                      }}
+                      onClick={() => {
+                        setMode('forgot');
+                        setError('');
+                        setSuccessMsg('');
+                      }}
+                    >
+                      Request New Reset Link →
+                    </button>
+                  )}
+                </div>
+              )}
               {successMsg && <div className="feedback-alert success-alert">{successMsg}</div>}
 
               <form onSubmit={handleSubmit} className="auth-form">

@@ -158,10 +158,27 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updatePassword = async (newPassword) => {
+    if (!hasValidCredentials) {
+      setIsPasswordRecovery(false);
+      return { message: 'Password updated successfully (Sandbox mode).' };
+    }
+
+    const { data: { session: activeSession } } = await supabase.auth.getSession();
+    if (!activeSession) {
+      setIsPasswordRecovery(false);
+      throw new Error('Your password reset link has expired or is invalid. Please request a new password reset email.');
+    }
+
     const { data, error } = await supabase.auth.updateUser({
       password: newPassword,
     });
-    if (error) throw error;
+    if (error) {
+      if (error.message && (error.message.toLowerCase().includes('session') || error.status === 401)) {
+        setIsPasswordRecovery(false);
+        throw new Error('Your password reset link has expired or is invalid. Please request a new password reset email.');
+      }
+      throw error;
+    }
     setIsPasswordRecovery(false);
     return data;
   };
