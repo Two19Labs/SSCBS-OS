@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabaseClient';
+import { EyeIcon, EyeOffIcon } from './icons';
 import './Auth.css';
 
 const slides = [
@@ -30,6 +31,8 @@ export default function Auth({ forceMode }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -327,15 +330,24 @@ export default function Auth({ forceMode }) {
                         </button>
                       )}
                     </div>
-                    <div className="input-field-wrapper">
+                    <div className="input-field-wrapper password-field-wrapper">
                       <input
-                        type="password"
+                        type={showPassword ? 'text' : 'password'}
                         id="password"
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                       />
+                      <button
+                        type="button"
+                        className="password-toggle-btn"
+                        onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                        tabIndex={-1}
+                      >
+                        {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+                      </button>
                     </div>
                   </div>
                 )}
@@ -343,15 +355,24 @@ export default function Auth({ forceMode }) {
                 {mode === 'update_password' && (
                   <div className="form-input-group">
                     <label htmlFor="confirmPassword">Confirm New Password</label>
-                    <div className="input-field-wrapper">
+                    <div className="input-field-wrapper password-field-wrapper">
                       <input
-                        type="password"
+                        type={showConfirmPassword ? 'text' : 'password'}
                         id="confirmPassword"
                         placeholder="••••••••"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
                       />
+                      <button
+                        type="button"
+                        className="password-toggle-btn"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                        tabIndex={-1}
+                      >
+                        {showConfirmPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+                      </button>
                     </div>
                   </div>
                 )}
