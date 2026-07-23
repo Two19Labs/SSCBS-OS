@@ -91,11 +91,11 @@ function App() {
 
   // Ensure current view is recorded in URL hash & localStorage on mount
   useEffect(() => {
-    if (view && view !== 'home' && typeof window !== 'undefined') {
+    if (!isPasswordRecovery && view && view !== 'home' && typeof window !== 'undefined') {
       window.location.hash = view;
       localStorage.setItem('sscbs_active_view', view);
     }
-  }, []);
+  }, [isPasswordRecovery]);
 
   // Check if profile setup is required (missing name, course/class, or section)
   const hasCompletedProfile = Boolean(

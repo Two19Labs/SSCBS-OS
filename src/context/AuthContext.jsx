@@ -12,24 +12,54 @@ const AuthContext = createContext({
   isConfigured: false,
 });
 
+const checkIsRecovery = () => {
+  if (typeof window === 'undefined') return false;
+  try {
+    if (sessionStorage.getItem('sscbs_password_recovery') === 'true') {
+      return true;
+    }
+    const href = window.location.href;
+    const hash = window.location.hash;
+    const search = window.location.search;
+    const isRecovery = (
+      hash.includes('type=recovery') ||
+      search.includes('type=recovery') ||
+      hash.includes('reset-password') ||
+      search.includes('reset-password') ||
+      href.includes('type=recovery') ||
+      href.includes('reset-password')
+    );
+    if (isRecovery) {
+      sessionStorage.setItem('sscbs_password_recovery', 'true');
+      return true;
+    }
+  } catch (e) {}
+  return false;
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
+  const [isPasswordRecovery, setIsPasswordRecoveryState] = useState(checkIsRecovery);
+
+  const setIsPasswordRecovery = (val) => {
+    try {
+      if (val) {
+        sessionStorage.setItem('sscbs_password_recovery', 'true');
+      } else {
+        sessionStorage.removeItem('sscbs_password_recovery');
+      }
+    } catch (e) {}
+    setIsPasswordRecoveryState(Boolean(val));
+  };
 
   useEffect(() => {
     let isMounted = true;
     let sessionResolved = false;
 
-    // Check if URL hash or search parameters indicate password recovery link
-    if (
-      typeof window !== 'undefined' &&
-      (window.location.hash.includes('type=recovery') ||
-       window.location.search.includes('type=recovery') ||
-       window.location.hash.includes('reset-password'))
-    ) {
+    if (checkIsRecovery()) {
       setIsPasswordRecovery(true);
     }
 
