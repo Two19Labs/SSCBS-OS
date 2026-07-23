@@ -99,68 +99,25 @@
   --linkedin-blue: #38bdf8;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-  background-color: var(--bg);
-  color: var(--ink);
-  overflow-x: hidden;
-  font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
-}
-
-#root {
-  width: 100%;
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Manrope', system-ui, sans-serif;
-  letter-spacing: -0.02em;
-}
-
-button, input, select, textarea {
-  font-family: inherit;
-  color: inherit;
-}
-
-select option {
-  background-color: var(--surface);
-  color: var(--ink);
-}
-
-a {
-  color: var(--accent);
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-a:hover {
-  color: var(--accent);
-}
-
-/* ── Always LinkedIn Blue & Underlined links for developers ── */
-.linkedin-link,
-a.developer-name {
-  color: var(--linkedin-blue) !important;
-  text-decoration: underline !important;
-  text-underline-offset: 3px;
-  font-weight: 600;
-  transition: opacity 0.2s ease, color 0.2s ease;
-}
-
-.linkedin-link:hover,
-a.developer-name:hover {
-  opacity: 0.85;
-}
-
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="search"],
+  input[type="password"],
+  select,
+  textarea {
+    font-size: 16px !important; /* Prevents auto-zoom shift on iOS mobile Safari */
+  }
+}
+

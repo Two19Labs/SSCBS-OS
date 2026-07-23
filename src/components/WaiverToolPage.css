@@ -1693,16 +1693,25 @@
 /* Mobile responsive fixes for table */
 @media (max-width: 768px) {
   .attendance-spreadsheet-table .sticky-col {
-    position: static;
-    box-shadow: none;
-    border-right: 1px solid var(--border);
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    background: var(--surface);
+    min-width: 140px;
+    max-width: 160px;
+    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.08);
+  }
+  .attendance-spreadsheet-table th.sticky-col {
+    position: sticky;
+    left: 0;
+    z-index: 6;
+    background: var(--bg);
   }
   .attendance-spreadsheet-table .sticky-col-right {
     position: static;
     box-shadow: none;
     border-left: 1px solid var(--border);
   }
-  .attendance-spreadsheet-table th.sticky-col,
   .attendance-spreadsheet-table th.sticky-col-right {
     position: static;
   }

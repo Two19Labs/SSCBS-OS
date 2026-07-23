@@ -200,42 +200,52 @@
   gap: 10px;
   padding: 10px 16px;
   background: var(--bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
+  min-height: 52px;
 }
 
 .app-topbar img {
   border-radius: 5px;
+  flex-shrink: 0;
 }
 
 .topbar-title {
   flex: 1;
+  min-width: 0;
   font-size: 15.5px;
   font-weight: 800;
   letter-spacing: -0.01em;
   color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .topbar-back {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   margin-left: -6px;
   border: none;
   border-radius: 9px;
   background: transparent;
   color: var(--ink);
   cursor: pointer;
+  flex-shrink: 0;
 }
 
-.topbar-back:hover {
+.topbar-back:hover,
+.topbar-back:active {
   background: var(--tint);
 }
 
 .topbar-avatar {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: none;
   background: var(--accent);
@@ -247,11 +257,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 /* ── Main content ── */
 .app-main {
-  padding: 18px 16px calc(84px + env(safe-area-inset-bottom));
+  padding: 16px 14px calc(88px + env(safe-area-inset-bottom));
   max-width: 1160px;
   margin: 0 auto;
   width: 100%;
@@ -270,6 +281,8 @@
   z-index: 40;
   display: flex;
   background: var(--surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-top: 1px solid var(--border);
   padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
 }
@@ -279,21 +292,28 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 3px;
-  padding: 5px 0 3px;
+  padding: 6px 0 4px;
+  min-height: 48px;
   border: none;
   background: transparent;
   font-family: inherit;
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--ink-faint);
   cursor: pointer;
   border-radius: 10px;
+  transition: color 0.15s ease, transform 0.1s ease;
 }
 
 .tabbar-item.active {
   color: var(--accent);
+}
+
+.tabbar-item:active {
+  transform: scale(0.96);
 }
 
 /* ── Tools hub (mobile) ── */

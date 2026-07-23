@@ -44,6 +44,29 @@
   flex-wrap: wrap;
 }
 
+@media (max-width: 600px) {
+  .notice-board-container {
+    padding: 16px 14px;
+    gap: 14px;
+  }
+  .notice-filters {
+    overflow-x: auto;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .notice-filters::-webkit-scrollbar {
+    display: none;
+  }
+  .filter-badge {
+    flex: 0 0 auto;
+    padding: 6px 12px;
+    font-size: 0.78rem;
+  }
+}
+
 .filter-badge {
   background: transparent;
   border: 1px solid var(--border-color);
