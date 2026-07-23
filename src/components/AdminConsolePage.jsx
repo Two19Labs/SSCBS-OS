@@ -82,28 +82,11 @@ const csSubjects = {
 const csTeachers = ["Dr. Mona Verma", "Dr. Amit Kumar", "Dr. Tarannum Ahmad", "Mr. Tatkarsh", "Dr. Narander Kumar Nigam", "Ms. Monika"];
 const csRooms = ["Room 651", "Room 644", "Room 326", "Room 237"];
 
-export default function AdminConsolePage({ onBack }) {
+function AdminConsoleContent({ onBack }) {
   const { user } = useAuth();
   const { timetable, updateTimetable } = useTimetable();
   const [activeTab, setActiveTab] = useState('upload'); // 'upload', 'editor', 'notices', 'analytics'
 
-  const isAdmin = isAdminEmail(user?.email);
-
-  if (!isAdmin) {
-    return (
-      <div className="admin-access-denied-wrapper">
-        <div className="admin-access-denied-card">
-          <span className="access-denied-icon">🔒</span>
-          <h2>Access Denied</h2>
-          <p>You do not have administrative privileges to access the SSCBS OS Admin Console.</p>
-          <p className="access-denied-sub">Only authorized administrator accounts can manage campus timetables, notices, and analytics.</p>
-          <button className="btn-access-denied-back" onClick={onBack}>
-            Return to Dashboard
-          </button>
-        </div>
-      </div>
-    );
-  }
 
 
   
@@ -2339,3 +2322,27 @@ export default function AdminConsolePage({ onBack }) {
     </div>
   );
 }
+
+export default function AdminConsolePage({ onBack }) {
+  const { user } = useAuth();
+  const isAdmin = isAdminEmail(user?.email);
+
+  if (!isAdmin) {
+    return (
+      <div className="admin-access-denied-wrapper">
+        <div className="admin-access-denied-card">
+          <span className="access-denied-icon">🔒</span>
+          <h2>Access Denied</h2>
+          <p>You do not have administrative privileges to access the SSCBS OS Admin Console.</p>
+          <p className="access-denied-sub">Only authorized administrator accounts can manage campus timetables, notices, and analytics.</p>
+          <button className="btn-access-denied-back" onClick={onBack}>
+            Return to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return <AdminConsoleContent onBack={onBack} />;
+}
+

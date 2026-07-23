@@ -190,12 +190,21 @@ CREATE TABLE IF NOT EXISTS public.active_presence (
 ALTER TABLE public.active_presence ENABLE ROW LEVEL SECURITY;
 
 -- Security Policies for active_presence
-CREATE POLICY "Enable all access for authenticated users on active_presence" 
+-- All authenticated users can read online presence
+CREATE POLICY "Enable read access for authenticated users on active_presence" 
+    ON public.active_presence 
+    FOR SELECT 
+    TO authenticated 
+    USING (true);
+
+-- Authenticated users can insert or update their own presence ping
+CREATE POLICY "Enable insert/update access for authenticated users on active_presence" 
     ON public.active_presence 
     FOR ALL 
     TO authenticated 
-    USING (true)
-    WITH CHECK (true);
+    USING (auth.jwt() ->> 'email' = email OR user_id = auth.uid()::text)
+    WITH CHECK (auth.jwt() ->> 'email' = email OR user_id = auth.uid()::text);
+
 
 
 
