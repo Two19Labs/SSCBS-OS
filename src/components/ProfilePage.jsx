@@ -121,16 +121,6 @@ export default function ProfilePage({ onNavigate }) {
         </div>
       </header>
 
-      <div className="profile-hero">
-        <div className="profile-avatar-large">
-          {displayName.charAt(0).toUpperCase()}
-        </div>
-        <div className="profile-hero-info">
-          <h3>{displayName}</h3>
-          <span className="profile-email-sub">{email}</span>
-        </div>
-      </div>
-
       <div className="profile-group-label">ACADEMIC INFO</div>
       <div className="profile-group">
         <label className="profile-row">
