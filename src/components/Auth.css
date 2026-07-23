@@ -603,12 +603,10 @@
 }
 
 .auth-credit-footer .developer-name {
-  color: var(--accent);
+  color: var(--linkedin-blue, #0a66c2) !important;
   font-weight: 600;
-  background: var(--accent);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-decoration: none;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
   transition: opacity 0.2s ease, transform 0.2s ease;
   display: inline-block;
 }

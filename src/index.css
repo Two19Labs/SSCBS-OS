@@ -121,3 +121,12 @@ html {
   }
 }
 
+a.linkedin-link,
+.developer-name.linkedin-link {
+  color: var(--linkedin-blue, #0a66c2) !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+  font-weight: 600;
+}
+
+
