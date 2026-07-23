@@ -57,7 +57,7 @@ const getInitialView = () => {
 };
 
 function App() {
-  const { user, loading } = useAuth();
+  const { user, loading, isPasswordRecovery } = useAuth();
   const [view, setViewState] = useState(getInitialView);
   const [returnView, setReturnView] = useState('home');
   const [isGpaOpen, setIsGpaOpen] = useState(false);
@@ -123,6 +123,10 @@ function App() {
         <p className="loading-text">Loading SSCBS Campus OS…</p>
       </div>
     );
+  }
+
+  if (isPasswordRecovery) {
+    return <Auth forceMode="update_password" />;
   }
 
   if (!user) {

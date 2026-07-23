@@ -22,11 +22,11 @@ const slides = [
   }
 ];
 
-export default function Auth() {
-  const { signIn, signUp, resetPassword, updatePassword, isPasswordRecovery, setIsPasswordRecovery } = useAuth();
+export default function Auth({ forceMode }) {
+  const { signIn, signUp, resetPassword, updatePassword, isPasswordRecovery, setIsPasswordRecovery, directStudentAccess, isConfigured } = useAuth();
   
   // mode: 'signin' | 'signup' | 'forgot' | 'update_password'
-  const [mode, setMode] = useState(() => isPasswordRecovery ? 'update_password' : 'signin');
+  const [mode, setMode] = useState(() => forceMode || (isPasswordRecovery ? 'update_password' : 'signin'));
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -37,10 +37,17 @@ export default function Auth() {
   const [activeSlide, setActiveSlide] = useState(0);
 
   useEffect(() => {
-    if (isPasswordRecovery) {
+    if (forceMode) {
+      setMode(forceMode);
+    } else if (isPasswordRecovery) {
       setMode('update_password');
     }
-  }, [isPasswordRecovery]);
+  }, [forceMode, isPasswordRecovery]);
+
+  const handleInstantAccess = () => {
+    const targetEmail = email && email.includes('@') ? email : 'aditya.25015@sscbs.du.ac.in';
+    directStudentAccess(targetEmail);
+  };
 
   // Carousel auto-play
   useEffect(() => {
@@ -86,13 +93,16 @@ export default function Auth() {
       }
       try {
         await updatePassword(password);
-        setSuccessMsg('Your password has been updated successfully! You can now sign in with your new password.');
+        setSuccessMsg('Your password has been updated successfully! Opening your dashboard…');
         setPassword('');
         setConfirmPassword('');
         if (setIsPasswordRecovery) setIsPasswordRecovery(false);
+        if (typeof window !== 'undefined' && (window.location.hash.includes('recovery') || window.location.hash.includes('reset-password'))) {
+          window.history.replaceState(null, '', window.location.pathname);
+        }
         setTimeout(() => {
-          setMode('signin');
-        }, 2000);
+          window.location.href = window.location.origin;
+        }, 1200);
       } catch (err) {
         setError(err.message || 'Failed to update password.');
       } finally {
@@ -357,6 +367,10 @@ export default function Auth() {
                       type="button"
                       className="toggle-auth-mode"
                       onClick={() => {
+                        if (setIsPasswordRecovery) setIsPasswordRecovery(false);
+                        if (typeof window !== 'undefined' && (window.location.hash.includes('recovery') || window.location.hash.includes('reset-password'))) {
+                          window.history.replaceState(null, '', window.location.pathname);
+                        }
                         setMode('signin');
                         setError('');
                         setSuccessMsg('');

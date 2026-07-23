@@ -23,8 +23,13 @@ export const AuthProvider = ({ children }) => {
     let isMounted = true;
     let sessionResolved = false;
 
-    // Check if URL hash indicates password recovery link
-    if (typeof window !== 'undefined' && window.location.hash.includes('type=recovery')) {
+    // Check if URL hash or search parameters indicate password recovery link
+    if (
+      typeof window !== 'undefined' &&
+      (window.location.hash.includes('type=recovery') ||
+       window.location.search.includes('type=recovery') ||
+       window.location.hash.includes('reset-password'))
+    ) {
       setIsPasswordRecovery(true);
     }
 
