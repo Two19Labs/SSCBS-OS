@@ -321,7 +321,9 @@ export default function AdminConsolePage({ onBack }) {
     topFeatureCount: 0
   });
   const [enabledSeries, setEnabledSeries] = useState({
-    total: true,
+    total_visits: true,
+    total_clicks: true,
+    total_combined: true,
     home: true,
     timetable: true,
     'find-prof': true,
@@ -1856,20 +1858,27 @@ export default function AdminConsolePage({ onBack }) {
                   const activeMetricObj = analyticsSummary[analyticsMetric] || analyticsSummary.combined || analyticsSummary;
                   const activeTotals = activeMetricObj.totals || analyticsSummary.totals;
 
-                  return [
-                    { key: 'total', label: 'All Platform Views', color: '#eab308' },
-                    { key: 'home', label: 'Home Dashboard', color: '#3b82f6' },
-                    { key: 'timetable', label: 'Timetable', color: '#8b5cf6' },
-                    { key: 'find-prof', label: 'Find My Professor', color: '#10b981' },
-                    { key: 'waiver', label: 'Waiver Tool', color: '#06b6d4' },
+                  const legendItems = [
+                    { key: 'total_visits', label: '👁️ Total Page Visits', color: '#3b82f6' },
+                    { key: 'total_clicks', label: '🖱️ Total Feature Clicks', color: '#10b981' },
+                    { key: 'total_combined', label: '📊 Total Activity (Combined)', color: '#eab308' },
+                    { key: 'home', label: 'Home Dashboard', color: '#8b5cf6' },
+                    { key: 'timetable', label: 'Timetable', color: '#a855f7' },
+                    { key: 'find-prof', label: 'Find My Professor', color: '#06b6d4' },
+                    { key: 'waiver', label: 'Waiver Tool', color: '#38bdf8' },
                     { key: 'gpa', label: 'GPA Calculator', color: '#f59e0b' },
                     { key: 'buzz', label: 'Campus Buzz', color: '#ec4899' },
                     { key: 'profile', label: 'Profile Page', color: '#14b8a6' },
                     { key: 'admin', label: 'Admin Console', color: '#f43f5e' }
-                  ].map(({ key, label, color }) => {
-                    const count = key === 'total'
-                      ? (activeTotals.grandTotal || activeTotals.total || 0)
-                      : (activeTotals[key] ?? 0);
+                  ];
+
+                  return legendItems.map(({ key, label, color }) => {
+                    let count = 0;
+                    if (key === 'total_visits') count = analyticsSummary.totals?.total_visits || activeTotals.grandTotal || 0;
+                    else if (key === 'total_clicks') count = analyticsSummary.totals?.total_clicks || 0;
+                    else if (key === 'total_combined') count = analyticsSummary.totals?.total_combined || activeTotals.grandTotal || 0;
+                    else count = activeTotals[key] ?? 0;
+
                     return (
                       <button
                         key={key}
@@ -1888,8 +1897,7 @@ export default function AdminConsolePage({ onBack }) {
               {/* SVG Line Graph Render */}
               <div className="line-graph-wrapper">
                 {(() => {
-                  const activeMetricObj = analyticsSummary[analyticsMetric] || analyticsSummary.combined || analyticsSummary;
-                  const series = activeMetricObj.series || analyticsSummary.series;
+                  const series = analyticsSummary.series || {};
                   const dateLabels = analyticsSummary.dateLabels || [];
                   if (!dateLabels || dateLabels.length === 0) return null;
 
@@ -1903,11 +1911,14 @@ export default function AdminConsolePage({ onBack }) {
                   const graphHeight = height - paddingTop - paddingBottom;
 
                   const seriesColors = {
+                    total_visits: '#3b82f6',
+                    total_clicks: '#10b981',
+                    total_combined: '#eab308',
                     total: '#eab308',
-                    home: '#3b82f6',
-                    timetable: '#8b5cf6',
-                    'find-prof': '#10b981',
-                    waiver: '#06b6d4',
+                    home: '#8b5cf6',
+                    timetable: '#a855f7',
+                    'find-prof': '#06b6d4',
+                    waiver: '#38bdf8',
                     gpa: '#f59e0b',
                     buzz: '#ec4899',
                     profile: '#14b8a6',
@@ -1959,6 +1970,7 @@ export default function AdminConsolePage({ onBack }) {
                           if (points.length === 0) return null;
                           const pathData = points.map((val, idx) => `${idx === 0 ? 'M' : 'L'} ${getX(idx)} ${getY(val)}`).join(' ');
                           const color = seriesColors[seriesKey] || '#8b5cf6';
+                          const isBoldLine = seriesKey.startsWith('total');
 
                           return (
                             <g key={seriesKey}>
@@ -1966,17 +1978,18 @@ export default function AdminConsolePage({ onBack }) {
                                 d={pathData}
                                 fill="none"
                                 stroke={color}
-                                strokeWidth={seriesKey === 'total' ? '3.5' : '2.5'}
+                                strokeWidth={isBoldLine ? '3.5' : '2'}
+                                strokeDasharray={seriesKey === 'total_clicks' ? '5 3' : 'none'}
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
-                                opacity={seriesKey === 'total' ? 0.7 : 0.9}
+                                opacity={isBoldLine ? 0.95 : 0.75}
                               />
                               {points.map((val, idx) => (
                                 <circle
                                   key={idx}
                                   cx={getX(idx)}
                                   cy={getY(val)}
-                                  r={seriesKey === 'total' ? '4.5' : '3.5'}
+                                  r={isBoldLine ? '4.5' : '3.5'}
                                   fill={color}
                                   stroke="var(--surface)"
                                   strokeWidth="1.5"

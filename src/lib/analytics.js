@@ -564,13 +564,27 @@ export async function fetchAnalyticsData(daysCount = 7) {
     .filter(k => k !== 'total')
     .sort((a, b) => totalsCombined[b] - totalsCombined[a])[0] || 'timetable';
 
+  // Overall series containing both total_visits and total_clicks for direct dual-line plotting
+  const dualSeries = {
+    total_visits: dateList.map(d => dateMapVisits[d.dateStr].total),
+    total_clicks: dateList.map(d => dateMapClicks[d.dateStr].total),
+    total_combined: dateList.map(d => dateMapCombined[d.dateStr].total),
+    total: dateList.map(d => dateMapCombined[d.dateStr].total),
+    ...combined.series
+  };
+
   return {
     dateLabels: dateList.map(d => d.label),
     visits,
     clicks,
     combined,
-    series: combined.series,
-    totals: combined.totals,
+    series: dualSeries,
+    totals: {
+      ...totalsCombined,
+      total_visits: totalsVisits.total,
+      total_clicks: totalsClicks.total,
+      total_combined: totalsCombined.total
+    },
     topFeatureName: FEATURE_NAMES[topKey] || 'Timetable',
     topFeatureCount: totalsCombined[topKey] || 0
   };
