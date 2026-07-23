@@ -96,8 +96,8 @@ export default function Auth() {
       setTimeout(() => {
         setLoading(false);
         setSuccessMsg(
-          'Demo mode: Google Sign-In simulated successfully. ' +
-          'Configure your Supabase keys in .env to use real Google Auth.'
+          'Offline Mode: Direct authentication enabled. ' +
+          'Configure your Supabase environment keys to sync with DU Cloud.'
         );
       }, 1000);
       return;

@@ -15,14 +15,16 @@ export const TimetableProvider = ({ children }) => {
       const cached = localStorage.getItem('sscbs_os_timetable');
       if (cached) {
         const parsed = JSON.parse(cached);
-        if (parsed && typeof parsed === 'object') return parsed;
+        if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+          return parsed;
+        }
       }
     } catch (e) {
       console.warn('Could not read cached timetable from localStorage:', e);
     }
     return timetablesData;
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Fetch timetable configuration on load
   useEffect(() => {
@@ -41,7 +43,7 @@ export const TimetableProvider = ({ children }) => {
 
         if (error) {
           console.error('Error fetching timetable from Supabase:', error);
-        } else if (data && data.value) {
+        } else if (data && data.value && typeof data.value === 'object' && Object.keys(data.value).length > 0) {
           setTimetable(data.value);
           try {
             localStorage.setItem('sscbs_os_timetable', JSON.stringify(data.value));
@@ -85,23 +87,27 @@ export const TimetableProvider = ({ children }) => {
 
   // Helper to extract timetable dynamically
   const getTimetable = (course, semester, section) => {
-    if (!timetable) return null;
-    const cData = timetable[course];
+    const dataToSearch = (timetable && Object.keys(timetable).length > 0) ? timetable : timetablesData;
+    if (!dataToSearch) return null;
+
+    // Standardize course name variations
+    let matchedCourse = course;
+    if (!dataToSearch[course]) {
+      if (course === 'BBA(FIA)' || course === 'BBA-FIA' || course === 'FIA') {
+        matchedCourse = 'BBA FIA';
+      } else if (course === 'BSc CS' || course === 'CS' || course === 'Computer Science' || course === 'BSc Comp Sci') {
+        matchedCourse = 'Bsc Comp Sci';
+      }
+    }
+
+    const cData = dataToSearch[matchedCourse] || dataToSearch['BMS'] || dataToSearch[Object.keys(dataToSearch)[0]];
     if (!cData) return null;
-    const sData = cData[semester];
-    if (!sData) {
-      const firstSemKey = Object.keys(cData)[0];
-      const firstSemData = cData[firstSemKey];
-      if (!firstSemData) return null;
-      const firstSecKey = Object.keys(firstSemData)[0];
-      return firstSemData[section] || firstSemData[firstSecKey] || null;
-    }
-    const secData = sData[section];
-    if (!secData) {
-      const firstSecKey = Object.keys(sData)[0];
-      return sData[firstSecKey] || null;
-    }
-    return secData;
+
+    const sData = cData[semester] || cData[Object.keys(cData)[0]];
+    if (!sData) return null;
+
+    const secData = sData[section] || sData[Object.keys(sData)[0]];
+    return secData || null;
   };
 
   // Helper to get active semesters dynamically for a course or across all courses

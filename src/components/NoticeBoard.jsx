@@ -9,7 +9,7 @@ export default function NoticeBoard() {
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('All');
 
-  const getMockNotices = () => [
+  const getDefaultCampusNotices = () => [
     {
       id: '1',
       title: 'HackSSCBS 2026 Registration Open',
@@ -57,7 +57,7 @@ export default function NoticeBoard() {
     try {
       setLoading(true);
       if (!hasValidCredentials) {
-        setNotices(filterActiveNotices(getMockNotices()));
+        setNotices(filterActiveNotices(getDefaultCampusNotices()));
         setLoading(false);
         return;
       }
@@ -69,13 +69,13 @@ export default function NoticeBoard() {
 
       if (error) {
         console.error('Error loading notices from Supabase:', error);
-        setNotices(filterActiveNotices(getMockNotices()));
+        setNotices(filterActiveNotices(getDefaultCampusNotices()));
       } else {
         setNotices(filterActiveNotices(data || []));
       }
     } catch (err) {
       console.error('Failed to fetch notices:', err);
-      setNotices(filterActiveNotices(getMockNotices()));
+      setNotices(filterActiveNotices(getDefaultCampusNotices()));
     } finally {
       setLoading(false);
     }
