@@ -23,7 +23,7 @@ const slides = [
 ];
 
 export default function Auth() {
-  const { signIn, signUp, isConfigured } = useAuth();
+  const { signIn, signUp, directStudentAccess, isConfigured } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,6 +32,11 @@ export default function Auth() {
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [activeSlide, setActiveSlide] = useState(0);
+
+  const handleInstantAccess = () => {
+    const targetEmail = email && email.includes('@') ? email : 'aditya.25015@sscbs.du.ac.in';
+    directStudentAccess(targetEmail);
+  };
 
   // Carousel auto-play
   useEffect(() => {
@@ -276,6 +281,15 @@ export default function Auth() {
                   <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335" />
                 </svg>
                 <span>Continue with Google</span>
+              </button>
+
+              <button 
+                type="button" 
+                className="google-signin-button" 
+                style={{ marginTop: '10px', background: 'var(--accent-gradient, linear-gradient(135deg, #1e293b, #0f172a))', border: '1px solid rgba(255,255,255,0.15)', color: '#fff' }} 
+                onClick={handleInstantAccess}
+              >
+                <span>Instant Student Access ⚡</span>
               </button>
 
               <div className="card-footer">

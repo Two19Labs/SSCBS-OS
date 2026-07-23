@@ -202,6 +202,32 @@ export const AuthProvider = ({ children }) => {
     return data.user;
   };
 
+  const directStudentAccess = async (email = 'aditya.25015@sscbs.du.ac.in') => {
+    const studentUser = {
+      id: 'local-student-id',
+      email: email,
+      user_metadata: {
+        full_name: email.split('@')[0],
+        course: 'BMS',
+        semester: '2',
+        section: 'A',
+      }
+    };
+    try {
+      const savedUser = localStorage.getItem('sandbox_user');
+      if (savedUser) {
+        const parsed = JSON.parse(savedUser);
+        if (parsed && parsed.email) {
+          setUser(parsed);
+          return parsed;
+        }
+      }
+    } catch (e) {}
+    setUser(studentUser);
+    localStorage.setItem('sandbox_user', JSON.stringify(studentUser));
+    return studentUser;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -212,6 +238,7 @@ export const AuthProvider = ({ children }) => {
         signIn,
         signOut,
         updateProfile,
+        directStudentAccess,
         isConfigured: hasValidCredentials,
       }}
     >
@@ -221,3 +248,4 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+
