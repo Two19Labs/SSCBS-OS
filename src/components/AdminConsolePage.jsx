@@ -309,8 +309,12 @@ export default function AdminConsolePage({ onBack }) {
   // Real-Time Online Presence & Time-Series Graph States
   const [onlinePresence, setOnlinePresence] = useState([]);
   const [analyticsTimeRange, setAnalyticsTimeRange] = useState(7); // 7, 30, 90
+  const [analyticsMetric, setAnalyticsMetric] = useState('combined'); // 'combined' | 'visits' | 'clicks'
   const [analyticsSummary, setAnalyticsSummary] = useState({
     dateLabels: [],
+    visits: { totals: {}, series: {} },
+    clicks: { totals: {}, series: {} },
+    combined: { totals: {}, series: {} },
     series: { total: [], home: [], timetable: [], 'find-prof': [], waiver: [], gpa: [], buzz: [], profile: [], admin: [] },
     totals: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, grandTotal: 0 },
     topFeatureName: 'Timetable',
@@ -1797,7 +1801,7 @@ export default function AdminConsolePage({ onBack }) {
                 <div>
                   <h3>📈 Feature Usage & Click Analytics (Time-Series)</h3>
                   <p className="section-desc-small">
-                    Daily engagement trends across SSCBS OS tools over time. Click legend items below to toggle feature lines.
+                    Daily engagement trends across SSCBS OS tools over time. Filter by page visits or feature clicks.
                   </p>
                 </div>
                 
@@ -1818,40 +1822,75 @@ export default function AdminConsolePage({ onBack }) {
                 </div>
               </div>
 
+              {/* Metric Type Selector Bar (Visits vs Clicks vs Combined) */}
+              <div className="analytics-metric-bar" style={{ display: 'flex', gap: '8px', margin: '14px 0 10px' }}>
+                {[
+                  { id: 'combined', label: '📊 All Engagement (Visits + Clicks)' },
+                  { id: 'visits', label: '👁️ Page Visits Only' },
+                  { id: 'clicks', label: '🖱️ Feature Clicks Only' }
+                ].map(({ id, label }) => (
+                  <button
+                    key={id}
+                    className={`btn-metric-type ${analyticsMetric === id ? 'active' : ''}`}
+                    onClick={() => setAnalyticsMetric(id)}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: '8px',
+                      fontSize: '0.8rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      border: '1.5px solid var(--border)',
+                      backgroundColor: analyticsMetric === id ? 'var(--accent)' : 'var(--bg)',
+                      color: analyticsMetric === id ? '#ffffff' : 'var(--ink-dim)',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
               {/* Interactive Series Legend Toggles */}
               <div className="graph-legend-toggles">
-                {[
-                  { key: 'total', label: 'All Platform Views', color: '#eab308' },
-                  { key: 'home', label: 'Home Dashboard', color: '#3b82f6' },
-                  { key: 'timetable', label: 'Timetable', color: '#8b5cf6' },
-                  { key: 'find-prof', label: 'Find My Professor', color: '#10b981' },
-                  { key: 'waiver', label: 'Waiver Tool', color: '#06b6d4' },
-                  { key: 'gpa', label: 'GPA Calculator', color: '#f59e0b' },
-                  { key: 'buzz', label: 'Campus Buzz', color: '#ec4899' },
-                  { key: 'profile', label: 'Profile Page', color: '#14b8a6' },
-                  { key: 'admin', label: 'Admin Console', color: '#f43f5e' }
-                ].map(({ key, label, color }) => {
-                  const count = key === 'total'
-                    ? (analyticsSummary.totals.grandTotal || 0)
-                    : (analyticsSummary.totals[key] ?? 0);
-                  return (
-                    <button
-                      key={key}
-                      className={`legend-toggle-item ${enabledSeries[key] ? 'active' : 'disabled'}`}
-                      onClick={() => toggleSeries(key)}
-                    >
-                      <span className="legend-dot" style={{ backgroundColor: color }}></span>
-                      <span className="legend-name">{label}</span>
-                      <span className="legend-count">({count})</span>
-                    </button>
-                  );
-                })}
+                {(() => {
+                  const activeMetricObj = analyticsSummary[analyticsMetric] || analyticsSummary.combined || analyticsSummary;
+                  const activeTotals = activeMetricObj.totals || analyticsSummary.totals;
+
+                  return [
+                    { key: 'total', label: 'All Platform Views', color: '#eab308' },
+                    { key: 'home', label: 'Home Dashboard', color: '#3b82f6' },
+                    { key: 'timetable', label: 'Timetable', color: '#8b5cf6' },
+                    { key: 'find-prof', label: 'Find My Professor', color: '#10b981' },
+                    { key: 'waiver', label: 'Waiver Tool', color: '#06b6d4' },
+                    { key: 'gpa', label: 'GPA Calculator', color: '#f59e0b' },
+                    { key: 'buzz', label: 'Campus Buzz', color: '#ec4899' },
+                    { key: 'profile', label: 'Profile Page', color: '#14b8a6' },
+                    { key: 'admin', label: 'Admin Console', color: '#f43f5e' }
+                  ].map(({ key, label, color }) => {
+                    const count = key === 'total'
+                      ? (activeTotals.grandTotal || activeTotals.total || 0)
+                      : (activeTotals[key] ?? 0);
+                    return (
+                      <button
+                        key={key}
+                        className={`legend-toggle-item ${enabledSeries[key] ? 'active' : 'disabled'}`}
+                        onClick={() => toggleSeries(key)}
+                      >
+                        <span className="legend-dot" style={{ backgroundColor: color }}></span>
+                        <span className="legend-name">{label}</span>
+                        <span className="legend-count">({count})</span>
+                      </button>
+                    );
+                  });
+                })()}
               </div>
 
               {/* SVG Line Graph Render */}
               <div className="line-graph-wrapper">
                 {(() => {
-                  const { dateLabels, series } = analyticsSummary;
+                  const activeMetricObj = analyticsSummary[analyticsMetric] || analyticsSummary.combined || analyticsSummary;
+                  const series = activeMetricObj.series || analyticsSummary.series;
+                  const dateLabels = analyticsSummary.dateLabels || [];
                   if (!dateLabels || dateLabels.length === 0) return null;
 
                   const width = 800;
@@ -1962,13 +2001,76 @@ export default function AdminConsolePage({ onBack }) {
                         >
                           <span className="tooltip-date">{hoveredPoint.date}</span>
                           <span className="tooltip-val">
-                            <strong>{FEATURE_NAMES[hoveredPoint.seriesKey] || (hoveredPoint.seriesKey === 'total' ? 'All Platform Views' : hoveredPoint.seriesKey.toUpperCase())}</strong>: {hoveredPoint.val} views
+                            <strong>{FEATURE_NAMES[hoveredPoint.seriesKey] || (hoveredPoint.seriesKey === 'total' ? 'All Platform Views' : hoveredPoint.seriesKey.toUpperCase())}</strong>: {hoveredPoint.val} {analyticsMetric === 'clicks' ? 'clicks' : analyticsMetric === 'visits' ? 'visits' : 'events'}
                           </span>
                         </div>
                       )}
                     </div>
                   );
                 })()}
+              </div>
+
+              {/* Detailed Tool Analytics Breakdown Table */}
+              <div className="feature-breakdown-card" style={{ marginTop: '20px' }}>
+                <h4 style={{ margin: '0 0 10px', fontSize: '0.95rem', fontWeight: 800, color: 'var(--ink)' }}>
+                  📊 Detailed Tool Breakdown (Visits vs Clicks)
+                </h4>
+                <div className="table-responsive-admin">
+                  <table className="registry-table-admin feature-breakdown-table">
+                    <thead>
+                      <tr>
+                        <th>Feature / Tool</th>
+                        <th>👁️ Page Visits</th>
+                        <th>🖱️ Action Clicks</th>
+                        <th>⚡ Total Engagement</th>
+                        <th>Share %</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(() => {
+                        const vTotals = analyticsSummary.visits?.totals || {};
+                        const cTotals = analyticsSummary.clicks?.totals || {};
+                        const combTotals = analyticsSummary.combined?.totals || {};
+                        const grandTotal = combTotals.grandTotal || combTotals.total || 1;
+
+                        const toolsList = [
+                          { id: 'home', name: 'Home Dashboard' },
+                          { id: 'timetable', name: 'Timetable' },
+                          { id: 'find-prof', name: 'Find My Professor' },
+                          { id: 'waiver', name: 'Waiver Tool' },
+                          { id: 'gpa', name: 'GPA Calculator' },
+                          { id: 'buzz', name: 'Campus Buzz' },
+                          { id: 'profile', name: 'Profile Page' },
+                          { id: 'admin', name: 'Admin Console' }
+                        ];
+
+                        return toolsList.map(({ id, name }) => {
+                          const visits = vTotals[id] || 0;
+                          const clicks = cTotals[id] || 0;
+                          const total = combTotals[id] || (visits + clicks);
+                          const sharePct = grandTotal > 0 ? Math.round((total / grandTotal) * 100) : 0;
+
+                          return (
+                            <tr key={id}>
+                              <td><strong style={{ color: 'var(--ink)' }}>{name}</strong></td>
+                              <td><span className="metric-badge-visit">{visits} visits</span></td>
+                              <td><span className="metric-badge-click">{clicks} clicks</span></td>
+                              <td><span className="metric-badge-total">{total} total</span></td>
+                              <td>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <div style={{ flex: 1, height: '6px', background: 'var(--border)', borderRadius: '3px', overflow: 'hidden' }}>
+                                    <div style={{ height: '100%', width: `${sharePct}%`, background: 'var(--accent)', borderRadius: '3px' }}></div>
+                                  </div>
+                                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--ink-dim)' }}>{sharePct}%</span>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        });
+                      })()}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
 

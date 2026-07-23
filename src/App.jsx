@@ -1,6 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useAuth } from './context/AuthContext';
-import { logFeatureView, subscribeToPresence } from './lib/analytics';
+import { logFeatureView, logFeatureClick, subscribeToPresence } from './lib/analytics';
 import Auth from './components/Auth';
 import HomeDashboard from './components/HomeDashboard';
 import ProfilePage from './components/ProfilePage';
@@ -133,6 +133,7 @@ function App() {
   const isAdmin = isAdminEmail(user.email);
 
   const openTool = (id) => {
+    logFeatureClick(id, user);
     if (id === 'gpa') {
       setIsGpaOpen(true);
       return;

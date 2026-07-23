@@ -11,7 +11,7 @@ export const FEATURE_NAMES = {
   admin: 'Admin Console'
 };
 
-const LOCAL_ANALYTICS_KEY = 'sscbs_analytics_daily_v2';
+const LOCAL_ANALYTICS_KEY = 'sscbs_analytics_daily_v5';
 
 function getLocalAnalyticsMap() {
   try {
@@ -47,6 +47,8 @@ const presenceSubscribers = new Set();
 let latestPresenceMap = {};
 let presenceHeartbeatTimer = null;
 let dbPresencePollingTimer = null;
+let lastTrackedView = null;
+let lastTrackTime = 0;
 
 function broadcastPresenceToSubscribers() {
   const list = Object.values(latestPresenceMap);
@@ -56,11 +58,26 @@ function broadcastPresenceToSubscribers() {
 }
 
 function getPresencePayload() {
-  if (!globalCurrentUser || !globalCurrentUser.email) return null;
-
-  const userId = String(globalCurrentUser.id || globalCurrentUser.email || 'anon');
   const sessionId = getTabSessionId();
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+
+  if (!globalCurrentUser || !globalCurrentUser.email) {
+    return {
+      id: 'guest_' + sessionId,
+      session_id: sessionId,
+      name: 'Guest Student',
+      email: 'guest_' + sessionId.substring(0, 7) + '@sscbs.du.ac.in',
+      course: 'Visitor',
+      semester: 'N/A',
+      section: 'N/A',
+      currentView: globalCurrentView || 'home',
+      viewLabel: FEATURE_NAMES[globalCurrentView] || 'Home Dashboard',
+      device: isMobile ? '📱 Mobile' : '💻 Desktop',
+      lastPing: Date.now()
+    };
+  }
+
+  const userId = String(globalCurrentUser.id || globalCurrentUser.email || 'anon');
 
   return {
     id: userId,
@@ -109,26 +126,49 @@ function updateLocalAndState(remoteList = []) {
   try {
     const payload = getPresencePayload();
     const now = Date.now();
-    const raw = localStorage.getItem('sscbs_online_presence_v4');
-    let map = raw ? JSON.parse(raw) : {};
-    if (typeof map !== 'object' || !map) map = {};
-
-    if (payload) {
-      map[payload.session_id] = payload;
-    }
+    const merged = {};
 
     // 1. Local Storage active sessions (60s drift tolerance)
-    const cleanMap = {};
-    Object.keys(map).forEach(sid => {
-      if (Math.abs(now - (map[sid].lastPing || 0)) < 60000) {
-        cleanMap[sid] = map[sid];
+    const raw = localStorage.getItem('sscbs_online_presence_v5');
+    let localMap = raw ? JSON.parse(raw) : {};
+    if (typeof localMap !== 'object' || !localMap) localMap = {};
+
+    if (payload) {
+      localMap[payload.session_id] = payload;
+    }
+
+    const cleanLocalMap = {};
+    Object.keys(localMap).forEach(sid => {
+      if (Math.abs(now - (localMap[sid].lastPing || 0)) < 60000) {
+        cleanLocalMap[sid] = localMap[sid];
+        merged[sid] = localMap[sid];
       }
     });
-    localStorage.setItem('sscbs_online_presence_v4', JSON.stringify(cleanMap));
+    localStorage.setItem('sscbs_online_presence_v5', JSON.stringify(cleanLocalMap));
 
-    const merged = { ...cleanMap };
+    // 2. Extract active WebSocket presence from activePresenceChannel directly
+    if (activePresenceChannel && typeof activePresenceChannel.presenceState === 'function') {
+      try {
+        const state = activePresenceChannel.presenceState();
+        if (state) {
+          Object.values(state).forEach(presences => {
+            if (Array.isArray(presences)) {
+              presences.forEach(p => {
+                if (p && p.email) {
+                  const sid = p.session_id || p.id || p.email;
+                  merged[sid] = {
+                    ...p,
+                    lastPing: now
+                  };
+                }
+              });
+            }
+          });
+        }
+      } catch (e) {}
+    }
 
-    // 2. Merge active WebSocket presence
+    // 3. Merge active WebSocket presence list passed via events
     if (Array.isArray(remoteList)) {
       remoteList.forEach(item => {
         if (item && item.email) {
@@ -141,7 +181,7 @@ function updateLocalAndState(remoteList = []) {
       });
     }
 
-    // 3. Group by user email (1 active card per student showing latest page)
+    // 4. Group by user email (1 active presence card per student showing latest page)
     const userMap = {};
     Object.values(merged).forEach(p => {
       if (!p || !p.email) return;
@@ -156,7 +196,7 @@ function updateLocalAndState(remoteList = []) {
     latestPresenceMap = userMap;
     broadcastPresenceToSubscribers();
 
-    // 4. Asynchronously fetch DB presence rows in background without blocking
+    // 5. Asynchronously fetch DB presence rows in background without overwriting active WebSocket state
     if (hasValidCredentials) {
       fetchActivePresenceFromDB().then(dbList => {
         if (Array.isArray(dbList) && dbList.length > 0) {
@@ -179,9 +219,6 @@ function updateLocalAndState(remoteList = []) {
   }
 }
 
-let lastTrackedView = null;
-let lastTrackTime = 0;
-
 function sendPresencePing() {
   const payload = getPresencePayload();
   if (!payload) return;
@@ -189,7 +226,7 @@ function sendPresencePing() {
   // 1. Immediate local memory & storage update
   updateLocalAndState([]);
 
-  // 2. Track over WebSocket ONLY on view change or every 25 seconds (prevents socket drops)
+  // 2. Track over WebSocket ONLY on view change or every 25 seconds
   const now = Date.now();
   if (hasValidCredentials && activePresenceChannel) {
     if (lastTrackedView !== payload.currentView || (now - lastTrackTime) > 25000) {
@@ -222,14 +259,12 @@ function sendPresencePing() {
 }
 
 function initGlobalPresenceTracker() {
-  // Start heartbeat interval every 1000ms (1 second)
   if (!presenceHeartbeatTimer) {
     presenceHeartbeatTimer = setInterval(() => {
       sendPresencePing();
     }, 1000);
   }
 
-  // Start DB polling interval every 1000ms (1 second)
   if (!dbPresencePollingTimer) {
     dbPresencePollingTimer = setInterval(() => {
       updateLocalAndState([]);
@@ -240,7 +275,7 @@ function initGlobalPresenceTracker() {
   if (hasValidCredentials && !activePresenceChannel) {
     try {
       const sid = getTabSessionId();
-      activePresenceChannel = supabase.channel('sscbs-online-presence-v6', {
+      activePresenceChannel = supabase.channel('sscbs-online-presence-v7', {
         config: { presence: { key: sid } }
       });
 
@@ -276,16 +311,7 @@ function initGlobalPresenceTracker() {
   }
 }
 
-/**
- * 🟢 Real-Time Presence Subscription via Supabase WebSockets, Database & Tab Sync
- * Pure, 100% real-time tracker for actual connected users
- */
 export function subscribeToPresence(user, currentView, onPresenceSync) {
-  if (!user || !user.email) {
-    if (onPresenceSync) onPresenceSync([]);
-    return () => {};
-  }
-
   if (user && user.email) {
     globalCurrentUser = user;
   }
@@ -308,10 +334,6 @@ export function subscribeToPresence(user, currentView, onPresenceSync) {
   };
 }
 
-/**
- * 📊 Log a real feature view/launch or click event to local storage & Supabase
- * Completely non-blocking and safe
- */
 export async function logFeatureView(featureId, user, eventType = 'visit') {
   if (!featureId) return;
 
@@ -321,23 +343,29 @@ export async function logFeatureView(featureId, user, eventType = 'visit') {
   try {
     const localMap = getLocalAnalyticsMap();
     if (!localMap[dateStr]) {
-      localMap[dateStr] = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, total: 0 };
+      localMap[dateStr] = {
+        visits: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, total: 0 },
+        clicks: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, total: 0 }
+      };
     }
-    localMap[dateStr][featureId] = (localMap[dateStr][featureId] || 0) + 1;
-    localMap[dateStr].total = (localMap[dateStr].total || 0) + 1;
+    const typeKey = eventType === 'click' ? 'clicks' : 'visits';
+    if (!localMap[dateStr][typeKey]) {
+      localMap[dateStr][typeKey] = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, total: 0 };
+    }
+    localMap[dateStr][typeKey][featureId] = (localMap[dateStr][typeKey][featureId] || 0) + 1;
+    localMap[dateStr][typeKey].total = (localMap[dateStr][typeKey].total || 0) + 1;
     saveLocalAnalyticsMap(localMap);
   } catch (e) {
     // Non-blocking
   }
 
-  // 2. Attempt remote Supabase insertion if configured and user logged in
-  if (hasValidCredentials && user) {
+  // 2. Attempt remote Supabase insertion if configured
+  if (hasValidCredentials) {
     try {
-      // Safely attempt logging individual event row to analytics_events table with event_type
       supabase
         .from('analytics_events')
         .insert([{
-          user_id: user.id || null,
+          user_id: user?.id || null,
           feature_id: featureId,
           event_type: eventType,
           created_at: new Date().toISOString()
@@ -345,24 +373,30 @@ export async function logFeatureView(featureId, user, eventType = 'visit') {
         .then(() => {})
         .catch(() => {});
 
-      // Safely attempt updating aggregate system_configs key
       supabase
         .from('system_configs')
         .select('value')
-        .eq('key', 'analytics_events_daily')
+        .eq('key', 'analytics_events_v2')
         .maybeSingle()
         .then(async ({ data }) => {
           let eventsMap = data?.value || {};
           if (typeof eventsMap !== 'object' || !eventsMap) eventsMap = {};
           if (!eventsMap[dateStr]) {
-            eventsMap[dateStr] = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, total: 0 };
+            eventsMap[dateStr] = {
+              visits: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, total: 0 },
+              clicks: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, total: 0 }
+            };
+          }
+          const typeKey = eventType === 'click' ? 'clicks' : 'visits';
+          if (!eventsMap[dateStr][typeKey]) {
+            eventsMap[dateStr][typeKey] = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, total: 0 };
           }
 
-          eventsMap[dateStr][featureId] = (eventsMap[dateStr][featureId] || 0) + 1;
-          eventsMap[dateStr].total = (eventsMap[dateStr].total || 0) + 1;
+          eventsMap[dateStr][typeKey][featureId] = (eventsMap[dateStr][typeKey][featureId] || 0) + 1;
+          eventsMap[dateStr][typeKey].total = (eventsMap[dateStr][typeKey].total || 0) + 1;
 
           await supabase.from('system_configs').upsert({
-            key: 'analytics_events_daily',
+            key: 'analytics_events_v2',
             value: eventsMap,
             updated_at: new Date().toISOString()
           }).catch(() => {});
@@ -375,12 +409,22 @@ export async function logFeatureView(featureId, user, eventType = 'visit') {
 }
 
 /**
+ * 🖱️ Log a feature click action
+ */
+export async function logFeatureClick(featureId, user) {
+  return logFeatureView(featureId, user, 'click');
+}
+
+/**
  * 📈 Fetch REAL analytics data combining Supabase DB events, system_configs, and local logs
- * NO DEMO / SEED CURVES. 100% REAL RECORDED DATA.
  */
 export async function fetchAnalyticsData(daysCount = 7) {
   const dateList = [];
-  const dateMap = {};
+  const emptyFeatureSet = () => ({ home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, total: 0 });
+
+  const dateMapVisits = {};
+  const dateMapClicks = {};
+  const dateMapCombined = {};
   const now = new Date();
 
   for (let i = daysCount - 1; i >= 0; i--) {
@@ -389,17 +433,9 @@ export async function fetchAnalyticsData(daysCount = 7) {
     const dateStr = d.toISOString().split('T')[0];
     const monthDay = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     dateList.push({ dateStr, label: monthDay });
-    dateMap[dateStr] = {
-      home: 0,
-      timetable: 0,
-      'find-prof': 0,
-      waiver: 0,
-      gpa: 0,
-      buzz: 0,
-      profile: 0,
-      admin: 0,
-      total: 0
-    };
+    dateMapVisits[dateStr] = emptyFeatureSet();
+    dateMapClicks[dateStr] = emptyFeatureSet();
+    dateMapCombined[dateStr] = emptyFeatureSet();
   }
 
   // A. Load from LocalStorage
@@ -407,26 +443,23 @@ export async function fetchAnalyticsData(daysCount = 7) {
   dateList.forEach(({ dateStr }) => {
     if (localMap[dateStr]) {
       const day = localMap[dateStr];
-      dateMap[dateStr].home += Number(day.home) || 0;
-      dateMap[dateStr].timetable += Number(day.timetable) || 0;
-      dateMap[dateStr]['find-prof'] += Number(day['find-prof']) || 0;
-      dateMap[dateStr].waiver += Number(day.waiver) || 0;
-      dateMap[dateStr].gpa += Number(day.gpa) || 0;
-      dateMap[dateStr].buzz += Number(day.buzz) || 0;
-      dateMap[dateStr].profile += Number(day.profile) || 0;
-      dateMap[dateStr].admin += Number(day.admin) || 0;
-      dateMap[dateStr].total += Number(day.total) || 0;
+      const v = day.visits || day;
+      const c = day.clicks || {};
+
+      Object.keys(dateMapVisits[dateStr]).forEach(feat => {
+        dateMapVisits[dateStr][feat] += Number(v[feat]) || 0;
+        dateMapClicks[dateStr][feat] += Number(c[feat]) || 0;
+      });
     }
   });
 
   // B. Load from Supabase system_configs or analytics_events
   if (hasValidCredentials) {
     try {
-      // B1. Check aggregate system_configs
       const { data } = await supabase
         .from('system_configs')
         .select('value')
-        .eq('key', 'analytics_events_daily')
+        .eq('key', 'analytics_events_v2')
         .maybeSingle();
 
       if (data?.value && typeof data.value === 'object') {
@@ -434,36 +467,36 @@ export async function fetchAnalyticsData(daysCount = 7) {
         dateList.forEach(({ dateStr }) => {
           if (eventsMap[dateStr]) {
             const day = eventsMap[dateStr];
-            dateMap[dateStr].home = Math.max(dateMap[dateStr].home, Number(day.home) || 0);
-            dateMap[dateStr].timetable = Math.max(dateMap[dateStr].timetable, Number(day.timetable) || 0);
-            dateMap[dateStr]['find-prof'] = Math.max(dateMap[dateStr]['find-prof'], Number(day['find-prof']) || 0);
-            dateMap[dateStr].waiver = Math.max(dateMap[dateStr].waiver, Number(day.waiver) || 0);
-            dateMap[dateStr].gpa = Math.max(dateMap[dateStr].gpa, Number(day.gpa) || 0);
-            dateMap[dateStr].buzz = Math.max(dateMap[dateStr].buzz, Number(day.buzz) || 0);
-            dateMap[dateStr].profile = Math.max(dateMap[dateStr].profile, Number(day.profile) || 0);
-            dateMap[dateStr].admin = Math.max(dateMap[dateStr].admin, Number(day.admin) || 0);
-            dateMap[dateStr].total = Math.max(dateMap[dateStr].total, Number(day.total) || 0);
+            const v = day.visits || day;
+            const c = day.clicks || {};
+
+            Object.keys(dateMapVisits[dateStr]).forEach(feat => {
+              dateMapVisits[dateStr][feat] = Math.max(dateMapVisits[dateStr][feat], Number(v[feat]) || 0);
+              dateMapClicks[dateStr][feat] = Math.max(dateMapClicks[dateStr][feat], Number(c[feat]) || 0);
+            });
           }
         });
       }
 
-      // B2. Query analytics_events table directly if populated
+      // Query analytics_events table directly
       const startDateStr = dateList[0]?.dateStr;
       if (startDateStr) {
         const { data: dbEvents } = await supabase
           .from('analytics_events')
-          .select('feature_id, created_at')
+          .select('feature_id, event_type, created_at')
           .gte('created_at', `${startDateStr}T00:00:00.000Z`);
 
         if (Array.isArray(dbEvents) && dbEvents.length > 0) {
           dbEvents.forEach(evt => {
             const evtDate = evt.created_at?.split('T')[0];
             const feat = evt.feature_id;
-            if (evtDate && dateMap[evtDate]) {
-              if (feat && dateMap[evtDate][feat] !== undefined) {
-                dateMap[evtDate][feat] += 1;
+            const type = evt.event_type === 'click' ? 'click' : 'visit';
+            if (evtDate && dateMapVisits[evtDate]) {
+              const targetMap = type === 'click' ? dateMapClicks[evtDate] : dateMapVisits[evtDate];
+              if (feat && targetMap[feat] !== undefined) {
+                targetMap[feat] += 1;
               }
-              dateMap[evtDate].total += 1;
+              targetMap.total += 1;
             }
           });
         }
@@ -473,47 +506,72 @@ export async function fetchAnalyticsData(daysCount = 7) {
     }
   }
 
-  // C. Calculate Totals
-  const totals = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, grandTotal: 0 };
+  // Calculate Combined DateMap & Totals
+  const totalsVisits = emptyFeatureSet();
+  const totalsClicks = emptyFeatureSet();
+  const totalsCombined = emptyFeatureSet();
 
   dateList.forEach(({ dateStr }) => {
-    const dayData = dateMap[dateStr];
-    const calculatedDayTotal = dayData.home + dayData.timetable + dayData['find-prof'] + dayData.waiver + dayData.gpa + dayData.buzz + dayData.profile + dayData.admin;
-    if (dayData.total < calculatedDayTotal) dayData.total = calculatedDayTotal;
+    const vDay = dateMapVisits[dateStr];
+    const cDay = dateMapClicks[dateStr];
+    const combDay = dateMapCombined[dateStr];
 
-    totals.home += dayData.home;
-    totals.timetable += dayData.timetable;
-    totals['find-prof'] += dayData['find-prof'];
-    totals.waiver += dayData.waiver;
-    totals.gpa += dayData.gpa;
-    totals.buzz += dayData.buzz;
-    totals.profile += dayData.profile;
-    totals.admin += dayData.admin;
-    totals.grandTotal += dayData.total;
+    const vSum = vDay.home + vDay.timetable + vDay['find-prof'] + vDay.waiver + vDay.gpa + vDay.buzz + vDay.profile + vDay.admin;
+    if (vDay.total < vSum) vDay.total = vSum;
+
+    const cSum = cDay.home + cDay.timetable + cDay['find-prof'] + cDay.waiver + cDay.gpa + cDay.buzz + cDay.profile + cDay.admin;
+    if (cDay.total < cSum) cDay.total = cSum;
+
+    Object.keys(combDay).forEach(feat => {
+      combDay[feat] = vDay[feat] + cDay[feat];
+    });
+
+    Object.keys(totalsVisits).forEach(feat => {
+      totalsVisits[feat] += vDay[feat];
+      totalsClicks[feat] += cDay[feat];
+      totalsCombined[feat] += combDay[feat];
+    });
   });
 
-  const series = {
-    home: dateList.map(d => dateMap[d.dateStr].home),
-    timetable: dateList.map(d => dateMap[d.dateStr].timetable),
-    'find-prof': dateList.map(d => dateMap[d.dateStr]['find-prof']),
-    waiver: dateList.map(d => dateMap[d.dateStr].waiver),
-    gpa: dateList.map(d => dateMap[d.dateStr].gpa),
-    buzz: dateList.map(d => dateMap[d.dateStr].buzz),
-    profile: dateList.map(d => dateMap[d.dateStr].profile),
-    admin: dateList.map(d => dateMap[d.dateStr].admin),
-    total: dateList.map(d => dateMap[d.dateStr].total)
+  const buildSeries = (dMap) => ({
+    home: dateList.map(d => dMap[d.dateStr].home),
+    timetable: dateList.map(d => dMap[d.dateStr].timetable),
+    'find-prof': dateList.map(d => dMap[d.dateStr]['find-prof']),
+    waiver: dateList.map(d => dMap[d.dateStr].waiver),
+    gpa: dateList.map(d => dMap[d.dateStr].gpa),
+    buzz: dateList.map(d => dMap[d.dateStr].buzz),
+    profile: dateList.map(d => dMap[d.dateStr].profile),
+    admin: dateList.map(d => dMap[d.dateStr].admin),
+    total: dateList.map(d => dMap[d.dateStr].total)
+  });
+
+  const visits = {
+    totals: { ...totalsVisits, grandTotal: totalsVisits.total },
+    series: buildSeries(dateMapVisits)
   };
 
-  const topKey = Object.keys(totals)
-    .filter(k => k !== 'grandTotal')
-    .sort((a, b) => totals[b] - totals[a])[0] || 'timetable';
+  const clicks = {
+    totals: { ...totalsClicks, grandTotal: totalsClicks.total },
+    series: buildSeries(dateMapClicks)
+  };
+
+  const combined = {
+    totals: { ...totalsCombined, grandTotal: totalsCombined.total },
+    series: buildSeries(dateMapCombined)
+  };
+
+  const topKey = Object.keys(totalsCombined)
+    .filter(k => k !== 'total')
+    .sort((a, b) => totalsCombined[b] - totalsCombined[a])[0] || 'timetable';
 
   return {
     dateLabels: dateList.map(d => d.label),
-    series,
-    totals,
+    visits,
+    clicks,
+    combined,
+    series: combined.series,
+    totals: combined.totals,
     topFeatureName: FEATURE_NAMES[topKey] || 'Timetable',
-    topFeatureCount: totals[topKey] || 0
+    topFeatureCount: totalsCombined[topKey] || 0
   };
 }
-
