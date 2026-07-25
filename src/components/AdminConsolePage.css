@@ -730,6 +730,39 @@
   margin-top: 0.5rem;
   border-top: 1px solid var(--border);
   padding-top: 0.5rem;
+  gap: 8px;
+}
+
+.notice-reorder-buttons {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.btn-reorder-notice {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  font-size: 0.75rem;
+  padding: 0.25rem 0.45rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-reorder-notice:hover:not(:disabled) {
+  background: var(--ink);
+  color: var(--surface);
+  border-color: var(--ink);
+}
+
+.btn-reorder-notice:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
 }
 
 .notice-item-date {

@@ -6,6 +6,15 @@ export default function NoticeBoard() {
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const sortNotices = (list) => {
+    return [...list].sort((a, b) => {
+      const orderA = a.display_order ?? 0;
+      const orderB = b.display_order ?? 0;
+      if (orderA !== orderB) return orderA - orderB;
+      return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+    });
+  };
+
   const getDefaultCampusNotices = () => [
     {
       id: '1',
@@ -14,6 +23,7 @@ export default function NoticeBoard() {
       society: 'Kronos',
       venue: 'Auditorium, SSCBS',
       link_url: 'https://hacksscbs.tech',
+      display_order: 1,
       created_at: new Date(Date.now() - 3600000 * 24).toISOString()
     },
     {
@@ -24,6 +34,7 @@ export default function NoticeBoard() {
       venue: 'Room 408 & 409',
       link_url: 'https://cdc.sscbs.du.ac.in',
       event_date: new Date(Date.now() + 3600000 * 24 * 3).toISOString(),
+      display_order: 2,
       created_at: new Date(Date.now() - 3600000 * 48).toISOString()
     },
     {
@@ -33,6 +44,7 @@ export default function NoticeBoard() {
       society: 'Macula',
       venue: 'Media Lab',
       event_date: new Date(Date.now() + 3600000 * 24 * 5).toISOString(),
+      display_order: 3,
       created_at: new Date(Date.now() - 3600000 * 72).toISOString()
     }
   ];
@@ -54,7 +66,7 @@ export default function NoticeBoard() {
     try {
       setLoading(true);
       if (!hasValidCredentials) {
-        setNotices(filterActiveNotices(getDefaultCampusNotices()));
+        setNotices(filterActiveNotices(sortNotices(getDefaultCampusNotices())));
         setLoading(false);
         return;
       }
@@ -62,17 +74,18 @@ export default function NoticeBoard() {
       const { data, error } = await supabase
         .from('notices')
         .select('*')
+        .order('display_order', { ascending: true })
         .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error loading notices from Supabase:', error);
-        setNotices(filterActiveNotices(getDefaultCampusNotices()));
+        setNotices(filterActiveNotices(sortNotices(getDefaultCampusNotices())));
       } else {
-        setNotices(filterActiveNotices(data || []));
+        setNotices(filterActiveNotices(sortNotices(data || [])));
       }
     } catch (err) {
       console.error('Failed to fetch notices:', err);
-      setNotices(filterActiveNotices(getDefaultCampusNotices()));
+      setNotices(filterActiveNotices(sortNotices(getDefaultCampusNotices())));
     } finally {
       setLoading(false);
     }

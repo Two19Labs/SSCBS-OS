@@ -136,6 +136,7 @@ function AdminConsoleContent({ onBack }) {
       const { data, error } = await supabase
         .from('notices')
         .select('*')
+        .order('display_order', { ascending: true })
         .order('created_at', { ascending: false });
       if (error) {
         console.error('Error fetching admin notices:', error);
@@ -148,7 +149,13 @@ function AdminConsoleContent({ onBack }) {
           setSaveStatus({ type: 'error', message: error.message || 'Failed to load notices.' });
         }
       } else {
-        setNoticesList(data || []);
+        const sorted = (data || []).sort((a, b) => {
+          const orderA = a.display_order ?? 0;
+          const orderB = b.display_order ?? 0;
+          if (orderA !== orderB) return orderA - orderB;
+          return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+        });
+        setNoticesList(sorted);
       }
     } catch (err) {
       console.error('Failed to load notices:', err);
@@ -162,6 +169,38 @@ function AdminConsoleContent({ onBack }) {
       }
     } finally {
       setLoadingNotices(false);
+    }
+  };
+
+  const handleReorderNotices = async (index, direction) => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= noticesList.length) return;
+
+    const newList = [...noticesList];
+    const temp = newList[index];
+    newList[index] = newList[targetIndex];
+    newList[targetIndex] = temp;
+
+    const updatedList = newList.map((item, idx) => ({
+      ...item,
+      display_order: idx
+    }));
+
+    setNoticesList(updatedList);
+
+    if (hasValidCredentials) {
+      try {
+        await Promise.all(
+          updatedList.map(item =>
+            supabase
+              .from('notices')
+              .update({ display_order: item.display_order })
+              .eq('id', item.id)
+          )
+        );
+      } catch (err) {
+        console.error('Failed to update notice display order in Supabase:', err);
+      }
     }
   };
 
@@ -189,6 +228,9 @@ function AdminConsoleContent({ onBack }) {
     setIsSaving(true);
     setSaveStatus({ type: '', message: '' });
     
+    const minOrder = noticesList.length > 0 ? Math.min(...noticesList.map(n => n.display_order ?? 0)) : 0;
+    const newDisplayOrder = minOrder - 1;
+
     try {
       if (!hasValidCredentials) {
         const newMockNotice = {
@@ -202,6 +244,7 @@ function AdminConsoleContent({ onBack }) {
           event_date: eventDateVal,
           active_from: activeFromVal,
           active_to: activeToVal,
+          display_order: newDisplayOrder,
           created_at: new Date().toISOString()
         };
         setNoticesList(prev => [newMockNotice, ...prev]);
@@ -222,7 +265,8 @@ function AdminConsoleContent({ onBack }) {
           link_url: noticeForm.link_url || null,
           event_date: eventDateVal,
           active_from: activeFromVal,
-          active_to: activeToVal
+          active_to: activeToVal,
+          display_order: newDisplayOrder
         }]);
 
       if (error) throw error;
@@ -1574,7 +1618,7 @@ function AdminConsoleContent({ onBack }) {
                   <div className="no-logs">No active notices found. Publish one to get started!</div>
                 ) : (
                   <div className="admin-notices-grid">
-                    {noticesList.map((notice) => {
+                    {noticesList.map((notice, index) => {
                       const getNoticeStatus = (n) => {
                         const now = new Date();
                         if (n.active_from && new Date(n.active_from) > now) {
@@ -1606,6 +1650,26 @@ function AdminConsoleContent({ onBack }) {
                           )}
 
                           <div className="notice-item-actions">
+                            <div className="notice-reorder-buttons">
+                              <button
+                                type="button"
+                                className="btn-reorder-notice"
+                                title="Move Up"
+                                disabled={index === 0 || isSaving}
+                                onClick={() => handleReorderNotices(index, 'up')}
+                              >
+                                ⬆️
+                              </button>
+                              <button
+                                type="button"
+                                className="btn-reorder-notice"
+                                title="Move Down"
+                                disabled={index === noticesList.length - 1 || isSaving}
+                                onClick={() => handleReorderNotices(index, 'down')}
+                              >
+                                ⬇️
+                              </button>
+                            </div>
                             <span className="notice-item-date">{new Date(notice.created_at).toLocaleDateString()}</span>
                             <button 
                               className="btn-delete-notice"
