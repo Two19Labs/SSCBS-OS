@@ -119,19 +119,20 @@ export default function NoticeBoard() {
           {notices.map(notice => (
             <div key={notice.id} className="notice-card">
               <div className="notice-card-header">
+                {notice.society ? (
+                  <div className="notice-society">
+                    <span className="society-avatar">
+                      {notice.society.charAt(0).toUpperCase()}
+                    </span>
+                    <span className="society-name">{notice.society}</span>
+                  </div>
+                ) : (
+                  <span className="notice-badge-announcement">ANNOUNCEMENT</span>
+                )}
                 <span className="notice-date">{formatDate(notice.created_at)}</span>
               </div>
               
               <h4 className="notice-title">{notice.title}</h4>
-              
-              {notice.society && (
-                <div className="notice-society">
-                  <span className="society-avatar">
-                    {notice.society.charAt(0).toUpperCase()}
-                  </span>
-                  <span className="society-name">{notice.society}</span>
-                </div>
-              )}
               
               {(notice.event_date || notice.venue) && (
                 <div className="notice-details-row">

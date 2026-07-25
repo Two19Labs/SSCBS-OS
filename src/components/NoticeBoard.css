@@ -168,18 +168,21 @@
 .notice-card {
   background: var(--surface);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 16px;
+  border-radius: 12px;
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.01);
+  gap: 12px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.015);
+  position: relative;
+  overflow: hidden;
 }
 
 .notice-card:hover {
-  border-color: var(--border-gold-glow);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  transform: translateY(-2px);
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
 }
 
 .notice-card-header {
@@ -187,48 +190,58 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  padding-bottom: 4px;
 }
 
-.category-tag {
+.notice-badge-announcement {
   font-size: 0.625rem;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0.8px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 2px 6px;
-  border-radius: 4px;
+  color: var(--text-dim);
+  background: rgba(0, 0, 0, 0.04);
+  padding: 3px 8px;
+  border-radius: 20px;
   border: 1px solid var(--border-color);
-  color: var(--text-main);
-  background: rgba(0, 0, 0, 0.03);
 }
 
 .notice-date {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
+  font-weight: 600;
   color: var(--text-dim);
   font-family: var(--mono);
+  background: rgba(0, 0, 0, 0.03);
+  padding: 2px 8px;
+  border-radius: 6px;
 }
 
 .notice-title {
   font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: 1.05rem;
+  font-weight: 800;
   color: var(--text-main);
   margin: 0;
   line-height: 1.35;
+  letter-spacing: -0.2px;
 }
 
 .notice-society {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
+  background: rgba(0, 0, 0, 0.03);
+  padding: 3px 10px 3px 4px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
 }
 
 .society-avatar {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: var(--ink);
   color: var(--surface);
-  font-size: 0.6rem;
+  font-size: 0.65rem;
   font-weight: 800;
   display: flex;
   align-items: center;
@@ -236,15 +249,15 @@
 }
 
 .society-name {
-  font-size: 0.725rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 700;
   color: var(--text-main);
 }
 
 .notice-content {
-  font-size: 0.8rem;
+  font-size: 0.825rem;
   color: var(--text-dim);
-  line-height: 1.45;
+  line-height: 1.5;
   margin: 0;
   word-break: break-word;
 }
@@ -255,7 +268,7 @@
   justify-content: flex-start;
 }
 
-/* Minimal Flat Button */
+/* Minimal Action Button */
 .btn-notice-action {
   display: inline-flex;
   align-items: center;
@@ -263,26 +276,28 @@
   background: var(--ink);
   border: 1px solid var(--ink);
   color: var(--surface);
-  font-size: 0.725rem;
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: 20px;
   text-decoration: none;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .btn-notice-action:hover {
-  background: var(--ink);
-  border-color: var(--ink);
+  background: #000000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  transform: translateY(-1px);
 }
 
 .arrow-icon {
-  transition: transform 0.15s ease;
+  transition: transform 0.2s ease;
 }
 
 .btn-notice-action:hover .arrow-icon {
-  transform: translate(1px, -1px);
+  transform: translate(2px, -2px);
 }
 
 .notice-details-row {
@@ -290,7 +305,6 @@
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
-  margin-top: 2px;
 }
 
 /* Event/Session Date Time & Venue Badges */
@@ -299,21 +313,21 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(0, 0, 0, 0.03);
+  background: rgba(0, 0, 0, 0.025);
   border: 1px solid var(--border-color);
-  padding: 6px 10px;
-  border-radius: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
   width: fit-content;
 }
 
 .event-time-icon,
 .venue-icon {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
 }
 
 .event-time-value,
 .venue-value {
-  font-size: 0.75rem;
+  font-size: 0.775rem;
   font-weight: 600;
   color: var(--text-main);
 }
