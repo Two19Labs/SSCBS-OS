@@ -97,6 +97,7 @@ function AdminConsoleContent({ onBack }) {
     title: '',
     category: 'General',
     society: '',
+    venue: '',
     content: '',
     link_url: '',
     event_date: '',
@@ -196,6 +197,7 @@ function AdminConsoleContent({ onBack }) {
           content: noticeForm.content,
           category: noticeForm.category,
           society: noticeForm.society || null,
+          venue: noticeForm.venue || null,
           link_url: noticeForm.link_url || null,
           event_date: eventDateVal,
           active_from: activeFromVal,
@@ -204,7 +206,7 @@ function AdminConsoleContent({ onBack }) {
         };
         setNoticesList(prev => [newMockNotice, ...prev]);
         setSaveStatus({ type: 'success', message: 'Notice created successfully (local mock)!' });
-        setNoticeForm({ title: '', category: 'General', society: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
+        setNoticeForm({ title: '', category: 'General', society: '', venue: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
         setIsSaving(false);
         return;
       }
@@ -216,6 +218,7 @@ function AdminConsoleContent({ onBack }) {
           content: noticeForm.content,
           category: noticeForm.category || 'General',
           society: noticeForm.society || null,
+          venue: noticeForm.venue || null,
           link_url: noticeForm.link_url || null,
           event_date: eventDateVal,
           active_from: activeFromVal,
@@ -225,7 +228,7 @@ function AdminConsoleContent({ onBack }) {
       if (error) throw error;
       
       setSaveStatus({ type: 'success', message: 'Notice published successfully onto the Campus Notice Board!' });
-      setNoticeForm({ title: '', category: 'General', society: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
+      setNoticeForm({ title: '', category: 'General', society: '', venue: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
       fetchAdminNotices();
     } catch (err) {
       if (err.message && (err.message.includes('schema cache') || err.message.includes('does not exist') || err.code === '42P01')) {
@@ -1464,16 +1467,30 @@ function AdminConsoleContent({ onBack }) {
                   />
                 </div>
                 
-                <div className="form-item-admin">
-                  <label htmlFor="notice-society">Organising Society (Optional)</label>
-                  <input
-                    type="text"
-                    id="notice-society"
-                    placeholder="e.g. Kronos"
-                    value={noticeForm.society}
-                    onChange={(e) => setNoticeForm(prev => ({ ...prev, society: e.target.value }))}
-                    className="admin-input-field"
-                  />
+                <div className="form-row-admin">
+                  <div className="form-item-admin flex-1">
+                    <label htmlFor="notice-society">Organising Society (Optional)</label>
+                    <input
+                      type="text"
+                      id="notice-society"
+                      placeholder="e.g. Kronos"
+                      value={noticeForm.society}
+                      onChange={(e) => setNoticeForm(prev => ({ ...prev, society: e.target.value }))}
+                      className="admin-input-field"
+                    />
+                  </div>
+                  
+                  <div className="form-item-admin flex-1">
+                    <label htmlFor="notice-venue">Venue / Location (Optional)</label>
+                    <input
+                      type="text"
+                      id="notice-venue"
+                      placeholder="e.g. Auditorium / Room 408 / Online"
+                      value={noticeForm.venue}
+                      onChange={(e) => setNoticeForm(prev => ({ ...prev, venue: e.target.value }))}
+                      className="admin-input-field"
+                    />
+                  </div>
                 </div>
 
                 <div className="form-item-admin">
@@ -1579,9 +1596,10 @@ function AdminConsoleContent({ onBack }) {
                           <h4 className="notice-item-title">{notice.title}</h4>
                           <p className="notice-item-desc">{notice.content.substring(0, 80)}{notice.content.length > 80 ? '...' : ''}</p>
                           
-                          {(notice.event_date || notice.active_from || notice.active_to) && (
+                          {(notice.event_date || notice.venue || notice.active_from || notice.active_to) && (
                             <div className="notice-item-schedule-info">
                               {notice.event_date && <div style={{ color: '#000000', fontWeight: 'bold' }}>📅 Event: {new Date(notice.event_date).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>}
+                              {notice.venue && <div style={{ color: '#000000' }}>📍 Venue: {notice.venue}</div>}
                               {notice.active_from && <div>🟢 Start: {new Date(notice.active_from).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>}
                               {notice.active_to && <div>🔴 Expire: {new Date(notice.active_to).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>}
                             </div>

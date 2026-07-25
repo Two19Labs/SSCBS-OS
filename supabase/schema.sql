@@ -111,6 +111,7 @@ CREATE TABLE IF NOT EXISTS public.notices (
     content TEXT NOT NULL,
     category TEXT NOT NULL,     -- 'Society', 'Session', 'Event', 'Academic'
     society TEXT,               -- e.g. 'Kronos', 'Macula' (Optional)
+    venue TEXT,                 -- e.g. 'Auditorium', 'Room 408' (Optional)
     link_url TEXT,              -- Registration link (Optional)
     event_date TIMESTAMP WITH TIME ZONE,  -- Event/Session date and time (Optional)
     active_from TIMESTAMP WITH TIME ZONE, -- Display notice start date (Optional)
@@ -118,6 +119,9 @@ CREATE TABLE IF NOT EXISTS public.notices (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL
 );
+
+-- Migration statement if table already exists:
+ALTER TABLE public.notices ADD COLUMN IF NOT EXISTS venue TEXT;
 
 -- Enable Row Level Security (RLS)
 ALTER TABLE public.notices ENABLE ROW LEVEL SECURITY;

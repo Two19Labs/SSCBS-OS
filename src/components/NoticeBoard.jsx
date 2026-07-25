@@ -12,6 +12,7 @@ export default function NoticeBoard() {
       title: 'HackSSCBS 2026 Registration Open',
       content: 'Register for the premier hackathon of SSCBS. Open to all students. Cash prizes up for grabs!',
       society: 'Kronos',
+      venue: 'Auditorium, SSCBS',
       link_url: 'https://hacksscbs.tech',
       created_at: new Date(Date.now() - 3600000 * 24).toISOString()
     },
@@ -20,6 +21,7 @@ export default function NoticeBoard() {
       title: 'Mock Placement Drive',
       content: 'Get corporate-ready with our mock group discussions and personal interviews. Compulsory for 3rd years.',
       society: 'Career Development Centre',
+      venue: 'Room 408 & 409',
       link_url: 'https://cdc.sscbs.du.ac.in',
       event_date: new Date(Date.now() + 3600000 * 24 * 3).toISOString(),
       created_at: new Date(Date.now() - 3600000 * 48).toISOString()
@@ -29,6 +31,7 @@ export default function NoticeBoard() {
       title: 'Introductory Photography Workshop',
       content: 'Learn camera exposure, composition rules, and editing basics from industry mentors.',
       society: 'Macula',
+      venue: 'Media Lab',
       event_date: new Date(Date.now() + 3600000 * 24 * 5).toISOString(),
       created_at: new Date(Date.now() - 3600000 * 72).toISOString()
     }
@@ -149,10 +152,20 @@ export default function NoticeBoard() {
                 </div>
               )}
               
-              {notice.event_date && (
-                <div className="notice-event-time">
-                  <span className="event-time-icon">📅</span>
-                  <span className="event-time-value">{formatEventDate(notice.event_date)}</span>
+              {(notice.event_date || notice.venue) && (
+                <div className="notice-details-row">
+                  {notice.event_date && (
+                    <div className="notice-event-time">
+                      <span className="event-time-icon">📅</span>
+                      <span className="event-time-value">{formatEventDate(notice.event_date)}</span>
+                    </div>
+                  )}
+                  {notice.venue && (
+                    <div className="notice-venue">
+                      <span className="venue-icon">📍</span>
+                      <span className="venue-value">{notice.venue}</span>
+                    </div>
+                  )}
                 </div>
               )}
               
