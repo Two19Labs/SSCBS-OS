@@ -2,19 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import './NoticeBoard.css';
 
-const CATEGORIES = ['All', 'Event', 'Session', 'Society', 'Academic'];
-
 export default function NoticeBoard() {
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState('All');
 
   const getDefaultCampusNotices = () => [
     {
       id: '1',
       title: 'HackSSCBS 2026 Registration Open',
       content: 'Register for the premier hackathon of SSCBS. Open to all students. Cash prizes up for grabs!',
-      category: 'Event',
       society: 'Kronos',
       link_url: 'https://hacksscbs.tech',
       created_at: new Date(Date.now() - 3600000 * 24).toISOString()
@@ -23,7 +19,6 @@ export default function NoticeBoard() {
       id: '2',
       title: 'Mock Placement Drive',
       content: 'Get corporate-ready with our mock group discussions and personal interviews. Compulsory for 3rd years.',
-      category: 'Session',
       society: 'Career Development Centre',
       link_url: 'https://cdc.sscbs.du.ac.in',
       event_date: new Date(Date.now() + 3600000 * 24 * 3).toISOString(),
@@ -33,7 +28,6 @@ export default function NoticeBoard() {
       id: '3',
       title: 'Introductory Photography Workshop',
       content: 'Learn camera exposure, composition rules, and editing basics from industry mentors.',
-      category: 'Society',
       society: 'Macula',
       event_date: new Date(Date.now() + 3600000 * 24 * 5).toISOString(),
       created_at: new Date(Date.now() - 3600000 * 72).toISOString()
@@ -99,11 +93,6 @@ export default function NoticeBoard() {
     }
   }, []);
 
-  const getFilteredNotices = () => {
-    if (activeFilter === 'All') return notices;
-    return notices.filter(n => n.category.toLowerCase() === activeFilter.toLowerCase());
-  };
-
   const formatDate = (isoString) => {
     const d = new Date(isoString);
     return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -127,20 +116,7 @@ export default function NoticeBoard() {
       <div className="notice-board-header">
         <div className="title-area">
           <h3>Campus Buzz & Notice Board</h3>
-          <p className="notice-board-subtitle">Stay updated with the latest events, society sessions, and activities across SSCBS.</p>
-        </div>
-        
-        {/* Category Filters */}
-        <div className="notice-filters">
-          {CATEGORIES.map(category => (
-            <button
-              key={category}
-              className={`filter-badge ${activeFilter === category ? 'active' : ''}`}
-              onClick={() => setActiveFilter(category)}
-            >
-              {category}
-            </button>
-          ))}
+          <p className="notice-board-subtitle">Stay updated with the latest notices and activities across SSCBS.</p>
         </div>
       </div>
 
@@ -149,19 +125,16 @@ export default function NoticeBoard() {
           <span className="notice-spinner"></span>
           <p>Fetching campus notices...</p>
         </div>
-      ) : getFilteredNotices().length === 0 ? (
+      ) : notices.length === 0 ? (
         <div className="notice-board-empty">
           <div className="empty-icon">📢</div>
-          <p>No notices found in this category.</p>
+          <p>No notices found.</p>
         </div>
       ) : (
         <div className="notice-grid">
-          {getFilteredNotices().map(notice => (
-            <div key={notice.id} className={`notice-card category-${notice.category.toLowerCase()}`}>
+          {notices.map(notice => (
+            <div key={notice.id} className="notice-card">
               <div className="notice-card-header">
-                <span className={`category-tag tag-${notice.category.toLowerCase()}`}>
-                  {notice.category}
-                </span>
                 <span className="notice-date">{formatDate(notice.created_at)}</span>
               </div>
               

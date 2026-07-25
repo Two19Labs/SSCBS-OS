@@ -95,7 +95,7 @@ function AdminConsoleContent({ onBack }) {
   const [loadingNotices, setLoadingNotices] = useState(false);
   const [noticeForm, setNoticeForm] = useState({
     title: '',
-    category: 'Event',
+    category: 'General',
     society: '',
     content: '',
     link_url: '',
@@ -204,7 +204,7 @@ function AdminConsoleContent({ onBack }) {
         };
         setNoticesList(prev => [newMockNotice, ...prev]);
         setSaveStatus({ type: 'success', message: 'Notice created successfully (local mock)!' });
-        setNoticeForm({ title: '', category: 'Event', society: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
+        setNoticeForm({ title: '', category: 'General', society: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
         setIsSaving(false);
         return;
       }
@@ -214,7 +214,7 @@ function AdminConsoleContent({ onBack }) {
         .insert([{
           title: noticeForm.title,
           content: noticeForm.content,
-          category: noticeForm.category,
+          category: noticeForm.category || 'General',
           society: noticeForm.society || null,
           link_url: noticeForm.link_url || null,
           event_date: eventDateVal,
@@ -225,7 +225,7 @@ function AdminConsoleContent({ onBack }) {
       if (error) throw error;
       
       setSaveStatus({ type: 'success', message: 'Notice published successfully onto the Campus Notice Board!' });
-      setNoticeForm({ title: '', category: 'Event', society: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
+      setNoticeForm({ title: '', category: 'General', society: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
       fetchAdminNotices();
     } catch (err) {
       if (err.message && (err.message.includes('schema cache') || err.message.includes('does not exist') || err.code === '42P01')) {
@@ -1464,33 +1464,16 @@ function AdminConsoleContent({ onBack }) {
                   />
                 </div>
                 
-                <div className="form-row-admin">
-                  <div className="form-item-admin flex-1">
-                    <label htmlFor="notice-category">Category</label>
-                    <select
-                      id="notice-category"
-                      value={noticeForm.category}
-                      onChange={(e) => setNoticeForm(prev => ({ ...prev, category: e.target.value }))}
-                      className="admin-select"
-                    >
-                      <option value="Event">Event</option>
-                      <option value="Session">Session</option>
-                      <option value="Society">Society</option>
-                      <option value="Academic">Academic</option>
-                    </select>
-                  </div>
-                  
-                  <div className="form-item-admin flex-1">
-                    <label htmlFor="notice-society">Organising Society</label>
-                    <input
-                      type="text"
-                      id="notice-society"
-                      placeholder="e.g. Kronos (Optional)"
-                      value={noticeForm.society}
-                      onChange={(e) => setNoticeForm(prev => ({ ...prev, society: e.target.value }))}
-                      className="admin-input-field"
-                    />
-                  </div>
+                <div className="form-item-admin">
+                  <label htmlFor="notice-society">Organising Society (Optional)</label>
+                  <input
+                    type="text"
+                    id="notice-society"
+                    placeholder="e.g. Kronos"
+                    value={noticeForm.society}
+                    onChange={(e) => setNoticeForm(prev => ({ ...prev, society: e.target.value }))}
+                    className="admin-input-field"
+                  />
                 </div>
 
                 <div className="form-item-admin">
@@ -1590,7 +1573,6 @@ function AdminConsoleContent({ onBack }) {
                       return (
                         <div key={notice.id} className="admin-notice-item">
                           <div className="notice-item-meta">
-                            <span className={`category-tag tag-${notice.category.toLowerCase()}`}>{notice.category}</span>
                             {notice.society && <span className="notice-item-society">@{notice.society}</span>}
                             <span className={`admin-status-badge ${status.class}`}>{status.label}</span>
                           </div>
