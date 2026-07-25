@@ -299,3 +299,17 @@
   text-underline-offset: 3px;
   font-weight: 600;
 }
+
+/* Disclaimer on Live Card */
+.live-card-disclaimer {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+  font-size: 11px;
+  color: var(--ink-dim);
+  line-height: 1.4;
+}
+

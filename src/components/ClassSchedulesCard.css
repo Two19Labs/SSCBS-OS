@@ -1420,3 +1420,23 @@
     gap: 10px;
   }
 }
+
+/* Schedule Disclaimer Note */
+.schedule-disclaimer-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--bg-hover, rgba(0, 0, 0, 0.025));
+  border: 1px dashed var(--border-color);
+  border-radius: 8px;
+  font-size: 0.76rem;
+  color: var(--text-dim);
+  line-height: 1.45;
+  margin-top: 4px;
+}
+
+.schedule-disclaimer-note strong {
+  color: var(--text-main);
+}
+

@@ -380,6 +380,17 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
               </div>
             )}
             
+            {/* Disclaimer Note */}
+            <div className="schedule-disclaimer-note">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2" fill="none" style={{ flexShrink: 0, marginTop: '2px' }}>
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+              </svg>
+              <span>
+                <strong>Note:</strong> Uses the latest official schedule sent by college via email. This is NOT real-time tracking — classes are subject to change or cancellation at the discretion of professors.
+              </span>
+            </div>
           </div>
 
           {/* Time Warp Testing Debugger — admins only, toggled from Profile */}
@@ -664,7 +675,14 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
             </div>
             
             <footer className="weekly-modal-footer">
-              <span className="break-info-note">☕ Note: Infinity Hour break takes place daily between 12:00 PM and 1:00 PM.</span>
+              <span className="break-info-note">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" strokeWidth="2" fill="none" style={{ flexShrink: 0, verticalAlign: 'middle', marginRight: '5px' }}>
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="16" x2="12" y2="12" />
+                  <line x1="12" y1="8" x2="12.01" y2="8" />
+                </svg>
+                Uses latest college email schedule (NOT real-time tracking; subject to professor changes/cancellation). Infinity Hour break: 12:00 PM – 1:00 PM.
+              </span>
               <button className="btn-close-modal" onClick={() => setShowWeeklyModal(false)}>Close View</button>
             </footer>
           </div>

@@ -103,12 +103,24 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
       );
     }
 
+    const renderLiveDisclaimer = () => (
+      <div className="live-card-disclaimer">
+        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2" fill="none" style={{ flexShrink: 0, marginTop: '2px' }}>
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="16" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12.01" y2="8" />
+        </svg>
+        <span>Uses latest schedule sent via college email (NOT real-time tracking; subject to professor changes/cancellation).</span>
+      </div>
+    );
+
     if (isWeekend) {
       return (
         <div className="home-live-card">
           <span className="micro-label dim">WEEKEND</span>
           <div className="live-subject">No classes today</div>
           <div className="live-meta">Relax, catch up on projects, and enjoy your free time.</div>
+          {renderLiveDisclaimer()}
         </div>
       );
     }
@@ -138,6 +150,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
               <span className="live-next-time">{nextPeriod.startLabel}</span>
             </div>
           )}
+          {renderLiveDisclaimer()}
         </div>
       );
     }
@@ -160,6 +173,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
               <span className="live-next-time">{nextPeriod.startLabel}</span>
             </div>
           )}
+          {renderLiveDisclaimer()}
         </div>
       );
     }
@@ -182,6 +196,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
               <span className="live-next-time">{nextPeriod.startLabel}</span>
             </div>
           )}
+          {renderLiveDisclaimer()}
         </div>
       );
     }
@@ -199,6 +214,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
               .filter(Boolean)
               .join(' · ') || 'Starts soon'}
           </div>
+          {renderLiveDisclaimer()}
         </div>
       );
     }
@@ -208,6 +224,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
         <span className="micro-label dim">DONE FOR TODAY</span>
         <div className="live-subject">Classes completed</div>
         <div className="live-meta">All scheduled sessions for today have concluded. Have a great evening!</div>
+        {renderLiveDisclaimer()}
       </div>
     );
   };

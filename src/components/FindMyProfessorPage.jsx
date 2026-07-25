@@ -310,6 +310,18 @@ export default function FindMyProfessorPage({ onBack }) {
         </div>
       </div>
 
+      {/* Disclaimer Banner */}
+      <div className="prof-disclaimer-banner">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2" fill="none" style={{ flexShrink: 0, marginTop: '2px' }}>
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="16" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12.01" y2="8" />
+        </svg>
+        <span>
+          <strong>Note:</strong> Timetables reflect the latest schedule sent by college via email. This is NOT real-time tracking — classes and room allocations are subject to change or cancellation at the discretion of professors.
+        </span>
+      </div>
+
       {/* Main Spacious Dual Column Layout */}
       <div className="prof-page-layout">
         
