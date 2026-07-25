@@ -27,7 +27,9 @@
   width: 100%;
   max-width: 980px;
   height: 88vh;
+  height: 88dvh;
   max-height: 760px;
+  max-height: calc(88dvh - 32px);
   display: flex;
   flex-direction: column;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);

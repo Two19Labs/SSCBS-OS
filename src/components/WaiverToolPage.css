@@ -1241,6 +1241,25 @@
 }
 
 @media (max-width: 600px) {
+  .fullpage-navbar {
+    padding: 0.65rem 0.85rem;
+    gap: 8px;
+  }
+
+  .navbar-logo-text {
+    font-size: 0.95rem;
+  }
+
+  .navbar-portal-badge {
+    font-size: 0.68rem;
+    padding: 0.2rem 0.55rem;
+  }
+
+  .btn-back-portal {
+    padding: 0.4rem 0.65rem;
+    font-size: 0.78rem;
+  }
+
   .page-header-row {
     flex-direction: column;
     align-items: flex-start;
@@ -1257,16 +1276,25 @@
   }
 
   .selector-view-tabs {
+    display: flex;
     overflow-x: auto;
     white-space: nowrap;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 4px;
     border-bottom: 2px solid var(--border);
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+  }
+
+  .selector-view-tabs::-webkit-scrollbar {
+    display: none;
   }
   
   .selector-view-tabs .tab-btn {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8rem;
+    padding: 0.6rem 0.85rem;
+    font-size: 0.82rem;
+    scroll-snap-align: start;
+    min-height: 40px;
   }
 
   .calendar-legend-row {

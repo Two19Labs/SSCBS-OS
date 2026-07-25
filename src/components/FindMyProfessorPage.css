@@ -1069,7 +1069,10 @@
   }
 
   .sidebar-prof-list-wrapper {
-    max-height: calc(100vh - 280px) !important;
+    max-height: calc(100vh - 220px) !important;
+    max-height: calc(100dvh - 220px) !important;
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
   }
 
   .prof-page-content {
