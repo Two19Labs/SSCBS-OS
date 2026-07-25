@@ -116,12 +116,14 @@ CREATE TABLE IF NOT EXISTS public.notices (
     event_date TIMESTAMP WITH TIME ZONE,  -- Event/Session date and time (Optional)
     active_from TIMESTAMP WITH TIME ZONE, -- Display notice start date (Optional)
     active_to TIMESTAMP WITH TIME ZONE,   -- Display notice end date (Optional)
+    display_order INT DEFAULT 0,          -- Custom ordering index
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL
 );
 
--- Migration statement if table already exists:
+-- Migration statements if table already exists:
 ALTER TABLE public.notices ADD COLUMN IF NOT EXISTS venue TEXT;
+ALTER TABLE public.notices ADD COLUMN IF NOT EXISTS display_order INT DEFAULT 0;
 
 -- Enable Row Level Security (RLS)
 ALTER TABLE public.notices ENABLE ROW LEVEL SECURITY;

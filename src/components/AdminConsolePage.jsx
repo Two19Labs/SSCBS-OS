@@ -107,17 +107,7 @@ function AdminConsoleContent({ onBack }) {
 
   const fetchAdminNotices = async () => {
     if (!hasValidCredentials) {
-      setNoticesList([
-        {
-          id: '1',
-          title: 'HackSSCBS 2026 Registration Open',
-          category: 'Event',
-          society: 'Kronos',
-          content: 'Register for the premier hackathon of SSCBS. Open to all students. Cash prizes up for grabs!',
-          link_url: 'https://hacksscbs.tech',
-          created_at: new Date().toISOString()
-        }
-      ]);
+      setNoticesList([]);
       return;
     }
     try {

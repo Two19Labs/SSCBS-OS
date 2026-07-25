@@ -15,39 +15,7 @@ export default function NoticeBoard() {
     });
   };
 
-  const getDefaultCampusNotices = () => [
-    {
-      id: '1',
-      title: 'HackSSCBS 2026 Registration Open',
-      content: 'Register for the premier hackathon of SSCBS. Open to all students. Cash prizes up for grabs!',
-      society: 'Kronos',
-      venue: 'Auditorium, SSCBS',
-      link_url: 'https://hacksscbs.tech',
-      display_order: 1,
-      created_at: new Date(Date.now() - 3600000 * 24).toISOString()
-    },
-    {
-      id: '2',
-      title: 'Mock Placement Drive',
-      content: 'Get corporate-ready with our mock group discussions and personal interviews. Compulsory for 3rd years.',
-      society: 'Career Development Centre',
-      venue: 'Room 408 & 409',
-      link_url: 'https://cdc.sscbs.du.ac.in',
-      event_date: new Date(Date.now() + 3600000 * 24 * 3).toISOString(),
-      display_order: 2,
-      created_at: new Date(Date.now() - 3600000 * 48).toISOString()
-    },
-    {
-      id: '3',
-      title: 'Introductory Photography Workshop',
-      content: 'Learn camera exposure, composition rules, and editing basics from industry mentors.',
-      society: 'Macula',
-      venue: 'Media Lab',
-      event_date: new Date(Date.now() + 3600000 * 24 * 5).toISOString(),
-      display_order: 3,
-      created_at: new Date(Date.now() - 3600000 * 72).toISOString()
-    }
-  ];
+  const getDefaultCampusNotices = () => [];
 
   const filterActiveNotices = (rawNotices) => {
     const now = new Date();
