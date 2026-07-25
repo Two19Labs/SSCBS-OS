@@ -151,7 +151,7 @@ export default function NoticeBoard() {
                 </div>
               )}
               
-              <p className="notice-content">{notice.content}</p>
+              {notice.content && <p className="notice-content">{notice.content}</p>}
               
               {notice.link_url && (
                 <div className="notice-card-footer">

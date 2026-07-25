@@ -773,6 +773,53 @@
   color: var(--ink-faint);
 }
 
+.notice-form-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-cancel-edit {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-cancel-edit:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-main);
+}
+
+.notice-action-buttons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-edit-notice {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-edit-notice:hover {
+  background: var(--ink);
+  color: var(--surface);
+  border-color: var(--ink);
+}
+
 .btn-delete-notice {
   background: rgba(185, 28, 28, 0.1);
   border: 1px solid var(--danger);

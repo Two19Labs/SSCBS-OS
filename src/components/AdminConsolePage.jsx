@@ -93,6 +93,7 @@ function AdminConsoleContent({ onBack }) {
   // Notices manager states
   const [noticesList, setNoticesList] = useState([]);
   const [loadingNotices, setLoadingNotices] = useState(false);
+  const [editingNoticeId, setEditingNoticeId] = useState(null);
   const [noticeForm, setNoticeForm] = useState({
     title: '',
     category: 'General',
@@ -104,6 +105,30 @@ function AdminConsoleContent({ onBack }) {
     active_from: '',
     active_to: ''
   });
+
+  const handleEditNoticeClick = (notice) => {
+    setEditingNoticeId(notice.id);
+    setNoticeForm({
+      title: notice.title || '',
+      category: notice.category || 'General',
+      society: notice.society || '',
+      venue: notice.venue || '',
+      content: notice.content || '',
+      link_url: notice.link_url || '',
+      event_date: notice.event_date || '',
+      active_from: notice.active_from || '',
+      active_to: notice.active_to || ''
+    });
+    const element = document.querySelector('.notice-creator-card');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingNoticeId(null);
+    setNoticeForm({ title: '', category: 'General', society: '', venue: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
+  };
 
   const fetchAdminNotices = async () => {
     if (!hasValidCredentials) {
@@ -204,7 +229,7 @@ function AdminConsoleContent({ onBack }) {
 
   const handleCreateNotice = async (e) => {
     e.preventDefault();
-    if (!noticeForm.title || !noticeForm.content) return;
+    if (!noticeForm.title) return;
 
     const activeFromVal = noticeForm.active_from ? new Date(noticeForm.active_from).toISOString() : null;
     const activeToVal = noticeForm.active_to ? new Date(noticeForm.active_to).toISOString() : null;
@@ -217,53 +242,97 @@ function AdminConsoleContent({ onBack }) {
 
     setIsSaving(true);
     setSaveStatus({ type: '', message: '' });
-    
-    const minOrder = noticesList.length > 0 ? Math.min(...noticesList.map(n => n.display_order ?? 0)) : 0;
-    const newDisplayOrder = minOrder - 1;
 
     try {
-      if (!hasValidCredentials) {
-        const newMockNotice = {
-          id: String(Date.now()),
-          title: noticeForm.title,
-          content: noticeForm.content,
-          category: noticeForm.category,
-          society: noticeForm.society || null,
-          venue: noticeForm.venue || null,
-          link_url: noticeForm.link_url || null,
-          event_date: eventDateVal,
-          active_from: activeFromVal,
-          active_to: activeToVal,
-          display_order: newDisplayOrder,
-          created_at: new Date().toISOString()
-        };
-        setNoticesList(prev => [newMockNotice, ...prev]);
-        setSaveStatus({ type: 'success', message: 'Notice created successfully (local mock)!' });
+      if (editingNoticeId) {
+        // UPDATE EXISTING NOTICE
+        if (!hasValidCredentials) {
+          setNoticesList(prev => prev.map(n => n.id === editingNoticeId ? {
+            ...n,
+            title: noticeForm.title,
+            content: noticeForm.content || '',
+            society: noticeForm.society || null,
+            venue: noticeForm.venue || null,
+            link_url: noticeForm.link_url || null,
+            event_date: eventDateVal,
+            active_from: activeFromVal,
+            active_to: activeToVal
+          } : n));
+          setSaveStatus({ type: 'success', message: 'Notice updated successfully!' });
+          setEditingNoticeId(null);
+          setNoticeForm({ title: '', category: 'General', society: '', venue: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
+          setIsSaving(false);
+          return;
+        }
+
+        const { error } = await supabase
+          .from('notices')
+          .update({
+            title: noticeForm.title,
+            content: noticeForm.content || '',
+            society: noticeForm.society || null,
+            venue: noticeForm.venue || null,
+            link_url: noticeForm.link_url || null,
+            event_date: eventDateVal,
+            active_from: activeFromVal,
+            active_to: activeToVal
+          })
+          .eq('id', editingNoticeId);
+
+        if (error) throw error;
+
+        setSaveStatus({ type: 'success', message: 'Notice updated successfully!' });
+        setEditingNoticeId(null);
         setNoticeForm({ title: '', category: 'General', society: '', venue: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
-        setIsSaving(false);
-        return;
+        fetchAdminNotices();
+      } else {
+        // CREATE NEW NOTICE
+        const minOrder = noticesList.length > 0 ? Math.min(...noticesList.map(n => n.display_order ?? 0)) : 0;
+        const newDisplayOrder = minOrder - 1;
+
+        if (!hasValidCredentials) {
+          const newMockNotice = {
+            id: String(Date.now()),
+            title: noticeForm.title,
+            content: noticeForm.content || '',
+            category: noticeForm.category || 'General',
+            society: noticeForm.society || null,
+            venue: noticeForm.venue || null,
+            link_url: noticeForm.link_url || null,
+            event_date: eventDateVal,
+            active_from: activeFromVal,
+            active_to: activeToVal,
+            display_order: newDisplayOrder,
+            created_at: new Date().toISOString()
+          };
+          setNoticesList(prev => [newMockNotice, ...prev]);
+          setSaveStatus({ type: 'success', message: 'Notice published successfully!' });
+          setNoticeForm({ title: '', category: 'General', society: '', venue: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
+          setIsSaving(false);
+          return;
+        }
+
+        const { error } = await supabase
+          .from('notices')
+          .insert([{
+            title: noticeForm.title,
+            content: noticeForm.content || '',
+            category: noticeForm.category || 'General',
+            society: noticeForm.society || null,
+            venue: noticeForm.venue || null,
+            link_url: noticeForm.link_url || null,
+            event_date: eventDateVal,
+            active_from: activeFromVal,
+            active_to: activeToVal,
+            display_order: newDisplayOrder
+          }]);
+
+        if (error) throw error;
+
+        setSaveStatus({ type: 'success', message: 'Notice published successfully onto the Campus Notice Board!' });
+        setNoticeForm({ title: '', category: 'General', society: '', venue: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
+        fetchAdminNotices();
       }
-
-      const { error } = await supabase
-        .from('notices')
-        .insert([{
-          title: noticeForm.title,
-          content: noticeForm.content,
-          category: noticeForm.category || 'General',
-          society: noticeForm.society || null,
-          venue: noticeForm.venue || null,
-          link_url: noticeForm.link_url || null,
-          event_date: eventDateVal,
-          active_from: activeFromVal,
-          active_to: activeToVal,
-          display_order: newDisplayOrder
-        }]);
-
-      if (error) throw error;
-      
-      setSaveStatus({ type: 'success', message: 'Notice published successfully onto the Campus Notice Board!' });
-      setNoticeForm({ title: '', category: 'General', society: '', venue: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
-      fetchAdminNotices();
     } catch (err) {
       if (err.message && (err.message.includes('schema cache') || err.message.includes('does not exist') || err.code === '42P01')) {
         setSaveStatus({
@@ -276,7 +345,7 @@ function AdminConsoleContent({ onBack }) {
           message: 'Connection Failed (Failed to fetch): Please disable any ad blockers, privacy extensions, or Brave Shields blocking supabase.co and try again.'
         });
       } else {
-        setSaveStatus({ type: 'error', message: err.message || 'Failed to publish notice.' });
+        setSaveStatus({ type: 'error', message: err.message || 'Failed to save notice.' });
       }
     } finally {
       setIsSaving(false);
@@ -1484,8 +1553,12 @@ function AdminConsoleContent({ onBack }) {
         ) : activeTab === 'notices' ? (
           <div className="tab-pane notices-pane">
             <div className="pane-left notice-creator-card">
-              <h3>Publish New Notice</h3>
-              <p className="subtitle-admin">Create announcements for events, society updates, guest lectures, and other college activities.</p>
+              <h3>{editingNoticeId ? 'Edit Campus Notice' : 'Publish New Notice'}</h3>
+              <p className="subtitle-admin">
+                {editingNoticeId 
+                  ? 'Modify details, location, event schedule, or expiry date of this notice.' 
+                  : 'Create announcements for events, society updates, guest lectures, and other college activities.'}
+              </p>
               
               <form onSubmit={handleCreateNotice} className="admin-notice-form">
                 <div className="form-item-admin">
@@ -1528,14 +1601,13 @@ function AdminConsoleContent({ onBack }) {
                 </div>
 
                 <div className="form-item-admin">
-                  <label htmlFor="notice-content">Notice Description</label>
+                  <label htmlFor="notice-content">Notice Description (Optional)</label>
                   <textarea
                     id="notice-content"
                     rows="4"
                     placeholder="Describe the notice or event details in full..."
                     value={noticeForm.content}
                     onChange={(e) => setNoticeForm(prev => ({ ...prev, content: e.target.value }))}
-                    required
                     className="admin-textarea-field"
                   />
                 </div>
@@ -1584,14 +1656,27 @@ function AdminConsoleContent({ onBack }) {
                   </div>
                 </div>
 
-                <button 
-                  type="submit" 
-                  className="btn-publish-timetable" 
-                  disabled={isSaving}
-                  style={{ marginTop: '0.5rem' }}
-                >
-                  {isSaving ? 'Publishing Notice...' : 'Publish Campus Notice'}
-                </button>
+                <div className="notice-form-buttons">
+                  <button 
+                    type="submit" 
+                    className="btn-publish-timetable" 
+                    disabled={isSaving}
+                    style={{ marginTop: '0.5rem' }}
+                  >
+                    {isSaving ? (editingNoticeId ? 'Updating Notice...' : 'Publishing Notice...') : (editingNoticeId ? 'Save Changes' : 'Publish Campus Notice')}
+                  </button>
+                  {editingNoticeId && (
+                    <button
+                      type="button"
+                      className="btn-cancel-edit"
+                      onClick={handleCancelEdit}
+                      disabled={isSaving}
+                      style={{ marginTop: '0.5rem' }}
+                    >
+                      Cancel Edit
+                    </button>
+                  )}
+                </div>
               </form>
             </div>
 
@@ -1628,7 +1713,9 @@ function AdminConsoleContent({ onBack }) {
                             <span className={`admin-status-badge ${status.class}`}>{status.label}</span>
                           </div>
                           <h4 className="notice-item-title">{notice.title}</h4>
-                          <p className="notice-item-desc">{notice.content.substring(0, 80)}{notice.content.length > 80 ? '...' : ''}</p>
+                          {notice.content && (
+                            <p className="notice-item-desc">{notice.content.substring(0, 80)}{notice.content.length > 80 ? '...' : ''}</p>
+                          )}
                           
                           {(notice.event_date || notice.venue || notice.active_from || notice.active_to) && (
                             <div className="notice-item-schedule-info">
@@ -1661,13 +1748,24 @@ function AdminConsoleContent({ onBack }) {
                               </button>
                             </div>
                             <span className="notice-item-date">{new Date(notice.created_at).toLocaleDateString()}</span>
-                            <button 
-                              className="btn-delete-notice"
-                              onClick={() => handleDeleteNotice(notice.id)}
-                              disabled={isSaving}
-                            >
-                              Delete
-                            </button>
+                            <div className="notice-action-buttons">
+                              <button
+                                type="button"
+                                className="btn-edit-notice"
+                                onClick={() => handleEditNoticeClick(notice)}
+                                disabled={isSaving}
+                              >
+                                ✏️ Edit
+                              </button>
+                              <button 
+                                type="button"
+                                className="btn-delete-notice"
+                                onClick={() => handleDeleteNotice(notice.id)}
+                                disabled={isSaving}
+                              >
+                                Delete
+                              </button>
+                            </div>
                           </div>
                         </div>
                       );
