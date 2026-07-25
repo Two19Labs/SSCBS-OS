@@ -129,6 +129,9 @@ ALTER TABLE public.notices ADD COLUMN IF NOT EXISTS display_order INT DEFAULT 0;
 ALTER TABLE public.notices ENABLE ROW LEVEL SECURITY;
 
 -- Setup Security Policies
+DROP POLICY IF EXISTS "Enable read access for all authenticated users on notices" ON public.notices;
+DROP POLICY IF EXISTS "Enable write access for admins on notices" ON public.notices;
+
 -- Anyone authenticated can read notices
 CREATE POLICY "Enable read access for all authenticated users on notices" 
     ON public.notices 
