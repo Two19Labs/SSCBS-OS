@@ -5,21 +5,21 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "Environmental Science: Theory into Prractice - 1",
-            "teacher": "Ms. Shipra Varshney",
-            "room": "Room 703"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 2,
-            "subject": "Funadamentals of Management",
-            "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 703"
+            "subject": "A",
+            "teacher": "Mr. Rohan Gulati",
+            "room": "Room 651"
           },
           {
             "period": 3,
-            "subject": "Financial Accounting and Analysis",
-            "teacher": "Dr. Saumya Jain",
-            "room": "Room 703"
+            "subject": "A",
+            "teacher": "Mr. Rohan Gulati",
+            "room": "Room 651"
           },
           {
             "period": 0,
@@ -30,21 +30,21 @@
           },
           {
             "period": 4,
-            "subject": "Basic IT Tools",
+            "subject": "A",
             "teacher": "Dr. Amit Kumar",
-            "room": "P"
+            "room": "Room 651"
           },
           {
             "period": 5,
-            "subject": "Entrepreneurship Essentials - 1",
-            "teacher": "Dr. Ramesh Kumar",
-            "room": "P"
+            "subject": "A",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 651"
           },
           {
             "period": 6,
-            "subject": "Entrepreneurship Essentials - 1",
-            "teacher": "Dr. Ramesh Kumar",
-            "room": "P"
+            "subject": "A",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 651"
           },
           {
             "period": 7,
@@ -56,21 +56,21 @@
         "Tuesday": [
           {
             "period": 1,
-            "subject": "Python and Data Fundamentals",
-            "teacher": "Dr.  Deepali Dhaka",
-            "room": "Merged with BBA 1A"
+            "subject": "B",
+            "teacher": "Dr. Neha Bhatia",
+            "room": "Room 651"
           },
           {
             "period": 2,
-            "subject": "Python and Data Fundamentals",
-            "teacher": "Dr.  Deepali Dhaka",
-            "room": "Merged with BBA 1A"
+            "subject": "B",
+            "teacher": "Dr. Neha Bhatia",
+            "room": "Room 651"
           },
           {
             "period": 3,
-            "subject": "Basic IT Tools",
+            "subject": "A",
             "teacher": "Dr. Amit Kumar",
-            "room": "P"
+            "room": "Room 651"
           },
           {
             "period": 0,
@@ -81,47 +81,47 @@
           },
           {
             "period": 4,
-            "subject": "Basic IT Tools",
+            "subject": "A",
             "teacher": "Dr. Amit Kumar",
-            "room": "P"
+            "room": "Room 651"
           },
           {
             "period": 5,
-            "subject": "Financial Accounting and Analysis",
-            "teacher": "Dr. Saumya Jain",
-            "room": "Room 703"
+            "subject": "C",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 651"
           },
           {
             "period": 6,
-            "subject": "Fit India (Merged with BBAFIA 1A) | Constitutional Values and Fundamental Duties (Merged with BBAFIA 1A)",
-            "teacher": "Ms. Nisha Rajput / Mr. Vipin Patel",
-            "room": "P / Merged with BBA 1A-203"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 7,
-            "subject": "Fit India (Merged with BBAFIA 1A) | Constitutional Values and Fundamental Duties (Merged with BBAFIA 1A)",
-            "teacher": "Ms. Nisha Rajput / Mr. Vipin Patel",
-            "room": "P / Merged with BBA 1A-203"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           }
         ],
         "Wednesday": [
           {
             "period": 1,
-            "subject": "Python and Data Fundamentals",
-            "teacher": "Dr.  Deepali Dhaka",
-            "room": "Merged with BBA 1A"
+            "subject": "C",
+            "teacher": "Dr. Deepali Dhaka",
+            "room": "Room 651"
           },
           {
             "period": 2,
-            "subject": "Python and Data Fundamentals",
-            "teacher": "Dr.  Deepali Dhaka",
-            "room": "P"
+            "subject": "C",
+            "teacher": "Dr. Deepali Dhaka",
+            "room": "Room 651"
           },
           {
             "period": 3,
-            "subject": "Funadamentals of Management",
-            "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 703"
+            "subject": "B",
+            "teacher": "Mr. Praveen S.K.",
+            "room": "Room 651"
           },
           {
             "period": 0,
@@ -132,21 +132,21 @@
           },
           {
             "period": 4,
-            "subject": "Financial Accounting and Analysis",
-            "teacher": "Dr. Saumya Jain",
-            "room": "Room 703"
+            "subject": "A",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 651"
           },
           {
             "period": 5,
-            "subject": "Statistics for Business Decisions",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 703"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 6,
-            "subject": "G1: Financial Accounting and Analysis | G2: Funadamentals of Management",
-            "teacher": "Dr. Saumya Jain (G1) / Dr. Tarannum Ahmad (G2)",
-            "room": "G1: Room 703 / G2: Room 337"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 7,
@@ -164,15 +164,15 @@
           },
           {
             "period": 2,
-            "subject": "Python and Data Fundamentals | Entrepreneurship Essentials - 1",
-            "teacher": "Dr.  Deepali Dhaka / Dr. Ramesh Kumar",
-            "room": "P / Room 703"
+            "subject": "C",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 651"
           },
           {
             "period": 3,
-            "subject": "Statistics for Business Decisions",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 703"
+            "subject": "C",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 651"
           },
           {
             "period": 0,
@@ -183,47 +183,47 @@
           },
           {
             "period": 4,
-            "subject": "Funadamentals of Management",
-            "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 703"
+            "subject": "A",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 651"
           },
           {
             "period": 5,
-            "subject": "Basic IT Tools",
+            "subject": "A",
             "teacher": "Dr. Amit Kumar",
-            "room": "P"
+            "room": "Room 651"
           },
           {
             "period": 6,
-            "subject": "Fit India (Merged with BBAFIA 1A) | Constitutional Values and Fundamental Duties (Merged with BBAFIA 1A)",
-            "teacher": "Ms. Nisha Rajput / Mr. Vipin Patel",
-            "room": "P / Merged with BBA 1A-203"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 7,
-            "subject": "Fit India (Merged with BBAFIA 1A)",
-            "teacher": "Ms. Nisha Rajput",
-            "room": "P"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           }
         ],
         "Friday": [
           {
             "period": 1,
-            "subject": "Environmental Science: Theory into Prractice - 1",
-            "teacher": "Ms. Shipra Varshney",
-            "room": "P"
+            "subject": "B",
+            "teacher": "Dr. Neha Bhatia",
+            "room": "Room 651"
           },
           {
             "period": 2,
-            "subject": "Environmental Science: Theory into Prractice - 1",
-            "teacher": "Ms. Shipra Varshney",
-            "room": "P"
+            "subject": "B",
+            "teacher": "Dr. Neha Bhatia",
+            "room": "Room 651"
           },
           {
             "period": 3,
-            "subject": "G2: Financial Accounting and Analysis | G1: Statistics for Business Decisions",
-            "teacher": "Dr. Saumya Jain (G2) / Dr. Mona Verma (G1)",
-            "room": "G2: Room 703 / G1: Room 337"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 0,
@@ -234,21 +234,21 @@
           },
           {
             "period": 4,
-            "subject": "G1: Funadamentals of Management | G2: Statistics for Business Decisions",
-            "teacher": "Dr. Tarannum Ahmad (G1) / Dr. Mona Verma (G2)",
-            "room": "G1: Room 703 / G2: Room 337"
+            "subject": "A",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 651"
           },
           {
             "period": 5,
-            "subject": "Statistics for Business Decisions",
-            "teacher": "Dr. Mona Verma",
-            "room": "Room 703"
+            "subject": "A",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 651"
           },
           {
             "period": 6,
-            "subject": "Entrepreneurship Essentials - 1",
-            "teacher": "Dr. Ramesh Kumar",
-            "room": "P"
+            "subject": "A",
+            "teacher": "Dr. Amit Kumar",
+            "room": "Room 651"
           },
           {
             "period": 7,
@@ -264,19 +264,19 @@
             "period": 1,
             "subject": "Entrepreneurship Essentials - 1",
             "teacher": "Mr. Apoorva Malik",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Environmental Science: Theory into Prractice - 1",
             "teacher": "Ms. Shipra Varshney",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Environmental Science: Theory into Prractice - 1",
             "teacher": "Ms. Shipra Varshney",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -287,27 +287,27 @@
           },
           {
             "period": 4,
-            "subject": "G2: Funadamentals of Management | G1: Statistics for Business Decisions",
-            "teacher": "Dr. Tarannum Ahmad (G2) / Dr. Mona Verma (G1)",
-            "room": "G2: Room 707 / G1: Room 337"
+            "subject": "Funadamentals of Management",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Statistics for Business Decisions",
             "teacher": "Dr. Mona Verma",
-            "room": "Room 707"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Basic IT Tools",
             "teacher": "Mr. Praveen SK",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 7,
             "subject": "Basic IT Tools",
             "teacher": "Mr. Praveen SK",
-            "room": "P"
+            "room": "Room 703"
           }
         ],
         "Tuesday": [
@@ -315,19 +315,19 @@
             "period": 1,
             "subject": "Fit India",
             "teacher": "Mr. Prakhar Tyagi",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "G1: Funadamentals of Management | G2: Financial Accounting and Analysis",
-            "teacher": "Dr. Tarannum Ahmad (G1) / Dr. Saumya Jain (G2)",
-            "room": "G1: Room 707 / G2: Room 337"
+            "subject": "Funadamentals of Management",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Funadamentals of Management",
             "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 707"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -340,25 +340,25 @@
             "period": 4,
             "subject": "Basic IT Tools",
             "teacher": "Mr. Praveen SK",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Statistics for Business Decisions",
             "teacher": "Dr. Mona Verma",
-            "room": "Room 707"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Entrepreneurship Essentials - 1",
             "teacher": "Mr. Apoorva Malik",
-            "room": "Room 707"
+            "room": "Room 703"
           },
           {
             "period": 7,
             "subject": "Entrepreneurship Essentials - 1",
             "teacher": "Mr. Apoorva Malik",
-            "room": "Room 707"
+            "room": "Room 703"
           }
         ],
         "Wednesday": [
@@ -366,19 +366,19 @@
             "period": 1,
             "subject": "Fit India",
             "teacher": "Mr. Prakhar Tyagi",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "SV",
-            "teacher": "SV",
-            "room": "P"
+            "subject": "SV (P)",
+            "teacher": "SV (P)",
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Basic IT Tools",
             "teacher": "Mr. Praveen SK",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -391,19 +391,19 @@
             "period": 4,
             "subject": "Funadamentals of Management",
             "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 707"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Entrepreneurship Essentials - 1",
             "teacher": "Mr. Apoorva Malik",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Entrepreneurship Essentials - 1",
             "teacher": "Mr. Apoorva Malik",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -417,19 +417,19 @@
             "period": 1,
             "subject": "Fit India",
             "teacher": "Mr. Prakhar Tyagi",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Statistics for Business Decisions",
             "teacher": "Dr. Mona Verma",
-            "room": "Room 707"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Financial Accounting and Analysis",
             "teacher": "Dr. Saumya Jain",
-            "room": "Room 707"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -440,15 +440,15 @@
           },
           {
             "period": 4,
-            "subject": "Statistics for Business Decisions (G2)",
+            "subject": "Statistics for Business Decisions",
             "teacher": "Dr. Mona Verma",
-            "room": "Room 707"
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Financial Accounting and Analysis (G1)",
+            "subject": "Financial Accounting and Analysis",
             "teacher": "Dr. Saumya Jain",
-            "room": "Room 707"
+            "room": "Room 703"
           },
           {
             "period": 6,
@@ -468,19 +468,19 @@
             "period": 1,
             "subject": "Fit India",
             "teacher": "Mr. Prakhar Tyagi",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Funadamentals of Management",
             "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 707"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Environmental Science: Theory into Prractice - 1",
             "teacher": "Ms. Shipra Varshney",
-            "room": "Room 707"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -493,13 +493,13 @@
             "period": 4,
             "subject": "Financial Accounting and Analysis",
             "teacher": "Dr. Saumya Jain",
-            "room": "Room 707"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Financial Accounting and Analysis",
             "teacher": "Dr. Saumya Jain",
-            "room": "Room 707"
+            "room": "Room 703"
           },
           {
             "period": 6,
@@ -527,13 +527,13 @@
             "period": 2,
             "subject": "Entrepreneurship Essentials - 1",
             "teacher": "Mr. Apoorva Malik",
-            "room": "Room 733"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Entrepreneurship Essentials - 1",
             "teacher": "Mr. Apoorva Malik",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -546,19 +546,19 @@
             "period": 4,
             "subject": "Financial Accounting and Analysis",
             "teacher": "Dr. Madhu Totla",
-            "room": "Room 733"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Funadamentals of Management",
             "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 733"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Basic IT Tools",
             "teacher": "Dr. Amit Kumar",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -572,19 +572,19 @@
             "period": 1,
             "subject": "Financial Accounting and Analysis",
             "teacher": "Dr. Madhu Totla",
-            "room": "Room 733"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Fit India",
             "teacher": "Mr. Prakhar Tyagi",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Fit India",
             "teacher": "Mr. Prakhar Tyagi",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -597,13 +597,13 @@
             "period": 4,
             "subject": "Entrepreneurship Essentials - 1",
             "teacher": "Mr. Apoorva Malik",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Entrepreneurship Essentials - 1",
             "teacher": "Mr. Apoorva Malik",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 6,
@@ -623,19 +623,19 @@
             "period": 1,
             "subject": "Environmental Science: Theory into Prractice - 1",
             "teacher": "Dr. Gunisha Wadhawan",
-            "room": "Room 733"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Fit India",
             "teacher": "Mr. Prakhar Tyagi",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Fit India",
             "teacher": "Mr. Prakhar Tyagi",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -648,19 +648,19 @@
             "period": 4,
             "subject": "Entrepreneurship Essentials - 1",
             "teacher": "Mr. Apoorva Malik",
-            "room": "Room 733"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Funadamentals of Management",
             "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 733"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Statistics for Business Decisions",
             "teacher": "Dr. Satish Kumar Garg",
-            "room": "Room 733"
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -674,19 +674,19 @@
             "period": 1,
             "subject": "Financial Accounting and Analysis",
             "teacher": "Dr. Madhu Totla",
-            "room": "Room 733"
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "G1: Funadamentals of Management | G2: Financial Accounting and Analysis",
-            "teacher": "Dr. Tarannum Ahmad (G1) / Dr. Madhu Totla (G2)",
-            "room": "G1: Room 733 / G2: Room 337"
+            "subject": "Funadamentals of Management",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Funadamentals of Management",
             "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 733"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -699,19 +699,19 @@
             "period": 4,
             "subject": "Basic IT Tools",
             "teacher": "Dr. Amit Kumar",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Statistics for Business Decisions",
             "teacher": "Dr. Satish Kumar Garg",
-            "room": "Room 733"
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "P"
+            "subject": "IT Tools (P) (Unsupervised)",
+            "teacher": "IT Tools (P) (Unsupervised)",
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -725,19 +725,19 @@
             "period": 1,
             "subject": "Environmental Science: Theory into Prractice - 1",
             "teacher": "Dr. Gunisha Wadhawan",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Environmental Science: Theory into Prractice - 1",
             "teacher": "Dr. Gunisha Wadhawan",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "G2: Funadamentals of Management | G1: Financial Accounting and Analysis",
-            "teacher": "Dr. Tarannum Ahmad (G2) / Dr. Madhu Totla (G1)",
-            "room": "G2: Room 733 / G1: Room 236"
+            "subject": "Funadamentals of Management",
+            "teacher": "Dr. Tarannum Ahmad",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -750,19 +750,19 @@
             "period": 4,
             "subject": "Statistics for Business Decisions",
             "teacher": "Dr. Satish Kumar Garg",
-            "room": "Room 733"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Statistics for Business Decisions",
             "teacher": "Dr. Satish Kumar Garg",
-            "room": "Tute"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Basic IT Tools",
             "teacher": "Dr. Amit Kumar",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -778,19 +778,19 @@
             "period": 1,
             "subject": "Entrepreneurship Essentials - 1",
             "teacher": "Dr. Nitin Dewan",
-            "room": "Room 737"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Entrepreneurship Essentials - 1",
             "teacher": "Dr. Nitin Dewan",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Financial Accounting and Analysis",
             "teacher": "Dr. Madhu Totla",
-            "room": "Room 737"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -803,13 +803,13 @@
             "period": 4,
             "subject": "Basic IT Tools",
             "teacher": "Mr. Praveen SK",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Basic IT Tools",
             "teacher": "Mr. Praveen SK",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 6,
@@ -829,19 +829,19 @@
             "period": 1,
             "subject": "Statistics for Business Decisions",
             "teacher": "Dr. Divya Seth",
-            "room": "Room 737"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Statistics for Business Decisions",
             "teacher": "Dr. Divya Seth",
-            "room": "Tute"
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Financial Accounting and Analysis (G2)",
+            "subject": "Financial Accounting and Analysis",
             "teacher": "Dr. Madhu Totla",
-            "room": "Room 737"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -854,13 +854,13 @@
             "period": 4,
             "subject": "Funadamentals of Management",
             "teacher": "Ms. Seema Kataria",
-            "room": "Room 737"
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Funadamentals of Management (G1)",
+            "subject": "Funadamentals of Management",
             "teacher": "Dr. Tarannum Ahmad",
-            "room": "Room 737"
+            "room": "Room 703"
           },
           {
             "period": 6,
@@ -880,19 +880,19 @@
             "period": 1,
             "subject": "Basic IT Tools",
             "teacher": "Mr. Praveen SK",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Environmental Science: Theory into Prractice - 1",
-            "teacher": "Dr. Gunisha Wadhawan",
-            "room": "P"
+            "subject": "Fit India",
+            "teacher": "Ms. Nisha Rajput",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Environmental Science: Theory into Prractice - 1",
-            "teacher": "Dr. Gunisha Wadhawan",
-            "room": "P"
+            "subject": "Fit India",
+            "teacher": "Ms. Nisha Rajput",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -905,25 +905,25 @@
             "period": 4,
             "subject": "Basic IT Tools",
             "teacher": "Mr. Praveen SK",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Entrepreneurship Essentials - 1",
             "teacher": "Dr. Nitin Dewan",
-            "room": "Room 737"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Entrepreneurship Essentials - 1",
             "teacher": "Dr. Nitin Dewan",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 7,
             "subject": "Entrepreneurship Essentials - 1",
             "teacher": "Dr. Nitin Dewan",
-            "room": "P"
+            "room": "Room 703"
           }
         ],
         "Thursday": [
@@ -937,13 +937,13 @@
             "period": 2,
             "subject": "Fit India",
             "teacher": "Mr. Prakhar Tyagi",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Financial Accounting and Analysis",
             "teacher": "Dr. Madhu Totla",
-            "room": "Room 737"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -954,21 +954,21 @@
           },
           {
             "period": 4,
-            "subject": "G1: Financial Accounting and Analysis | G2: Funadamentals of Management",
-            "teacher": "Dr. Madhu Totla (G1) / Ms. Seema Kataria (G2)",
-            "room": "G1: Room 737 / G2: Room 236"
+            "subject": "Funadamentals of Management",
+            "teacher": "Ms. Seema Kataria",
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Statistics for Business Decisions",
             "teacher": "Dr. Divya Seth",
-            "room": "Room 737"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Statistics for Business Decisions",
             "teacher": "Dr. Divya Seth",
-            "room": "Room 737"
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -982,19 +982,19 @@
             "period": 1,
             "subject": "Financial Accounting and Analysis",
             "teacher": "Dr. Madhu Totla",
-            "room": "Room 737"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Fit India",
             "teacher": "Mr. Prakhar Tyagi",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Environmental Science: Theory into Prractice - 1",
             "teacher": "Dr. Gunisha Wadhawan",
-            "room": "Room 737"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -1007,25 +1007,25 @@
             "period": 4,
             "subject": "Funadamentals of Management",
             "teacher": "Ms. Seema Kataria",
-            "room": "Room 737"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Funadamentals of Management",
             "teacher": "Ms. Seema Kataria",
-            "room": "Room 737"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Fit India",
             "teacher": "Ms. Nisha Rajput",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 7,
             "subject": "Fit India",
             "teacher": "Ms. Nisha Rajput",
-            "room": "P"
+            "room": "Room 703"
           }
         ]
       }
@@ -1035,21 +1035,21 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "Business Intelligence and Data Visualization",
-            "teacher": "Ms. Sanchi Kalra",
-            "room": "P"
+            "subject": "Financial Markets & Institutions",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Business Intelligence and Data Visualization",
-            "teacher": "Ms. Sanchi Kalra",
-            "room": "P"
+            "subject": "Financial Markets & Institutions",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Introduction to Business Analytics",
-            "teacher": "Dr. Rishi Rajan Sahay",
-            "room": "Room 607"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -1060,47 +1060,47 @@
           },
           {
             "period": 4,
-            "subject": "G1: Organizational Behaviour | G?: Introduction to Business Analytics",
-            "teacher": "Dr. Anuja Mathur (G1) / Dr. Rishi Rajan Sahay (G?)",
-            "room": "G1: Room 607 / G?: Room 226"
+            "subject": "Hindi C (Merged  BMS 3A)",
+            "teacher": "Dr. Soumya Guliyan",
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Macroeconomics",
-            "teacher": "Dr. Shalini Prakash",
-            "room": "Room 607"
+            "subject": "Hindi C (Merged  BMS 3A)",
+            "teacher": "Dr. Soumya Guliyan",
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Social and Emotional learning",
-            "teacher": "Ms. Ayesha S. Ansari",
-            "room": "P"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 7,
-            "subject": "Social and Emotional learning",
-            "teacher": "Ms. Ayesha S. Ansari",
-            "room": "P"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           }
         ],
         "Tuesday": [
           {
             "period": 1,
-            "subject": "Business Intelligence and Data Visualization",
-            "teacher": "Ms. Sanchi Kalra",
-            "room": "P"
+            "subject": "C&I (P) (Unsupervised)",
+            "teacher": "C&I (P) (Unsupervised)",
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Business Intelligence and Data Visualization",
-            "teacher": "Ms. Sanchi Kalra",
-            "room": "P"
+            "subject": "Financial Markets & Institutions",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Organizational Behaviour",
-            "teacher": "Dr. Anuja Mathur",
-            "room": "Room 607"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -1111,47 +1111,47 @@
           },
           {
             "period": 4,
-            "subject": "Creativity and Innovation",
-            "teacher": "Dr. Ramesh Kumar",
-            "room": "Room 607"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Introduction to Business Analytics",
-            "teacher": "Dr. Rishi Rajan Sahay",
-            "room": "Room 607"
+            "subject": "Corporate Finance",
+            "teacher": "Mr. Amit Kumar",
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Creativity and Innovation",
-            "teacher": "Dr. Ramesh Kumar",
-            "room": "P"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 7,
-            "subject": "Creativity and Innovation",
-            "teacher": "Dr. Ramesh Kumar",
-            "room": "P"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           }
         ],
         "Wednesday": [
           {
             "period": 1,
-            "subject": "Social and Emotional learning",
-            "teacher": "Ms. Ayesha S. Ansari",
-            "room": "Room 607"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 2,
-            "subject": "Macroeconomics",
-            "teacher": "Dr. Shalini Prakash",
-            "room": "Room 607"
+            "subject": "Financial Markets & Institutions",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "G1: Macroeconomics | G2: Organizational Behaviour",
-            "teacher": "Dr. Shalini Prakash (G1) / Dr. Anuja Mathur (G2)",
-            "room": "G1: Room 607 / G2: Room 337"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -1162,27 +1162,27 @@
           },
           {
             "period": 4,
-            "subject": "Creativity and Innovation",
-            "teacher": "Dr. Ramesh Kumar",
-            "room": "P"
+            "subject": "Social and Emotional Learning",
+            "teacher": "Ms. Ayesha S. Ansari",
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Organizational Behaviour",
-            "teacher": "Dr. Anuja Mathur",
-            "room": "Room 607"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Hindi B | Hindi C | Hindi D (Merged with BMS 3D)",
-            "teacher": "Dr. Garima Tripathi / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "subject": "Hindi C (Merged  BMS 3A)",
+            "teacher": "Dr. Soumya Guliyan",
+            "room": "Room 703"
           },
           {
             "period": 7,
-            "subject": "Hindi B | Hindi C | Hindi D (Merged with BMS 3D)",
-            "teacher": "Dr. Garima Tripathi / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "subject": "Hindi C (Merged  BMS 3A)",
+            "teacher": "Dr. Soumya Guliyan",
+            "room": "Room 703"
           }
         ],
         "Thursday": [
@@ -1190,19 +1190,19 @@
             "period": 1,
             "subject": "Free",
             "teacher": "-",
-            "room": "P"
+            "room": "-"
           },
           {
             "period": 2,
-            "subject": "Macroeconomics",
-            "teacher": "Dr. Shalini Prakash",
-            "room": "Room 607"
+            "subject": "Corporate Finance",
+            "teacher": "Mr. Amit Kumar",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Creativity and Innovation",
-            "teacher": "Dr. Ramesh Kumar",
-            "room": "Room 607"
+            "subject": "Corporate Finance",
+            "teacher": "Mr. Amit Kumar",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -1213,21 +1213,21 @@
           },
           {
             "period": 4,
-            "subject": "Introduction to Business Analytics",
-            "teacher": "Dr. Rishi Rajan Sahay",
-            "room": "Room 607"
+            "subject": "Creativity and Innovation",
+            "teacher": "Ms. Twinkle Ainapure",
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Creativity and Innovation",
-            "teacher": "Dr. Ramesh Kumar",
-            "room": "P"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -1239,21 +1239,21 @@
         "Friday": [
           {
             "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
+            "subject": "Creativity and Innovation",
+            "teacher": "Ms. Twinkle Ainapure",
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Introduction to Business Analytics",
-            "teacher": "Dr. Rishi Rajan Sahay",
-            "room": "Room 607"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Organizational Behaviour",
-            "teacher": "Dr. Anuja Mathur",
-            "room": "Room 607"
+            "subject": "Corporate Finance",
+            "teacher": "Mr. Amit Kumar",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -1264,21 +1264,21 @@
           },
           {
             "period": 4,
-            "subject": "G2: Macroeconomics | G?: Introduction to Business Analytics",
-            "teacher": "Dr. Shalini Prakash (G2) / Dr. Rishi Rajan Sahay (G?)",
-            "room": "G2: Room 607 / G?: Room 326"
+            "subject": "Social and Emotional Learning",
+            "teacher": "Ms. Ayesha S. Ansari",
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Hindi B",
-            "teacher": "Dr. Garima Tripathi",
-            "room": "Hin B"
+            "subject": "Social and Emotional Learning",
+            "teacher": "Ms. Ayesha S. Ansari",
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Hindi B",
-            "teacher": "Dr. Garima Tripathi",
-            "room": "Hin B"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 7,
@@ -1292,21 +1292,21 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "Creativity and Innovation",
-            "teacher": "Dr. Krishnaveni Achary",
-            "room": "Room 603"
+            "subject": "Corporate Law",
+            "teacher": "Dr.Monu",
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Creativity and Innovation",
-            "teacher": "Dr. Krishnaveni Achary",
-            "room": "P"
+            "subject": "Corporate Law",
+            "teacher": "Dr.Monu",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Organizational Behaviour",
-            "teacher": "Dr. Anuja Mathur",
-            "room": "Room 603"
+            "subject": "Financial Markets & Institutions",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -1317,47 +1317,47 @@
           },
           {
             "period": 4,
-            "subject": "Macroeconomics",
-            "teacher": "Dr. Sushmita",
-            "room": "Room 603"
+            "subject": "Hindi D (Merged BMS 3D)",
+            "teacher": "Mr. Komal",
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "G2: Organizational Behaviour | G?: Introduction to Business Analytics",
-            "teacher": "Dr. Anuja Mathur (G2) / Dr. Rishi Rajan Sahay (G?)",
-            "room": "G2: Room 603 / G?: Room 226"
+            "subject": "Hindi D (Merged BMS 3D)",
+            "teacher": "Mr. Komal",
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Introduction to Business Analytics",
-            "teacher": "Dr. Rishi Rajan Sahay",
-            "room": "Room 603"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           }
         ],
         "Tuesday": [
           {
             "period": 1,
-            "subject": "Creativity and Innovation",
-            "teacher": "Dr. Krishnaveni Achary",
-            "room": "Room 603"
+            "subject": "C&I (P) (Unsupervised)",
+            "teacher": "C&I (P) (Unsupervised)",
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "G1: Macroeconomics | G?: Introduction to Business Analytics",
-            "teacher": "Ms. Shalini Prakash (G1) / Dr. Rishi Rajan Sahay (G?)",
-            "room": "G1: Room 603 / G?: Room 226"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Macroeconomics",
-            "teacher": "Dr. Sushmita",
-            "room": "Room 603"
+            "subject": "Financial Markets & Institutions",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -1368,47 +1368,47 @@
           },
           {
             "period": 4,
-            "subject": "Introduction to Business Analytics",
-            "teacher": "Dr. Rishi Rajan Sahay",
-            "room": "Room 603"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Hindi C (Merged with BMS 3A)",
-            "teacher": "Dr. Soumya Guliyan",
-            "room": "Hin B"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Hindi C (Merged with BMS 3A)",
-            "teacher": "Dr. Soumya Guliyan",
-            "room": "Hin B"
+            "subject": "Business Intelligence and Data Visualization",
+            "teacher": "Mr. Vineet",
+            "room": "Room 703"
           },
           {
             "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
+            "subject": "Business Intelligence and Data Visualization",
+            "teacher": "Mr. Vineet",
+            "room": "Room 703"
           }
         ],
         "Wednesday": [
           {
             "period": 1,
-            "subject": "Business Intelligence and Data Visualization",
-            "teacher": "Ms. Sanchi Kalra",
-            "room": "P"
+            "subject": "Corporate Finance",
+            "teacher": "Dr. Madhu Totla",
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Business Intelligence and Data Visualization",
-            "teacher": "Ms. Sanchi Kalra",
-            "room": "P"
+            "subject": "The Art of Being Happy",
+            "teacher": "Ms. Kajol",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Introduction to Business Analytics",
-            "teacher": "Dr. Rishi Rajan Sahay",
-            "room": "Room 603"
+            "subject": "Corporate Finance",
+            "teacher": "Dr. Madhu Totla",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -1419,47 +1419,47 @@
           },
           {
             "period": 4,
-            "subject": "Creativity and Innovation",
-            "teacher": "Dr. Krishnaveni Achary",
-            "room": "P"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Creativity and Innovation",
-            "teacher": "Dr. Krishnaveni Achary",
-            "room": "P"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Komal  648",
-            "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Komal  648",
-            "room": "Hin A / Hin C / Hin D"
+            "subject": "Hindi A (Merged with BMS 3A)",
+            "teacher": "Dr. Garima TripathI",
+            "room": "Room 703"
           },
           {
             "period": 7,
-            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Komal  648",
-            "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Komal  648",
-            "room": "Hin A / Hin C / Hin D"
+            "subject": "Hindi A (Merged with BMS 3A)",
+            "teacher": "Dr. Garima TripathI",
+            "room": "Room 703"
           }
         ],
         "Thursday": [
           {
             "period": 1,
-            "subject": "The Art of Being Happy",
-            "teacher": "Ms. Kishori Ravi Shankar",
-            "room": "P"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 2,
-            "subject": "The Art of Being Happy",
-            "teacher": "Ms. Kishori Ravi Shankar",
-            "room": "P"
+            "subject": "Corporate Law",
+            "teacher": "Dr.Monu",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Introduction to Business Analytics",
-            "teacher": "Dr. Rishi Rajan Sahay",
-            "room": "Room 603"
+            "subject": "Corporate Law",
+            "teacher": "Dr.Monu",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -1470,47 +1470,47 @@
           },
           {
             "period": 4,
-            "subject": "Organizational Behaviour",
-            "teacher": "Dr. Anuja Mathur",
-            "room": "Room 603"
+            "subject": "Financial Markets & Institutions",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "G2: Macroeconomics | G1: Organizational Behaviour",
-            "teacher": "Dr. Sushmita (G2) / Dr. Anuja Mathur (G1)",
-            "room": "G2: Room 603 / G1: Room 236"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "P"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
+            "subject": "Corporate Law",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           }
         ],
         "Friday": [
           {
             "period": 1,
-            "subject": "Business Intelligence and Data Visualization",
-            "teacher": "Ms. Sanchi Kalra",
-            "room": "P"
+            "subject": "The Art of Being Happy",
+            "teacher": "Ms. Kajol",
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Business Intelligence and Data Visualization",
-            "teacher": "Ms. Sanchi Kalra",
-            "room": "P"
+            "subject": "Corporate Finance",
+            "teacher": "Dr. Madhu Totla",
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "The Art of Being Happy",
-            "teacher": "Ms. Kishori Ravi Shankar",
-            "room": "Room 603"
+            "teacher": "Ms. Kajol",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -1521,21 +1521,21 @@
           },
           {
             "period": 4,
-            "subject": "Organizational Behaviour",
-            "teacher": "Dr. Anuja Mathur",
-            "room": "Room 603"
+            "subject": "Corporate Finance",
+            "teacher": "Dr. Madhu Totla",
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Macroeconomics",
-            "teacher": "Dr. Sushmita",
-            "room": "Room 603"
+            "subject": "Business Intelligence and Data Visualization",
+            "teacher": "Mr. Vineet",
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
+            "subject": "Business Intelligence and Data Visualization",
+            "teacher": "Mr. Vineet",
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -1551,19 +1551,19 @@
             "period": 1,
             "subject": "Organizational Behaviour",
             "teacher": "Mr. Abhimanyu Verma",
-            "room": "Room 644"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Social and Emotional Learning",
             "teacher": "Dr. Sushmita",
-            "room": "Room 644"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Creativity and Innovation",
             "teacher": "Dr. Krishnaveni Achary",
-            "room": "Room 644"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -1576,45 +1576,45 @@
             "period": 4,
             "subject": "Introduction to Business Analytics",
             "teacher": "Dr. Satish Kumar Goel",
-            "room": "Room 644"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Introduction to Business Analytics",
             "teacher": "Dr. Satish Kumar Goel",
-            "room": "Room 644"
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Communication in Professional Life | Business Intelligence and Data Visualization",
-            "teacher": "Dr. Ankita Arora / Mr. Vinayak Gautam",
-            "room": "Room 557 / Room 644"
+            "subject": "Business Intelligence and Data Visualization",
+            "teacher": "Mr. Vinayak Gautam",
+            "room": "Room 703"
           },
           {
             "period": 7,
-            "subject": "Communication in Professional Life | Business Intelligence and Data Visualization",
-            "teacher": "Dr. Ankita Arora / Mr. Vinayak Gautam",
-            "room": "Room 557 / Room 644"
+            "subject": "Business Intelligence and Data Visualization",
+            "teacher": "Mr. Vinayak Gautam",
+            "room": "Room 703"
           }
         ],
         "Tuesday": [
           {
             "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "P"
+            "subject": "C&I (P) (Unsupervised)",
+            "teacher": "C&I (P) (Unsupervised)",
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Introduction to Business Analytics",
             "teacher": "Dr. Satish Kumar Goel",
-            "room": "Room 644"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Creativity and Innovation",
             "teacher": "Dr. Krishnaveni Achary",
-            "room": "Room 644"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -1627,19 +1627,19 @@
             "period": 4,
             "subject": "Creativity and Innovation",
             "teacher": "Dr. Krishnaveni Achary",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "G1: Organizational Behaviour | G2: Social and Emotional Learning",
-            "teacher": "Dr.  Seema Kataria (G1) / Dr. Sushmita (G2)",
-            "room": "G1: Room 644 / G2: Room 236"
+            "subject": "Organizational Behaviour",
+            "teacher": "Dr.  Seema Kataria",
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "G2: Organizational Behaviour | G1: Social and Emotional Learning",
-            "teacher": "Dr.  Seema Kataria (G2) / Dr. Sushmita (G1)",
-            "room": "G2: Room 644 / G1: Room 236"
+            "subject": "Organizational Behaviour",
+            "teacher": "Dr.  Seema Kataria",
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -1653,19 +1653,19 @@
             "period": 1,
             "subject": "The Art of Being Happy",
             "teacher": "Ms. Kishori Ravi Shankar",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "The Art of Being Happy | Social and Emotional Learning",
-            "teacher": "Ms. Kishori Ravi Shankar / Ms. Ayesha S. Ansari",
-            "room": "P / Room 236"
+            "subject": "The Art of Being Happy",
+            "teacher": "Ms. Kishori Ravi Shankar",
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Social and Emotional Learning",
             "teacher": "Dr. Sushmita",
-            "room": "Room 644"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -1678,25 +1678,25 @@
             "period": 4,
             "subject": "Organizational Behaviour",
             "teacher": "Dr. Anuja Mathur",
-            "room": "Room 644"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Introduction to Business Analytics",
             "teacher": "Dr. Satish Kumar Goel",
-            "room": "Room 326"
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Hindi B",
-            "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Ms. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "subject": "Hindi A (Merged with BMS 3A)",
+            "teacher": "Dr. Garima TripathI",
+            "room": "Room 703"
           },
           {
             "period": 7,
-            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Hindi B",
-            "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Ms. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "subject": "Hindi A (Merged with BMS 3A)",
+            "teacher": "Dr. Garima TripathI",
+            "room": "Room 703"
           }
         ],
         "Thursday": [
@@ -1704,19 +1704,19 @@
             "period": 1,
             "subject": "Creativity and Innovation",
             "teacher": "Dr. Krishnaveni Achary",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Creativity and Innovation",
             "teacher": "Dr. Krishnaveni Achary",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "The Art of Being Happy | Social and Emotional Learning",
-            "teacher": "Ms. Kishori Ravi Shankar / Dr. Sushmita",
-            "room": "Room 644 / VAC"
+            "subject": "Social and Emotional Learning",
+            "teacher": "Dr. Sushmita",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -1729,19 +1729,19 @@
             "period": 4,
             "subject": "Introduction to Business Analytics",
             "teacher": "Dr. Satish Kumar Goel",
-            "room": "Room 644"
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Communication in Professional Life | Business Intelligence and Data Visualization",
-            "teacher": "Dr. Ankita Arora / Mr. Vinayak Gautam",
-            "room": "Room 557 / Room 644 / Room 326"
+            "subject": "Business Intelligence and Data Visualization",
+            "teacher": "Mr. Vinayak Gautam",
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Communication in Professional Life | Business Intelligence and Data Visualization",
-            "teacher": "Dr. Ankita Arora / Mr. Vinayak Gautam",
-            "room": "Room 557 / Room 644 / Room 326"
+            "subject": "Business Intelligence and Data Visualization",
+            "teacher": "Mr. Vinayak Gautam",
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -1755,19 +1755,19 @@
             "period": 1,
             "subject": "Hindi B",
             "teacher": "Ms. Komal",
-            "room": "Hin B"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Hindi B",
             "teacher": "Ms. Komal",
-            "room": "Hin B"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Social and Emotional Learning",
             "teacher": "Dr. Sushmita",
-            "room": "Room 644"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -1780,19 +1780,19 @@
             "period": 4,
             "subject": "Social and Emotional Learning",
             "teacher": "Dr. Sushmita",
-            "room": "VAC"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Organizational Behaviour",
             "teacher": "Dr. Anuja Mathur",
-            "room": "Room 644"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Introduction to Business Analytics",
             "teacher": "Dr. Satish Kumar Goel",
-            "room": "Room 644"
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -1808,19 +1808,19 @@
             "period": 1,
             "subject": "Creativity and Innovation",
             "teacher": "Dr. Ritika Aggarwal",
-            "room": "Room 648"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Creativity and Innovation",
             "teacher": "Dr. Ritika Aggarwal",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Macroeconomics",
             "teacher": "Dr. Sushmita",
-            "room": "Room 648"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -1833,13 +1833,13 @@
             "period": 4,
             "subject": "Business Intelligence and Data Visualization",
             "teacher": "Mr. Vinayak Gautam",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Business Intelligence and Data Visualization",
             "teacher": "Mr. Vinayak Gautam",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 6,
@@ -1859,19 +1859,19 @@
             "period": 1,
             "subject": "Introduction to Business Analytics",
             "teacher": "Dr. Satish Kumar Goel",
-            "room": "Room 648"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Organizational Behaviour",
             "teacher": "Mr. Abhimanyu Verma",
-            "room": "Room 648"
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "G1: Organizational Behaviour | G?: Introduction to Business Analytics",
-            "teacher": "Mr. Abhimanyu Verma (G1) / Dr. Satish Kumar Goel (G?)",
-            "room": "G1: Room 648 / G?: Room 226"
+            "subject": "Organizational Behaviour",
+            "teacher": "Mr. Abhimanyu Verma",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -1884,25 +1884,25 @@
             "period": 4,
             "subject": "Introduction to Business Analytics",
             "teacher": "Dr. Satish Kumar Goel",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Business Intelligence and Data Visualization",
             "teacher": "Mr. Vinayak Gautam",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Business Intelligence and Data Visualization",
             "teacher": "Mr. Vinayak Gautam",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 7,
             "subject": "Hindi B",
             "teacher": "Dr. Garima TripathI",
-            "room": "Hin B"
+            "room": "Room 703"
           }
         ],
         "Wednesday": [
@@ -1910,19 +1910,19 @@
             "period": 1,
             "subject": "The Art of Being Happy",
             "teacher": "Ms. Kajol",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Organizational Behaviour",
             "teacher": "Mr. Abhimanyu Verma",
-            "room": "Room 648"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "The Art of Being Happy",
             "teacher": "Ms. Kajol",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -1935,25 +1935,25 @@
             "period": 4,
             "subject": "Macroeconomics",
             "teacher": "Dr. Sushmita",
-            "room": "Room 648"
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Macroeconomics (G1)",
+            "subject": "Macroeconomics",
             "teacher": "Dr. Sushmita",
-            "room": "Room 648"
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Hindi B | Hindi C (Merged with BMS 3A) | Hindi D (Merged with BMS 3A)",
-            "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "subject": "Hindi B",
+            "teacher": "Dr. Garima TripathI",
+            "room": "Room 703"
           },
           {
             "period": 7,
-            "subject": "Hindi B | Hindi C (Merged with BMS 3A) | Hindi D (Merged with BMS 3A)",
-            "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "subject": "Hindi B",
+            "teacher": "Dr. Garima TripathI",
+            "room": "Room 703"
           }
         ],
         "Thursday": [
@@ -1961,19 +1961,19 @@
             "period": 1,
             "subject": "Creativity and Innovation",
             "teacher": "Dr. Ritika Aggarwal",
-            "room": "Room 648"
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "G2: Organizational Behaviour | G?: Introduction to Business Analytics",
-            "teacher": "Mr. Abhimanyu Verma (G2) / Dr. Satish Kumar Goel (G?)",
-            "room": "G2: Room 648 / G?: Room 226"
+            "subject": "Organizational Behaviour",
+            "teacher": "Mr. Abhimanyu Verma",
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Introduction to Business Analytics",
             "teacher": "Dr. Satish Kumar Goel",
-            "room": "Room 648"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -1986,19 +1986,19 @@
             "period": 4,
             "subject": "Macroeconomics",
             "teacher": "Dr. Sushmita",
-            "room": "Room 648"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Hindi B",
             "teacher": "Dr. Garima TripathI",
-            "room": "Hin B"
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "P"
+            "subject": "C&I (P) (Unsupervised)",
+            "teacher": "C&I (P) (Unsupervised)",
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -2012,19 +2012,19 @@
             "period": 1,
             "subject": "Organizational Behaviour",
             "teacher": "Mr. Abhimanyu Verma",
-            "room": "Room 648"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "The Art of Being Happy",
             "teacher": "Ms. Kajol",
-            "room": "Room 648"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Introduction to Business Analytics",
             "teacher": "Dr. Satish Kumar Goel",
-            "room": "Room 648"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -2037,19 +2037,19 @@
             "period": 4,
             "subject": "Creativity and Innovation",
             "teacher": "Dr. Ritika Aggarwal",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Creativity and Innovation",
             "teacher": "Dr. Ritika Aggarwal",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Macroeconomics (G2)",
+            "subject": "Macroeconomics",
             "teacher": "Dr. Sushmita",
-            "room": "Room 648"
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -2067,19 +2067,19 @@
             "period": 1,
             "subject": "Legal Aspects of Business",
             "teacher": "Mr. Mohd. Rashid",
-            "room": "Room 303"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Startup Operations & Future Proofing",
             "teacher": "Dr. Ayushi Gupta",
-            "room": "Room 303"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Startup Operations & Future Proofing",
             "teacher": "Dr. Ayushi Gupta",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -2092,13 +2092,13 @@
             "period": 4,
             "subject": "Startup Operations & Future Proofing",
             "teacher": "Dr. Paridhi",
-            "room": "Room 303"
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "P"
+            "subject": "SOFP (P) (Unsupervised)",
+            "teacher": "SOFP (P) (Unsupervised)",
+            "room": "Room 703"
           },
           {
             "period": 6,
@@ -2118,19 +2118,19 @@
             "period": 1,
             "subject": "Startup Operations & Future Proofing",
             "teacher": "Dr. Paridhi",
-            "room": "Room 303"
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "G1: Startup Operations & Future Proofing | G2: Legal Aspects of Business",
-            "teacher": "Dr. Paridhi (G1) / Mr. Mohd. Rashid (G2)",
-            "room": "G1: Room 303 / G2: Room 338"
+            "subject": "Startup Operations & Future Proofing",
+            "teacher": "Dr. Paridhi",
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Security Analysis & Portfolio Management",
             "teacher": "Dr. Neeraj Kumar Sehrawat",
-            "room": "Room 303"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -2143,19 +2143,19 @@
             "period": 4,
             "subject": "Legal Aspects of Business",
             "teacher": "Mr. Mohd. Rashid",
-            "room": "Room 303"
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "New Age Marketing (G1)",
+            "subject": "New Age Marketing",
             "teacher": "Mr. Tushar Marwaha",
-            "room": "Room 303"
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Security Analysis & Portfolio Management (G2)",
+            "subject": "Security Analysis & Portfolio Management",
             "teacher": "Dr. Neeraj Kumar Sehrawat",
-            "room": "Room 303"
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -2173,15 +2173,15 @@
           },
           {
             "period": 2,
-            "subject": "G2: Startup Operations & Future Proofing | G1: Legal Aspects of Business",
-            "teacher": "Dr. Paridhi (G2) / Mr. Mohd. Rashid (G1)",
-            "room": "G2: Room 303 / G1: Room 338"
+            "subject": "Startup Operations & Future Proofing",
+            "teacher": "Dr. Paridhi",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "G1: Security Analysis & Portfolio Management | G2: New Age Marketing",
-            "teacher": "Dr. Neeraj Kumar Sehrawat (G1) / Mr. Tushar Marwaha (G2)",
-            "room": "G1: Room 303 / G2: Room 338"
+            "subject": "New Age Marketing",
+            "teacher": "Mr. Tushar Marwaha",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -2194,19 +2194,19 @@
             "period": 4,
             "subject": "New Age Marketing",
             "teacher": "Mr. Tushar Marwaha",
-            "room": "Room 303"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Negotiation & Leadership",
             "teacher": "Mr. Vipin Patel",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Negotiation & Leadership",
             "teacher": "Mr. Vipin Patel",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -2220,19 +2220,19 @@
             "period": 1,
             "subject": "Startup Operations & Future Proofing",
             "teacher": "Dr. Paridhi",
-            "room": "Room 303"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Legal Aspects of Business",
             "teacher": "Mr. Mohd. Rashid",
-            "room": "Room 303"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Startup Operations & Future Proofing",
             "teacher": "Dr. Paridhi",
-            "room": "Startup"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -2245,25 +2245,25 @@
             "period": 4,
             "subject": "New Age Marketing",
             "teacher": "Mr. Tushar Marwaha",
-            "room": "Room 303"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Negotiation & Leadership",
             "teacher": "Mr. Vipin Patel",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Security Analysis & Portfolio Management",
             "teacher": "Dr. Neeraj Kumar Sehrawat",
-            "room": "Room 303"
+            "room": "Room 703"
           },
           {
             "period": 7,
             "subject": "Negotiation & Leadership",
             "teacher": "Mr. Vipin Patel",
-            "room": "P"
+            "room": "Room 703"
           }
         ],
         "Friday": [
@@ -2271,19 +2271,19 @@
             "period": 1,
             "subject": "Startup Operations & Future Proofing",
             "teacher": "Dr. Ayushi Gupta",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Startup Operations & Future Proofing",
             "teacher": "Dr. Ayushi Gupta",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Security Analysis & Portfolio Management",
             "teacher": "Dr. Neeraj Kumar Sehrawat",
-            "room": "Room 303"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -2296,7 +2296,7 @@
             "period": 4,
             "subject": "New Age Marketing",
             "teacher": "Mr. Tushar Marwaha",
-            "room": "Room 303"
+            "room": "Room 703"
           },
           {
             "period": 5,
@@ -2322,21 +2322,21 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "Startup Operations & Future Proofing",
-            "teacher": "Ms. Sonam",
-            "room": "Room 307"
+            "subject": "Business Environment and Policy",
+            "teacher": "Mr. Raj",
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Business Ethics & Governance",
-            "teacher": "Dr. Paridhi",
-            "room": "Room 307"
+            "subject": "Corporate Restructuring",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Legal Aspects of Business",
-            "teacher": "Ms. Monu",
-            "room": "Room 307"
+            "subject": "Corporate Restructuring",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -2347,21 +2347,21 @@
           },
           {
             "period": 4,
-            "subject": "New Age Marketing",
-            "teacher": "Mr. Tushar Marwaha",
-            "room": "Room 307"
+            "subject": "Corporate Restructuring",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Security Analysis & Portfolio Management",
-            "teacher": "Dr. Neeraj Kumar Sehrawat",
-            "room": "Room 307"
+            "subject": "Insurance Management",
+            "teacher": "Dr. Ishan Luthra",
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "P"
+            "subject": "Corporate Restructuring",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -2373,21 +2373,21 @@
         "Tuesday": [
           {
             "period": 1,
-            "subject": "Negotiation & Leadership",
-            "teacher": "Dr. Ankita Arora",
-            "room": "P"
+            "subject": "Management of Financial Institutions",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Negotiation & Leadership",
-            "teacher": "Dr. Ankita Arora",
-            "room": "P"
+            "subject": "Negotiation and Leadership (Merged with BMS 5D)",
+            "teacher": "Ms. Mohini Rajput",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Business Ethics & Governance",
-            "teacher": "Dr. Paridhi",
-            "room": "Room 307"
+            "subject": "Negotiation and Leadership (Merged with BMS 5D)",
+            "teacher": "Ms. Mohini Rajput",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -2398,15 +2398,15 @@
           },
           {
             "period": 4,
-            "subject": "New Age Marketing",
-            "teacher": "Mr. Tushar Marwaha",
-            "room": "Room 307"
+            "subject": "Azmi",
+            "teacher": "Azmi",
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Startup Operations & Future Proofing",
-            "teacher": "Ms. Sonam",
-            "room": "P"
+            "subject": "Business Environment and Policy",
+            "teacher": "Mr. Raj",
+            "room": "Room 703"
           },
           {
             "period": 6,
@@ -2424,21 +2424,21 @@
         "Wednesday": [
           {
             "period": 1,
-            "subject": "Legal Aspects of Business",
-            "teacher": "Ms. Monu",
-            "room": "Room 307"
+            "subject": "Management of Financial Institutions",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Legal Aspects of Business",
-            "teacher": "Ms. Monu",
-            "room": "Tute"
+            "subject": "Negotiation and Leadership (Merged with BMS 5D)",
+            "teacher": "Ms. Mohini Rajput",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Business Ethics & Governance",
-            "teacher": "Dr. Paridhi",
-            "room": "Room 307"
+            "subject": "Negotiation and Leadership (Merged with BMS 5D)",
+            "teacher": "Ms. Mohini Rajput",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -2449,21 +2449,21 @@
           },
           {
             "period": 4,
-            "subject": "Startup Operations & Future Proofing",
-            "teacher": "Ms. Sonam",
-            "room": "P"
+            "subject": "Financial Derivatives",
+            "teacher": "Mr. Mohd. Rashid",
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Startup Operations & Future Proofing",
-            "teacher": "Ms. Sonam",
-            "room": "P"
+            "subject": "Financial Derivatives",
+            "teacher": "Mr. Mohd. Rashid",
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
+            "subject": "Financial Analytics (P) (Unsupervised)",
+            "teacher": "Financial Analytics (P) (Unsupervised)",
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -2475,21 +2475,21 @@
         "Thursday": [
           {
             "period": 1,
-            "subject": "Legal Aspects of Business",
-            "teacher": "Ms. Monu",
-            "room": "Room 307"
+            "subject": "Corporate Restructuring",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "G1: Business Ethics & Governance | G2: New Age Marketing",
-            "teacher": "Dr. Paridhi (G1) / Mr. Tushar Marwaha (G2)",
-            "room": "G1: Room 307 / G2: Room 338"
+            "subject": "Corporate Restructuring",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Startup Operations & Future Proofing",
-            "teacher": "Ms. Sonam",
-            "room": "Room 307"
+            "subject": "Financial Derivatives",
+            "teacher": "Mr. Mohd. Rashid",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -2500,21 +2500,21 @@
           },
           {
             "period": 4,
-            "subject": "Security Analysis & Portfolio Management",
-            "teacher": "Dr. Neeraj Kumar Sehrawat",
-            "room": "Room 307"
+            "subject": "Financial Derivatives",
+            "teacher": "Mr. Mohd. Rashid",
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Security Analysis & Portfolio Management (G1)",
-            "teacher": "Dr. Neeraj Kumar Sehrawat",
-            "room": "Room 307"
+            "subject": "Business Environment and Policy",
+            "teacher": "Mr. Raj",
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
+            "subject": "Insurance Management",
+            "teacher": "Dr. Ishan Luthra",
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -2526,21 +2526,21 @@
         "Friday": [
           {
             "period": 1,
-            "subject": "Negotiation & Leadership",
-            "teacher": "Dr. Ankita Arora",
-            "room": "P"
+            "subject": "Financial Derivatives",
+            "teacher": "Mr. Mohd. Rashid",
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Negotiation & Leadership",
-            "teacher": "Dr. Ankita Arora",
-            "room": "P"
+            "subject": "Insurance Management",
+            "teacher": "Dr. Ishan Luthra",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "G2: Business Ethics & Governance | G1: New Age Marketing",
-            "teacher": "Dr. Paridhi (G2) / Mr. Tushar Marwaha (G1)",
-            "room": "G2: Room 307 / G1: Room 338"
+            "subject": "Insurance Management",
+            "teacher": "Dr. Ishan Luthra",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -2551,21 +2551,21 @@
           },
           {
             "period": 4,
-            "subject": "Security Analysis & Portfolio Management",
-            "teacher": "Dr. Neeraj Kumar Sehrawat",
-            "room": "Room 307"
+            "subject": "Corporate Restructuring",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "New Age Marketing",
-            "teacher": "Mr. Tushar Marwaha",
-            "room": "Room 307"
+            "subject": "Corporate Restructuring",
+            "teacher": "Dr. Nidhi Kesari",
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Security Analysis & Portfolio Management (G2)",
-            "teacher": "Dr. Neeraj Kumar Sehrawat",
-            "room": "Room 307"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 7,
@@ -2581,19 +2581,19 @@
             "period": 1,
             "subject": "Business Ethics & Governance",
             "teacher": "Dr. Paridhi",
-            "room": "Room 361"
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Financial Analytics | Startup Operations & Future Proofing",
-            "teacher": "Mr. Ankit Bisht / Ms. Sonam",
-            "room": "Room 507 / Room 361"
+            "subject": "Financial Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Financial Analytics | Startup Operations & Future Proofing",
-            "teacher": "Mr. Ankit Bisht / Ms. Sonam",
-            "room": "Room 507 / Room 361"
+            "subject": "Financial Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -2606,25 +2606,25 @@
             "period": 4,
             "subject": "New Age Marketing",
             "teacher": "Mr. Abhimanyu Verma",
-            "room": "Room 361"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "New Age Marketing",
             "teacher": "Mr. Abhimanyu Verma",
-            "room": "Room 361"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Security Analysis & Portfolio Management",
             "teacher": "Dr. Neeraj Kumar Sehrawat",
-            "room": "Room 361"
+            "room": "Room 703"
           },
           {
             "period": 7,
             "subject": "Security Analysis & Portfolio Management",
             "teacher": "Dr. Neeraj Kumar Sehrawat",
-            "room": "Tute"
+            "room": "Room 703"
           }
         ],
         "Tuesday": [
@@ -2632,19 +2632,19 @@
             "period": 1,
             "subject": "New Age Marketing",
             "teacher": "Mr. Abhimanyu Verma",
-            "room": "Room 361"
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Statistical Software Package | PA",
-            "teacher": "Dr. Mona Verma / PA",
-            "room": "P"
+            "subject": "Statistical Software Package",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Statistical Software Package | PA",
-            "teacher": "Dr. Mona Verma / PA",
-            "room": "P"
+            "subject": "Statistical Software Package",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -2657,25 +2657,25 @@
             "period": 4,
             "subject": "Startup Operations & Future Proofing",
             "teacher": "Ms. Sonam",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Negotiation & Leadership",
             "teacher": "Ms. Priyanka Aggarwal",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Marketing of Services",
             "teacher": "Mr. Tushar Marwaha",
-            "room": "Room 523"
+            "room": "Room 703"
           },
           {
             "period": 7,
             "subject": "Marketing of Services",
             "teacher": "Mr. Tushar Marwaha",
-            "room": "Merged with BMS &  BBA 7"
+            "room": "Room 703"
           }
         ],
         "Wednesday": [
@@ -2683,19 +2683,19 @@
             "period": 1,
             "subject": "New Age Marketing",
             "teacher": "Mr. Abhimanyu Verma",
-            "room": "Room 361"
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Statistical Software Package | PA",
-            "teacher": "Dr. Mona Verma / PA",
-            "room": "P"
+            "subject": "Statistical Software Package",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Statistical Software Package | PA",
-            "teacher": "Dr. Mona Verma / PA",
-            "room": "P"
+            "subject": "Statistical Software Package",
+            "teacher": "Dr. Mona Verma",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -2708,45 +2708,45 @@
             "period": 4,
             "subject": "Business Ethics & Governance",
             "teacher": "Dr. Paridhi",
-            "room": "Room 361"
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Security Analysis & Portfolio Management | Marketing of Services",
-            "teacher": "Dr. Neeraj Kumar Sehrawat / Mr. Tushar Marwaha",
-            "room": "Room 361 / Room 523"
+            "subject": "Marketing of Services",
+            "teacher": "Mr. Tushar Marwaha",
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Security Analysis & Portfolio Management | Marketing of Services",
-            "teacher": "Dr. Neeraj Kumar Sehrawat / Mr. Tushar Marwaha",
-            "room": "Tute / Room 523"
+            "subject": "Marketing of Services",
+            "teacher": "Mr. Tushar Marwaha",
+            "room": "Room 703"
           },
           {
             "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "P"
+            "subject": "SOFP (P) (Unsupervised)",
+            "teacher": "SOFP (P) (Unsupervised)",
+            "room": "Room 703"
           }
         ],
         "Thursday": [
           {
             "period": 1,
-            "subject": "Financial Analytics | Startup Operations & Future Proofing",
-            "teacher": "Mr. Ankit Bisht / Ms. Sonam",
-            "room": "Room 507 / P"
+            "subject": "Financial Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Financial Analytics | Startup Operations & Future Proofing",
-            "teacher": "Mr. Ankit Bisht / Ms. Sonam",
-            "room": "Room 507 / Room 651 / P"
+            "subject": "Financial Analytics",
+            "teacher": "Mr. Ankit Bisht",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "G2: Business Ethics & Governance | G1: New Age Marketing",
-            "teacher": "Dr. Raj Kumar (G2) / Mr. Abhimanyu Verma (G1)",
-            "room": "G2: Room 361 / G1: Room 338"
+            "subject": "Business Ethics & Governance",
+            "teacher": "Dr. Raj Kumar",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -2759,19 +2759,19 @@
             "period": 4,
             "subject": "Negotiation & Leadership",
             "teacher": "Ms. Priyanka Aggarwal",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Negotiation & Leadership",
             "teacher": "Ms. Priyanka Aggarwal",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "P"
+            "subject": "Financial Analytics (P) (Unsupervised)",
+            "teacher": "Financial Analytics (P) (Unsupervised)",
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -2785,19 +2785,19 @@
             "period": 1,
             "subject": "Business Ethics & Governance",
             "teacher": "Dr. Paridhi",
-            "room": "Room 361"
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "G1: Business Ethics & Governance | G2: New Age Marketing",
-            "teacher": "Dr. Paridhi (G1) / Mr. Abhimanyu Verma (G2)",
-            "room": "G1: Room 361 / G2: Room 338"
+            "subject": "Business Ethics & Governance",
+            "teacher": "Dr. Paridhi",
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "New Age Marketing",
             "teacher": "Mr. Abhimanyu Verma",
-            "room": "Room 361"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -2810,19 +2810,19 @@
             "period": 4,
             "subject": "New Age Marketing",
             "teacher": "Mr. Abhimanyu Verma",
-            "room": "Room 361"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "New Age Marketing",
             "teacher": "Mr. Abhimanyu Verma",
-            "room": "Tute"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Negotiation & Leadership",
             "teacher": "Ms. Priyanka Aggarwal",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -2838,19 +2838,19 @@
             "period": 1,
             "subject": "Startup Operations & Future Proofing",
             "teacher": "Dr. Ayushi Gupta",
-            "room": "Room 257"
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "G1: New Age Marketing | G2: Legal Aspects of Business",
-            "teacher": "Mr. Abhimanyu Verma (G1) / Mr. Mohd. Rashid (G2)",
-            "room": "G1: Room 257 / G2: Room 534"
+            "subject": "Legal Aspects of Business",
+            "teacher": "Mr. Mohd. Rashid",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "G2: New Age Marketing | G1: Business Ethics & Governance",
-            "teacher": "Mr. Abhimanyu Verma (G2) / Dr. Raj Kumar (G1)",
-            "room": "G2: Room 257 / G1: Room 534"
+            "subject": "Business Ethics & Governance",
+            "teacher": "Dr. Raj Kumar",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -2863,13 +2863,13 @@
             "period": 4,
             "subject": "New Age Marketing",
             "teacher": "Mr. Abhimanyu Verma",
-            "room": "Room 257"
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Marketing of Services (G2)",
+            "subject": "Marketing of Services",
             "teacher": "Mr. Tushar Marwaha",
-            "room": "Room 257"
+            "room": "Room 703"
           },
           {
             "period": 6,
@@ -2889,19 +2889,19 @@
             "period": 1,
             "subject": "Legal Aspects of Business",
             "teacher": "Ms. Kishori Ravi Shankar",
-            "room": "Room 257"
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "G1: Legal Aspects of Business | G2: Business Ethics & Governance",
-            "teacher": "Ms. Kishori Ravi Shankar (G1) / Dr. Raj Kumar (G2)",
-            "room": "G1: Room 257 / G2: Room 534"
+            "subject": "Business Ethics & Governance",
+            "teacher": "Dr. Raj Kumar",
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Business Ethics & Governance",
             "teacher": "Dr. Raj Kumar",
-            "room": "Room 257"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -2914,19 +2914,19 @@
             "period": 4,
             "subject": "Negotiation & Leadership",
             "teacher": "Ms. Priyanka Aggarwal",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Consumer Behvaiour | Marketing of Services",
-            "teacher": "Dr. Anuja Mathur / Mr. Praveen S.K.",
-            "room": "Room 534 / Room 257"
+            "subject": "New Age Marketing",
+            "teacher": "Mr. Abhimanyu Verma",
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Consumer Behvaiour | Marketing of Services",
-            "teacher": "Dr. Anuja Mathur / Mr. Praveen S.K.",
-            "room": "Room 534 / Room 257"
+            "subject": "New Age Marketing",
+            "teacher": "Mr. Abhimanyu Verma",
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -2940,19 +2940,19 @@
             "period": 1,
             "subject": "Startup Operations & Future Proofing",
             "teacher": "Dr. Paridhi",
-            "room": "Room 257"
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Consumer Behvaiour | Marketing of Services",
-            "teacher": "Dr. Anuja Mathur / Mr. Praveen S.K.",
-            "room": "Room 534 / Room 257"
+            "subject": "New Age Marketing",
+            "teacher": "Mr. Abhimanyu Verma",
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "New Age Marketing",
             "teacher": "Mr. Abhimanyu Verma",
-            "room": "Room 257"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -2965,13 +2965,13 @@
             "period": 4,
             "subject": "Business Ethics & Governance",
             "teacher": "Dr. Raj Kumar",
-            "room": "Room 257"
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "P"
+            "subject": "SOFP (P) (Unsupervised)",
+            "teacher": "SOFP (P) (Unsupervised)",
+            "room": "Room 703"
           },
           {
             "period": 6,
@@ -2991,19 +2991,19 @@
             "period": 1,
             "subject": "New Age Marketing",
             "teacher": "Mr. Abhimanyu Verma",
-            "room": "Room 257"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Business Ethics & Governance",
             "teacher": "Dr. Raj Kumar",
-            "room": "Room 257"
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "G?: Consumer Behvaiour | G1: Marketing of Services",
-            "teacher": "Dr. Anuja Mathur (G?) / Mr. Tushar Marwaha (G1)",
-            "room": "G?: Tute / G1: Room 257"
+            "subject": "Marketing of Services",
+            "teacher": "Mr. Tushar Marwaha",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -3016,19 +3016,19 @@
             "period": 4,
             "subject": "Startup Operations & Future Proofing",
             "teacher": "Dr. Ayushi Gupta",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Startup Operations & Future Proofing",
             "teacher": "Dr. Ayushi Gupta",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Negotiation & Leadership",
             "teacher": "Ms. Priyanka Aggarwal",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -3042,19 +3042,19 @@
             "period": 1,
             "subject": "Legal Aspects of Business",
             "teacher": "Ms. Kishori Ravi Shankar",
-            "room": "Room 257"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Legal Aspects of Business",
             "teacher": "Ms. Kishori Ravi Shankar",
-            "room": "Room 257"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Startup Operations & Future Proofing",
             "teacher": "Dr. Ayushi Gupta",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -3067,13 +3067,13 @@
             "period": 4,
             "subject": "Negotiation & Leadership",
             "teacher": "Ms. Priyanka Aggarwal",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Negotiation & Leadership",
             "teacher": "Ms. Priyanka Aggarwal",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 6,
@@ -3097,19 +3097,19 @@
             "period": 1,
             "subject": "Marketing and Sales for Entrepreneurs",
             "teacher": "Dr. Mehak Aggarwal",
-            "room": "Room 523"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Social Media Analytics (Merged with BBA 7A + BSc 7)",
             "teacher": "Mr. Rohan Gulati",
-            "room": "Room 523 / Room 651"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Social Media Analytics (Merged with BBA 7A + BSc 7)",
             "teacher": "Mr. Rohan Gulati",
-            "room": "Room 523 / Room 651"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -3122,25 +3122,25 @@
             "period": 4,
             "subject": "Marketing Analytics (Merged with BBA 7A)",
             "teacher": "Mr. Ankit Bisht",
-            "room": "Room 523"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Marketing Analytics (Merged with BBA 7A)",
             "teacher": "Mr. Ankit Bisht",
-            "room": "Room 523"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Research Methodology",
             "teacher": "Dr. Satish Kumar Goel",
-            "room": "Room 523"
+            "room": "Room 703"
           },
           {
             "period": 7,
             "subject": "Research Methodology",
             "teacher": "Dr. Satish Kumar Goel",
-            "room": "Room 523"
+            "room": "Room 703"
           }
         ],
         "Tuesday": [
@@ -3148,19 +3148,19 @@
             "period": 1,
             "subject": "Marketing and Sales for Entrepreneurs",
             "teacher": "Dr. Mehak Aggarwal",
-            "room": "Room 523"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Social Media Analytics (Merged with BBA 7A + BSc 7)",
             "teacher": "Mr. Rohan Gulati",
-            "room": "Room 523"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Social Media Analytics (Merged with BBA 7A + BSc 7)",
             "teacher": "Mr. Rohan Gulati",
-            "room": "Tute"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -3173,25 +3173,25 @@
             "period": 4,
             "subject": "Marketing Analytics (Merged with BBA 7A)",
             "teacher": "Mr. Ankit Bisht",
-            "room": "Room 523"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Marketing Analytics (Merged with BBA 7A)",
             "teacher": "Mr. Ankit Bisht",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Marketing of Services (Merged with BMS 5C)",
             "teacher": "Mr. Tushar Marwaha",
-            "room": "Room 523"
+            "room": "Room 703"
           },
           {
             "period": 7,
             "subject": "Marketing of Services (Merged with BMS 5C)",
             "teacher": "Mr. Tushar Marwaha",
-            "room": "Tute"
+            "room": "Room 703"
           }
         ],
         "Wednesday": [
@@ -3199,19 +3199,19 @@
             "period": 1,
             "subject": "Marketing and Sales for Entrepreneurs",
             "teacher": "Dr. Mehak Aggarwal",
-            "room": "Room 523"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Marketing and Sales for Entrepreneurs",
             "teacher": "Dr. Mehak Aggarwal",
-            "room": "Room 523"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Research Methodology",
             "teacher": "Dr. Satish Kumar Goel",
-            "room": "Room 523"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -3224,25 +3224,25 @@
             "period": 4,
             "subject": "Research Methodology",
             "teacher": "Dr. Satish Kumar Goel",
-            "room": "Tute"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Marketing of Services (Merged with BMS 5C)",
             "teacher": "Mr. Tushar Marwaha",
-            "room": "Room 523"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Marketing of Services (Merged with BMS 5C)",
             "teacher": "Mr. Tushar Marwaha",
-            "room": "Room 523"
+            "room": "Room 703"
           },
           {
             "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "P"
+            "subject": "Marketing Analytics (P) (Unsupervised)",
+            "teacher": "Marketing Analytics (P) (Unsupervised)",
+            "room": "Room 703"
           }
         ],
         "Thursday": [
@@ -3356,21 +3356,21 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "Environmental Science: Theory into Prractice - 1",
-            "teacher": "Dr.  Guncha Sharma",
-            "room": "P"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 2,
-            "subject": "Environmental Science: Theory into Prractice - 1",
-            "teacher": "Dr.  Guncha Sharma",
-            "room": "P"
+            "subject": "BMS+BBA(FIA)+BSc",
+            "teacher": "BMS+BBA(FIA)+BSc",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Microeconomics",
-            "teacher": "Ms. Shalini Prakash",
-            "room": "Room 203"
+            "subject": "BMS+BBA(FIA)+BSc",
+            "teacher": "BMS+BBA(FIA)+BSc",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -3381,15 +3381,15 @@
           },
           {
             "period": 4,
-            "subject": "G1: Microeconomics | G2: Financial Accounting and Analysis",
-            "teacher": "Ms. Shalini Prakash (G1) / Dr. Saumya Jain (G2)",
-            "room": "G1: Room 203 / G2: Room 236"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 5,
-            "subject": "Basic IT Tools",
-            "teacher": "Mr. Amit Kumar",
-            "room": "P"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 6,
@@ -3407,21 +3407,21 @@
         "Tuesday": [
           {
             "period": 1,
-            "subject": "Entrepreneurship Essentials - 1 | Python and Data Fundamentals (Merged with BMS 1A)",
-            "teacher": "Dr. Ritika Aggarwal / Dr.  Deepali Dhaka",
-            "room": "Room 203 / Merged with BMS 1A-703"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 2,
-            "subject": "Entrepreneurship Essentials - 1 | Python and Data Fundamentals (Merged with BMS 1A)",
-            "teacher": "Dr. Ritika Aggarwal / Dr.  Deepali Dhaka",
-            "room": "P / Merged with BMS 1A-703"
+            "subject": "BMS+BBA(FIA)+BSc",
+            "teacher": "BMS+BBA(FIA)+BSc",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Statistics for Business Decisions",
-            "teacher": "Dr. Rishi Rajan Sahay",
-            "room": "Room 203"
+            "subject": "BMS+BBA(FIA)+BSc G1+G2",
+            "teacher": "BMS+BBA(FIA)+BSc G1+G2",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -3432,47 +3432,47 @@
           },
           {
             "period": 4,
-            "subject": "Financial Accounting and Analysis",
-            "teacher": "Dr. Saumya Jain",
-            "room": "Room 203"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 5,
-            "subject": "Microeconomics",
-            "teacher": "Ms. Shalini Prakash",
-            "room": "Room 203"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 6,
-            "subject": "Constitutional Values and Fundamental Duties (Merged with BMS 1A) | Fit India",
-            "teacher": "Mr. Vipin Patel / Ms. Nisha Rajput",
-            "room": "Merged with BMS 1A / P"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 7,
-            "subject": "Constitutional Values and Fundamental Duties (Merged with BMS 1A) | Fit India",
-            "teacher": "Mr. Vipin Patel / Ms. Nisha Rajput",
-            "room": "Merged with BMS 1A / P"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           }
         ],
         "Wednesday": [
           {
             "period": 1,
-            "subject": "Entrepreneurship Essentials - 1 | Python and Data Fundamentals (Merged with BMS 1A)",
-            "teacher": "Dr. Ritika Aggarwal / Dr.  Deepali Dhaka",
-            "room": "P / Merged with BMS 1A-703"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 2,
-            "subject": "Entrepreneurship Essentials - 1 | Python and Data Fundamentals (Merged with BMS 1A)",
-            "teacher": "Dr. Ritika Aggarwal / Dr.  Deepali Dhaka",
-            "room": "P"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 3,
-            "subject": "Financial Accounting and Analysis",
-            "teacher": "Dr. Saumya Jain",
-            "room": "Room 203"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 0,
@@ -3483,15 +3483,15 @@
           },
           {
             "period": 4,
-            "subject": "Basic IT Tools",
-            "teacher": "Mr. Amit Kumar",
-            "room": "P"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 5,
-            "subject": "Statistics for Business Decisions",
-            "teacher": "Dr. Rishi Rajan Sahay",
-            "room": "Tute"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 6,
@@ -3509,21 +3509,21 @@
         "Thursday": [
           {
             "period": 1,
-            "subject": "Environmental Science: Theory into Prractice - 1",
-            "teacher": "Dr.  Guncha Sharma",
-            "room": "Room 203"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 2,
-            "subject": "Entrepreneurship Essentials - 1 | Python and Data Fundamentals (Merged with BMS 1A)",
-            "teacher": "Dr. Ritika Aggarwal / Dr.  Deepali Dhaka",
-            "room": "Room 203 / P"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 3,
-            "subject": "Microeconomics",
-            "teacher": "Ms. Shalini Prakash",
-            "room": "Room 203"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 0,
@@ -3534,47 +3534,47 @@
           },
           {
             "period": 4,
-            "subject": "Financial Accounting and Analysis",
-            "teacher": "Dr. Saumya Jain",
-            "room": "Room 203"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 5,
-            "subject": "Statistics for Business Decisions",
-            "teacher": "Dr. Rishi Rajan Sahay",
-            "room": "Room 203"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 6,
-            "subject": "Constitutional Values and Fundamental Duties (Merged with BMS 1A) | Fit India",
-            "teacher": "Mr. Vipin Patel / Ms. Nisha Rajput",
-            "room": "Merged with BMS 1A / P"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 7,
-            "subject": "Fit India",
-            "teacher": "Ms. Nisha Rajput",
-            "room": "P"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           }
         ],
         "Friday": [
           {
             "period": 1,
-            "subject": "Entrepreneurship Essentials - 1",
-            "teacher": "Dr. Kumar Bijoy",
-            "room": "P"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 2,
-            "subject": "G2: Microeconomics | G1: Financial Accounting and Analysis",
-            "teacher": "Ms. Shalini Prakash (G2) / Dr. Saumya Jain (G1)",
-            "room": "G2: Room 203 / G1: Room 236"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 3,
-            "subject": "Statistics for Business Decisions",
-            "teacher": "Dr. Rishi Rajan Sahay",
-            "room": "Room 203"
+            "subject": "Free",
+            "teacher": "-",
+            "room": "-"
           },
           {
             "period": 0,
@@ -3585,15 +3585,15 @@
           },
           {
             "period": 4,
-            "subject": "Basic IT Tools",
-            "teacher": "Mr. Amit Kumar",
-            "room": "P"
+            "subject": "BMS 3D",
+            "teacher": "BMS 3D",
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Basic IT Tools",
-            "teacher": "Mr. Amit Kumar",
-            "room": "P"
+            "subject": "BMS 3D (P)",
+            "teacher": "BMS 3D (P)",
+            "room": "Room 703"
           },
           {
             "period": 6,
@@ -3613,21 +3613,21 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "Financial Accounting Analysis (G1)",
+            "subject": "Financial Accounting Analysis",
             "teacher": "Dr. Madhu Totla",
-            "room": "Room 253"
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "G1: Micro Economics | G2: Statistics for Business Decisions",
-            "teacher": "Ms. Shalini Prakash (G1) / Dr. Mona Verma (G2)",
-            "room": "G1: Room 253 / G2: Room 236"
+            "subject": "Micro Economics",
+            "teacher": "Ms. Shalini Prakash",
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Environmental Science: Theory into Practice - 1",
             "teacher": "Dr.  Guncha Sharma",
-            "room": "Room 253"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -3640,25 +3640,25 @@
             "period": 4,
             "subject": "Financial Accounting Analysis",
             "teacher": "Ms. Seema Kataria",
-            "room": "Room 253"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Financial Accounting Analysis",
             "teacher": "Ms. Seema Kataria",
-            "room": "Room 253"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Fit India  (Merged with BSc 1)",
             "teacher": "Ms. Nisha Rajput",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 7,
             "subject": "Fit India  (Merged with BSc 1)",
             "teacher": "Ms. Nisha Rajput",
-            "room": "P"
+            "room": "Room 703"
           }
         ],
         "Tuesday": [
@@ -3666,19 +3666,19 @@
             "period": 1,
             "subject": "Basic IT Tools",
             "teacher": "Dr. Neha Bhatia",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Basic IT Tools",
             "teacher": "Dr. Neha Bhatia",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Statistics for Business Decisions",
             "teacher": "Dr. Divya Seth",
-            "room": "Room 253"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -3691,13 +3691,13 @@
             "period": 4,
             "subject": "Micro Economics",
             "teacher": "Ms. Shalini Prakash",
-            "room": "Room 253"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Entrepreneurship Essentials - 1",
             "teacher": "Dr. Ramesh Kumar",
-            "room": "Room 253"
+            "room": "Room 703"
           },
           {
             "period": 6,
@@ -3717,70 +3717,19 @@
             "period": 1,
             "subject": "Statistics for Business Decisions",
             "teacher": "Dr. Divya Seth",
-            "room": "Room 253"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Statistics for Business Decisions",
             "teacher": "Dr. Divya Seth",
-            "room": "Room 253"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Entrepreneurship Essentials - 1",
             "teacher": "Dr. Ramesh Kumar",
-            "room": "Room 253"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "G2: Micro Economics | G1: Statistics for Business Decisions",
-            "teacher": "Ms. Shalini Prakash (G2) / Dr. Mona Verma (G1)",
-            "room": "G2: Room 253 / G1: Room 236"
-          },
-          {
-            "period": 5,
-            "subject": "Entrepreneurship Essentials - 1",
-            "teacher": "Dr. Ramesh Kumar",
-            "room": "P"
-          },
-          {
-            "period": 6,
-            "subject": "Fit India  (Merged with BSc 1)",
-            "teacher": "Ms. Nisha Rajput",
-            "room": "P"
-          },
-          {
-            "period": 7,
-            "subject": "Fit India  (Merged with BSc 1)",
-            "teacher": "Ms. Nisha Rajput",
-            "room": "P"
-          }
-        ],
-        "Thursday": [
-          {
-            "period": 1,
-            "subject": "Entrepreneurship Essentials - 1",
-            "teacher": "Dr. Kumar Bijoy",
-            "room": "P"
-          },
-          {
-            "period": 2,
-            "subject": "Environmental Science: Theory into Practice - 1",
-            "teacher": "Dr.  Guncha Sharma",
-            "room": "P"
-          },
-          {
-            "period": 3,
-            "subject": "Environmental Science: Theory into Practice - 1",
-            "teacher": "Dr.  Guncha Sharma",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -3793,19 +3742,70 @@
             "period": 4,
             "subject": "Micro Economics",
             "teacher": "Ms. Shalini Prakash",
-            "room": "Room 253"
+            "room": "Room 703"
+          },
+          {
+            "period": 5,
+            "subject": "Entrepreneurship Essentials - 1",
+            "teacher": "Dr. Ramesh Kumar",
+            "room": "Room 703"
+          },
+          {
+            "period": 6,
+            "subject": "Fit India  (Merged with BSc 1)",
+            "teacher": "Ms. Nisha Rajput",
+            "room": "Room 703"
+          },
+          {
+            "period": 7,
+            "subject": "Fit India  (Merged with BSc 1)",
+            "teacher": "Ms. Nisha Rajput",
+            "room": "Room 703"
+          }
+        ],
+        "Thursday": [
+          {
+            "period": 1,
+            "subject": "Entrepreneurship Essentials - 1",
+            "teacher": "Dr. Kumar Bijoy",
+            "room": "Room 703"
+          },
+          {
+            "period": 2,
+            "subject": "Environmental Science: Theory into Practice - 1",
+            "teacher": "Dr.  Guncha Sharma",
+            "room": "Room 703"
+          },
+          {
+            "period": 3,
+            "subject": "Environmental Science: Theory into Practice - 1",
+            "teacher": "Dr.  Guncha Sharma",
+            "room": "Room 703"
+          },
+          {
+            "period": 0,
+            "isBreak": true,
+            "subject": "Infinity Hour (Break)",
+            "teacher": "",
+            "room": ""
+          },
+          {
+            "period": 4,
+            "subject": "Micro Economics",
+            "teacher": "Ms. Shalini Prakash",
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Financial Accounting Analysis",
             "teacher": "Ms. Seema Kataria",
-            "room": "Room 253"
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Financial Accounting Analysis (G2)",
+            "subject": "Financial Accounting Analysis",
             "teacher": "Dr. Saumya Jain",
-            "room": "Room 253"
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -3819,19 +3819,19 @@
             "period": 1,
             "subject": "Basic IT Tools",
             "teacher": "Dr. Neha Bhatia",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Basic IT Tools",
             "teacher": "Dr. Neha Bhatia",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Micro Economics",
             "teacher": "Ms. Shalini Prakash",
-            "room": "Room 253"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -3844,535 +3844,19 @@
             "period": 4,
             "subject": "Entrepreneurship Essentials - 1",
             "teacher": "Dr. Ramesh Kumar",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Entrepreneurship Essentials - 1",
             "teacher": "Dr. Ramesh Kumar",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Free",
             "teacher": "-",
             "room": "-"
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ]
-      }
-    },
-    "3": {
-      "A": {
-        "Monday": [
-          {
-            "period": 1,
-            "subject": "Financial Markets & Institutions (G2)",
-            "teacher": "Dr. Kumar Bijoy",
-            "room": "Room 553"
-          },
-          {
-            "period": 2,
-            "subject": "Financial Markets & Institutions",
-            "teacher": "Dr. Kumar Bijoy",
-            "room": "Room 553"
-          },
-          {
-            "period": 3,
-            "subject": "Corporate Law",
-            "teacher": "Dr. Nidhi Kesari",
-            "room": "Room 553"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Hindi C (Merged  BMS 3A)",
-            "teacher": "Dr. Soumya Guliyan",
-            "room": "Hin B"
-          },
-          {
-            "period": 5,
-            "subject": "Hindi C (Merged  BMS 3A)",
-            "teacher": "Dr. Soumya Guliyan",
-            "room": "Hin B"
-          },
-          {
-            "period": 6,
-            "subject": "Business Intelligence and Data Visualization | Corporate Law",
-            "teacher": "Mr. Vineet / Dr. Nidhi Kesari",
-            "room": "P"
-          },
-          {
-            "period": 7,
-            "subject": "Business Intelligence and Data Visualization | Corporate Law",
-            "teacher": "Mr. Vineet / Dr. Nidhi Kesari",
-            "room": "P"
-          }
-        ],
-        "Tuesday": [
-          {
-            "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "P"
-          },
-          {
-            "period": 2,
-            "subject": "Financial Markets & Institutions",
-            "teacher": "Dr. Kumar Bijoy",
-            "room": "Room 553"
-          },
-          {
-            "period": 3,
-            "subject": "Corporate Law",
-            "teacher": "Dr. Nidhi Kesari",
-            "room": "Room 553"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Corporate Law",
-            "teacher": "Dr. Nidhi Kesari",
-            "room": "Room 553"
-          },
-          {
-            "period": 5,
-            "subject": "Corporate Finance",
-            "teacher": "Mr. Amit Kumar",
-            "room": "Room 553"
-          },
-          {
-            "period": 6,
-            "subject": "Creativity and Innovation",
-            "teacher": "Ms. Twinkle Ainapure",
-            "room": "P"
-          },
-          {
-            "period": 7,
-            "subject": "Creativity and Innovation",
-            "teacher": "Ms. Twinkle Ainapure",
-            "room": "P"
-          }
-        ],
-        "Wednesday": [
-          {
-            "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 2,
-            "subject": "Financial Markets & Institutions",
-            "teacher": "Dr. Kumar Bijoy",
-            "room": "Room 553"
-          },
-          {
-            "period": 3,
-            "subject": "G1: Corporate Finance | G2: Corporate Law",
-            "teacher": "Mr. Amit Kumar (G1) / Dr. Nidhi Kesari (G2)",
-            "room": "G1: Room 553 / G2: Room 236"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Social and Emotional Learning",
-            "teacher": "Ms. Ayesha S. Ansari",
-            "room": "Room 553"
-          },
-          {
-            "period": 5,
-            "subject": "Corporate Law (G1)",
-            "teacher": "Dr. Nidhi Kesari",
-            "room": "Room 553"
-          },
-          {
-            "period": 6,
-            "subject": "Garima  607 | Hindi C (Merged  BMS 3A) | Hindi D (Merged BMS 3D)",
-            "teacher": "Garima  607 / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
-          },
-          {
-            "period": 7,
-            "subject": "Garima  607 | Hindi C (Merged  BMS 3A) | Hindi D (Merged BMS 3D)",
-            "teacher": "Garima  607 / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
-          }
-        ],
-        "Thursday": [
-          {
-            "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 2,
-            "subject": "Corporate Finance",
-            "teacher": "Mr. Amit Kumar",
-            "room": "Room 553"
-          },
-          {
-            "period": 3,
-            "subject": "G1: Financial Markets & Institutions | G2: Corporate Finance",
-            "teacher": "Dr. Kumar Bijoy (G1) / Mr. Amit Kumar (G2)",
-            "room": "G1: Room 553 / G2: Room 237"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Creativity and Innovation",
-            "teacher": "Ms. Twinkle Ainapure",
-            "room": "Room 553"
-          },
-          {
-            "period": 5,
-            "subject": "Business Intelligence and Data Visualization | Corporate Law",
-            "teacher": "Mr. Vineet / Dr. Nidhi Kesari",
-            "room": "P"
-          },
-          {
-            "period": 6,
-            "subject": "Business Intelligence and Data Visualization | Corporate Law",
-            "teacher": "Mr. Vineet / Dr. Nidhi Kesari",
-            "room": "P"
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ],
-        "Friday": [
-          {
-            "period": 1,
-            "subject": "Creativity and Innovation",
-            "teacher": "Ms. Twinkle Ainapure",
-            "room": "Room 553"
-          },
-          {
-            "period": 2,
-            "subject": "Creativity and Innovation",
-            "teacher": "Ms. Twinkle Ainapure",
-            "room": "P"
-          },
-          {
-            "period": 3,
-            "subject": "Corporate Finance",
-            "teacher": "Mr. Amit Kumar",
-            "room": "Room 553"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Social and Emotional Learning",
-            "teacher": "Ms. Ayesha S. Ansari",
-            "room": "Room 553"
-          },
-          {
-            "period": 5,
-            "subject": "Social and Emotional Learning",
-            "teacher": "Ms. Ayesha S. Ansari",
-            "room": "Room 553"
-          },
-          {
-            "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ]
-      },
-      "B": {
-        "Monday": [
-          {
-            "period": 1,
-            "subject": "Corporate Law",
-            "teacher": "Dr.Monu",
-            "room": "Room 557"
-          },
-          {
-            "period": 2,
-            "subject": "Corporate Law",
-            "teacher": "Dr.Monu",
-            "room": "Room 557"
-          },
-          {
-            "period": 3,
-            "subject": "Financial Markets & Institutions",
-            "teacher": "Dr. Kumar Bijoy",
-            "room": "Room 557"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Hindi D (Merged BMS 3D)",
-            "teacher": "Mr. Komal",
-            "room": "Hin B"
-          },
-          {
-            "period": 5,
-            "subject": "Hindi D (Merged BMS 3D)",
-            "teacher": "Mr. Komal",
-            "room": "Hin B"
-          },
-          {
-            "period": 6,
-            "subject": "Corporate Law",
-            "teacher": "Dr. Nidhi Kesari",
-            "room": "P"
-          },
-          {
-            "period": 7,
-            "subject": "Corporate Law",
-            "teacher": "Dr. Nidhi Kesari",
-            "room": "P"
-          }
-        ],
-        "Tuesday": [
-          {
-            "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "P"
-          },
-          {
-            "period": 2,
-            "subject": "G1: Corporate Finance | G2: Corporate Law",
-            "teacher": "Dr. Madhu Totla (G1) / Dr. Nidhi Kesari (G2)",
-            "room": "G1: Room 557 / G2: Room 237"
-          },
-          {
-            "period": 3,
-            "subject": "Financial Markets & Institutions",
-            "teacher": "Dr. Kumar Bijoy",
-            "room": "Room 557"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Creativity and Innovation | Digital Finance",
-            "teacher": "Ms. Twinkle Ainapure / Mr. Bhavya Bansal",
-            "room": "Room 557 / Room 534"
-          },
-          {
-            "period": 5,
-            "subject": "Creativity and Innovation | Digital Finance",
-            "teacher": "Ms. Twinkle Ainapure / Mr. Bhavya Bansal",
-            "room": "P / Room 534"
-          },
-          {
-            "period": 6,
-            "subject": "Business Intelligence and Data Visualization",
-            "teacher": "Mr. Vineet",
-            "room": "P"
-          },
-          {
-            "period": 7,
-            "subject": "Business Intelligence and Data Visualization",
-            "teacher": "Mr. Vineet",
-            "room": "P"
-          }
-        ],
-        "Wednesday": [
-          {
-            "period": 1,
-            "subject": "Corporate Finance",
-            "teacher": "Dr. Madhu Totla",
-            "room": "Room 557"
-          },
-          {
-            "period": 2,
-            "subject": "The Art of Being Happy",
-            "teacher": "Ms. Kajol",
-            "room": "Room 557"
-          },
-          {
-            "period": 3,
-            "subject": "G1: Financial Markets & Institutions | G2: Corporate Finance",
-            "teacher": "Dr. Kumar Bijoy (G1) / Dr. Madhu Totla (G2)",
-            "room": "G1: Room 557 / G2: Room 237"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Creativity and Innovation | Digital Finance",
-            "teacher": "Ms. Twinkle Ainapure / Mr. Bhavya Bansal",
-            "room": "Room 557 / Room 534"
-          },
-          {
-            "period": 5,
-            "subject": "Creativity and Innovation | Digital Finance",
-            "teacher": "Ms. Twinkle Ainapure / Mr. Bhavya Bansal",
-            "room": "P / Room 534"
-          },
-          {
-            "period": 6,
-            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged  BMS 3A) | Hindi D (Merged BMS 3D)",
-            "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
-          },
-          {
-            "period": 7,
-            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged  BMS 3A) | Hindi D (Merged BMS 3D)",
-            "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
-          }
-        ],
-        "Thursday": [
-          {
-            "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 2,
-            "subject": "G1: Corporate Law | G2: Financial Markets & Institutions",
-            "teacher": "Dr.Monu (G1) / Dr. Kumar Bijoy (G2)",
-            "room": "G1: Room 557 / G2: Room 534"
-          },
-          {
-            "period": 3,
-            "subject": "Corporate Law",
-            "teacher": "Dr.Monu",
-            "room": "Room 557"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Financial Markets & Institutions",
-            "teacher": "Dr. Kumar Bijoy",
-            "room": "Room 557"
-          },
-          {
-            "period": 5,
-            "subject": "Corporate Law",
-            "teacher": "Dr. Nidhi Kesari",
-            "room": "P"
-          },
-          {
-            "period": 6,
-            "subject": "Corporate Law",
-            "teacher": "Dr. Nidhi Kesari",
-            "room": "P"
-          },
-          {
-            "period": 7,
-            "subject": "Creativity and Innovation",
-            "teacher": "Ms. Twinkle Ainapure",
-            "room": "P"
-          }
-        ],
-        "Friday": [
-          {
-            "period": 1,
-            "subject": "The Art of Being Happy",
-            "teacher": "Ms. Kajol",
-            "room": "P"
-          },
-          {
-            "period": 2,
-            "subject": "Corporate Finance",
-            "teacher": "Dr. Madhu Totla",
-            "room": "Room 557"
-          },
-          {
-            "period": 3,
-            "subject": "The Art of Being Happy",
-            "teacher": "Ms. Kajol",
-            "room": "P"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Corporate Finance",
-            "teacher": "Dr. Madhu Totla",
-            "room": "Room 557"
-          },
-          {
-            "period": 5,
-            "subject": "Business Intelligence and Data Visualization",
-            "teacher": "Mr. Vineet",
-            "room": "P"
-          },
-          {
-            "period": 6,
-            "subject": "Business Intelligence and Data Visualization",
-            "teacher": "Mr. Vineet",
-            "room": "P"
           },
           {
             "period": 7,
@@ -4390,19 +3874,19 @@
             "period": 1,
             "subject": "Azmi",
             "teacher": "Azmi",
-            "room": "Room 503"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Business Environment and Policy",
             "teacher": "Dr. Raj Kumar",
-            "room": "Room 503"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Financial Derivatives",
             "teacher": "Mr. Mohd. Rashid",
-            "room": "Room 503"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -4415,19 +3899,19 @@
             "period": 4,
             "subject": "Azmi",
             "teacher": "Azmi",
-            "room": "Room 503"
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Corporate Restructuring (G1)",
+            "subject": "Corporate Restructuring",
             "teacher": "Dr. Nidhi Kesari",
-            "room": "Room 503"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Insurance Management",
             "teacher": "Dr. Ishan Luthra",
-            "room": "Room 503"
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -4441,19 +3925,19 @@
             "period": 1,
             "subject": "Financial Derivatives",
             "teacher": "Mr. Mohd. Rashid",
-            "room": "Room 503"
+            "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "Azmi",
-            "teacher": "Azmi",
-            "room": "P"
+            "subject": "Azmi (P)",
+            "teacher": "Azmi (P)",
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Azmi",
-            "teacher": "Azmi",
-            "room": "P"
+            "subject": "Azmi (P)",
+            "teacher": "Azmi (P)",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -4466,13 +3950,13 @@
             "period": 4,
             "subject": "Negotiation and Leadership (Merged with BMS 5D)",
             "teacher": "Ms. Mohini Rajput",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Negotiation and Leadership (Merged with BMS 5D)",
             "teacher": "Ms. Mohini Rajput",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 6,
@@ -4492,19 +3976,19 @@
             "period": 1,
             "subject": "Business Environment and Policy",
             "teacher": "Dr. Raj Kumar",
-            "room": "Room 503"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Corporate Restructuring",
             "teacher": "Dr. Nidhi Kesari",
-            "room": "Room 503"
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "G1: Business Environment and Policy | G2: Financial Derivatives",
-            "teacher": "Dr. Raj Kumar (G1) / Mr. Mohd. Rashid (G2)",
-            "room": "G1: Room 503 / G2: Room 534"
+            "subject": "Financial Derivatives",
+            "teacher": "Mr. Mohd. Rashid",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -4517,13 +4001,13 @@
             "period": 4,
             "subject": "Negotiation and Leadership (Merged with BMS 5D)",
             "teacher": "Ms. Mohini Rajput",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Negotiation and Leadership (Merged with BMS 5D)",
             "teacher": "Ms. Mohini Rajput",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 6,
@@ -4543,19 +4027,19 @@
             "period": 1,
             "subject": "Financial Derivatives",
             "teacher": "Mr. Mohd. Rashid",
-            "room": "Room 503"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Corporate Restructuring",
             "teacher": "Dr. Nidhi Kesari",
-            "room": "Room 503"
+            "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "Azmi",
-            "teacher": "Azmi",
-            "room": "P"
+            "subject": "Azmi (P)",
+            "teacher": "Azmi (P)",
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -4566,21 +4050,21 @@
           },
           {
             "period": 4,
-            "subject": "Corporate Restructuring (G2)",
+            "subject": "Corporate Restructuring",
             "teacher": "Dr. Nidhi Kesari",
-            "room": "Room 503"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Insurance Management",
             "teacher": "Dr. Ishan Luthra",
-            "room": "Room 503"
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "P"
+            "subject": "SOFP (P) (Unsupervised)",
+            "teacher": "SOFP (P) (Unsupervised)",
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -4594,225 +4078,19 @@
             "period": 1,
             "subject": "Business Environment and Policy",
             "teacher": "Dr. Raj Kumar",
-            "room": "Room 503"
+            "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Corporate Restructuring",
             "teacher": "Dr. Nidhi Kesari",
-            "room": "Room 503"
-          },
-          {
-            "period": 3,
-            "subject": "G2: Business Environment and Policy | G1: Financial Derivatives",
-            "teacher": "Dr. Raj Kumar (G2) / Mr. Mohd. Rashid (G1)",
-            "room": "G2: Room 503 / G1: Room 534"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Insurance Management",
-            "teacher": "Dr. Ishan Luthra",
-            "room": "Room 503"
-          },
-          {
-            "period": 5,
-            "subject": "Insurance Management",
-            "teacher": "Dr. Ishan Luthra",
-            "room": "Tute"
-          },
-          {
-            "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ]
-      },
-      "B": {
-        "Monday": [
-          {
-            "period": 1,
-            "subject": "Business Environment and Policy",
-            "teacher": "Mr. Raj",
-            "room": "Room 507"
-          },
-          {
-            "period": 2,
-            "subject": "Financial Analytics (Merged with BMS 5C & BBA 5A) | Azmi",
-            "teacher": "Mr. Ankit Bisht / Azmi",
-            "room": "Merged with BMS 5C / P"
-          },
-          {
-            "period": 3,
-            "subject": "Financial Analytics (Merged with BMS 5C & BBA 5A) | Azmi",
-            "teacher": "Mr. Ankit Bisht / Azmi",
-            "room": "Merged with BMS 5C / P"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Corporate Restructuring",
-            "teacher": "Dr. Nidhi Kesari",
-            "room": "Room 507"
-          },
-          {
-            "period": 5,
-            "subject": "Insurance Management",
-            "teacher": "Dr. Ishan Luthra",
-            "room": "Room 507"
-          },
-          {
-            "period": 6,
-            "subject": "Corporate Restructuring",
-            "teacher": "Dr. Nidhi Kesari",
-            "room": "Room 507"
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ],
-        "Tuesday": [
-          {
-            "period": 1,
-            "subject": "Management of Financial Institutions",
-            "teacher": "Dr. Kumar Bijoy",
-            "room": "Room 507"
-          },
-          {
-            "period": 2,
-            "subject": "Statistical Software Packages (Merged with BMS 5A) | Negotiation and Leadership (Merged with BMS 5D)",
-            "teacher": "Dr. Mona Verma / Ms. Mohini Rajput",
-            "room": "P"
-          },
-          {
-            "period": 3,
-            "subject": "Statistical Software Packages (Merged with BMS 5A) | Negotiation and Leadership (Merged with BMS 5D)",
-            "teacher": "Dr. Mona Verma / Ms. Mohini Rajput",
-            "room": "P"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Azmi",
-            "teacher": "Azmi",
-            "room": "Room 507"
-          },
-          {
-            "period": 5,
-            "subject": "Business Environment and Policy",
-            "teacher": "Mr. Raj",
-            "room": "Room 507"
-          },
-          {
-            "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ],
-        "Wednesday": [
-          {
-            "period": 1,
-            "subject": "Management of Financial Institutions",
-            "teacher": "Dr. Kumar Bijoy",
-            "room": "Room 507"
-          },
-          {
-            "period": 2,
-            "subject": "Statistical Software Packages (Merged with BMS 5A) | Negotiation and Leadership (Merged with BMS 5D)",
-            "teacher": "Dr. Mona Verma / Ms. Mohini Rajput",
-            "room": "P"
-          },
-          {
-            "period": 3,
-            "subject": "Statistical Software Packages (Merged with BMS 5A) | Negotiation and Leadership (Merged with BMS 5D)",
-            "teacher": "Dr. Mona Verma / Ms. Mohini Rajput",
-            "room": "P"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "G2: Corporate Restructuring | G1: Financial Derivatives",
-            "teacher": "Dr. Nidhi Kesari (G2) / Mr. Mohd. Rashid (G1)",
-            "room": "G2: Room 507 / G1: Room 534"
-          },
-          {
-            "period": 5,
-            "subject": "Financial Derivatives",
-            "teacher": "Mr. Mohd. Rashid",
-            "room": "Room 507"
-          },
-          {
-            "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "P"
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ],
-        "Thursday": [
-          {
-            "period": 1,
-            "subject": "Corporate Restructuring | Azmi",
-            "teacher": "Dr. Nidhi Kesari / Azmi",
-            "room": "P / Room 507"
-          },
-          {
-            "period": 2,
-            "subject": "Corporate Restructuring | Azmi",
-            "teacher": "Dr. Nidhi Kesari / Azmi",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Financial Derivatives",
             "teacher": "Mr. Mohd. Rashid",
-            "room": "Room 507"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -4823,66 +4101,15 @@
           },
           {
             "period": 4,
-            "subject": "G1: Business Environment and Policy | G2: Financial Derivatives",
-            "teacher": "Mr. Raj (G1) / Mr. Mohd. Rashid (G2)",
-            "room": "G1: Room 507 / G2: Room 534"
-          },
-          {
-            "period": 5,
-            "subject": "Business Environment and Policy",
-            "teacher": "Mr. Raj",
-            "room": "Room 507"
-          },
-          {
-            "period": 6,
             "subject": "Insurance Management",
             "teacher": "Dr. Ishan Luthra",
-            "room": "Room 507"
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ],
-        "Friday": [
-          {
-            "period": 1,
-            "subject": "Financial Derivatives",
-            "teacher": "Mr. Mohd. Rashid",
-            "room": "Room 507"
-          },
-          {
-            "period": 2,
-            "subject": "Management of Financial Institutions | Insurance Management",
-            "teacher": "Dr. Kumar Bijoy / Dr. Ishan Luthra",
-            "room": "Room 507 / Room 237"
-          },
-          {
-            "period": 3,
-            "subject": "Management of Financial Institutions | Insurance Management",
-            "teacher": "Dr. Kumar Bijoy / Dr. Ishan Luthra",
-            "room": "Tute"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "G2: Business Environment and Policy | G1: Corporate Restructuring",
-            "teacher": "Mr. Raj (G2) / Dr. Nidhi Kesari (G1)",
-            "room": "G2: Room 507 / G1: Room 534"
+            "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "Corporate Restructuring",
-            "teacher": "Dr. Nidhi Kesari",
-            "room": "Room 507"
+            "subject": "Insurance Management",
+            "teacher": "Dr. Ishan Luthra",
+            "room": "Room 703"
           },
           {
             "period": 6,
@@ -4912,13 +4139,13 @@
             "period": 2,
             "subject": "Social Media Analytics (Merged with BMS 7A + BSc 7)",
             "teacher": "Mr. Rohan Gulati",
-            "room": "Room 523 / Room 651"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Social Media Analytics (Merged with BMS 7A + BSc 7)",
             "teacher": "Mr. Rohan Gulati",
-            "room": "Room 523 / Room 651"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -4931,25 +4158,25 @@
             "period": 4,
             "subject": "Marketing Analytics (Merged with BMS 7A)",
             "teacher": "Mr. Ankit Bisht",
-            "room": "Room 523"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Marketing Analytics (Merged with BMS 7A)",
             "teacher": "Mr. Ankit Bisht",
-            "room": "Room 523"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Research Methodology (Merged with BMS 7A)",
             "teacher": "Dr. Satish Kumar Goel",
-            "room": "Room 523"
+            "room": "Room 703"
           },
           {
             "period": 7,
             "subject": "Research Methodology (Merged with BMS 7A)",
             "teacher": "Dr. Satish Kumar Goel",
-            "room": "Room 523"
+            "room": "Room 703"
           }
         ],
         "Tuesday": [
@@ -4963,13 +4190,13 @@
             "period": 2,
             "subject": "Social Media Analytics (Merged with BMS 7A + BSc 7)",
             "teacher": "Mr. Rohan Gulati",
-            "room": "Room 533"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Social Media Analytics (Merged with BMS 7A + BSc 7)",
             "teacher": "Mr. Rohan Gulati",
-            "room": "Tute"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -4982,25 +4209,25 @@
             "period": 4,
             "subject": "Marketing Analytics (Merged with BMS 7A)",
             "teacher": "Mr. Ankit Bisht",
-            "room": "Room 523"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Marketing Analytics (Merged with BMS 7A)",
             "teacher": "Mr. Ankit Bisht",
-            "room": "P"
+            "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Infrastructure Finance",
             "teacher": "Dr. Amit Kumar",
-            "room": "Room 533"
+            "room": "Room 703"
           },
           {
             "period": 7,
             "subject": "Infrastructure Finance",
             "teacher": "Dr. Amit Kumar",
-            "room": "Tute"
+            "room": "Room 703"
           }
         ],
         "Wednesday": [
@@ -5014,13 +4241,13 @@
             "period": 2,
             "subject": "Infrastructure Finance",
             "teacher": "Dr. Amit Kumar",
-            "room": "Room 533"
+            "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Research Methodology (Merged with BMS 7A)",
             "teacher": "Dr. Satish Kumar Goel",
-            "room": "Room 523"
+            "room": "Room 703"
           },
           {
             "period": 0,
@@ -5033,19 +4260,19 @@
             "period": 4,
             "subject": "Research Methodology (Merged with BMS 7A)",
             "teacher": "Dr. Satish Kumar Goel",
-            "room": "Tute"
+            "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Infrastructure Finance",
             "teacher": "Dr. Amit Kumar",
-            "room": "Room 533"
+            "room": "Room 703"
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "P"
+            "subject": "Marketing Analytics (P) (Unsupervised)",
+            "teacher": "Marketing Analytics (P) (Unsupervised)",
+            "room": "Room 703"
           },
           {
             "period": 7,
@@ -5165,20 +4392,20 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "Front End Programming",
-            "teacher": "Pushkar Gole",
-            "room": "Room 426"
+            "subject": "PG Lab 426",
+            "teacher": "PG Lab 426",
+            "room": "Room 403"
           },
           {
             "period": 2,
-            "subject": "G1: Front End Programming | G2: Computer System Architecture (Lab)",
-            "teacher": "Kavita Rastogi (G1) / Onkar Singh (G2)",
+            "subject": "KR G1/OS G2",
+            "teacher": "KR G1/OS G2",
             "room": "Room 403"
           },
           {
             "period": 3,
-            "subject": "Fundamentals of Organizational Behaviour (GE-Management) - merged with BMS 3B | Entrepreneurship Essentials - I (GE-Entrepreneurship)",
-            "teacher": "Anuja Mathur / Mehak Aggarwal",
+            "subject": "AM/MA",
+            "teacher": "AM/MA",
             "room": "Room 403"
           },
           {
@@ -5190,20 +4417,20 @@
           },
           {
             "period": 4,
-            "subject": "Front End Programming",
-            "teacher": "Kavita Rastogi",
-            "room": "SEC Room"
+            "subject": "KR (SEC Room)",
+            "teacher": "KR (SEC Room)",
+            "room": "Room 403"
           },
           {
             "period": 5,
-            "subject": "Fundamentals of Organizational Behaviour (GE-Management) - merged with BMS 3B",
-            "teacher": "Anuja Mathur",
+            "subject": "AM",
+            "teacher": "AM",
             "room": "Room 403"
           },
           {
             "period": 6,
-            "subject": "Mathematics for Computing (Lab) (G2)",
-            "teacher": "Anamika Gupta",
+            "subject": "AG G2",
+            "teacher": "AG G2",
             "room": "Room 403"
           },
           {
@@ -5216,20 +4443,20 @@
         "Tuesday": [
           {
             "period": 1,
-            "subject": "Front End Programming",
-            "teacher": "Pushkar Gole",
-            "room": "Room 426"
+            "subject": "PG Lab 426",
+            "teacher": "PG Lab 426",
+            "room": "Room 403"
           },
           {
             "period": 2,
-            "subject": "G1: Computer System Architecture (Lab) | G2: Front End Programming",
-            "teacher": "Onkar Singh (G1) / Kavita Rastogi (G2)",
+            "subject": "OS G1/KR G2",
+            "teacher": "OS G1/KR G2",
             "room": "Room 403"
           },
           {
             "period": 3,
-            "subject": "G1: Front End Programming | G2: Computer System Architecture (Lab)",
-            "teacher": "Kavita Rastogi (G1) / Onkar Singh (G2)",
+            "subject": "KR G1/OS G2",
+            "teacher": "KR G1/OS G2",
             "room": "Room 403"
           },
           {
@@ -5241,26 +4468,26 @@
           },
           {
             "period": 4,
-            "subject": "Mathematics for Computing",
-            "teacher": "Neha Bhatia",
+            "subject": "NB",
+            "teacher": "NB",
             "room": "Room 403"
           },
           {
             "period": 5,
-            "subject": "Mathematics for Computing",
-            "teacher": "Neha Bhatia",
+            "subject": "NB",
+            "teacher": "NB",
             "room": "Room 403"
           },
           {
             "period": 6,
-            "subject": "Constitutional Values and Fundamental Duties | Fit India",
-            "teacher": "Vipin Patel / Nisha Rajput",
+            "subject": "VP/NR",
+            "teacher": "VP/NR",
             "room": "Room 403"
           },
           {
             "period": 7,
-            "subject": "Constitutional Values and Fundamental Duties | Fit India",
-            "teacher": "Vipin Patel / Nisha Rajput",
+            "subject": "VP/NR",
+            "teacher": "VP/NR",
             "room": "Room 403"
           }
         ],
@@ -5273,14 +4500,14 @@
           },
           {
             "period": 2,
-            "subject": "Front End Programming",
-            "teacher": "Kavita Rastogi",
-            "room": "Python"
+            "subject": "KR (Python)",
+            "teacher": "KR (Python)",
+            "room": "Room 403"
           },
           {
             "period": 3,
-            "subject": "Computer System Architecture (Theory)",
-            "teacher": "Deepali Dhaka",
+            "subject": "DD",
+            "teacher": "DD",
             "room": "Room 403"
           },
           {
@@ -5292,46 +4519,46 @@
           },
           {
             "period": 4,
-            "subject": "G1: Mathematics for Computing (Lab) | G2: Front End Programming",
-            "teacher": "Anamika Gupta (G1) / Kavita Rastogi (G2)",
+            "subject": "AG G1/KR G2",
+            "teacher": "AG G1/KR G2",
             "room": "Room 403"
           },
           {
             "period": 5,
-            "subject": "EVS I",
-            "teacher": "Guncha Sharma",
+            "subject": "GS",
+            "teacher": "GS",
             "room": "Room 403"
           },
           {
             "period": 6,
-            "subject": "EVS I",
-            "teacher": "Guncha Sharma",
+            "subject": "GS",
+            "teacher": "GS",
             "room": "Room 403"
           },
           {
             "period": 7,
-            "subject": "EVS I",
-            "teacher": "Guncha Sharma",
+            "subject": "GS",
+            "teacher": "GS",
             "room": "Room 403"
           }
         ],
         "Thursday": [
           {
             "period": 1,
-            "subject": "Computer System Architecture (Theory)",
-            "teacher": "Deepali Dhaka",
+            "subject": "DD",
+            "teacher": "DD",
             "room": "Room 403"
           },
           {
             "period": 2,
-            "subject": "Front End Programming",
-            "teacher": "Kavita Rastogi",
-            "room": "Python"
+            "subject": "KR (Python)",
+            "teacher": "KR (Python)",
+            "room": "Room 403"
           },
           {
             "period": 3,
-            "subject": "Computer System Architecture (Theory)",
-            "teacher": "Deepali Dhaka",
+            "subject": "DD",
+            "teacher": "DD",
             "room": "Room 403"
           },
           {
@@ -5343,47 +4570,47 @@
           },
           {
             "period": 4,
-            "subject": "Fundamentals of Organizational Behaviour (GE-Management) - merged with BMS 3B | Entrepreneurship Essentials - I (GE-Entrepreneurship)",
-            "teacher": "Anuja Mathur / Mehak Aggarwal",
+            "subject": "AM/ MA",
+            "teacher": "AM/ MA",
             "room": "Room 403"
           },
           {
             "period": 5,
-            "subject": "Fundamentals of Organizational Behaviour (GE-Management) - merged with BMS 3B | Entrepreneurship Essentials - I (GE-Entrepreneurship)",
-            "teacher": "Anuja Mathur / Mehak Aggarwal",
+            "subject": "AM/ MA L",
+            "teacher": "AM/ MA L",
             "room": "Room 403"
           },
           {
             "period": 6,
-            "subject": "Constitutional Values and Fundamental Duties | Fit India",
-            "teacher": "Vipin Patel / Nisha Rajput",
+            "subject": "VP/NR",
+            "teacher": "VP/NR",
             "room": "Room 403"
           },
           {
             "period": 7,
-            "subject": "Fit India",
-            "teacher": "Nisha Rajput",
+            "subject": "NR",
+            "teacher": "NR",
             "room": "Room 403"
           }
         ],
         "Friday": [
           {
             "period": 1,
-            "subject": "Front End Programming",
-            "teacher": "Kavita Rastogi",
-            "room": "Python"
+            "subject": "KR (Python)",
+            "teacher": "KR (Python)",
+            "room": "Room 403"
           },
           {
             "period": 2,
-            "subject": "EE Lab",
-            "teacher": "EE Lab",
-            "room": "unsupervised"
+            "subject": "EE Lab (unsupervised)",
+            "teacher": "EE Lab (unsupervised)",
+            "room": "Room 403"
           },
           {
             "period": 3,
-            "subject": "Front End Programming",
-            "teacher": "Kavita Rastogi",
-            "room": "SEC Room"
+            "subject": "KR (SEC Room)",
+            "teacher": "KR (SEC Room)",
+            "room": "Room 403"
           },
           {
             "period": 0,
@@ -5394,27 +4621,27 @@
           },
           {
             "period": 4,
-            "subject": "Fundamentals of Organizational Behaviour (GE-Management) - merged with BMS 3B | Entrepreneurship Essentials - I (GE-Entrepreneurship)",
-            "teacher": "Anuja Mathur / Mehak Aggarwal",
+            "subject": "AM/ MA L",
+            "teacher": "AM/ MA L",
             "room": "Room 403"
           },
           {
             "period": 5,
-            "subject": "Fundamentals of Organizational Behaviour (GE-Management) - merged with BMS 3B | Entrepreneurship Essentials - I (GE-Entrepreneurship)",
-            "teacher": "Anuja Mathur / Mehak Aggarwal",
+            "subject": "AM/ MA L",
+            "teacher": "AM/ MA L",
             "room": "Room 403"
           },
           {
             "period": 6,
-            "subject": "Mathematics for Computing",
-            "teacher": "Neha Bhatia",
+            "subject": "NB",
+            "teacher": "NB",
             "room": "Room 403"
           },
           {
             "period": 7,
-            "subject": "Mathematics for Computing",
-            "teacher": "Neha Bhatia",
-            "room": "Room 426"
+            "subject": "NB Lab 426",
+            "teacher": "NB Lab 426",
+            "room": "Room 403"
           }
         ]
       }
@@ -5424,21 +4651,21 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "Artificial Intelligence",
-            "teacher": "Onkar Singh",
+            "subject": "OS",
+            "teacher": "OS",
             "room": "Room 407"
           },
           {
             "period": 2,
-            "subject": "Business Intelligence and Data Visualization",
-            "teacher": "Pushkar Gole",
+            "subject": "PG",
+            "teacher": "PG",
             "room": "Room 407"
           },
           {
             "period": 3,
-            "subject": "Business Intelligence and Data Visualization",
-            "teacher": "Pushkar Gole",
-            "room": "Room 460"
+            "subject": "PG Lab 460",
+            "teacher": "PG Lab 460",
+            "room": "Room 407"
           },
           {
             "period": 0,
@@ -5449,14 +4676,14 @@
           },
           {
             "period": 4,
-            "subject": "Data Structures",
-            "teacher": "Sonika Thakral",
+            "subject": "ST",
+            "teacher": "ST",
             "room": "Room 407"
           },
           {
             "period": 5,
-            "subject": "G1: Data Structures | G2: Data Mining",
-            "teacher": "Sonika Thakral (G1) / Anamika Gupta (G2)",
+            "subject": "ST G1/AG G2",
+            "teacher": "ST G1/AG G2",
             "room": "Room 407"
           },
           {
@@ -5475,20 +4702,20 @@
         "Tuesday": [
           {
             "period": 1,
-            "subject": "Artificial Intelligence",
-            "teacher": "Onkar Singh",
+            "subject": "OS",
+            "teacher": "OS",
             "room": "Room 407"
           },
           {
             "period": 2,
-            "subject": "Business Intelligence and Data Visualization",
-            "teacher": "Pushkar Gole",
+            "subject": "PG",
+            "teacher": "PG",
             "room": "Room 407"
           },
           {
             "period": 3,
-            "subject": "Business Intelligence and Data Visualization",
-            "teacher": "Pushkar Gole",
+            "subject": "PG",
+            "teacher": "PG",
             "room": "Room 407"
           },
           {
@@ -5500,34 +4727,34 @@
           },
           {
             "period": 4,
-            "subject": "G1: Artificial Intelligence | G2: Data Mining",
-            "teacher": "Onkar Singh (G1) / Anamika Gupta (G2)",
+            "subject": "OS G1/AG G2",
+            "teacher": "OS G1/AG G2",
             "room": "Room 407"
           },
           {
             "period": 5,
-            "subject": "G1: Data Mining | G2: Data Structures",
-            "teacher": "Anamika Gupta (G1) / Sonika Thakral (G2)",
+            "subject": "AG G1/ST G2",
+            "teacher": "AG G1/ST G2",
             "room": "Room 407"
           },
           {
             "period": 6,
-            "subject": "G1: Data Mining | G2: Data Structures",
-            "teacher": "Anamika Gupta (G1) / Sonika Thakral (G2)",
+            "subject": "AG G1/ST G2",
+            "teacher": "AG G1/ST G2",
             "room": "Room 407"
           },
           {
             "period": 7,
-            "subject": "Hindi C",
-            "teacher": "Soumya Guliyan",
-            "room": "Hindi B"
+            "subject": "SoG (Hindi B)",
+            "teacher": "SoG (Hindi B)",
+            "room": "Room 407"
           }
         ],
         "Wednesday": [
           {
             "period": 1,
-            "subject": "Artificial Intelligence",
-            "teacher": "Onkar Singh",
+            "subject": "OS",
+            "teacher": "OS",
             "room": "Room 407"
           },
           {
@@ -5551,46 +4778,46 @@
           },
           {
             "period": 4,
-            "subject": "Data Structures",
-            "teacher": "Sonika Thakral",
+            "subject": "ST",
+            "teacher": "ST",
             "room": "Room 407"
           },
           {
             "period": 5,
-            "subject": "Hindi C",
-            "teacher": "Soumya Guliyan",
-            "room": "Hindi B"
+            "subject": "SoG (Hindi B)",
+            "teacher": "SoG (Hindi B)",
+            "room": "Room 407"
           },
           {
             "period": 6,
-            "subject": "HINDI A | Hindi C | Hindi D",
-            "teacher": "HINDI A / Hindi C / Hindi D",
-            "room": "room 607 / room 644 / Room 648"
+            "subject": "HINDI A (room 607)/                        Hindi C (room 644)/   Hindi D (Room 648)",
+            "teacher": "HINDI A (room 607)/                        Hindi C (room 644)/   Hindi D (Room 648)",
+            "room": "Room 407"
           },
           {
             "period": 7,
-            "subject": "HINDI A | Hindi C | Hindi D",
-            "teacher": "HINDI A / Hindi C / Hindi D",
-            "room": "room 607 / room 644 / Room 648"
+            "subject": "HINDI A (room 607)/                        Hindi C (room 644)/   Hindi D (Room 648)",
+            "teacher": "HINDI A (room 607)/                        Hindi C (room 644)/   Hindi D (Room 648)",
+            "room": "Room 407"
           }
         ],
         "Thursday": [
           {
             "period": 1,
-            "subject": "Operating Systems",
-            "teacher": "Nidhi Seth",
+            "subject": "NS",
+            "teacher": "NS",
             "room": "Room 407"
           },
           {
             "period": 2,
-            "subject": "Operating Systems",
-            "teacher": "Nidhi Seth",
+            "subject": "NS L",
+            "teacher": "NS L",
             "room": "Room 407"
           },
           {
             "period": 3,
-            "subject": "Operating Systems",
-            "teacher": "Nidhi Seth",
+            "subject": "NS",
+            "teacher": "NS",
             "room": "Room 407"
           },
           {
@@ -5602,20 +4829,20 @@
           },
           {
             "period": 4,
-            "subject": "Data Structures",
-            "teacher": "Sonika Thakral",
+            "subject": "ST",
+            "teacher": "ST",
             "room": "Room 407"
           },
           {
             "period": 5,
-            "subject": "Data Mining",
-            "teacher": "Anamika Gupta",
+            "subject": "AG",
+            "teacher": "AG",
             "room": "Room 407"
           },
           {
             "period": 6,
-            "subject": "G1: Data Structures | G2: Artificial Intelligence",
-            "teacher": "Sonika Thakral (G1) / Onkar Singh (G2)",
+            "subject": "ST G1/OS G2",
+            "teacher": "ST G1/OS G2",
             "room": "Room 407"
           },
           {
@@ -5628,20 +4855,20 @@
         "Friday": [
           {
             "period": 1,
-            "subject": "G?: Artificial Intelligence | G2: Operating Systems",
-            "teacher": "Onkar Singh (G?) / Nidhi Seth (G2)",
+            "subject": "OS GI/ NS G2",
+            "teacher": "OS GI/ NS G2",
             "room": "Room 407"
           },
           {
             "period": 2,
-            "subject": "G1: Operating Systems | G2: Artificial Intelligence",
-            "teacher": "Nidhi Seth (G1) / Onkar Singh (G2)",
+            "subject": "NS G1/OS G2",
+            "teacher": "NS G1/OS G2",
             "room": "Room 407"
           },
           {
             "period": 3,
-            "subject": "Operating Systems",
-            "teacher": "Nidhi Seth",
+            "subject": "NS",
+            "teacher": "NS",
             "room": "Room 407"
           },
           {
@@ -5653,20 +4880,20 @@
           },
           {
             "period": 4,
-            "subject": "Sushmita | Kajol",
-            "teacher": "Sushmita / Kajol",
+            "subject": "Sushmita/Kajol",
+            "teacher": "Sushmita/Kajol",
             "room": "Room 407"
           },
           {
             "period": 5,
-            "subject": "Data Mining",
-            "teacher": "Anamika Gupta",
+            "subject": "AG",
+            "teacher": "AG",
             "room": "Room 407"
           },
           {
             "period": 6,
-            "subject": "Data Mining",
-            "teacher": "Anamika Gupta",
+            "subject": "AG",
+            "teacher": "AG",
             "room": "Room 407"
           },
           {
@@ -5683,21 +4910,21 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "Software Engineering",
-            "teacher": "Kavita Rastogi",
+            "subject": "KR",
+            "teacher": "KR",
             "room": "Room 457"
           },
           {
             "period": 2,
-            "subject": "Social Media Analytics",
-            "teacher": "Rohan Gulati",
+            "subject": "RG",
+            "teacher": "RG",
             "room": "Room 457"
           },
           {
             "period": 3,
-            "subject": "Social Media Analytics | Entrepreneurship Essentials - I (GE-Entrepreneurship)",
-            "teacher": "Rohan Gulati / Mehak Aggarwal",
-            "room": "Room 457 / Room 403"
+            "subject": "RG/MA (Room 403)",
+            "teacher": "RG/MA (Room 403)",
+            "room": "Room 457"
           },
           {
             "period": 0,
@@ -5708,46 +4935,46 @@
           },
           {
             "period": 4,
-            "subject": "Machine Learning",
-            "teacher": "Anamika Gupta",
+            "subject": "AG",
+            "teacher": "AG",
             "room": "Room 457"
           },
           {
             "period": 5,
-            "subject": "Introduction to Blockchain",
-            "teacher": "Ayushi Gupta",
-            "room": "Th"
+            "subject": "AyG (Th)",
+            "teacher": "AyG (Th)",
+            "room": "Room 457"
           },
           {
             "period": 6,
-            "subject": "Introduction to Blockchain",
-            "teacher": "Ayushi Gupta",
-            "room": "SEC Room"
+            "subject": "AyG (SEC Room)",
+            "teacher": "AyG (SEC Room)",
+            "room": "Room 457"
           },
           {
             "period": 7,
-            "subject": "Algorithms and Advanced DS",
-            "teacher": "Sonika Thakral",
+            "subject": "ST",
+            "teacher": "ST",
             "room": "Room 457"
           }
         ],
         "Tuesday": [
           {
             "period": 1,
-            "subject": "Software Engineering",
-            "teacher": "Kavita Rastogi",
+            "subject": "KR",
+            "teacher": "KR",
             "room": "Room 457"
           },
           {
             "period": 2,
-            "subject": "Social Media Analytics",
-            "teacher": "Rohan Gulati",
+            "subject": "RG",
+            "teacher": "RG",
             "room": "Room 457"
           },
           {
             "period": 3,
-            "subject": "Social Media Analytics",
-            "teacher": "Rohan Gulati",
+            "subject": "RG",
+            "teacher": "RG",
             "room": "Room 457"
           },
           {
@@ -5759,46 +4986,46 @@
           },
           {
             "period": 4,
-            "subject": "G1: Algorithms and Advanced DS | G2: Software Engineering",
-            "teacher": "Sonika Thakral (G1) / Kavita Rastogi (G2)",
+            "subject": "ST G1/ KR G2",
+            "teacher": "ST G1/ KR G2",
             "room": "Room 457"
           },
           {
             "period": 5,
-            "subject": "Introduction to Blockchain",
-            "teacher": "Ayushi Gupta",
-            "room": "Th"
+            "subject": "AyG (Th)",
+            "teacher": "AyG (Th)",
+            "room": "Room 457"
           },
           {
             "period": 6,
-            "subject": "Introduction to Blockchain",
-            "teacher": "Ayushi Gupta",
-            "room": "SEC Room"
+            "subject": "AyG (SEC Room)",
+            "teacher": "AyG (SEC Room)",
+            "room": "Room 457"
           },
           {
             "period": 7,
-            "subject": "Algorithms and Advanced DS",
-            "teacher": "Sonika Thakral",
+            "subject": "ST",
+            "teacher": "ST",
             "room": "Room 457"
           }
         ],
         "Wednesday": [
           {
             "period": 1,
-            "subject": "G1: Introduction to Blockchain | G2: Software Engineering",
-            "teacher": "Ayushi Gupta (G1) / Kavita Rastogi (G2)",
+            "subject": "AyG G1/KR G2",
+            "teacher": "AyG G1/KR G2",
             "room": "Room 457"
           },
           {
             "period": 2,
-            "subject": "Introduction to Blockchain",
-            "teacher": "Ayushi Gupta",
-            "room": "SEC Lab 426"
+            "subject": "AyG (SEC Lab 426)",
+            "teacher": "AyG (SEC Lab 426)",
+            "room": "Room 457"
           },
           {
             "period": 3,
-            "subject": "Software Engineering",
-            "teacher": "Kavita Rastogi",
+            "subject": "KR",
+            "teacher": "KR",
             "room": "Room 457"
           },
           {
@@ -5810,46 +5037,46 @@
           },
           {
             "period": 4,
-            "subject": "EE Lab",
-            "teacher": "EE Lab",
-            "room": "unsupervised"
+            "subject": "EE Lab (unsupervised)",
+            "teacher": "EE Lab (unsupervised)",
+            "room": "Room 457"
           },
           {
             "period": 5,
-            "subject": "G1: Algorithms and Advanced DS | G2: Machine Learning",
-            "teacher": "Sonika Thakral (G1) / Anamika Gupta (G2)",
+            "subject": "ST G1/AG G2",
+            "teacher": "ST G1/AG G2",
             "room": "Room 457"
           },
           {
             "period": 6,
-            "subject": "G1: Machine Learning | G2: Algorithms and Advanced DS",
-            "teacher": "Anamika Gupta (G1) / Sonika Thakral (G2)",
+            "subject": "AG G1/ST G2",
+            "teacher": "AG G1/ST G2",
             "room": "Room 457"
           },
           {
             "period": 7,
-            "subject": "Machine Learning (G1)",
-            "teacher": "Anamika Gupta",
+            "subject": "AG G1",
+            "teacher": "AG G1",
             "room": "Room 457"
           }
         ],
         "Thursday": [
           {
             "period": 1,
-            "subject": "Introduction to Blockchain",
-            "teacher": "Ayushi Gupta",
-            "room": "Room 426"
+            "subject": "AyG Lab 426",
+            "teacher": "AyG Lab 426",
+            "room": "Room 457"
           },
           {
             "period": 2,
-            "subject": "Introduction to Blockchain",
-            "teacher": "Ayushi Gupta",
-            "room": "SEC Lab 426"
+            "subject": "AyG (SEC Lab 426)",
+            "teacher": "AyG (SEC Lab 426)",
+            "room": "Room 457"
           },
           {
             "period": 3,
-            "subject": "G1: Software Engineering | G2: Algorithms and Advanced DS",
-            "teacher": "Kavita Rastogi (G1) / Sonika Thakral (G2)",
+            "subject": "KR G1/ST G2",
+            "teacher": "KR G1/ST G2",
             "room": "Room 457"
           },
           {
@@ -5861,46 +5088,46 @@
           },
           {
             "period": 4,
-            "subject": "Entrepreneurship Essentials - I (GE-Entrepreneurship)",
-            "teacher": "Mehak Aggarwal",
-            "room": "Room 403"
+            "subject": "MA (Room 403)",
+            "teacher": "MA (Room 403)",
+            "room": "Room 457"
           },
           {
             "period": 5,
-            "subject": "Entrepreneurship Essentials - I (GE-Entrepreneurship)",
-            "teacher": "Mehak Aggarwal",
-            "room": "Room 403"
+            "subject": "MA Lab (Room 403)",
+            "teacher": "MA Lab (Room 403)",
+            "room": "Room 457"
           },
           {
             "period": 6,
-            "subject": "Machine Learning",
-            "teacher": "Anamika Gupta",
+            "subject": "AG",
+            "teacher": "AG",
             "room": "Room 457"
           },
           {
             "period": 7,
-            "subject": "Machine Learning (G2)",
-            "teacher": "Anamika Gupta",
+            "subject": "AG G2",
+            "teacher": "AG G2",
             "room": "Room 457"
           }
         ],
         "Friday": [
           {
             "period": 1,
-            "subject": "Introduction to Blockchain",
-            "teacher": "Ayushi Gupta",
-            "room": "Th"
+            "subject": "AyG (Th)",
+            "teacher": "AyG (Th)",
+            "room": "Room 457"
           },
           {
             "period": 2,
-            "subject": "G1: Software Engineering | G2: Introduction to Blockchain",
-            "teacher": "Kavita Rastogi (G1) / Ayushi Gupta (G2)",
+            "subject": "KR G1/AyG G2",
+            "teacher": "KR G1/AyG G2",
             "room": "Room 457"
           },
           {
             "period": 3,
-            "subject": "Machine Learning",
-            "teacher": "Anamika Gupta",
+            "subject": "AG",
+            "teacher": "AG",
             "room": "Room 457"
           },
           {
@@ -5912,20 +5139,20 @@
           },
           {
             "period": 4,
-            "subject": "Entrepreneurship Essentials - I (GE-Entrepreneurship)",
-            "teacher": "Mehak Aggarwal",
-            "room": "Room 403"
+            "subject": "MA Lab (Room 403)",
+            "teacher": "MA Lab (Room 403)",
+            "room": "Room 457"
           },
           {
             "period": 5,
-            "subject": "Entrepreneurship Essentials - I (GE-Entrepreneurship)",
-            "teacher": "Mehak Aggarwal",
-            "room": "Room 403"
+            "subject": "MA Lab (Room 403)",
+            "teacher": "MA Lab (Room 403)",
+            "room": "Room 457"
           },
           {
             "period": 6,
-            "subject": "Algorithms and Advanced DS",
-            "teacher": "Sonika Thakral",
+            "subject": "ST",
+            "teacher": "ST",
             "room": "Room 457"
           },
           {
@@ -5942,21 +5169,21 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "Deep Learning",
-            "teacher": "Mogana Neelkandan",
-            "room": "Room 460"
+            "subject": "MN Lab (460)",
+            "teacher": "MN Lab (460)",
+            "room": "Room 435"
           },
           {
             "period": 2,
-            "subject": "Deep Learning",
-            "teacher": "Mogana Neelkandan",
+            "subject": "MN",
+            "teacher": "MN",
             "room": "Room 435"
           },
           {
             "period": 3,
-            "subject": "Compiler Design | Entrepreneurship Essentials-1",
-            "teacher": "Onkar Singh / Mehak Aggarwal",
-            "room": "Room 426 / Room 403"
+            "subject": "OS Lab (426)/ MA (Room 403)",
+            "teacher": "OS Lab (426)/ MA (Room 403)",
+            "room": "Room 435"
           },
           {
             "period": 0,
@@ -5967,8 +5194,8 @@
           },
           {
             "period": 4,
-            "subject": "Compiler Design",
-            "teacher": "Onkar Singh",
+            "subject": "OS",
+            "teacher": "OS",
             "room": "Room 435"
           },
           {
@@ -6050,15 +5277,15 @@
           },
           {
             "period": 2,
-            "subject": "Research Methodology",
-            "teacher": "Shikha Gupta",
+            "subject": "SG",
+            "teacher": "SG",
             "room": "Room 435"
           },
           {
             "period": 3,
-            "subject": "Research Methodology",
-            "teacher": "Shikha Gupta",
-            "room": "Room 426"
+            "subject": "SG Lab (426)",
+            "teacher": "SG Lab (426)",
+            "room": "Room 435"
           },
           {
             "period": 0,
@@ -6069,15 +5296,15 @@
           },
           {
             "period": 4,
-            "subject": "Compiler Design",
-            "teacher": "Onkar Singh",
+            "subject": "OS",
+            "teacher": "OS",
             "room": "Room 435"
           },
           {
             "period": 5,
-            "subject": "EE Lab",
-            "teacher": "EE Lab",
-            "room": "unsupervised"
+            "subject": "EE Lab (unsupervised)",
+            "teacher": "EE Lab (unsupervised)",
+            "room": "Room 435"
           },
           {
             "period": 6,
@@ -6095,20 +5322,20 @@
         "Thursday": [
           {
             "period": 1,
-            "subject": "Deep Learning",
-            "teacher": "Mogana Neelkandan",
-            "room": "Room 460"
+            "subject": "MN Lab (460)",
+            "teacher": "MN Lab (460)",
+            "room": "Room 435"
           },
           {
             "period": 2,
-            "subject": "Deep Learning",
-            "teacher": "Mogana Neelkandan",
+            "subject": "MN",
+            "teacher": "MN",
             "room": "Room 435"
           },
           {
             "period": 3,
-            "subject": "Research Methodology",
-            "teacher": "Shikha Gupta",
+            "subject": "SG",
+            "teacher": "SG",
             "room": "Room 435"
           },
           {
@@ -6120,15 +5347,15 @@
           },
           {
             "period": 4,
-            "subject": "Compiler Design | Entrepreneurship Essentials-1",
-            "teacher": "Onkar Singh / Mehak Aggarwal",
-            "room": "Room 435 / Room 403"
+            "subject": "OS/ MA (Room 403)",
+            "teacher": "OS/ MA (Room 403)",
+            "room": "Room 435"
           },
           {
             "period": 5,
-            "subject": "Compiler Design | Entrepreneurship Essentials-1",
-            "teacher": "Onkar Singh / Mehak Aggarwal",
-            "room": "Room 426 / Room 403"
+            "subject": "OS Lab (426)/ MA Lab (Room 403)",
+            "teacher": "OS Lab (426)/ MA Lab (Room 403)",
+            "room": "Room 435"
           },
           {
             "period": 6,
@@ -6146,21 +5373,21 @@
         "Friday": [
           {
             "period": 1,
-            "subject": "Deep Learning",
-            "teacher": "Mogana Neelkandan",
+            "subject": "MN",
+            "teacher": "MN",
             "room": "Room 435"
           },
           {
             "period": 2,
-            "subject": "Research Methodology",
-            "teacher": "Shikha Gupta",
+            "subject": "SG",
+            "teacher": "SG",
             "room": "Room 435"
           },
           {
             "period": 3,
-            "subject": "Research Methodology",
-            "teacher": "Shikha Gupta",
-            "room": "Room 426"
+            "subject": "SG Lab 426",
+            "teacher": "SG Lab 426",
+            "room": "Room 435"
           },
           {
             "period": 0,
@@ -6171,15 +5398,15 @@
           },
           {
             "period": 4,
-            "subject": "Entrepreneurship Essentials-1",
-            "teacher": "Mehak Aggarwal",
-            "room": "Room 403"
+            "subject": "MA Lab (Room 403)",
+            "teacher": "MA Lab (Room 403)",
+            "room": "Room 435"
           },
           {
             "period": 5,
-            "subject": "Entrepreneurship Essentials-1",
-            "teacher": "Mehak Aggarwal",
-            "room": "Room 403"
+            "subject": "MA Lab (Room 403)",
+            "teacher": "MA Lab (Room 403)",
+            "room": "Room 435"
           },
           {
             "period": 6,
