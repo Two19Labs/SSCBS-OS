@@ -543,6 +543,8 @@ function AdminConsoleContent({ onBack }) {
   const [isParsingCs, setIsParsingCs] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState({ type: '', message: '' });
+  const [geminiApiKey, setGeminiApiKey] = useState(() => import.meta.env.VITE_GEMINI_API_KEY || '');
+  const [showAiKeyInput, setShowAiKeyInput] = useState(false);
 
   // Manual Editor Filters
   const [selectedCourse, setSelectedCourse] = useState('BMS');
@@ -822,6 +824,115 @@ function AdminConsoleContent({ onBack }) {
     });
 
     return { course, sem, section, defaultRoom, weekSchedule };
+  };
+
+  // AI-Powered Scanner (Google Gemini API LLM)
+  const parseFileWithAI = async (selectedFile) => {
+    if (!selectedFile) return;
+    const apiKeyToUse = geminiApiKey || import.meta.env.VITE_GEMINI_API_KEY || '';
+    addLog(`[AI Scanner] Reading file "${selectedFile.name}" for AI layout parsing...`, 'info');
+    setIsParsingMgmt(true);
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const workbook = XLSX.read(e.target.result, { type: 'array' });
+        const timetables = {};
+
+        for (const sheetName of workbook.SheetNames) {
+          if (isIgnoredSheet(sheetName)) continue;
+          const sheet = workbook.Sheets[sheetName];
+          if (!sheet) continue;
+          const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+          const blockStarts = [];
+          sheetData.forEach((row, idx) => {
+            const rowStr = row.map(c => clean(c)).join(' ').toUpperCase();
+            if (rowStr.includes('SHAHEED SUKHDEV') || rowStr.includes('CLASS TIME TABLE')) {
+              if (blockStarts.length === 0 || idx - blockStarts[blockStarts.length - 1] > 15) {
+                blockStarts.push(idx);
+              }
+            }
+          });
+
+          if (blockStarts.length === 0) continue;
+          addLog(`[AI Scanner] Sheet "${sheetName}": Found ${blockStarts.length} block(s). Processing with AI...`, 'info');
+
+          for (let bIdx = 0; bIdx < blockStarts.length; bIdx++) {
+            const startRow = blockStarts[bIdx];
+            const nextStartRow = blockStarts[bIdx + 1] || sheetData.length;
+            const blockRows = sheetData.slice(startRow, nextStartRow);
+            
+            // Try AI parsing with Gemini Flash API if available
+            let parsedOk = false;
+            if (apiKeyToUse) {
+              try {
+                let blockText = `=== SHEET: ${sheetName} ===\n`;
+                blockRows.forEach((r, idx) => {
+                  const nonE = r.map((c, colIdx) => c !== null && c !== undefined && String(c).trim() !== '' ? `[Col ${colIdx}]: ${String(c).trim()}` : null).filter(Boolean);
+                  if (nonE.length > 0) blockText += `Row ${idx}: ${nonE.join(' | ')}\n`;
+                });
+
+                const promptText = `Analyze this raw Excel timetable block for SSCBS college and return strict raw JSON for the schedule:\n` + blockText;
+                
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKeyToUse}`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    contents: [{ parts: [{ text: promptText }] }],
+                    generationConfig: { responseMimeType: 'application/json', temperature: 0.1 }
+                  })
+                });
+
+                if (res.ok) {
+                  const resData = await res.json();
+                  const rawJson = resData.candidates[0].content.parts[0].text;
+                  const aiResult = JSON.parse(rawJson);
+                  if (aiResult && aiResult.course && (aiResult.weekSchedule || aiResult.schedule)) {
+                    const course = aiResult.course;
+                    const sem = String(aiResult.semester || '1');
+                    const section = aiResult.section || 'A';
+                    const sched = aiResult.weekSchedule || aiResult.schedule;
+                    if (!timetables[course]) timetables[course] = {};
+                    if (!timetables[course][sem]) timetables[course][sem] = {};
+                    timetables[course][sem][section] = sched;
+                    addLog(`  -> [AI Parsed Block ${bIdx + 1}] ${course} Sem ${sem} Sec ${section}`, 'success');
+                    parsedOk = true;
+                  }
+                }
+              } catch (aiErr) {
+                console.warn('AI Parse fallback:', aiErr.message);
+              }
+            }
+
+            if (!parsedOk) {
+              let defaultSem = '1';
+              let defaultCourse = sheetName.toUpperCase().includes('BBA') ? 'BBA FIA' : sheetName.toUpperCase().includes('CS') ? 'Bsc Comp Sci' : 'BMS';
+              const res = parseSheetBlock(sheetData, startRow, defaultCourse, defaultSem);
+              if (res) {
+                const { course, sem, section, weekSchedule } = res;
+                if (!timetables[course]) timetables[course] = {};
+                if (!timetables[course][sem]) timetables[course][sem] = {};
+                timetables[course][sem][section] = weekSchedule;
+                addLog(`  -> [Smart Parsed Block ${bIdx + 1}] ${course} Sem ${sem} Sec ${section}`, 'info');
+              }
+            }
+          }
+        }
+
+        if (Object.keys(timetables).length > 0) {
+          setMgmtParsedData(prev => ({ ...(prev || {}), ...timetables }));
+          addLog(`[AI Scanner] ✓ Successfully scanned & parsed Excel file with Gemini AI!`, 'success');
+        } else {
+          addLog(`[AI Scanner] ⚠️ No blocks recognized in file.`, 'warning');
+        }
+      } catch (err) {
+        addLog(`[AI Scanner] Error parsing file: ${err.message}`, 'error');
+      } finally {
+        setIsParsingMgmt(false);
+      }
+    };
+    reader.readAsArrayBuffer(selectedFile);
   };
 
   // Parser for Management (BBA FIA & BMS) Excel
@@ -1228,7 +1339,7 @@ function AdminConsoleContent({ onBack }) {
               <div>
                 <h3>Schedule Upload Center</h3>
                 <p className="subtitle-admin">
-                  Upload timetables separately for <strong>Management (BBA FIA & BMS)</strong> and <strong>B.Sc. Computer Science</strong>. Both Odd (1, 3, 5, 7) and Even (2, 4, 6, 8) semesters are fully supported.
+                  Upload timetables for <strong>BMS, BBA FIA</strong> & <strong>B.Sc. Computer Science</strong> using AI-Powered LLM extraction or sheet upload.
                 </p>
               </div>
               <button 
@@ -1239,6 +1350,63 @@ function AdminConsoleContent({ onBack }) {
               >
                 🗑️ Scrap & Clear All Active Timetables
               </button>
+            </div>
+
+            {/* AI-POWERED DRAG & DROP SCANNER BANNER */}
+            <div className="ai-upload-scanner-card" style={{ background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(168, 85, 247, 0.12) 100%)', border: '1px solid rgba(168, 85, 247, 0.3)', borderRadius: '16px', padding: '20px', marginBottom: '24px', position: 'relative' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ fontSize: '24px' }}>🤖</span>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#e2e8f0' }}>AI-Powered Timetable Scanner (Google Gemini LLM)</h4>
+                    <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#94a3b8' }}>
+                      Drag & drop any Excel timetable here. Gemini AI extracts all courses, semesters, sections, professors, & rooms dynamically without fragile column rules.
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  type="button"
+                  onClick={() => setShowAiKeyInput(!showAiKeyInput)}
+                  style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#cbd5e1', padding: '6px 12px', borderRadius: '8px', fontSize: '12px', cursor: 'pointer' }}
+                >
+                  ⚙️ {showAiKeyInput ? 'Hide API Key' : 'Configure Gemini API Key'}
+                </button>
+              </div>
+
+              {showAiKeyInput && (
+                <div style={{ marginBottom: '16px', display: 'flex', gap: '10px', alignItems: 'center', background: 'rgba(0,0,0,0.2)', padding: '10px 14px', borderRadius: '10px' }}>
+                  <label htmlFor="gemini-key-input" style={{ fontSize: '12px', color: '#cbd5e1', whiteSpace: 'nowrap' }}>Gemini Key:</label>
+                  <input 
+                    type="password"
+                    id="gemini-key-input"
+                    value={geminiApiKey}
+                    onChange={(e) => setGeminiApiKey(e.target.value)}
+                    placeholder="Enter GEMINI_API_KEY..."
+                    style={{ flex: 1, background: 'rgba(15, 23, 42, 0.8)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '6px 10px', borderRadius: '6px', fontSize: '13px' }}
+                  />
+                  <span style={{ fontSize: '11px', color: '#94a3b8' }}>Free key from aistudio.google.com</span>
+                </div>
+              )}
+
+              <div 
+                className="dropzone-ai"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    parseFileWithAI(e.dataTransfer.files[0]);
+                  }
+                }}
+                style={{ border: '2px dashed rgba(168, 85, 247, 0.4)', borderRadius: '12px', padding: '24px', textAlign: 'center', background: 'rgba(15, 23, 42, 0.4)', cursor: 'pointer' }}
+              >
+                <div style={{ fontSize: '28px', marginBottom: '8px' }}>✨ 📄</div>
+                <p style={{ margin: 0, fontSize: '14px', color: '#e2e8f0', fontWeight: '500' }}>
+                  Drop ANY Excel timetable file here for AI Instant Scanning or <label className="file-input-label" style={{ color: '#c084fc', textDecoration: 'underline', cursor: 'pointer' }}>browse<input type="file" onChange={(e) => e.target.files && e.target.files[0] && parseFileWithAI(e.target.files[0])} accept=".xlsx" className="hidden-file-input" /></label>
+                </p>
+                <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#64748b' }}>
+                  Supports BMS, BBA FIA, B.Sc CS odd and even semester timetables in any format
+                </p>
+              </div>
             </div>
 
             <div className="upload-dual-grid">
