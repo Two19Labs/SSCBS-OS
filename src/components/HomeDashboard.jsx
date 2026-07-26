@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTimetable } from '../context/TimetableContext';
 import { PERIODS, DAYS } from '../data/timetables';
 import NoticeBoard from './NoticeBoard';
-import { SearchIcon, PercentIcon, CalculatorIcon, FileIcon } from './icons';
+import { SearchIcon, PercentIcon, CalculatorIcon, FileIcon, ShieldIcon } from './icons';
 import './HomeDashboard.css';
 
 function getISTTime() {
@@ -231,6 +231,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
 
   const tools = [
     { id: 'find-prof', micro: 'SEARCH', microClass: 'success', title: 'Find My Professor', desc: "Who's teaching where, right now", Icon: SearchIcon },
+    { id: 'admin', micro: 'AI SCAN', microClass: 'gold', title: 'AI Timetable Scanner', desc: 'Scan & implement Excel timetables with Gemini LLM', Icon: ShieldIcon },
     { id: 'waiver', micro: '85%', microClass: 'gold', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon },
     { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon },
     { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: true },
