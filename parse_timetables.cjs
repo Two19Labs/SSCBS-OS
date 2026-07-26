@@ -84,7 +84,7 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
       if (!found) {
         const keys = Object.keys(facultyMap);
         for (let k of keys) {
-          if (teacherCodeLower === k || teacherCodeLower.startsWith(k + ' ') || teacherCodeLower.endsWith(' ' + k)) {
+          if (teacherCodeLower === k || teacherCodeLower.startsWith(k + ' ') || teacherCodeLower.endsWith(' ' + k) || teacherCodeLower.includes(k)) {
             found = facultyMap[k];
             break;
           }
@@ -190,7 +190,7 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
     if (!found) {
       const keys = Object.keys(facultyMap);
       for (let k of keys) {
-        if (teacherCodeLower === k || teacherCodeLower.startsWith(k + ' ') || teacherCodeLower.endsWith(' ' + k)) {
+        if (teacherCodeLower === k || teacherCodeLower.startsWith(k + ' ') || teacherCodeLower.endsWith(' ' + k) || teacherCodeLower.includes(k)) {
           found = facultyMap[k];
           break;
         }
@@ -297,15 +297,20 @@ bbaSheets.forEach(({ name, defaultCourse, defaultSem }) => {
 
     if (periodRowIdx === -1) return;
 
+    // Dynamically find day rows and column offset for this block
     const dayRows = {};
-    for (let i = 1; i <= 8; i++) {
-      const row = data[timingsRowIdx + i] || [];
-      const dayLabel = clean(row[0]);
-      if (DAYS.includes(dayLabel)) {
-        dayRows[dayLabel] = row;
+    for (let r = timingsRowIdx + 1; r <= timingsRowIdx + 10; r++) {
+      const row = data[r] || [];
+      for (let c = 0; c < row.length; c++) {
+        const val = clean(row[c]);
+        if (DAYS.includes(val)) {
+          dayRows[val] = { row, dayCol: c };
+          break;
+        }
       }
     }
 
+    // Extract faculty map for this block
     const facultyMap = {};
     for (let r = timingsRowIdx + 7; r < timingsRowIdx + 35; r++) {
       const row = data[r] || [];
@@ -315,57 +320,66 @@ bbaSheets.forEach(({ name, defaultCourse, defaultSem }) => {
         break;
       }
 
-      const nonEmpties = row.map(c => clean(c)).filter(Boolean);
-      if (nonEmpties.length >= 3) {
-        const paperName = clean(row[1]) || clean(row[0]);
-        let facultyName = '';
-        let facultyCode = '';
+      let paperName = '';
+      let facultyName = '';
+      let facultyCode = '';
 
-        for (let c = 2; c < row.length; c++) {
-          const val = clean(row[c]);
-          if (val.startsWith('Dr.') || val.startsWith('Mr.') || val.startsWith('Ms.') || val.startsWith('Prof.')) {
-            facultyName = val;
-            for (let c2 = c + 1; c2 < row.length; c2++) {
-              const codeVal = clean(row[c2]);
-              if (codeVal && !codeVal.includes('Th') && !codeVal.includes('Prac') && !codeVal.includes('Tute')) {
-                facultyCode = codeVal;
-                break;
-              }
+      for (let c = 0; c < row.length; c++) {
+        const val = clean(row[c]);
+        if (val.startsWith('Dr.') || val.startsWith('Mr.') || val.startsWith('Ms.') || val.startsWith('Prof.')) {
+          facultyName = val;
+          for (let p = c - 1; p >= 0; p--) {
+            const pVal = clean(row[p]);
+            if (pVal && pVal !== 'Core' && pVal !== 'GE' && pVal !== 'SEC' && pVal !== 'VAC' && pVal !== 'AEC' && !pVal.match(/^\d+$/)) {
+              paperName = pVal;
+              break;
             }
-            break;
           }
+          for (let codeIdx = c + 1; codeIdx < row.length; codeIdx++) {
+            const codeVal = clean(row[codeIdx]);
+            if (codeVal && !codeVal.includes('Th') && !codeVal.includes('Prac') && !codeVal.includes('Tute') && !codeVal.includes('Load')) {
+              facultyCode = codeVal;
+              break;
+            }
+          }
+          break;
         }
+      }
 
-        if (facultyCode && paperName) {
-          facultyMap[facultyCode.toLowerCase()] = { facultyName, paperName };
-        }
+      if (facultyCode && paperName && facultyName) {
+        facultyMap[facultyCode.toLowerCase()] = { facultyName, paperName };
       }
     }
 
     const weekSchedule = {};
     DAYS.forEach(day => {
       const fullDayName = FULL_DAYS[day];
-      const row = dayRows[day] || [];
+      const dayInfo = dayRows[day];
       const dayClasses = [];
 
       const periodColumns = [
-        { id: 1, col: 1 },
-        { id: 2, col: 2 },
-        { id: 3, col: 3 },
-        { id: 0, col: 4, isBreak: true },
-        { id: 4, col: 5 },
-        { id: 5, col: 6 },
-        { id: 6, col: 7 },
-        { id: 7, col: 8 }
+        { id: 1, relCol: 1 },
+        { id: 2, relCol: 2 },
+        { id: 3, relCol: 3 },
+        { id: 0, relCol: 4, isBreak: true },
+        { id: 4, relCol: 5 },
+        { id: 5, relCol: 6 },
+        { id: 6, relCol: 7 },
+        { id: 7, relCol: 8 }
       ];
 
-      periodColumns.forEach(({ id, col, isBreak }) => {
+      periodColumns.forEach(({ id, relCol, isBreak }) => {
         if (isBreak) {
           dayClasses.push({ period: 0, isBreak: true, subject: "Infinity Hour (Break)", teacher: "", room: "" });
           return;
         }
 
-        const cellValue = clean(row[col]);
+        if (!dayInfo) {
+          dayClasses.push({ period: id, subject: "Free", teacher: "-", room: "-" });
+          return;
+        }
+
+        const cellValue = clean(dayInfo.row[dayInfo.dayCol + relCol]);
         const parsedCell = parseUnifiedCell(cellValue, id, facultyMap, defaultRoom);
         dayClasses.push(parsedCell);
       });
@@ -376,7 +390,7 @@ bbaSheets.forEach(({ name, defaultCourse, defaultSem }) => {
     if (!timetables[course]) timetables[course] = {};
     if (!timetables[course][sem]) timetables[course][sem] = {};
     timetables[course][sem][section] = weekSchedule;
-    console.log(`  Parsed ${course} Sem ${sem} Sec ${section} (${defaultRoom})`);
+    console.log(`  Parsed ${course} Sem ${sem} Sec ${section} (${defaultRoom}) - Faculty mappings: ${Object.keys(facultyMap).length}`);
   });
 });
 
@@ -433,11 +447,14 @@ if (bscSheet) {
     if (periodRowIdx === -1) return;
 
     const dayRows = {};
-    for (let i = 1; i <= 8; i++) {
-      const row = data[timingsRowIdx + i] || [];
-      const dayLabel = clean(row[0]);
-      if (DAYS.includes(dayLabel)) {
-        dayRows[dayLabel] = row;
+    for (let r = timingsRowIdx + 1; r <= timingsRowIdx + 10; r++) {
+      const row = data[r] || [];
+      for (let c = 0; c < row.length; c++) {
+        const val = clean(row[c]);
+        if (DAYS.includes(val)) {
+          dayRows[val] = { row, dayCol: c };
+          break;
+        }
       }
     }
 
@@ -476,32 +493,35 @@ if (bscSheet) {
       }
     }
 
-    console.log(`  BSc Block ${bIdx + 1}: Sem ${sem}, Default Room: ${defaultRoom}, Faculty entries: ${Object.keys(facultyMap).length}`);
-
     const weekSchedule = {};
     DAYS.forEach(day => {
       const fullDayName = FULL_DAYS[day];
-      const row = dayRows[day] || [];
+      const dayInfo = dayRows[day];
       const dayClasses = [];
 
       const periodColumns = [
-        { id: 1, col: 1 },
-        { id: 2, col: 2 },
-        { id: 3, col: 3 },
-        { id: 0, col: 4, isBreak: true },
-        { id: 4, col: 5 },
-        { id: 5, col: 6 },
-        { id: 6, col: 7 },
-        { id: 7, col: 8 }
+        { id: 1, relCol: 1 },
+        { id: 2, relCol: 2 },
+        { id: 3, relCol: 3 },
+        { id: 0, relCol: 4, isBreak: true },
+        { id: 4, relCol: 5 },
+        { id: 5, relCol: 6 },
+        { id: 6, relCol: 7 },
+        { id: 7, relCol: 8 }
       ];
 
-      periodColumns.forEach(({ id, col, isBreak }) => {
+      periodColumns.forEach(({ id, relCol, isBreak }) => {
         if (isBreak) {
           dayClasses.push({ period: 0, isBreak: true, subject: "Infinity Hour (Break)", teacher: "", room: "" });
           return;
         }
 
-        const cellValue = clean(row[col]);
+        if (!dayInfo) {
+          dayClasses.push({ period: id, subject: "Free", teacher: "-", room: "-" });
+          return;
+        }
+
+        const cellValue = clean(dayInfo.row[dayInfo.dayCol + relCol]);
         const parsedCell = parseUnifiedCell(cellValue, id, facultyMap, defaultRoom);
         dayClasses.push(parsedCell);
       });

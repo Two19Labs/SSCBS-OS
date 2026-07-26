@@ -730,19 +730,22 @@ function AdminConsoleContent({ onBack }) {
 
     if (periodRowIdx === -1) return null;
 
-    // Read classes for Monday to Friday
+    // Read classes for Monday to Friday by dynamically locating the day column
     const dayRows = {};
-    for (let i = 1; i <= 8; i++) {
-      const row = sheetData[timingsRowIdx + i] || [];
-      const dayLabel = clean(row[0]);
-      if (DAYS.includes(dayLabel)) {
-        dayRows[dayLabel] = row;
+    for (let r = timingsRowIdx + 1; r <= timingsRowIdx + 10; r++) {
+      const row = sheetData[r] || [];
+      for (let c = 0; c < row.length; c++) {
+        const val = clean(row[c]);
+        if (DAYS.includes(val)) {
+          dayRows[val] = { row, dayCol: c };
+          break;
+        }
       }
     }
 
     // Find paper & faculty code mapping table below block
     const facultyMap = {};
-    for (let r = timingsRowIdx + 6; r < timingsRowIdx + 30; r++) {
+    for (let r = timingsRowIdx + 7; r < timingsRowIdx + 35; r++) {
       const row = sheetData[r] || [];
       const rowStr = row.map(c => clean(c)).join(' ');
 
@@ -750,16 +753,34 @@ function AdminConsoleContent({ onBack }) {
         break;
       }
 
-      const paperName = clean(row[1]);
-      const paperCode = clean(row[4]);
-      const facultyName = clean(row[5]);
-      const facultyCode = clean(row[7]);
+      let paperName = '';
+      let facultyName = '';
+      let facultyCode = '';
 
-      if (facultyCode && paperName) {
-        facultyMap[facultyCode.toLowerCase()] = { facultyName: facultyName || facultyCode, paperName };
+      for (let c = 0; c < row.length; c++) {
+        const val = clean(row[c]);
+        if (val.startsWith('Dr.') || val.startsWith('Mr.') || val.startsWith('Ms.') || val.startsWith('Prof.')) {
+          facultyName = val;
+          for (let p = c - 1; p >= 0; p--) {
+            const pVal = clean(row[p]);
+            if (pVal && pVal !== 'Core' && pVal !== 'GE' && pVal !== 'SEC' && pVal !== 'VAC' && pVal !== 'AEC' && !pVal.match(/^\d+$/)) {
+              paperName = pVal;
+              break;
+            }
+          }
+          for (let codeIdx = c + 1; codeIdx < row.length; codeIdx++) {
+            const codeVal = clean(row[codeIdx]);
+            if (codeVal && !codeVal.includes('Th') && !codeVal.includes('Prac') && !codeVal.includes('Tute') && !codeVal.includes('Load')) {
+              facultyCode = codeVal;
+              break;
+            }
+          }
+          break;
+        }
       }
-      if (paperCode && paperName) {
-        facultyMap[paperCode.toLowerCase()] = { facultyName: facultyName || paperCode, paperName };
+
+      if (facultyCode && paperName && facultyName) {
+        facultyMap[facultyCode.toLowerCase()] = { facultyName, paperName };
       }
     }
 
@@ -767,22 +788,32 @@ function AdminConsoleContent({ onBack }) {
     const weekSchedule = {};
     DAYS.forEach(day => {
       const fullDayName = FULL_DAYS[day];
-      const row = dayRows[day] || [];
+      const dayInfo = dayRows[day];
       const dayClasses = [];
 
       const periodColumns = [
-        { id: 1, col: 1 }, { id: 2, col: 2 }, { id: 3, col: 3 },
-        { id: 0, col: 4, isBreak: true },
-        { id: 4, col: 5 }, { id: 5, col: 6 }, { id: 6, col: 7 }, { id: 7, col: 8 }
+        { id: 1, relCol: 1 },
+        { id: 2, relCol: 2 },
+        { id: 3, relCol: 3 },
+        { id: 0, relCol: 4, isBreak: true },
+        { id: 4, relCol: 5 },
+        { id: 5, relCol: 6 },
+        { id: 6, relCol: 7 },
+        { id: 7, relCol: 8 }
       ];
 
-      periodColumns.forEach(({ id, col, isBreak }) => {
+      periodColumns.forEach(({ id, relCol, isBreak }) => {
         if (isBreak) {
           dayClasses.push({ period: 0, isBreak: true, subject: "Infinity Hour (Break)", teacher: "", room: "" });
           return;
         }
 
-        const cellValue = clean(row[col]);
+        if (!dayInfo) {
+          dayClasses.push({ period: id, subject: "Free", teacher: "-", room: "-" });
+          return;
+        }
+
+        const cellValue = clean(dayInfo.row[dayInfo.dayCol + relCol]);
         const parsedCell = parseUnifiedCell(cellValue, id, facultyMap, defaultRoom);
         dayClasses.push(parsedCell);
       });

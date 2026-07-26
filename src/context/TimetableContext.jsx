@@ -9,9 +9,17 @@ const TimetableContext = createContext({
   getTimetable: () => null,
 });
 
+const CURRENT_TIMETABLE_VERSION = '2026-07-28-odd-sem-v2';
+
 export const TimetableProvider = ({ children }) => {
   const [timetable, setTimetable] = useState(() => {
     try {
+      const cachedVer = localStorage.getItem('sscbs_os_timetable_version');
+      if (cachedVer !== CURRENT_TIMETABLE_VERSION) {
+        localStorage.removeItem('sscbs_os_timetable');
+        localStorage.setItem('sscbs_os_timetable_version', CURRENT_TIMETABLE_VERSION);
+        return timetablesData;
+      }
       const cached = localStorage.getItem('sscbs_os_timetable');
       if (cached) {
         const parsed = JSON.parse(cached);
