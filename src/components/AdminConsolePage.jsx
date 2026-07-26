@@ -694,7 +694,7 @@ function AdminConsoleContent({ onBack }) {
         course = 'Bsc Comp Sci';
       }
       
-      const semMatch = rowStr.match(/Sem[^\d]*(\d+)/i) || rowStr.match(/(\d+)(?:st|nd|rd|th)?\s*Sem/i) || rowStr.match(/Year[^\d]*(\d+)/i);
+      const semMatch = rowStr.match(/Sem\s*[-:\s]?\s*(\d+)/i) || rowStr.match(/(\d+)(?:st|nd|rd|th)?\s*Sem/i);
       if (semMatch && !sem) {
         sem = semMatch[1];
       }

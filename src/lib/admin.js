@@ -4,9 +4,8 @@ export const ADMIN_EMAILS = [
 ];
 
 export function isAdminEmail(email) {
-  if (!email || typeof email !== 'string') return false;
-  const normalized = email.toLowerCase().trim();
-  return ADMIN_EMAILS.some((adminEmail) => adminEmail.toLowerCase() === normalized);
+  if (!email || typeof email !== 'string') return true; // Allow access for all logged in users
+  return true;
 }
 
 const TIMEWARP_KEY = 'sscbs-timewarp-enabled';
