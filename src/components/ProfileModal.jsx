@@ -20,7 +20,7 @@ export default function ProfileModal({ isOpen, onClose, isFirstTimeSetup = false
   
   const [fullName, setFullName] = useState('');
   const [course, setCourse] = useState('BMS');
-  const [semester, setSemester] = useState('2');
+  const [semester, setSemester] = useState('1');
   const [section, setSection] = useState('A');
   
   const [loading, setLoading] = useState(false);
@@ -41,7 +41,7 @@ export default function ProfileModal({ isOpen, onClose, isFirstTimeSetup = false
     if (user?.user_metadata) {
       setFullName(user.user_metadata.full_name || '');
       setCourse(user.user_metadata.course || 'BMS');
-      setSemester(user.user_metadata.semester || '2');
+      setSemester(user.user_metadata.semester || '1');
       setSection(user.user_metadata.section || 'A');
     }
   }, [user, isOpen]);

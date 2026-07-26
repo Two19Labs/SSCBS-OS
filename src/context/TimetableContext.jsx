@@ -112,7 +112,7 @@ export const TimetableProvider = ({ children }) => {
 
   // Helper to get active semesters dynamically for a course or across all courses
   const getActiveSemesters = (course) => {
-    if (!timetable || Object.keys(timetable).length === 0) return ['2', '4', '6', '8'];
+    if (!timetable || Object.keys(timetable).length === 0) return ['1', '3', '5', '7'];
     
     if (course && timetable[course]) {
       const sems = Object.keys(timetable[course]);
@@ -128,7 +128,7 @@ export const TimetableProvider = ({ children }) => {
     });
     
     const sems = Array.from(set);
-    if (sems.length === 0) return ['2', '4', '6', '8'];
+    if (sems.length === 0) return ['1', '3', '5', '7'];
     return sems.sort((a, b) => parseInt(a) - parseInt(b));
   };
 
