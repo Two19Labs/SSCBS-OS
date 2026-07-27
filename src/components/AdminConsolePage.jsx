@@ -2553,55 +2553,27 @@ RULES:
                   <h3>Semester Enrollment</h3>
                 </div>
                 {(() => {
-                  const sem2 = analyticsUsers.filter(u => u.semester === '2').length;
-                  const sem4 = analyticsUsers.filter(u => u.semester === '4').length;
-                  const sem6 = analyticsUsers.filter(u => u.semester === '6').length;
-                  const sem8 = analyticsUsers.filter(u => u.semester === '8').length;
-                  const maxVal = Math.max(sem2, sem4, sem6, sem8, 1);
-
-                  const s2Pct = (sem2 / maxVal) * 100;
-                  const s4Pct = (sem4 / maxVal) * 100;
-                  const s6Pct = (sem6 / maxVal) * 100;
-                  const s8Pct = (sem8 / maxVal) * 100;
+                  const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
+                  const yearLabels = ['1st Year', '1st Year', '2nd Year', '2nd Year', '3rd Year', '3rd Year', '4th Year', '4th Year'];
+                  const counts = semesters.map(s => analyticsUsers.filter(u => u.semester === String(s)).length);
+                  const maxVal = Math.max(...counts, 1);
 
                   return (
                     <div className="bar-chart-wrapper">
-                      <div className="bar-item-admin">
-                        <div className="bar-item-label-row">
-                          <span>Semester 2 (1st Year)</span>
-                          <span>{sem2} Students</span>
-                        </div>
-                        <div className="bar-track-admin">
-                          <div className="bar-fill-admin" style={{ width: `${s2Pct}%`, background: 'linear-gradient(90deg, #8b5cf6, #c084fc)' }} />
-                        </div>
-                      </div>
-                      <div className="bar-item-admin">
-                        <div className="bar-item-label-row">
-                          <span>Semester 4 (2nd Year)</span>
-                          <span>{sem4} Students</span>
-                        </div>
-                        <div className="bar-track-admin">
-                          <div className="bar-fill-admin" style={{ width: `${s4Pct}%`, background: 'linear-gradient(90deg, #8b5cf6, #c084fc)' }} />
-                        </div>
-                      </div>
-                      <div className="bar-item-admin">
-                        <div className="bar-item-label-row">
-                          <span>Semester 6 (3rd Year)</span>
-                          <span>{sem6} Students</span>
-                        </div>
-                        <div className="bar-track-admin">
-                          <div className="bar-fill-admin" style={{ width: `${s6Pct}%`, background: 'linear-gradient(90deg, #8b5cf6, #c084fc)' }} />
-                        </div>
-                      </div>
-                      <div className="bar-item-admin">
-                        <div className="bar-item-label-row">
-                          <span>Semester 8 (4th Year)</span>
-                          <span>{sem8} Students</span>
-                        </div>
-                        <div className="bar-track-admin">
-                          <div className="bar-fill-admin" style={{ width: `${s8Pct}%`, background: 'linear-gradient(90deg, #8b5cf6, #c084fc)' }} />
-                        </div>
-                      </div>
+                      {semesters.map((sem, i) => {
+                        const pct = (counts[i] / maxVal) * 100;
+                        return (
+                          <div className="bar-item-admin" key={sem}>
+                            <div className="bar-item-label-row">
+                              <span>Semester {sem} ({yearLabels[i]})</span>
+                              <span>{counts[i]} Students</span>
+                            </div>
+                            <div className="bar-track-admin">
+                              <div className="bar-fill-admin" style={{ width: `${pct}%`, background: 'linear-gradient(90deg, #8b5cf6, #c084fc)' }} />
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   );
                 })()}
