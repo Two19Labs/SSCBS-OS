@@ -931,6 +931,7 @@ RULES:
 - Use the legend to resolve codes in the grid to full subject names and teacher names
 - If a cell is empty or says "Free" or "Unsupervised", set subject to "Free" and teacher to "-"
 - For split cells like "KR/OS", create a combined entry: subject="Subject1 / Subject2", teacher="Teacher1 / Teacher2"
+- If a cell contains "(P)" it means Practical. Keep the subject name and append "(Practical)", use the same default room as the class's allotted room
 - BBA(FIA) should be normalized to "BBA FIA"
 - B.Sc.(H) Computer Science should be normalized to "Bsc Comp Sci"
 - Return ONLY the raw JSON object, no markdown, no explanation`;
