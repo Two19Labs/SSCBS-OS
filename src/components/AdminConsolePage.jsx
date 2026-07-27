@@ -936,14 +936,14 @@ RULES:
 - B.Sc.(H) Computer Science should be normalized to "Bsc Comp Sci"
 - Return ONLY the raw JSON object, no markdown, no explanation`;
 
-                const res = await fetch('https://router.huggingface.co/hf-inference/models/Qwen/Qwen3-32B/v1/chat/completions', {
+                const res = await fetch('https://router.huggingface.co/v1/chat/completions', {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                   },
                   body: JSON.stringify({
-                    model: 'Qwen/Qwen3-32B',
+                    model: 'Qwen/Qwen2.5-72B-Instruct',
                     messages: [
                       { role: 'system', content: systemPrompt },
                       { role: 'user', content: `Parse this timetable block:\n\n${blockText}` }
@@ -1462,52 +1462,52 @@ RULES:
             </div>
 
             {/* AI-POWERED TIMETABLE PARSER (HUGGING FACE) */}
-            <div className="ai-upload-scanner-card" style={{ background: 'linear-gradient(135deg, rgba(255, 170, 51, 0.10) 0%, rgba(255, 107, 53, 0.12) 100%)', border: '1px solid rgba(255, 170, 51, 0.3)', borderRadius: '16px', padding: '20px', marginBottom: '24px', position: 'relative' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontSize: '24px' }}>🤗</span>
+            <div className="ai-upload-scanner-card" style={{ background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.12) 100%)', border: '1px solid rgba(139, 92, 246, 0.3)', borderRadius: '16px', padding: '20px', marginBottom: '24px', position: 'relative', backdropFilter: 'blur(8px)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', flexShrink: 0 }}>🤗</div>
                   <div>
-                    <h4 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#e2e8f0' }}>AI-Powered Timetable Parser (Hugging Face)</h4>
-                    <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#94a3b8' }}>
-                      Drop any Excel timetable — Qwen3-32B AI extracts all courses, semesters, sections, professors &amp; rooms accurately.
+                    <h4 style={{ margin: 0, fontSize: '17px', fontWeight: '700', color: '#f1f5f9', letterSpacing: '-0.01em' }}>AI-Powered Timetable Parser</h4>
+                    <p style={{ margin: '3px 0 0 0', fontSize: '12.5px', color: '#94a3b8', lineHeight: '1.4' }}>
+                      Hugging Face &bull; Qwen2.5-72B — extracts courses, semesters, sections, professors &amp; rooms
                     </p>
                   </div>
                 </div>
                 <button 
                   type="button"
                   onClick={() => setShowHfKeyInput(!showHfKeyInput)}
-                  style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#cbd5e1', padding: '6px 12px', borderRadius: '8px', fontSize: '12px', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                  style={{ background: 'rgba(139, 92, 246, 0.15)', border: '1px solid rgba(139, 92, 246, 0.35)', color: '#c4b5fd', padding: '7px 14px', borderRadius: '8px', fontSize: '12px', cursor: 'pointer', whiteSpace: 'nowrap', fontWeight: '500' }}
                 >
                   ⚙️ {showHfKeyInput ? 'Hide Token' : 'Configure HF Token'}
                 </button>
               </div>
 
               {showHfKeyInput && (
-                <div style={{ marginBottom: '16px', display: 'flex', gap: '10px', alignItems: 'center', background: 'rgba(0,0,0,0.2)', padding: '10px 14px', borderRadius: '10px' }}>
-                  <label htmlFor="hf-key-input" style={{ fontSize: '12px', color: '#cbd5e1', whiteSpace: 'nowrap' }}>HF Token:</label>
+                <div style={{ marginBottom: '14px', display: 'flex', gap: '10px', alignItems: 'center', background: 'rgba(15, 23, 42, 0.5)', padding: '10px 14px', borderRadius: '10px', border: '1px solid rgba(139, 92, 246, 0.15)' }}>
+                  <label htmlFor="hf-key-input" style={{ fontSize: '12px', color: '#c4b5fd', whiteSpace: 'nowrap', fontWeight: '500' }}>HF Token:</label>
                   <input 
                     type="password"
                     id="hf-key-input"
                     value={hfApiKey}
                     onChange={(e) => setHfApiKey(e.target.value)}
                     placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxxxx"
-                    style={{ flex: 1, background: 'rgba(15, 23, 42, 0.8)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '6px 10px', borderRadius: '6px', fontSize: '13px', fontFamily: 'monospace' }}
+                    style={{ flex: 1, background: 'rgba(15, 23, 42, 0.8)', border: '1px solid rgba(139, 92, 246, 0.3)', color: '#f1f5f9', padding: '7px 12px', borderRadius: '8px', fontSize: '13px', fontFamily: 'monospace' }}
                   />
-                  <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer" style={{ fontSize: '11px', color: '#ffaa33', whiteSpace: 'nowrap' }}>Get free token →</a>
+                  <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer" style={{ fontSize: '11px', color: '#a78bfa', whiteSpace: 'nowrap', fontWeight: '500' }}>Get free token &#8594;</a>
                 </div>
               )}
 
               {aiParseProgress.status && (
-                <div style={{ marginBottom: '12px', background: 'rgba(0,0,0,0.2)', padding: '10px 14px', borderRadius: '10px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <span style={{ fontSize: '13px', color: '#e2e8f0' }}>{aiParseProgress.status}</span>
+                <div style={{ marginBottom: '14px', background: 'rgba(15, 23, 42, 0.5)', padding: '12px 14px', borderRadius: '10px', border: '1px solid rgba(139, 92, 246, 0.15)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '13px', color: '#e2e8f0', fontWeight: '500' }}>{aiParseProgress.status}</span>
                     {aiParseProgress.total > 0 && (
-                      <span style={{ fontSize: '12px', color: '#94a3b8' }}>{Math.round((aiParseProgress.current / aiParseProgress.total) * 100)}%</span>
+                      <span style={{ fontSize: '12px', color: '#a78bfa', fontWeight: '600' }}>{Math.round((aiParseProgress.current / aiParseProgress.total) * 100)}%</span>
                     )}
                   </div>
                   {aiParseProgress.total > 0 && (
-                    <div style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
-                      <div style={{ height: '100%', width: `${(aiParseProgress.current / aiParseProgress.total) * 100}%`, background: 'linear-gradient(90deg, #ffaa33, #ff6b35)', borderRadius: '2px', transition: 'width 0.3s ease' }} />
+                    <div style={{ height: '5px', background: 'rgba(139, 92, 246, 0.15)', borderRadius: '3px', overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${(aiParseProgress.current / aiParseProgress.total) * 100}%`, background: 'linear-gradient(90deg, #6366f1, #a78bfa)', borderRadius: '3px', transition: 'width 0.3s ease' }} />
                     </div>
                   )}
                 </div>
@@ -1522,17 +1522,19 @@ RULES:
                     parseFileWithHuggingFace(e.dataTransfer.files[0]);
                   }
                 }}
-                style={{ border: '2px dashed rgba(255, 170, 51, 0.4)', borderRadius: '12px', padding: '24px', textAlign: 'center', background: 'rgba(15, 23, 42, 0.4)', cursor: 'pointer' }}
+                style={{ border: '2px dashed rgba(139, 92, 246, 0.35)', borderRadius: '12px', padding: '28px 24px', textAlign: 'center', background: 'rgba(15, 23, 42, 0.4)', cursor: 'pointer' }}
               >
-                <div style={{ fontSize: '28px', marginBottom: '8px' }}>🤗 📄</div>
+                <div style={{ fontSize: '32px', marginBottom: '10px' }}>📄 ✨</div>
                 <p style={{ margin: 0, fontSize: '14px', color: '#e2e8f0', fontWeight: '500' }}>
-                  Drop ANY Excel timetable file here for AI Parsing or <label className="file-input-label" style={{ color: '#ffaa33', textDecoration: 'underline', cursor: 'pointer' }}>browse<input type="file" onChange={(e) => e.target.files && e.target.files[0] && parseFileWithHuggingFace(e.target.files[0])} accept=".xlsx,.xls" className="hidden-file-input" /></label>
+                  Drop ANY Excel timetable file here for AI Parsing or <label className="file-input-label" style={{ color: '#a78bfa', textDecoration: 'underline', cursor: 'pointer', fontWeight: '600' }}>browse<input type="file" onChange={(e) => e.target.files && e.target.files[0] && parseFileWithHuggingFace(e.target.files[0])} accept=".xlsx,.xls" className="hidden-file-input" /></label>
                 </p>
-                <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#64748b' }}>
-                  {hfApiKey ? '✓ HF Token configured — AI parsing enabled' : '⚠️ No HF token — will use smart fallback parser'}
+                <p style={{ margin: '6px 0 0 0', fontSize: '12px', color: hfApiKey ? '#86efac' : '#fbbf24' }}>
+                  {hfApiKey ? '✓ HF Token configured — AI parsing enabled' : '⚠ No HF token — will use smart fallback parser'}
                 </p>
               </div>
             </div>
+
+
 
             <div className="upload-dual-grid">
               {/* Card 1: Management (BBA FIA / BMS) */}
