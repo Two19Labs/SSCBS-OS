@@ -132,6 +132,28 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
     return Math.max(0, Math.min(100, progress));
   };
 
+  // Helper: Resolve room "P" (practical) to the section's default room
+  const resolveRoom = (room) => {
+    if (!room || room === 'P' || room === 'p') {
+      // Find the most common non-P room from the full timetable
+      if (timetable) {
+        const roomCounts = {};
+        for (const day of DAYS) {
+          const classes = timetable[day] || [];
+          for (const cls of classes) {
+            if (cls.room && cls.room !== 'P' && cls.room !== 'p' && cls.room !== '-' && !cls.isBreak) {
+              roomCounts[cls.room] = (roomCounts[cls.room] || 0) + 1;
+            }
+          }
+        }
+        const sorted = Object.entries(roomCounts).sort((a, b) => b[1] - a[1]);
+        if (sorted.length > 0) return sorted[0][0];
+      }
+      return room === 'P' || room === 'p' ? '' : room;
+    }
+    return room;
+  };
+
   // Find active and next classes
   let activeClass = null;
   let nextClass = null;
@@ -234,8 +256,8 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                   <div className="hero-details">
                     <div className="hero-status-row">
                       <span className="badge-status live">Ongoing Now</span>
-                      {activeClass.room && activeClass.room !== '-' && (
-                        <span className="room-label">Room: <strong className="highlight-tag">{activeClass.room}</strong></span>
+                      {resolveRoom(activeClass.room) && resolveRoom(activeClass.room) !== '-' && (
+                        <span className="room-label">Room: <strong className="highlight-tag">{resolveRoom(activeClass.room)}</strong></span>
                       )}
                     </div>
                     <h3>{activeClass.subject}</h3>
@@ -317,7 +339,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                     <div className="next-class-info">
                       <p className="next-sub">{nextClass.subject}</p>
                       <p className="next-details">
-                        {nextClass.room && `${nextClass.room} • `} 
+                        {resolveRoom(nextClass.room) && `${resolveRoom(nextClass.room)} • `} 
                         {PERIODS.find(p => p.id === nextClass.period || (nextClass.isBreak && p.id === 0))?.startLabel}
                       </p>
                     </div>
@@ -366,8 +388,8 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                             <h5 className="slot-subject" title={cls.isBreak ? "Break" : cls.subject}>
                               {cls.isBreak ? "Break" : cls.subject}
                             </h5>
-                            {!cls.isBreak && cls.subject !== 'Free' && cls.room ? (
-                              <p className="slot-meta" title={`${cls.room} • ${cls.teacher}`}>{cls.room} • {cls.teacher}</p>
+                            {!cls.isBreak && cls.subject !== 'Free' && resolveRoom(cls.room) ? (
+                              <p className="slot-meta" title={`${resolveRoom(cls.room)} • ${cls.teacher}`}>{resolveRoom(cls.room)} • {cls.teacher}</p>
                             ) : (
                               <p className="slot-meta-empty">-</p>
                             )}
@@ -574,13 +596,12 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                                           <span>{matchClass.teacher}</span>
                                         </div>
                                       )}
-                                      {matchClass.room && matchClass.room !== '-' && (
+                                      {resolveRoom(matchClass.room) && resolveRoom(matchClass.room) !== '-' && (
                                         <div className="timeline-meta-item room-tag">
-                                          <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2" fill="none">
-                                            <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
-                                            <circle cx="12" cy="10" r="3" />
+                                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
                                           </svg>
-                                          <span>{matchClass.room}</span>
+                                          <span>{resolveRoom(matchClass.room)}</span>
                                         </div>
                                       )}
                                     </div>
@@ -647,13 +668,13 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                                               {matchClass.teacher}
                                             </div>
                                           )}
-                                          {matchClass.room && matchClass.room !== '-' && (
+                                          {resolveRoom(matchClass.room) && resolveRoom(matchClass.room) !== '-' && (
                                             <div className="cell-room" title="Room">
                                               <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" strokeWidth="2.0" fill="none" className="cell-svg-icon">
                                                 <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
                                                 <circle cx="12" cy="10" r="3" />
                                               </svg>
-                                              {matchClass.room}
+                                              {resolveRoom(matchClass.room)}
                                             </div>
                                           )}
                                         </div>
