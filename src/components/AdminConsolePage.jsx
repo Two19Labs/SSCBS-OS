@@ -543,8 +543,9 @@ function AdminConsoleContent({ onBack }) {
   const [isParsingCs, setIsParsingCs] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState({ type: '', message: '' });
-  const [geminiApiKey, setGeminiApiKey] = useState(() => import.meta.env.VITE_GEMINI_API_KEY || '');
-  const [showAiKeyInput, setShowAiKeyInput] = useState(false);
+  const [hfApiKey, setHfApiKey] = useState(() => import.meta.env.VITE_HF_API_KEY || '');
+  const [showHfKeyInput, setShowHfKeyInput] = useState(false);
+  const [aiParseProgress, setAiParseProgress] = useState({ current: 0, total: 0, status: '' });
 
   // Manual Editor Filters
   const [selectedCourse, setSelectedCourse] = useState('BMS');
@@ -826,19 +827,28 @@ function AdminConsoleContent({ onBack }) {
     return { course, sem, section, defaultRoom, weekSchedule };
   };
 
-  // AI-Powered Scanner (Google Gemini API LLM)
-  const parseFileWithAI = async (selectedFile) => {
+  // AI-Powered Timetable Parser (Hugging Face Inference API)
+  const parseFileWithHuggingFace = async (selectedFile) => {
     if (!selectedFile) return;
-    const apiKeyToUse = geminiApiKey || import.meta.env.VITE_GEMINI_API_KEY || '';
-    addLog(`[AI Scanner] Reading file "${selectedFile.name}" for AI layout parsing...`, 'info');
+    const token = hfApiKey || import.meta.env.VITE_HF_API_KEY || '';
+    if (!token) {
+      addLog('[AI Parser] ⚠️ No Hugging Face API key configured. Click "⚙️ Configure HF Token" to add your free token from huggingface.co/settings/tokens', 'warning');
+      addLog('[AI Parser] Falling back to smart rule-based parser...', 'info');
+    }
+    addLog(`[AI Parser] Reading file "${selectedFile.name}"...`, 'info');
     setIsParsingMgmt(true);
+    setAiParseProgress({ current: 0, total: 0, status: 'Reading Excel...' });
 
     const reader = new FileReader();
     reader.onload = async (e) => {
       try {
         const workbook = XLSX.read(e.target.result, { type: 'array' });
         const timetables = {};
+        let totalBlocks = 0;
+        let processedBlocks = 0;
 
+        // First pass: count all blocks
+        const allSheetBlocks = [];
         for (const sheetName of workbook.SheetNames) {
           if (isIgnoredSheet(sheetName)) continue;
           const sheet = workbook.Sheets[sheetName];
@@ -855,79 +865,177 @@ function AdminConsoleContent({ onBack }) {
             }
           });
 
-          if (blockStarts.length === 0) continue;
-          addLog(`[AI Scanner] Sheet "${sheetName}": Found ${blockStarts.length} block(s). Processing with AI...`, 'info');
+          if (blockStarts.length > 0) {
+            allSheetBlocks.push({ sheetName, sheetData, blockStarts });
+            totalBlocks += blockStarts.length;
+          }
+        }
 
+        setAiParseProgress({ current: 0, total: totalBlocks, status: `Found ${totalBlocks} timetable blocks...` });
+        addLog(`[AI Parser] Found ${totalBlocks} timetable block(s) across ${allSheetBlocks.length} sheet(s).`, 'info');
+
+        for (const { sheetName, sheetData, blockStarts } of allSheetBlocks) {
           for (let bIdx = 0; bIdx < blockStarts.length; bIdx++) {
+            processedBlocks++;
             const startRow = blockStarts[bIdx];
             const nextStartRow = blockStarts[bIdx + 1] || sheetData.length;
-            const blockRows = sheetData.slice(startRow, nextStartRow);
-            
-            // Try AI parsing with Gemini Flash API if available
+            const blockRows = sheetData.slice(startRow, Math.min(nextStartRow, startRow + 40));
+
+            setAiParseProgress({ current: processedBlocks, total: totalBlocks, status: `Parsing block ${processedBlocks}/${totalBlocks} from "${sheetName}"...` });
+
             let parsedOk = false;
-            if (apiKeyToUse) {
+
+            // Try Hugging Face AI parsing
+            if (token) {
               try {
-                let blockText = `=== SHEET: ${sheetName} ===\n`;
+                // Convert block rows to structured text for the LLM
+                let blockText = '';
                 blockRows.forEach((r, idx) => {
-                  const nonE = r.map((c, colIdx) => c !== null && c !== undefined && String(c).trim() !== '' ? `[Col ${colIdx}]: ${String(c).trim()}` : null).filter(Boolean);
-                  if (nonE.length > 0) blockText += `Row ${idx}: ${nonE.join(' | ')}\n`;
+                  const nonEmpty = r.map((c, colIdx) => {
+                    if (c === null || c === undefined || String(c).trim() === '') return null;
+                    return `[C${colIdx}]${String(c).trim()}`;
+                  }).filter(Boolean);
+                  if (nonEmpty.length > 0) blockText += `R${idx}: ${nonEmpty.join(' | ')}\n`;
                 });
 
-                const promptText = `Analyze this raw Excel timetable block for SSCBS college and return strict raw JSON for the schedule:\n` + blockText;
-                
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKeyToUse}`, {
+                const systemPrompt = `You are a timetable data extractor for SSCBS college (Shaheed Sukhdev College of Business Studies, Delhi University). You will receive raw cell data from an Excel timetable block.
+
+EXTRACT and return a JSON object with EXACTLY this structure:
+{
+  "course": "BMS" or "BBA FIA" or "Bsc Comp Sci",
+  "semester": "1" or "3" or "5" or "7" (string),
+  "section": "A" or "B" or "C" or "D" (string),
+  "room": "Room 703" (default room from header),
+  "weekSchedule": {
+    "Monday": [
+      {"period": 1, "subject": "Subject Name", "teacher": "Dr. Full Name", "room": "Room 703"},
+      {"period": 2, "subject": "...", "teacher": "...", "room": "..."},
+      {"period": 3, "subject": "...", "teacher": "...", "room": "..."},
+      {"period": 0, "isBreak": true, "subject": "Infinity Hour (Break)", "teacher": "", "room": ""},
+      {"period": 4, "subject": "...", "teacher": "...", "room": "..."},
+      {"period": 5, "subject": "...", "teacher": "...", "room": "..."},
+      {"period": 6, "subject": "...", "teacher": "...", "room": "..."},
+      {"period": 7, "subject": "...", "teacher": "...", "room": "..."}
+    ],
+    "Tuesday": [...same 8 entries...],
+    "Wednesday": [...],
+    "Thursday": [...],
+    "Friday": [...]
+  }
+}
+
+RULES:
+- The timetable grid has days Mon-Fri as rows and periods I-VII as columns (with Infinity Hour break between period III and IV)
+- Each day MUST have exactly 8 entries: periods 1,2,3 then break (period 0), then periods 4,5,6,7
+- Below the timetable grid is a LEGEND TABLE mapping faculty codes (like "TA","MV","SJ") to full paper names and full faculty names (Dr./Mr./Ms.)
+- Use the legend to resolve codes in the grid to full subject names and teacher names
+- If a cell is empty or says "Free" or "Unsupervised", set subject to "Free" and teacher to "-"
+- For split cells like "KR/OS", create a combined entry: subject="Subject1 / Subject2", teacher="Teacher1 / Teacher2"
+- BBA(FIA) should be normalized to "BBA FIA"
+- B.Sc.(H) Computer Science should be normalized to "Bsc Comp Sci"
+- Return ONLY the raw JSON object, no markdown, no explanation`;
+
+                const res = await fetch('https://router.huggingface.co/hf-inference/models/Qwen/Qwen3-32B/v1/chat/completions', {
                   method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                  },
                   body: JSON.stringify({
-                    contents: [{ parts: [{ text: promptText }] }],
-                    generationConfig: { responseMimeType: 'application/json', temperature: 0.1 }
+                    model: 'Qwen/Qwen3-32B',
+                    messages: [
+                      { role: 'system', content: systemPrompt },
+                      { role: 'user', content: `Parse this timetable block:\n\n${blockText}` }
+                    ],
+                    max_tokens: 4096,
+                    temperature: 0.1
                   })
                 });
 
                 if (res.ok) {
-                  const resData = await res.json();
-                  const rawJson = resData.candidates[0].content.parts[0].text;
-                  const aiResult = JSON.parse(rawJson);
-                  if (aiResult && aiResult.course && (aiResult.weekSchedule || aiResult.schedule)) {
-                    const course = aiResult.course;
-                    const sem = String(aiResult.semester || '1');
-                    const section = aiResult.section || 'A';
-                    const sched = aiResult.weekSchedule || aiResult.schedule;
-                    if (!timetables[course]) timetables[course] = {};
-                    if (!timetables[course][sem]) timetables[course][sem] = {};
-                    timetables[course][sem][section] = sched;
-                    addLog(`  -> [AI Parsed Block ${bIdx + 1}] ${course} Sem ${sem} Sec ${section}`, 'success');
-                    parsedOk = true;
+                  const data = await res.json();
+                  let rawText = data.choices?.[0]?.message?.content || '';
+                  
+                  // Strip markdown code fences and thinking tags if present
+                  rawText = rawText.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+                  rawText = rawText.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+                  
+                  // Find JSON object in the response
+                  const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+                  if (jsonMatch) {
+                    const aiResult = JSON.parse(jsonMatch[0]);
+                    if (aiResult && aiResult.course && aiResult.weekSchedule) {
+                      const course = aiResult.course;
+                      const sem = String(aiResult.semester || '1');
+                      const section = aiResult.section || 'A';
+                      if (!timetables[course]) timetables[course] = {};
+                      if (!timetables[course][sem]) timetables[course][sem] = {};
+                      timetables[course][sem][section] = aiResult.weekSchedule;
+                      addLog(`  ✓ [AI Block ${processedBlocks}] ${course} Sem ${sem} Sec ${section}`, 'success');
+                      parsedOk = true;
+                    }
                   }
+                } else {
+                  const errText = await res.text();
+                  addLog(`  ⚠️ [AI Block ${processedBlocks}] HF API error (${res.status}). Using fallback parser.`, 'warning');
+                  console.warn('HF API error:', errText);
                 }
               } catch (aiErr) {
-                console.warn('AI Parse fallback:', aiErr.message);
+                addLog(`  ⚠️ [AI Block ${processedBlocks}] AI parse error: ${aiErr.message}. Using fallback.`, 'warning');
               }
             }
 
+            // Fallback to smart rule-based parser
             if (!parsedOk) {
               let defaultSem = '1';
-              let defaultCourse = sheetName.toUpperCase().includes('BBA') ? 'BBA FIA' : sheetName.toUpperCase().includes('CS') ? 'Bsc Comp Sci' : 'BMS';
-              const res = parseSheetBlock(sheetData, startRow, defaultCourse, defaultSem);
-              if (res) {
-                const { course, sem, section, weekSchedule } = res;
+              let defaultCourse = sheetName.toUpperCase().includes('BBA') ? 'BBA FIA' : sheetName.toUpperCase().includes('CS') || sheetName.toUpperCase().includes('CLASSWISE') ? 'Bsc Comp Sci' : 'BMS';
+              const result = parseSheetBlock(sheetData, startRow, defaultCourse, defaultSem);
+              if (result) {
+                const { course, sem, section, weekSchedule } = result;
                 if (!timetables[course]) timetables[course] = {};
                 if (!timetables[course][sem]) timetables[course][sem] = {};
                 timetables[course][sem][section] = weekSchedule;
-                addLog(`  -> [Smart Parsed Block ${bIdx + 1}] ${course} Sem ${sem} Sec ${section}`, 'info');
+                addLog(`  → [Fallback Block ${processedBlocks}] ${course} Sem ${sem} Sec ${section}`, 'info');
               }
+            }
+
+            // Small delay between API calls to respect rate limits
+            if (token && bIdx < blockStarts.length - 1) {
+              await new Promise(r => setTimeout(r, 500));
             }
           }
         }
 
         if (Object.keys(timetables).length > 0) {
-          setMgmtParsedData(prev => ({ ...(prev || {}), ...timetables }));
-          addLog(`[AI Scanner] ✓ Successfully scanned & parsed Excel file with Gemini AI!`, 'success');
+          // Merge with existing parsed data (mgmt + cs)
+          const mgmtData = {};
+          const csData = {};
+          for (const [courseName, sems] of Object.entries(timetables)) {
+            if (courseName === 'Bsc Comp Sci') {
+              csData[courseName] = sems;
+            } else {
+              mgmtData[courseName] = sems;
+            }
+          }
+          if (Object.keys(mgmtData).length > 0) {
+            setMgmtParsedData(prev => ({ ...(prev || {}), ...mgmtData }));
+          }
+          if (Object.keys(csData).length > 0) {
+            setCsParsedData(prev => ({ ...(prev || {}), ...csData }));
+          }
+
+          const summary = Object.entries(timetables).map(([c, sems]) => 
+            `${c}: Sems [${Object.keys(sems).sort().join(', ')}]`
+          ).join(' | ');
+          addLog(`[AI Parser] ✅ Successfully parsed! ${summary}`, 'success');
+          setAiParseProgress({ current: totalBlocks, total: totalBlocks, status: 'Complete!' });
         } else {
-          addLog(`[AI Scanner] ⚠️ No blocks recognized in file.`, 'warning');
+          addLog(`[AI Parser] ⚠️ No timetable blocks recognized in file.`, 'warning');
+          setAiParseProgress({ current: 0, total: 0, status: '' });
         }
       } catch (err) {
-        addLog(`[AI Scanner] Error parsing file: ${err.message}`, 'error');
+        addLog(`[AI Parser] ❌ Error: ${err.message}`, 'error');
+        setAiParseProgress({ current: 0, total: 0, status: '' });
       } finally {
         setIsParsingMgmt(false);
       }
@@ -1339,7 +1447,7 @@ function AdminConsoleContent({ onBack }) {
               <div>
                 <h3>Schedule Upload Center</h3>
                 <p className="subtitle-admin">
-                  Upload timetables for <strong>BMS, BBA FIA</strong> & <strong>B.Sc. Computer Science</strong> using AI-Powered LLM extraction or sheet upload.
+                  Upload timetables for <strong>BMS, BBA FIA</strong> & <strong>B.Sc. Computer Science</strong> using AI-Powered Hugging Face parser or manual sheet upload.
                 </p>
               </div>
               <button 
@@ -1352,39 +1460,55 @@ function AdminConsoleContent({ onBack }) {
               </button>
             </div>
 
-            {/* AI-POWERED DRAG & DROP SCANNER BANNER */}
-            <div className="ai-upload-scanner-card" style={{ background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(168, 85, 247, 0.12) 100%)', border: '1px solid rgba(168, 85, 247, 0.3)', borderRadius: '16px', padding: '20px', marginBottom: '24px', position: 'relative' }}>
+            {/* AI-POWERED TIMETABLE PARSER (HUGGING FACE) */}
+            <div className="ai-upload-scanner-card" style={{ background: 'linear-gradient(135deg, rgba(255, 170, 51, 0.10) 0%, rgba(255, 107, 53, 0.12) 100%)', border: '1px solid rgba(255, 170, 51, 0.3)', borderRadius: '16px', padding: '20px', marginBottom: '24px', position: 'relative' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontSize: '24px' }}>🤖</span>
+                  <span style={{ fontSize: '24px' }}>🤗</span>
                   <div>
-                    <h4 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#e2e8f0' }}>AI-Powered Timetable Scanner (Google Gemini LLM)</h4>
+                    <h4 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#e2e8f0' }}>AI-Powered Timetable Parser (Hugging Face)</h4>
                     <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#94a3b8' }}>
-                      Drag & drop any Excel timetable here. Gemini AI extracts all courses, semesters, sections, professors, & rooms dynamically without fragile column rules.
+                      Drop any Excel timetable — Qwen3-32B AI extracts all courses, semesters, sections, professors &amp; rooms accurately.
                     </p>
                   </div>
                 </div>
                 <button 
                   type="button"
-                  onClick={() => setShowAiKeyInput(!showAiKeyInput)}
-                  style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#cbd5e1', padding: '6px 12px', borderRadius: '8px', fontSize: '12px', cursor: 'pointer' }}
+                  onClick={() => setShowHfKeyInput(!showHfKeyInput)}
+                  style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#cbd5e1', padding: '6px 12px', borderRadius: '8px', fontSize: '12px', cursor: 'pointer', whiteSpace: 'nowrap' }}
                 >
-                  ⚙️ {showAiKeyInput ? 'Hide API Key' : 'Configure Gemini API Key'}
+                  ⚙️ {showHfKeyInput ? 'Hide Token' : 'Configure HF Token'}
                 </button>
               </div>
 
-              {showAiKeyInput && (
+              {showHfKeyInput && (
                 <div style={{ marginBottom: '16px', display: 'flex', gap: '10px', alignItems: 'center', background: 'rgba(0,0,0,0.2)', padding: '10px 14px', borderRadius: '10px' }}>
-                  <label htmlFor="gemini-key-input" style={{ fontSize: '12px', color: '#cbd5e1', whiteSpace: 'nowrap' }}>Gemini Key:</label>
+                  <label htmlFor="hf-key-input" style={{ fontSize: '12px', color: '#cbd5e1', whiteSpace: 'nowrap' }}>HF Token:</label>
                   <input 
                     type="password"
-                    id="gemini-key-input"
-                    value={geminiApiKey}
-                    onChange={(e) => setGeminiApiKey(e.target.value)}
-                    placeholder="Enter GEMINI_API_KEY..."
-                    style={{ flex: 1, background: 'rgba(15, 23, 42, 0.8)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '6px 10px', borderRadius: '6px', fontSize: '13px' }}
+                    id="hf-key-input"
+                    value={hfApiKey}
+                    onChange={(e) => setHfApiKey(e.target.value)}
+                    placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxxxx"
+                    style={{ flex: 1, background: 'rgba(15, 23, 42, 0.8)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '6px 10px', borderRadius: '6px', fontSize: '13px', fontFamily: 'monospace' }}
                   />
-                  <span style={{ fontSize: '11px', color: '#94a3b8' }}>Free key from aistudio.google.com</span>
+                  <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer" style={{ fontSize: '11px', color: '#ffaa33', whiteSpace: 'nowrap' }}>Get free token →</a>
+                </div>
+              )}
+
+              {aiParseProgress.status && (
+                <div style={{ marginBottom: '12px', background: 'rgba(0,0,0,0.2)', padding: '10px 14px', borderRadius: '10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <span style={{ fontSize: '13px', color: '#e2e8f0' }}>{aiParseProgress.status}</span>
+                    {aiParseProgress.total > 0 && (
+                      <span style={{ fontSize: '12px', color: '#94a3b8' }}>{Math.round((aiParseProgress.current / aiParseProgress.total) * 100)}%</span>
+                    )}
+                  </div>
+                  {aiParseProgress.total > 0 && (
+                    <div style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${(aiParseProgress.current / aiParseProgress.total) * 100}%`, background: 'linear-gradient(90deg, #ffaa33, #ff6b35)', borderRadius: '2px', transition: 'width 0.3s ease' }} />
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -1394,17 +1518,17 @@ function AdminConsoleContent({ onBack }) {
                 onDrop={(e) => {
                   e.preventDefault();
                   if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                    parseFileWithAI(e.dataTransfer.files[0]);
+                    parseFileWithHuggingFace(e.dataTransfer.files[0]);
                   }
                 }}
-                style={{ border: '2px dashed rgba(168, 85, 247, 0.4)', borderRadius: '12px', padding: '24px', textAlign: 'center', background: 'rgba(15, 23, 42, 0.4)', cursor: 'pointer' }}
+                style={{ border: '2px dashed rgba(255, 170, 51, 0.4)', borderRadius: '12px', padding: '24px', textAlign: 'center', background: 'rgba(15, 23, 42, 0.4)', cursor: 'pointer' }}
               >
-                <div style={{ fontSize: '28px', marginBottom: '8px' }}>✨ 📄</div>
+                <div style={{ fontSize: '28px', marginBottom: '8px' }}>🤗 📄</div>
                 <p style={{ margin: 0, fontSize: '14px', color: '#e2e8f0', fontWeight: '500' }}>
-                  Drop ANY Excel timetable file here for AI Instant Scanning or <label className="file-input-label" style={{ color: '#c084fc', textDecoration: 'underline', cursor: 'pointer' }}>browse<input type="file" onChange={(e) => e.target.files && e.target.files[0] && parseFileWithAI(e.target.files[0])} accept=".xlsx" className="hidden-file-input" /></label>
+                  Drop ANY Excel timetable file here for AI Parsing or <label className="file-input-label" style={{ color: '#ffaa33', textDecoration: 'underline', cursor: 'pointer' }}>browse<input type="file" onChange={(e) => e.target.files && e.target.files[0] && parseFileWithHuggingFace(e.target.files[0])} accept=".xlsx,.xls" className="hidden-file-input" /></label>
                 </p>
                 <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#64748b' }}>
-                  Supports BMS, BBA FIA, B.Sc CS odd and even semester timetables in any format
+                  {hfApiKey ? '✓ HF Token configured — AI parsing enabled' : '⚠️ No HF token — will use smart fallback parser'}
                 </p>
               </div>
             </div>

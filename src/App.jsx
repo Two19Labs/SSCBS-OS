@@ -163,7 +163,7 @@ function App() {
     { id: 'find-prof', label: 'Find My Professor', Icon: SearchIcon },
     { id: 'waiver', label: 'Waiver Tool', Icon: PercentIcon },
     { id: 'gpa', label: 'GPA Calculator', Icon: CalculatorIcon },
-    { id: 'admin', label: 'Admin Console & AI Scanner', Icon: ShieldIcon },
+    { id: 'pyqs', label: 'PYQs & Resources', Icon: FileIcon, locked: true },
     { id: 'buzz', label: 'Campus Buzz', Icon: MegaphoneIcon },
   ];
 
@@ -180,7 +180,7 @@ function App() {
     timetable: 'Timetable',
     tools: 'Tools',
     'find-prof': 'Find My Professor',
-    admin: 'Admin Console & AI Scanner',
+    admin: 'Admin Console',
     buzz: 'Campus Buzz',
     profile: 'Profile',
   }[view];
@@ -196,11 +196,11 @@ function App() {
           </Suspense>
         );
       case 'admin':
-        return (
+        return isAdmin ? (
           <Suspense fallback={<PageLoader />}>
             <AdminConsolePage onBack={goBack} />
           </Suspense>
-        );
+        ) : <HomeDashboard onNavigate={openTool} onOpenProfile={() => setView('profile')} />;
       case 'buzz':
         return (
           <div className="buzz-page">
@@ -216,7 +216,6 @@ function App() {
               { id: 'find-prof', micro: 'SEARCH', microClass: 'success', title: 'Find My Professor', desc: "Who's teaching where, right now", Icon: SearchIcon },
               { id: 'waiver', micro: '85%', microClass: 'gold', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon },
               { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon },
-              { id: 'admin', micro: 'AI SCAN', microClass: 'gold', title: 'Admin Console & AI Scanner', desc: 'Scan timetables with Gemini LLM & manage campus OS', Icon: ShieldIcon },
               { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: true },
             ].map(({ id, micro, microClass, title, desc, Icon, locked }) => (
               <button
