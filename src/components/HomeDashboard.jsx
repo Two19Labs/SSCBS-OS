@@ -4,6 +4,7 @@ import { useTimetable } from '../context/TimetableContext';
 import { PERIODS, DAYS } from '../data/timetables';
 import NoticeBoard from './NoticeBoard';
 import { SearchIcon, PercentIcon, CalculatorIcon, FileIcon } from './icons';
+import { isAdminEmail } from '../lib/admin';
 import './HomeDashboard.css';
 
 function getISTTime() {
@@ -19,6 +20,7 @@ const parseTimeToMinutes = (timeStr) => {
 
 export default function HomeDashboard({ onNavigate, onOpenProfile }) {
   const { user } = useAuth();
+  const isAdmin = isAdminEmail(user?.email);
   const { getTimetable } = useTimetable();
   const [time, setTime] = useState(getISTTime());
 
@@ -231,7 +233,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
 
   const tools = [
     { id: 'find-prof', micro: 'SEARCH', microClass: 'success', title: 'Find My Professor', desc: "Who's teaching where, right now", Icon: SearchIcon },
-    { id: 'waiver', micro: '85%', microClass: 'gold', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon },
+    { id: 'waiver', micro: 'SOON', microClass: 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !isAdmin },
     { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon },
     { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: true },
   ];
