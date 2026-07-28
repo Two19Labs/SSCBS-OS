@@ -2139,7 +2139,7 @@ RULES:
               </div>
             </div>
           </div>
-        ) : (
+        ) : activeTab === 'analytics' ? (
           /* Student Demographics Analytics Tab */
           <div className="tab-pane analytics-pane">
             <div className="analytics-stats-grid">
