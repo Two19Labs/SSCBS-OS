@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#eceae4;font-family:system-ui,sans-serif}
+a{color:#1a1a1a;text-decoration:none}a:hover{color:#5148d6}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 8px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 14px/1.2 system-ui,sans-serif;color:#1a1a1a}
+.dv-intro{max-width:760px;font:400 12.5px/1.6 system-ui,sans-serif;color:rgba(0,0,0,.6);margin:0 0 28px}
+.dv-opts{display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:10px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11.5px/1.3 system-ui,sans-serif;color:rgba(0,0,0,.55)}
+.dv-olabel b{color:#1a1a1a;font-weight:600}
+.dv-row{display:flex;gap:20px;align-items:flex-start}
+.dv-card{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.07);overflow:hidden}
+.dv-opt:target .dv-oid{background:#2a78d6;color:#fff}
+.dv-next{margin:26px 0 0;font:12px/1.5 system-ui,sans-serif;color:rgba(0,0,0,.5)}
+</style>
+</helmet>
+
+<section class="dv-turn" id="t3">
+<div class="dv-thd"><a class="dv-tid" href="#t3">3</a><span class="dv-tname">SSCBS Campus OS — final design system (Manrope · maroon & gold)</span></div>
+<p class="dv-intro">Every page of Campus OS in one language: <a class="dv-oid" href="#3a">3a</a> mobile screens (light), <a class="dv-oid" href="#3b">3b</a> dark mode, <a class="dv-oid" href="#3c">3c</a> desktop sidebar shell, <a class="dv-oid" href="#3d">3d</a> design tokens for dev handoff. Time-warp controls live behind the profile page for admins only.</p>
+
+<!-- ═══════════ 3a MOBILE · LIGHT ═══════════ -->
+<div class="dv-opt" id="3a" style="margin-bottom:36px">
+<div class="dv-olabel"><a class="dv-oid" href="#3a">3a</a><b>Mobile screens · light</b> — timetable, find my professor, waiver tool, GPA, notices, profile</div>
+<div class="dv-row" style="flex-wrap:wrap">
+
+<!-- TIMETABLE -->
+<div class="dv-card" style="width:390px;background:#f7f3ec;font-family:'Manrope',system-ui,sans-serif;color:#241a14;border-radius:16px" data-screen-label="Timetable">
+  <div style="display:flex;flex-direction:column;min-height:780px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px;border-bottom:1px solid rgba(36,26,20,.08)">
+      <div><div style="font:800 18px 'Manrope',sans-serif">Timetable</div><div style="font:600 10px 'Manrope',sans-serif;letter-spacing:.09em;color:#7a6d5f">BMS · SEM 2 · SECTION A</div></div>
+      <span style="font:600 10px 'Manrope',sans-serif;letter-spacing:.06em;color:#7a6d5f">TUE 10:38</span>
+    </div>
+    <div style="display:flex;gap:6px;padding:14px 20px 0">
+      <span style="flex:1;text-align:center;font:600 11px 'Manrope',sans-serif;color:#7a6d5f;border:1px solid rgba(36,26,20,.12);border-radius:10px;padding:8px 0">Mon</span>
+      <span style="flex:1;text-align:center;font:800 11px 'Manrope',sans-serif;color:#f7ead9;background:#71222c;border-radius:10px;padding:8px 0">Tue</span>
+      <span style="flex:1;text-align:center;font:600 11px 'Manrope',sans-serif;color:#7a6d5f;border:1px solid rgba(36,26,20,.12);border-radius:10px;padding:8px 0">Wed</span>
+      <span style="flex:1;text-align:center;font:600 11px 'Manrope',sans-serif;color:#7a6d5f;border:1px solid rgba(36,26,20,.12);border-radius:10px;padding:8px 0">Thu</span>
+      <span style="flex:1;text-align:center;font:600 11px 'Manrope',sans-serif;color:#7a6d5f;border:1px solid rgba(36,26,20,.12);border-radius:10px;padding:8px 0">Fri</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;padding:16px 20px 0">
+      <div style="display:flex;gap:12px;background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:14px;padding:12px 14px;opacity:.6">
+        <span style="font:600 10.5px ui-monospace,monospace;color:#7a6d5f;width:76px;flex:none;padding-top:2px">09:15–10:00</span>
+        <div><div style="font:800 13px 'Manrope',sans-serif">Financial Accounting</div><div style="font:400 11px 'Manrope',sans-serif;color:#7a6d5f">Prof. A. Mehta · Rm 108 · done</div></div>
+      </div>
+      <div style="display:flex;gap:12px;background:#fffdf9;border:1.5px solid #71222c;border-radius:14px;padding:12px 14px;position:relative">
+        <span style="font:800 10.5px ui-monospace,monospace;color:#71222c;width:76px;flex:none;padding-top:2px">10:15–11:00</span>
+        <div style="flex:1">
+          <div style="display:flex;justify-content:space-between"><span style="font:800 13px 'Manrope',sans-serif">Business Statistics</span><span style="font:800 11px 'Manrope',sans-serif;color:#71222c">22m left</span></div>
+          <div style="font:400 11px 'Manrope',sans-serif;color:#7a6d5f">Dr. Ritu Sharma · Rm 204</div>
+          <div style="margin-top:8px;height:4px;background:rgba(36,26,20,.08);border-radius:2px;overflow:hidden"><div style="width:52%;height:100%;background:#71222c"></div></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;border:1px dashed rgba(36,26,20,.18);border-radius:14px;padding:10px 14px">
+        <span style="font:600 10.5px ui-monospace,monospace;color:#a89a90;width:76px;flex:none">11:00–11:05</span>
+        <div style="font:600 11px 'Manrope',sans-serif;color:#a89a90">Break</div>
+      </div>
+      <div style="display:flex;gap:12px;background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:14px;padding:12px 14px">
+        <span style="font:600 10.5px ui-monospace,monospace;color:#7a6d5f;width:76px;flex:none;padding-top:2px">11:05–11:50</span>
+        <div><div style="font:800 13px 'Manrope',sans-serif">Marketing Management</div><div style="font:400 11px 'Manrope',sans-serif;color:#7a6d5f">Dr. K. Bhatia · Rm 108</div></div>
+      </div>
+      <div style="display:flex;gap:12px;background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:14px;padding:12px 14px">
+        <span style="font:600 10.5px ui-monospace,monospace;color:#7a6d5f;width:76px;flex:none;padding-top:2px">11:55–12:40</span>
+        <div><div style="font:800 13px 'Manrope',sans-serif">Marketing Management</div><div style="font:400 11px 'Manrope',sans-serif;color:#7a6d5f">Dr. K. Bhatia · Rm 108 · double period</div></div>
+      </div>
+      <div style="display:flex;gap:12px;border:1px dashed rgba(36,26,20,.18);border-radius:14px;padding:10px 14px">
+        <span style="font:600 10.5px ui-monospace,monospace;color:#a89a90;width:76px;flex:none">12:40–13:25</span>
+        <div style="font:600 11px 'Manrope',sans-serif;color:#a89a90">Lunch break</div>
+      </div>
+      <div style="display:flex;gap:12px;background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:14px;padding:12px 14px">
+        <span style="font:600 10.5px ui-monospace,monospace;color:#7a6d5f;width:76px;flex:none;padding-top:2px">13:25–14:10</span>
+        <div><div style="font:800 13px 'Manrope',sans-serif">Statistics Tutorial</div><div style="font:400 11px 'Manrope',sans-serif;color:#7a6d5f">Dr. R. Sharma · Rm 310 · G2</div></div>
+      </div>
+    </div>
+    <div style="padding:14px 20px 0;font:400 11px 'Manrope',sans-serif;color:#a89a90;text-align:center">4 classes · ends 14:10</div>
+    <div style="flex:1"></div>
+    <div style="display:flex;justify-content:space-around;border-top:1px solid rgba(36,26,20,.1);background:#fffdf9;padding:10px 8px 20px;border-radius:0 0 16px 16px">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#7a6d5f"><div style="width:18px;height:18px;border-radius:5px;border:1.5px solid #7a6d5f"></div><span style="font:600 9.5px 'Manrope',sans-serif">Home</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#71222c"><div style="width:18px;height:18px;border-radius:5px;background:#71222c"></div><span style="font:800 9.5px 'Manrope',sans-serif">Timetable</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#7a6d5f"><div style="width:18px;height:18px;border-radius:999px;border:1.5px solid #7a6d5f"></div><span style="font:600 9.5px 'Manrope',sans-serif">Tools</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#7a6d5f"><div style="width:18px;height:18px;border-radius:999px;border:1.5px solid #7a6d5f;background:rgba(36,26,20,.06)"></div><span style="font:600 9.5px 'Manrope',sans-serif">Profile</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- FIND MY PROFESSOR -->
+<div class="dv-card" style="width:390px;background:#f7f3ec;font-family:'Manrope',system-ui,sans-serif;color:#241a14;border-radius:16px" data-screen-label="Find My Professor">
+  <div style="display:flex;flex-direction:column;min-height:780px">
+    <div style="display:flex;align-items:center;gap:12px;padding:18px 20px 12px;border-bottom:1px solid rgba(36,26,20,.08)">
+      <span style="width:30px;height:30px;border-radius:999px;border:1px solid rgba(36,26,20,.14);display:flex;align-items:center;justify-content:center;color:#7a6d5f">←</span>
+      <div><div style="font:800 18px 'Manrope',sans-serif">Find My Professor</div><div style="font:600 10px 'Manrope',sans-serif;letter-spacing:.09em;color:#7a6d5f">LIVE · TUESDAY 10:38</div></div>
+    </div>
+    <div style="margin:16px 20px 0;display:flex;align-items:center;gap:9px;background:#fffdf9;border:1px solid rgba(36,26,20,.12);border-radius:12px;padding:12px 15px">
+      <div style="width:12px;height:12px;border-radius:999px;border:1.5px solid #a89a90"></div>
+      <span style="font:400 13px 'Manrope',sans-serif;color:#a89a90">Search faculty…</span>
+    </div>
+    <div style="margin:16px 20px 0;background:#fffdf9;border:1.5px solid #b08d3e;border-radius:14px;padding:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font:800 10px 'Manrope',sans-serif;letter-spacing:.09em;color:#0b7a54">● TEACHING NOW</span>
+        <span style="font:600 11px 'Manrope',sans-serif;color:#7a6d5f">until 11:00</span>
+      </div>
+      <div style="margin-top:9px;font:800 18px 'Manrope',sans-serif">Dr. Ritu Sharma</div>
+      <div style="margin-top:2px;font:400 12.5px 'Manrope',sans-serif;color:#7a6d5f">Business Statistics · BMS Sem 2 A</div>
+      <div style="margin-top:13px;display:flex;gap:8px">
+        <div style="flex:1;background:rgba(176,141,62,.12);border-radius:10px;padding:10px 12px"><div style="font:800 9px 'Manrope',sans-serif;letter-spacing:.09em;color:#7a6d5f">ROOM</div><div style="font:800 20px 'Manrope',sans-serif;color:#8a6c2a">204</div></div>
+        <div style="flex:1;background:rgba(36,26,20,.04);border-radius:10px;padding:10px 12px"><div style="font:800 9px 'Manrope',sans-serif;letter-spacing:.09em;color:#7a6d5f">FLOOR</div><div style="font:800 20px 'Manrope',sans-serif">2F</div></div>
+        <div style="flex:1;background:rgba(36,26,20,.04);border-radius:10px;padding:10px 12px"><div style="font:800 9px 'Manrope',sans-serif;letter-spacing:.09em;color:#7a6d5f">ENDS</div><div style="font:800 20px 'Manrope',sans-serif">11:00</div></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin:18px 20px 0">
+      <span style="font:800 11.5px 'Manrope',sans-serif;background:#241a14;color:#f7f3ec;border-radius:10px;padding:8px 15px">Today</span>
+      <span style="font:600 11.5px 'Manrope',sans-serif;border:1px solid rgba(36,26,20,.14);color:#7a6d5f;border-radius:10px;padding:8px 15px">Weekly</span>
+    </div>
+    <div style="margin:14px 20px 0;background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:14px;overflow:hidden">
+      <div style="display:flex;gap:12px;padding:12px 14px;border-bottom:1px solid rgba(36,26,20,.07)">
+        <span style="font:600 10.5px ui-monospace,monospace;color:#7a6d5f;width:76px;flex:none">09:15–10:00</span>
+        <div><div style="font:800 12.5px 'Manrope',sans-serif">Business Statistics</div><div style="font:400 11px 'Manrope',sans-serif;color:#7a6d5f">Rm 201 · BMS Sem 2 B</div></div>
+      </div>
+      <div style="display:flex;gap:12px;padding:12px 14px;border-bottom:1px solid rgba(36,26,20,.07);background:rgba(176,141,62,.1);border-left:3px solid #b08d3e">
+        <span style="font:800 10.5px ui-monospace,monospace;color:#8a6c2a;width:76px;flex:none">10:15–11:00</span>
+        <div><div style="font:800 12.5px 'Manrope',sans-serif;color:#8a6c2a">Business Statistics · now</div><div style="font:400 11px 'Manrope',sans-serif;color:#7a6d5f">Rm 204 · BMS Sem 2 A</div></div>
+      </div>
+      <div style="display:flex;gap:12px;padding:12px 14px;border-bottom:1px solid rgba(36,26,20,.07)">
+        <span style="font:600 10.5px ui-monospace,monospace;color:#7a6d5f;width:76px;flex:none">11:05–11:50</span>
+        <div><div style="font:800 12.5px 'Manrope',sans-serif">Free period</div><div style="font:400 11px 'Manrope',sans-serif;color:#7a6d5f">Staff room, 3F</div></div>
+      </div>
+      <div style="display:flex;gap:12px;padding:12px 14px">
+        <span style="font:600 10.5px ui-monospace,monospace;color:#7a6d5f;width:76px;flex:none">12:40–13:25</span>
+        <div><div style="font:800 12.5px 'Manrope',sans-serif">Statistics Tutorial</div><div style="font:400 11px 'Manrope',sans-serif;color:#7a6d5f">Rm 310 · BFIA Sem 2</div></div>
+      </div>
+    </div>
+    <div style="padding:14px 20px 0;font:400 11px 'Manrope',sans-serif;color:#a89a90;text-align:center">Data from the official timetable · wef 9 Feb 2026</div>
+    <div style="flex:1"></div>
+    <div style="display:flex;justify-content:space-around;border-top:1px solid rgba(36,26,20,.1);background:#fffdf9;padding:10px 8px 20px;border-radius:0 0 16px 16px">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#7a6d5f"><div style="width:18px;height:18px;border-radius:5px;border:1.5px solid #7a6d5f"></div><span style="font:600 9.5px 'Manrope',sans-serif">Home</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#7a6d5f"><div style="width:18px;height:18px;border-radius:5px;border:1.5px solid #7a6d5f"></div><span style="font:600 9.5px 'Manrope',sans-serif">Timetable</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#71222c"><div style="width:18px;height:18px;border-radius:999px;background:#71222c"></div><span style="font:800 9.5px 'Manrope',sans-serif">Tools</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#7a6d5f"><div style="width:18px;height:18px;border-radius:999px;border:1.5px solid #7a6d5f;background:rgba(36,26,20,.06)"></div><span style="font:600 9.5px 'Manrope',sans-serif">Profile</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- WAIVER TOOL -->
+<div class="dv-card" style="width:390px;background:#f7f3ec;font-family:'Manrope',system-ui,sans-serif;color:#241a14;border-radius:16px" data-screen-label="Waiver Tool">
+  <div style="display:flex;flex-direction:column;min-height:780px">
+    <div style="display:flex;align-items:center;gap:12px;padding:18px 20px 12px;border-bottom:1px solid rgba(36,26,20,.08)">
+      <span style="width:30px;height:30px;border-radius:999px;border:1px solid rgba(36,26,20,.14);display:flex;align-items:center;justify-content:center;color:#7a6d5f">←</span>
+      <div><div style="font:800 18px 'Manrope',sans-serif">Waiver Tool</div><div style="font:600 10px 'Manrope',sans-serif;letter-spacing:.09em;color:#7a6d5f">TARGET · 85% ATTENDANCE</div></div>
+    </div>
+    <div style="margin:16px 20px 0;background:#71222c;color:#f7ead9;border-radius:14px;padding:16px">
+      <div style="font:800 10px 'Manrope',sans-serif;letter-spacing:.09em;color:rgba(247,234,217,.7)">RECOMMENDATION</div>
+      <div style="margin-top:6px;font:800 20px/1.25 'Manrope',sans-serif">Apply 3 waivers to clear every subject</div>
+      <div style="margin-top:4px;font:400 12px 'Manrope',sans-serif;color:rgba(247,234,217,.75)">From attendance_sem2.xlsx · uploaded just now</div>
+    </div>
+    <div style="padding:20px 20px 10px;font:800 14px 'Manrope',sans-serif">Recommended waiver dates</div>
+    <div style="display:flex;flex-direction:column;gap:8px;padding:0 20px">
+      <div style="display:flex;align-items:center;gap:12px;background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:12px;padding:12px 14px">
+        <div style="width:40px;text-align:center;background:rgba(113,34,44,.07);border-radius:8px;padding:6px 0"><div style="font:800 14px 'Manrope',sans-serif;color:#71222c">14</div><div style="font:800 8px 'Manrope',sans-serif;letter-spacing:.08em;color:#7a6d5f">MAR</div></div>
+        <div style="flex:1"><div style="font:800 12.5px 'Manrope',sans-serif">Business Statistics — Theory</div><div style="font:400 11px 'Manrope',sans-serif;color:#7a6d5f">Clears 2 absences · lifts 81.2% → 86.1%</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:12px;padding:12px 14px">
+        <div style="width:40px;text-align:center;background:rgba(113,34,44,.07);border-radius:8px;padding:6px 0"><div style="font:800 14px 'Manrope',sans-serif;color:#71222c">21</div><div style="font:800 8px 'Manrope',sans-serif;letter-spacing:.08em;color:#7a6d5f">MAR</div></div>
+        <div style="flex:1"><div style="font:800 12.5px 'Manrope',sans-serif">Marketing Mgmt — Theory</div><div style="font:400 11px 'Manrope',sans-serif;color:#7a6d5f">Clears 2 absences · lifts 82.4% → 87.3%</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:12px;padding:12px 14px">
+        <div style="width:40px;text-align:center;background:rgba(113,34,44,.07);border-radius:8px;padding:6px 0"><div style="font:800 14px 'Manrope',sans-serif;color:#71222c">04</div><div style="font:800 8px 'Manrope',sans-serif;letter-spacing:.08em;color:#7a6d5f">APR</div></div>
+        <div style="flex:1"><div style="font:800 12.5px 'Manrope',sans-serif">Statistics — Tutorial</div><div style="font:400 11px 'Manrope',sans-serif;color:#7a6d5f">Clears 1 absence · lifts 83.3% → 87.5%</div></div>
+      </div>
+    </div>
+    <div style="padding:20px 20px 10px;font:800 14px 'Manrope',sans-serif">After waivers</div>
+    <div style="display:flex;flex-direction:column;gap:10px;padding:0 20px 8px">
+      <div>
+        <div style="display:flex;justify-content:space-between;font:600 11.5px 'Manrope',sans-serif"><span>Business Statistics</span><span style="color:#0b7a54">86.1%</span></div>
+        <div style="margin-top:5px;height:6px;background:rgba(36,26,20,.07);border-radius:3px;overflow:hidden;position:relative"><div style="width:86.1%;height:100%;background:#0b7a54;border-radius:3px"></div><div style="position:absolute;left:85%;top:-1px;width:2px;height:8px;background:#241a14"></div></div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font:600 11.5px 'Manrope',sans-serif"><span>Marketing Management</span><span style="color:#0b7a54">87.3%</span></div>
+        <div style="margin-top:5px;height:6px;background:rgba(36,26,20,.07);border-radius:3px;overflow:hidden;position:relative"><div style="width:87.3%;height:100%;background:#0b7a54;border-radius:3px"></div><div style="position:absolute;left:85%;top:-1px;width:2px;height:8px;background:#241a14"></div></div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font:600 11.5px 'Manrope',sans-serif"><span>Financial Accounting</span><span style="color:#0b7a54">91.7%</span></div>
+        <div style="margin-top:5px;height:6px;background:rgba(36,26,20,.07);border-radius:3px;overflow:hidden;position:relative"><div style="width:91.7%;height:100%;background:#0b7a54;border-radius:3px"></div><div style="position:absolute;left:85%;top:-1px;width:2px;height:8px;background:#241a14"></div></div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font:600 11.5px 'Manrope',sans-serif"><span>Statistics — Tutorial</span><span style="color:#0b7a54">87.5%</span></div>
+        <div style="margin-top:5px;height:6px;background:rgba(36,26,20,.07);border-radius:3px;overflow:hidden;position:relative"><div style="width:87.5%;height:100%;background:#0b7a54;border-radius:3px"></div><div style="position:absolute;left:85%;top:-1px;width:2px;height:8px;background:#241a14"></div></div>
+      </div>
+    </div>
+    <div style="margin:12px 20px 0;text-align:center;background:#241a14;color:#f7f3ec;border-radius:12px;padding:13px;font:800 13px 'Manrope',sans-serif">Re-upload attendance sheet</div>
+    <div style="flex:1"></div>
+    <div style="text-align:center;padding:14px 0 20px;font:400 10px 'Manrope',sans-serif;color:#a89a90">Solver checks every combination within your waiver limit</div>
+  </div>
+</div>
+
+<!-- GPA CALCULATOR -->
+<div class="dv-card" style="width:390px;background:#f7f3ec;font-family:'Manrope',system-ui,sans-serif;color:#241a14;border-radius:16px" data-screen-label="GPA Calculator">
+  <div style="display:flex;flex-direction:column;min-height:780px">
+    <div style="display:flex;align-items:center;gap:12px;padding:18px 20px 12px;border-bottom:1px solid rgba(36,26,20,.08)">
+      <span style="width:30px;height:30px;border-radius:999px;border:1px solid rgba(36,26,20,.14);display:flex;align-items:center;justify-content:center;color:#7a6d5f">←</span>
+      <div><div style="font:800 18px 'Manrope',sans-serif">GPA Calculator</div><div style="font:600 10px 'Manrope',sans-serif;letter-spacing:.09em;color:#7a6d5f">OFFICIAL DU CREDIT SCHEMA</div></div>
+    </div>
+    <div style="margin:16px 20px 0;display:flex;gap:10px">
+      <div style="flex:1;background:#71222c;color:#f7ead9;border-radius:14px;padding:14px 16px">
+        <div style="font:800 9.5px 'Manrope',sans-serif;letter-spacing:.09em;color:rgba(247,234,217,.7)">SGPA · SEM 2</div>
+        <div style="font:800 30px 'Manrope',sans-serif;letter-spacing:-.02em">8.42</div>
+      </div>
+      <div style="flex:1;background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:14px;padding:14px 16px">
+        <div style="font:800 9.5px 'Manrope',sans-serif;letter-spacing:.09em;color:#7a6d5f">CGPA · OVERALL</div>
+        <div style="font:800 30px 'Manrope',sans-serif;letter-spacing:-.02em;color:#71222c">8.61</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin:18px 20px 0">
+      <span style="font:600 11.5px 'Manrope',sans-serif;border:1px solid rgba(36,26,20,.14);color:#7a6d5f;border-radius:10px;padding:8px 14px">Sem 1</span>
+      <span style="font:800 11.5px 'Manrope',sans-serif;background:#241a14;color:#f7f3ec;border-radius:10px;padding:8px 14px">Sem 2</span>
+    </div>
+    <div style="margin:14px 20px 0;background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:14px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(36,26,20,.07)">
+        <div style="flex:1"><div style="font:800 12.5px 'Manrope',sans-serif">Business Statistics</div><div style="font:400 10.5px 'Manrope',sans-serif;color:#7a6d5f">DSC · 4 credits</div></div>
+        <span style="font:800 12px 'Manrope',sans-serif;background:rgba(11,122,84,.09);color:#0b7a54;border-radius:8px;padding:6px 12px">A+ · 9</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(36,26,20,.07)">
+        <div style="flex:1"><div style="font:800 12.5px 'Manrope',sans-serif">Marketing Management</div><div style="font:400 10.5px 'Manrope',sans-serif;color:#7a6d5f">DSC · 4 credits</div></div>
+        <span style="font:800 12px 'Manrope',sans-serif;background:rgba(36,26,20,.05);color:#241a14;border-radius:8px;padding:6px 12px">A · 8</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(36,26,20,.07)">
+        <div style="flex:1"><div style="font:800 12.5px 'Manrope',sans-serif">Financial Accounting</div><div style="font:400 10.5px 'Manrope',sans-serif;color:#7a6d5f">DSC · 4 credits</div></div>
+        <span style="font:800 12px 'Manrope',sans-serif;background:rgba(11,122,84,.09);color:#0b7a54;border-radius:8px;padding:6px 12px">O · 10</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(36,26,20,.07)">
+        <div style="flex:1"><div style="font:800 12.5px 'Manrope',sans-serif">Business Economics</div><div style="font:400 10.5px 'Manrope',sans-serif;color:#7a6d5f">GE · 4 credits</div></div>
+        <span style="font:800 12px 'Manrope',sans-serif;background:rgba(36,26,20,.05);color:#241a14;border-radius:8px;padding:6px 12px">A · 8</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(36,26,20,.07)">
+        <div style="flex:1"><div style="font:800 12.5px 'Manrope',sans-serif">Environmental Science</div><div style="font:400 10.5px 'Manrope',sans-serif;color:#7a6d5f">AEC · 2 credits</div></div>
+        <span style="font:800 12px 'Manrope',sans-serif;background:rgba(36,26,20,.05);color:#241a14;border-radius:8px;padding:6px 12px">B+ · 7</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 14px">
+        <div style="flex:1"><div style="font:800 12.5px 'Manrope',sans-serif">Digital Fluency</div><div style="font:400 10.5px 'Manrope',sans-serif;color:#7a6d5f">SEC · 2 credits</div></div>
+        <span style="font:800 12px 'Manrope',sans-serif;background:rgba(11,122,84,.09);color:#0b7a54;border-radius:8px;padding:6px 12px">A+ · 9</span>
+      </div>
+    </div>
+    <div style="margin:12px 20px 0;display:flex;justify-content:space-between;font:600 11px 'Manrope',sans-serif;color:#7a6d5f"><span>20 credits · 6 courses</span><span>Tap a grade to change it</span></div>
+    <div style="margin:16px 20px 0;text-align:center;border:1.5px dashed rgba(36,26,20,.2);border-radius:12px;padding:12px;font:800 12.5px 'Manrope',sans-serif;color:#7a6d5f">+ Add course</div>
+    <div style="flex:1"></div>
+    <div style="text-align:center;padding:14px 0 20px;font:400 10px 'Manrope',sans-serif;color:#a89a90">SGPA = Σ(credit × grade point) ÷ Σ credits</div>
+  </div>
+</div>
+
+<!-- NOTICES -->
+<div class="dv-card" style="width:390px;background:#f7f3ec;font-family:'Manrope',system-ui,sans-serif;color:#241a14;border-radius:16px" data-screen-label="Notices">
+  <div style="display:flex;flex-direction:column;min-height:780px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px;border-bottom:1px solid rgba(36,26,20,.08)">
+      <div><div style="font:800 18px 'Manrope',sans-serif">Campus buzz</div><div style="font:600 10px 'Manrope',sans-serif;letter-spacing:.09em;color:#7a6d5f">EVENTS · SESSIONS · SOCIETIES</div></div>
+      <div style="width:30px;height:30px;border-radius:999px;background:#71222c;color:#f7ead9;display:flex;align-items:center;justify-content:center;font:700 13px 'Manrope',sans-serif">M</div>
+    </div>
+    <div style="display:flex;gap:6px;padding:14px 20px 0;flex-wrap:wrap">
+      <span style="font:800 11px 'Manrope',sans-serif;background:#241a14;color:#f7f3ec;border-radius:999px;padding:7px 13px">All</span>
+      <span style="font:600 11px 'Manrope',sans-serif;border:1px solid rgba(36,26,20,.14);color:#7a6d5f;border-radius:999px;padding:7px 13px">Event</span>
+      <span style="font:600 11px 'Manrope',sans-serif;border:1px solid rgba(36,26,20,.14);color:#7a6d5f;border-radius:999px;padding:7px 13px">Session</span>
+      <span style="font:600 11px 'Manrope',sans-serif;border:1px solid rgba(36,26,20,.14);color:#7a6d5f;border-radius:999px;padding:7px 13px">Society</span>
+      <span style="font:600 11px 'Manrope',sans-serif;border:1px solid rgba(36,26,20,.14);color:#7a6d5f;border-radius:999px;padding:7px 13px">Academic</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;padding:16px 20px 0">
+      <div style="background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:14px;padding:15px 16px">
+        <div style="display:flex;justify-content:space-between"><span style="font:800 9.5px 'Manrope',sans-serif;letter-spacing:.09em;color:#71222c">EVENT</span><span style="font:400 10.5px 'Manrope',sans-serif;color:#a89a90">Jul 16</span></div>
+        <div style="margin-top:7px;font:800 14px 'Manrope',sans-serif">SSCBS OS Launch!</div>
+        <div style="margin-top:3px;font:400 11.5px/1.55 'Manrope',sans-serif;color:#7a6d5f">We're delighted to launch SSCBS's very own OS — everything a CBS student will ever need.</div>
+        <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font:600 10.5px 'Manrope',sans-serif;color:#7a6d5f">Two19 Labs</span>
+          <span style="font:800 11.5px 'Manrope',sans-serif;background:#71222c;color:#f7ead9;border-radius:9px;padding:7px 13px">Register →</span>
+        </div>
+      </div>
+      <div style="background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:14px;padding:15px 16px">
+        <div style="display:flex;justify-content:space-between"><span style="font:800 9.5px 'Manrope',sans-serif;letter-spacing:.09em;color:#8a6c2a">SESSION</span><span style="font:400 10.5px 'Manrope',sans-serif;color:#a89a90">Jul 18</span></div>
+        <div style="margin-top:7px;font:800 14px 'Manrope',sans-serif">Placement prep: case interviews 101</div>
+        <div style="margin-top:3px;font:400 11.5px/1.55 'Manrope',sans-serif;color:#7a6d5f">Seminar Hall, 4 pm. Open to Sem 2 & 4. Bring a notebook — live case walk-through.</div>
+        <div style="margin-top:10px;font:600 10.5px 'Manrope',sans-serif;color:#7a6d5f">Placement Cell</div>
+      </div>
+      <div style="background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:14px;padding:15px 16px">
+        <div style="display:flex;justify-content:space-between"><span style="font:800 9.5px 'Manrope',sans-serif;letter-spacing:.09em;color:#0b7a54">SOCIETY</span><span style="font:400 10.5px 'Manrope',sans-serif;color:#a89a90">Jul 20</span></div>
+        <div style="margin-top:7px;font:800 14px 'Manrope',sans-serif">The Darkroom — photowalk signups open</div>
+        <div style="margin-top:3px;font:400 11.5px/1.55 'Manrope',sans-serif;color:#7a6d5f">Old Delhi heritage walk this Sunday. 20 slots, first come first served.</div>
+        <div style="margin-top:10px;font:600 10.5px 'Manrope',sans-serif;color:#7a6d5f">Visual Arts Society</div>
+      </div>
+      <div style="background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:14px;padding:15px 16px">
+        <div style="display:flex;justify-content:space-between"><span style="font:800 9.5px 'Manrope',sans-serif;letter-spacing:.09em;color:#b45309">ACADEMIC</span><span style="font:400 10.5px 'Manrope',sans-serif;color:#a89a90">Jul 21</span></div>
+        <div style="margin-top:7px;font:800 14px 'Manrope',sans-serif">Internal assessment datesheet released</div>
+        <div style="margin-top:3px;font:400 11.5px/1.55 'Manrope',sans-serif;color:#7a6d5f">IA-1 begins Aug 3. Check the notice board PDF for your section's schedule.</div>
+        <div style="margin-top:10px;font:600 10.5px 'Manrope',sans-serif;color:#7a6d5f">Exam Cell</div>
+      </div>
+    </div>
+    <div style="flex:1"></div>
+    <div style="display:flex;justify-content:space-around;border-top:1px solid rgba(36,26,20,.1);background:#fffdf9;padding:10px 8px 20px;border-radius:0 0 16px 16px;margin-top:16px">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#71222c"><div style="width:18px;height:18px;border-radius:5px;background:#71222c"></div><span style="font:800 9.5px 'Manrope',sans-serif">Home</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#7a6d5f"><div style="width:18px;height:18px;border-radius:5px;border:1.5px solid #7a6d5f"></div><span style="font:600 9.5px 'Manrope',sans-serif">Timetable</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#7a6d5f"><div style="width:18px;height:18px;border-radius:999px;border:1.5px solid #7a6d5f"></div><span style="font:600 9.5px 'Manrope',sans-serif">Tools</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#7a6d5f"><div style="width:18px;height:18px;border-radius:999px;border:1.5px solid #7a6d5f;background:rgba(36,26,20,.06)"></div><span style="font:600 9.5px 'Manrope',sans-serif">Profile</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="dv-card" style="width:390px;background:#f7f3ec;font-family:'Manrope',system-ui,sans-serif;color:#241a14;border-radius:16px" data-screen-label="Profile">
+  <div style="display:flex;flex-direction:column;min-height:780px">
+    <div style="padding:18px 20px 12px;border-bottom:1px solid rgba(36,26,20,.08);font:800 18px 'Manrope',sans-serif">Profile</div>
+    <div style="margin:16px 20px 0;background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px">
+      <div style="width:52px;height:52px;border-radius:999px;background:#71222c;color:#f7ead9;display:flex;align-items:center;justify-content:center;font:800 22px 'Manrope',sans-serif">M</div>
+      <div><div style="font:800 15px 'Manrope',sans-serif">Manthan Kabra</div><div style="font:400 11.5px 'Manrope',sans-serif;color:#7a6d5f">manthan.25138@sscbs.du.ac.in</div><div style="margin-top:4px;display:inline-block;font:800 9.5px 'Manrope',sans-serif;letter-spacing:.06em;background:rgba(113,34,44,.08);color:#71222c;border-radius:999px;padding:3px 9px">BMS · SEM 2 · A</div></div>
+    </div>
+    <div style="padding:20px 20px 8px;font:800 13px 'Manrope',sans-serif;color:#7a6d5f">MY CLASS</div>
+    <div style="margin:0 20px;background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:14px;overflow:hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid rgba(36,26,20,.07)"><span style="font:600 12.5px 'Manrope',sans-serif">Course</span><span style="font:800 12.5px 'Manrope',sans-serif;color:#71222c">BMS ›</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid rgba(36,26,20,.07)"><span style="font:600 12.5px 'Manrope',sans-serif">Semester</span><span style="font:800 12.5px 'Manrope',sans-serif;color:#71222c">2 ›</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 16px"><span style="font:600 12.5px 'Manrope',sans-serif">Section</span><span style="font:800 12.5px 'Manrope',sans-serif;color:#71222c">A ›</span></div>
+    </div>
+    <div style="padding:20px 20px 8px;font:800 13px 'Manrope',sans-serif;color:#7a6d5f">APPEARANCE</div>
+    <div style="margin:0 20px;background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:14px;padding:6px;display:flex;gap:4px">
+      <span style="flex:1;text-align:center;font:800 11.5px 'Manrope',sans-serif;background:#241a14;color:#f7f3ec;border-radius:9px;padding:9px 0">Light</span>
+      <span style="flex:1;text-align:center;font:600 11.5px 'Manrope',sans-serif;color:#7a6d5f;padding:9px 0">Dark</span>
+      <span style="flex:1;text-align:center;font:600 11.5px 'Manrope',sans-serif;color:#7a6d5f;padding:9px 0">System</span>
+    </div>
+    <div style="padding:20px 20px 8px;font:800 13px 'Manrope',sans-serif;color:#7a6d5f">ADMIN</div>
+    <div style="margin:0 20px;background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:14px;overflow:hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid rgba(36,26,20,.07)"><span style="font:600 12.5px 'Manrope',sans-serif">Admin console</span><span style="font:600 12px 'Manrope',sans-serif;color:#a89a90">›</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 16px"><div><div style="font:600 12.5px 'Manrope',sans-serif">Time-warp simulator</div><div style="font:400 10.5px 'Manrope',sans-serif;color:#a89a90">Test any day & time · admins only</div></div><div style="width:36px;height:20px;border-radius:999px;background:rgba(36,26,20,.12);position:relative"><div style="position:absolute;left:2px;top:2px;width:16px;height:16px;border-radius:999px;background:#fffdf9"></div></div></div>
+    </div>
+    <div style="margin:20px 20px 0;text-align:center;border:1px solid rgba(185,28,28,.3);color:#b91c1c;border-radius:12px;padding:12px;font:800 12.5px 'Manrope',sans-serif">Sign out</div>
+    <div style="flex:1"></div>
+    <div style="text-align:center;padding:14px 0 8px;font:400 10px 'Manrope',sans-serif;color:#a89a90">Made with ♥ by Two19 Labs · v2.0</div>
+    <div style="display:flex;justify-content:space-around;border-top:1px solid rgba(36,26,20,.1);background:#fffdf9;padding:10px 8px 20px;border-radius:0 0 16px 16px">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#7a6d5f"><div style="width:18px;height:18px;border-radius:5px;border:1.5px solid #7a6d5f"></div><span style="font:600 9.5px 'Manrope',sans-serif">Home</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#7a6d5f"><div style="width:18px;height:18px;border-radius:5px;border:1.5px solid #7a6d5f"></div><span style="font:600 9.5px 'Manrope',sans-serif">Timetable</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#7a6d5f"><div style="width:18px;height:18px;border-radius:999px;border:1.5px solid #7a6d5f"></div><span style="font:600 9.5px 'Manrope',sans-serif">Tools</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#71222c"><div style="width:18px;height:18px;border-radius:999px;background:#71222c"></div><span style="font:800 9.5px 'Manrope',sans-serif">Profile</span></div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ═══════════ 3b MOBILE · DARK ═══════════ -->
+<div class="dv-opt" id="3b" style="margin-bottom:36px">
+<div class="dv-olabel"><a class="dv-oid" href="#3b">3b</a><b>Dark mode</b> — home & timetable; same structure, inverted surfaces, gold takes over from maroon</div>
+<div class="dv-row">
+
+<!-- HOME · DARK -->
+<div class="dv-card" style="width:390px;background:#181114;font-family:'Manrope',system-ui,sans-serif;color:#f2e8e2;border-radius:16px" data-screen-label="Home dark">
+  <div style="display:flex;flex-direction:column;min-height:780px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px;border-bottom:1px solid rgba(242,232,226,.08)">
+      <div style="display:flex;align-items:center;gap:9px">
+        <img src="assets/sscbs_logo.png" alt="SSCBS crest" width="26" height="26" style="display:block">
+        <span style="font:800 15px 'Manrope',sans-serif">SSCBS OS</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font:600 10px 'Manrope',sans-serif;letter-spacing:.06em;color:#a89a90">TUE 10:38</span>
+        <div style="width:30px;height:30px;border-radius:999px;background:#c9a558;color:#181114;display:flex;align-items:center;justify-content:center;font:800 13px 'Manrope',sans-serif">M</div>
+      </div>
+    </div>
+    <div style="padding:20px 20px 0">
+      <div style="font:800 25px/1.15 'Manrope',sans-serif;letter-spacing:-.02em">Good morning, Manthan</div>
+      <div style="margin-top:7px;font:600 10.5px 'Manrope',sans-serif;letter-spacing:.09em;color:#a89a90">BMS · SEM 2 · SECTION A</div>
+    </div>
+    <div style="margin:16px 20px 0;background:#231a1d;border:1px solid rgba(242,232,226,.1);border-radius:14px;padding:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font:800 10px 'Manrope',sans-serif;letter-spacing:.09em;color:#57c896">● IN CLASS</span>
+        <span style="font:800 12px 'Manrope',sans-serif;color:#c9a558">22m left</span>
+      </div>
+      <div style="margin-top:9px;font:800 18px 'Manrope',sans-serif">Business Statistics</div>
+      <div style="margin-top:3px;font:400 12.5px 'Manrope',sans-serif;color:#a89a90">Dr. Ritu Sharma · Room 204 · till 11:00</div>
+      <div style="margin-top:12px;height:4px;background:rgba(242,232,226,.1);border-radius:2px;overflow:hidden"><div style="width:52%;height:100%;background:#c9a558"></div></div>
+      <div style="margin-top:11px;padding-top:10px;border-top:1px solid rgba(242,232,226,.08);display:flex;justify-content:space-between">
+        <span style="font:400 12px 'Manrope',sans-serif;color:#a89a90">Next — Marketing Mgmt · Rm 108</span>
+        <span style="font:800 12px 'Manrope',sans-serif">11:05</span>
+      </div>
+    </div>
+    <div style="padding:24px 20px 10px;font:800 15px 'Manrope',sans-serif">Tools</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px">
+      <div style="background:#231a1d;border:1px solid rgba(242,232,226,.1);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px">
+        <span style="font:800 9px 'Manrope',sans-serif;letter-spacing:.09em;color:#57c896">LIVE</span>
+        <span style="font:800 13px 'Manrope',sans-serif">Find My Professor</span>
+        <span style="font:400 11px/1.45 'Manrope',sans-serif;color:#a89a90">Who's teaching where, right now</span>
+      </div>
+      <div style="background:#231a1d;border:1px solid rgba(242,232,226,.1);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px">
+        <span style="font:800 9px 'Manrope',sans-serif;letter-spacing:.09em;color:#c9a558">85%</span>
+        <span style="font:800 13px 'Manrope',sans-serif">Waiver Tool</span>
+        <span style="font:400 11px/1.45 'Manrope',sans-serif;color:#a89a90">Clear attendance smartly</span>
+      </div>
+      <div style="background:#231a1d;border:1px solid rgba(242,232,226,.1);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px">
+        <span style="font:800 9px 'Manrope',sans-serif;letter-spacing:.09em;color:#d98a94">DU</span>
+        <span style="font:800 13px 'Manrope',sans-serif">GPA Calculator</span>
+        <span style="font:400 11px/1.45 'Manrope',sans-serif;color:#a89a90">SGPA & CGPA, official schemas</span>
+      </div>
+      <div style="border:1px dashed rgba(242,232,226,.18);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px">
+        <span style="font:800 9px 'Manrope',sans-serif;letter-spacing:.09em;color:#a89a90">SOON</span>
+        <span style="font:800 13px 'Manrope',sans-serif;color:#a89a90">PYQs & Resources</span>
+        <span style="font:400 11px/1.45 'Manrope',sans-serif;color:#7d716b">Papers, syllabus, notes</span>
+      </div>
+    </div>
+    <div style="display:flex;align-items:baseline;justify-content:space-between;padding:24px 20px 10px">
+      <span style="font:800 15px 'Manrope',sans-serif">Campus buzz</span>
+      <span style="font:800 11px 'Manrope',sans-serif;color:#c9a558">All →</span>
+    </div>
+    <div style="margin:0 20px;background:#231a1d;border:1px solid rgba(242,232,226,.1);border-radius:14px;padding:14px 16px">
+      <div style="display:flex;justify-content:space-between"><span style="font:800 9.5px 'Manrope',sans-serif;letter-spacing:.09em;color:#d98a94">EVENT</span><span style="font:400 10.5px 'Manrope',sans-serif;color:#7d716b">Jul 16</span></div>
+      <div style="margin-top:7px;font:800 13.5px 'Manrope',sans-serif">SSCBS OS Launch!</div>
+      <div style="margin-top:2px;font:400 11.5px/1.5 'Manrope',sans-serif;color:#a89a90">Everything a CBS student will ever need — Two19 Labs</div>
+    </div>
+    <div style="flex:1"></div>
+    <div style="text-align:center;padding:14px 0 8px;font:400 10px 'Manrope',sans-serif;color:#7d716b">Made with ♥ by Two19 Labs</div>
+    <div style="display:flex;justify-content:space-around;border-top:1px solid rgba(242,232,226,.08);background:#231a1d;padding:10px 8px 20px;border-radius:0 0 16px 16px">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#c9a558"><div style="width:18px;height:18px;border-radius:5px;background:#c9a558"></div><span style="font:800 9.5px 'Manrope',sans-serif">Home</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#a89a90"><div style="width:18px;height:18px;border-radius:5px;border:1.5px solid #a89a90"></div><span style="font:600 9.5px 'Manrope',sans-serif">Timetable</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#a89a90"><div style="width:18px;height:18px;border-radius:999px;border:1.5px solid #a89a90"></div><span style="font:600 9.5px 'Manrope',sans-serif">Tools</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#a89a90"><div style="width:18px;height:18px;border-radius:999px;border:1.5px solid #a89a90;background:rgba(242,232,226,.06)"></div><span style="font:600 9.5px 'Manrope',sans-serif">Profile</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- TIMETABLE · DARK -->
+<div class="dv-card" style="width:390px;background:#181114;font-family:'Manrope',system-ui,sans-serif;color:#f2e8e2;border-radius:16px" data-screen-label="Timetable dark">
+  <div style="display:flex;flex-direction:column;min-height:780px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px;border-bottom:1px solid rgba(242,232,226,.08)">
+      <div><div style="font:800 18px 'Manrope',sans-serif">Timetable</div><div style="font:600 10px 'Manrope',sans-serif;letter-spacing:.09em;color:#a89a90">BMS · SEM 2 · SECTION A</div></div>
+      <span style="font:600 10px 'Manrope',sans-serif;letter-spacing:.06em;color:#a89a90">TUE 10:38</span>
+    </div>
+    <div style="display:flex;gap:6px;padding:14px 20px 0">
+      <span style="flex:1;text-align:center;font:600 11px 'Manrope',sans-serif;color:#a89a90;border:1px solid rgba(242,232,226,.12);border-radius:10px;padding:8px 0">Mon</span>
+      <span style="flex:1;text-align:center;font:800 11px 'Manrope',sans-serif;color:#181114;background:#c9a558;border-radius:10px;padding:8px 0">Tue</span>
+      <span style="flex:1;text-align:center;font:600 11px 'Manrope',sans-serif;color:#a89a90;border:1px solid rgba(242,232,226,.12);border-radius:10px;padding:8px 0">Wed</span>
+      <span style="flex:1;text-align:center;font:600 11px 'Manrope',sans-serif;color:#a89a90;border:1px solid rgba(242,232,226,.12);border-radius:10px;padding:8px 0">Thu</span>
+      <span style="flex:1;text-align:center;font:600 11px 'Manrope',sans-serif;color:#a89a90;border:1px solid rgba(242,232,226,.12);border-radius:10px;padding:8px 0">Fri</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;padding:16px 20px 0">
+      <div style="display:flex;gap:12px;background:#231a1d;border:1px solid rgba(242,232,226,.08);border-radius:14px;padding:12px 14px;opacity:.55">
+        <span style="font:600 10.5px ui-monospace,monospace;color:#a89a90;width:76px;flex:none;padding-top:2px">09:15–10:00</span>
+        <div><div style="font:800 13px 'Manrope',sans-serif">Financial Accounting</div><div style="font:400 11px 'Manrope',sans-serif;color:#a89a90">Prof. A. Mehta · Rm 108 · done</div></div>
+      </div>
+      <div style="display:flex;gap:12px;background:#231a1d;border:1.5px solid #c9a558;border-radius:14px;padding:12px 14px">
+        <span style="font:800 10.5px ui-monospace,monospace;color:#c9a558;width:76px;flex:none;padding-top:2px">10:15–11:00</span>
+        <div style="flex:1">
+          <div style="display:flex;justify-content:space-between"><span style="font:800 13px 'Manrope',sans-serif">Business Statistics</span><span style="font:800 11px 'Manrope',sans-serif;color:#c9a558">22m left</span></div>
+          <div style="font:400 11px 'Manrope',sans-serif;color:#a89a90">Dr. Ritu Sharma · Rm 204</div>
+          <div style="margin-top:8px;height:4px;background:rgba(242,232,226,.1);border-radius:2px;overflow:hidden"><div style="width:52%;height:100%;background:#c9a558"></div></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;border:1px dashed rgba(242,232,226,.15);border-radius:14px;padding:10px 14px">
+        <span style="font:600 10.5px ui-monospace,monospace;color:#7d716b;width:76px;flex:none">11:00–11:05</span>
+        <div style="font:600 11px 'Manrope',sans-serif;color:#7d716b">Break</div>
+      </div>
+      <div style="display:flex;gap:12px;background:#231a1d;border:1px solid rgba(242,232,226,.08);border-radius:14px;padding:12px 14px">
+        <span style="font:600 10.5px ui-monospace,monospace;color:#a89a90;width:76px;flex:none;padding-top:2px">11:05–11:50</span>
+        <div><div style="font:800 13px 'Manrope',sans-serif">Marketing Management</div><div style="font:400 11px 'Manrope',sans-serif;color:#a89a90">Dr. K. Bhatia · Rm 108</div></div>
+      </div>
+      <div style="display:flex;gap:12px;background:#231a1d;border:1px solid rgba(242,232,226,.08);border-radius:14px;padding:12px 14px">
+        <span style="font:600 10.5px ui-monospace,monospace;color:#a89a90;width:76px;flex:none;padding-top:2px">11:55–12:40</span>
+        <div><div style="font:800 13px 'Manrope',sans-serif">Marketing Management</div><div style="font:400 11px 'Manrope',sans-serif;color:#a89a90">Dr. K. Bhatia · Rm 108 · double period</div></div>
+      </div>
+      <div style="display:flex;gap:12px;border:1px dashed rgba(242,232,226,.15);border-radius:14px;padding:10px 14px">
+        <span style="font:600 10.5px ui-monospace,monospace;color:#7d716b;width:76px;flex:none">12:40–13:25</span>
+        <div style="font:600 11px 'Manrope',sans-serif;color:#7d716b">Lunch break</div>
+      </div>
+      <div style="display:flex;gap:12px;background:#231a1d;border:1px solid rgba(242,232,226,.08);border-radius:14px;padding:12px 14px">
+        <span style="font:600 10.5px ui-monospace,monospace;color:#a89a90;width:76px;flex:none;padding-top:2px">13:25–14:10</span>
+        <div><div style="font:800 13px 'Manrope',sans-serif">Statistics Tutorial</div><div style="font:400 11px 'Manrope',sans-serif;color:#a89a90">Dr. R. Sharma · Rm 310 · G2</div></div>
+      </div>
+    </div>
+    <div style="padding:14px 20px 0;font:400 11px 'Manrope',sans-serif;color:#7d716b;text-align:center">4 classes · ends 14:10</div>
+    <div style="flex:1"></div>
+    <div style="display:flex;justify-content:space-around;border-top:1px solid rgba(242,232,226,.08);background:#231a1d;padding:10px 8px 20px;border-radius:0 0 16px 16px">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#a89a90"><div style="width:18px;height:18px;border-radius:5px;border:1.5px solid #a89a90"></div><span style="font:600 9.5px 'Manrope',sans-serif">Home</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#c9a558"><div style="width:18px;height:18px;border-radius:5px;background:#c9a558"></div><span style="font:800 9.5px 'Manrope',sans-serif">Timetable</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#a89a90"><div style="width:18px;height:18px;border-radius:999px;border:1.5px solid #a89a90"></div><span style="font:600 9.5px 'Manrope',sans-serif">Tools</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#a89a90"><div style="width:18px;height:18px;border-radius:999px;border:1.5px solid #a89a90;background:rgba(242,232,226,.06)"></div><span style="font:600 9.5px 'Manrope',sans-serif">Profile</span></div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ═══════════ 3c DESKTOP SHELL ═══════════ -->
+<div class="dv-opt" id="3c" style="margin-bottom:36px">
+<div class="dv-olabel"><a class="dv-oid" href="#3c">3c</a><b>Desktop app shell</b> — sidebar navigation, dashboard with live class + buzz column</div>
+<div class="dv-card" style="width:1180px;background:#f7f3ec;font-family:'Manrope',system-ui,sans-serif;color:#241a14;border-radius:16px" data-screen-label="Desktop dashboard">
+  <div style="display:flex;min-height:720px">
+    <div style="width:224px;flex:none;background:#fffdf9;border-right:1px solid rgba(36,26,20,.09);display:flex;flex-direction:column;border-radius:16px 0 0 16px">
+      <div style="display:flex;align-items:center;gap:9px;padding:20px 18px 18px">
+        <img src="assets/sscbs_logo.png" alt="SSCBS crest" width="28" height="28" style="display:block">
+        <span style="font:800 15px 'Manrope',sans-serif;letter-spacing:-.01em">SSCBS OS</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px;padding:0 10px">
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(113,34,44,.08);color:#71222c;border-radius:10px;padding:10px 12px"><div style="width:15px;height:15px;border-radius:4px;background:#71222c"></div><span style="font:800 12.5px 'Manrope',sans-serif">Home</span></div>
+        <div style="display:flex;align-items:center;gap:10px;color:#7a6d5f;border-radius:10px;padding:10px 12px"><div style="width:15px;height:15px;border-radius:4px;border:1.5px solid #7a6d5f"></div><span style="font:600 12.5px 'Manrope',sans-serif">Timetable</span></div>
+        <div style="display:flex;align-items:center;gap:10px;color:#7a6d5f;border-radius:10px;padding:10px 12px"><div style="width:15px;height:15px;border-radius:999px;border:1.5px solid #7a6d5f"></div><span style="font:600 12.5px 'Manrope',sans-serif">Find My Professor</span></div>
+        <div style="display:flex;align-items:center;gap:10px;color:#7a6d5f;border-radius:10px;padding:10px 12px"><div style="width:15px;height:15px;border-radius:4px;border:1.5px solid #7a6d5f;transform:rotate(45deg)"></div><span style="font:600 12.5px 'Manrope',sans-serif">Waiver Tool</span></div>
+        <div style="display:flex;align-items:center;gap:10px;color:#7a6d5f;border-radius:10px;padding:10px 12px"><div style="width:15px;height:15px;border-radius:999px;border:2.5px solid #7a6d5f"></div><span style="font:600 12.5px 'Manrope',sans-serif">GPA Calculator</span></div>
+        <div style="display:flex;align-items:center;gap:10px;color:#7a6d5f;border-radius:10px;padding:10px 12px"><div style="width:15px;height:15px;border-radius:4px;border:1.5px dashed #a89a90"></div><span style="font:600 12.5px 'Manrope',sans-serif">PYQs <span style="font:800 8.5px 'Manrope',sans-serif;letter-spacing:.06em;background:rgba(36,26,20,.07);color:#a89a90;border-radius:999px;padding:2px 7px;margin-left:4px">SOON</span></span></div>
+        <div style="display:flex;align-items:center;gap:10px;color:#7a6d5f;border-radius:10px;padding:10px 12px"><div style="width:15px;height:15px;border-radius:999px;border:1.5px solid #7a6d5f;background:rgba(36,26,20,.06)"></div><span style="font:600 12.5px 'Manrope',sans-serif">Campus buzz</span></div>
+      </div>
+      <div style="flex:1"></div>
+      <div style="margin:0 10px;display:flex;align-items:center;gap:8px;border:1px solid rgba(36,26,20,.1);border-radius:10px;padding:8px 10px">
+        <span style="font:600 10.5px 'Manrope',sans-serif;color:#7a6d5f">Theme</span>
+        <div style="flex:1"></div>
+        <span style="font:800 10px 'Manrope',sans-serif;background:#241a14;color:#f7f3ec;border-radius:7px;padding:4px 8px">Light</span>
+        <span style="font:600 10px 'Manrope',sans-serif;color:#7a6d5f;padding:4px 4px">Dark</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:14px 18px 18px">
+        <div style="width:34px;height:34px;border-radius:999px;background:#71222c;color:#f7ead9;display:flex;align-items:center;justify-content:center;font:800 14px 'Manrope',sans-serif">M</div>
+        <div style="min-width:0"><div style="font:800 12px 'Manrope',sans-serif">Manthan Kabra</div><div style="font:400 10px 'Manrope',sans-serif;color:#a89a90;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">BMS · Sem 2 · A</div></div>
+      </div>
+    </div>
+    <div style="flex:1;padding:26px 30px;display:flex;flex-direction:column">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div><div style="font:800 24px 'Manrope',sans-serif;letter-spacing:-.02em">Good morning, Manthan</div><div style="margin-top:5px;font:600 10.5px 'Manrope',sans-serif;letter-spacing:.09em;color:#7a6d5f">TUESDAY, JUL 21 · 3 CLASSES TODAY</div></div>
+        <span style="font:600 11px 'Manrope',sans-serif;color:#7a6d5f;border:1px solid rgba(36,26,20,.12);border-radius:999px;padding:6px 12px">IST 10:38:12</span>
+      </div>
+      <div style="display:flex;gap:20px;margin-top:20px;flex:1;align-items:stretch">
+        <div style="flex:1.6;display:flex;flex-direction:column;gap:16px">
+          <div style="background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:16px;padding:20px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font:800 10px 'Manrope',sans-serif;letter-spacing:.09em;color:#0b7a54">● IN CLASS</span>
+              <span style="font:800 13px 'Manrope',sans-serif;color:#71222c">22m 14s left</span>
+            </div>
+            <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:flex-end">
+              <div><div style="font:800 22px 'Manrope',sans-serif;letter-spacing:-.01em">Business Statistics</div><div style="margin-top:3px;font:400 13px 'Manrope',sans-serif;color:#7a6d5f">Dr. Ritu Sharma · Room 204 · 10:15 – 11:00</div></div>
+              <span style="font:800 12px 'Manrope',sans-serif;background:#241a14;color:#f7f3ec;border-radius:10px;padding:9px 16px">Weekly view →</span>
+            </div>
+            <div style="margin-top:14px;height:5px;background:rgba(36,26,20,.08);border-radius:3px;overflow:hidden"><div style="width:52%;height:100%;background:#71222c"></div></div>
+            <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(36,26,20,.08);display:flex;gap:24px">
+              <span style="font:400 12px 'Manrope',sans-serif;color:#7a6d5f">Next — <b style="color:#241a14">Marketing Mgmt</b> · Rm 108 · 11:05</span>
+              <span style="font:400 12px 'Manrope',sans-serif;color:#7a6d5f">Then — Statistics Tutorial · Rm 310 · 13:25</span>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+            <div style="background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px">
+              <span style="font:800 9px 'Manrope',sans-serif;letter-spacing:.09em;color:#0b7a54">LIVE</span>
+              <span style="font:800 13.5px 'Manrope',sans-serif">Find My Professor</span>
+              <span style="font:400 11px/1.5 'Manrope',sans-serif;color:#7a6d5f">Who's teaching where, right now</span>
+              <span style="margin-top:4px;font:800 11px 'Manrope',sans-serif;color:#71222c">Launch →</span>
+            </div>
+            <div style="background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px">
+              <span style="font:800 9px 'Manrope',sans-serif;letter-spacing:.09em;color:#b08d3e">85%</span>
+              <span style="font:800 13.5px 'Manrope',sans-serif">Waiver Tool</span>
+              <span style="font:400 11px/1.5 'Manrope',sans-serif;color:#7a6d5f">Clear attendance smartly</span>
+              <span style="margin-top:4px;font:800 11px 'Manrope',sans-serif;color:#71222c">Launch →</span>
+            </div>
+            <div style="background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px">
+              <span style="font:800 9px 'Manrope',sans-serif;letter-spacing:.09em;color:#71222c">DU</span>
+              <span style="font:800 13.5px 'Manrope',sans-serif">GPA Calculator</span>
+              <span style="font:400 11px/1.5 'Manrope',sans-serif;color:#7a6d5f">SGPA & CGPA, official schemas</span>
+              <span style="margin-top:4px;font:800 11px 'Manrope',sans-serif;color:#71222c">Launch →</span>
+            </div>
+          </div>
+          <div style="border:1.5px dashed rgba(36,26,20,.18);border-radius:14px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
+            <div><span style="font:800 13px 'Manrope',sans-serif;color:#7a6d5f">PYQs & Resources</span><span style="font:400 11.5px 'Manrope',sans-serif;color:#a89a90"> — papers, syllabus & notes, coming soon</span></div>
+            <span style="font:800 9px 'Manrope',sans-serif;letter-spacing:.09em;background:rgba(36,26,20,.06);color:#a89a90;border-radius:999px;padding:5px 10px">SOON</span>
+          </div>
+        </div>
+        <div style="flex:1;background:#fffdf9;border:1px solid rgba(36,26,20,.1);border-radius:16px;padding:18px;display:flex;flex-direction:column">
+          <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <span style="font:800 15px 'Manrope',sans-serif">Campus buzz</span>
+            <span style="font:800 11px 'Manrope',sans-serif;color:#71222c">All →</span>
+          </div>
+          <div style="display:flex;gap:5px;margin-top:12px">
+            <span style="font:800 10px 'Manrope',sans-serif;background:#241a14;color:#f7f3ec;border-radius:999px;padding:5px 10px">All</span>
+            <span style="font:600 10px 'Manrope',sans-serif;border:1px solid rgba(36,26,20,.14);color:#7a6d5f;border-radius:999px;padding:5px 10px">Event</span>
+            <span style="font:600 10px 'Manrope',sans-serif;border:1px solid rgba(36,26,20,.14);color:#7a6d5f;border-radius:999px;padding:5px 10px">Society</span>
+            <span style="font:600 10px 'Manrope',sans-serif;border:1px solid rgba(36,26,20,.14);color:#7a6d5f;border-radius:999px;padding:5px 10px">Academic</span>
+          </div>
+          <div style="margin-top:14px;border:1px solid rgba(36,26,20,.09);border-radius:12px;padding:13px 14px">
+            <div style="display:flex;justify-content:space-between"><span style="font:800 9px 'Manrope',sans-serif;letter-spacing:.09em;color:#71222c">EVENT</span><span style="font:400 10px 'Manrope',sans-serif;color:#a89a90">Jul 16</span></div>
+            <div style="margin-top:6px;font:800 13px 'Manrope',sans-serif">SSCBS OS Launch!</div>
+            <div style="margin-top:2px;font:400 11px/1.5 'Manrope',sans-serif;color:#7a6d5f">Everything a CBS student will ever need.</div>
+            <div style="margin-top:9px;font:800 11px 'Manrope',sans-serif;color:#71222c">Register →</div>
+          </div>
+          <div style="margin-top:10px;border:1px solid rgba(36,26,20,.09);border-radius:12px;padding:13px 14px">
+            <div style="display:flex;justify-content:space-between"><span style="font:800 9px 'Manrope',sans-serif;letter-spacing:.09em;color:#8a6c2a">SESSION</span><span style="font:400 10px 'Manrope',sans-serif;color:#a89a90">Jul 18</span></div>
+            <div style="margin-top:6px;font:800 13px 'Manrope',sans-serif">Case interviews 101</div>
+            <div style="margin-top:2px;font:400 11px/1.5 'Manrope',sans-serif;color:#7a6d5f">Seminar Hall, 4 pm · Placement Cell</div>
+          </div>
+          <div style="margin-top:10px;border:1px solid rgba(36,26,20,.09);border-radius:12px;padding:13px 14px">
+            <div style="display:flex;justify-content:space-between"><span style="font:800 9px 'Manrope',sans-serif;letter-spacing:.09em;color:#0b7a54">SOCIETY</span><span style="font:400 10px 'Manrope',sans-serif;color:#a89a90">Jul 20</span></div>
+            <div style="margin-top:6px;font:800 13px 'Manrope',sans-serif">Photowalk signups open</div>
+            <div style="margin-top:2px;font:400 11px/1.5 'Manrope',sans-serif;color:#7a6d5f">The Darkroom · 20 slots</div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="text-align:center;padding-top:12px;font:400 10px 'Manrope',sans-serif;color:#a89a90">Made with ♥ by Two19 Labs</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ 3d TOKENS ═══════════ -->
+<div class="dv-opt" id="3d">
+<div class="dv-olabel"><a class="dv-oid" href="#3d">3d</a><b>Design tokens</b> — drop-in CSS variables for your existing index.css</div>
+<div class="dv-card" style="width:820px;background:#fffdf9;font-family:'Manrope',system-ui,sans-serif;color:#241a14;border-radius:16px;padding:24px 28px">
+  <div style="font:800 16px 'Manrope',sans-serif">Handoff tokens · 2b system</div>
+  <div style="margin-top:4px;font:400 12px 'Manrope',sans-serif;color:#7a6d5f">Replace the <span style="font-family:ui-monospace,monospace">:root</span> block in index.css. Font: Manrope 400 / 600 / 800 (Google Fonts). Radii: cards 14px, controls 10px, chips 999px.</div>
+  <div style="display:flex;gap:24px;margin-top:18px">
+    <div style="flex:1">
+      <div style="font:800 10px 'Manrope',sans-serif;letter-spacing:.09em;color:#7a6d5f">LIGHT</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:7px;background:#f7f3ec;border:1px solid rgba(36,26,20,.12)"></div><div><div style="font:700 10.5px ui-monospace,monospace">#F7F3EC</div><div style="font:400 9.5px 'Manrope',sans-serif;color:#a89a90">--bg</div></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:7px;background:#fffdf9;border:1px solid rgba(36,26,20,.12)"></div><div><div style="font:700 10.5px ui-monospace,monospace">#FFFDF9</div><div style="font:400 9.5px 'Manrope',sans-serif;color:#a89a90">--surface</div></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:7px;background:#241a14"></div><div><div style="font:700 10.5px ui-monospace,monospace">#241A14</div><div style="font:400 9.5px 'Manrope',sans-serif;color:#a89a90">--ink</div></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:7px;background:#7a6d5f"></div><div><div style="font:700 10.5px ui-monospace,monospace">#7A6D5F</div><div style="font:400 9.5px 'Manrope',sans-serif;color:#a89a90">--ink-dim</div></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:7px;background:#71222c"></div><div><div style="font:700 10.5px ui-monospace,monospace">#71222C</div><div style="font:400 9.5px 'Manrope',sans-serif;color:#a89a90">--maroon</div></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:7px;background:#b08d3e"></div><div><div style="font:700 10.5px ui-monospace,monospace">#B08D3E</div><div style="font:400 9.5px 'Manrope',sans-serif;color:#a89a90">--gold</div></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:7px;background:#0b7a54"></div><div><div style="font:700 10.5px ui-monospace,monospace">#0B7A54</div><div style="font:400 9.5px 'Manrope',sans-serif;color:#a89a90">--success</div></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:7px;background:#b91c1c"></div><div><div style="font:700 10.5px ui-monospace,monospace">#B91C1C</div><div style="font:400 9.5px 'Manrope',sans-serif;color:#a89a90">--danger</div></div></div>
+      </div>
+    </div>
+    <div style="flex:1">
+      <div style="font:800 10px 'Manrope',sans-serif;letter-spacing:.09em;color:#7a6d5f">DARK</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:7px;background:#181114"></div><div><div style="font:700 10.5px ui-monospace,monospace">#181114</div><div style="font:400 9.5px 'Manrope',sans-serif;color:#a89a90">--bg</div></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:7px;background:#231a1d"></div><div><div style="font:700 10.5px ui-monospace,monospace">#231A1D</div><div style="font:400 9.5px 'Manrope',sans-serif;color:#a89a90">--surface</div></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:7px;background:#f2e8e2;border:1px solid rgba(36,26,20,.12)"></div><div><div style="font:700 10.5px ui-monospace,monospace">#F2E8E2</div><div style="font:400 9.5px 'Manrope',sans-serif;color:#a89a90">--ink</div></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:7px;background:#a89a90"></div><div><div style="font:700 10.5px ui-monospace,monospace">#A89A90</div><div style="font:400 9.5px 'Manrope',sans-serif;color:#a89a90">--ink-dim</div></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:7px;background:#d98a94"></div><div><div style="font:700 10.5px ui-monospace,monospace">#D98A94</div><div style="font:400 9.5px 'Manrope',sans-serif;color:#a89a90">--maroon (lifted)</div></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:7px;background:#c9a558"></div><div><div style="font:700 10.5px ui-monospace,monospace">#C9A558</div><div style="font:400 9.5px 'Manrope',sans-serif;color:#a89a90">--gold (primary)</div></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:7px;background:#57c896"></div><div><div style="font:700 10.5px ui-monospace,monospace">#57C896</div><div style="font:400 9.5px 'Manrope',sans-serif;color:#a89a90">--success</div></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:7px;background:#e57373"></div><div><div style="font:700 10.5px ui-monospace,monospace">#E57373</div><div style="font:400 9.5px 'Manrope',sans-serif;color:#a89a90">--danger</div></div></div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:18px;border-top:1px solid rgba(36,26,20,.08);padding-top:14px;display:flex;gap:28px;align-items:baseline;flex-wrap:wrap">
+    <span style="font:800 25px 'Manrope',sans-serif;letter-spacing:-.02em">Page title 25/800</span>
+    <span style="font:800 18px 'Manrope',sans-serif">Section 18/800</span>
+    <span style="font:800 13px 'Manrope',sans-serif">Card title 13/800</span>
+    <span style="font:600 12.5px 'Manrope',sans-serif">Row label 12.5/600</span>
+    <span style="font:400 12px 'Manrope',sans-serif;color:#7a6d5f">Body 12/400 dim</span>
+    <span style="font:800 10px 'Manrope',sans-serif;letter-spacing:.09em;color:#7a6d5f">MICRO LABEL 10/800 +9%</span>
+  </div>
+  <div style="margin-top:10px;font:400 11px/1.6 'Manrope',sans-serif;color:#7a6d5f">Rules: maroon = primary actions & active nav (light mode); gold = live/highlight accents and takes over as primary in dark mode. Never both on one element. Borders over shadows. One accent per card. No gradients, no emoji.</div>
+</div>
+</div>
+
+
+</section>
+
+</x-dc>
+</body>
+</html>
