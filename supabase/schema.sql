@@ -214,8 +214,32 @@ CREATE POLICY "Enable insert/update access for authenticated users on active_pre
     USING (auth.jwt() ->> 'email' = email OR user_id = auth.uid()::text)
     WITH CHECK (auth.jwt() ->> 'email' = email OR user_id = auth.uid()::text);
 
+-- 9. Create a table to store holidays/fests and custom messages
+CREATE TABLE IF NOT EXISTS public.holidays (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    date DATE NOT NULL UNIQUE,
+    title TEXT NOT NULL,
+    message TEXT,
+    type TEXT DEFAULT 'Holiday', -- 'Holiday', 'Fest', etc.
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL
+);
 
+-- Enable Row Level Security (RLS)
+ALTER TABLE public.holidays ENABLE ROW LEVEL SECURITY;
 
+-- Setup Security Policies
+-- Anyone authenticated can read holidays
+CREATE POLICY "Enable read access for all authenticated users on holidays" 
+    ON public.holidays 
+    FOR SELECT 
+    TO authenticated 
+    USING (true);
 
-
-
+-- Only admins can write (insert, update, delete) holidays
+CREATE POLICY "Enable write access for admins on holidays" 
+    ON public.holidays 
+    FOR ALL 
+    TO authenticated 
+    USING (auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'))
+    WITH CHECK (auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'));

@@ -84,8 +84,40 @@ const csRooms = ["Room 651", "Room 644", "Room 326", "Room 237"];
 
 function AdminConsoleContent({ onBack }) {
   const { user } = useAuth();
-  const { timetable, updateTimetable } = useTimetable();
-  const [activeTab, setActiveTab] = useState('upload'); // 'upload', 'editor', 'notices', 'analytics'
+  const { timetable, updateTimetable, holidays, addHoliday, deleteHoliday } = useTimetable();
+  const [activeTab, setActiveTab] = useState('upload'); // 'upload', 'editor', 'notices', 'analytics', 'holidays'
+
+  // Holidays state
+  const [holidayForm, setHolidayForm] = useState({ date: '', title: '', message: '', type: 'Holiday' });
+  const [isSavingHoliday, setIsSavingHoliday] = useState(false);
+
+  const handleAddHoliday = async (e) => {
+    e.preventDefault();
+    if (!holidayForm.date || !holidayForm.title) return;
+    setIsSavingHoliday(true);
+    try {
+      await addHoliday(holidayForm);
+      setSaveStatus({ type: 'success', message: 'Holiday added successfully!' });
+      setHolidayForm({ date: '', title: '', message: '', type: 'Holiday' });
+    } catch (err) {
+      setSaveStatus({ type: 'error', message: err.message || 'Failed to add holiday.' });
+    } finally {
+      setIsSavingHoliday(false);
+    }
+  };
+
+  const handleDeleteHoliday = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this holiday?')) return;
+    setIsSavingHoliday(true);
+    try {
+      await deleteHoliday(id);
+      setSaveStatus({ type: 'success', message: 'Holiday removed successfully.' });
+    } catch (err) {
+      setSaveStatus({ type: 'error', message: err.message || 'Failed to delete holiday.' });
+    } finally {
+      setIsSavingHoliday(false);
+    }
+  };
 
 
 
@@ -1432,6 +1464,12 @@ RULES:
           >
             Student Demographics
           </button>
+          <button 
+            className={`admin-tab-btn ${activeTab === 'holidays' ? 'active' : ''}`}
+            onClick={() => setActiveTab('holidays')}
+          >
+            Holidays & Fests
+          </button>
         </nav>
 
         {saveStatus.message && (
@@ -2703,7 +2741,106 @@ RULES:
               })()}
             </div>
           </div>
-        )}
+        ) : activeTab === 'holidays' ? (
+          <div className="tab-pane holidays-pane flex-row gap-4">
+            <div className="pane-left notice-creator-card" style={{ flex: '1' }}>
+              <div className="chart-header-admin">
+                <h3>Add New Blocked Date</h3>
+                <p className="section-desc-small">Mark a day as a Holiday, Fest, or Off-day. The student portal will show this message instead of their class schedule.</p>
+              </div>
+              
+              <form onSubmit={handleAddHoliday} className="admin-form">
+                <div className="form-item-admin">
+                  <label>Date</label>
+                  <input
+                    type="date"
+                    required
+                    value={holidayForm.date}
+                    onChange={(e) => setHolidayForm(prev => ({ ...prev, date: e.target.value }))}
+                    className="admin-input-field"
+                  />
+                </div>
+                
+                <div className="form-row-admin">
+                  <div className="form-item-admin flex-1">
+                    <label>Title</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Diwali / Crescendo Fest"
+                      value={holidayForm.title}
+                      onChange={(e) => setHolidayForm(prev => ({ ...prev, title: e.target.value }))}
+                      className="admin-input-field"
+                    />
+                  </div>
+                  <div className="form-item-admin flex-1">
+                    <label>Type</label>
+                    <select
+                      value={holidayForm.type}
+                      onChange={(e) => setHolidayForm(prev => ({ ...prev, type: e.target.value }))}
+                      className="admin-select-field"
+                    >
+                      <option value="Holiday">Holiday</option>
+                      <option value="Fest">Fest</option>
+                      <option value="Event">Event</option>
+                      <option value="Off-Day">Off-Day</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-item-admin">
+                  <label>Custom Message (Shown to students)</label>
+                  <textarea
+                    rows="3"
+                    placeholder="e.g. No classes today due to the annual college fest. Enjoy!"
+                    value={holidayForm.message}
+                    onChange={(e) => setHolidayForm(prev => ({ ...prev, message: e.target.value }))}
+                    className="admin-textarea-field"
+                  />
+                </div>
+
+                <div className="notice-form-buttons">
+                  <button type="submit" className="btn-publish-timetable" disabled={isSavingHoliday}>
+                    {isSavingHoliday ? 'Saving...' : 'Add Blocked Date'}
+                  </button>
+                </div>
+              </form>
+            </div>
+            
+            <div className="pane-right notices-list-card" style={{ flex: '1.5' }}>
+              <h3>Blocked Dates List</h3>
+              <div className="notices-manager-list">
+                {(!holidays || holidays.length === 0) ? (
+                  <div className="no-logs">No blocked dates found.</div>
+                ) : (
+                  <div className="admin-notices-grid">
+                    {holidays.map(holiday => (
+                      <div key={holiday.id} className="admin-notice-item">
+                        <div className="notice-item-meta">
+                          <span className="admin-status-badge status-active">{holiday.type}</span>
+                        </div>
+                        <h4 className="notice-item-title">{holiday.title}</h4>
+                        {holiday.message && <p className="notice-item-desc">{holiday.message}</p>}
+                        <div className="notice-item-schedule-info">
+                          <div style={{ color: '#000000', fontWeight: 'bold' }}>📅 {new Date(holiday.date).toDateString()}</div>
+                        </div>
+                        <div className="notice-item-actions" style={{ justifyContent: 'flex-end', marginTop: '10px' }}>
+                          <button 
+                            className="btn-delete-notice"
+                            onClick={() => handleDeleteHoliday(holiday.id)}
+                            disabled={isSavingHoliday}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : null}
       </main>
     </div>
   );

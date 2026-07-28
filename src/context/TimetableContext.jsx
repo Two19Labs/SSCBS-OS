@@ -7,6 +7,9 @@ const TimetableContext = createContext({
   loading: true,
   updateTimetable: async () => {},
   getTimetable: () => null,
+  holidays: [],
+  addHoliday: async () => {},
+  deleteHoliday: async () => {},
 });
 
 const CURRENT_TIMETABLE_VERSION = '2026-07-28-odd-sem-v2';
@@ -32,6 +35,7 @@ export const TimetableProvider = ({ children }) => {
     }
     return timetablesData;
   });
+  const [holidays, setHolidays] = useState([]);
   const [loading, setLoading] = useState(false);
 
   // Fetch timetable configuration on load
@@ -64,7 +68,23 @@ export const TimetableProvider = ({ children }) => {
       }
     }
 
+    async function fetchHolidays() {
+      if (!hasValidCredentials) return;
+      try {
+        const { data, error } = await supabase
+          .from('holidays')
+          .select('*')
+          .order('date', { ascending: true });
+        if (!error && data) {
+          setHolidays(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch holidays:', err);
+      }
+    }
+
     fetchTimetable();
+    fetchHolidays();
   }, []);
 
   // Update timetable function (Admin only)
@@ -91,6 +111,42 @@ export const TimetableProvider = ({ children }) => {
       console.error('Error saving timetable to Supabase:', error);
       throw error;
     }
+  };
+
+  // Add a holiday (Admin only)
+  const addHoliday = async (holiday) => {
+    if (!hasValidCredentials) throw new Error('Supabase not configured');
+    
+    const { data, error } = await supabase
+      .from('holidays')
+      .insert([holiday])
+      .select()
+      .single();
+      
+    if (error) {
+      console.error('Error adding holiday:', error);
+      throw error;
+    }
+    
+    setHolidays([...holidays, data].sort((a, b) => new Date(a.date) - new Date(b.date)));
+    return data;
+  };
+
+  // Delete a holiday (Admin only)
+  const deleteHoliday = async (id) => {
+    if (!hasValidCredentials) throw new Error('Supabase not configured');
+    
+    const { error } = await supabase
+      .from('holidays')
+      .delete()
+      .eq('id', id);
+      
+    if (error) {
+      console.error('Error deleting holiday:', error);
+      throw error;
+    }
+    
+    setHolidays(holidays.filter(h => h.id !== id));
   };
 
   // Helper to extract timetable dynamically
@@ -148,6 +204,9 @@ export const TimetableProvider = ({ children }) => {
         updateTimetable,
         getTimetable,
         getActiveSemesters,
+        holidays,
+        addHoliday,
+        deleteHoliday,
       }}
     >
       {children}

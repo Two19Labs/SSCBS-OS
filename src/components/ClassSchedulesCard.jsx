@@ -7,7 +7,7 @@ import './ClassSchedulesCard.css';
 
 export default function ClassSchedulesCard({ onOpenProfile }) {
   const { user } = useAuth();
-  const { getTimetable } = useTimetable();
+  const { getTimetable, holidays } = useTimetable();
   
   // Profile settings
   const course = user?.user_metadata?.course;
@@ -89,6 +89,10 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
   const timetable = hasConfiguredProfile ? getTimetable(course, semester, section) : null;
   const todayClasses = timetable ? timetable[dayOfWeek] || [] : [];
 
+  // Check if today is a holiday
+  const todayStr = time.getFullYear() + '-' + String(time.getMonth() + 1).padStart(2, '0') + '-' + String(time.getDate()).padStart(2, '0');
+  const todayHoliday = holidays?.find(h => h.date === todayStr);
+
   // Parse time string e.g. "09:00" to minutes (540)
   const parseTimeToMinutes = (timeStr) => {
     const [hours, minutes] = timeStr.split(':').map(Number);
@@ -159,7 +163,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
   let nextClass = null;
   let activePeriodInfo = null;
 
-  if (timetable && !isWeekend) {
+  if (timetable && !isWeekend && !todayHoliday) {
     todayClasses.forEach((cls) => {
       const periodInfo = PERIODS.find(p => p.id === cls.period || (cls.isBreak && p.id === 0));
       if (!periodInfo) return;
@@ -243,7 +247,15 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
 
             {/* Current status display */}
             <div className="tracker-main-status">
-              {isWeekend ? (
+              {todayHoliday ? (
+                <div className="status-hero break">
+                  <div className="hero-details">
+                    <span className="badge-status break-badge">{todayHoliday.type || 'Holiday'}</span>
+                    <h3>{todayHoliday.title}</h3>
+                    <p className="break-note">{todayHoliday.message || 'No classes today due to the scheduled holiday/fest.'}</p>
+                  </div>
+                </div>
+              ) : isWeekend ? (
                 <div className="status-hero inactive">
                   <div className="hero-details">
                     <span className="badge-status weekend">Break</span>
@@ -359,7 +371,7 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
             </div>
 
             {/* Daily Timeline Tracker */}
-            {!isWeekend && (
+            {!isWeekend && !todayHoliday && (
               <div className="daily-timeline-section">
                 <h3>Today's Timeline</h3>
                 <div className="timeline-trail-container">
