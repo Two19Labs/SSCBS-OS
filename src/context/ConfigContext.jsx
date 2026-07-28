@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 
 const DEFAULT_FEATURE_FLAGS = {
+  'timetable': true,
   'find-prof': true,
   'waiver': false,
   'gpa': true,
@@ -16,7 +17,13 @@ const ConfigContext = createContext({
 });
 
 export const ConfigProvider = ({ children }) => {
-  const [featureFlags, setFeatureFlags] = useState(DEFAULT_FEATURE_FLAGS);
+  const [featureFlags, setFeatureFlags] = useState(() => {
+    try {
+      const cached = localStorage.getItem('sscbs_os_feature_flags');
+      if (cached) return { ...DEFAULT_FEATURE_FLAGS, ...JSON.parse(cached) };
+    } catch (e) {}
+    return DEFAULT_FEATURE_FLAGS;
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,7 +42,9 @@ export const ConfigProvider = ({ children }) => {
         if (error) {
           console.error('Error fetching feature flags:', error);
         } else if (data && data.value) {
-          setFeatureFlags({ ...DEFAULT_FEATURE_FLAGS, ...data.value });
+          const newFlags = { ...DEFAULT_FEATURE_FLAGS, ...data.value };
+          setFeatureFlags(newFlags);
+          try { localStorage.setItem('sscbs_os_feature_flags', JSON.stringify(newFlags)); } catch (e) {}
         }
       } catch (err) {
         console.error('Failed to connect to Supabase for config:', err);
@@ -49,6 +58,7 @@ export const ConfigProvider = ({ children }) => {
   const updateFeatureFlags = async (newFlags) => {
     const updatedFlags = { ...featureFlags, ...newFlags };
     setFeatureFlags(updatedFlags);
+    try { localStorage.setItem('sscbs_os_feature_flags', JSON.stringify(updatedFlags)); } catch (e) {}
 
     if (!hasValidCredentials) {
       console.warn('Supabase not configured. Feature flags updated in-memory only.');
