@@ -23,8 +23,12 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
   const { user } = useAuth();
   const { featureFlags } = useConfig();
   const isAdmin = isAdminEmail(user?.email);
-  const { getTimetable } = useTimetable();
+  const { getTimetable, holidays } = useTimetable();
   const [time, setTime] = useState(getISTTime());
+
+  // Check if today is a holiday
+  const todayStr = time.getFullYear() + '-' + String(time.getMonth() + 1).padStart(2, '0') + '-' + String(time.getDate()).padStart(2, '0');
+  const todayHoliday = holidays?.find(h => h.date === todayStr);
 
   useEffect(() => {
     const interval = setInterval(() => setTime(getISTTime()), 1000);
@@ -117,6 +121,16 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
         <span>Uses latest schedule sent via college email (NOT real-time tracking; subject to professor changes/cancellation).</span>
       </div>
     );
+
+    if (todayHoliday) {
+      return (
+        <div className="home-live-card" style={{ borderLeft: '4px solid var(--maroon)' }}>
+          <span className="micro-label maroon">● {todayHoliday.type.toUpperCase()}</span>
+          <div className="live-subject">{todayHoliday.title}</div>
+          <div className="live-meta">{todayHoliday.message || 'No classes scheduled for today.'}</div>
+        </div>
+      );
+    }
 
     if (isWeekend) {
       return (
