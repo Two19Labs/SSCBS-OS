@@ -1,5 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useAuth } from './context/AuthContext';
+import { useConfig } from './context/ConfigContext';
 import { logFeatureView, logFeatureClick, subscribeToPresence } from './lib/analytics';
 import Auth from './components/Auth';
 import HomeDashboard from './components/HomeDashboard';
@@ -58,6 +59,7 @@ const getInitialView = () => {
 
 function App() {
   const { user, loading, isPasswordRecovery } = useAuth();
+  const { featureFlags } = useConfig();
   const [view, setViewState] = useState(getInitialView);
   const [returnView, setReturnView] = useState('home');
   const [isGpaOpen, setIsGpaOpen] = useState(false);
@@ -160,11 +162,11 @@ function App() {
   const navItems = [
     { id: 'home', label: 'Home', Icon: HomeIcon },
     { id: 'timetable', label: 'Timetable', Icon: CalendarIcon },
-    { id: 'find-prof', label: 'Find My Professor', Icon: SearchIcon },
-    { id: 'waiver', label: 'Waiver Tool', Icon: PercentIcon },
-    { id: 'gpa', label: 'GPA Calculator', Icon: CalculatorIcon },
-    { id: 'pyqs', label: 'PYQs & Resources', Icon: FileIcon, locked: true },
-    { id: 'buzz', label: 'Campus Buzz', Icon: MegaphoneIcon },
+    { id: 'find-prof', label: 'Find My Professor', Icon: SearchIcon, locked: !isAdmin && !featureFlags['find-prof'] },
+    { id: 'waiver', label: 'Waiver Tool', Icon: PercentIcon, locked: !isAdmin && !featureFlags['waiver'] },
+    { id: 'gpa', label: 'GPA Calculator', Icon: CalculatorIcon, locked: !isAdmin && !featureFlags['gpa'] },
+    { id: 'pyqs', label: 'PYQs & Resources', Icon: FileIcon, locked: !isAdmin && !featureFlags['pyqs'] },
+    { id: 'buzz', label: 'Campus Buzz', Icon: MegaphoneIcon, locked: !isAdmin && !featureFlags['buzz'] },
   ];
 
   const tabs = [
@@ -213,10 +215,10 @@ function App() {
         return (
           <div className="tools-hub">
             {[
-              { id: 'find-prof', micro: 'SEARCH', microClass: 'success', title: 'Find My Professor', desc: "Who's teaching where, right now", Icon: SearchIcon },
-              { id: 'waiver', micro: 'SOON', microClass: 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !isAdmin },
-              { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon },
-              { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: true },
+              { id: 'find-prof', micro: 'SEARCH', microClass: 'success', title: 'Find My Professor', desc: "Who's teaching where, right now", Icon: SearchIcon, locked: !isAdmin && !featureFlags['find-prof'] },
+              { id: 'waiver', micro: 'SOON', microClass: 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !isAdmin && !featureFlags['waiver'] },
+              { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon, locked: !isAdmin && !featureFlags['gpa'] },
+              { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !isAdmin && !featureFlags['pyqs'] },
             ].map(({ id, micro, microClass, title, desc, Icon, locked }) => (
               <button
                 key={id}

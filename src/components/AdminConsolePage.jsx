@@ -3,6 +3,7 @@ import * as XLSX from 'xlsx';
 import { useTimetable } from '../context/TimetableContext';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import { useConfig } from '../context/ConfigContext';
 import { isAdminEmail } from '../lib/admin';
 import { subscribeToPresence, fetchAnalyticsData, FEATURE_NAMES } from '../lib/analytics';
 import DateTimePicker from './DateTimePicker';
@@ -85,11 +86,31 @@ const csRooms = ["Room 651", "Room 644", "Room 326", "Room 237"];
 function AdminConsoleContent({ onBack }) {
   const { user } = useAuth();
   const { timetable, updateTimetable, holidays, addHoliday, deleteHoliday } = useTimetable();
-  const [activeTab, setActiveTab] = useState('upload'); // 'upload', 'editor', 'notices', 'analytics', 'holidays'
+  const { featureFlags, updateFeatureFlags } = useConfig();
+  const [activeTab, setActiveTab] = useState('upload'); // 'upload', 'editor', 'notices', 'analytics', 'holidays', 'settings'
 
   // Holidays state
   const [holidayForm, setHolidayForm] = useState({ date: '', title: '', message: '', type: 'Holiday' });
   const [isSavingHoliday, setIsSavingHoliday] = useState(false);
+
+  // App Settings state
+  const [localFeatureFlags, setLocalFeatureFlags] = useState(featureFlags || {});
+  useEffect(() => {
+    if (featureFlags) setLocalFeatureFlags(featureFlags);
+  }, [featureFlags]);
+
+  const handleToggleFeature = async (featureId) => {
+    const newFlags = { ...localFeatureFlags, [featureId]: !localFeatureFlags[featureId] };
+    setLocalFeatureFlags(newFlags);
+    try {
+      await updateFeatureFlags(newFlags);
+      setSaveStatus({ type: 'success', message: 'Feature flag updated!' });
+    } catch (e) {
+      setSaveStatus({ type: 'error', message: 'Failed to update feature.' });
+      setLocalFeatureFlags(featureFlags);
+    }
+    setTimeout(() => setSaveStatus({ type: '', message: '' }), 3000);
+  };
 
   const handleAddHoliday = async (e) => {
     e.preventDefault();
@@ -1470,6 +1491,12 @@ RULES:
           >
             Holidays & Fests
           </button>
+          <button 
+            className={`admin-tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
+            onClick={() => setActiveTab('settings')}
+          >
+            App Settings
+          </button>
         </nav>
 
         {saveStatus.message && (
@@ -2838,6 +2865,38 @@ RULES:
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        ) : activeTab === 'settings' ? (
+          <div className="tab-pane settings-pane">
+            <div className="chart-header-admin">
+              <h3>Global App Settings</h3>
+              <p className="section-desc-small">Enable or disable specific features across the SSCBS OS workspace. Disabled features will be locked for all students, showing a "SOON" tag.</p>
+            </div>
+            
+            <div className="settings-grid">
+              {[
+                { id: 'find-prof', label: 'Find My Professor' },
+                { id: 'waiver', label: 'Waiver Tool' },
+                { id: 'gpa', label: 'GPA Calculator' },
+                { id: 'pyqs', label: 'PYQs & Resources' },
+                { id: 'buzz', label: 'Campus Buzz' },
+              ].map(feat => (
+                <div key={feat.id} className="setting-card">
+                  <div className="setting-info">
+                    <h4>{feat.label}</h4>
+                    <span className={`status-pill ${localFeatureFlags[feat.id] ? 'enabled' : 'disabled'}`}>
+                      {localFeatureFlags[feat.id] ? 'Active' : 'Disabled'}
+                    </span>
+                  </div>
+                  <button 
+                    className={`toggle-btn ${localFeatureFlags[feat.id] ? 'on' : 'off'}`}
+                    onClick={() => handleToggleFeature(feat.id)}
+                  >
+                    {localFeatureFlags[feat.id] ? 'Turn Off' : 'Turn On'}
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
         ) : null}

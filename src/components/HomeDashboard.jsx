@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTimetable } from '../context/TimetableContext';
+import { useConfig } from '../context/ConfigContext';
 import { PERIODS, DAYS } from '../data/timetables';
 import NoticeBoard from './NoticeBoard';
 import { SearchIcon, PercentIcon, CalculatorIcon, FileIcon } from './icons';
@@ -21,7 +22,8 @@ const parseTimeToMinutes = (timeStr) => {
 export default function HomeDashboard({ onNavigate, onOpenProfile }) {
   const { user } = useAuth();
   const isAdmin = isAdminEmail(user?.email);
-  const { getTimetable } = useTimetable();
+  const { getTimetable, holidays } = useTimetable();
+  const { featureFlags } = useConfig();
   const [time, setTime] = useState(getISTTime());
 
   useEffect(() => {
@@ -43,6 +45,9 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
   const isWeekend = dayOfWeek === 'Sunday' || dayOfWeek === 'Saturday';
   const currentMinutes = hour * 60 + time.getMinutes();
 
+  const todayStr = time.getFullYear() + '-' + String(time.getMonth() + 1).padStart(2, '0') + '-' + String(time.getDate()).padStart(2, '0');
+  const todayHoliday = holidays?.find(h => h.date === todayStr);
+
   const timetable = hasProfile ? getTimetable(course, semester, section) : null;
   const todayClasses = timetable ? timetable[dayOfWeek] || [] : [];
 
@@ -51,7 +56,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
   let nextClass = null;
   let nextPeriod = null;
 
-  if (timetable && !isWeekend) {
+  if (timetable && !isWeekend && !todayHoliday) {
     todayClasses.forEach((cls) => {
       const p = PERIODS.find((x) => x.id === cls.period || (cls.isBreak && x.id === 0));
       if (!p) return;
@@ -92,6 +97,17 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
   const isRealClass = activeClass && !activeClass.isBreak && activeClass.subject !== 'Free';
 
   const renderLiveCard = () => {
+    if (todayHoliday) {
+      return (
+        <div className="home-live-card" style={{ borderColor: 'var(--accent)' }}>
+          <span className="micro-label" style={{ color: 'var(--accent)' }}>{todayHoliday.type?.toUpperCase() || 'HOLIDAY'}</span>
+          <div className="live-subject">{todayHoliday.title}</div>
+          <div className="live-meta">{todayHoliday.message || 'No classes today.'}</div>
+          {renderLiveDisclaimer()}
+        </div>
+      );
+    }
+
     if (!hasProfile) {
       return (
         <div className="home-live-card">
@@ -232,10 +248,10 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
   };
 
   const tools = [
-    { id: 'find-prof', micro: 'SEARCH', microClass: 'success', title: 'Find My Professor', desc: "Who's teaching where, right now", Icon: SearchIcon },
-    { id: 'waiver', micro: 'SOON', microClass: 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !isAdmin },
-    { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon },
-    { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: true },
+    { id: 'find-prof', micro: 'SEARCH', microClass: 'success', title: 'Find My Professor', desc: "Who's teaching where, right now", Icon: SearchIcon, locked: !isAdmin && !featureFlags['find-prof'] },
+    { id: 'waiver', micro: 'SOON', microClass: 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !isAdmin && !featureFlags['waiver'] },
+    { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon, locked: !isAdmin && !featureFlags['gpa'] },
+    { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !isAdmin && !featureFlags['pyqs'] },
   ];
 
   return (
