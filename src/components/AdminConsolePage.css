@@ -2017,3 +2017,44 @@
   font-size: 0.78rem;
 }
 
+/* Toggle Switch */
+.admin-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+.admin-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.admin-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--ink-dimmer);
+  transition: .3s;
+  border-radius: 24px;
+}
+.admin-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--surface);
+  transition: .3s;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+input:checked + .admin-slider {
+  background-color: var(--blue);
+}
+input:checked + .admin-slider:before {
+  transform: translateX(20px);
+}

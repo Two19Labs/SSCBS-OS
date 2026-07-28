@@ -3,6 +3,7 @@ import * as XLSX from 'xlsx';
 import { useTimetable } from '../context/TimetableContext';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import { useConfig } from '../context/ConfigContext';
 import { isAdminEmail } from '../lib/admin';
 import { subscribeToPresence, fetchAnalyticsData, FEATURE_NAMES } from '../lib/analytics';
 import DateTimePicker from './DateTimePicker';
@@ -84,8 +85,9 @@ const csRooms = ["Room 651", "Room 644", "Room 326", "Room 237"];
 
 function AdminConsoleContent({ onBack }) {
   const { user } = useAuth();
+  const { featureFlags, updateFeatureFlags } = useConfig();
   const { timetable, updateTimetable, holidays, addHoliday, deleteHoliday } = useTimetable();
-  const [activeTab, setActiveTab] = useState('upload'); // 'upload', 'editor', 'notices', 'analytics', 'holidays'
+  const [activeTab, setActiveTab] = useState('upload'); // 'upload', 'editor', 'notices', 'analytics', 'holidays', 'settings'
 
   // Holidays state
   const [holidayForm, setHolidayForm] = useState({ date: '', title: '', message: '', type: 'Holiday' });
@@ -1470,6 +1472,12 @@ RULES:
           >
             Holidays & Fests
           </button>
+          <button 
+            className={`admin-tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
+            onClick={() => setActiveTab('settings')}
+          >
+            App Settings
+          </button>
         </nav>
 
         {saveStatus.message && (
@@ -2838,6 +2846,47 @@ RULES:
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        ) : activeTab === 'settings' ? (
+          <div className="tab-pane flex-col gap-4">
+            <div className="chart-header-admin">
+              <h3>App Section Toggles</h3>
+              <p className="section-desc-small">Enable or disable various tools and sections of the SSCBS OS portal. Disabled tools will appear locked for students.</p>
+            </div>
+            
+            <div className="admin-form" style={{ maxWidth: '600px' }}>
+              {[
+                { id: 'timetable', label: 'Timetable & Class Schedules', desc: 'Display timetable on home page and navigation' },
+                { id: 'find-prof', label: 'Find My Professor', desc: 'Allow students to search for professor locations' },
+                { id: 'waiver', label: 'Waiver Tool', desc: 'Interactive attendance clearance tool' },
+                { id: 'gpa', label: 'GPA Calculator', desc: 'Official DU schema calculator' },
+                { id: 'pyqs', label: 'PYQs & Resources', desc: 'Access to previous year questions' },
+                { id: 'buzz', label: 'Campus Buzz', notice: 'Notice board and announcements' }
+              ].map(feature => (
+                <div key={feature.id} className="form-item-admin" style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', background: 'var(--surface)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                  <div>
+                    <h4 style={{ margin: '0 0 4px', fontSize: '1rem', color: 'var(--ink)' }}>{feature.label}</h4>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--ink-dim)' }}>{feature.desc || feature.notice}</p>
+                  </div>
+                  <label className="admin-switch">
+                    <input 
+                      type="checkbox" 
+                      checked={featureFlags[feature.id] ?? false}
+                      onChange={async (e) => {
+                        const checked = e.target.checked;
+                        try {
+                          await updateFeatureFlags({ [feature.id]: checked });
+                          setSaveStatus({ type: 'success', message: `Feature '${feature.label}' ${checked ? 'enabled' : 'disabled'}!` });
+                        } catch(err) {
+                          setSaveStatus({ type: 'error', message: 'Failed to update feature flag' });
+                        }
+                      }}
+                    />
+                    <span className="admin-slider"></span>
+                  </label>
+                </div>
+              ))}
             </div>
           </div>
         ) : null}
