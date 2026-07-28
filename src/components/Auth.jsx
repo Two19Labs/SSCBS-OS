@@ -62,7 +62,8 @@ export default function Auth({ forceMode }) {
 
   const isCollegeEmail = (email) => {
     if (!email) return true;
-    return email.toLowerCase().endsWith('@sscbs.du.ac.in');
+    const lower = email.toLowerCase();
+    return lower.endsWith('@sscbs.du.ac.in') || lower === 'two19labs@gmail.com';
   };
 
   const handleSubmit = async (e) => {
