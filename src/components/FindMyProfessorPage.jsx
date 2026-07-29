@@ -43,9 +43,11 @@ const FACULTY_DISPLAY_MAP = {
   'ta': 'Dr. Tarannum Ahmad',
   'mv': 'Dr. Mona Verma',
   'sj': 'Dr. Shikha Gupta',
+  'skg': 'Dr. Shikha Gupta',
   'sk': 'Mr. Praveen SK',
   'ps': 'Mr. Praveen SK',
   'kr': 'Kavita Rastogi',
+  'krs': 'Dr. Kavita Rastogi',
   'os': 'Onkar Singh',
   'ng': 'Neha Gupta',
   'nb': 'Dr. Neha Bhatia',
@@ -53,10 +55,22 @@ const FACULTY_DISPLAY_MAP = {
   'ma': 'Ms. Mohini Rajput',
   'mn': 'Dr. Mona Verma',
   'azmi': 'Dr. Azmi Ashraf',
-  'prakhar': 'Prakhar',
-  'apoorva': 'Apoorva',
-  'shipra': 'Shipra',
-  'sanchi': 'Ms. Sanchi Kalra'
+  'av': 'Abhimanyu',
+  'pa': 'Dr. Preeti Rajpal',
+  'komal': 'Mr. Komal',
+  'garima': 'Dr. Garima Tripathi',
+  'vinayak': 'Vinayak',
+  'nisha': 'Nisha',
+  'vipin': 'Vipin',
+  'ishan': 'Ishan',
+  'ankit': 'Ankit',
+  'seema': 'Dr. Seema',
+  'mt': 'Dr. Madhu Totla',
+  'sv': 'Shikha Verma',
+  'nks': 'Dr. Nidhi Kesari',
+  'mr': 'Ms. Mohini Rajput',
+  'tm': 'Mr. Tushar Marwaha',
+  'paridhi': 'Ms. Paridhi'
 };
 
 // Clean display names (remove group suffixes, (P), (Tute), room numbers, and expand raw initials)

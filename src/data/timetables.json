@@ -319,8 +319,8 @@
           },
           {
             "period": 2,
-            "subject": "G1: Funadamentals of Management | G2: SJ",
-            "teacher": "Dr. Tarannum Ahmad (G1) / SJ (G2)",
+            "subject": "G1: Funadamentals of Management",
+            "teacher": "Dr. Tarannum Ahmad (G1) / Dr. Shikha Gupta (G2)",
             "room": "G1: Room 703 / G2: Room 337"
           },
           {
@@ -371,7 +371,7 @@
           {
             "period": 2,
             "subject": "SV",
-            "teacher": "SV",
+            "teacher": "Shikha Verma",
             "room": "P"
           },
           {
@@ -545,7 +545,7 @@
           {
             "period": 4,
             "subject": "MT",
-            "teacher": "MT",
+            "teacher": "Dr. Madhu Totla",
             "room": "Room 703"
           },
           {
@@ -571,7 +571,7 @@
           {
             "period": 1,
             "subject": "MT",
-            "teacher": "MT",
+            "teacher": "Dr. Madhu Totla",
             "room": "Room 703"
           },
           {
@@ -673,13 +673,13 @@
           {
             "period": 1,
             "subject": "MT",
-            "teacher": "MT",
+            "teacher": "Dr. Madhu Totla",
             "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "G1: Funadamentals of Management | G2: MT",
-            "teacher": "Dr. Tarannum Ahmad (G1) / MT (G2)",
+            "subject": "G1: Funadamentals of Management",
+            "teacher": "Dr. Tarannum Ahmad (G1) / Dr. Madhu Totla (G2)",
             "room": "G1: Room 703 / G2: Room 337"
           },
           {
@@ -735,8 +735,8 @@
           },
           {
             "period": 3,
-            "subject": "G2: Funadamentals of Management | G1: MT",
-            "teacher": "Dr. Tarannum Ahmad (G2) / MT (G1)",
+            "subject": "G2: Funadamentals of Management",
+            "teacher": "Dr. Tarannum Ahmad (G2) / Dr. Madhu Totla (G1)",
             "room": "G2: Room 703 / G1: Room 236"
           },
           {
@@ -789,7 +789,7 @@
           {
             "period": 3,
             "subject": "MT",
-            "teacher": "MT",
+            "teacher": "Dr. Madhu Totla",
             "room": "Room 703"
           },
           {
@@ -840,7 +840,7 @@
           {
             "period": 3,
             "subject": "MT (G2)",
-            "teacher": "MT",
+            "teacher": "Dr. Madhu Totla",
             "room": "Room 703"
           },
           {
@@ -942,7 +942,7 @@
           {
             "period": 3,
             "subject": "MT",
-            "teacher": "MT",
+            "teacher": "Dr. Madhu Totla",
             "room": "Room 703"
           },
           {
@@ -954,8 +954,8 @@
           },
           {
             "period": 4,
-            "subject": "G1: MT | G2: Funadamentals of Management",
-            "teacher": "MT (G1) / Ms. Seema Kataria (G2)",
+            "subject": "G2: Funadamentals of Management",
+            "teacher": "Dr. Madhu Totla (G1) / Ms. Seema Kataria (G2)",
             "room": "G1: Room 703 / G2: Room 236"
           },
           {
@@ -981,7 +981,7 @@
           {
             "period": 1,
             "subject": "MT",
-            "teacher": "MT",
+            "teacher": "Dr. Madhu Totla",
             "room": "Room 703"
           },
           {
@@ -1060,8 +1060,8 @@
           },
           {
             "period": 4,
-            "subject": "G1: AM | G?: Introduction to Business Analytics",
-            "teacher": "AM (G1) / Dr. Rishi Rajan Sahay (G?)",
+            "subject": "G?: Introduction to Business Analytics",
+            "teacher": "Dr. Amit Kumar (G1) / Dr. Rishi Rajan Sahay (G?)",
             "room": "G1: Room 703 / G?: Room 226"
           },
           {
@@ -1149,8 +1149,8 @@
           },
           {
             "period": 3,
-            "subject": "G1: Macroeconomics | G2: AM",
-            "teacher": "Dr. Shalini Prakash (G1) / AM (G2)",
+            "subject": "G1: Macroeconomics",
+            "teacher": "Dr. Shalini Prakash (G1) / Dr. Amit Kumar (G2)",
             "room": "G1: Room 703 / G2: Room 337"
           },
           {
@@ -1323,8 +1323,8 @@
           },
           {
             "period": 5,
-            "subject": "G2: AM | G?: Introduction to Business Analytics",
-            "teacher": "AM (G2) / Dr. Rishi Rajan Sahay (G?)",
+            "subject": "G?: Introduction to Business Analytics",
+            "teacher": "Dr. Amit Kumar (G2) / Dr. Rishi Rajan Sahay (G?)",
             "room": "G2: Room 703 / G?: Room 226"
           },
           {
@@ -1431,14 +1431,14 @@
           },
           {
             "period": 6,
-            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Komal  648",
-            "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Komal  648",
+            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A)",
+            "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Mr. Komal",
             "room": "Room 607"
           },
           {
             "period": 7,
-            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Komal  648",
-            "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Komal  648",
+            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A)",
+            "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Mr. Komal",
             "room": "Room 607"
           }
         ],
@@ -1446,13 +1446,13 @@
           {
             "period": 1,
             "subject": "KRS",
-            "teacher": "KRS",
+            "teacher": "Dr. Kavita Rastogi",
             "room": "P"
           },
           {
             "period": 2,
             "subject": "KRS",
-            "teacher": "KRS",
+            "teacher": "Dr. Kavita Rastogi",
             "room": "P"
           },
           {
@@ -1476,8 +1476,8 @@
           },
           {
             "period": 5,
-            "subject": "G2: Macroeconomics | G1: AM",
-            "teacher": "Dr. Sushmita (G2) / AM (G1)",
+            "subject": "G2: Macroeconomics",
+            "teacher": "Dr. Sushmita (G2) / Dr. Amit Kumar (G1)",
             "room": "G2: Room 703 / G1: Room 236"
           },
           {
@@ -1509,7 +1509,7 @@
           {
             "period": 3,
             "subject": "KRS",
-            "teacher": "KRS",
+            "teacher": "Dr. Kavita Rastogi",
             "room": "Room 703"
           },
           {
@@ -1550,7 +1550,7 @@
           {
             "period": 1,
             "subject": "AV",
-            "teacher": "AV",
+            "teacher": "Abhimanyu",
             "room": "Room 703"
           },
           {
@@ -1631,14 +1631,14 @@
           },
           {
             "period": 5,
-            "subject": "G1: Seema | G2: Social and Emotional Learning",
-            "teacher": "Seema (G1) / Dr. Sushmita (G2)",
+            "subject": "G2: Social and Emotional Learning",
+            "teacher": "Dr. Seema (G1) / Dr. Sushmita (G2)",
             "room": "G1: Room 703 / G2: Room 236"
           },
           {
             "period": 6,
-            "subject": "G2: Seema | G1: Social and Emotional Learning",
-            "teacher": "Seema (G2) / Dr. Sushmita (G1)",
+            "subject": "G1: Social and Emotional Learning",
+            "teacher": "Dr. Seema (G2) / Dr. Sushmita (G1)",
             "room": "G2: Room 703 / G1: Room 236"
           },
           {
@@ -1652,13 +1652,13 @@
           {
             "period": 1,
             "subject": "KRS",
-            "teacher": "KRS",
+            "teacher": "Dr. Kavita Rastogi",
             "room": "P"
           },
           {
             "period": 2,
-            "subject": "KRS | Social and Emotional Learning",
-            "teacher": "KRS / Ms. Ayesha S. Ansari",
+            "subject": "Social and Emotional Learning",
+            "teacher": "Dr. Kavita Rastogi / Ms. Ayesha S. Ansari",
             "room": "P / Room 236"
           },
           {
@@ -1714,8 +1714,8 @@
           },
           {
             "period": 3,
-            "subject": "KRS | Social and Emotional Learning",
-            "teacher": "KRS / Dr. Sushmita",
+            "subject": "Social and Emotional Learning",
+            "teacher": "Dr. Kavita Rastogi / Dr. Sushmita",
             "room": "Room 703 / VAC"
           },
           {
@@ -1864,13 +1864,13 @@
           {
             "period": 2,
             "subject": "AV",
-            "teacher": "AV",
+            "teacher": "Abhimanyu",
             "room": "Room 703"
           },
           {
             "period": 3,
-            "subject": "G1: AV | G?: Introduction to Business Analytics",
-            "teacher": "AV (G1) / Dr. Satish Kumar Goel (G?)",
+            "subject": "G?: Introduction to Business Analytics",
+            "teacher": "Abhimanyu (G1) / Dr. Satish Kumar Goel (G?)",
             "room": "G1: Room 703 / G?: Room 226"
           },
           {
@@ -1888,15 +1888,15 @@
           },
           {
             "period": 5,
-            "subject": "Vinayak  (648/326)",
-            "teacher": "Vinayak  (648 / 326)",
-            "room": "P"
+            "subject": "Vinayak",
+            "teacher": "Vinayak  ( / )",
+            "room": "Room 648 / Room 326"
           },
           {
             "period": 6,
-            "subject": "Vinayak  (648/326)",
-            "teacher": "Vinayak  (648 / 326)",
-            "room": "P"
+            "subject": "Vinayak",
+            "teacher": "Vinayak  ( / )",
+            "room": "Room 648 / Room 326"
           },
           {
             "period": 7,
@@ -1915,7 +1915,7 @@
           {
             "period": 2,
             "subject": "AV",
-            "teacher": "AV",
+            "teacher": "Abhimanyu",
             "room": "Room 703"
           },
           {
@@ -1965,8 +1965,8 @@
           },
           {
             "period": 2,
-            "subject": "G2: AV | G?: Introduction to Business Analytics",
-            "teacher": "AV (G2) / Dr. Satish Kumar Goel (G?)",
+            "subject": "G?: Introduction to Business Analytics",
+            "teacher": "Abhimanyu (G2) / Dr. Satish Kumar Goel (G?)",
             "room": "G2: Room 703 / G?: Room 226"
           },
           {
@@ -2011,7 +2011,7 @@
           {
             "period": 1,
             "subject": "AV",
-            "teacher": "AV",
+            "teacher": "Abhimanyu",
             "room": "Room 703"
           },
           {
@@ -2066,7 +2066,7 @@
           {
             "period": 1,
             "subject": "MR",
-            "teacher": "MR",
+            "teacher": "Ms. Mohini Rajput",
             "room": "Room 703"
           },
           {
@@ -2091,7 +2091,7 @@
           {
             "period": 4,
             "subject": "Paridhi",
-            "teacher": "Paridhi",
+            "teacher": "Ms. Paridhi",
             "room": "Room 703"
           },
           {
@@ -2117,19 +2117,19 @@
           {
             "period": 1,
             "subject": "Paridhi",
-            "teacher": "Paridhi",
+            "teacher": "Ms. Paridhi",
             "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "G1: Paridhi | G2: MR",
-            "teacher": "Paridhi (G1) / MR (G2)",
+            "subject": "G1: Paridhi",
+            "teacher": "Ms. Paridhi (G1) / Ms. Mohini Rajput (G2)",
             "room": "G1: Room 703 / G2: Room 338"
           },
           {
             "period": 3,
             "subject": "NKS",
-            "teacher": "NKS",
+            "teacher": "Dr. Nidhi Kesari",
             "room": "Room 703"
           },
           {
@@ -2142,19 +2142,19 @@
           {
             "period": 4,
             "subject": "MR",
-            "teacher": "MR",
+            "teacher": "Ms. Mohini Rajput",
             "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "TM (G1)",
-            "teacher": "TM",
+            "teacher": "Mr. Tushar Marwaha",
             "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "NKS (G2)",
-            "teacher": "NKS",
+            "teacher": "Dr. Nidhi Kesari",
             "room": "Room 703"
           },
           {
@@ -2173,14 +2173,14 @@
           },
           {
             "period": 2,
-            "subject": "G2: Paridhi | G1: MR",
-            "teacher": "Paridhi (G2) / MR (G1)",
+            "subject": "G2: Paridhi",
+            "teacher": "Ms. Paridhi (G2) / Ms. Mohini Rajput (G1)",
             "room": "G2: Room 703 / G1: Room 338"
           },
           {
             "period": 3,
             "subject": "G1: NKS | G2: TM",
-            "teacher": "NKS (G1) / TM (G2)",
+            "teacher": "Dr. Nidhi Kesari (G1) / Mr. Tushar Marwaha (G2)",
             "room": "G1: Room 703 / G2: Room 338"
           },
           {
@@ -2193,7 +2193,7 @@
           {
             "period": 4,
             "subject": "TM",
-            "teacher": "TM",
+            "teacher": "Mr. Tushar Marwaha",
             "room": "Room 703"
           },
           {
@@ -2219,19 +2219,19 @@
           {
             "period": 1,
             "subject": "Paridhi",
-            "teacher": "Paridhi",
+            "teacher": "Ms. Paridhi",
             "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "MR",
-            "teacher": "MR",
+            "teacher": "Ms. Mohini Rajput",
             "room": "Room 703"
           },
           {
             "period": 3,
             "subject": "Paridhi",
-            "teacher": "Paridhi",
+            "teacher": "Ms. Paridhi",
             "room": "Startup"
           },
           {
@@ -2244,7 +2244,7 @@
           {
             "period": 4,
             "subject": "TM",
-            "teacher": "TM",
+            "teacher": "Mr. Tushar Marwaha",
             "room": "Room 703"
           },
           {
@@ -2256,7 +2256,7 @@
           {
             "period": 6,
             "subject": "NKS",
-            "teacher": "NKS",
+            "teacher": "Dr. Nidhi Kesari",
             "room": "Room 703"
           },
           {
@@ -2282,7 +2282,7 @@
           {
             "period": 3,
             "subject": "NKS",
-            "teacher": "NKS",
+            "teacher": "Dr. Nidhi Kesari",
             "room": "Room 703"
           },
           {
@@ -2295,7 +2295,7 @@
           {
             "period": 4,
             "subject": "TM",
-            "teacher": "TM",
+            "teacher": "Mr. Tushar Marwaha",
             "room": "Room 703"
           },
           {
@@ -2329,7 +2329,7 @@
           {
             "period": 2,
             "subject": "Paridhi",
-            "teacher": "Paridhi",
+            "teacher": "Ms. Paridhi",
             "room": "Room 703"
           },
           {
@@ -2348,13 +2348,13 @@
           {
             "period": 4,
             "subject": "TM",
-            "teacher": "TM",
+            "teacher": "Mr. Tushar Marwaha",
             "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "NKS",
-            "teacher": "NKS",
+            "teacher": "Dr. Nidhi Kesari",
             "room": "Room 703"
           },
           {
@@ -2386,7 +2386,7 @@
           {
             "period": 3,
             "subject": "Paridhi",
-            "teacher": "Paridhi",
+            "teacher": "Ms. Paridhi",
             "room": "Room 703"
           },
           {
@@ -2399,7 +2399,7 @@
           {
             "period": 4,
             "subject": "TM",
-            "teacher": "TM",
+            "teacher": "Mr. Tushar Marwaha",
             "room": "Room 703"
           },
           {
@@ -2437,7 +2437,7 @@
           {
             "period": 3,
             "subject": "Paridhi",
-            "teacher": "Paridhi",
+            "teacher": "Ms. Paridhi",
             "room": "Room 703"
           },
           {
@@ -2481,8 +2481,8 @@
           },
           {
             "period": 2,
-            "subject": "G1: Paridhi | G2: TM",
-            "teacher": "Paridhi (G1) / TM (G2)",
+            "subject": "G1: Paridhi",
+            "teacher": "Ms. Paridhi (G1) / Mr. Tushar Marwaha (G2)",
             "room": "G1: Room 703 / G2: Room 338"
           },
           {
@@ -2501,13 +2501,13 @@
           {
             "period": 4,
             "subject": "NKS",
-            "teacher": "NKS",
+            "teacher": "Dr. Nidhi Kesari",
             "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "NKS (G1)",
-            "teacher": "NKS",
+            "teacher": "Dr. Nidhi Kesari",
             "room": "Room 703"
           },
           {
@@ -2538,8 +2538,8 @@
           },
           {
             "period": 3,
-            "subject": "G2: Paridhi | G1: TM",
-            "teacher": "Paridhi (G2) / TM (G1)",
+            "subject": "G2: Paridhi",
+            "teacher": "Ms. Paridhi (G2) / Mr. Tushar Marwaha (G1)",
             "room": "G2: Room 703 / G1: Room 338"
           },
           {
@@ -2552,19 +2552,19 @@
           {
             "period": 4,
             "subject": "NKS",
-            "teacher": "NKS",
+            "teacher": "Dr. Nidhi Kesari",
             "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "TM",
-            "teacher": "TM",
+            "teacher": "Mr. Tushar Marwaha",
             "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "NKS (G2)",
-            "teacher": "NKS",
+            "teacher": "Dr. Nidhi Kesari",
             "room": "Room 703"
           },
           {
@@ -2580,19 +2580,19 @@
           {
             "period": 1,
             "subject": "Paridhi",
-            "teacher": "Paridhi",
+            "teacher": "Ms. Paridhi",
             "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "Ankit  (Merged BBA 5B) | Sonam",
-            "teacher": "Ankit  (Merged BBA 5B) / Sonam",
+            "teacher": "Ankit (Merged BBA 5B) / Sonam",
             "room": "Room 507 / Room 703"
           },
           {
             "period": 3,
             "subject": "Ankit  (Merged BBA 5B) | Sonam",
-            "teacher": "Ankit  (Merged BBA 5B) / Sonam",
+            "teacher": "Ankit (Merged BBA 5B) / Sonam",
             "room": "Room 507 / Room 703"
           },
           {
@@ -2617,13 +2617,13 @@
           {
             "period": 6,
             "subject": "NKS",
-            "teacher": "NKS",
+            "teacher": "Dr. Nidhi Kesari",
             "room": "Room 703"
           },
           {
             "period": 7,
             "subject": "NKS",
-            "teacher": "NKS",
+            "teacher": "Dr. Nidhi Kesari",
             "room": "Tute"
           }
         ],
@@ -2631,20 +2631,20 @@
           {
             "period": 1,
             "subject": "AV",
-            "teacher": "AV",
+            "teacher": "Abhimanyu",
             "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "MV  (361/326) (Merged BBA 5B) | PA",
-            "teacher": "MV  (361 / 326) (Merged BBA 5B) / PA",
-            "room": "P"
+            "subject": "MV   (Merged BBA 5B)",
+            "teacher": "MV  ( / ) (Merged BBA 5B) / Dr. Preeti Rajpal",
+            "room": "Room 361 / Room 326"
           },
           {
             "period": 3,
-            "subject": "MV  (361/326) (Merged BBA 5B) | PA",
-            "teacher": "MV  (361 / 326) (Merged BBA 5B) / PA",
-            "room": "P"
+            "subject": "MV   (Merged BBA 5B)",
+            "teacher": "MV  ( / ) (Merged BBA 5B) / Dr. Preeti Rajpal",
+            "room": "Room 361 / Room 326"
           },
           {
             "period": 0,
@@ -2682,20 +2682,20 @@
           {
             "period": 1,
             "subject": "AV",
-            "teacher": "AV",
+            "teacher": "Abhimanyu",
             "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "MV  (361/326) (Merged BBA 5B) | PA",
-            "teacher": "MV  (361 / 326) (Merged BBA 5B) / PA",
-            "room": "P"
+            "subject": "MV   (Merged BBA 5B)",
+            "teacher": "MV  ( / ) (Merged BBA 5B) / Dr. Preeti Rajpal",
+            "room": "Room 361 / Room 326"
           },
           {
             "period": 3,
-            "subject": "MV  (361/326) (Merged BBA 5B) | PA",
-            "teacher": "MV  (361 / 326) (Merged BBA 5B) / PA",
-            "room": "P"
+            "subject": "MV   (Merged BBA 5B)",
+            "teacher": "MV  ( / ) (Merged BBA 5B) / Dr. Preeti Rajpal",
+            "room": "Room 361 / Room 326"
           },
           {
             "period": 0,
@@ -2707,19 +2707,19 @@
           {
             "period": 4,
             "subject": "Paridhi",
-            "teacher": "Paridhi",
+            "teacher": "Ms. Paridhi",
             "room": "Room 703"
           },
           {
             "period": 5,
-            "subject": "NKS | Marketing of Services",
-            "teacher": "NKS / Mr. Tushar Marwaha",
+            "subject": "Marketing of Services",
+            "teacher": "Dr. Nidhi Kesari / Mr. Tushar Marwaha",
             "room": "Room 703 / Room 523"
           },
           {
             "period": 6,
-            "subject": "NKS | Marketing of Services",
-            "teacher": "NKS / Mr. Tushar Marwaha",
+            "subject": "Marketing of Services",
+            "teacher": "Dr. Nidhi Kesari / Mr. Tushar Marwaha",
             "room": "Tute / Room 523"
           },
           {
@@ -2739,13 +2739,13 @@
           {
             "period": 2,
             "subject": "Ankit (P) (Merged with BBA 5B) | Sonam",
-            "teacher": "Ankit (P) (Merged with BBA 5B) / Sonam",
+            "teacher": "Ankit (P) / Sonam",
             "room": "Room 507 / Room 651 / P"
           },
           {
             "period": 3,
             "subject": "G2: Raj | G1: AV",
-            "teacher": "Raj (G2) / AV (G1)",
+            "teacher": "Raj (G2) / Abhimanyu (G1)",
             "room": "G2: Room 703 / G1: Room 338"
           },
           {
@@ -2784,19 +2784,19 @@
           {
             "period": 1,
             "subject": "Paridhi",
-            "teacher": "Paridhi",
+            "teacher": "Ms. Paridhi",
             "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "G1: Paridhi | G2: AV",
-            "teacher": "Paridhi (G1) / AV (G2)",
+            "subject": "G1: Paridhi",
+            "teacher": "Ms. Paridhi (G1) / Abhimanyu (G2)",
             "room": "G1: Room 703 / G2: Room 338"
           },
           {
             "period": 3,
             "subject": "AV",
-            "teacher": "AV",
+            "teacher": "Abhimanyu",
             "room": "Room 703"
           },
           {
@@ -2843,13 +2843,13 @@
           {
             "period": 2,
             "subject": "G1: AV | G2: MR",
-            "teacher": "AV (G1) / MR (G2)",
+            "teacher": "Abhimanyu (G1) / Ms. Mohini Rajput (G2)",
             "room": "G1: Room 703 / G2: Room 534"
           },
           {
             "period": 3,
             "subject": "G2: AV | G1: Raj",
-            "teacher": "AV (G2) / Raj (G1)",
+            "teacher": "Abhimanyu (G2) / Raj (G1)",
             "room": "G2: Room 703 / G1: Room 534"
           },
           {
@@ -2862,7 +2862,7 @@
           {
             "period": 4,
             "subject": "AV",
-            "teacher": "AV",
+            "teacher": "Abhimanyu",
             "room": "Room 703"
           },
           {
@@ -2888,13 +2888,13 @@
           {
             "period": 1,
             "subject": "KRS",
-            "teacher": "KRS",
+            "teacher": "Dr. Kavita Rastogi",
             "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "G1: KRS | G2: Raj",
-            "teacher": "KRS (G1) / Raj (G2)",
+            "teacher": "Dr. Kavita Rastogi (G1) / Raj (G2)",
             "room": "G1: Room 703 / G2: Room 534"
           },
           {
@@ -2918,13 +2918,13 @@
           },
           {
             "period": 5,
-            "subject": "AM | Marketing of Services",
+            "subject": "Marketing of Services",
             "teacher": "Dr. Amit Kumar / Mr. Praveen S.K.",
             "room": "Room 534 / Room 703"
           },
           {
             "period": 6,
-            "subject": "AM | Marketing of Services",
+            "subject": "Marketing of Services",
             "teacher": "Dr. Amit Kumar / Mr. Praveen S.K.",
             "room": "Room 534 / Room 703"
           },
@@ -2939,19 +2939,19 @@
           {
             "period": 1,
             "subject": "Paridhi",
-            "teacher": "Paridhi",
+            "teacher": "Ms. Paridhi",
             "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "AM | Marketing of Services",
+            "subject": "Marketing of Services",
             "teacher": "Dr. Amit Kumar / Mr. Praveen S.K.",
             "room": "Room 534 / Room 703"
           },
           {
             "period": 3,
             "subject": "AV",
-            "teacher": "AV",
+            "teacher": "Abhimanyu",
             "room": "Room 703"
           },
           {
@@ -2990,7 +2990,7 @@
           {
             "period": 1,
             "subject": "AV",
-            "teacher": "AV",
+            "teacher": "Abhimanyu",
             "room": "Room 703"
           },
           {
@@ -3001,8 +3001,8 @@
           },
           {
             "period": 3,
-            "subject": "G?: AM  (534) | G1: Marketing of Services",
-            "teacher": "AM  (534) (G?) / Mr. Tushar Marwaha (G1)",
+            "subject": "G?: AM   | G1: Marketing of Services",
+            "teacher": "Dr. Amit Kumar (G?) / Mr. Tushar Marwaha (G1)",
             "room": "G?: Tute / G1: Room 703"
           },
           {
@@ -3041,13 +3041,13 @@
           {
             "period": 1,
             "subject": "KRS",
-            "teacher": "KRS",
+            "teacher": "Dr. Kavita Rastogi",
             "room": "Room 703"
           },
           {
             "period": 2,
             "subject": "KRS",
-            "teacher": "KRS",
+            "teacher": "Dr. Kavita Rastogi",
             "room": "Room 703"
           },
           {
@@ -3133,13 +3133,13 @@
           {
             "period": 6,
             "subject": "SKG",
-            "teacher": "SKG",
+            "teacher": "Dr. Shikha Gupta",
             "room": "Room 703"
           },
           {
             "period": 7,
             "subject": "SKG",
-            "teacher": "SKG",
+            "teacher": "Dr. Shikha Gupta",
             "room": "Room 703"
           }
         ],
@@ -3177,9 +3177,9 @@
           },
           {
             "period": 5,
-            "subject": "Ankit  (523/651)",
-            "teacher": "Ankit  (523 / 651)",
-            "room": "P"
+            "subject": "Ankit",
+            "teacher": "Ankit  ( / )",
+            "room": "Room 523 / Room 651"
           },
           {
             "period": 6,
@@ -3210,7 +3210,7 @@
           {
             "period": 3,
             "subject": "SKG",
-            "teacher": "SKG",
+            "teacher": "Dr. Shikha Gupta",
             "room": "Room 703"
           },
           {
@@ -3223,7 +3223,7 @@
           {
             "period": 4,
             "subject": "SKG",
-            "teacher": "SKG",
+            "teacher": "Dr. Shikha Gupta",
             "room": "Tute"
           },
           {
@@ -3381,8 +3381,8 @@
           },
           {
             "period": 4,
-            "subject": "G1: Microeconomics | G2: SJ",
-            "teacher": "Ms. Shalini Prakash (G1) / SJ (G2)",
+            "subject": "G1: Microeconomics",
+            "teacher": "Ms. Shalini Prakash (G1) / Dr. Shikha Gupta (G2)",
             "room": "G1: Room 703 / G2: Room 236"
           },
           {
@@ -3444,15 +3444,15 @@
           },
           {
             "period": 6,
-            "subject": "Vipin | Nisha  (Merged with BBA 1A-703)",
-            "teacher": "Vipin / Nisha  (Merged with BBA 1A-703)",
-            "room": "Merged with BMS 1A / P"
+            "subject": "Vipin | Nisha  (Merged with BBA 1A-)",
+            "teacher": "Vipin / Nisha (Merged with BBA 1A-)",
+            "room": "Room 703"
           },
           {
             "period": 7,
-            "subject": "Vipin | Nisha  (Merged with BBA 1A-703)",
-            "teacher": "Vipin / Nisha  (Merged with BBA 1A-703)",
-            "room": "Merged with BMS 1A / P"
+            "subject": "Vipin | Nisha  (Merged with BBA 1A-)",
+            "teacher": "Vipin / Nisha (Merged with BBA 1A-)",
+            "room": "Room 703"
           }
         ],
         "Wednesday": [
@@ -3546,15 +3546,15 @@
           },
           {
             "period": 6,
-            "subject": "Vipin | Nisha  (Merged with BBA 1A-703)",
-            "teacher": "Vipin / Nisha  (Merged with BBA 1A-703)",
-            "room": "Merged with BMS 1A / P"
+            "subject": "Vipin | Nisha  (Merged with BBA 1A-)",
+            "teacher": "Vipin / Nisha (Merged with BBA 1A-)",
+            "room": "Room 703"
           },
           {
             "period": 7,
-            "subject": "Nisha (703)",
-            "teacher": "Nisha (703)",
-            "room": "P"
+            "subject": "Nisha",
+            "teacher": "Nisha",
+            "room": "Room 703"
           }
         ],
         "Friday": [
@@ -3566,8 +3566,8 @@
           },
           {
             "period": 2,
-            "subject": "G2: Microeconomics | G1: SJ",
-            "teacher": "Ms. Shalini Prakash (G2) / SJ (G1)",
+            "subject": "G2: Microeconomics",
+            "teacher": "Ms. Shalini Prakash (G2) / Dr. Shikha Gupta (G1)",
             "room": "G2: Room 703 / G1: Room 236"
           },
           {
@@ -3614,12 +3614,12 @@
           {
             "period": 1,
             "subject": "MT (G1)",
-            "teacher": "MT",
+            "teacher": "Dr. Madhu Totla",
             "room": "Room 703"
           },
           {
             "period": 2,
-            "subject": "G1: SP | G2: Statistics for Business Decisions",
+            "subject": "G2: Statistics for Business Decisions",
             "teacher": "SP (G1) / Dr. Mona Verma (G2)",
             "room": "G1: Room 703 / G2: Room 236"
           },
@@ -3639,13 +3639,13 @@
           {
             "period": 4,
             "subject": "Seema",
-            "teacher": "Seema",
+            "teacher": "Dr. Seema",
             "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "Seema",
-            "teacher": "Seema",
+            "teacher": "Dr. Seema",
             "room": "Room 703"
           },
           {
@@ -3740,7 +3740,7 @@
           },
           {
             "period": 4,
-            "subject": "G2: SP | G1: Statistics for Business Decisions",
+            "subject": "G1: Statistics for Business Decisions",
             "teacher": "SP (G2) / Dr. Mona Verma (G1)",
             "room": "G2: Room 703 / G1: Room 236"
           },
@@ -3798,7 +3798,7 @@
           {
             "period": 5,
             "subject": "Seema",
-            "teacher": "Seema",
+            "teacher": "Dr. Seema",
             "room": "Room 703"
           },
           {
@@ -4011,14 +4011,14 @@
           },
           {
             "period": 6,
-            "subject": "Garima  607 | Hindi C (Merged  BMS 3A) | Hindi D (Merged BMS 3D)",
-            "teacher": "Garima  607 / Dr. Soumya Guliyan / Mr. Komal",
+            "subject": "Hindi C (Merged  BMS 3A) | Hindi D (Merged BMS 3D)",
+            "teacher": "Dr. Garima Tripathi / Dr. Soumya Guliyan / Mr. Komal",
             "room": "Room 607"
           },
           {
             "period": 7,
-            "subject": "Garima  607 | Hindi C (Merged  BMS 3A) | Hindi D (Merged BMS 3D)",
-            "teacher": "Garima  607 / Dr. Soumya Guliyan / Mr. Komal",
+            "subject": "Hindi C (Merged  BMS 3A) | Hindi D (Merged BMS 3D)",
+            "teacher": "Dr. Garima Tripathi / Dr. Soumya Guliyan / Mr. Komal",
             "room": "Room 607"
           }
         ],
@@ -4187,7 +4187,7 @@
           {
             "period": 2,
             "subject": "G1: MT | G2: NK",
-            "teacher": "MT (G1) / NK (G2)",
+            "teacher": "Dr. Madhu Totla (G1) / NK (G2)",
             "room": "G1: Room 703 / G2: Room 237"
           },
           {
@@ -4232,7 +4232,7 @@
           {
             "period": 1,
             "subject": "MT",
-            "teacher": "MT",
+            "teacher": "Dr. Madhu Totla",
             "room": "Room 703"
           },
           {
@@ -4244,7 +4244,7 @@
           {
             "period": 3,
             "subject": "G1: KB | G2: MT",
-            "teacher": "KB (G1) / MT (G2)",
+            "teacher": "KB (G1) / Dr. Madhu Totla (G2)",
             "room": "G1: Room 703 / G2: Room 237"
           },
           {
@@ -4340,7 +4340,7 @@
           {
             "period": 2,
             "subject": "MT",
-            "teacher": "MT",
+            "teacher": "Dr. Madhu Totla",
             "room": "Room 703"
           },
           {
@@ -4359,7 +4359,7 @@
           {
             "period": 4,
             "subject": "MT",
-            "teacher": "MT",
+            "teacher": "Dr. Madhu Totla",
             "room": "Room 703"
           },
           {
@@ -4401,7 +4401,7 @@
           {
             "period": 3,
             "subject": "MR",
-            "teacher": "MR",
+            "teacher": "Ms. Mohini Rajput",
             "room": "Room 703"
           },
           {
@@ -4440,7 +4440,7 @@
           {
             "period": 1,
             "subject": "MR",
-            "teacher": "MR",
+            "teacher": "Ms. Mohini Rajput",
             "room": "Room 703"
           },
           {
@@ -4503,7 +4503,7 @@
           {
             "period": 3,
             "subject": "G1: Raj | G2: MR",
-            "teacher": "Raj (G1) / MR (G2)",
+            "teacher": "Raj (G1) / Ms. Mohini Rajput (G2)",
             "room": "G1: Room 703 / G2: Room 534"
           },
           {
@@ -4542,7 +4542,7 @@
           {
             "period": 1,
             "subject": "MR",
-            "teacher": "MR",
+            "teacher": "Ms. Mohini Rajput",
             "room": "Room 703"
           },
           {
@@ -4605,7 +4605,7 @@
           {
             "period": 3,
             "subject": "G2: Raj | G1: MR",
-            "teacher": "Raj (G2) / MR (G1)",
+            "teacher": "Raj (G2) / Ms. Mohini Rajput (G1)",
             "room": "G2: Room 703 / G1: Room 534"
           },
           {
@@ -4651,13 +4651,13 @@
           },
           {
             "period": 2,
-            "subject": "Ankit | Azmi",
+            "subject": "Ankit",
             "teacher": "Ankit / Dr. Azmi Ashraf",
             "room": "Merged with BMS 5C / P"
           },
           {
             "period": 3,
-            "subject": "Ankit | Azmi",
+            "subject": "Ankit",
             "teacher": "Ankit / Dr. Azmi Ashraf",
             "room": "Merged with BMS 5C / P"
           },
@@ -4702,15 +4702,15 @@
           },
           {
             "period": 2,
-            "subject": "MV  (361/326) (Merged BMS 5C) | Negotiation and Leadership (Merged with BMS 5D)",
-            "teacher": "MV  (361 / 326) (Merged BMS 5C) / Ms. Mohini Rajput",
-            "room": "P"
+            "subject": "MV   (Merged BMS 5C) | Negotiation and Leadership (Merged with BMS 5D)",
+            "teacher": "MV  ( / ) (Merged BMS 5C) / Ms. Mohini Rajput",
+            "room": "Room 361 / Room 326"
           },
           {
             "period": 3,
-            "subject": "MV  (361/326) (Merged BMS 5C) | Negotiation and Leadership (Merged with BMS 5D)",
-            "teacher": "MV  (361 / 326) (Merged BMS 5C) / Ms. Mohini Rajput",
-            "room": "P"
+            "subject": "MV   (Merged BMS 5C) | Negotiation and Leadership (Merged with BMS 5D)",
+            "teacher": "MV  ( / ) (Merged BMS 5C) / Ms. Mohini Rajput",
+            "room": "Room 361 / Room 326"
           },
           {
             "period": 0,
@@ -4753,15 +4753,15 @@
           },
           {
             "period": 2,
-            "subject": "MV  (361/326) (Merged BMS 5C) | Negotiation and Leadership (Merged with BMS 5D)",
-            "teacher": "MV  (361 / 326) (Merged BMS 5C) / Ms. Mohini Rajput",
-            "room": "P"
+            "subject": "MV   (Merged BMS 5C) | Negotiation and Leadership (Merged with BMS 5D)",
+            "teacher": "MV  ( / ) (Merged BMS 5C) / Ms. Mohini Rajput",
+            "room": "Room 361 / Room 326"
           },
           {
             "period": 3,
-            "subject": "MV  (361/326) (Merged BMS 5C) | Negotiation and Leadership (Merged with BMS 5D)",
-            "teacher": "MV  (361 / 326) (Merged BMS 5C) / Ms. Mohini Rajput",
-            "room": "P"
+            "subject": "MV   (Merged BMS 5C) | Negotiation and Leadership (Merged with BMS 5D)",
+            "teacher": "MV  ( / ) (Merged BMS 5C) / Ms. Mohini Rajput",
+            "room": "Room 361 / Room 326"
           },
           {
             "period": 0,
@@ -4773,13 +4773,13 @@
           {
             "period": 4,
             "subject": "G2: NK | G1: MR",
-            "teacher": "NK (G2) / MR (G1)",
+            "teacher": "NK (G2) / Ms. Mohini Rajput (G1)",
             "room": "G2: Room 703 / G1: Room 534"
           },
           {
             "period": 5,
             "subject": "MR",
-            "teacher": "MR",
+            "teacher": "Ms. Mohini Rajput",
             "room": "Room 703"
           },
           {
@@ -4798,20 +4798,20 @@
         "Thursday": [
           {
             "period": 1,
-            "subject": "Ankit  (Merged with BMS 5C) | Azmi",
-            "teacher": "Ankit  (Merged with BMS 5C) / Dr. Azmi Ashraf",
+            "subject": "Ankit  (Merged with BMS 5C)",
+            "teacher": "Ankit (Merged with BMS 5C) / Dr. Azmi Ashraf",
             "room": "P / Room 703"
           },
           {
             "period": 2,
-            "subject": "Ankit  (507/651) (Merged with BMS 5C) | Azmi",
-            "teacher": "Ankit  (507 / 651) (Merged with BMS 5C) / Dr. Azmi Ashraf",
-            "room": "P"
+            "subject": "Ankit   (Merged with BMS 5C)",
+            "teacher": "Ankit  ( / ) (Merged with BMS 5C) / Dr. Azmi Ashraf",
+            "room": "Room 507 / Room 651"
           },
           {
             "period": 3,
             "subject": "MR",
-            "teacher": "MR",
+            "teacher": "Ms. Mohini Rajput",
             "room": "Room 703"
           },
           {
@@ -4824,7 +4824,7 @@
           {
             "period": 4,
             "subject": "G1: Raj | G2: MR",
-            "teacher": "Raj (G1) / MR (G2)",
+            "teacher": "Raj (G1) / Ms. Mohini Rajput (G2)",
             "room": "G1: Room 703 / G2: Room 534"
           },
           {
@@ -4850,7 +4850,7 @@
           {
             "period": 1,
             "subject": "MR",
-            "teacher": "MR",
+            "teacher": "Ms. Mohini Rajput",
             "room": "Room 703"
           },
           {
@@ -4861,9 +4861,9 @@
           },
           {
             "period": 3,
-            "subject": "Management of Financial Institutions | Ishan  (237)",
-            "teacher": "Dr. Kumar Bijoy / Ishan  (237)",
-            "room": "Tute"
+            "subject": "Management of Financial Institutions | Ishan",
+            "teacher": "Dr. Kumar Bijoy / Ishan",
+            "room": "Room 237"
           },
           {
             "period": 0,
@@ -4942,13 +4942,13 @@
           {
             "period": 6,
             "subject": "SKG",
-            "teacher": "SKG",
+            "teacher": "Dr. Shikha Gupta",
             "room": "Room 523"
           },
           {
             "period": 7,
             "subject": "SKG",
-            "teacher": "SKG",
+            "teacher": "Dr. Shikha Gupta",
             "room": "Room 523"
           }
         ],
@@ -4986,9 +4986,9 @@
           },
           {
             "period": 5,
-            "subject": "Ankit  (523/651)",
-            "teacher": "Ankit  (523 / 651)",
-            "room": "P"
+            "subject": "Ankit",
+            "teacher": "Ankit  ( / )",
+            "room": "Room 523 / Room 651"
           },
           {
             "period": 6,
@@ -5019,7 +5019,7 @@
           {
             "period": 3,
             "subject": "SKG",
-            "teacher": "SKG",
+            "teacher": "Dr. Shikha Gupta",
             "room": "Room 523"
           },
           {
@@ -5031,9 +5031,9 @@
           },
           {
             "period": 4,
-            "subject": "SKG  (523)",
-            "teacher": "SKG  (523)",
-            "room": "Tute"
+            "subject": "SKG",
+            "teacher": "Dr. Shikha Gupta",
+            "room": "Room 523"
           },
           {
             "period": 5,
@@ -5171,13 +5171,13 @@
           },
           {
             "period": 2,
-            "subject": "G1: Front End Programming | G2: CSA",
+            "subject": "G1: Front End Programming",
             "teacher": "Kavita Rastogi (G1) / Onkar Singh (G2)",
             "room": "Room 403"
           },
           {
             "period": 3,
-            "subject": "OB | EE-I",
+            "subject": "EE-I",
             "teacher": "Anuja Mathur / Mehak Aggarwal",
             "room": "Room 403"
           },
@@ -5222,13 +5222,13 @@
           },
           {
             "period": 2,
-            "subject": "G1: CSA | G2: Front End Programming",
+            "subject": "G2: Front End Programming",
             "teacher": "Onkar Singh (G1) / Kavita Rastogi (G2)",
             "room": "Room 403"
           },
           {
             "period": 3,
-            "subject": "G1: Front End Programming | G2: CSA",
+            "subject": "G1: Front End Programming",
             "teacher": "Kavita Rastogi (G1) / Onkar Singh (G2)",
             "room": "Room 403"
           },
@@ -5292,7 +5292,7 @@
           },
           {
             "period": 4,
-            "subject": "G1: MC | G2: Front End Programming",
+            "subject": "G2: Front End Programming",
             "teacher": "Anamika Gupta (G1) / Kavita Rastogi (G2)",
             "room": "Room 403"
           },
@@ -5343,13 +5343,13 @@
           },
           {
             "period": 4,
-            "subject": "OB | EE-I",
+            "subject": "EE-I",
             "teacher": "Anuja Mathur / Mehak Aggarwal",
             "room": "Room 403"
           },
           {
             "period": 5,
-            "subject": "OB | EE-I",
+            "subject": "EE-I",
             "teacher": "Anuja Mathur / Mehak Aggarwal",
             "room": "Room 403"
           },
@@ -5394,13 +5394,13 @@
           },
           {
             "period": 4,
-            "subject": "OB | EE-I",
+            "subject": "EE-I",
             "teacher": "Anuja Mathur / Mehak Aggarwal",
             "room": "Room 403"
           },
           {
             "period": 5,
-            "subject": "OB | EE-I",
+            "subject": "EE-I",
             "teacher": "Anuja Mathur / Mehak Aggarwal",
             "room": "Room 403"
           },
@@ -5628,7 +5628,7 @@
         "Friday": [
           {
             "period": 1,
-            "subject": "G?: AI | G2: OS",
+            "subject": "G?: AI",
             "teacher": "Onkar Singh (G?) / Nidhi Seth (G2)",
             "room": "Room 407"
           },
@@ -5695,7 +5695,7 @@
           },
           {
             "period": 3,
-            "subject": "SMA | EE-I",
+            "subject": "EE-I",
             "teacher": "Rohan Gulati / Mehak Aggarwal",
             "room": "Room 457 / Room 403"
           },
@@ -5785,7 +5785,7 @@
         "Wednesday": [
           {
             "period": 1,
-            "subject": "G1: Introduction to Blockchain | G2: SE",
+            "subject": "G1: Introduction to Blockchain",
             "teacher": "Ayushi Gupta (G1) / Kavita Rastogi (G2)",
             "room": "Room 457"
           },
@@ -5893,7 +5893,7 @@
           },
           {
             "period": 2,
-            "subject": "G1: SE | G2: Introduction to Blockchain",
+            "subject": "G2: Introduction to Blockchain",
             "teacher": "Kavita Rastogi (G1) / Ayushi Gupta (G2)",
             "room": "Room 457"
           },
@@ -5954,7 +5954,7 @@
           },
           {
             "period": 3,
-            "subject": "CD | EE-1",
+            "subject": "EE-1",
             "teacher": "Onkar Singh / Mehak Aggarwal",
             "room": "Room 426 / Room 403"
           },
@@ -6120,13 +6120,13 @@
           },
           {
             "period": 4,
-            "subject": "CD | EE-1",
+            "subject": "EE-1",
             "teacher": "Onkar Singh / Mehak Aggarwal",
             "room": "Room 435 / Room 403"
           },
           {
             "period": 5,
-            "subject": "CD | EE-1",
+            "subject": "EE-1",
             "teacher": "Onkar Singh / Mehak Aggarwal",
             "room": "Room 426 / Room 403"
           },

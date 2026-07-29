@@ -12,7 +12,7 @@ const TimetableContext = createContext({
   deleteHoliday: async () => {},
 });
 
-const CURRENT_TIMETABLE_VERSION = '2026-07-30-odd-sem-v7';
+const CURRENT_TIMETABLE_VERSION = '2026-07-30-odd-sem-v8';
 
 export const TimetableProvider = ({ children }) => {
   const [timetable, setTimetable] = useState(() => {
