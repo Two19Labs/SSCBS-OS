@@ -373,6 +373,8 @@
   align-items: start;
   box-sizing: border-box;
   width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
 }
 
 .workspace-sidebar {
