@@ -428,7 +428,7 @@
           {
             "period": 3,
             "subject": "SJ",
-            "teacher": "SJ",
+            "teacher": "Dr. Shikha Gupta",
             "room": "Room 703"
           },
           {
@@ -447,7 +447,7 @@
           {
             "period": 5,
             "subject": "SJ (G1)",
-            "teacher": "SJ",
+            "teacher": "Dr. Shikha Gupta",
             "room": "Room 703"
           },
           {
@@ -492,13 +492,13 @@
           {
             "period": 4,
             "subject": "SJ",
-            "teacher": "SJ",
+            "teacher": "Dr. Shikha Gupta",
             "room": "Room 703"
           },
           {
             "period": 5,
             "subject": "SJ",
-            "teacher": "SJ",
+            "teacher": "Dr. Shikha Gupta",
             "room": "Room 703"
           },
           {
@@ -1036,13 +1036,13 @@
           {
             "period": 1,
             "subject": "Sanchi",
-            "teacher": "Sanchi",
+            "teacher": "Ms. Sanchi Kalra",
             "room": "P"
           },
           {
             "period": 2,
             "subject": "Sanchi",
-            "teacher": "Sanchi",
+            "teacher": "Ms. Sanchi Kalra",
             "room": "P"
           },
           {
@@ -1087,19 +1087,19 @@
           {
             "period": 1,
             "subject": "Sanchi",
-            "teacher": "Sanchi",
+            "teacher": "Ms. Sanchi Kalra",
             "room": "P"
           },
           {
             "period": 2,
             "subject": "Sanchi",
-            "teacher": "Sanchi",
+            "teacher": "Ms. Sanchi Kalra",
             "room": "P"
           },
           {
             "period": 3,
             "subject": "AM",
-            "teacher": "AM",
+            "teacher": "Dr. Amit Kumar",
             "room": "Room 703"
           },
           {
@@ -1169,20 +1169,20 @@
           {
             "period": 5,
             "subject": "AM",
-            "teacher": "AM",
+            "teacher": "Dr. Amit Kumar",
             "room": "Room 703"
           },
           {
             "period": 6,
             "subject": "Hindi B | Hindi C | Hindi D (Merged with BMS 3D)",
             "teacher": "Dr. Garima Tripathi / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 7,
             "subject": "Hindi B | Hindi C | Hindi D (Merged with BMS 3D)",
             "teacher": "Dr. Garima Tripathi / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "room": "Room 607 / Room 644 / Room 648"
           }
         ],
         "Thursday": [
@@ -1252,7 +1252,7 @@
           {
             "period": 3,
             "subject": "AM",
-            "teacher": "AM",
+            "teacher": "Dr. Amit Kumar",
             "room": "Room 703"
           },
           {
@@ -1305,7 +1305,7 @@
           {
             "period": 3,
             "subject": "AM",
-            "teacher": "AM",
+            "teacher": "Dr. Amit Kumar",
             "room": "Room 703"
           },
           {
@@ -1395,13 +1395,13 @@
           {
             "period": 1,
             "subject": "Sanchi",
-            "teacher": "Sanchi",
+            "teacher": "Ms. Sanchi Kalra",
             "room": "P"
           },
           {
             "period": 2,
             "subject": "Sanchi",
-            "teacher": "Sanchi",
+            "teacher": "Ms. Sanchi Kalra",
             "room": "P"
           },
           {
@@ -1433,13 +1433,13 @@
             "period": 6,
             "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Komal  648",
             "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Komal  648",
-            "room": "Hin A / Hin C / Hin D"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 7,
             "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Komal  648",
             "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Komal  648",
-            "room": "Hin A / Hin C / Hin D"
+            "room": "Room 607 / Room 644 / Room 648"
           }
         ],
         "Thursday": [
@@ -1471,7 +1471,7 @@
           {
             "period": 4,
             "subject": "AM",
-            "teacher": "AM",
+            "teacher": "Dr. Amit Kumar",
             "room": "Room 703"
           },
           {
@@ -1497,13 +1497,13 @@
           {
             "period": 1,
             "subject": "Sanchi",
-            "teacher": "Sanchi",
+            "teacher": "Ms. Sanchi Kalra",
             "room": "P"
           },
           {
             "period": 2,
             "subject": "Sanchi",
-            "teacher": "Sanchi",
+            "teacher": "Ms. Sanchi Kalra",
             "room": "P"
           },
           {
@@ -1522,7 +1522,7 @@
           {
             "period": 4,
             "subject": "AM",
-            "teacher": "AM",
+            "teacher": "Dr. Amit Kumar",
             "room": "Room 703"
           },
           {
@@ -1677,7 +1677,7 @@
           {
             "period": 4,
             "subject": "AM",
-            "teacher": "AM",
+            "teacher": "Dr. Amit Kumar",
             "room": "Room 703"
           },
           {
@@ -1690,13 +1690,13 @@
             "period": 6,
             "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Hindi B",
             "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Ms. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 7,
             "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Hindi B",
             "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Ms. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "room": "Room 607 / Room 644 / Room 648"
           }
         ],
         "Thursday": [
@@ -1785,7 +1785,7 @@
           {
             "period": 5,
             "subject": "AM",
-            "teacher": "AM",
+            "teacher": "Dr. Amit Kumar",
             "room": "Room 703"
           },
           {
@@ -1889,13 +1889,13 @@
           {
             "period": 5,
             "subject": "Vinayak  (648/326)",
-            "teacher": "Vinayak  (648/326)",
+            "teacher": "Vinayak  (648 / 326)",
             "room": "P"
           },
           {
             "period": 6,
             "subject": "Vinayak  (648/326)",
-            "teacher": "Vinayak  (648/326)",
+            "teacher": "Vinayak  (648 / 326)",
             "room": "P"
           },
           {
@@ -1947,13 +1947,13 @@
             "period": 6,
             "subject": "Hindi B | Hindi C (Merged with BMS 3A) | Hindi D (Merged with BMS 3A)",
             "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 7,
             "subject": "Hindi B | Hindi C (Merged with BMS 3A) | Hindi D (Merged with BMS 3A)",
             "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "room": "Room 607 / Room 644 / Room 648"
           }
         ],
         "Thursday": [
@@ -2637,13 +2637,13 @@
           {
             "period": 2,
             "subject": "MV  (361/326) (Merged BBA 5B) | PA",
-            "teacher": "MV  (361/326) (Merged BBA 5B) / PA",
+            "teacher": "MV  (361 / 326) (Merged BBA 5B) / PA",
             "room": "P"
           },
           {
             "period": 3,
             "subject": "MV  (361/326) (Merged BBA 5B) | PA",
-            "teacher": "MV  (361/326) (Merged BBA 5B) / PA",
+            "teacher": "MV  (361 / 326) (Merged BBA 5B) / PA",
             "room": "P"
           },
           {
@@ -2688,13 +2688,13 @@
           {
             "period": 2,
             "subject": "MV  (361/326) (Merged BBA 5B) | PA",
-            "teacher": "MV  (361/326) (Merged BBA 5B) / PA",
+            "teacher": "MV  (361 / 326) (Merged BBA 5B) / PA",
             "room": "P"
           },
           {
             "period": 3,
             "subject": "MV  (361/326) (Merged BBA 5B) | PA",
-            "teacher": "MV  (361/326) (Merged BBA 5B) / PA",
+            "teacher": "MV  (361 / 326) (Merged BBA 5B) / PA",
             "room": "P"
           },
           {
@@ -2919,13 +2919,13 @@
           {
             "period": 5,
             "subject": "AM | Marketing of Services",
-            "teacher": "AM / Mr. Praveen S.K.",
+            "teacher": "Dr. Amit Kumar / Mr. Praveen S.K.",
             "room": "Room 534 / Room 703"
           },
           {
             "period": 6,
             "subject": "AM | Marketing of Services",
-            "teacher": "AM / Mr. Praveen S.K.",
+            "teacher": "Dr. Amit Kumar / Mr. Praveen S.K.",
             "room": "Room 534 / Room 703"
           },
           {
@@ -2945,7 +2945,7 @@
           {
             "period": 2,
             "subject": "AM | Marketing of Services",
-            "teacher": "AM / Mr. Praveen S.K.",
+            "teacher": "Dr. Amit Kumar / Mr. Praveen S.K.",
             "room": "Room 534 / Room 703"
           },
           {
@@ -3178,7 +3178,7 @@
           {
             "period": 5,
             "subject": "Ankit  (523/651)",
-            "teacher": "Ankit  (523/651)",
+            "teacher": "Ankit  (523 / 651)",
             "room": "P"
           },
           {
@@ -3433,7 +3433,7 @@
           {
             "period": 4,
             "subject": "SJ",
-            "teacher": "SJ",
+            "teacher": "Dr. Shikha Gupta",
             "room": "Room 703"
           },
           {
@@ -3471,7 +3471,7 @@
           {
             "period": 3,
             "subject": "SJ",
-            "teacher": "SJ",
+            "teacher": "Dr. Shikha Gupta",
             "room": "Room 703"
           },
           {
@@ -3535,7 +3535,7 @@
           {
             "period": 4,
             "subject": "SJ",
-            "teacher": "SJ",
+            "teacher": "Dr. Shikha Gupta",
             "room": "Room 703"
           },
           {
@@ -3804,7 +3804,7 @@
           {
             "period": 6,
             "subject": "SJ (G2)",
-            "teacher": "SJ",
+            "teacher": "Dr. Shikha Gupta",
             "room": "Room 703"
           },
           {
@@ -4013,13 +4013,13 @@
             "period": 6,
             "subject": "Garima  607 | Hindi C (Merged  BMS 3A) | Hindi D (Merged BMS 3D)",
             "teacher": "Garima  607 / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 7,
             "subject": "Garima  607 | Hindi C (Merged  BMS 3A) | Hindi D (Merged BMS 3D)",
             "teacher": "Garima  607 / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "room": "Room 607 / Room 644 / Room 648"
           }
         ],
         "Thursday": [
@@ -4270,13 +4270,13 @@
             "period": 6,
             "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged  BMS 3A) | Hindi D (Merged BMS 3D)",
             "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 7,
             "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged  BMS 3A) | Hindi D (Merged BMS 3D)",
             "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "room": "Room 607 / Room 644 / Room 648"
           }
         ],
         "Thursday": [
@@ -4389,7 +4389,7 @@
           {
             "period": 1,
             "subject": "Azmi",
-            "teacher": "Azmi",
+            "teacher": "Dr. Azmi Ashraf",
             "room": "Room 703"
           },
           {
@@ -4414,7 +4414,7 @@
           {
             "period": 4,
             "subject": "Azmi",
-            "teacher": "Azmi",
+            "teacher": "Dr. Azmi Ashraf",
             "room": "Room 703"
           },
           {
@@ -4446,13 +4446,13 @@
           {
             "period": 2,
             "subject": "Azmi",
-            "teacher": "Azmi",
+            "teacher": "Dr. Azmi Ashraf",
             "room": "P"
           },
           {
             "period": 3,
             "subject": "Azmi",
-            "teacher": "Azmi",
+            "teacher": "Dr. Azmi Ashraf",
             "room": "P"
           },
           {
@@ -4554,7 +4554,7 @@
           {
             "period": 3,
             "subject": "Azmi",
-            "teacher": "Azmi",
+            "teacher": "Dr. Azmi Ashraf",
             "room": "P"
           },
           {
@@ -4652,13 +4652,13 @@
           {
             "period": 2,
             "subject": "Ankit | Azmi",
-            "teacher": "Ankit / Azmi",
+            "teacher": "Ankit / Dr. Azmi Ashraf",
             "room": "Merged with BMS 5C / P"
           },
           {
             "period": 3,
             "subject": "Ankit | Azmi",
-            "teacher": "Ankit / Azmi",
+            "teacher": "Ankit / Dr. Azmi Ashraf",
             "room": "Merged with BMS 5C / P"
           },
           {
@@ -4703,13 +4703,13 @@
           {
             "period": 2,
             "subject": "MV  (361/326) (Merged BMS 5C) | Negotiation and Leadership (Merged with BMS 5D)",
-            "teacher": "MV  (361/326) (Merged BMS 5C) / Ms. Mohini Rajput",
+            "teacher": "MV  (361 / 326) (Merged BMS 5C) / Ms. Mohini Rajput",
             "room": "P"
           },
           {
             "period": 3,
             "subject": "MV  (361/326) (Merged BMS 5C) | Negotiation and Leadership (Merged with BMS 5D)",
-            "teacher": "MV  (361/326) (Merged BMS 5C) / Ms. Mohini Rajput",
+            "teacher": "MV  (361 / 326) (Merged BMS 5C) / Ms. Mohini Rajput",
             "room": "P"
           },
           {
@@ -4722,7 +4722,7 @@
           {
             "period": 4,
             "subject": "Azmi",
-            "teacher": "Azmi",
+            "teacher": "Dr. Azmi Ashraf",
             "room": "Room 703"
           },
           {
@@ -4754,13 +4754,13 @@
           {
             "period": 2,
             "subject": "MV  (361/326) (Merged BMS 5C) | Negotiation and Leadership (Merged with BMS 5D)",
-            "teacher": "MV  (361/326) (Merged BMS 5C) / Ms. Mohini Rajput",
+            "teacher": "MV  (361 / 326) (Merged BMS 5C) / Ms. Mohini Rajput",
             "room": "P"
           },
           {
             "period": 3,
             "subject": "MV  (361/326) (Merged BMS 5C) | Negotiation and Leadership (Merged with BMS 5D)",
-            "teacher": "MV  (361/326) (Merged BMS 5C) / Ms. Mohini Rajput",
+            "teacher": "MV  (361 / 326) (Merged BMS 5C) / Ms. Mohini Rajput",
             "room": "P"
           },
           {
@@ -4799,13 +4799,13 @@
           {
             "period": 1,
             "subject": "Ankit  (Merged with BMS 5C) | Azmi",
-            "teacher": "Ankit  (Merged with BMS 5C) / Azmi",
+            "teacher": "Ankit  (Merged with BMS 5C) / Dr. Azmi Ashraf",
             "room": "P / Room 703"
           },
           {
             "period": 2,
             "subject": "Ankit  (507/651) (Merged with BMS 5C) | Azmi",
-            "teacher": "Ankit  (507/651) (Merged with BMS 5C) / Azmi",
+            "teacher": "Ankit  (507 / 651) (Merged with BMS 5C) / Dr. Azmi Ashraf",
             "room": "P"
           },
           {
@@ -4987,7 +4987,7 @@
           {
             "period": 5,
             "subject": "Ankit  (523/651)",
-            "teacher": "Ankit  (523/651)",
+            "teacher": "Ankit  (523 / 651)",
             "room": "P"
           },
           {
@@ -5533,7 +5533,7 @@
           {
             "period": 2,
             "subject": "AA",
-            "teacher": "AA",
+            "teacher": "Dr. Anamika Agarwal",
             "room": "Room 407"
           },
           {
