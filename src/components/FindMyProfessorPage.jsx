@@ -5,6 +5,41 @@ import { PERIODS, DAYS } from '../data/timetables';
 import { isAdminEmail, isTimeWarpEnabled } from '../lib/admin';
 import './FindMyProfessorPage.css';
 
+// SSCBS Faculty Initials Resolution Map
+const FACULTY_INITIALS_MAP = {
+  'ayg': 'Ayushi Goel',
+  'ag': 'Ayushi Goel',
+  'aa': 'Dr. Anamika Agarwal',
+  'dd': 'Dr. Deepali Dhaka',
+  'am': 'Dr. Amit Kumar',
+  'ta': 'Dr. Tarannum Ahmad',
+  'mv': 'Dr. Mona Verma',
+  'sj': 'Dr. Shikha Gupta',
+  'sk': 'Mr. Praveen SK',
+  'ps': 'Mr. Praveen SK',
+  'kr': 'Kavita Rastogi',
+  'os': 'Onkar Singh',
+  'ng': 'Neha Gupta',
+  'nb': 'Dr. Neha Bhatia',
+  'st': 'Sonika Thakral'
+};
+
+// Patterns matching subjects, electives, or labels mistakenly placed in teacher fields
+const NON_TEACHER_PATTERNS = [
+  /^hindi\s*[a-d]?$/i,
+  /^hindi\s.*/i,
+  /^(aecc|vac|sec|ge|evs|sports|physical ed|value addition)$/i,
+  /^(free|unsupervised|break|infinity hour|merged|-)$/i,
+  /^ee2$/i,
+  /^social ent/i
+];
+
+const isNonTeacher = (name) => {
+  if (!name) return true;
+  const clean = name.trim();
+  return NON_TEACHER_PATTERNS.some(pattern => pattern.test(clean));
+};
+
 // Normalize teacher name by removing titles, group markers, and converting to lowercase
 const normalizeName = (name) => {
   if (!name) return '';
@@ -17,34 +52,35 @@ const normalizeName = (name) => {
     .trim();
 };
 
-// Splits a teacher cell into individual names
+// Splits a teacher cell into individual names and filters out non-faculty entries
 const splitTeachers = (teacherStr) => {
   if (!teacherStr || typeof teacherStr !== 'string') return [];
   return teacherStr
     .split(/\/|\band\b|,/gi)
     .map(t => t.trim())
     .filter(t => {
-      const lower = t.toLowerCase();
-      return t && 
-             t !== '-' && 
-             !lower.includes('free') && 
-             !lower.includes('unsupervised') && 
-             !lower.includes('break') &&
-             lower !== 'ee2' &&
-             !lower.startsWith('social enter') &&
-             !lower.startsWith('social ent');
+      if (!t || t === '-') return false;
+      if (isNonTeacher(t)) return false;
+      return true;
     });
 };
 
-// Clean display names (remove group suffixes, etc.)
+// Clean display names (remove group suffixes, strip Lab markers, expand initials)
 const cleanDisplayName = (name) => {
   if (!name) return '';
-  return name
+  let cleaned = name
     .replace(/\(g\d+\)/gi, '')
     .replace(/\b(g\d+)\b/gi, '')
     .replace(/g\d+:\s*/gi, '')
+    .replace(/\blab\b/gi, '')
     .replace(/[\s-]+/g, ' ')
     .trim();
+
+  const lower = cleaned.toLowerCase();
+  if (FACULTY_INITIALS_MAP[lower]) {
+    return FACULTY_INITIALS_MAP[lower];
+  }
+  return cleaned;
 };
 
 // Parse time string to minutes since midnight

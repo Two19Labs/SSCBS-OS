@@ -861,6 +861,69 @@ function AdminConsoleContent({ onBack }) {
     return { course, sem, section, defaultRoom, weekSchedule };
   };
 
+  // Helper to sanitize weekSchedule from AI parser
+  const sanitizeAiWeekSchedule = (schedule) => {
+    if (!schedule || typeof schedule !== 'object') return schedule;
+    const nonTeacherRegex = /^(hindi\s*[a-d]?|hindi\s.*|aecc|vac|sec|ge|evs|sports|physical ed|value addition|lab|free|unsupervised|break|infinity hour|-)$/i;
+    const initialsMap = {
+      'ayg': 'Ayushi Goel',
+      'ag': 'Ayushi Goel',
+      'aa': 'Dr. Anamika Agarwal',
+      'dd': 'Dr. Deepali Dhaka',
+      'am': 'Dr. Amit Kumar',
+      'ta': 'Dr. Tarannum Ahmad',
+      'mv': 'Dr. Mona Verma',
+      'sj': 'Dr. Shikha Gupta',
+      'sk': 'Mr. Praveen SK',
+      'ps': 'Mr. Praveen SK',
+      'kr': 'Kavita Rastogi',
+      'os': 'Onkar Singh',
+      'ng': 'Neha Gupta',
+      'nb': 'Dr. Neha Bhatia',
+      'st': 'Sonika Thakral'
+    };
+
+    const sanitized = {};
+    for (const day in schedule) {
+      if (!Array.isArray(schedule[day])) {
+        sanitized[day] = schedule[day];
+        continue;
+      }
+      sanitized[day] = schedule[day].map(item => {
+        if (!item || item.isBreak) return item;
+        let teacher = (item.teacher || '-').trim();
+        let subject = (item.subject || '').trim();
+
+        if (nonTeacherRegex.test(teacher)) {
+          if (subject && !subject.toLowerCase().includes(teacher.toLowerCase())) {
+            subject = `${subject} (${teacher})`;
+          } else if (!subject) {
+            subject = teacher;
+          }
+          teacher = '-';
+        } else {
+          const parts = teacher.split(/\/|\band\b|,/gi).map(p => p.trim());
+          const cleanedParts = parts.map(p => {
+            let cleaned = p.replace(/\blab\b/gi, '').replace(/\(g\d+\)/gi, '').trim();
+            const lower = cleaned.toLowerCase();
+            if (initialsMap[lower]) return initialsMap[lower];
+            if (nonTeacherRegex.test(lower)) return '';
+            return cleaned;
+          }).filter(Boolean);
+
+          teacher = cleanedParts.length > 0 ? cleanedParts.join(' / ') : '-';
+        }
+
+        return {
+          ...item,
+          subject,
+          teacher
+        };
+      });
+    }
+    return sanitized;
+  };
+
   // AI-Powered Timetable Parser (Hugging Face Inference API)
   const parseFileWithHuggingFace = async (selectedFile) => {
     if (!selectedFile) return;
@@ -961,8 +1024,11 @@ EXTRACT and return a JSON object with EXACTLY this structure:
 RULES:
 - The timetable grid has days Mon-Fri as rows and periods I-VII as columns (with Infinity Hour break between period III and IV)
 - Each day MUST have exactly 8 entries: periods 1,2,3 then break (period 0), then periods 4,5,6,7
-- Below the timetable grid is a LEGEND TABLE mapping faculty codes (like "TA","MV","SJ") to full paper names and full faculty names (Dr./Mr./Ms.)
-- Use the legend to resolve codes in the grid to full subject names and teacher names
+- Below the timetable grid is a LEGEND TABLE mapping faculty codes (like "TA","MV","SJ","AyG","DD") to full paper names and full faculty names (Dr./Mr./Ms.)
+- Use the legend to resolve codes in the grid to full subject names and full teacher names
+- CRITICAL FACULTY VS ELECTIVE RULES:
+  * NEVER place elective subject names (such as "Hindi A", "Hindi B", "Hindi C", "Hindi D", "AECC", "VAC", "SEC", "GE") into the "teacher" field. Place them in "subject". If no professor is specified for an elective slot, set "teacher" to "-"
+  * Strip trailing "Lab" or "(P)" from teacher names (e.g. if a cell says "AyG Lab", resolve teacher to "Ayushi Goel" and set subject to practical)
 - If a cell is empty or says "Free" or "Unsupervised", set subject to "Free" and teacher to "-"
 - For split cells like "KR/OS", create a combined entry: subject="Subject1 / Subject2", teacher="Teacher1 / Teacher2"
 - If a cell contains "(P)" it means Practical. Keep the subject name and append "(Practical)", use the same default room as the class's allotted room
@@ -1005,7 +1071,10 @@ RULES:
                       const section = aiResult.section || 'A';
                       if (!timetables[course]) timetables[course] = {};
                       if (!timetables[course][sem]) timetables[course][sem] = {};
-                      timetables[course][sem][section] = aiResult.weekSchedule;
+                      
+                      // Sanitize parsed AI schedule before storing
+                      const sanitizedSchedule = sanitizeAiWeekSchedule(aiResult.weekSchedule);
+                      timetables[course][sem][section] = sanitizedSchedule;
                       addLog(`  ✓ [AI Block ${processedBlocks}] ${course} Sem ${sem} Sec ${section}`, 'success');
                       parsedOk = true;
                     }

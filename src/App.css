@@ -53,7 +53,7 @@
   border-right: 1px solid var(--border);
   display: none;
   flex-direction: column;
-  padding: 18px 12px 14px;
+  padding: 18px 14px 14px;
   z-index: 40;
 }
 
@@ -452,11 +452,18 @@
   }
 
   .page-heading-desktop h1 {
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 800;
     letter-spacing: -0.02em;
     margin: 0;
     color: var(--ink);
+  }
+}
+
+/* ═══ Large Desktop ≥ 1440px ═══ */
+@media (min-width: 1440px) {
+  .app-main {
+    padding: 36px 56px 56px;
   }
 }
 
