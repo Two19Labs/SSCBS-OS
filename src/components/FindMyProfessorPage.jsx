@@ -31,7 +31,32 @@ const isNonTeacher = (name) => {
   return NON_TEACHER_PATTERNS.some(pattern => pattern.test(clean));
 };
 
-// Clean display names (remove group suffixes, (P), (Tute), room numbers, and extra spaces)
+const FACULTY_DISPLAY_MAP = {
+  'aa': 'Dr. Anamika Agarwal',
+  'ag': 'Ayushi Goel',
+  'ayg': 'Ayushi Goel',
+  'dd': 'Dr. Deepali Dhaka',
+  'am': 'Dr. Amit Kumar',
+  'ta': 'Dr. Tarannum Ahmad',
+  'mv': 'Dr. Mona Verma',
+  'sj': 'Dr. Shikha Gupta',
+  'sk': 'Mr. Praveen SK',
+  'ps': 'Mr. Praveen SK',
+  'kr': 'Kavita Rastogi',
+  'os': 'Onkar Singh',
+  'ng': 'Neha Gupta',
+  'nb': 'Dr. Neha Bhatia',
+  'st': 'Sonika Thakral',
+  'ma': 'Ms. Mohini Rajput',
+  'mn': 'Dr. Mona Verma',
+  'azmi': 'Dr. Azmi Ashraf',
+  'prakhar': 'Prakhar',
+  'apoorva': 'Apoorva',
+  'shipra': 'Shipra',
+  'sanchi': 'Ms. Sanchi Kalra'
+};
+
+// Clean display names (remove group suffixes, (P), (Tute), room numbers, and expand raw initials)
 const cleanDisplayName = (name) => {
   if (!name) return '';
   let cleaned = name
@@ -42,6 +67,11 @@ const cleanDisplayName = (name) => {
     .replace(/\b[2-7]\d{2}\b/g, '')
     .replace(/[\s-]+/g, ' ')
     .trim();
+
+  const lower = cleaned.toLowerCase();
+  if (FACULTY_DISPLAY_MAP[lower]) {
+    return FACULTY_DISPLAY_MAP[lower];
+  }
 
   return cleaned;
 };
