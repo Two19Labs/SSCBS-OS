@@ -184,19 +184,14 @@
 }
 
 /* Status Hero Section */
+/* Self-wrapping grid: two columns when there's room for both, otherwise it
+   drops to a single column automatically — cannot overflow horizontally.
+   min(100%, 360px) keeps the column from ever exceeding the container. */
 .tracker-main-status {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
   gap: 16px;
   min-width: 0;
-}
-
-/* Stack the live class + next block once space is tight (accounts for the
-   250px sidebar on laptops, where two columns no longer fit comfortably). */
-@media (max-width: 1000px) {
-  .tracker-main-status {
-    grid-template-columns: 1fr;
-  }
 }
 
 .status-hero {
@@ -397,6 +392,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-width: 0;
 }
 
 .daily-timeline-section h3 {
@@ -417,6 +413,7 @@
 .timeline-trail {
   display: flex;
   gap: 14px;
+  min-width: 0;
   overflow-x: auto;
   padding: 4px 2px 10px 2px;
   scroll-behavior: smooth;
