@@ -9,10 +9,13 @@ const ROOM_DISPLAY_MAP = {
   'Hin A / Hin C / Hin D': 'Room 607 / Room 644 / Room 648',
   'room 607 / room 644 / Room 648': 'Room 607 / Room 644 / Room 648',
   'Hin A': 'Room 607',
-  'Hin B': 'Room 644',
+  'Hindi A': 'Room 607',
+  'Hin B': 'Room 607',
+  'Hindi B': 'Room 607',
   'Hin C': 'Room 644',
+  'Hindi C': 'Room 644',
   'Hin D': 'Room 648',
-  'Hindi B': 'Room 644'
+  'Hindi D': 'Room 648'
 };
 
 // Patterns matching subjects, electives, or labels mistakenly placed in teacher fields
