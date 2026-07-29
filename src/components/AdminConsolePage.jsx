@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useConfig } from '../context/ConfigContext';
 import { isAdminEmail } from '../lib/admin';
 import { subscribeToPresence, fetchAnalyticsData, FEATURE_NAMES } from '../lib/analytics';
+import { sanitizeWeekSchedule } from '../utils/sanitizeSchedule';
 import DateTimePicker from './DateTimePicker';
 import './AdminConsolePage.css';
 
@@ -861,69 +862,6 @@ function AdminConsoleContent({ onBack }) {
     return { course, sem, section, defaultRoom, weekSchedule };
   };
 
-  // Helper to sanitize weekSchedule from AI parser
-  const sanitizeAiWeekSchedule = (schedule) => {
-    if (!schedule || typeof schedule !== 'object') return schedule;
-    const nonTeacherRegex = /^(hindi\s*[a-d]?|hindi\s.*|aecc|vac|sec|ge|evs|sports|physical ed|value addition|lab|free|unsupervised|break|infinity hour|-)$/i;
-    const initialsMap = {
-      'ayg': 'Ayushi Goel',
-      'ag': 'Ayushi Goel',
-      'aa': 'Dr. Anamika Agarwal',
-      'dd': 'Dr. Deepali Dhaka',
-      'am': 'Dr. Amit Kumar',
-      'ta': 'Dr. Tarannum Ahmad',
-      'mv': 'Dr. Mona Verma',
-      'sj': 'Dr. Shikha Gupta',
-      'sk': 'Mr. Praveen SK',
-      'ps': 'Mr. Praveen SK',
-      'kr': 'Kavita Rastogi',
-      'os': 'Onkar Singh',
-      'ng': 'Neha Gupta',
-      'nb': 'Dr. Neha Bhatia',
-      'st': 'Sonika Thakral'
-    };
-
-    const sanitized = {};
-    for (const day in schedule) {
-      if (!Array.isArray(schedule[day])) {
-        sanitized[day] = schedule[day];
-        continue;
-      }
-      sanitized[day] = schedule[day].map(item => {
-        if (!item || item.isBreak) return item;
-        let teacher = (item.teacher || '-').trim();
-        let subject = (item.subject || '').trim();
-
-        if (nonTeacherRegex.test(teacher)) {
-          if (subject && !subject.toLowerCase().includes(teacher.toLowerCase())) {
-            subject = `${subject} (${teacher})`;
-          } else if (!subject) {
-            subject = teacher;
-          }
-          teacher = '-';
-        } else {
-          const parts = teacher.split(/\/|\band\b|,/gi).map(p => p.trim());
-          const cleanedParts = parts.map(p => {
-            let cleaned = p.replace(/\blab\b/gi, '').replace(/\(g\d+\)/gi, '').trim();
-            const lower = cleaned.toLowerCase();
-            if (initialsMap[lower]) return initialsMap[lower];
-            if (nonTeacherRegex.test(lower)) return '';
-            return cleaned;
-          }).filter(Boolean);
-
-          teacher = cleanedParts.length > 0 ? cleanedParts.join(' / ') : '-';
-        }
-
-        return {
-          ...item,
-          subject,
-          teacher
-        };
-      });
-    }
-    return sanitized;
-  };
-
   // AI-Powered Timetable Parser (Hugging Face Inference API)
   const parseFileWithHuggingFace = async (selectedFile) => {
     if (!selectedFile) return;
@@ -1029,8 +967,10 @@ RULES:
 - CRITICAL FACULTY VS ELECTIVE RULES:
   * NEVER place elective subject names (such as "Hindi A", "Hindi B", "Hindi C", "Hindi D", "AECC", "VAC", "SEC", "GE") into the "teacher" field. Place them in "subject". If no professor is specified for an elective slot, set "teacher" to "-"
   * Strip trailing "Lab" or "(P)" from teacher names (e.g. if a cell says "AyG Lab", resolve teacher to "Ayushi Goel" and set subject to practical)
+- CRITICAL SPLIT GROUP (G1 / G2) & ROOM EXTRACTION RULES:
+  * When a class cell is split between Group 1 (G1) and Group 2 (G2), PRESERVE group markers! Format subjects as "G1: Subject1 | G2: Subject2", teachers as "Teacher1 (G1) / Teacher2 (G2)", and rooms as "G1: Room 607 / G2: Room 226".
+  * If a 3-digit room number (e.g. 648, 607, 703, 361, 534, 523, 651, 326) appears inside a teacher or subject cell (e.g. "Komal 648", "MV (361/326)"), EXTRACT it into the "room" field as "Room 648" (or "Room 361 / Room 326") and clean it out of the teacher/subject text.
 - If a cell is empty or says "Free" or "Unsupervised", set subject to "Free" and teacher to "-"
-- For split cells like "KR/OS", create a combined entry: subject="Subject1 / Subject2", teacher="Teacher1 / Teacher2"
 - If a cell contains "(P)" it means Practical. Keep the subject name and append "(Practical)", use the same default room as the class's allotted room
 - BBA(FIA) should be normalized to "BBA FIA"
 - B.Sc.(H) Computer Science should be normalized to "Bsc Comp Sci"
@@ -1073,7 +1013,7 @@ RULES:
                       if (!timetables[course][sem]) timetables[course][sem] = {};
                       
                       // Sanitize parsed AI schedule before storing
-                      const sanitizedSchedule = sanitizeAiWeekSchedule(aiResult.weekSchedule);
+                      const sanitizedSchedule = sanitizeWeekSchedule(aiResult.weekSchedule);
                       timetables[course][sem][section] = sanitizedSchedule;
                       addLog(`  ✓ [AI Block ${processedBlocks}] ${course} Sem ${sem} Sec ${section}`, 'success');
                       parsedOk = true;
@@ -1098,7 +1038,7 @@ RULES:
                 const { course, sem, section, weekSchedule } = result;
                 if (!timetables[course]) timetables[course] = {};
                 if (!timetables[course][sem]) timetables[course][sem] = {};
-                timetables[course][sem][section] = weekSchedule;
+                timetables[course][sem][section] = sanitizeWeekSchedule(weekSchedule);
                 addLog(`  → [Fallback Block ${processedBlocks}] ${course} Sem ${sem} Sec ${section}`, 'info');
               }
             }

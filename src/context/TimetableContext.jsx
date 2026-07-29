@@ -1,9 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import timetablesData from '../data/timetables.json';
+import { sanitizeEntireTimetable } from '../utils/sanitizeSchedule';
+
+const sanitizedInitialTimetables = sanitizeEntireTimetable(timetablesData);
 
 const TimetableContext = createContext({
-  timetable: timetablesData,
+  timetable: sanitizedInitialTimetables,
   loading: true,
   updateTimetable: async () => {},
   getTimetable: () => null,
@@ -12,7 +15,7 @@ const TimetableContext = createContext({
   deleteHoliday: async () => {},
 });
 
-const CURRENT_TIMETABLE_VERSION = '2026-07-28-odd-sem-v2';
+const CURRENT_TIMETABLE_VERSION = '2026-07-28-odd-sem-v3';
 
 export const TimetableProvider = ({ children }) => {
   const [timetable, setTimetable] = useState(() => {
@@ -21,19 +24,19 @@ export const TimetableProvider = ({ children }) => {
       if (cachedVer !== CURRENT_TIMETABLE_VERSION) {
         localStorage.removeItem('sscbs_os_timetable');
         localStorage.setItem('sscbs_os_timetable_version', CURRENT_TIMETABLE_VERSION);
-        return timetablesData;
+        return sanitizedInitialTimetables;
       }
       const cached = localStorage.getItem('sscbs_os_timetable');
       if (cached) {
         const parsed = JSON.parse(cached);
         if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
-          return parsed;
+          return sanitizeEntireTimetable(parsed);
         }
       }
     } catch (e) {
       console.warn('Could not read cached timetable from localStorage:', e);
     }
-    return timetablesData;
+    return sanitizedInitialTimetables;
   });
   const [holidays, setHolidays] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -56,9 +59,10 @@ export const TimetableProvider = ({ children }) => {
         if (error) {
           console.error('Error fetching timetable from Supabase:', error);
         } else if (data && data.value && typeof data.value === 'object' && Object.keys(data.value).length > 0) {
-          setTimetable(data.value);
+          const sanitizedFetched = sanitizeEntireTimetable(data.value);
+          setTimetable(sanitizedFetched);
           try {
-            localStorage.setItem('sscbs_os_timetable', JSON.stringify(data.value));
+            localStorage.setItem('sscbs_os_timetable', JSON.stringify(sanitizedFetched));
           } catch (e) {}
         }
       } catch (err) {
