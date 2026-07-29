@@ -23,9 +23,10 @@ const NON_TEACHER_PATTERNS = [
   /^hindi\s*[a-d]?$/i,
   /^hindi\s.*/i,
   /^(aecc|vac|sec|ge|evs|sports|physical ed|value addition)$/i,
-  /^(free|unsupervised|break|infinity hour|merged|-)$/i,
-  /^ee2$/i,
-  /^social ent/i
+  /^(free|unsupervised|break|infinity hour|merged|-|\)|\()$/i,
+  /^ee[1-2]?$/i,
+  /^social ent/i,
+  /^\W*$/
 ];
 
 const isNonTeacher = (name) => {
@@ -70,18 +71,24 @@ const FACULTY_DISPLAY_MAP = {
   'nks': 'Dr. Nidhi Kesari',
   'mr': 'Ms. Mohini Rajput',
   'tm': 'Mr. Tushar Marwaha',
-  'paridhi': 'Ms. Paridhi'
+  'paridhi': 'Ms. Paridhi',
+  'sp': 'Dr. Shalini Prakash',
+  'kb': 'Dr. Kumar Bijoy',
+  'nk': 'Dr. Nidhi Kesari',
+  'rk': 'Dr. Ramesh Kumar'
 };
 
 // Clean display names (remove group suffixes, (P), (Tute), room numbers, and expand raw initials)
 const cleanDisplayName = (name) => {
   if (!name) return '';
   let cleaned = name
-    .replace(/\(((?:G1\s*\+\s*G2)|G1|G2|G\?|P|Practical|Tute|Tutorial|\d{3}(?:\/\d{3})*)\)/gi, '')
+    .replace(/\(((?:G1\s*\+\s*G2)|G1|G2|G\?|P|Practical|Tute|Tutorial|Merged[^\)]*|\d{3}(?:\/\d{3})*)\)/gi, '')
+    .replace(/merged\s+with\s+[^\)]*/gi, '')
     .replace(/\b(g\d+)\b/gi, '')
     .replace(/g\d+:\s*/gi, '')
     .replace(/\b(P|Practical|Tute|Tutorial|Lab)\b/gi, '')
     .replace(/\b[2-7]\d{2}\b/g, '')
+    .replace(/^[()\s\/-]+|[()\s\/-]+$/g, '')
     .replace(/[\s-]+/g, ' ')
     .trim();
 
@@ -205,7 +212,7 @@ export default function FindMyProfessorPage({ onBack }) {
     if (sorted.length > 0 && !selectedProf) {
       setSelectedProf(sorted[0]);
     }
-  }, []);
+  }, [timetablesData]);
 
   // Filtered list of professors for sidebar
   const filteredProfs = professorsList.filter(p => 
