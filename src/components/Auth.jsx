@@ -296,6 +296,9 @@ export default function Auth({ forceMode }) {
                     </svg>
                     <span>{mode === 'signup' ? 'Sign up with College Google' : 'Continue with College Google'}</span>
                   </button>
+                  <div className="auth-divider">
+                    <span>or</span>
+                  </div>
                 </>
               )}
 
