@@ -6,7 +6,6 @@ import { useAuth } from '../context/AuthContext';
 import { useConfig } from '../context/ConfigContext';
 import { isAdminEmail } from '../lib/admin';
 import { subscribeToPresence, fetchAnalyticsData, FEATURE_NAMES } from '../lib/analytics';
-import { sanitizeWeekSchedule } from '../utils/sanitizeSchedule';
 import DateTimePicker from './DateTimePicker';
 import './AdminConsolePage.css';
 
@@ -933,14 +932,14 @@ function AdminConsoleContent({ onBack }) {
                   if (nonEmpty.length > 0) blockText += `R${idx}: ${nonEmpty.join(' | ')}\n`;
                 });
 
-                const systemPrompt = `You are a timetable data extractor for SSCBS college (Shaheed Sukhdev College of Business Studies, Delhi University). You will receive raw cell data from an Excel timetable block.
+                const systemPrompt = `You are a precise timetable data extractor for Shaheed Sukhdev College of Business Studies (SSCBS, Delhi University). You will receive raw cell data from an Excel timetable block.
 
-EXTRACT and return a JSON object with EXACTLY this structure:
+Extract and return a raw JSON object with EXACTLY this structure:
 {
   "course": "BMS" or "BBA FIA" or "Bsc Comp Sci",
   "semester": "1" or "3" or "5" or "7" (string),
   "section": "A" or "B" or "C" or "D" (string),
-  "room": "Room 703" (default room from header),
+  "room": "Room 703",
   "weekSchedule": {
     "Monday": [
       {"period": 1, "subject": "Subject Name", "teacher": "Dr. Full Name", "room": "Room 703"},
@@ -959,22 +958,31 @@ EXTRACT and return a JSON object with EXACTLY this structure:
   }
 }
 
-RULES:
-- The timetable grid has days Mon-Fri as rows and periods I-VII as columns (with Infinity Hour break between period III and IV)
-- Each day MUST have exactly 8 entries: periods 1,2,3 then break (period 0), then periods 4,5,6,7
-- Below the timetable grid is a LEGEND TABLE mapping faculty codes (like "TA","MV","SJ","AyG","DD") to full paper names and full faculty names (Dr./Mr./Ms.)
-- Use the legend to resolve codes in the grid to full subject names and full teacher names
-- CRITICAL FACULTY VS ELECTIVE RULES:
-  * NEVER place elective subject names (such as "Hindi A", "Hindi B", "Hindi C", "Hindi D", "AECC", "VAC", "SEC", "GE") into the "teacher" field. Place them in "subject". If no professor is specified for an elective slot, set "teacher" to "-"
-  * Strip trailing "Lab" or "(P)" from teacher names (e.g. if a cell says "AyG Lab", resolve teacher to "Ayushi Goel" and set subject to practical)
-- CRITICAL SPLIT GROUP (G1 / G2) & ROOM EXTRACTION RULES:
-  * When a class cell is split between Group 1 (G1) and Group 2 (G2), PRESERVE group markers! Format subjects as "G1: Subject1 | G2: Subject2", teachers as "Teacher1 (G1) / Teacher2 (G2)", and rooms as "G1: Room 607 / G2: Room 226".
-  * If a 3-digit room number (e.g. 648, 607, 703, 361, 534, 523, 651, 326) appears inside a teacher or subject cell (e.g. "Komal 648", "MV (361/326)"), EXTRACT it into the "room" field as "Room 648" (or "Room 361 / Room 326") and clean it out of the teacher/subject text.
-- If a cell is empty or says "Free" or "Unsupervised", set subject to "Free" and teacher to "-"
-- If a cell contains "(P)" it means Practical. Keep the subject name and append "(Practical)", use the same default room as the class's allotted room
-- BBA(FIA) should be normalized to "BBA FIA"
-- B.Sc.(H) Computer Science should be normalized to "Bsc Comp Sci"
-- Return ONLY the raw JSON object, no markdown, no explanation`;
+STRICT EXTRACTION RULES:
+1. LEGEND TABLE MATCHING (MOST IMPORTANT):
+   - At the bottom of each timetable block, there is a paper/faculty legend table mapping short teacher codes (e.g. "SP", "AM", "RRS", "TA", "MV", "SJ", "AyG", "DD") to paper names and full faculty names.
+   - ALWAYS look up short codes in that block's legend table and return the full faculty name (e.g., "SP" -> "Dr. Shalini Prakash", "RRS" -> "Dr. Rishi Rajan Sahay", "AM" -> "Dr. Anuja Mathur" or "Dr. Amit Kumar" based on the legend).
+   - Never guess or confuse teacher names; strictly rely on the legend table provided in the raw block.
+
+2. CLEAN TEACHER NAMES:
+   - Do NOT attach "(Tute)", "(P)", "(Practical)", "(Tutorial)", "(G1)", "(G2)", or room numbers to the teacher's name.
+   - Example: If a cell says "SP (Tute)" or "SP (P)", teacher must be "Dr. Shalini Prakash". Put "(Tutorial)" or "(Practical)" in subject.
+
+3. ROOM NUMBER EXTRACTION:
+   - If a 3-digit number (e.g., 607, 648, 703, 361) or "(607/226)" appears inside the cell, place it cleanly in the "room" field as "Room 607" (or "Room 607 / Room 226"). Do not leave room numbers inside subject or teacher names.
+
+4. ELECTIVES VS FACULTY:
+   - Elective course names (e.g. "Hindi A", "Hindi B", "Hindi C", "Hindi D", "AECC", "VAC", "SEC", "GE") are subjects, NOT teachers. Put them in "subject". If no professor is specified for an elective slot, set "teacher" to "-".
+
+5. SPLIT GROUP (G1 / G2) CLASSES:
+   - If a cell has a split class for Group 1 and Group 2 (e.g., G1 taught by Dr. Anuja Mathur in 607, G2 taught by Dr. Rishi Rajan Sahay in 226):
+     * subject: "G1: Subject1 | G2: Subject2" (or "Subject Name" if same)
+     * teacher: "Dr. Anuja Mathur (G1) / Dr. Rishi Rajan Sahay (G2)"
+     * room: "G1: Room 607 / G2: Room 226"
+
+6. FORMAT & DAY STRUCTURE:
+   - Each day (Monday to Friday) MUST have 8 period objects: period 1, 2, 3, 0 (isBreak), 4, 5, 6, 7.
+   - Return ONLY the raw JSON object, no markdown code fences, no extra text.`;
 
                 const res = await fetch('https://router.huggingface.co/v1/chat/completions', {
                   method: 'POST',
@@ -1012,9 +1020,7 @@ RULES:
                       if (!timetables[course]) timetables[course] = {};
                       if (!timetables[course][sem]) timetables[course][sem] = {};
                       
-                      // Sanitize parsed AI schedule before storing
-                      const sanitizedSchedule = sanitizeWeekSchedule(aiResult.weekSchedule);
-                      timetables[course][sem][section] = sanitizedSchedule;
+                      timetables[course][sem][section] = aiResult.weekSchedule;
                       addLog(`  ✓ [AI Block ${processedBlocks}] ${course} Sem ${sem} Sec ${section}`, 'success');
                       parsedOk = true;
                     }
@@ -1038,7 +1044,7 @@ RULES:
                 const { course, sem, section, weekSchedule } = result;
                 if (!timetables[course]) timetables[course] = {};
                 if (!timetables[course][sem]) timetables[course][sem] = {};
-                timetables[course][sem][section] = sanitizeWeekSchedule(weekSchedule);
+                timetables[course][sem][section] = weekSchedule;
                 addLog(`  → [Fallback Block ${processedBlocks}] ${course} Sem ${sem} Sec ${section}`, 'info');
               }
             }

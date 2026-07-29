@@ -5,25 +5,6 @@ import { PERIODS, DAYS } from '../data/timetables';
 import { isAdminEmail, isTimeWarpEnabled } from '../lib/admin';
 import './FindMyProfessorPage.css';
 
-// SSCBS Faculty Initials Resolution Map
-const FACULTY_INITIALS_MAP = {
-  'ayg': 'Ayushi Goel',
-  'ag': 'Ayushi Goel',
-  'aa': 'Dr. Anamika Agarwal',
-  'dd': 'Dr. Deepali Dhaka',
-  'am': 'Dr. Amit Kumar',
-  'ta': 'Dr. Tarannum Ahmad',
-  'mv': 'Dr. Mona Verma',
-  'sj': 'Dr. Shikha Gupta',
-  'sk': 'Mr. Praveen SK',
-  'ps': 'Mr. Praveen SK',
-  'kr': 'Kavita Rastogi',
-  'os': 'Onkar Singh',
-  'ng': 'Neha Gupta',
-  'nb': 'Dr. Neha Bhatia',
-  'st': 'Sonika Thakral'
-};
-
 // Patterns matching subjects, electives, or labels mistakenly placed in teacher fields
 const NON_TEACHER_PATTERNS = [
   /^hindi\s*[a-d]?$/i,
@@ -40,13 +21,26 @@ const isNonTeacher = (name) => {
   return NON_TEACHER_PATTERNS.some(pattern => pattern.test(clean));
 };
 
+// Clean display names (remove group suffixes, (P), (Tute), room numbers, and extra spaces)
+const cleanDisplayName = (name) => {
+  if (!name) return '';
+  let cleaned = name
+    .replace(/\(((?:G1\s*\+\s*G2)|G1|G2|G\?|P|Practical|Tute|Tutorial|\d{3}(?:\/\d{3})*)\)/gi, '')
+    .replace(/\b(g\d+)\b/gi, '')
+    .replace(/g\d+:\s*/gi, '')
+    .replace(/\b(P|Practical|Tute|Tutorial|Lab)\b/gi, '')
+    .replace(/\b[2-7]\d{2}\b/g, '')
+    .replace(/[\s-]+/g, ' ')
+    .trim();
+
+  return cleaned;
+};
+
 // Normalize teacher name by removing titles, group markers, and converting to lowercase
 const normalizeName = (name) => {
   if (!name) return '';
-  return name
+  return cleanDisplayName(name)
     .toLowerCase()
-    .replace(/\(g\d+\)/g, '')
-    .replace(/g\d+:\s*/g, '')
     .replace(/^(dr|prof|mr|ms|mrs)\.?\s+/i, '')
     .replace(/[\s.-]+/g, ' ')
     .trim();
@@ -57,30 +51,12 @@ const splitTeachers = (teacherStr) => {
   if (!teacherStr || typeof teacherStr !== 'string') return [];
   return teacherStr
     .split(/\/|\band\b|,/gi)
-    .map(t => t.trim())
+    .map(t => cleanDisplayName(t))
     .filter(t => {
-      if (!t || t === '-') return false;
+      if (!t || t === '-' || t.length < 2) return false;
       if (isNonTeacher(t)) return false;
       return true;
     });
-};
-
-// Clean display names (remove group suffixes, strip Lab markers, expand initials)
-const cleanDisplayName = (name) => {
-  if (!name) return '';
-  let cleaned = name
-    .replace(/\(g\d+\)/gi, '')
-    .replace(/\b(g\d+)\b/gi, '')
-    .replace(/g\d+:\s*/gi, '')
-    .replace(/\blab\b/gi, '')
-    .replace(/[\s-]+/g, ' ')
-    .trim();
-
-  const lower = cleaned.toLowerCase();
-  if (FACULTY_INITIALS_MAP[lower]) {
-    return FACULTY_INITIALS_MAP[lower];
-  }
-  return cleaned;
 };
 
 // Parse time string to minutes since midnight
