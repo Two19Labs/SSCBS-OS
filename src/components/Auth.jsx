@@ -297,9 +297,6 @@ export default function Auth({ forceMode }) {
                     <span>{mode === 'signup' ? 'Sign up with College Google' : 'Continue with College Google'}</span>
                   </button>
                   <p className="google-hint">✨ Fastest way in — one tap, no password to remember.</p>
-                  <div className="auth-divider">
-                    <span>or use your email &amp; password</span>
-                  </div>
                 </>
               )}
 
