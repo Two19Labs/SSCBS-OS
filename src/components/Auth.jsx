@@ -296,7 +296,6 @@ export default function Auth({ forceMode }) {
                     </svg>
                     <span>{mode === 'signup' ? 'Sign up with College Google' : 'Continue with College Google'}</span>
                   </button>
-                  <p className="google-hint">✨ Fastest way in — one tap, no password to remember.</p>
                 </>
               )}
 
