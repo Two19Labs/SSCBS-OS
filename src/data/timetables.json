@@ -1272,13 +1272,13 @@
             "period": 5,
             "subject": "Hindi B",
             "teacher": "Dr. Garima Tripathi",
-            "room": "Hin B"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 6,
             "subject": "Hindi B",
             "teacher": "Dr. Garima Tripathi",
-            "room": "Hin B"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 7,
@@ -1376,13 +1376,13 @@
             "period": 5,
             "subject": "Hindi C (Merged with BMS 3A)",
             "teacher": "Dr. Soumya Guliyan",
-            "room": "Hin B"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 6,
             "subject": "Hindi C (Merged with BMS 3A)",
             "teacher": "Dr. Soumya Guliyan",
-            "room": "Hin B"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 7,
@@ -1755,13 +1755,13 @@
             "period": 1,
             "subject": "Hindi B",
             "teacher": "Ms. Komal",
-            "room": "Hin B"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 2,
             "subject": "Hindi B",
             "teacher": "Ms. Komal",
-            "room": "Hin B"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 3,
@@ -1902,7 +1902,7 @@
             "period": 7,
             "subject": "Hindi B",
             "teacher": "Dr. Garima TripathI",
-            "room": "Hin B"
+            "room": "Room 607 / Room 644 / Room 648"
           }
         ],
         "Wednesday": [
@@ -1992,7 +1992,7 @@
             "period": 5,
             "subject": "Hindi B",
             "teacher": "Dr. Garima TripathI",
-            "room": "Hin B"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 6,
@@ -3899,13 +3899,13 @@
             "period": 4,
             "subject": "Hindi C (Merged  BMS 3A)",
             "teacher": "Dr. Soumya Guliyan",
-            "room": "Hin B"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 5,
             "subject": "Hindi C (Merged  BMS 3A)",
             "teacher": "Dr. Soumya Guliyan",
-            "room": "Hin B"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 6,
@@ -4156,13 +4156,13 @@
             "period": 4,
             "subject": "Hindi D (Merged BMS 3D)",
             "teacher": "Mr. Komal",
-            "room": "Hin B"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 5,
             "subject": "Hindi D (Merged BMS 3D)",
             "teacher": "Mr. Komal",
-            "room": "Hin B"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 6,
@@ -5520,7 +5520,7 @@
             "period": 7,
             "subject": "AECC",
             "teacher": "Soumya Guliyan",
-            "room": "Hindi B"
+            "room": "Room 607 / Room 644 / Room 648"
           }
         ],
         "Wednesday": [
@@ -5559,19 +5559,19 @@
             "period": 5,
             "subject": "AECC",
             "teacher": "Soumya Guliyan",
-            "room": "Hindi B"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 6,
             "subject": "HINDI A | Hindi C | Hindi D",
             "teacher": "HINDI A / Hindi C / Hindi D",
-            "room": "room 607 / room 644 / Room 648"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 7,
             "subject": "HINDI A | Hindi C | Hindi D",
             "teacher": "HINDI A / Hindi C / Hindi D",
-            "room": "room 607 / room 644 / Room 648"
+            "room": "Room 607 / Room 644 / Room 648"
           }
         ],
         "Thursday": [
