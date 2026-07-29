@@ -8,6 +8,11 @@
   box-sizing: border-box;
 }
 
+.global-footer-credit .house-credit {
+  display: block;
+  margin-top: 4px;
+}
+
 .global-footer-credit .heart-icon {
   color: #e53e3e;
   display: inline-block;

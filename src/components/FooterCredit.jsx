@@ -24,6 +24,17 @@ export default function FooterCredit({ className = '' }) {
           Manthan Kabra
         </a>
       </span>
+      <span className="house-credit">
+        From the House of{' '}
+        <a
+          href="https://two19labs.in/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="developer-name linkedin-link"
+        >
+          Two19 Labs
+        </a>
+      </span>
     </footer>
   );
 }
