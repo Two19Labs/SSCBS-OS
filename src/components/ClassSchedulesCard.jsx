@@ -136,9 +136,23 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
     return Math.max(0, Math.min(100, progress));
   };
 
-  // Helper: Resolve room "P" (practical) to the section's default room
+  const ROOM_DISPLAY_MAP = {
+    'Hin A / Hin C / Hin D': 'Room 607 / Room 644 / Room 648',
+    'room 607 / room 644 / Room 648': 'Room 607 / Room 644 / Room 648',
+    'Hin A': 'Room 607',
+    'Hin B': 'Room 644',
+    'Hin C': 'Room 644',
+    'Hin D': 'Room 648',
+    'Hindi B': 'Room 644'
+  };
+
+  // Helper: Resolve room "P" (practical) to the section's default room and map non-3-digit room names
   const resolveRoom = (room) => {
-    if (!room || room === 'P' || room === 'p') {
+    if (!room) return '';
+    const cleanR = room.trim();
+    if (ROOM_DISPLAY_MAP[cleanR]) return ROOM_DISPLAY_MAP[cleanR];
+
+    if (cleanR === 'P' || cleanR === 'p') {
       // Find the most common non-P room from the full timetable
       if (timetable) {
         const roomCounts = {};
@@ -146,16 +160,17 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
           const classes = timetable[day] || [];
           for (const cls of classes) {
             if (cls.room && cls.room !== 'P' && cls.room !== 'p' && cls.room !== '-' && !cls.isBreak) {
-              roomCounts[cls.room] = (roomCounts[cls.room] || 0) + 1;
+              const displayR = ROOM_DISPLAY_MAP[cls.room.trim()] || cls.room;
+              roomCounts[displayR] = (roomCounts[displayR] || 0) + 1;
             }
           }
         }
         const sorted = Object.entries(roomCounts).sort((a, b) => b[1] - a[1]);
         if (sorted.length > 0) return sorted[0][0];
       }
-      return room === 'P' || room === 'p' ? '' : room;
+      return '';
     }
-    return room;
+    return cleanR;
   };
 
   // Find active and next classes

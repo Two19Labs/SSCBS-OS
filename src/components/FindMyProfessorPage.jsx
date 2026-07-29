@@ -5,6 +5,16 @@ import { PERIODS, DAYS } from '../data/timetables';
 import { isAdminEmail, isTimeWarpEnabled } from '../lib/admin';
 import './FindMyProfessorPage.css';
 
+const ROOM_DISPLAY_MAP = {
+  'Hin A / Hin C / Hin D': 'Room 607 / Room 644 / Room 648',
+  'room 607 / room 644 / Room 648': 'Room 607 / Room 644 / Room 648',
+  'Hin A': 'Room 607',
+  'Hin B': 'Room 644',
+  'Hin C': 'Room 644',
+  'Hin D': 'Room 648',
+  'Hindi B': 'Room 644'
+};
+
 // Patterns matching subjects, electives, or labels mistakenly placed in teacher fields
 const NON_TEACHER_PATTERNS = [
   /^hindi\s*[a-d]?$/i,
@@ -177,7 +187,7 @@ export default function FindMyProfessorPage({ onBack }) {
                   day,
                   period: c.period,
                   subject: c.subject,
-                  room: c.room,
+                  room: ROOM_DISPLAY_MAP[(c.room || '').trim()] || c.room,
                   isBreak: c.isBreak
                 });
               }
