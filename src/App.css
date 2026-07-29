@@ -48,7 +48,7 @@
   top: 0;
   left: 0;
   bottom: 0;
-  width: 250px;
+  width: var(--sidebar-w);
   background: var(--surface);
   border-right: 1px solid var(--border);
   display: none;
@@ -270,11 +270,19 @@
 
 /* ── Main content ── */
 .app-main {
-  padding: 16px 14px calc(88px + env(safe-area-inset-bottom));
-  max-width: 1160px;
+  padding: 16px var(--page-pad-x) calc(88px + env(safe-area-inset-bottom));
+  max-width: var(--content-max);
   margin: 0 auto;
   width: 100%;
   flex: 1;
+}
+
+/* Tablet / large phone (still tab-bar UI): roomier gutters */
+@media (min-width: 641px) and (max-width: 899px) {
+  .app-main {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
 }
 
 .page-heading-desktop {
@@ -413,8 +421,8 @@
 .micro-label.gold { color: var(--gold-text); }
 .micro-label.maroon { color: var(--accent); }
 
-/* ═══ Desktop ≥ 1024px ═══ */
-@media (min-width: 1024px) {
+/* ═══ Laptop / desktop ≥ 900px — sidebar UI ═══ */
+@media (min-width: 900px) {
   .app-sidebar {
     display: flex;
   }
@@ -425,21 +433,21 @@
   }
 
   .app-main {
-    margin-left: 250px;
+    margin-left: var(--sidebar-w);
     width: auto;
     max-width: none;
     padding: 28px 32px 40px;
   }
 
   .app-main > * {
-    max-width: 1160px;
+    max-width: var(--content-max);
     margin-left: auto;
     margin-right: auto;
   }
 
   .page-heading-desktop {
     display: block;
-    max-width: 1160px;
+    max-width: var(--content-max);
     margin: 0 auto 18px;
   }
 

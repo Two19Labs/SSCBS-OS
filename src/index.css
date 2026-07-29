@@ -64,6 +64,18 @@
   /* ── Special Brand Tokens ── */
   --linkedin-blue: #0a66c2;
 
+  /* ── Layout system ──────────────────────────────────────────
+     One shared set of widths + breakpoints for the whole OS so
+     every page reflows at the same points and lines up identically.
+     Breakpoint convention (media queries can't read CSS vars):
+       phone     ≤ 640px   → bottom tab-bar UI
+       tablet    641–899px → bottom tab-bar UI, wider gutters
+       laptop/desktop ≥ 900px → sidebar UI
+     ─────────────────────────────────────────────────────────── */
+  --content-max: 1160px;   /* shared max content width */
+  --sidebar-w: 250px;      /* desktop sidebar width */
+  --page-pad-x: 16px;      /* horizontal page gutter (phone) */
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
