@@ -121,7 +121,7 @@ function parseWorkbook(filePath) {
           else if (/BMS/i.test(mStr)) course = 'BMS';
 
           // Semester
-          const semMatch = mStr.match(/(\d)(?:st|nd|rd|th)?\s*Sem/i) || mStr.match(/Sem(?:ester)?\s*(\d)/i);
+          const semMatch = mStr.match(/Sem\s*:?\s*(\d+)(?:st|nd|rd|th)?/i) || mStr.match(/(\d+)(?:st|nd|rd|th)?\s*Sem/i);
           if (semMatch) sem = semMatch[1];
 
           // Section
