@@ -802,11 +802,9 @@ export default function TeamFinderPage({ onBack }) {
                     href={post.competition_link.startsWith('http') ? post.competition_link : `https://${post.competition_link}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="comp-link-pill"
-                    title="Open official competition page"
+                    className="comp-link-blue"
                   >
-                    <FileIcon size={12} />
-                    <span>Official Portal ↗</span>
+                    Click to visit ↗
                   </a>
                 )}
 

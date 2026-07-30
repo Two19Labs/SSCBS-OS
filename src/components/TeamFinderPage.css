@@ -334,29 +334,19 @@
   letter-spacing: -0.2px;
 }
 
-.comp-link-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: var(--accent-tint, rgba(113, 34, 44, 0.08));
-  color: var(--accent);
-  border: 1px solid var(--border);
-  font-size: 0.725rem;
+.comp-link-blue {
+  color: #2563eb;
+  font-size: 0.775rem;
   font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 6px;
-  text-decoration: none;
-  transition: all 0.15s ease;
-  width: fit-content;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  display: inline-block;
   margin-bottom: 8px;
+  transition: color 0.15s ease;
 }
 
-.comp-link-pill:hover {
-  background: var(--accent);
-  color: #ffffff;
-  border-color: var(--accent);
-  transform: translateY(-1px);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+.comp-link-blue:hover {
+  color: #1d4ed8;
 }
 
 .post-title {
