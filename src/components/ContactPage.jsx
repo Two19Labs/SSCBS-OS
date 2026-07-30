@@ -133,11 +133,11 @@ export default function ContactPage({ onBack }) {
             <div className="info-icon"><MailIcon size={20} /></div>
             <div>
               <h4>House of Two19 Labs</h4>
-              <p className="info-val">support@two19labs.in</p>
+              <p className="info-val">two19labs@gmail.com</p>
             </div>
           </div>
           <a
-            href="mailto:support@two19labs.in"
+            href="mailto:two19labs@gmail.com"
             target="_blank"
             rel="noopener noreferrer"
             className="btn-copy-num link-btn"
