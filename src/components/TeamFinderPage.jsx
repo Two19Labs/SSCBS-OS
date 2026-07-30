@@ -51,10 +51,11 @@ export default function TeamFinderPage({ onBack }) {
   
   // Modals state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [editingPost, setEditingPost] = useState(null); // When editing a post
   const [selectedPostForApply, setSelectedPostForApply] = useState(null);
   const [selectedPostForReview, setSelectedPostForReview] = useState(null);
 
-  // Create Form State
+  // Create/Edit Form State
   const [formData, setFormData] = useState({
     competition_name: '',
     organizer: '',
@@ -155,6 +156,50 @@ export default function TeamFinderPage({ onBack }) {
     }
   }, []);
 
+  const handleOpenCreateModal = () => {
+    setEditingPost(null);
+    setFormData({
+      competition_name: '',
+      organizer: '',
+      competition_link: '',
+      phone_number: '',
+      title: '',
+      description: '',
+      skills_have: [],
+      skills_looking_for: [],
+      custom_skill_have: '',
+      custom_skill_looking: '',
+      total_members: 4,
+      spots_left: 1,
+      course: user?.user_metadata?.course || 'BMS',
+      year: user?.user_metadata?.semester ? `Sem ${user.user_metadata.semester}` : '2nd Year',
+    });
+    setFormError('');
+    setIsCreateModalOpen(true);
+  };
+
+  const handleOpenEditModal = (post) => {
+    setEditingPost(post);
+    setFormData({
+      competition_name: post.competition_name || '',
+      organizer: post.organizer || '',
+      competition_link: post.competition_link || '',
+      phone_number: post.phone_number || '',
+      title: post.title || '',
+      description: post.description || '',
+      skills_have: post.skills_have ? [...post.skills_have] : [],
+      skills_looking_for: post.skills_looking_for ? [...post.skills_looking_for] : [],
+      custom_skill_have: '',
+      custom_skill_looking: '',
+      total_members: post.total_members || 4,
+      spots_left: post.spots_left || 1,
+      course: post.course || 'BMS',
+      year: post.year || '2nd Year',
+    });
+    setFormError('');
+    setIsCreateModalOpen(true);
+  };
+
   const handleToggleSkillHave = (skill) => {
     setFormData((prev) => {
       const exists = prev.skills_have.includes(skill);
@@ -245,6 +290,43 @@ export default function TeamFinderPage({ onBack }) {
     const totalMem = parseInt(formData.total_members, 10) || 4;
     const openSpots = Math.min(totalMem, parseInt(formData.spots_left, 10) || 1);
 
+    if (editingPost) {
+      // ── EDIT EXISTING POST ──
+      const updatePayload = {
+        competition_name: formData.competition_name.trim(),
+        organizer: formData.organizer.trim() || 'Corporate / Society',
+        competition_link: formData.competition_link.trim(),
+        phone_number: formData.phone_number.trim(),
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        skills_have: formData.skills_have,
+        skills_looking_for: formData.skills_looking_for,
+        total_members: totalMem,
+        spots_left: openSpots,
+        course: formData.course,
+        year: formData.year,
+        is_open: openSpots > 0,
+      };
+
+      try {
+        if (hasValidCredentials) {
+          await supabase.from('squad_posts').update(updatePayload).eq('id', editingPost.id);
+        }
+      } catch (err) {
+        console.warn('Supabase update post error:', err);
+      }
+
+      const updated = posts.map((p) => (p.id === editingPost.id ? { ...p, ...updatePayload } : p));
+      setPosts(updated);
+      localStorage.setItem('sscbs_squad_posts', JSON.stringify(updated));
+
+      setSubmitting(false);
+      setIsCreateModalOpen(false);
+      setEditingPost(null);
+      return;
+    }
+
+    // ── CREATE NEW POST ──
     const postPayload = {
       user_id: user?.id,
       competition_name: formData.competition_name.trim(),
@@ -267,7 +349,6 @@ export default function TeamFinderPage({ onBack }) {
 
     try {
       if (hasValidCredentials) {
-        // 1. Try full insert
         let res = await supabase
           .from('squad_posts')
           .insert([postPayload])
@@ -275,7 +356,6 @@ export default function TeamFinderPage({ onBack }) {
 
         if (res.error) {
           console.warn('Full payload insert warning, trying core payload:', res.error);
-          // 2. Fallback insert with core columns
           const corePayload = {
             user_id: user?.id,
             competition_name: postPayload.competition_name,
@@ -320,23 +400,6 @@ export default function TeamFinderPage({ onBack }) {
 
     setSubmitting(false);
     setIsCreateModalOpen(false);
-    // Reset form
-    setFormData({
-      competition_name: '',
-      organizer: '',
-      competition_link: '',
-      phone_number: '',
-      title: '',
-      description: '',
-      skills_have: [],
-      skills_looking_for: [],
-      custom_skill_have: '',
-      custom_skill_looking: '',
-      total_members: 4,
-      spots_left: 1,
-      course: user?.user_metadata?.course || 'BMS',
-      year: user?.user_metadata?.semester ? `Sem ${user.user_metadata.semester}` : '2nd Year',
-    });
   };
 
   const handleDeletePost = async (id) => {
@@ -460,12 +523,10 @@ export default function TeamFinderPage({ onBack }) {
     const currentOpen = Math.max(0, (post.spots_left || 1) - 1);
     const isNowOpen = currentOpen > 0;
 
-    // Update application status to 'accepted'
     const updatedApps = applications.map((a) => (a.id === app.id ? { ...a, status: 'accepted' } : a));
     setApplications(updatedApps);
     localStorage.setItem('sscbs_squad_apps', JSON.stringify(updatedApps));
 
-    // Update post open spots count & filled status
     const updatedPosts = posts.map((p) =>
       p.id === post.id ? { ...p, spots_left: currentOpen, is_open: isNowOpen } : p
     );
@@ -504,7 +565,6 @@ export default function TeamFinderPage({ onBack }) {
 
     const currentOpen = (post.spots_left || 0) + 1;
 
-    // Reopen spot
     const updatedApps = applications.map((a) => (a.id === app.id ? { ...a, status: 'declined' } : a));
     setApplications(updatedApps);
     localStorage.setItem('sscbs_squad_apps', JSON.stringify(updatedApps));
@@ -626,7 +686,7 @@ export default function TeamFinderPage({ onBack }) {
           </div>
         </div>
 
-        <button className="btn-tf-primary" onClick={() => setIsCreateModalOpen(true)}>
+        <button className="btn-tf-primary" onClick={handleOpenCreateModal}>
           <UsersIcon size={16} />
           <span>Post Team Opening</span>
         </button>
@@ -712,7 +772,7 @@ export default function TeamFinderPage({ onBack }) {
               ? 'No team listings match your current filters.'
               : 'There are currently no active team postings. Post a new opening to start building your squad!'}
           </p>
-          <button className="btn-tf-primary" onClick={() => setIsCreateModalOpen(true)}>
+          <button className="btn-tf-primary" onClick={handleOpenCreateModal}>
             Post Team Opening
           </button>
         </div>
@@ -742,9 +802,11 @@ export default function TeamFinderPage({ onBack }) {
                     href={post.competition_link.startsWith('http') ? post.competition_link : `https://${post.competition_link}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="comp-link"
+                    className="comp-link-pill"
+                    title="Open official competition page"
                   >
-                    <FileIcon size={13} /> Official Link ↗
+                    <FileIcon size={12} />
+                    <span>Official Portal ↗</span>
                   </a>
                 )}
 
@@ -821,6 +883,13 @@ export default function TeamFinderPage({ onBack }) {
                         </button>
                         <button
                           className="btn-card-subtle"
+                          onClick={() => handleOpenEditModal(post)}
+                          title="Edit Listing Details"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn-card-subtle"
                           onClick={() => handleToggleStatus(post.id, post.is_open)}
                         >
                           {post.is_open ? 'Close' : 'Reopen'}
@@ -867,14 +936,16 @@ export default function TeamFinderPage({ onBack }) {
         </div>
       )}
 
-      {/* ── CREATE POST MODAL ── */}
+      {/* ── CREATE / EDIT POST MODAL ── */}
       {isCreateModalOpen && (
         <div className="tf-modal-overlay" onClick={() => setIsCreateModalOpen(false)}>
           <div className="tf-modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="tf-modal-header">
               <div>
-                <h3>Post Team Opening</h3>
-                <p className="tf-modal-subtitle">Find complementary teammates for your competition squad</p>
+                <h3>{editingPost ? 'Edit Squad Listing' : 'Post Team Opening'}</h3>
+                <p className="tf-modal-subtitle">
+                  {editingPost ? 'Update competition details & team requirements' : 'Find complementary teammates for your competition squad'}
+                </p>
               </div>
               <button className="tf-close-btn" onClick={() => setIsCreateModalOpen(false)} aria-label="Close">
                 ×
@@ -1129,7 +1200,7 @@ export default function TeamFinderPage({ onBack }) {
                   Cancel
                 </button>
                 <button type="submit" className="btn-tf-primary" disabled={submitting}>
-                  {submitting ? 'Publishing…' : 'Publish Opening'}
+                  {submitting ? 'Saving…' : editingPost ? 'Update Opening' : 'Publish Opening'}
                 </button>
               </div>
             </form>
