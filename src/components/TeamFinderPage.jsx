@@ -51,8 +51,8 @@ export default function TeamFinderPage({ onBack }) {
   
   // Modals state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [selectedPostForApply, setSelectedPostForApply] = useState(null); // Post user wants to apply to
-  const [selectedPostForReview, setSelectedPostForReview] = useState(null); // Post host wants to review applicants for
+  const [selectedPostForApply, setSelectedPostForApply] = useState(null);
+  const [selectedPostForReview, setSelectedPostForReview] = useState(null);
 
   // Create Form State
   const [formData, setFormData] = useState({
@@ -543,7 +543,7 @@ export default function TeamFinderPage({ onBack }) {
 
   if (!isAdmin) {
     return (
-      <div className="team-finder-container compact">
+      <div className="team-finder-container">
         <div className="admin-restricted-card">
           <div className="restricted-badge">
             <ShieldIcon size={18} />
@@ -555,7 +555,7 @@ export default function TeamFinderPage({ onBack }) {
             <code>aditya.25015@sscbs.du.ac.in</code> & <code>manthan.25138@sscbs.du.ac.in</code>).
           </p>
           {onBack && (
-            <button className="btn-tf-primary compact" onClick={onBack} style={{ marginTop: '1rem' }}>
+            <button className="btn-tf-primary" onClick={onBack} style={{ marginTop: '1rem' }}>
               <BackIcon /> Return to Dashboard
             </button>
           )}
@@ -565,36 +565,36 @@ export default function TeamFinderPage({ onBack }) {
   }
 
   return (
-    <div className="team-finder-container compact">
+    <div className="team-finder-container">
       {/* ── Header ── */}
-      <header className="tf-header compact">
+      <header className="tf-header">
         <div className="tf-header-left">
           {onBack && (
-            <button className="tf-back-btn compact" onClick={onBack} title="Back">
+            <button className="tf-back-btn" onClick={onBack} title="Back">
               <BackIcon />
             </button>
           )}
           <div>
-            <div className="tf-badge compact">
+            <div className="tf-badge">
               <ShieldIcon size={12} />
               <span>ADMIN PREVIEW</span>
             </div>
-            <h1 className="tf-title compact">Team Finder & Competition Hub</h1>
-            <p className="tf-subtitle compact">
+            <h1 className="tf-title">Team Finder & Competition Hub</h1>
+            <p className="tf-subtitle">
               Connect with peers, match complementary skills, and form competition teams.
             </p>
           </div>
         </div>
 
-        <button className="btn-tf-primary compact" onClick={() => setIsCreateModalOpen(true)}>
+        <button className="btn-tf-primary" onClick={() => setIsCreateModalOpen(true)}>
           <UsersIcon size={16} />
           <span>Post Team Opening</span>
         </button>
       </header>
 
       {/* ── Filter Bar ── */}
-      <div className="tf-controls-bar compact">
-        <div className="tf-search-box compact">
+      <div className="tf-controls-bar">
+        <div className="tf-search-box">
           <SearchIcon size={15} />
           <input
             type="text"
@@ -609,27 +609,27 @@ export default function TeamFinderPage({ onBack }) {
           )}
         </div>
 
-        <div className="tf-filter-pills compact">
+        <div className="tf-filter-pills">
           <button
-            className={`tf-filter-pill compact ${filterType === 'all' ? 'active' : ''}`}
+            className={`tf-filter-pill ${filterType === 'all' ? 'active' : ''}`}
             onClick={() => setFilterType('all')}
           >
             All ({posts.length})
           </button>
           <button
-            className={`tf-filter-pill compact ${filterType === 'open' ? 'active' : ''}`}
+            className={`tf-filter-pill ${filterType === 'open' ? 'active' : ''}`}
             onClick={() => setFilterType('open')}
           >
             Open ({posts.filter((p) => p.is_open).length})
           </button>
           <button
-            className={`tf-filter-pill compact ${filterType === 'my_posts' ? 'active' : ''}`}
+            className={`tf-filter-pill ${filterType === 'my_posts' ? 'active' : ''}`}
             onClick={() => setFilterType('my_posts')}
           >
             Mine ({posts.filter((p) => p.created_by_email === user?.email || p.user_id === user?.id).length})
           </button>
           <button
-            className={`tf-filter-pill compact ${filterType === 'my_requests' ? 'active' : ''}`}
+            className={`tf-filter-pill ${filterType === 'my_requests' ? 'active' : ''}`}
             onClick={() => setFilterType('my_requests')}
           >
             My Requests ({mySentApplications.length})
@@ -638,10 +638,10 @@ export default function TeamFinderPage({ onBack }) {
       </div>
 
       {/* ── Skill Tag Quick Filter Strip ── */}
-      <div className="tf-skills-strip compact">
-        <span className="strip-label compact">Skill needed:</span>
+      <div className="tf-skills-strip">
+        <span className="strip-label">Skill needed:</span>
         <button
-          className={`skill-tag-filter compact ${selectedSkillFilter === '' ? 'selected' : ''}`}
+          className={`skill-tag-filter ${selectedSkillFilter === '' ? 'selected' : ''}`}
           onClick={() => setSelectedSkillFilter('')}
         >
           All Skills
@@ -649,7 +649,7 @@ export default function TeamFinderPage({ onBack }) {
         {DEFAULT_SKILLS.slice(0, 6).map((skill) => (
           <button
             key={skill}
-            className={`skill-tag-filter compact ${selectedSkillFilter === skill ? 'selected' : ''}`}
+            className={`skill-tag-filter ${selectedSkillFilter === skill ? 'selected' : ''}`}
             onClick={() => setSelectedSkillFilter(selectedSkillFilter === skill ? '' : skill)}
           >
             {skill}
@@ -659,12 +659,12 @@ export default function TeamFinderPage({ onBack }) {
 
       {/* ── Feed Grid ── */}
       {loading ? (
-        <div className="tf-loading compact">
+        <div className="tf-loading">
           <div className="notice-spinner"></div>
           <p>Loading squad postings…</p>
         </div>
       ) : filteredPosts.length === 0 ? (
-        <div className="tf-empty-state compact">
+        <div className="tf-empty-state">
           <TrophyIcon size={32} />
           <h3>No team postings found</h3>
           <p>
@@ -672,12 +672,12 @@ export default function TeamFinderPage({ onBack }) {
               ? 'No team listings match your current filters.'
               : 'There are currently no active team postings. Post a new opening to start building your squad!'}
           </p>
-          <button className="btn-tf-primary compact" onClick={() => setIsCreateModalOpen(true)}>
+          <button className="btn-tf-primary" onClick={() => setIsCreateModalOpen(true)}>
             Post Team Opening
           </button>
         </div>
       ) : (
-        <div className="tf-posts-grid compact">
+        <div className="tf-posts-grid">
           {filteredPosts.map((post) => {
             const isHost = post.created_by_email === user?.email || post.user_id === user?.id;
             const postApps = applications.filter((a) => a.post_id === post.id);
@@ -689,35 +689,35 @@ export default function TeamFinderPage({ onBack }) {
             );
 
             return (
-              <div key={post.id} className={`tf-post-card compact ${!post.is_open ? 'closed' : ''}`}>
-                <div className="card-top-bar compact">
-                  <span className="comp-organizer compact">{post.organizer || 'Corporate / Society'}</span>
+              <div key={post.id} className={`tf-post-card ${!post.is_open ? 'closed' : ''}`}>
+                <div className="card-top-bar">
+                  <span className="comp-organizer">{post.organizer || 'Corporate / Society'}</span>
                   {renderSquadDots(post.total_members || 4, post.spots_left || 1, post.is_open)}
                 </div>
 
-                <h2 className="comp-name compact">{post.competition_name}</h2>
+                <h2 className="comp-name">{post.competition_name}</h2>
 
                 {post.competition_link && (
                   <a
                     href={post.competition_link.startsWith('http') ? post.competition_link : `https://${post.competition_link}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="comp-link compact"
+                    className="comp-link"
                   >
                     <FileIcon size={13} /> Official Link ↗
                   </a>
                 )}
 
-                <h3 className="post-title compact">{post.title}</h3>
-                {post.description && <p className="post-desc compact">{post.description}</p>}
+                <h3 className="post-title">{post.title}</h3>
+                {post.description && <p className="post-desc">{post.description}</p>}
 
                 {/* Skills Present */}
                 {post.skills_have && post.skills_have.length > 0 && (
-                  <div className="skills-group compact">
-                    <span className="skills-group-label compact">Skills Present:</span>
-                    <div className="skills-pills compact">
+                  <div className="skills-group">
+                    <span className="skills-group-label">Skills Present:</span>
+                    <div className="skills-pills">
                       {post.skills_have.map((s, idx) => (
-                        <span key={idx} className="skill-pill present compact">
+                        <span key={idx} className="skill-pill present">
                           ✓ {s}
                         </span>
                       ))}
@@ -727,11 +727,11 @@ export default function TeamFinderPage({ onBack }) {
 
                 {/* Skills Needed */}
                 {post.skills_looking_for && post.skills_looking_for.length > 0 && (
-                  <div className="skills-group compact">
-                    <span className="skills-group-label compact">Looking For:</span>
-                    <div className="skills-pills compact">
+                  <div className="skills-group">
+                    <span className="skills-group-label">Looking For:</span>
+                    <div className="skills-pills">
                       {post.skills_looking_for.map((s, idx) => (
-                        <span key={idx} className="skill-pill needed compact">
+                        <span key={idx} className="skill-pill needed">
                           ⚡ {s}
                         </span>
                       ))}
@@ -753,25 +753,25 @@ export default function TeamFinderPage({ onBack }) {
                 )}
 
                 {/* Card Footer */}
-                <div className="card-footer compact">
-                  <div className="creator-info compact">
-                    <span className="creator-avatar compact">
+                <div className="card-footer">
+                  <div className="creator-info">
+                    <span className="creator-avatar">
                       {(post.created_by_name || post.created_by_email || 'A').charAt(0).toUpperCase()}
                     </span>
-                    <span className="creator-details compact">
-                      <span className="creator-name compact">{post.created_by_name || 'Student'}</span>
-                      <span className="creator-course compact">
+                    <span className="creator-details">
+                      <span className="creator-name">{post.created_by_name || 'Student'}</span>
+                      <span className="creator-course">
                         {post.course} • {post.year}
                       </span>
                     </span>
                   </div>
 
-                  <div className="card-actions compact">
+                  <div className="card-actions">
                     {/* Host Controls */}
                     {isHost ? (
                       <>
                         <button
-                          className="btn-review-apps compact"
+                          className="btn-review-apps"
                           onClick={() => setSelectedPostForReview(post)}
                           title="Review Applicant Requests"
                         >
@@ -780,13 +780,13 @@ export default function TeamFinderPage({ onBack }) {
                           {pendingAppsCount > 0 && <span className="apps-count-badge">{pendingAppsCount}</span>}
                         </button>
                         <button
-                          className="btn-card-subtle compact"
+                          className="btn-card-subtle"
                           onClick={() => handleToggleStatus(post.id, post.is_open)}
                         >
                           {post.is_open ? 'Close' : 'Reopen'}
                         </button>
                         <button
-                          className="btn-card-subtle danger compact"
+                          className="btn-card-subtle danger"
                           onClick={() => handleDeletePost(post.id)}
                         >
                           Delete
@@ -802,7 +802,7 @@ export default function TeamFinderPage({ onBack }) {
                             )}%20on%20SSCBS%20OS.`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="wa-connect-btn compact"
+                            className="wa-connect-btn"
                             title="Direct WhatsApp Connect"
                           >
                             <WhatsAppIcon size={14} /> WhatsApp
@@ -811,7 +811,7 @@ export default function TeamFinderPage({ onBack }) {
 
                         {post.is_open && !userApp && (
                           <button
-                            className="btn-tf-primary compact"
+                            className="btn-tf-primary"
                             onClick={() => handleOpenApplyModal(post)}
                           >
                             <MailIcon size={13} /> Request to Join
@@ -829,20 +829,23 @@ export default function TeamFinderPage({ onBack }) {
 
       {/* ── CREATE POST MODAL ── */}
       {isCreateModalOpen && (
-        <div className="modal-backdrop" onClick={() => setIsCreateModalOpen(false)}>
-          <div className="tf-modal compact" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header compact">
-              <h2>Post Team Opening</h2>
-              <button className="modal-close" onClick={() => setIsCreateModalOpen(false)}>
+        <div className="tf-modal-overlay" onClick={() => setIsCreateModalOpen(false)}>
+          <div className="tf-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="tf-modal-header">
+              <div>
+                <h3>Post Team Opening</h3>
+                <p className="tf-modal-subtitle">Find complementary teammates for your competition squad</p>
+              </div>
+              <button className="tf-close-btn" onClick={() => setIsCreateModalOpen(false)} aria-label="Close">
                 ×
               </button>
             </div>
 
-            <form onSubmit={handleSubmitPost} className="tf-form compact">
+            <form onSubmit={handleSubmitPost} className="tf-modal-form">
               {formError && <div className="form-error-banner">{formError}</div>}
 
-              <div className="form-row grid-2">
-                <div className="form-group">
+              <div className="tf-form-row">
+                <div className="tf-form-group tf-flex-1">
                   <label>Competition Name *</label>
                   <input
                     type="text"
@@ -853,25 +856,19 @@ export default function TeamFinderPage({ onBack }) {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="tf-form-group tf-flex-1">
                   <label>Organizing Institute / Corp</label>
                   <input
                     type="text"
                     placeholder="e.g. EY India, Bain, IIM Ahmedabad"
                     value={formData.organizer}
                     onChange={(e) => setFormData({ ...formData, organizer: e.target.value })}
-                    list="preset-organizers"
                   />
-                  <datalist id="preset-organizers">
-                    {PRESET_ORGANIZERS.map((org) => (
-                      <option key={org} value={org} />
-                    ))}
-                  </datalist>
                 </div>
               </div>
 
-              <div className="form-row grid-2">
-                <div className="form-group">
+              <div className="tf-form-row">
+                <div className="tf-form-group tf-flex-1">
                   <label>Competition Link</label>
                   <input
                     type="url"
@@ -881,7 +878,7 @@ export default function TeamFinderPage({ onBack }) {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="tf-form-group tf-flex-1">
                   <label>WhatsApp / Contact Phone *</label>
                   <input
                     type="tel"
@@ -893,7 +890,7 @@ export default function TeamFinderPage({ onBack }) {
                 </div>
               </div>
 
-              <div className="form-group">
+              <div className="tf-form-group">
                 <label>Listing Title *</label>
                 <input
                   type="text"
@@ -904,7 +901,7 @@ export default function TeamFinderPage({ onBack }) {
                 />
               </div>
 
-              <div className="form-group">
+              <div className="tf-form-group">
                 <label>Team Overview & Strategy</label>
                 <textarea
                   rows="2"
@@ -915,8 +912,8 @@ export default function TeamFinderPage({ onBack }) {
               </div>
 
               {/* Members & Spots Selector */}
-              <div className="form-row grid-2">
-                <div className="form-group">
+              <div className="tf-form-row">
+                <div className="tf-form-group tf-flex-1">
                   <label>Total Team Size</label>
                   <select
                     value={formData.total_members}
@@ -929,7 +926,7 @@ export default function TeamFinderPage({ onBack }) {
                   </select>
                 </div>
 
-                <div className="form-group">
+                <div className="tf-form-group tf-flex-1">
                   <label>Open Spots Left</label>
                   <select
                     value={formData.spots_left}
@@ -944,7 +941,7 @@ export default function TeamFinderPage({ onBack }) {
               </div>
 
               {/* Skills Present */}
-              <div className="form-group">
+              <div className="tf-form-group">
                 <label>Skills Present in Your Team</label>
 
                 {formData.skills_have.length > 0 && (
@@ -965,23 +962,23 @@ export default function TeamFinderPage({ onBack }) {
                   </div>
                 )}
 
-                <div className="skill-selector-box compact">
+                <div className="tf-skill-selector-box">
                   {DEFAULT_SKILLS.map((skill) => (
                     <button
                       type="button"
                       key={skill}
-                      className={`skill-select-pill compact ${formData.skills_have.includes(skill) ? 'active' : ''}`}
+                      className={`tf-skill-pill ${formData.skills_have.includes(skill) ? 'active' : ''}`}
                       onClick={() => handleToggleSkillHave(skill)}
                     >
-                      {formData.skills_have.includes(skill) && <CheckIcon size={11} />} {skill}
+                      {formData.skills_have.includes(skill) && <CheckIcon size={12} />} {skill}
                     </button>
                   ))}
                 </div>
 
-                <div className="custom-skill-input-row compact">
+                <div className="tf-custom-skill-row">
                   <input
                     type="text"
-                    placeholder="Type custom skill..."
+                    placeholder="Type custom skill present..."
                     value={formData.custom_skill_have}
                     onChange={(e) => setFormData({ ...formData, custom_skill_have: e.target.value })}
                     onKeyDown={(e) => {
@@ -991,8 +988,8 @@ export default function TeamFinderPage({ onBack }) {
                       }
                     }}
                   />
-                  <button type="button" onClick={handleAddCustomSkillHave} className="btn-add-skill compact">
-                    + Add Skill
+                  <button type="button" onClick={handleAddCustomSkillHave} className="tf-btn-add-skill">
+                    + Add
                   </button>
                 </div>
                 {skillHaveFeedback && (
@@ -1001,7 +998,7 @@ export default function TeamFinderPage({ onBack }) {
               </div>
 
               {/* Skills Needed */}
-              <div className="form-group">
+              <div className="tf-form-group">
                 <label>Skills Needed in Teammate(s)</label>
 
                 {formData.skills_looking_for.length > 0 && (
@@ -1022,20 +1019,20 @@ export default function TeamFinderPage({ onBack }) {
                   </div>
                 )}
 
-                <div className="skill-selector-box compact">
+                <div className="tf-skill-selector-box">
                   {DEFAULT_SKILLS.map((skill) => (
                     <button
                       type="button"
                       key={skill}
-                      className={`skill-select-pill compact needed ${formData.skills_looking_for.includes(skill) ? 'active' : ''}`}
+                      className={`tf-skill-pill needed ${formData.skills_looking_for.includes(skill) ? 'active' : ''}`}
                       onClick={() => handleToggleSkillLooking(skill)}
                     >
-                      {formData.skills_looking_for.includes(skill) && <CheckIcon size={11} />} {skill}
+                      {formData.skills_looking_for.includes(skill) && <CheckIcon size={12} />} {skill}
                     </button>
                   ))}
                 </div>
 
-                <div className="custom-skill-input-row compact">
+                <div className="tf-custom-skill-row">
                   <input
                     type="text"
                     placeholder="Type custom skill needed..."
@@ -1048,8 +1045,8 @@ export default function TeamFinderPage({ onBack }) {
                       }
                     }}
                   />
-                  <button type="button" onClick={handleAddCustomSkillLooking} className="btn-add-skill compact">
-                    + Add Skill
+                  <button type="button" onClick={handleAddCustomSkillLooking} className="tf-btn-add-skill">
+                    + Add
                   </button>
                 </div>
                 {skillLookingFeedback && (
@@ -1057,8 +1054,8 @@ export default function TeamFinderPage({ onBack }) {
                 )}
               </div>
 
-              <div className="form-row grid-2">
-                <div className="form-group">
+              <div className="tf-form-row">
+                <div className="tf-form-group tf-flex-1">
                   <label>Course</label>
                   <select
                     value={formData.course}
@@ -1071,7 +1068,7 @@ export default function TeamFinderPage({ onBack }) {
                   </select>
                 </div>
 
-                <div className="form-group">
+                <div className="tf-form-group tf-flex-1">
                   <label>Year / Semester</label>
                   <input
                     type="text"
@@ -1082,7 +1079,7 @@ export default function TeamFinderPage({ onBack }) {
                 </div>
               </div>
 
-              <div className="modal-footer compact">
+              <div className="tf-modal-footer">
                 <button
                   type="button"
                   className="btn-tf-secondary"
@@ -1091,7 +1088,7 @@ export default function TeamFinderPage({ onBack }) {
                 >
                   Cancel
                 </button>
-                <button type="submit" className="btn-tf-primary compact" disabled={submitting}>
+                <button type="submit" className="btn-tf-primary" disabled={submitting}>
                   {submitting ? 'Publishing…' : 'Publish Opening'}
                 </button>
               </div>
@@ -1102,23 +1099,23 @@ export default function TeamFinderPage({ onBack }) {
 
       {/* ── JOIN REQUEST MODAL (FOR APPLICANTS) ── */}
       {selectedPostForApply && (
-        <div className="modal-backdrop" onClick={() => setSelectedPostForApply(null)}>
-          <div className="tf-modal compact" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header compact">
+        <div className="tf-modal-overlay" onClick={() => setSelectedPostForApply(null)}>
+          <div className="tf-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="tf-modal-header">
               <div>
-                <h2>Request to Join Team</h2>
-                <p className="modal-sub-label">{selectedPostForApply.competition_name}</p>
+                <h3>Request to Join Team</h3>
+                <p className="tf-modal-subtitle">{selectedPostForApply.competition_name}</p>
               </div>
-              <button className="modal-close" onClick={() => setSelectedPostForApply(null)}>
+              <button className="tf-close-btn" onClick={() => setSelectedPostForApply(null)}>
                 ×
               </button>
             </div>
 
-            <form onSubmit={handleSubmitJoinRequest} className="tf-form compact">
+            <form onSubmit={handleSubmitJoinRequest} className="tf-modal-form">
               {applyError && <div className="form-error-banner">{applyError}</div>}
               {applySuccess && <div className="skill-feedback-msg success" style={{ marginBottom: '12px', fontSize: '0.85rem' }}>{applySuccess}</div>}
 
-              <div className="form-group">
+              <div className="tf-form-group">
                 <label>Pitch Note to Host *</label>
                 <textarea
                   rows="3"
@@ -1129,7 +1126,7 @@ export default function TeamFinderPage({ onBack }) {
                 />
               </div>
 
-              <div className="form-group">
+              <div className="tf-form-group">
                 <label>Your WhatsApp / Contact Phone (Optional)</label>
                 <input
                   type="tel"
@@ -1140,16 +1137,16 @@ export default function TeamFinderPage({ onBack }) {
               </div>
 
               {selectedPostForApply.skills_looking_for && selectedPostForApply.skills_looking_for.length > 0 && (
-                <div className="form-group">
+                <div className="tf-form-group">
                   <label>Highlight Skills You Bring to the Team</label>
-                  <div className="skill-selector-box compact">
+                  <div className="tf-skill-selector-box">
                     {selectedPostForApply.skills_looking_for.map((skill) => {
                       const isSelected = applyForm.highlighted_skills.includes(skill);
                       return (
                         <button
                           type="button"
                           key={skill}
-                          className={`skill-select-pill compact ${isSelected ? 'active' : ''}`}
+                          className={`tf-skill-pill ${isSelected ? 'active' : ''}`}
                           onClick={() => {
                             setApplyForm((prev) => ({
                               ...prev,
@@ -1159,7 +1156,7 @@ export default function TeamFinderPage({ onBack }) {
                             }));
                           }}
                         >
-                          {isSelected && <CheckIcon size={11} />} {skill}
+                          {isSelected && <CheckIcon size={12} />} {skill}
                         </button>
                       );
                     })}
@@ -1167,7 +1164,7 @@ export default function TeamFinderPage({ onBack }) {
                 </div>
               )}
 
-              <div className="modal-footer compact">
+              <div className="tf-modal-footer">
                 <button
                   type="button"
                   className="btn-tf-secondary"
@@ -1176,7 +1173,7 @@ export default function TeamFinderPage({ onBack }) {
                 >
                   Cancel
                 </button>
-                <button type="submit" className="btn-tf-primary compact" disabled={applySubmitting}>
+                <button type="submit" className="btn-tf-primary" disabled={applySubmitting}>
                   {applySubmitting ? 'Sending Request…' : 'Submit Join Request'}
                 </button>
               </div>
@@ -1187,16 +1184,16 @@ export default function TeamFinderPage({ onBack }) {
 
       {/* ── HOST REVIEW APPLICATIONS MODAL ── */}
       {selectedPostForReview && (
-        <div className="modal-backdrop" onClick={() => setSelectedPostForReview(null)}>
-          <div className="tf-modal compact review-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header compact">
+        <div className="tf-modal-overlay" onClick={() => setSelectedPostForReview(null)}>
+          <div className="tf-modal-card review-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="tf-modal-header">
               <div>
-                <h2>Review Team Applicants</h2>
-                <p className="modal-sub-label">
+                <h3>Review Team Applicants</h3>
+                <p className="tf-modal-subtitle">
                   {selectedPostForReview.competition_name} • {selectedPostForReview.spots_left} open spot(s)
                 </p>
               </div>
-              <button className="modal-close" onClick={() => setSelectedPostForReview(null)}>
+              <button className="tf-close-btn" onClick={() => setSelectedPostForReview(null)}>
                 ×
               </button>
             </div>
@@ -1207,7 +1204,7 @@ export default function TeamFinderPage({ onBack }) {
 
                 if (postApps.length === 0) {
                   return (
-                    <div className="tf-empty-state compact" style={{ padding: '30px 10px' }}>
+                    <div className="tf-empty-state" style={{ padding: '30px 10px' }}>
                       <MailIcon size={28} />
                       <p>No join requests received yet for this competition opening.</p>
                     </div>
@@ -1242,7 +1239,7 @@ export default function TeamFinderPage({ onBack }) {
                           <div className="app-skills-row">
                             <span className="app-skills-label">Skills Offered:</span>
                             {app.highlighted_skills.map((s, idx) => (
-                              <span key={idx} className="skill-pill present compact">
+                              <span key={idx} className="skill-pill present">
                                 {s}
                               </span>
                             ))}
@@ -1259,7 +1256,7 @@ export default function TeamFinderPage({ onBack }) {
                               )}.`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="wa-connect-btn compact"
+                              className="wa-connect-btn"
                             >
                               <WhatsAppIcon size={13} /> Chat on WhatsApp
                             </a>
@@ -1274,7 +1271,7 @@ export default function TeamFinderPage({ onBack }) {
                                 ✓ Accept & Fill Spot
                               </button>
                               <button
-                                className="btn-card-subtle danger compact"
+                                className="btn-card-subtle danger"
                                 onClick={() => handleDeclineApplicant(app)}
                               >
                                 Decline
@@ -1284,7 +1281,7 @@ export default function TeamFinderPage({ onBack }) {
 
                           {app.status === 'accepted' && (
                             <button
-                              className="btn-card-subtle danger compact"
+                              className="btn-card-subtle danger"
                               onClick={() => handleRemoveAcceptedMember(app)}
                             >
                               Remove Member (Reopen Spot)
@@ -1298,7 +1295,7 @@ export default function TeamFinderPage({ onBack }) {
               })()}
             </div>
 
-            <div className="modal-footer compact">
+            <div className="tf-modal-footer" style={{ padding: '16px 24px' }}>
               <button className="btn-tf-secondary" onClick={() => setSelectedPostForReview(null)}>
                 Done Reviewing
               </button>
