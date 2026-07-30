@@ -22,6 +22,7 @@ import {
   ShieldIcon,
   BackIcon,
   MessageIcon,
+  TrophyIcon,
 } from './components/icons';
 import './App.css';
 import InstallPwaPrompt from './components/InstallPwaPrompt';
@@ -34,6 +35,7 @@ const FindMyProfessorPage = lazy(() => import('./components/FindMyProfessorPage'
 const AdminConsolePage = lazy(() => import('./components/AdminConsolePage'));
 const GpaCalculatorModal = lazy(() => import('./components/GpaCalculatorModal'));
 const ContactPage = lazy(() => import('./components/ContactPage'));
+const TeamFinderPage = lazy(() => import('./components/TeamFinderPage'));
 
 const PageLoader = () => (
   <div className="loading-screen" style={{ minHeight: '300px' }}>
@@ -45,8 +47,9 @@ const PageLoader = () => (
   </div>
 );
 
-const TOOL_VIEWS = ['find-prof', 'waiver', 'admin'];
-const VALID_VIEWS = ['home', 'timetable', 'find-prof', 'waiver', 'tools', 'buzz', 'profile', 'admin', 'contact'];
+const TOOL_VIEWS = ['find-prof', 'waiver', 'admin', 'team-finder'];
+const VALID_VIEWS = ['home', 'timetable', 'find-prof', 'waiver', 'tools', 'buzz', 'profile', 'admin', 'contact', 'team-finder'];
+
 
 const getInitialView = () => {
   if (typeof window !== 'undefined') {
@@ -171,6 +174,7 @@ function App() {
     { id: 'home', label: 'Home', Icon: HomeIcon },
     { id: 'timetable', label: 'Timetable', Icon: CalendarIcon, locked: !featureFlags['timetable'] && !isAdmin },
     { id: 'find-prof', label: 'Find My Professor', Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
+    ...(isAdmin ? [{ id: 'team-finder', label: 'Team Finder (Beta)', Icon: TrophyIcon }] : []),
     { id: 'waiver', label: 'Waiver Tool', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
     { id: 'gpa', label: 'GPA Calculator', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
     { id: 'pyqs', label: 'PYQs & Resources', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
@@ -192,6 +196,7 @@ function App() {
     timetable: 'Timetable',
     tools: 'Tools',
     'find-prof': 'Find My Professor',
+    'team-finder': 'Team Finder (Admin Beta)',
     admin: 'Admin Console',
     buzz: 'Campus Buzz',
     profile: 'Profile',
@@ -206,6 +211,12 @@ function App() {
         return (
           <Suspense fallback={<PageLoader />}>
             <FindMyProfessorPage onBack={goBack} />
+          </Suspense>
+        );
+      case 'team-finder':
+        return (
+          <Suspense fallback={<PageLoader />}>
+            <TeamFinderPage onBack={goBack} />
           </Suspense>
         );
       case 'contact':
@@ -232,6 +243,7 @@ function App() {
         return (
           <div className="tools-hub">
             {[
+              ...(isAdmin ? [{ id: 'team-finder', micro: 'BETA', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post case comp openings', Icon: TrophyIcon, locked: false }] : []),
               { id: 'find-prof', micro: 'SEARCH', microClass: 'success', title: 'Find My Professor', desc: "Who's teaching where, right now", Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
               { id: 'waiver', micro: 'SOON', microClass: 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
               { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
@@ -257,6 +269,7 @@ function App() {
         return <HomeDashboard onNavigate={openTool} onOpenProfile={() => setView('profile')} />;
     }
   };
+
 
   return (
     <>

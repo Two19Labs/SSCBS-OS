@@ -243,3 +243,47 @@ CREATE POLICY "Enable write access for admins on holidays"
     TO authenticated 
     USING (auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'))
     WITH CHECK (auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'));
+
+-- 10. Create a table for Team Finder / Squad Posts (Admin Beta & Campus Rollout)
+CREATE TABLE IF NOT EXISTS public.squad_posts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    competition_name TEXT NOT NULL,
+    organizer TEXT,
+    competition_link TEXT,
+    phone_number TEXT NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    skills_have TEXT[] DEFAULT '{}'::TEXT[],
+    skills_looking_for TEXT[] DEFAULT '{}'::TEXT[],
+    spots_left INT DEFAULT 1,
+    course TEXT DEFAULT 'BMS',
+    year TEXT DEFAULT '2nd Year',
+    is_open BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS
+ALTER TABLE public.squad_posts ENABLE ROW LEVEL SECURITY;
+
+-- Allow authenticated users to read squad posts
+CREATE POLICY "Enable read access for authenticated users on squad_posts" 
+    ON public.squad_posts 
+    FOR SELECT 
+    TO authenticated 
+    USING (true);
+
+-- Allow authenticated users to create and update squad posts
+CREATE POLICY "Enable insert access for authenticated users on squad_posts" 
+    ON public.squad_posts 
+    FOR INSERT 
+    TO authenticated 
+    WITH CHECK (true);
+
+CREATE POLICY "Enable update/delete access for creator or admin on squad_posts" 
+    ON public.squad_posts 
+    FOR ALL 
+    TO authenticated 
+    USING (user_id = auth.uid() OR auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'));
+
