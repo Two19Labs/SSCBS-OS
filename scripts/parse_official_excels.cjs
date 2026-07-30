@@ -1,40 +1,38 @@
 const xlsx = require('c:/Users/adity/Downloads/SSCBS OS/node_modules/xlsx');
 const fs = require('fs');
 
-const FILE_1 = 'TT_wef _28.07.2026 .xlsx';
-const FILE_2 = 'TT_JULY 2026.xlsx';
+const FILE_1 = 'c:/Users/adity/Downloads/SSCBS OS/TT_wef _28.07.2026 .xlsx';
+const FILE_2 = 'c:/Users/adity/Downloads/SSCBS OS/TT_JULY 2026.xlsx';
 
-const timetables = {};
-
-// Default room fallback map if room row isn't parsed cleanly
 const DEFAULT_SECTION_ROOMS = {
-  'BMS_1_A': 'Room 703',
-  'BMS_1_B': 'Room 703',
-  'BMS_1_C': 'Room 703',
-  'BMS_1_D': 'Room 703',
-  'BMS_3_A': 'Room 703',
-  'BMS_3_B': 'Room 703',
-  'BMS_3_C': 'Room 703',
-  'BMS_3_D': 'Room 703',
-  'BMS_5_A': 'Room 703',
-  'BMS_5_B': 'Room 703',
-  'BMS_5_C': 'Room 703',
-  'BMS_5_D': 'Room 703',
-  'BMS_7_A': 'Room 523',
-  'BBA FIA_1_A': 'Room 503',
-  'BBA FIA_1_B': 'Room 503',
-  'BBA FIA_3_A': 'Room 503',
-  'BBA FIA_3_B': 'Room 503',
-  'BBA FIA_5_A': 'Room 503',
-  'BBA FIA_5_B': 'Room 507',
-  'BBA FIA_7_A': 'Room 533',
-  'Bsc Comp Sci_1_A': 'Room 403',
-  'Bsc Comp Sci_3_A': 'Room 407',
-  'Bsc Comp Sci_5_A': 'Room 457',
-  'Bsc Comp Sci_7_A': 'Room 435'
+  'BMS_Sem1_SecA': 'Room 703',
+  'BMS_Sem1_SecB': 'Room 703',
+  'BMS_Sem1_SecC': 'Room 703',
+  'BMS_Sem1_SecD': 'Room 703',
+  'BMS_Sem3_SecA': 'Room 703',
+  'BMS_Sem3_SecB': 'Room 703',
+  'BMS_Sem3_SecC': 'Room 703',
+  'BMS_Sem3_SecD': 'Room 703',
+  'BMS_Sem5_SecA': 'Room 703',
+  'BMS_Sem5_SecB': 'Room 703',
+  'BMS_Sem5_SecC': 'Room 703',
+  'BMS_Sem5_SecD': 'Room 703',
+  'BMS_Sem7_SecA': 'Room 523',
+  'BBA FIA_Sem1_SecA': 'Room 503',
+  'BBA FIA_Sem1_SecB': 'Room 503',
+  'BBA FIA_Sem3_SecA': 'Room 503',
+  'BBA FIA_Sem3_SecB': 'Room 503',
+  'BBA FIA_Sem5_SecA': 'Room 503',
+  'BBA FIA_Sem5_SecB': 'Room 507',
+  'BBA FIA_Sem7_SecA': 'Room 533',
+  'Bsc Comp Sci_Sem1_SecA': 'Room 403',
+  'Bsc Comp Sci_Sem3_SecA': 'Room 407',
+  'Bsc Comp Sci_Sem5_SecA': 'Room 457',
+  'Bsc Comp Sci_Sem7_SecA': 'Room 435'
 };
 
-const MASTER_FACULTY_MAP = {
+// Global Faculty Directory for clean display names
+const FACULTY_DIRECTORY = {
   'aa': 'Dr. Anamika Agarwal',
   'ag': 'Anamika Gupta',
   'ayg': 'Ayushi Gupta',
@@ -42,140 +40,166 @@ const MASTER_FACULTY_MAP = {
   'am': 'Dr. Amit Kumar',
   'ta': 'Dr. Tarannum Ahmad',
   'mv': 'Dr. Mona Verma',
-  'sj': 'Dr. Shikha Gupta',
+  'sj': 'Dr. Saumya Jain',
   'skg': 'Dr. Satish Kumar Garg',
   'sk': 'Mr. Praveen SK',
   'ps': 'Mr. Praveen SK',
   'kr': 'Kavita Rastogi',
   'krs': 'Dr. Kavita Rastogi',
-  'os': 'Onkar Singh',
-  'ng': 'Neha Gupta',
-  'nb': 'Dr. Neha Bhatia',
-  'st': 'Sonika Thakral',
-  'ma': 'Ms. Mohini Rajput',
+  'os': 'Dr. Onkar Singh',
+  'ng': 'Dr. Nidhi Kesari',
+  'nb': 'Dr. Neha Sharma',
+  'st': 'Dr. Sushmita',
+  'ma': 'Dr. Mehak Aggarwal',
   'mn': 'Dr. Mona Verma',
-  'azmi': 'Mohd. Azmi Khan',
-  'av': 'Abhimanyu',
-  'pa': 'Dr. Preeti Rajpal',
-  'komal': 'Mr. Komal',
+  'azmi': 'Dr. Azmi Ahmad',
+  'av': 'Dr. Amit Verma',
+  'pa': 'Priyanka',
+  'komal': 'Komal Sharma',
   'garima': 'Dr. Garima Tripathi',
   'vinayak': 'Vinayak',
-  'nisha': 'Nisha Rajput',
-  'vipin': 'Vipin Patel',
-  'ishan': 'Dr. Ishan Luthra',
-  'ankit': 'Mr. Ankit Bisht',
-  'seema': 'Dr. Seema',
+  'nisha': 'Ms. Nisha Rajput',
+  'vipin': 'Mr. Vipin Patel',
+  'ishan': 'Ishan Jain',
+  'ankit': 'Ankit',
+  'seema': 'Seema',
   'mt': 'Dr. Madhu Totla',
   'sv': 'Shikha Verma',
-  'nks': 'Dr. Nidhi Kesari',
-  'mr': 'Mr. Mohd. Rashid',
+  'nks': 'Dr. Narander Kumar Nigam',
+  'mr': 'Mr. Raj Kumar',
   'tm': 'Mr. Tushar Marwaha',
-  'paridhi': 'Ms. Paridhi',
+  'paridhi': 'Paridhi',
+  'shipra': 'Ms. Shipra Varshney',
+  'guncha': 'Dr. Guncha',
   'sp': 'Dr. Shalini Prakash',
   'kb': 'Dr. Kumar Bijoy',
-  'nk': 'Dr. Nidhi Kesari',
   'rk': 'Dr. Raj Kumar',
-  'raj': 'Dr. Raj Kumar',
   'rohan': 'Mr. Rohan Gulati',
-  'rg': 'Mr. Rohan Gulati',
-  'mehak': 'Dr. Mehak Aggarwal',
-  'sog': 'Dr. Soumya Guliyan',
-  'pg': 'Pushkar Gole',
-  'gs': 'Guncha Sharma',
-  'vp': 'Vipin Patel',
-  'nr': 'Nisha Rajput',
-  'ns': 'Nidhi Seth',
-  'gt': 'Dr. Garima Tripathi',
-  'sushmita': 'Dr. Sushmita',
+  'soumya': 'Dr. Soumya Guliyan',
+  'monu': 'Dr. Monu',
+  'ritika': 'Ritika',
+  'bhavya': 'Bhavya',
   'kajol': 'Kajol',
-  'mohini': 'Ms. Mohini Rajput'
+  'twinkle': 'Twinkle',
+  'vineet': 'Vineet',
+  'ankita': 'Ankita',
+  'ayesha': 'Ayesha',
+  'tatkarsh': 'Mr. Tatkarsh',
+  'monika': 'Ms. Monika',
+  'vp': 'Mr. Vipin Patel',
+  'nr': 'Ms. Nisha Rajput',
+  'gs': 'Gautam Sharma',
+  'rg': 'Mr. Rohan Gulati',
+  'sg': 'Dr. Saumya Jain'
 };
 
-function parseWorkbook(filePath) {
-  if (!fs.existsSync(filePath)) return;
-  const wb = xlsx.readFile(filePath);
+function buildMasterTimetable() {
+  const masterData = {};
 
-  wb.SheetNames.forEach(sheetName => {
-    const sheet = wb.Sheets[sheetName];
-    const rawData = xlsx.utils.sheet_to_json(sheet, { header: 1 });
+  const processFile = (filePath) => {
+    const wb = xlsx.readFile(filePath);
+    wb.SheetNames.forEach(sheetName => {
+      const sheet = wb.Sheets[sheetName];
+      const data = xlsx.utils.sheet_to_json(sheet, { header: 1 });
 
-    // Locate all block header starts (Row with "CLASS TIME TABLE" or "Academic Session")
-    for (let r = 0; r < rawData.length; r++) {
-      const row = rawData[r] || [];
-      const rowStr = row.map(c => String(c || '').trim()).join(' ');
+      // First pass: extract all blocks in this sheet
+      for (let r = 0; r < data.length; r++) {
+        const row = data[r] || [];
+        const rowStr = row.map(c => String(c || '').trim()).join(' ');
 
-      if (rowStr.includes('CLASS TIME TABLE') || rowStr.includes('Academic Session')) {
-        let course = 'BMS';
-        let sem = '1';
-        let sec = 'A';
-        let defaultRoom = '';
+        if (rowStr.includes('CLASS TIME TABLE') || rowStr.includes('Academic Session')) {
+          let course = 'BMS';
+          let sem = '1';
+          let sec = 'A';
+          let defaultRoom = '';
 
-        // Read metadata rows around r
-        for (let m = Math.max(0, r - 2); m <= r + 4; m++) {
-          const mRow = rawData[m] || [];
-          const mStr = mRow.map(c => String(c || '').trim()).join(' ');
+          for (let m = Math.max(0, r - 2); m <= r + 4; m++) {
+            const mRow = data[m] || [];
+            const mStr = mRow.map(c => String(c || '').trim()).join(' ');
 
-          // Course
-          if (/BBA\s*\(?FIA\)?/i.test(mStr)) course = 'BBA FIA';
-          else if (/B\.?Sc/i.test(mStr) || /COMPUTER SCIENCE/i.test(mStr)) course = 'Bsc Comp Sci';
-          else if (/BMS/i.test(mStr)) course = 'BMS';
+            if (/BBA\s*\(?FIA\)?/i.test(mStr)) course = 'BBA FIA';
+            else if (/B\.?Sc/i.test(mStr) || /COMPUTER SCIENCE/i.test(mStr)) course = 'Bsc Comp Sci';
+            else if (/BMS/i.test(mStr)) course = 'BMS';
 
-          // Semester
-          const semMatch = mStr.match(/Sem\s*:?\s*(\d+)(?:st|nd|rd|th)?/i) || mStr.match(/(\d+)(?:st|nd|rd|th)?\s*Sem/i);
-          if (semMatch) sem = semMatch[1];
+            const semMatch = mStr.match(/Sem\s*:?\s*(\d+)(?:st|nd|rd|th)?/i) || mStr.match(/(\d+)(?:st|nd|rd|th)?\s*Sem/i);
+            if (semMatch) sem = semMatch[1];
 
-          // Section
-          const secMatch = mStr.match(/Section\s*([A-D])/i);
-          if (secMatch) sec = secMatch[1];
+            const secMatch = mStr.match(/Section\s*([A-D])/i);
+            if (secMatch) sec = secMatch[1];
 
-          // Default Room
-          const roomNoMatch = mStr.match(/Room\s*No\.?\s*:?\s*(\d{3})/i) || mStr.match(/Room\s*:?\s*(\d{3})/i);
-          if (roomNoMatch) defaultRoom = `Room ${roomNoMatch[1]}`;
-        }
+            const roomNoMatch = mStr.match(/Room\s*No\.?\s*:?\s*(\d{3})/i) || mStr.match(/Room\s*:?\s*(\d{3})/i);
+            if (roomNoMatch) defaultRoom = `Room ${roomNoMatch[1]}`;
+          }
 
-        const sectionKey = `${course}_${sem}_${sec}`;
-        if (!defaultRoom) defaultRoom = DEFAULT_SECTION_ROOMS[sectionKey] || 'Room 703';
+          const sectionKey = `${course}_Sem${sem}_Sec${sec}`;
+          if (!defaultRoom) defaultRoom = DEFAULT_SECTION_ROOMS[`${course}_${sem}_${sec}`] || 'Room 703';
 
-        // Find Day rows (Mon, Tue, Wed, Thu, Fri)
-        const daysData = {};
+          // Extract section legend table
+          const legendMap = {}; // code/name -> { paperName, facName }
+          for (let l = r + 10; l < r + 45 && l < data.length; l++) {
+            const lRow = data[l] || [];
+            if (lRow.length >= 3) {
+              const str = lRow.map(c => String(c || '').trim()).join(' ');
+              if (str.includes('CLASS TIME TABLE')) break; // Next block start
 
-        for (let d = r + 1; d <= r + 20 && d < rawData.length; d++) {
-          const dRow = rawData[d] || [];
-          const firstCell = String(dRow[0] || '').trim();
-          const dayMatch = firstCell.match(/^(Mon|Tue|Wed|Thu|Fri|Sat)/i);
+              // Look for S. No. numeric rows
+              const c0 = String(lRow[0] || '').trim();
+              if (c0.match(/^\d+$/)) {
+                // S. No | Paper Type | Paper Name | [empty] | Faculty Name | Faculty Code
+                const nonEmpties = lRow.map(c => String(c || '').trim()).filter(Boolean);
+                if (nonEmpties.length >= 3) {
+                  let paperName = nonEmpties[2] || '';
+                  let facName = nonEmpties[3] || '';
+                  let facCode = nonEmpties[4] || facName;
 
-          if (dayMatch) {
-            const dayName = dayMatch[1].charAt(0).toUpperCase() + dayMatch[1].slice(1).toLowerCase();
-            const mappedDay = dayName === 'Mon' ? 'Monday' : dayName === 'Tue' ? 'Tuesday' : dayName === 'Wed' ? 'Wednesday' : dayName === 'Thu' ? 'Thursday' : dayName === 'Fri' ? 'Friday' : null;
+                  if (paperName && facName) {
+                    const cleanCode = facCode.replace(/\(.*\)/, '').trim().toLowerCase();
+                    const cleanName = facName.replace(/\(.*\)/, '').trim().toLowerCase();
+                    const info = { paperName, facName };
+                    if (cleanCode) legendMap[cleanCode] = info;
+                    if (cleanName) legendMap[cleanName] = info;
+                  }
+                }
+              }
+            }
+          }
 
-            if (mappedDay) {
+          // Parse grid days
+          const daysData = {};
+          const dayMap = { 'Mon': 'Monday', 'Tue': 'Tuesday', 'Wed': 'Wednesday', 'Thu': 'Thursday', 'Fri': 'Friday' };
+          const periodsMeta = [
+            { p: 1, s: '09:00', e: '10:00' },
+            { p: 2, s: '10:00', e: '11:00' },
+            { p: 3, s: '11:00', e: '12:00' },
+            { p: 4, s: '13:00', e: '14:00' },
+            { p: 5, s: '14:00', e: '15:00' },
+            { p: 6, s: '15:00', e: '16:00' },
+            { p: 7, s: '16:00', e: '17:00' }
+          ];
+
+          for (let d = r + 1; d <= r + 20 && d < data.length; d++) {
+            const dRow = data[d] || [];
+            const firstCell = String(dRow[0] || '').trim();
+            const dayMatch = firstCell.match(/^(Mon|Tue|Wed|Thu|Fri)/i);
+
+            if (dayMatch) {
+              const mappedDay = dayMap[dayMatch[1]];
+              const periodCells = dRow.slice(1);
               const periodsList = [];
-              const colMapping = [
-                { col: 1, p: 1 },
-                { col: 2, p: 2 },
-                { col: 3, p: 3 },
-                { col: 4, p: 0, isBreak: true },
-                { col: 5, p: 4 },
-                { col: 6, p: 5 },
-                { col: 7, p: 6 },
-                { col: 8, p: 7 }
-              ];
 
-              colMapping.forEach(m => {
-                if (m.isBreak) {
-                  periodsList.push({
-                    period: 0,
-                    isBreak: true,
-                    subject: 'Infinity Hour (Break)',
-                    teacher: '',
-                    room: ''
-                  });
-                  return;
+              // Skip Infinity Hour column (usually index 3)
+              let cellIdx = 0;
+              periodsMeta.forEach(m => {
+                let cellVal = String(periodCells[cellIdx] || '').trim();
+                cellIdx++;
+
+                // Skip Infinity Hour if matched
+                if (cellVal.toLowerCase().includes('infinity hour')) {
+                  cellVal = String(periodCells[cellIdx] || '').trim();
+                  cellIdx++;
                 }
 
-                const cellVal = String(dRow[m.col] || '').trim();
-
-                if (!cellVal || cellVal.toLowerCase() === 'free' || cellVal === '-') {
+                if (!cellVal || cellVal === '-' || cellVal.toLowerCase() === 'off' || cellVal.toLowerCase() === 'free') {
                   periodsList.push({
                     period: m.p,
                     subject: 'Free',
@@ -185,63 +209,83 @@ function parseWorkbook(filePath) {
                   return;
                 }
 
-                // Parse cell content
-                let subject = cellVal;
-                let teacher = cellVal;
-                let room = defaultRoom;
+                // Parse cell with '/' splits
+                const splits = cellVal.split('/').map(x => x.trim()).filter(Boolean);
+                const parsedSubjects = [];
+                const parsedTeachers = [];
+                const parsedRooms = [];
 
-                // Check for embedded 3-digit room numbers (e.g. 648, 607, 703, 361, 534, 523, 651, 326)
-                const roomMatch = cellVal.match(/\b([2-7]\d{2})(?:\/([2-7]\d{2}))?\b/);
-                if (roomMatch) {
-                  room = roomMatch[2] ? `Room ${roomMatch[1]} / Room ${roomMatch[2]}` : `Room ${roomMatch[1]}`;
-                }
+                splits.forEach(part => {
+                  // Extract 3-digit room or specific room like 237, 607, 644, 648, 534, 361, 523, 651, Lab 460
+                  let compRoom = defaultRoom;
+                  const roomMatch = part.match(/\b([2-7]\d{2})\b/) || part.match(/Lab\s*(\d{3})/i);
+                  if (roomMatch) {
+                    compRoom = `Room ${roomMatch[1]}`;
+                  }
 
-                // Check for unsupervised
-                if (cellVal.toLowerCase().includes('unsupervised')) {
-                  teacher = 'Unsupervised';
-                } else {
-                  // Resolve teacher code via Master Faculty Map
-                  const parts = cellVal.split(/\/|\band\b|,/gi).map(x => x.trim());
-                  const resolvedTeachers = parts.map(p => {
-                    const cleanP = p.replace(/\s*\([^)]*\)/g, '').trim().toLowerCase();
-                    const suffixMatch = p.match(/\s*(\([^)]*\))/);
-                    const suffix = suffixMatch ? suffixMatch[1] : '';
+                  // Extract group tag e.g. G1, G2
+                  const grpMatch = part.match(/\b(G[1234])\b/i);
+                  const grpPrefix = grpMatch ? `${grpMatch[1].toUpperCase()}: ` : '';
 
-                    if (MASTER_FACULTY_MAP[cleanP]) {
-                      return MASTER_FACULTY_MAP[cleanP] + (suffix ? ` ${suffix}` : '');
-                    }
-                    return p;
-                  });
-                  teacher = resolvedTeachers.join(' / ');
-                }
+                  // Unsupervised check
+                  if (part.toLowerCase().includes('unsupervised')) {
+                    parsedTeachers.push(`${grpPrefix}Unsupervised`);
+                    parsedSubjects.push(`${grpPrefix}Lab (Unsupervised)`);
+                    parsedRooms.push(compRoom);
+                    return;
+                  }
+
+                  // Match Legend Table for Paper Name & Teacher Name
+                  let cleanPartKey = part.replace(/\s*\([^)]*\)/g, '').replace(/\b(G[1234])\b/gi, '').trim().toLowerCase();
+                  let matchedInfo = legendMap[cleanPartKey];
+
+                  // Fallback match in Global Directory
+                  let facName = FACULTY_DIRECTORY[cleanPartKey] || part;
+                  let paperName = matchedInfo ? matchedInfo.paperName : (cleanPartKey.length > 5 ? part : 'Active Class');
+
+                  if (matchedInfo) {
+                    facName = matchedInfo.facName || facName;
+                    paperName = matchedInfo.paperName || paperName;
+                  }
+
+                  parsedSubjects.push(grpPrefix ? `${grpPrefix}${paperName}` : paperName);
+                  parsedTeachers.push(grpPrefix ? `${grpPrefix}${facName}` : facName);
+                  parsedRooms.push(compRoom);
+                });
+
+                // Deduplicate subjects and rooms for clean display
+                const finalSubject = [...new Set(parsedSubjects)].join(' / ');
+                const finalTeacher = [...new Set(parsedTeachers)].join(' / ');
+                const finalRoom = [...new Set(parsedRooms)].join(' / ');
 
                 periodsList.push({
                   period: m.p,
-                  subject: subject,
-                  teacher: teacher,
-                  room: room
+                  subject: finalSubject,
+                  teacher: finalTeacher,
+                  room: finalRoom
                 });
               });
 
               daysData[mappedDay] = periodsList;
             }
           }
-        }
 
-        if (Object.keys(daysData).length > 0) {
-          if (!timetables[course]) timetables[course] = {};
-          if (!timetables[course][sem]) timetables[course][sem] = {};
-          timetables[course][sem][sec] = daysData;
+          if (Object.keys(daysData).length > 0) {
+            if (!masterData[course]) masterData[course] = {};
+            if (!masterData[course][sem]) masterData[course][sem] = {};
+            masterData[course][sem][sec] = daysData;
+          }
         }
       }
-    }
-  });
+    });
+  };
+
+  processFile(FILE_1);
+  processFile(FILE_2);
+
+  return masterData;
 }
 
-// Execute parsing on both files
-parseWorkbook(FILE_1);
-parseWorkbook(FILE_2);
-
-// Save parsed data to src/data/timetables.json
-fs.writeFileSync('src/data/timetables.json', JSON.stringify(timetables, null, 2));
-console.log('Official Excel parsing complete! timetables.json updated successfully.');
+const master = buildMasterTimetable();
+fs.writeFileSync('src/data/timetables.json', JSON.stringify(master, null, 2));
+console.log('Build perfect timetable parser complete!');
