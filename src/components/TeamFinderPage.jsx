@@ -37,45 +37,6 @@ const PRESET_ORGANIZERS = [
   'L\'Oréal',
 ];
 
-const SAMPLE_POSTS = [
-  {
-    id: 'sample-1',
-    competition_name: 'EY NextGen Leader 2026',
-    organizer: 'EY India',
-    competition_link: 'https://www.ey.com/en_in/careers/nextgen-leader-challenge',
-    phone_number: '919876543210',
-    title: 'Building 4-member Squad for EY NextGen Challenge!',
-    description: 'We have 2 team members proficient in Market Strategy and Pitch Deck Presentation. Looking for 2 people with strong hands-on Financial Modeling & Valuation skills to crunch numbers.',
-    skills_have: ['Market Strategy & Research', 'Public Speaking & Pitching', 'Slide Deck & UI Design'],
-    skills_looking_for: ['Financial Modeling', 'Valuation & DCF'],
-    spots_left: 2,
-    course: 'BMS',
-    year: '2nd Year',
-    is_open: true,
-    created_by_email: 'aditya.25015@sscbs.du.ac.in',
-    created_by_name: 'Aditya (Admin)',
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: 'sample-2',
-    competition_name: 'Bain Capability Network (BCN) Case Comp',
-    organizer: 'Bain & Company',
-    competition_link: 'https://www.bain.com/',
-    phone_number: '919988776655',
-    title: 'Need 1 Deck Specialist & Analyst for Bain BCN Case Competition',
-    description: 'Aiming for top podium. We have financial analysis covered. Need 1 design/slide wizard who can structure McKinsey/Bain style slides cleanly.',
-    skills_have: ['Financial Modeling', 'Valuation & DCF', 'Market Strategy & Research'],
-    skills_looking_for: ['Slide Deck & UI Design', 'Python / Data Analytics'],
-    spots_left: 1,
-    course: 'BFIA',
-    year: '3rd Year',
-    is_open: true,
-    created_by_email: 'manthan.25138@sscbs.du.ac.in',
-    created_by_name: 'Manthan (Admin)',
-    created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
-  },
-];
-
 export default function TeamFinderPage({ onBack }) {
   const { user } = useAuth();
   const isAdmin = isAdminEmail(user?.email);
@@ -100,13 +61,13 @@ export default function TeamFinderPage({ onBack }) {
     custom_skill_have: '',
     custom_skill_looking: '',
     spots_left: 1,
-    course: 'BMS',
-    year: '2nd Year',
+    course: user?.user_metadata?.course || 'BMS',
+    year: user?.user_metadata?.semester ? `Sem ${user.user_metadata.semester}` : '2nd Year',
   });
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
 
-  // Load posts from Supabase or localStorage fallback
+  // Fetch real posts from Supabase (or localStorage sync if offline)
   const fetchPosts = async () => {
     setLoading(true);
     try {
@@ -116,25 +77,25 @@ export default function TeamFinderPage({ onBack }) {
           .select('*')
           .order('created_at', { ascending: false });
 
-        if (!error && data && data.length > 0) {
+        if (!error && data) {
           setPosts(data);
+          localStorage.setItem('sscbs_squad_posts', JSON.stringify(data));
           setLoading(false);
           return;
         }
       }
 
-      // LocalStorage / Sample fallback
+      // Offline / cached storage fallback
       const saved = localStorage.getItem('sscbs_squad_posts');
       if (saved) {
         setPosts(JSON.parse(saved));
       } else {
-        setPosts(SAMPLE_POSTS);
-        localStorage.setItem('sscbs_squad_posts', JSON.stringify(SAMPLE_POSTS));
+        setPosts([]);
       }
     } catch (err) {
-      console.warn('Using local fallback for squad posts:', err);
+      console.warn('Error fetching squad posts:', err);
       const saved = localStorage.getItem('sscbs_squad_posts');
-      setPosts(saved ? JSON.parse(saved) : SAMPLE_POSTS);
+      setPosts(saved ? JSON.parse(saved) : []);
     } finally {
       setLoading(false);
     }
@@ -142,6 +103,19 @@ export default function TeamFinderPage({ onBack }) {
 
   useEffect(() => {
     fetchPosts();
+
+    if (hasValidCredentials) {
+      const channel = supabase
+        .channel('public:squad_posts')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'squad_posts' }, () => {
+          fetchPosts();
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
   }, []);
 
   const handleToggleSkillHave = (skill) => {
@@ -201,20 +175,20 @@ export default function TeamFinderPage({ onBack }) {
       return;
     }
     if (!formData.title.trim()) {
-      setFormError('Please enter a team post title.');
+      setFormError('Please enter a post title.');
       return;
     }
     if (!formData.phone_number.trim()) {
-      setFormError('Please provide a WhatsApp / phone contact number.');
+      setFormError('Please provide a contact phone / WhatsApp number.');
       return;
     }
 
     setSubmitting(true);
 
-    const newPost = {
-      id: 'post-' + Date.now(),
+    const postPayload = {
+      user_id: user?.id,
       competition_name: formData.competition_name.trim(),
-      organizer: formData.organizer.trim() || 'Independent / Corporate',
+      organizer: formData.organizer.trim() || 'Corporate / Society',
       competition_link: formData.competition_link.trim(),
       phone_number: formData.phone_number.trim(),
       title: formData.title.trim(),
@@ -232,32 +206,27 @@ export default function TeamFinderPage({ onBack }) {
 
     try {
       if (hasValidCredentials) {
-        const { error } = await supabase.from('squad_posts').insert([
-          {
-            user_id: user.id,
-            competition_name: newPost.competition_name,
-            organizer: newPost.organizer,
-            competition_link: newPost.competition_link,
-            phone_number: newPost.phone_number,
-            title: newPost.title,
-            description: newPost.description,
-            skills_have: newPost.skills_have,
-            skills_looking_for: newPost.skills_looking_for,
-            spots_left: newPost.spots_left,
-            course: newPost.course,
-            year: newPost.year,
-            is_open: true,
-          },
-        ]);
+        const { data, error } = await supabase
+          .from('squad_posts')
+          .insert([postPayload])
+          .select();
+
         if (error) {
-          console.warn('Supabase insert warning, saving locally:', error);
+          console.error('Supabase error inserting post:', error);
+          setFormError('Could not save post to database. Checking fallback...');
+        } else if (data && data[0]) {
+          postPayload.id = data[0].id;
         }
       }
     } catch (err) {
       console.warn('Saving locally:', err);
     }
 
-    const updated = [newPost, ...posts];
+    if (!postPayload.id) {
+      postPayload.id = 'post-' + Date.now();
+    }
+
+    const updated = [postPayload, ...posts.filter((p) => p.id !== postPayload.id)];
     setPosts(updated);
     localStorage.setItem('sscbs_squad_posts', JSON.stringify(updated));
 
@@ -276,8 +245,8 @@ export default function TeamFinderPage({ onBack }) {
       custom_skill_have: '',
       custom_skill_looking: '',
       spots_left: 1,
-      course: 'BMS',
-      year: '2nd Year',
+      course: user?.user_metadata?.course || 'BMS',
+      year: user?.user_metadata?.semester ? `Sem ${user.user_metadata.semester}` : '2nd Year',
     });
   };
 
@@ -316,21 +285,21 @@ export default function TeamFinderPage({ onBack }) {
     }
   };
 
-  // Filter logic
+  // Filtering
   const filteredPosts = posts.filter((post) => {
     const matchesSearch =
-      post.competition_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.organizer.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.skills_looking_for.some((s) => s.toLowerCase().includes(searchQuery.toLowerCase()));
+      (post.competition_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (post.organizer || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (post.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (post.skills_looking_for || []).some((s) => s.toLowerCase().includes(searchQuery.toLowerCase()));
 
     if (!matchesSearch) return false;
 
     if (filterType === 'open' && !post.is_open) return false;
-    if (filterType === 'my_posts' && post.created_by_email !== user?.email) return false;
+    if (filterType === 'my_posts' && post.created_by_email !== user?.email && post.user_id !== user?.id) return false;
 
     if (selectedSkillFilter) {
-      const hasSkill = post.skills_looking_for.includes(selectedSkillFilter);
+      const hasSkill = (post.skills_looking_for || []).includes(selectedSkillFilter);
       if (!hasSkill) return false;
     }
 
@@ -342,19 +311,16 @@ export default function TeamFinderPage({ onBack }) {
       <div className="team-finder-container">
         <div className="admin-restricted-card">
           <div className="restricted-badge">
-            <ShieldIcon size={24} />
+            <ShieldIcon size={20} />
             <span>Admin Beta Access Restricted</span>
           </div>
           <h2>Team Finder & Competition Hub</h2>
           <p>
-            This module is currently in active private preview for SSCBS OS administrators (
+            This feature is currently restricted to SSCBS OS administrators (
             <code>aditya.25015@sscbs.du.ac.in</code> & <code>manthan.25138@sscbs.du.ac.in</code>).
           </p>
-          <p className="restricted-sub">
-            Full campus rollout for all BMS, BFIA & B.Sc students will occur in the upcoming update.
-          </p>
           {onBack && (
-            <button className="btn-secondary" onClick={onBack}>
+            <button className="btn-tf-primary" onClick={onBack} style={{ marginTop: '1rem' }}>
               <BackIcon /> Return to Dashboard
             </button>
           )}
@@ -365,7 +331,7 @@ export default function TeamFinderPage({ onBack }) {
 
   return (
     <div className="team-finder-container">
-      {/* ── Top Header Banner ── */}
+      {/* ── Header ── */}
       <header className="tf-header">
         <div className="tf-header-left">
           {onBack && (
@@ -375,29 +341,29 @@ export default function TeamFinderPage({ onBack }) {
           )}
           <div>
             <div className="tf-badge">
-              <ShieldIcon size={14} />
-              <span>ADMIN PREVIEW • ADITYA & MANTHAN</span>
+              <ShieldIcon size={13} />
+              <span>ADMIN PREVIEW</span>
             </div>
             <h1 className="tf-title">Team Finder & Competition Hub</h1>
             <p className="tf-subtitle">
-              Form competitive squads for Case Comps, Finance Challenges & Corporate Hackathons.
+              Connect with peers, find complementary skills, and form teams for case competitions & hackathons.
             </p>
           </div>
         </div>
 
-        <button className="tf-create-btn" onClick={() => setIsCreateModalOpen(true)}>
+        <button className="btn-tf-primary" onClick={() => setIsCreateModalOpen(true)}>
           <UsersIcon size={18} />
           <span>Post Team Opening</span>
         </button>
       </header>
 
-      {/* ── Controls & Filter Bar ── */}
+      {/* ── Filter Bar ── */}
       <div className="tf-controls-bar">
         <div className="tf-search-box">
-          <SearchIcon size={18} />
+          <SearchIcon size={16} />
           <input
             type="text"
-            placeholder="Search competitions, skills needed, organizers..."
+            placeholder="Search competitions, skills, or organizers..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -419,20 +385,20 @@ export default function TeamFinderPage({ onBack }) {
             className={`tf-filter-pill ${filterType === 'open' ? 'active' : ''}`}
             onClick={() => setFilterType('open')}
           >
-            Open Positions ({posts.filter((p) => p.is_open).length})
+            Open ({posts.filter((p) => p.is_open).length})
           </button>
           <button
             className={`tf-filter-pill ${filterType === 'my_posts' ? 'active' : ''}`}
             onClick={() => setFilterType('my_posts')}
           >
-            My Admin Posts ({posts.filter((p) => p.created_by_email === user?.email).length})
+            My Openings ({posts.filter((p) => p.created_by_email === user?.email || p.user_id === user?.id).length})
           </button>
         </div>
       </div>
 
       {/* ── Skill Tag Quick Filter Strip ── */}
       <div className="tf-skills-strip">
-        <span className="strip-label">Filter by Needed Skill:</span>
+        <span className="strip-label">Skill needed:</span>
         <button
           className={`skill-tag-filter ${selectedSkillFilter === '' ? 'selected' : ''}`}
           onClick={() => setSelectedSkillFilter('')}
@@ -453,16 +419,20 @@ export default function TeamFinderPage({ onBack }) {
       {/* ── Feed Grid ── */}
       {loading ? (
         <div className="tf-loading">
-          <div className="system-spinner"></div>
-          <p>Loading active competition squads…</p>
+          <div className="notice-spinner"></div>
+          <p>Loading squad postings…</p>
         </div>
       ) : filteredPosts.length === 0 ? (
         <div className="tf-empty-state">
-          <TrophyIcon size={40} />
-          <h3>No squad listings match your criteria</h3>
-          <p>Be the first to create a team opening for an upcoming case competition!</p>
-          <button className="tf-create-btn" onClick={() => setIsCreateModalOpen(true)}>
-            Post Team Opening Now
+          <TrophyIcon size={36} />
+          <h3>No team postings found</h3>
+          <p>
+            {searchQuery || selectedSkillFilter || filterType !== 'all'
+              ? 'No team listings match your current filters.'
+              : 'There are currently no active team postings. Post a new opening to start building your squad!'}
+          </p>
+          <button className="btn-tf-primary" onClick={() => setIsCreateModalOpen(true)}>
+            Post Team Opening
           </button>
         </div>
       ) : (
@@ -470,14 +440,10 @@ export default function TeamFinderPage({ onBack }) {
           {filteredPosts.map((post) => (
             <div key={post.id} className={`tf-post-card ${!post.is_open ? 'closed' : ''}`}>
               <div className="card-top-bar">
-                <span className="comp-organizer">{post.organizer}</span>
-                <div className="card-status-tags">
-                  {post.is_open ? (
-                    <span className="status-badge open">🔥 {post.spots_left} Spot(s) Left</span>
-                  ) : (
-                    <span className="status-badge filled">✓ Team Filled</span>
-                  )}
-                </div>
+                <span className="comp-organizer">{post.organizer || 'Corporate / Society'}</span>
+                <span className={`micro-label ${post.is_open ? 'success' : 'dim'}`}>
+                  {post.is_open ? `${post.spots_left || 1} SPOT(S) LEFT` : 'FILLED'}
+                </span>
               </div>
 
               <h2 className="comp-name">{post.competition_name}</h2>
@@ -489,17 +455,17 @@ export default function TeamFinderPage({ onBack }) {
                   rel="noopener noreferrer"
                   className="comp-link"
                 >
-                  <FileIcon size={14} /> Official Competition Page ↗
+                  <FileIcon size={14} /> Competition Link ↗
                 </a>
               )}
 
               <h3 className="post-title">{post.title}</h3>
-              <p className="post-desc">{post.description}</p>
+              {post.description && <p className="post-desc">{post.description}</p>}
 
               {/* Skills We Have */}
               {post.skills_have && post.skills_have.length > 0 && (
                 <div className="skills-group">
-                  <span className="skills-group-label">Skills Present in Team:</span>
+                  <span className="skills-group-label">Skills Present:</span>
                   <div className="skills-pills">
                     {post.skills_have.map((s, idx) => (
                       <span key={idx} className="skill-pill present">
@@ -531,7 +497,7 @@ export default function TeamFinderPage({ onBack }) {
                     {(post.created_by_name || post.created_by_email || 'A').charAt(0).toUpperCase()}
                   </span>
                   <span className="creator-details">
-                    <span className="creator-name">{post.created_by_name || 'Admin Student'}</span>
+                    <span className="creator-name">{post.created_by_name || 'Student'}</span>
                     <span className="creator-course">
                       {post.course} • {post.year}
                     </span>
@@ -547,25 +513,23 @@ export default function TeamFinderPage({ onBack }) {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="wa-connect-btn"
-                      title="Direct WhatsApp Reachout"
+                      title="Direct WhatsApp Connect"
                     >
-                      <WhatsAppIcon size={16} /> WhatsApp
+                      <WhatsAppIcon size={15} /> WhatsApp
                     </a>
                   )}
 
-                  {post.created_by_email === user?.email && (
+                  {(post.created_by_email === user?.email || post.user_id === user?.id) && (
                     <>
                       <button
-                        className="btn-icon-subtle"
+                        className="btn-card-subtle"
                         onClick={() => handleToggleStatus(post.id, post.is_open)}
-                        title={post.is_open ? 'Mark as Closed' : 'Reopen Team'}
                       >
                         {post.is_open ? 'Close' : 'Reopen'}
                       </button>
                       <button
-                        className="btn-icon-subtle danger"
+                        className="btn-card-subtle danger"
                         onClick={() => handleDeletePost(post.id)}
-                        title="Delete Post"
                       >
                         Delete
                       </button>
@@ -598,7 +562,7 @@ export default function TeamFinderPage({ onBack }) {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. EY NextGen Leader 2026, Bain BCN"
+                    placeholder="e.g. EY NextGen Leader, Bain BCN Case Comp"
                     value={formData.competition_name}
                     onChange={(e) => setFormData({ ...formData, competition_name: e.target.value })}
                   />
@@ -623,7 +587,7 @@ export default function TeamFinderPage({ onBack }) {
 
               <div className="form-row grid-2">
                 <div className="form-group">
-                  <label>Official Competition Link</label>
+                  <label>Competition Link</label>
                   <input
                     type="url"
                     placeholder="https://..."
@@ -637,7 +601,7 @@ export default function TeamFinderPage({ onBack }) {
                   <input
                     type="tel"
                     required
-                    placeholder="e.g. 919876543210 (Country code + phone)"
+                    placeholder="e.g. 919876543210"
                     value={formData.phone_number}
                     onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
                   />
@@ -649,7 +613,7 @@ export default function TeamFinderPage({ onBack }) {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Need 1 Financial Modeler & Deck Specialist for EY NextGen"
+                  placeholder="e.g. Need 1 Financial Modeler for EY NextGen"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 />
@@ -659,15 +623,15 @@ export default function TeamFinderPage({ onBack }) {
                 <label>Team Overview & Requirements</label>
                 <textarea
                   rows="3"
-                  placeholder="Describe your current team composition, strategy, vision, or deadline details..."
+                  placeholder="Describe your team strategy, current members, deadline, and requirements..."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 />
               </div>
 
-              {/* Skills We Have Selector */}
+              {/* Skills Present */}
               <div className="form-group">
-                <label>Skills Present in Your Current Team</label>
+                <label>Skills Present in Your Team</label>
                 <div className="skill-selector-box">
                   {DEFAULT_SKILLS.map((skill) => (
                     <button
@@ -699,10 +663,10 @@ export default function TeamFinderPage({ onBack }) {
                 </div>
               </div>
 
-              {/* Skills We Are Looking For Selector */}
+              {/* Skills Needed */}
               <div className="form-group">
-                <label>Skills Needed in Teammate(s) You Want to Hire</label>
-                <div className="skill-selector-box needed-box">
+                <label>Skills Needed in Teammates</label>
+                <div className="skill-selector-box">
                   {DEFAULT_SKILLS.map((skill) => (
                     <button
                       type="button"
@@ -717,7 +681,7 @@ export default function TeamFinderPage({ onBack }) {
                 <div className="custom-skill-input-row">
                   <input
                     type="text"
-                    placeholder="Add custom skill looking for..."
+                    placeholder="Add custom skill needed..."
                     value={formData.custom_skill_looking}
                     onChange={(e) => setFormData({ ...formData, custom_skill_looking: e.target.value })}
                     onKeyDown={(e) => {
@@ -735,7 +699,7 @@ export default function TeamFinderPage({ onBack }) {
 
               <div className="form-row grid-3">
                 <div className="form-group">
-                  <label>Open Spots Left</label>
+                  <label>Open Spots</label>
                   <select
                     value={formData.spots_left}
                     onChange={(e) => setFormData({ ...formData, spots_left: e.target.value })}
@@ -748,7 +712,7 @@ export default function TeamFinderPage({ onBack }) {
                 </div>
 
                 <div className="form-group">
-                  <label>Lead Course</label>
+                  <label>Course</label>
                   <select
                     value={formData.course}
                     onChange={(e) => setFormData({ ...formData, course: e.target.value })}
@@ -761,30 +725,27 @@ export default function TeamFinderPage({ onBack }) {
                 </div>
 
                 <div className="form-group">
-                  <label>Year</label>
-                  <select
+                  <label>Year / Semester</label>
+                  <input
+                    type="text"
                     value={formData.year}
                     onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                  >
-                    <option value="1st Year">1st Year</option>
-                    <option value="2nd Year">2nd Year</option>
-                    <option value="3rd Year">3rd Year</option>
-                    <option value="4th Year">4th Year</option>
-                  </select>
+                    placeholder="e.g. 2nd Year / Sem 4"
+                  />
                 </div>
               </div>
 
               <div className="modal-footer">
                 <button
                   type="button"
-                  className="btn-secondary"
+                  className="btn-tf-secondary"
                   onClick={() => setIsCreateModalOpen(false)}
                   disabled={submitting}
                 >
                   Cancel
                 </button>
-                <button type="submit" className="tf-create-btn" disabled={submitting}>
-                  {submitting ? 'Publishing Post…' : 'Publish Squad Opening'}
+                <button type="submit" className="btn-tf-primary" disabled={submitting}>
+                  {submitting ? 'Publishing…' : 'Publish Opening'}
                 </button>
               </div>
             </form>
