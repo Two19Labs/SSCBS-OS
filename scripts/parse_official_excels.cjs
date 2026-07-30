@@ -5,39 +5,38 @@ const FILE_1 = 'c:/Users/adity/Downloads/SSCBS OS/TT_wef _28.07.2026 .xlsx';
 const FILE_2 = 'c:/Users/adity/Downloads/SSCBS OS/TT_JULY 2026.xlsx';
 
 const DEFAULT_SECTION_ROOMS = {
-  'BMS_Sem1_SecA': 'Room 703',
-  'BMS_Sem1_SecB': 'Room 703',
-  'BMS_Sem1_SecC': 'Room 703',
-  'BMS_Sem1_SecD': 'Room 703',
-  'BMS_Sem3_SecA': 'Room 703',
-  'BMS_Sem3_SecB': 'Room 703',
-  'BMS_Sem3_SecC': 'Room 703',
-  'BMS_Sem3_SecD': 'Room 703',
-  'BMS_Sem5_SecA': 'Room 703',
-  'BMS_Sem5_SecB': 'Room 703',
-  'BMS_Sem5_SecC': 'Room 703',
-  'BMS_Sem5_SecD': 'Room 703',
-  'BMS_Sem7_SecA': 'Room 523',
-  'BBA FIA_Sem1_SecA': 'Room 503',
-  'BBA FIA_Sem1_SecB': 'Room 503',
-  'BBA FIA_Sem3_SecA': 'Room 503',
-  'BBA FIA_Sem3_SecB': 'Room 503',
-  'BBA FIA_Sem5_SecA': 'Room 503',
-  'BBA FIA_Sem5_SecB': 'Room 507',
-  'BBA FIA_Sem7_SecA': 'Room 533',
-  'Bsc Comp Sci_Sem1_SecA': 'Room 403',
-  'Bsc Comp Sci_Sem3_SecA': 'Room 407',
-  'Bsc Comp Sci_Sem5_SecA': 'Room 457',
-  'Bsc Comp Sci_Sem7_SecA': 'Room 435'
+  'BMS_1_A': 'Room 703',
+  'BMS_1_B': 'Room 703',
+  'BMS_1_C': 'Room 703',
+  'BMS_1_D': 'Room 703',
+  'BMS_3_A': 'Room 703',
+  'BMS_3_B': 'Room 703',
+  'BMS_3_C': 'Room 703',
+  'BMS_3_D': 'Room 703',
+  'BMS_5_A': 'Room 703',
+  'BMS_5_B': 'Room 703',
+  'BMS_5_C': 'Room 703',
+  'BMS_5_D': 'Room 703',
+  'BMS_7_A': 'Room 523',
+  'BBA FIA_1_A': 'Room 503',
+  'BBA FIA_1_B': 'Room 503',
+  'BBA FIA_3_A': 'Room 503',
+  'BBA FIA_3_B': 'Room 503',
+  'BBA FIA_5_A': 'Room 503',
+  'BBA FIA_5_B': 'Room 507',
+  'BBA FIA_7_A': 'Room 533',
+  'Bsc Comp Sci_1_A': 'Room 403',
+  'Bsc Comp Sci_3_A': 'Room 407',
+  'Bsc Comp Sci_5_A': 'Room 457',
+  'Bsc Comp Sci_7_A': 'Room 435'
 };
 
-// Global Faculty Directory for clean display names
 const FACULTY_DIRECTORY = {
   'aa': 'Dr. Anamika Agarwal',
   'ag': 'Anamika Gupta',
   'ayg': 'Ayushi Gupta',
   'dd': 'Dr. Deepali Dhaka',
-  'am': 'Dr. Amit Kumar',
+  'am': 'Dr. Anuja Mathur',
   'ta': 'Dr. Tarannum Ahmad',
   'mv': 'Dr. Mona Verma',
   'sj': 'Dr. Saumya Jain',
@@ -84,6 +83,8 @@ const FACULTY_DIRECTORY = {
   'vineet': 'Vineet',
   'ankita': 'Ankita',
   'ayesha': 'Ayesha',
+  'rrs': 'Dr. Rishi Rajan Sahay',
+  'sanchi': 'Ms. Sanchi Kalra',
   'tatkarsh': 'Mr. Tatkarsh',
   'monika': 'Ms. Monika',
   'vp': 'Mr. Vipin Patel',
@@ -93,16 +94,28 @@ const FACULTY_DIRECTORY = {
   'sg': 'Dr. Saumya Jain'
 };
 
+const PERIOD_COL_MAP = [
+  { period: 1, colIdx: 1 },
+  { period: 2, colIdx: 2 },
+  { period: 3, colIdx: 3 },
+  // colIdx 4 is Infinity Hour 12:00 - 1:00 PM
+  { period: 4, colIdx: 5 },
+  { period: 5, colIdx: 6 },
+  { period: 6, colIdx: 7 },
+  { period: 7, colIdx: 8 }
+];
+
 function buildMasterTimetable() {
   const masterData = {};
 
   const processFile = (filePath) => {
+    if (!fs.existsSync(filePath)) return;
     const wb = xlsx.readFile(filePath);
+
     wb.SheetNames.forEach(sheetName => {
       const sheet = wb.Sheets[sheetName];
       const data = xlsx.utils.sheet_to_json(sheet, { header: 1 });
 
-      // First pass: extract all blocks in this sheet
       for (let r = 0; r < data.length; r++) {
         const row = data[r] || [];
         const rowStr = row.map(c => String(c || '').trim()).join(' ');
@@ -131,35 +144,39 @@ function buildMasterTimetable() {
             if (roomNoMatch) defaultRoom = `Room ${roomNoMatch[1]}`;
           }
 
-          const sectionKey = `${course}_Sem${sem}_Sec${sec}`;
           if (!defaultRoom) defaultRoom = DEFAULT_SECTION_ROOMS[`${course}_${sem}_${sec}`] || 'Room 703';
 
           // Extract section legend table
-          const legendMap = {}; // code/name -> { paperName, facName }
-          for (let l = r + 10; l < r + 45 && l < data.length; l++) {
+          const legendMap = {};
+          for (let l = r + 8; l < r + 50 && l < data.length; l++) {
             const lRow = data[l] || [];
-            if (lRow.length >= 3) {
-              const str = lRow.map(c => String(c || '').trim()).join(' ');
-              if (str.includes('CLASS TIME TABLE')) break; // Next block start
+            const str = lRow.map(c => String(c || '').trim()).join(' ');
+            if (str.includes('CLASS TIME TABLE') && l > r + 15) break;
 
-              // Look for S. No. numeric rows
-              const c0 = String(lRow[0] || '').trim();
-              if (c0.match(/^\d+$/)) {
-                // S. No | Paper Type | Paper Name | [empty] | Faculty Name | Faculty Code
-                const nonEmpties = lRow.map(c => String(c || '').trim()).filter(Boolean);
-                if (nonEmpties.length >= 3) {
-                  let paperName = nonEmpties[2] || '';
-                  let facName = nonEmpties[3] || '';
-                  let facCode = nonEmpties[4] || facName;
+            const nonEmpties = lRow.map(c => String(c || '').trim()).filter(Boolean);
+            if (nonEmpties.length >= 3) {
+              let paperName = '';
+              let facName = '';
+              let facCode = '';
 
-                  if (paperName && facName) {
-                    const cleanCode = facCode.replace(/\(.*\)/, '').trim().toLowerCase();
-                    const cleanName = facName.replace(/\(.*\)/, '').trim().toLowerCase();
-                    const info = { paperName, facName };
-                    if (cleanCode) legendMap[cleanCode] = info;
-                    if (cleanName) legendMap[cleanName] = info;
-                  }
-                }
+              if (nonEmpties[0].match(/^\d+$/)) {
+                // BMS/BBA format: S.No | Type | Paper Name | Faculty Name | Code
+                paperName = nonEmpties[2] || '';
+                facName = nonEmpties[3] || '';
+                facCode = nonEmpties[4] || facName;
+              } else if (['core', 'ge', 'sec', 'vac', 'dse', 'aec'].includes(nonEmpties[0].toLowerCase())) {
+                // CS format: Type | Course Name | Code | Faculty Name | Faculty Code
+                paperName = nonEmpties[1] || '';
+                facName = nonEmpties[3] || nonEmpties[2] || '';
+                facCode = nonEmpties[4] || nonEmpties[3] || facName;
+              }
+
+              if (paperName && (facName || facCode)) {
+                const info = { paperName, facName: facName || facCode };
+                const cleanCode = facCode.replace(/\(.*\)/, '').trim().toLowerCase();
+                const cleanName = facName.replace(/\(.*\)/, '').trim().toLowerCase();
+                if (cleanCode) legendMap[cleanCode] = info;
+                if (cleanName) legendMap[cleanName] = info;
               }
             }
           }
@@ -167,15 +184,6 @@ function buildMasterTimetable() {
           // Parse grid days
           const daysData = {};
           const dayMap = { 'Mon': 'Monday', 'Tue': 'Tuesday', 'Wed': 'Wednesday', 'Thu': 'Thursday', 'Fri': 'Friday' };
-          const periodsMeta = [
-            { p: 1, s: '09:00', e: '10:00' },
-            { p: 2, s: '10:00', e: '11:00' },
-            { p: 3, s: '11:00', e: '12:00' },
-            { p: 4, s: '13:00', e: '14:00' },
-            { p: 5, s: '14:00', e: '15:00' },
-            { p: 6, s: '15:00', e: '16:00' },
-            { p: 7, s: '16:00', e: '17:00' }
-          ];
 
           for (let d = r + 1; d <= r + 20 && d < data.length; d++) {
             const dRow = data[d] || [];
@@ -184,24 +192,14 @@ function buildMasterTimetable() {
 
             if (dayMatch) {
               const mappedDay = dayMap[dayMatch[1]];
-              const periodCells = dRow.slice(1);
               const periodsList = [];
 
-              // Skip Infinity Hour column (usually index 3)
-              let cellIdx = 0;
-              periodsMeta.forEach(m => {
-                let cellVal = String(periodCells[cellIdx] || '').trim();
-                cellIdx++;
-
-                // Skip Infinity Hour if matched
-                if (cellVal.toLowerCase().includes('infinity hour')) {
-                  cellVal = String(periodCells[cellIdx] || '').trim();
-                  cellIdx++;
-                }
+              PERIOD_COL_MAP.forEach(pm => {
+                let cellVal = String(dRow[pm.colIdx] || '').trim();
 
                 if (!cellVal || cellVal === '-' || cellVal.toLowerCase() === 'off' || cellVal.toLowerCase() === 'free') {
                   periodsList.push({
-                    period: m.p,
+                    period: pm.period,
                     subject: 'Free',
                     teacher: '-',
                     room: '-'
@@ -209,57 +207,55 @@ function buildMasterTimetable() {
                   return;
                 }
 
-                // Parse cell with '/' splits
+                // Parse components divided by '/'
                 const splits = cellVal.split('/').map(x => x.trim()).filter(Boolean);
                 const parsedSubjects = [];
                 const parsedTeachers = [];
                 const parsedRooms = [];
 
                 splits.forEach(part => {
-                  // Extract 3-digit room or specific room like 237, 607, 644, 648, 534, 361, 523, 651, Lab 460
+                  // Room extraction
                   let compRoom = defaultRoom;
                   const roomMatch = part.match(/\b([2-7]\d{2})\b/) || part.match(/Lab\s*(\d{3})/i);
                   if (roomMatch) {
                     compRoom = `Room ${roomMatch[1]}`;
                   }
 
-                  // Extract group tag e.g. G1, G2
+                  // Group prefix
                   const grpMatch = part.match(/\b(G[1234])\b/i);
                   const grpPrefix = grpMatch ? `${grpMatch[1].toUpperCase()}: ` : '';
 
                   // Unsupervised check
                   if (part.toLowerCase().includes('unsupervised')) {
                     parsedTeachers.push(`${grpPrefix}Unsupervised`);
-                    parsedSubjects.push(`${grpPrefix}Lab (Unsupervised)`);
+                    parsedSubjects.push(`${grpPrefix}${part}`);
                     parsedRooms.push(compRoom);
                     return;
                   }
 
-                  // Match Legend Table for Paper Name & Teacher Name
-                  let cleanPartKey = part.replace(/\s*\([^)]*\)/g, '').replace(/\b(G[1234])\b/gi, '').trim().toLowerCase();
-                  let matchedInfo = legendMap[cleanPartKey];
+                  // Legend Map matching
+                  const cleanKey = part.replace(/\s*\([^)]*\)/g, '').replace(/\b(G[1234])\b/gi, '').trim().toLowerCase();
+                  const matchedInfo = legendMap[cleanKey];
 
-                  // Fallback match in Global Directory
-                  let facName = FACULTY_DIRECTORY[cleanPartKey] || part;
-                  let paperName = matchedInfo ? matchedInfo.paperName : (cleanPartKey.length > 5 ? part : 'Active Class');
+                  let teacherName = FACULTY_DIRECTORY[cleanKey] || part;
+                  let paperTitle = matchedInfo ? matchedInfo.paperName : part;
 
-                  if (matchedInfo) {
-                    facName = matchedInfo.facName || facName;
-                    paperName = matchedInfo.paperName || paperName;
+                  if (matchedInfo && matchedInfo.facName) {
+                    teacherName = matchedInfo.facName;
                   }
 
-                  parsedSubjects.push(grpPrefix ? `${grpPrefix}${paperName}` : paperName);
-                  parsedTeachers.push(grpPrefix ? `${grpPrefix}${facName}` : facName);
+                  parsedSubjects.push(grpPrefix ? `${grpPrefix}${paperTitle}` : paperTitle);
+                  parsedTeachers.push(grpPrefix ? `${grpPrefix}${teacherName}` : teacherName);
                   parsedRooms.push(compRoom);
                 });
 
-                // Deduplicate subjects and rooms for clean display
+                // Format deduplicated strings
                 const finalSubject = [...new Set(parsedSubjects)].join(' / ');
                 const finalTeacher = [...new Set(parsedTeachers)].join(' / ');
                 const finalRoom = [...new Set(parsedRooms)].join(' / ');
 
                 periodsList.push({
-                  period: m.p,
+                  period: pm.period,
                   subject: finalSubject,
                   teacher: finalTeacher,
                   room: finalRoom
@@ -288,4 +284,4 @@ function buildMasterTimetable() {
 
 const master = buildMasterTimetable();
 fs.writeFileSync('src/data/timetables.json', JSON.stringify(master, null, 2));
-console.log('Build perfect timetable parser complete!');
+console.log('Fixed grid column timetable parser complete!');

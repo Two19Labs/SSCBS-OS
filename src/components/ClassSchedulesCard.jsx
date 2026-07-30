@@ -663,9 +663,9 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                     <thead>
                       <tr>
                         <th className="sticky-corner-cell">Day</th>
-                        {PERIODS.filter(p => !p.isBreak).map((period) => (
-                          <th key={period.id}>
-                            <div className="th-period-label">{period.label}</div>
+                        {PERIODS.map((period) => (
+                          <th key={period.id} className={period.isBreak ? 'th-break-col' : ''}>
+                            <div className="th-period-label">{period.isBreak ? 'Break' : period.label}</div>
                             <div className="th-time-label">{period.startLabel} - {period.endLabel}</div>
                           </th>
                         ))}
@@ -681,7 +681,17 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                               <strong>{day}</strong>
                               {isToday && <span className="today-badge">TODAY</span>}
                             </td>
-                            {PERIODS.filter(p => !p.isBreak).map((period) => {
+                            {PERIODS.map((period) => {
+                              if (period.isBreak) {
+                                return (
+                                  <td key={period.id} className="weekly-class-cell break-grid-cell">
+                                    <div className="cell-free-box break-box">
+                                      <span className="free-emoji">🍽️</span>
+                                      <span className="free-text">Infinity Hour</span>
+                                    </div>
+                                  </td>
+                                );
+                              }
                               const matchClass = dayCls.find(c => c.period === period.id);
                               const isCellActive = dayOfWeek === day && activeClass && activeClass.period === period.id;
                               return (
