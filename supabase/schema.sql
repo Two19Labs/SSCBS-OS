@@ -275,6 +275,10 @@ ALTER TABLE public.squad_posts ADD COLUMN IF NOT EXISTS total_members INT DEFAUL
 -- Enable RLS
 ALTER TABLE public.squad_posts ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Enable read access for authenticated users on squad_posts" ON public.squad_posts;
+DROP POLICY IF EXISTS "Enable insert access for authenticated users on squad_posts" ON public.squad_posts;
+DROP POLICY IF EXISTS "Enable update/delete access for creator or admin on squad_posts" ON public.squad_posts;
+
 -- Allow authenticated users to read squad posts
 CREATE POLICY "Enable read access for authenticated users on squad_posts" 
     ON public.squad_posts 
@@ -315,6 +319,10 @@ CREATE TABLE IF NOT EXISTS public.squad_applications (
 
 -- Enable RLS
 ALTER TABLE public.squad_applications ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Enable read access on squad_applications" ON public.squad_applications;
+DROP POLICY IF EXISTS "Enable insert access on squad_applications" ON public.squad_applications;
+DROP POLICY IF EXISTS "Enable update/delete access on squad_applications" ON public.squad_applications;
 
 -- Allow authenticated users to view applications for posts they created or applied to
 CREATE POLICY "Enable read access on squad_applications"
