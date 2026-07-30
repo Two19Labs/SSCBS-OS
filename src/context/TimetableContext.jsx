@@ -57,7 +57,6 @@ export const TimetableProvider = ({ children }) => {
       }
     }
 
-    fetchTimetable();
     fetchHolidays();
   }, []);
 

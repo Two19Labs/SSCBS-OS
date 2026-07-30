@@ -1379,7 +1379,7 @@ STRICT EXTRACTION RULES:
   };
 
   // Manual editor handlers
-  const getCourses = () => Object.keys(timetable || {});
+  const getCourses = () => Object.keys(timetable || {}).filter(k => k !== '_meta' && typeof timetable[k] === 'object');
   const getSemesters = () => {
     if (!timetable || !timetable[selectedCourse]) return [];
     return Object.keys(timetable[selectedCourse]);
