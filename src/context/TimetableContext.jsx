@@ -38,35 +38,9 @@ export const TimetableProvider = ({ children }) => {
   const [holidays, setHolidays] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch timetable configuration on load
+  // Timetable is sourced directly from timetablesData (src/data/timetables.json)
   useEffect(() => {
-    async function fetchTimetable() {
-      if (!hasValidCredentials) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from('system_configs')
-          .select('value')
-          .eq('key', 'timetable')
-          .maybeSingle();
-
-        if (error) {
-          console.error('Error fetching timetable from Supabase:', error);
-        } else if (data && data.value && typeof data.value === 'object' && Object.keys(data.value).length > 0) {
-          setTimetable(data.value);
-          try {
-            localStorage.setItem('sscbs_os_timetable', JSON.stringify(data.value));
-          } catch (e) {}
-        }
-      } catch (err) {
-        console.error('Failed to connect to Supabase timetable storage:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
+    setLoading(false);
 
     async function fetchHolidays() {
       if (!hasValidCredentials) return;
