@@ -1961,12 +1961,15 @@ STRICT EXTRACTION RULES:
                 <div>
                   <h3>📈 Feature Visit Analytics (Time-Series)</h3>
                   <p className="section-desc-small">
-                    Daily visit trends across student OS tools over time. Toggle student features below to inspect page metrics.
+                    {analyticsTimeRange === 1 
+                      ? 'Hourly visit trends across student OS tools over the last 24 hours. Toggle student features below to inspect page metrics.' 
+                      : 'Daily visit trends across student OS tools over time. Toggle student features below to inspect page metrics.'}
                   </p>
                 </div>
                 
                 <div className="graph-time-selectors">
                   {[
+                    { days: 1, label: 'Last 24 Hours' },
                     { days: 7, label: 'Last 7 Days' },
                     { days: 30, label: 'Last 30 Days' },
                     { days: 90, label: 'Last 90 Days' }
@@ -2019,6 +2022,7 @@ STRICT EXTRACTION RULES:
                 {(() => {
                   const series = analyticsSummary.series || {};
                   const dateLabels = analyticsSummary.dateLabels || [];
+                  const fullLabels = analyticsSummary.fullLabels || dateLabels;
                   if (!dateLabels || dateLabels.length === 0) return null;
 
                   const width = 800;
@@ -2107,7 +2111,7 @@ STRICT EXTRACTION RULES:
                                   stroke="var(--surface)"
                                   strokeWidth="1.5"
                                   className="graph-point-circle"
-                                  onMouseEnter={() => setHoveredPoint({ date: dateLabels[idx], seriesKey, val, x: getX(idx), y: getY(val) })}
+                                  onMouseEnter={() => setHoveredPoint({ date: fullLabels[idx] || dateLabels[idx], seriesKey, val, x: getX(idx), y: getY(val) })}
                                   onMouseLeave={() => setHoveredPoint(null)}
                                 />
                               ))}
