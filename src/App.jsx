@@ -35,7 +35,10 @@ const GpaCalculatorModal = lazy(() => import('./components/GpaCalculatorModal'))
 
 const PageLoader = () => (
   <div className="loading-screen" style={{ minHeight: '300px' }}>
-    <span className="system-spinner"></span>
+    <div className="loading-logo-container">
+      <img src="/sscbs_logo.png" alt="SSCBS OS" className="loading-logo" />
+      <span className="system-spinner"></span>
+    </div>
     <p className="loading-text">Loading...</p>
   </div>
 );
@@ -121,7 +124,10 @@ function App() {
   if (loading) {
     return (
       <div className="loading-screen">
-        <span className="system-spinner"></span>
+        <div className="loading-logo-container">
+          <img src="/sscbs_logo.png" alt="SSCBS OS" className="loading-logo" />
+          <span className="system-spinner"></span>
+        </div>
         <p className="loading-text">Loading SSCBS Campus OS…</p>
       </div>
     );
