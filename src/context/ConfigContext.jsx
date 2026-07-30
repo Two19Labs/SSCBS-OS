@@ -8,6 +8,7 @@ const DEFAULT_FEATURE_FLAGS = {
   'gpa': true,
   'pyqs': false,
   'buzz': true,
+  'contact': true,
 };
 
 const ConfigContext = createContext({

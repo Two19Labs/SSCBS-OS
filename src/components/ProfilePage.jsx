@@ -202,6 +202,14 @@ export default function ProfilePage({ onNavigate }) {
         </div>
       </div>
 
+      <div className="profile-group-label">HELP & SUPPORT</div>
+      <div className="profile-group">
+        <button className="profile-row profile-row-btn" onClick={() => onNavigate('contact')}>
+          <span className="profile-row-label">Contact Us / WhatsApp DM</span>
+          <span className="profile-row-value"><ChevronRight /></span>
+        </button>
+      </div>
+
       {isAdmin && (
         <>
           <div className="profile-group-label">ADMIN</div>

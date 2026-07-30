@@ -122,3 +122,37 @@ export const EyeOffIcon = ({ size = 18 }) => (
     <line x1="2" y1="2" x2="22" y2="22" />
   </svg>
 );
+
+export const WhatsAppIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" />
+    <path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1a5 5 0 0 0 5 5h1a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1" strokeLinecap="round" />
+  </svg>
+);
+
+export const MessageIcon = ({ filled, size = 18 }) => (
+  <svg {...base(filled)} width={size} height={size}>
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+  </svg>
+);
+
+export const MailIcon = ({ size = 18 }) => (
+  <svg {...base(false)} width={size} height={size}>
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+    <polyline points="22,6 12,13 2,6" />
+  </svg>
+);
+
+export const CopyIcon = ({ size = 18 }) => (
+  <svg {...base(false)} width={size} height={size}>
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+  </svg>
+);
+
+export const CheckIcon = ({ size = 18 }) => (
+  <svg {...base(false)} width={size} height={size} strokeWidth={2}>
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+

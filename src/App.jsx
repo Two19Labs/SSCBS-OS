@@ -21,6 +21,7 @@ import {
   MegaphoneIcon,
   ShieldIcon,
   BackIcon,
+  MessageIcon,
 } from './components/icons';
 import './App.css';
 import InstallPwaPrompt from './components/InstallPwaPrompt';
@@ -32,6 +33,7 @@ const WaiverToolPage = lazy(() => import('./components/WaiverToolPage'));
 const FindMyProfessorPage = lazy(() => import('./components/FindMyProfessorPage'));
 const AdminConsolePage = lazy(() => import('./components/AdminConsolePage'));
 const GpaCalculatorModal = lazy(() => import('./components/GpaCalculatorModal'));
+const ContactPage = lazy(() => import('./components/ContactPage'));
 
 const PageLoader = () => (
   <div className="loading-screen" style={{ minHeight: '300px' }}>
@@ -43,8 +45,8 @@ const PageLoader = () => (
   </div>
 );
 
-const TOOL_VIEWS = ['find-prof', 'waiver', 'admin'];
-const VALID_VIEWS = ['home', 'timetable', 'find-prof', 'waiver', 'tools', 'buzz', 'profile', 'admin'];
+const TOOL_VIEWS = ['find-prof', 'waiver', 'admin', 'contact'];
+const VALID_VIEWS = ['home', 'timetable', 'find-prof', 'waiver', 'tools', 'buzz', 'profile', 'admin', 'contact'];
 
 const getInitialView = () => {
   if (typeof window !== 'undefined') {
@@ -173,6 +175,7 @@ function App() {
     { id: 'gpa', label: 'GPA Calculator', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
     { id: 'pyqs', label: 'PYQs & Resources', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
     { id: 'buzz', label: 'Campus Buzz', Icon: MegaphoneIcon, locked: !featureFlags['buzz'] && !isAdmin },
+    { id: 'contact', label: 'Contact Us', Icon: MessageIcon, locked: !featureFlags['contact'] && !isAdmin },
   ];
 
   const tabs = [
@@ -191,6 +194,7 @@ function App() {
     admin: 'Admin Console',
     buzz: 'Campus Buzz',
     profile: 'Profile',
+    contact: 'Contact Us',
   }[view];
 
   const renderView = () => {
@@ -201,6 +205,12 @@ function App() {
         return (
           <Suspense fallback={<PageLoader />}>
             <FindMyProfessorPage onBack={goBack} />
+          </Suspense>
+        );
+      case 'contact':
+        return (
+          <Suspense fallback={<PageLoader />}>
+            <ContactPage onBack={goBack} />
           </Suspense>
         );
       case 'admin':
@@ -222,6 +232,7 @@ function App() {
           <div className="tools-hub">
             {[
               { id: 'find-prof', micro: 'SEARCH', microClass: 'success', title: 'Find My Professor', desc: "Who's teaching where, right now", Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
+              { id: 'contact', micro: 'HELP', microClass: 'success', title: 'Contact Us', desc: 'Direct WhatsApp support & DM', Icon: MessageIcon, locked: !featureFlags['contact'] && !isAdmin },
               { id: 'waiver', micro: 'SOON', microClass: 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
               { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
               { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
