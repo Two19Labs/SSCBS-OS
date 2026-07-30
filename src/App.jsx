@@ -45,7 +45,7 @@ const PageLoader = () => (
   </div>
 );
 
-const TOOL_VIEWS = ['find-prof', 'waiver', 'admin', 'contact'];
+const TOOL_VIEWS = ['find-prof', 'waiver', 'admin'];
 const VALID_VIEWS = ['home', 'timetable', 'find-prof', 'waiver', 'tools', 'buzz', 'profile', 'admin', 'contact'];
 
 const getInitialView = () => {
@@ -182,6 +182,7 @@ function App() {
     { id: 'home', label: 'Home', Icon: HomeIcon },
     { id: 'timetable', label: 'Timetable', Icon: CalendarIcon },
     { id: 'tools', label: 'Tools', Icon: GridIcon },
+    { id: 'contact', label: 'Contact', Icon: MessageIcon },
     { id: 'profile', label: 'Profile', Icon: UserIcon },
   ];
 
