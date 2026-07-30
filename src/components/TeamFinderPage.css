@@ -581,6 +581,27 @@
   border-color: var(--danger);
 }
 
+.btn-card-subtle.admin-mod-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--accent-tint, rgba(113, 34, 44, 0.08));
+  border-color: rgba(113, 34, 44, 0.25);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.btn-card-subtle.admin-mod-btn:hover {
+  background: rgba(185, 28, 28, 0.12);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.admin-shield-icon {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
 /* ═══════════════════════════════════════════════════════════
    FIXED MODALS — PROFILE MODAL SPECIFICATIONS
    ═══════════════════════════════════════════════════════════ */

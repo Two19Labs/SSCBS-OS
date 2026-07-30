@@ -909,11 +909,12 @@ export default function TeamFinderPage({ onBack }) {
                           {post.is_open ? 'Close' : 'Reopen'}
                         </button>
                         <button
-                          className="btn-card-subtle danger"
+                          className={`btn-card-subtle danger ${!isHost ? 'admin-mod-btn' : ''}`}
                           onClick={() => handleDeletePost(post.id)}
                           title={!isHost ? 'Admin Moderation Delete' : 'Delete Post'}
                         >
-                          {!isHost ? '🛡 Delete' : 'Delete'}
+                          {!isHost && <ShieldIcon size={13} className="admin-shield-icon" />}
+                          <span>Delete</span>
                         </button>
                       </>
                     ) : (
