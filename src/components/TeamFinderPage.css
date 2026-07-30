@@ -79,7 +79,7 @@
   line-height: 1.3;
 }
 
-/* ── Standard SSCBS Primary & Secondary Buttons (Compact) ── */
+/* ── Standard SSCBS Primary & Secondary Buttons ── */
 .btn-tf-primary.compact {
   display: inline-flex;
   align-items: center;
@@ -239,7 +239,7 @@
   font-weight: 700;
 }
 
-/* ── Feed Grid (Dense & Compact) ── */
+/* ── Feed Grid ── */
 .tf-posts-grid.compact {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -285,7 +285,7 @@
   border-radius: 4px;
 }
 
-/* ── Squad Dots Indicator (Filled ● vs Open ○) ── */
+/* Squad Dots Indicator */
 .squad-dots-wrapper {
   display: flex;
   align-items: center;
@@ -322,7 +322,6 @@
   text-transform: uppercase;
 }
 
-/* Card Titles & Text */
 .comp-name.compact {
   font-size: 1.05rem;
   font-weight: 800;
@@ -402,6 +401,37 @@
   border: 1px solid rgba(185, 28, 28, 0.2);
 }
 
+/* User Application Status Badge on Card */
+.user-app-status-row {
+  margin-bottom: 8px;
+}
+
+.user-app-status-pill {
+  font-size: 0.725rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.user-app-status-pill.pending {
+  background: rgba(180, 83, 9, 0.1);
+  color: var(--amber);
+  border: 1px solid rgba(180, 83, 9, 0.25);
+}
+
+.user-app-status-pill.accepted {
+  background: var(--success-tint, rgba(11, 122, 84, 0.1));
+  color: var(--success);
+  border: 1px solid rgba(11, 122, 84, 0.25);
+}
+
+.user-app-status-pill.declined {
+  background: rgba(185, 28, 28, 0.1);
+  color: var(--danger);
+  border: 1px solid rgba(185, 28, 28, 0.25);
+}
+
 /* Card Footer */
 .card-footer.compact {
   margin-top: 10px;
@@ -472,6 +502,35 @@
   background: #20ba59;
 }
 
+.btn-review-apps.compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-review-apps.compact:hover {
+  border-color: var(--ink);
+}
+
+.apps-count-badge {
+  background: var(--accent);
+  color: var(--on-accent, #ffffff);
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 999px;
+  line-height: 1;
+}
+
 .btn-card-subtle.compact {
   background: transparent;
   border: 1px solid var(--border);
@@ -519,232 +578,130 @@
   padding: 18px;
 }
 
-.modal-header.compact {
+.modal-sub-label {
+  font-size: 0.75rem;
+  color: var(--ink-dim);
+  margin: 2px 0 0 0;
+}
+
+/* Host Review Applicants Modal List */
+.apps-review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.app-review-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.app-review-card.accepted {
+  border-color: var(--success);
+  background: var(--success-tint, rgba(11, 122, 84, 0.04));
+}
+
+.app-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border);
 }
 
-.modal-header.compact h2 {
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: var(--ink);
-  margin: 0;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  color: var(--ink-dim);
-  font-size: 1.4rem;
-  cursor: pointer;
-  line-height: 1;
-}
-
-.tf-form.compact .form-group {
-  margin-bottom: 12px;
-}
-
-.tf-form.compact label {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--ink);
-  margin-bottom: 4px;
-}
-
-.tf-form.compact input,
-.tf-form.compact textarea,
-.tf-form.compact select {
-  width: 100%;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 7px 10px;
-  color: var(--ink);
-  font-size: 0.8rem;
-  font-family: inherit;
-  transition: all 0.15s ease;
-  box-sizing: border-box;
-}
-
-.tf-form.compact input:focus,
-.tf-form.compact textarea:focus,
-.tf-form.compact select:focus {
-  outline: none;
-  border-color: var(--ink);
-}
-
-/* Selected Skills Pills inside Form */
-.selected-skills-row {
+.app-applicant-info {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
-  margin-bottom: 6px;
-  background: var(--bg);
-  padding: 6px 8px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
+  gap: 8px;
 }
 
-.selected-skills-title {
-  font-size: 0.68rem;
-  font-weight: 800;
-  color: var(--ink-dim);
-  text-transform: uppercase;
-}
-
-.selected-skill-pill {
-  font-size: 0.7rem;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.selected-skill-pill.present {
-  background: var(--success-tint, rgba(11, 122, 84, 0.12));
-  color: var(--success);
-  border: 1px solid rgba(11, 122, 84, 0.25);
-}
-
-.selected-skill-pill.needed {
-  background: rgba(185, 28, 28, 0.12);
-  color: var(--danger);
-  border: 1px solid rgba(185, 28, 28, 0.25);
-}
-
-.btn-remove-skill {
-  background: none;
-  border: none;
-  color: inherit;
-  font-size: 0.85rem;
-  font-weight: 800;
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
-  opacity: 0.7;
-}
-
-.btn-remove-skill:hover {
-  opacity: 1;
-}
-
-/* Skill Selector & Add Custom Skill */
-.skill-selector-box.compact {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-bottom: 6px;
-}
-
-.skill-select-pill.compact {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--ink-dim);
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 0.725rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-}
-
-.skill-select-pill.compact.active {
-  background: var(--success-tint, rgba(11, 122, 84, 0.09));
-  border-color: var(--success);
-  color: var(--success);
-}
-
-.skill-select-pill.compact.needed.active {
-  background: rgba(185, 28, 28, 0.09);
-  border-color: var(--danger);
-  color: var(--danger);
-}
-
-.custom-skill-input-row.compact {
-  display: flex;
-  gap: 6px;
-}
-
-.custom-skill-input-row.compact input {
-  flex: 1;
-}
-
-.btn-add-skill.compact {
+.applicant-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
   background: var(--ink);
-  border: 1px solid var(--ink);
   color: var(--surface);
-  padding: 0 10px;
-  border-radius: 6px;
+  font-weight: 800;
   font-size: 0.75rem;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.btn-add-skill.compact:hover {
-  background: #000000;
+.applicant-name {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink);
 }
 
-.skill-feedback-msg {
-  font-size: 0.725rem;
+.applicant-meta {
+  font-size: 0.7rem;
+  color: var(--ink-dim);
+}
+
+.status-pill-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.status-pill-badge.accepted {
+  color: var(--success);
+}
+
+.status-pill-badge.declined {
+  color: var(--danger);
+}
+
+.status-pill-badge.pending {
+  color: var(--amber);
+}
+
+.app-pitch-text {
+  font-size: 0.78rem;
+  color: var(--ink);
+  line-height: 1.4;
+  margin: 0;
+  font-style: italic;
+}
+
+.app-skills-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.app-skills-label {
+  font-size: 0.68rem;
   font-weight: 700;
+  color: var(--ink-dim);
+}
+
+.app-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   margin-top: 4px;
 }
 
-.skill-feedback-msg.success {
-  color: var(--success);
-}
-
-.form-error-banner {
-  background: rgba(185, 28, 28, 0.1);
-  border: 1px solid rgba(185, 28, 28, 0.25);
-  color: var(--danger);
-  padding: 6px 10px;
+.btn-accept-app {
+  background: var(--success);
+  color: #ffffff;
+  font-size: 0.725rem;
+  font-weight: 700;
+  padding: 5px 10px;
   border-radius: 6px;
-  font-size: 0.775rem;
-  margin-bottom: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-.modal-footer.compact {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 14px;
-  padding-top: 10px;
-  border-top: 1px solid var(--border);
-}
-
-.tf-loading.compact,
-.tf-empty-state.compact {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 50px 16px;
-  gap: 8px;
-  color: var(--ink-dim);
-  text-align: center;
-}
-
-.tf-empty-state.compact h3 {
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--ink);
-  margin: 0;
-}
-
-.tf-empty-state.compact p {
-  margin: 0 0 10px 0;
-  font-size: 0.8rem;
-  max-width: 380px;
+.btn-accept-app:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
 }

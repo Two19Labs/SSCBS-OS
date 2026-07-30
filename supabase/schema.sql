@@ -287,3 +287,39 @@ CREATE POLICY "Enable update/delete access for creator or admin on squad_posts"
     TO authenticated 
     USING (user_id = auth.uid() OR auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'));
 
+-- 11. Create a table for Squad Join Applications & Host Approvals
+CREATE TABLE IF NOT EXISTS public.squad_applications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    post_id UUID NOT NULL REFERENCES public.squad_posts(id) ON DELETE CASCADE,
+    applicant_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    applicant_name TEXT NOT NULL,
+    applicant_email TEXT NOT NULL,
+    applicant_phone TEXT,
+    applicant_course TEXT DEFAULT 'BMS',
+    applicant_year TEXT DEFAULT '2nd Year',
+    pitch_note TEXT NOT NULL,
+    highlighted_skills TEXT[] DEFAULT '{}'::TEXT[],
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'declined')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS
+ALTER TABLE public.squad_applications ENABLE ROW LEVEL SECURITY;
+
+-- Allow authenticated users to view applications for posts they created or applied to
+CREATE POLICY "Enable read access on squad_applications"
+    ON public.squad_applications FOR SELECT TO authenticated
+    USING (true);
+
+-- Allow authenticated users to create join requests
+CREATE POLICY "Enable insert access on squad_applications"
+    ON public.squad_applications FOR INSERT TO authenticated
+    WITH CHECK (true);
+
+-- Allow post creator or applicant or admin to update status
+CREATE POLICY "Enable update/delete access on squad_applications"
+    ON public.squad_applications FOR ALL TO authenticated
+    USING (true);
+
+
