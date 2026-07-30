@@ -113,9 +113,20 @@
 }
 
 .sidebar-description {
-  margin: 2px 0 12px 0;
+  margin: 2px 0 6px 0;
   font-size: 0.725rem;
   color: var(--text-dim);
+}
+
+.sidebar-naming-note {
+  margin: 0 0 10px 0;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  line-height: 1.35;
+  background: var(--bg-hover, rgba(0, 0, 0, 0.025));
+  padding: 6px 8px;
+  border-radius: 6px;
+  border-left: 2.5px solid var(--accent, #71222c);
 }
 
 .sidebar-input-wrapper {

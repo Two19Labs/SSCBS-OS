@@ -394,7 +394,7 @@ export default function FindMyProfessorPage({ onBack }) {
           <line x1="12" y1="8" x2="12.01" y2="8" />
         </svg>
         <span>
-          <strong>Note:</strong> Timetables reflect the latest schedule sent by college via email. This is NOT real-time tracking — classes and room allocations are subject to change or cancellation at the discretion of professors.
+          <strong>Note:</strong> Timetables reflect the latest schedule sent by college via email. This is NOT real-time tracking — classes and room allocations are subject to change or cancellation at the discretion of professors. Some professors may appear multiple times in the list due to their naming conventions, double check their full names and initials, both.
         </span>
       </div>
 
@@ -406,6 +406,9 @@ export default function FindMyProfessorPage({ onBack }) {
           <div className="sidebar-search-box">
             <h4>SSCBS Faculty List</h4>
             <p className="sidebar-description">Filter and select a professor to track</p>
+            <p className="sidebar-naming-note">
+              * Note: Some professors may appear multiple times in the list due to their naming conventions, double check their full names and initials, both.
+            </p>
             <div className="sidebar-input-wrapper">
               <svg className="sidebar-search-icon" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2.5" fill="none">
                 <circle cx="11" cy="11" r="8"></circle>
