@@ -795,6 +795,7 @@ export default function TeamFinderPage({ onBack }) {
         <div className="tf-posts-grid">
           {filteredPosts.map((post) => {
             const isHost = post.created_by_email === user?.email || post.user_id === user?.id;
+            const isHostOrAdmin = isHost || isAdmin;
             const postApps = applications.filter((a) => a.post_id === post.id);
             const pendingAppsCount = postApps.filter((a) => a.status === 'pending').length;
             
@@ -882,8 +883,8 @@ export default function TeamFinderPage({ onBack }) {
                   </div>
 
                   <div className="card-actions">
-                    {/* Host Controls */}
-                    {isHost ? (
+                    {/* Host or Admin Controls */}
+                    {isHostOrAdmin ? (
                       <>
                         <button
                           className="btn-review-apps"
@@ -910,8 +911,9 @@ export default function TeamFinderPage({ onBack }) {
                         <button
                           className="btn-card-subtle danger"
                           onClick={() => handleDeletePost(post.id)}
+                          title={!isHost ? 'Admin Moderation Delete' : 'Delete Post'}
                         >
-                          Delete
+                          {!isHost ? '🛡 Delete' : 'Delete'}
                         </button>
                       </>
                     ) : (
