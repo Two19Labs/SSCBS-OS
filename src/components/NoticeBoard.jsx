@@ -30,8 +30,20 @@ export default function NoticeBoard() {
     });
   };
 
-  const fetchNotices = async () => {
+  const fetchNotices = async (force = false) => {
     try {
+      if (!force) {
+        const cached = sessionStorage.getItem('sscbs_cached_notices');
+        const cachedTime = sessionStorage.getItem('sscbs_cached_notices_time');
+        if (cached && cachedTime && (Date.now() - Number(cachedTime)) < 120000) {
+          try {
+            setNotices(JSON.parse(cached));
+            setLoading(false);
+            return;
+          } catch (e) {}
+        }
+      }
+
       setLoading(true);
       if (!hasValidCredentials) {
         setNotices(filterActiveNotices(sortNotices(getDefaultCampusNotices())));
@@ -49,7 +61,10 @@ export default function NoticeBoard() {
         console.error('Error loading notices from Supabase:', error);
         setNotices(filterActiveNotices(sortNotices(getDefaultCampusNotices())));
       } else {
-        setNotices(filterActiveNotices(sortNotices(data || [])));
+        const activeNotices = filterActiveNotices(sortNotices(data || []));
+        setNotices(activeNotices);
+        sessionStorage.setItem('sscbs_cached_notices', JSON.stringify(activeNotices));
+        sessionStorage.setItem('sscbs_cached_notices_time', String(Date.now()));
       }
     } catch (err) {
       console.error('Failed to fetch notices:', err);
@@ -67,7 +82,7 @@ export default function NoticeBoard() {
       const channel = supabase
         .channel('public:notices')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'notices' }, () => {
-          fetchNotices();
+          fetchNotices(true);
         })
         .subscribe();
 

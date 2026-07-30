@@ -128,7 +128,7 @@ function updateLocalAndState(remoteList = []) {
     const now = Date.now();
     const merged = {};
 
-    // 1. Local Storage active sessions (60s drift tolerance)
+    // 1. Local Storage active sessions (60s drift tolerance across browser tabs)
     const raw = localStorage.getItem('sscbs_online_presence_v5');
     let localMap = raw ? JSON.parse(raw) : {};
     if (typeof localMap !== 'object' || !localMap) localMap = {};
@@ -195,25 +195,6 @@ function updateLocalAndState(remoteList = []) {
 
     latestPresenceMap = userMap;
     broadcastPresenceToSubscribers();
-
-    // 5. Asynchronously fetch DB presence rows in background without overwriting active WebSocket state
-    if (hasValidCredentials) {
-      fetchActivePresenceFromDB().then(dbList => {
-        if (Array.isArray(dbList) && dbList.length > 0) {
-          let updated = false;
-          dbList.forEach(item => {
-            if (item && item.email) {
-              const existing = latestPresenceMap[item.email];
-              if (!existing || (item.lastPing || 0) >= (existing.lastPing || 0) || item.currentView !== existing.currentView) {
-                latestPresenceMap[item.email] = item;
-                updated = true;
-              }
-            }
-          });
-          if (updated) broadcastPresenceToSubscribers();
-        }
-      }).catch(() => {});
-    }
   } catch (e) {
     // ignore sync errors
   }
@@ -228,10 +209,10 @@ function sendPresencePing() {
   // 1. Immediate local memory & storage update
   updateLocalAndState([]);
 
-  // 2. Track over WebSocket ONLY on view change or every 25 seconds
+  // 2. Track over WebSocket ONLY on view change or every 60 seconds
   const now = Date.now();
   if (hasValidCredentials && activePresenceChannel) {
-    if (lastTrackedView !== payload.currentView || (now - lastTrackTime) > 25000) {
+    if (lastTrackedView !== payload.currentView || (now - lastTrackTime) > 60000) {
       lastTrackedView = payload.currentView;
       lastTrackTime = now;
       try {
@@ -239,41 +220,14 @@ function sendPresencePing() {
       } catch (e) {}
     }
   }
-
-  // 3. Database HTTP active_presence upsert throttled to once every 15 seconds (or on view change)
-  if (hasValidCredentials) {
-    if (lastTrackedView !== payload.currentView || (now - lastDbPingTime) > 15000) {
-      lastDbPingTime = now;
-      try {
-        supabase.from('active_presence').upsert({
-          session_id: payload.session_id,
-          user_id: payload.id,
-          name: payload.name,
-          email: payload.email,
-          course: payload.course,
-          semester: payload.semester,
-          section: payload.section,
-          current_view: payload.currentView,
-          view_label: payload.viewLabel,
-          device: payload.device,
-          last_ping: new Date().toISOString()
-        }).then(() => {}).catch(() => {});
-      } catch (e) {}
-    }
-  }
 }
 
 function initGlobalPresenceTracker() {
   if (!presenceHeartbeatTimer) {
+    // Lightweight local ping timer every 10 seconds for tab freshness
     presenceHeartbeatTimer = setInterval(() => {
       sendPresencePing();
-    }, 1000);
-  }
-
-  if (!dbPresencePollingTimer) {
-    dbPresencePollingTimer = setInterval(() => {
-      updateLocalAndState([]);
-    }, 3000);
+    }, 10000);
   }
 
   // Setup Singleton Supabase Realtime Channel if not yet created
@@ -398,44 +352,6 @@ export async function logFeatureView(featureId, user) {
           created_at: new Date().toISOString()
         }])
         .then(() => {})
-        .catch(() => {});
-
-      supabase
-        .from('system_configs')
-        .select('value')
-        .eq('key', 'analytics_events_v2')
-        .maybeSingle()
-        .then(async ({ data }) => {
-          let eventsMap = data?.value || {};
-          if (typeof eventsMap !== 'object' || !eventsMap) eventsMap = {};
-          if (!eventsMap[dateStr]) {
-            eventsMap[dateStr] = {
-              visits: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 },
-              hourly: {}
-            };
-          }
-          if (!eventsMap[dateStr].visits) {
-            eventsMap[dateStr].visits = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 };
-          }
-          if (!eventsMap[dateStr].hourly) {
-            eventsMap[dateStr].hourly = {};
-          }
-          if (!eventsMap[dateStr].hourly[hourKey]) {
-            eventsMap[dateStr].hourly[hourKey] = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 };
-          }
-
-          eventsMap[dateStr].visits[featureId] = (eventsMap[dateStr].visits[featureId] || 0) + 1;
-          eventsMap[dateStr].visits.total = (eventsMap[dateStr].visits.total || 0) + 1;
-
-          eventsMap[dateStr].hourly[hourKey][featureId] = (eventsMap[dateStr].hourly[hourKey][featureId] || 0) + 1;
-          eventsMap[dateStr].hourly[hourKey].total = (eventsMap[dateStr].hourly[hourKey].total || 0) + 1;
-
-          await supabase.from('system_configs').upsert({
-            key: 'analytics_events_v2',
-            value: eventsMap,
-            updated_at: new Date().toISOString()
-          }).catch(() => {});
-        })
         .catch(() => {});
     } catch (e) {
       // Completely non-blocking

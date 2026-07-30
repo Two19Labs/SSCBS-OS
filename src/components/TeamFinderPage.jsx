@@ -90,7 +90,21 @@ export default function TeamFinderPage({ onBack }) {
   const [applySuccess, setApplySuccess] = useState('');
 
   // Fetch real posts & applications from Supabase
-  const fetchPostsAndApps = async () => {
+  const fetchPostsAndApps = async (force = false) => {
+    if (!force) {
+      const cachedTime = sessionStorage.getItem('sscbs_squad_fetched_time');
+      const savedPosts = localStorage.getItem('sscbs_squad_posts');
+      const savedApps = localStorage.getItem('sscbs_squad_apps');
+      if (cachedTime && (Date.now() - Number(cachedTime)) < 60000 && savedPosts) {
+        try {
+          if (savedPosts) setPosts(JSON.parse(savedPosts));
+          if (savedApps) setApplications(JSON.parse(savedApps));
+          setLoading(false);
+          return;
+        } catch (e) {}
+      }
+    }
+
     setLoading(true);
     try {
       if (hasValidCredentials) {
@@ -118,6 +132,7 @@ export default function TeamFinderPage({ onBack }) {
         } else if (appsRes.error) {
           console.error('Supabase fetch apps error:', appsRes.error);
         }
+        sessionStorage.setItem('sscbs_squad_fetched_time', String(Date.now()));
       } else {
         const savedPosts = localStorage.getItem('sscbs_squad_posts');
         const savedApps = localStorage.getItem('sscbs_squad_apps');
@@ -138,14 +153,14 @@ export default function TeamFinderPage({ onBack }) {
       const channelPosts = supabase
         .channel('public:squad_posts')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'squad_posts' }, () => {
-          fetchPostsAndApps();
+          fetchPostsAndApps(true);
         })
         .subscribe();
 
       const channelApps = supabase
         .channel('public:squad_applications')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'squad_applications' }, () => {
-          fetchPostsAndApps();
+          fetchPostsAndApps(true);
         })
         .subscribe();
 

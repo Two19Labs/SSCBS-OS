@@ -1,6 +1,7 @@
 /* =========================================================
    Team Finder & Competition Hub — SSCBS OS Design System
    Matches Light & Dark theme tokens (--bg, --surface, --ink, --border)
+   Optimized for Desktop, Tablet & Mobile screens
    ========================================================= */
 
 .team-finder-container {
@@ -19,7 +20,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  padding-bottom: 12px;
+  padding-bottom: 14px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -47,6 +48,7 @@
 
 .tf-back-btn:hover {
   border-color: var(--ink);
+  transform: translateX(-2px);
 }
 
 .tf-badge {
@@ -84,6 +86,7 @@
 .btn-tf-primary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   background: var(--ink);
   color: var(--surface);
@@ -148,7 +151,7 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 8px 36px 8px 36px;
+  padding: 9px 36px 9px 36px;
   color: var(--ink);
   font-size: 0.85rem;
   font-family: inherit;
@@ -159,6 +162,7 @@
 .tf-search-box input:focus {
   outline: none;
   border-color: var(--ink);
+  box-shadow: 0 0 0 3px var(--accent-tint, rgba(113, 34, 44, 0.08));
 }
 
 .clear-search-btn {
@@ -206,8 +210,13 @@
   align-items: center;
   gap: 6px;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding-bottom: 6px;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tf-skills-strip::-webkit-scrollbar {
+  display: none;
 }
 
 .strip-label {
@@ -245,7 +254,7 @@
 /* ── Feed Grid ── */
 .tf-posts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 14px;
 }
 
@@ -257,13 +266,20 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.015);
+  animation: tfCardFadeIn 0.25s ease-out;
+}
+
+@keyframes tfCardFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .tf-post-card:hover {
   border-color: var(--border-strong);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
 }
 
 .tf-post-card.closed {
@@ -274,7 +290,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  gap: 8px;
 }
 
 .comp-organizer {
@@ -284,7 +301,7 @@
   letter-spacing: 0.5px;
   color: var(--gold-text, var(--gold));
   background: var(--gold-tint, rgba(176, 141, 62, 0.12));
-  padding: 2px 8px;
+  padding: 3px 8px;
   border-radius: 4px;
 }
 
@@ -295,8 +312,9 @@
   gap: 6px;
   background: var(--bg);
   border: 1px solid var(--border);
-  padding: 2px 8px;
+  padding: 3px 9px;
   border-radius: 999px;
+  flex-shrink: 0;
 }
 
 .squad-dots {
@@ -440,13 +458,14 @@
 
 /* Card Footer */
 .card-footer {
-  margin-top: 10px;
+  margin-top: 12px;
   padding-top: 10px;
   border-top: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .creator-info {
@@ -487,7 +506,9 @@
 .card-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .wa-connect-btn {
@@ -546,6 +567,7 @@
   padding: 5px 9px;
   border-radius: 6px;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .btn-card-subtle:hover {
@@ -560,7 +582,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════
-   FIXED MODALS — MATCHING PROFILE MODAL SPECIFICATIONS
+   FIXED MODALS — PROFILE MODAL SPECIFICATIONS
    ═══════════════════════════════════════════════════════════ */
 
 .tf-modal-overlay {
@@ -1007,13 +1029,87 @@
   max-width: 400px;
 }
 
-/* Mobile Responsiveness */
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN OVERHAUL (PC, TABLET & MOBILE)
+   ═══════════════════════════════════════════════════════════ */
+
 @media (max-width: 640px) {
+  .tf-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .tf-header .btn-tf-primary {
+    width: 100%;
+  }
+
+  .tf-controls-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .tf-search-box {
+    width: 100%;
+  }
+
+  .tf-filter-pills {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .tf-filter-pill {
+    flex-shrink: 0;
+  }
+
+  .tf-posts-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .card-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .card-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
   .tf-form-row {
     flex-direction: column;
     gap: 12px;
   }
-  .tf-posts-grid {
-    grid-template-columns: 1fr;
+
+  .tf-modal-overlay {
+    padding: 0;
+    align-items: flex-end;
   }
+
+  .tf-modal-card {
+    max-width: 100%;
+    max-height: 88vh;
+    max-height: 88dvh;
+    border-radius: 20px 20px 0 0;
+    animation: tfSlideUpSheet 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .tf-modal-header {
+    padding: 16px 20px;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .tf-modal-form {
+    padding: 18px 20px calc(24px + env(safe-area-inset-bottom, 0px)) 20px;
+  }
+}
+
+@keyframes tfSlideUpSheet {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
 }
