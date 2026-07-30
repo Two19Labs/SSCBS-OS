@@ -552,7 +552,7 @@ export default function TeamFinderPage({ onBack }) {
           <h2>Team Finder & Competition Hub</h2>
           <p>
             This feature is currently restricted to SSCBS OS administrators (
-            <code>aditya.25015@sscbs.du.ac.in</code> & <code>manthan.25138@sscbs.du.ac.in</code>).
+            <code>aditya.25015</code>, <code>manthan.25138</code> & <code>somya.25221</code>).
           </p>
           {onBack && (
             <button className="btn-tf-primary" onClick={onBack} style={{ marginTop: '1rem' }}>

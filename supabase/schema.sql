@@ -285,7 +285,7 @@ CREATE POLICY "Enable update/delete access for creator or admin on squad_posts"
     ON public.squad_posts 
     FOR ALL 
     TO authenticated 
-    USING (user_id = auth.uid() OR auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'));
+    USING (user_id = auth.uid() OR auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in', 'somya.25221@sscbs.du.ac.in'));
 
 -- 11. Create a table for Squad Join Applications & Host Approvals
 CREATE TABLE IF NOT EXISTS public.squad_applications (

@@ -1,6 +1,7 @@
 export const ADMIN_EMAILS = [
   'aditya.25015@sscbs.du.ac.in',
   'manthan.25138@sscbs.du.ac.in',
+  'somya.25221@sscbs.du.ac.in',
 ];
 
 export function isAdminEmail(email) {
