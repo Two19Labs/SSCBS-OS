@@ -99,13 +99,23 @@ export default function TeamFinderPage({ onBack }) {
         ]);
 
         if (!postsRes.error && postsRes.data) {
-          setPosts(postsRes.data);
-          localStorage.setItem('sscbs_squad_posts', JSON.stringify(postsRes.data));
+          const enrichedPosts = postsRes.data.map((p) => ({
+            ...p,
+            created_by_name: p.created_by_name || (p.created_by_email ? p.created_by_email.split('@')[0] : 'Student Lead'),
+            created_by_email: p.created_by_email || '',
+            total_members: p.total_members || (p.spots_left ? p.spots_left + 1 : 4),
+          }));
+          setPosts(enrichedPosts);
+          localStorage.setItem('sscbs_squad_posts', JSON.stringify(enrichedPosts));
+        } else if (postsRes.error) {
+          console.error('Supabase fetch posts error:', postsRes.error);
         }
 
         if (!appsRes.error && appsRes.data) {
           setApplications(appsRes.data);
           localStorage.setItem('sscbs_squad_apps', JSON.stringify(appsRes.data));
+        } else if (appsRes.error) {
+          console.error('Supabase fetch apps error:', appsRes.error);
         }
       } else {
         const savedPosts = localStorage.getItem('sscbs_squad_posts');
@@ -257,17 +267,47 @@ export default function TeamFinderPage({ onBack }) {
 
     try {
       if (hasValidCredentials) {
-        const { data, error } = await supabase
+        // 1. Try full insert
+        let res = await supabase
           .from('squad_posts')
           .insert([postPayload])
           .select();
 
-        if (!error && data && data[0]) {
-          postPayload.id = data[0].id;
+        if (res.error) {
+          console.warn('Full payload insert warning, trying core payload:', res.error);
+          // 2. Fallback insert with core columns
+          const corePayload = {
+            user_id: user?.id,
+            competition_name: postPayload.competition_name,
+            organizer: postPayload.organizer,
+            competition_link: postPayload.competition_link,
+            phone_number: postPayload.phone_number,
+            title: postPayload.title,
+            description: postPayload.description,
+            skills_have: postPayload.skills_have,
+            skills_looking_for: postPayload.skills_looking_for,
+            spots_left: postPayload.spots_left,
+            course: postPayload.course,
+            year: postPayload.year,
+            is_open: postPayload.is_open,
+          };
+          res = await supabase
+            .from('squad_posts')
+            .insert([corePayload])
+            .select();
+        }
+
+        if (!res.error && res.data && res.data[0]) {
+          postPayload.id = res.data[0].id;
+        } else if (res.error) {
+          console.error('Supabase squad_posts insert error:', res.error);
+          setFormError('Could not save post online: ' + (res.error.message || 'Database error'));
+          setSubmitting(false);
+          return;
         }
       }
     } catch (err) {
-      console.warn('Saving locally:', err);
+      console.error('Exception during post submission:', err);
     }
 
     if (!postPayload.id) {

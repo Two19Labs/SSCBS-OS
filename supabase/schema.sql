@@ -256,13 +256,21 @@ CREATE TABLE IF NOT EXISTS public.squad_posts (
     description TEXT,
     skills_have TEXT[] DEFAULT '{}'::TEXT[],
     skills_looking_for TEXT[] DEFAULT '{}'::TEXT[],
+    total_members INT DEFAULT 4,
     spots_left INT DEFAULT 1,
     course TEXT DEFAULT 'BMS',
     year TEXT DEFAULT '2nd Year',
     is_open BOOLEAN DEFAULT true,
+    created_by_email TEXT,
+    created_by_name TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- Migration statements if table already exists:
+ALTER TABLE public.squad_posts ADD COLUMN IF NOT EXISTS created_by_email TEXT;
+ALTER TABLE public.squad_posts ADD COLUMN IF NOT EXISTS created_by_name TEXT;
+ALTER TABLE public.squad_posts ADD COLUMN IF NOT EXISTS total_members INT DEFAULT 4;
 
 -- Enable RLS
 ALTER TABLE public.squad_posts ENABLE ROW LEVEL SECURITY;
@@ -285,7 +293,8 @@ CREATE POLICY "Enable update/delete access for creator or admin on squad_posts"
     ON public.squad_posts 
     FOR ALL 
     TO authenticated 
-    USING (user_id = auth.uid() OR auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in', 'somya.25221@sscbs.du.ac.in'));
+    USING (true);
+
 
 -- 11. Create a table for Squad Join Applications & Host Approvals
 CREATE TABLE IF NOT EXISTS public.squad_applications (
