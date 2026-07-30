@@ -60,12 +60,17 @@ export default function TeamFinderPage({ onBack }) {
     skills_looking_for: [],
     custom_skill_have: '',
     custom_skill_looking: '',
+    total_members: 4,
     spots_left: 1,
     course: user?.user_metadata?.course || 'BMS',
     year: user?.user_metadata?.semester ? `Sem ${user.user_metadata.semester}` : '2nd Year',
   });
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
+
+  // Skill Feedback messages
+  const [skillHaveFeedback, setSkillHaveFeedback] = useState('');
+  const [skillLookingFeedback, setSkillLookingFeedback] = useState('');
 
   // Fetch real posts from Supabase (or localStorage sync if offline)
   const fetchPosts = async () => {
@@ -143,27 +148,53 @@ export default function TeamFinderPage({ onBack }) {
   };
 
   const handleAddCustomSkillHave = () => {
-    if (!formData.custom_skill_have.trim()) return;
     const skill = formData.custom_skill_have.trim();
+    if (!skill) return;
+
     if (!formData.skills_have.includes(skill)) {
       setFormData((prev) => ({
         ...prev,
         skills_have: [...prev.skills_have, skill],
         custom_skill_have: '',
       }));
+      setSkillHaveFeedback(`✓ Successfully added "${skill}" to skills present!`);
+      setTimeout(() => setSkillHaveFeedback(''), 3500);
+    } else {
+      setSkillHaveFeedback(`"${skill}" is already added.`);
+      setTimeout(() => setSkillHaveFeedback(''), 3500);
     }
   };
 
   const handleAddCustomSkillLooking = () => {
-    if (!formData.custom_skill_looking.trim()) return;
     const skill = formData.custom_skill_looking.trim();
+    if (!skill) return;
+
     if (!formData.skills_looking_for.includes(skill)) {
       setFormData((prev) => ({
         ...prev,
         skills_looking_for: [...prev.skills_looking_for, skill],
         custom_skill_looking: '',
       }));
+      setSkillLookingFeedback(`✓ Successfully added "${skill}" to skills needed!`);
+      setTimeout(() => setSkillLookingFeedback(''), 3500);
+    } else {
+      setSkillLookingFeedback(`"${skill}" is already added.`);
+      setTimeout(() => setSkillLookingFeedback(''), 3500);
     }
+  };
+
+  const handleRemoveSkillHave = (skill) => {
+    setFormData((prev) => ({
+      ...prev,
+      skills_have: prev.skills_have.filter((s) => s !== skill),
+    }));
+  };
+
+  const handleRemoveSkillLooking = (skill) => {
+    setFormData((prev) => ({
+      ...prev,
+      skills_looking_for: prev.skills_looking_for.filter((s) => s !== skill),
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -185,6 +216,9 @@ export default function TeamFinderPage({ onBack }) {
 
     setSubmitting(true);
 
+    const totalMem = parseInt(formData.total_members, 10) || 4;
+    const openSpots = Math.min(totalMem, parseInt(formData.spots_left, 10) || 1);
+
     const postPayload = {
       user_id: user?.id,
       competition_name: formData.competition_name.trim(),
@@ -195,10 +229,11 @@ export default function TeamFinderPage({ onBack }) {
       description: formData.description.trim(),
       skills_have: formData.skills_have,
       skills_looking_for: formData.skills_looking_for,
-      spots_left: parseInt(formData.spots_left, 10) || 1,
+      total_members: totalMem,
+      spots_left: openSpots,
       course: formData.course,
       year: formData.year,
-      is_open: true,
+      is_open: openSpots > 0,
       created_by_email: user.email,
       created_by_name: user.user_metadata?.full_name || user.email.split('@')[0],
       created_at: new Date().toISOString(),
@@ -213,7 +248,7 @@ export default function TeamFinderPage({ onBack }) {
 
         if (error) {
           console.error('Supabase error inserting post:', error);
-          setFormError('Could not save post to database. Checking fallback...');
+          setFormError('Could not save post to database. Saving locally...');
         } else if (data && data[0]) {
           postPayload.id = data[0].id;
         }
@@ -244,6 +279,7 @@ export default function TeamFinderPage({ onBack }) {
       skills_looking_for: [],
       custom_skill_have: '',
       custom_skill_looking: '',
+      total_members: 4,
       spots_left: 1,
       course: user?.user_metadata?.course || 'BMS',
       year: user?.user_metadata?.semester ? `Sem ${user.user_metadata.semester}` : '2nd Year',
@@ -285,6 +321,30 @@ export default function TeamFinderPage({ onBack }) {
     }
   };
 
+  // Helper function to render visual dots: ● filled vs ○ open
+  const renderSquadDots = (totalMembers = 4, openSpots = 1, isOpen = true) => {
+    const total = Math.max(1, parseInt(totalMembers, 10) || 4);
+    const open = isOpen ? Math.min(total, Math.max(0, parseInt(openSpots, 10) || 0)) : 0;
+    const filled = Math.max(0, total - open);
+
+    const dots = [];
+    for (let i = 0; i < filled; i++) {
+      dots.push(<span key={`f-${i}`} className="squad-dot filled" title="Filled Member Spot">●</span>);
+    }
+    for (let i = 0; i < open; i++) {
+      dots.push(<span key={`o-${i}`} className="squad-dot open" title="Open Slot Looking for Member">○</span>);
+    }
+
+    return (
+      <div className="squad-dots-wrapper" title={`${filled}/${total} slots filled (${open} open)`}>
+        <div className="squad-dots">{dots}</div>
+        <span className="squad-dots-subtext">
+          {open > 0 ? `${open} open` : 'Full'}
+        </span>
+      </div>
+    );
+  };
+
   // Filtering
   const filteredPosts = posts.filter((post) => {
     const matchesSearch =
@@ -308,11 +368,11 @@ export default function TeamFinderPage({ onBack }) {
 
   if (!isAdmin) {
     return (
-      <div className="team-finder-container">
+      <div className="team-finder-container compact">
         <div className="admin-restricted-card">
           <div className="restricted-badge">
-            <ShieldIcon size={20} />
-            <span>Admin Beta Access Restricted</span>
+            <ShieldIcon size={18} />
+            <span>Admin Beta Restricted</span>
           </div>
           <h2>Team Finder & Competition Hub</h2>
           <p>
@@ -320,7 +380,7 @@ export default function TeamFinderPage({ onBack }) {
             <code>aditya.25015@sscbs.du.ac.in</code> & <code>manthan.25138@sscbs.du.ac.in</code>).
           </p>
           {onBack && (
-            <button className="btn-tf-primary" onClick={onBack} style={{ marginTop: '1rem' }}>
+            <button className="btn-tf-primary compact" onClick={onBack} style={{ marginTop: '1rem' }}>
               <BackIcon /> Return to Dashboard
             </button>
           )}
@@ -330,37 +390,37 @@ export default function TeamFinderPage({ onBack }) {
   }
 
   return (
-    <div className="team-finder-container">
+    <div className="team-finder-container compact">
       {/* ── Header ── */}
-      <header className="tf-header">
+      <header className="tf-header compact">
         <div className="tf-header-left">
           {onBack && (
-            <button className="tf-back-btn" onClick={onBack} title="Back">
+            <button className="tf-back-btn compact" onClick={onBack} title="Back">
               <BackIcon />
             </button>
           )}
           <div>
-            <div className="tf-badge">
-              <ShieldIcon size={13} />
+            <div className="tf-badge compact">
+              <ShieldIcon size={12} />
               <span>ADMIN PREVIEW</span>
             </div>
-            <h1 className="tf-title">Team Finder & Competition Hub</h1>
-            <p className="tf-subtitle">
-              Connect with peers, find complementary skills, and form teams for case competitions & hackathons.
+            <h1 className="tf-title compact">Team Finder & Competition Hub</h1>
+            <p className="tf-subtitle compact">
+              Connect with peers, match complementary skills, and form competition teams.
             </p>
           </div>
         </div>
 
-        <button className="btn-tf-primary" onClick={() => setIsCreateModalOpen(true)}>
-          <UsersIcon size={18} />
+        <button className="btn-tf-primary compact" onClick={() => setIsCreateModalOpen(true)}>
+          <UsersIcon size={16} />
           <span>Post Team Opening</span>
         </button>
       </header>
 
       {/* ── Filter Bar ── */}
-      <div className="tf-controls-bar">
-        <div className="tf-search-box">
-          <SearchIcon size={16} />
+      <div className="tf-controls-bar compact">
+        <div className="tf-search-box compact">
+          <SearchIcon size={15} />
           <input
             type="text"
             placeholder="Search competitions, skills, or organizers..."
@@ -374,33 +434,33 @@ export default function TeamFinderPage({ onBack }) {
           )}
         </div>
 
-        <div className="tf-filter-pills">
+        <div className="tf-filter-pills compact">
           <button
-            className={`tf-filter-pill ${filterType === 'all' ? 'active' : ''}`}
+            className={`tf-filter-pill compact ${filterType === 'all' ? 'active' : ''}`}
             onClick={() => setFilterType('all')}
           >
-            All Listings ({posts.length})
+            All ({posts.length})
           </button>
           <button
-            className={`tf-filter-pill ${filterType === 'open' ? 'active' : ''}`}
+            className={`tf-filter-pill compact ${filterType === 'open' ? 'active' : ''}`}
             onClick={() => setFilterType('open')}
           >
             Open ({posts.filter((p) => p.is_open).length})
           </button>
           <button
-            className={`tf-filter-pill ${filterType === 'my_posts' ? 'active' : ''}`}
+            className={`tf-filter-pill compact ${filterType === 'my_posts' ? 'active' : ''}`}
             onClick={() => setFilterType('my_posts')}
           >
-            My Openings ({posts.filter((p) => p.created_by_email === user?.email || p.user_id === user?.id).length})
+            Mine ({posts.filter((p) => p.created_by_email === user?.email || p.user_id === user?.id).length})
           </button>
         </div>
       </div>
 
       {/* ── Skill Tag Quick Filter Strip ── */}
-      <div className="tf-skills-strip">
-        <span className="strip-label">Skill needed:</span>
+      <div className="tf-skills-strip compact">
+        <span className="strip-label compact">Skill needed:</span>
         <button
-          className={`skill-tag-filter ${selectedSkillFilter === '' ? 'selected' : ''}`}
+          className={`skill-tag-filter compact ${selectedSkillFilter === '' ? 'selected' : ''}`}
           onClick={() => setSelectedSkillFilter('')}
         >
           All Skills
@@ -408,7 +468,7 @@ export default function TeamFinderPage({ onBack }) {
         {DEFAULT_SKILLS.slice(0, 6).map((skill) => (
           <button
             key={skill}
-            className={`skill-tag-filter ${selectedSkillFilter === skill ? 'selected' : ''}`}
+            className={`skill-tag-filter compact ${selectedSkillFilter === skill ? 'selected' : ''}`}
             onClick={() => setSelectedSkillFilter(selectedSkillFilter === skill ? '' : skill)}
           >
             {skill}
@@ -418,57 +478,55 @@ export default function TeamFinderPage({ onBack }) {
 
       {/* ── Feed Grid ── */}
       {loading ? (
-        <div className="tf-loading">
+        <div className="tf-loading compact">
           <div className="notice-spinner"></div>
           <p>Loading squad postings…</p>
         </div>
       ) : filteredPosts.length === 0 ? (
-        <div className="tf-empty-state">
-          <TrophyIcon size={36} />
+        <div className="tf-empty-state compact">
+          <TrophyIcon size={32} />
           <h3>No team postings found</h3>
           <p>
             {searchQuery || selectedSkillFilter || filterType !== 'all'
               ? 'No team listings match your current filters.'
               : 'There are currently no active team postings. Post a new opening to start building your squad!'}
           </p>
-          <button className="btn-tf-primary" onClick={() => setIsCreateModalOpen(true)}>
+          <button className="btn-tf-primary compact" onClick={() => setIsCreateModalOpen(true)}>
             Post Team Opening
           </button>
         </div>
       ) : (
-        <div className="tf-posts-grid">
+        <div className="tf-posts-grid compact">
           {filteredPosts.map((post) => (
-            <div key={post.id} className={`tf-post-card ${!post.is_open ? 'closed' : ''}`}>
-              <div className="card-top-bar">
-                <span className="comp-organizer">{post.organizer || 'Corporate / Society'}</span>
-                <span className={`micro-label ${post.is_open ? 'success' : 'dim'}`}>
-                  {post.is_open ? `${post.spots_left || 1} SPOT(S) LEFT` : 'FILLED'}
-                </span>
+            <div key={post.id} className={`tf-post-card compact ${!post.is_open ? 'closed' : ''}`}>
+              <div className="card-top-bar compact">
+                <span className="comp-organizer compact">{post.organizer || 'Corporate / Society'}</span>
+                {renderSquadDots(post.total_members || 4, post.spots_left || 1, post.is_open)}
               </div>
 
-              <h2 className="comp-name">{post.competition_name}</h2>
+              <h2 className="comp-name compact">{post.competition_name}</h2>
 
               {post.competition_link && (
                 <a
                   href={post.competition_link.startsWith('http') ? post.competition_link : `https://${post.competition_link}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="comp-link"
+                  className="comp-link compact"
                 >
-                  <FileIcon size={14} /> Competition Link ↗
+                  <FileIcon size={13} /> Official Link ↗
                 </a>
               )}
 
-              <h3 className="post-title">{post.title}</h3>
-              {post.description && <p className="post-desc">{post.description}</p>}
+              <h3 className="post-title compact">{post.title}</h3>
+              {post.description && <p className="post-desc compact">{post.description}</p>}
 
               {/* Skills We Have */}
               {post.skills_have && post.skills_have.length > 0 && (
-                <div className="skills-group">
-                  <span className="skills-group-label">Skills Present:</span>
-                  <div className="skills-pills">
+                <div className="skills-group compact">
+                  <span className="skills-group-label compact">Skills Present:</span>
+                  <div className="skills-pills compact">
                     {post.skills_have.map((s, idx) => (
-                      <span key={idx} className="skill-pill present">
+                      <span key={idx} className="skill-pill present compact">
                         ✓ {s}
                       </span>
                     ))}
@@ -478,11 +536,11 @@ export default function TeamFinderPage({ onBack }) {
 
               {/* Skills We Need */}
               {post.skills_looking_for && post.skills_looking_for.length > 0 && (
-                <div className="skills-group">
-                  <span className="skills-group-label">Looking For:</span>
-                  <div className="skills-pills">
+                <div className="skills-group compact">
+                  <span className="skills-group-label compact">Looking For:</span>
+                  <div className="skills-pills compact">
                     {post.skills_looking_for.map((s, idx) => (
-                      <span key={idx} className="skill-pill needed">
+                      <span key={idx} className="skill-pill needed compact">
                         ⚡ {s}
                       </span>
                     ))}
@@ -491,20 +549,20 @@ export default function TeamFinderPage({ onBack }) {
               )}
 
               {/* Card Footer */}
-              <div className="card-footer">
-                <div className="creator-info">
-                  <span className="creator-avatar">
+              <div className="card-footer compact">
+                <div className="creator-info compact">
+                  <span className="creator-avatar compact">
                     {(post.created_by_name || post.created_by_email || 'A').charAt(0).toUpperCase()}
                   </span>
-                  <span className="creator-details">
-                    <span className="creator-name">{post.created_by_name || 'Student'}</span>
-                    <span className="creator-course">
+                  <span className="creator-details compact">
+                    <span className="creator-name compact">{post.created_by_name || 'Student'}</span>
+                    <span className="creator-course compact">
                       {post.course} • {post.year}
                     </span>
                   </span>
                 </div>
 
-                <div className="card-actions">
+                <div className="card-actions compact">
                   {post.phone_number && (
                     <a
                       href={`https://wa.me/${post.phone_number.replace(/\D/g, '')}?text=Hi!%20Saw%20your%20team%20post%20for%20${encodeURIComponent(
@@ -512,23 +570,23 @@ export default function TeamFinderPage({ onBack }) {
                       )}%20on%20SSCBS%20OS.`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="wa-connect-btn"
+                      className="wa-connect-btn compact"
                       title="Direct WhatsApp Connect"
                     >
-                      <WhatsAppIcon size={15} /> WhatsApp
+                      <WhatsAppIcon size={14} /> WhatsApp
                     </a>
                   )}
 
                   {(post.created_by_email === user?.email || post.user_id === user?.id) && (
                     <>
                       <button
-                        className="btn-card-subtle"
+                        className="btn-card-subtle compact"
                         onClick={() => handleToggleStatus(post.id, post.is_open)}
                       >
                         {post.is_open ? 'Close' : 'Reopen'}
                       </button>
                       <button
-                        className="btn-card-subtle danger"
+                        className="btn-card-subtle danger compact"
                         onClick={() => handleDeletePost(post.id)}
                       >
                         Delete
@@ -545,15 +603,15 @@ export default function TeamFinderPage({ onBack }) {
       {/* ── Create Post Modal ── */}
       {isCreateModalOpen && (
         <div className="modal-backdrop" onClick={() => setIsCreateModalOpen(false)}>
-          <div className="tf-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
+          <div className="tf-modal compact" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header compact">
               <h2>Post Team Opening</h2>
               <button className="modal-close" onClick={() => setIsCreateModalOpen(false)}>
                 ×
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="tf-form">
+            <form onSubmit={handleSubmit} className="tf-form compact">
               {formError && <div className="form-error-banner">{formError}</div>}
 
               <div className="form-row grid-2">
@@ -562,7 +620,7 @@ export default function TeamFinderPage({ onBack }) {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. EY NextGen Leader, Bain BCN Case Comp"
+                    placeholder="e.g. EY NextGen Leader, Bain BCN"
                     value={formData.competition_name}
                     onChange={(e) => setFormData({ ...formData, competition_name: e.target.value })}
                   />
@@ -620,34 +678,84 @@ export default function TeamFinderPage({ onBack }) {
               </div>
 
               <div className="form-group">
-                <label>Team Overview & Requirements</label>
+                <label>Team Overview & Strategy</label>
                 <textarea
-                  rows="3"
-                  placeholder="Describe your team strategy, current members, deadline, and requirements..."
+                  rows="2"
+                  placeholder="Describe your team composition, strategy, deadline..."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 />
               </div>
 
+              {/* Members & Spots Selector */}
+              <div className="form-row grid-2">
+                <div className="form-group">
+                  <label>Total Team Size</label>
+                  <select
+                    value={formData.total_members}
+                    onChange={(e) => setFormData({ ...formData, total_members: e.target.value })}
+                  >
+                    <option value="2">2 Members</option>
+                    <option value="3">3 Members</option>
+                    <option value="4">4 Members</option>
+                    <option value="5">5 Members</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Open Spots Left</label>
+                  <select
+                    value={formData.spots_left}
+                    onChange={(e) => setFormData({ ...formData, spots_left: e.target.value })}
+                  >
+                    <option value="1">1 Open Spot (● ● ● ○)</option>
+                    <option value="2">2 Open Spots (● ● ○ ○)</option>
+                    <option value="3">3 Open Spots (● ○ ○ ○)</option>
+                    <option value="4">4 Open Spots (○ ○ ○ ○)</option>
+                  </select>
+                </div>
+              </div>
+
               {/* Skills Present */}
               <div className="form-group">
                 <label>Skills Present in Your Team</label>
-                <div className="skill-selector-box">
+
+                {formData.skills_have.length > 0 && (
+                  <div className="selected-skills-row">
+                    <span className="selected-skills-title">Active:</span>
+                    {formData.skills_have.map((skill) => (
+                      <span key={skill} className="selected-skill-pill present">
+                        {skill}
+                        <button
+                          type="button"
+                          className="btn-remove-skill"
+                          onClick={() => handleRemoveSkillHave(skill)}
+                          title="Remove skill"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <div className="skill-selector-box compact">
                   {DEFAULT_SKILLS.map((skill) => (
                     <button
                       type="button"
                       key={skill}
-                      className={`skill-select-pill ${formData.skills_have.includes(skill) ? 'active' : ''}`}
+                      className={`skill-select-pill compact ${formData.skills_have.includes(skill) ? 'active' : ''}`}
                       onClick={() => handleToggleSkillHave(skill)}
                     >
-                      {formData.skills_have.includes(skill) && <CheckIcon size={12} />} {skill}
+                      {formData.skills_have.includes(skill) && <CheckIcon size={11} />} {skill}
                     </button>
                   ))}
                 </div>
-                <div className="custom-skill-input-row">
+
+                <div className="custom-skill-input-row compact">
                   <input
                     type="text"
-                    placeholder="Add custom skill present..."
+                    placeholder="Type custom skill..."
                     value={formData.custom_skill_have}
                     onChange={(e) => setFormData({ ...formData, custom_skill_have: e.target.value })}
                     onKeyDown={(e) => {
@@ -657,31 +765,55 @@ export default function TeamFinderPage({ onBack }) {
                       }
                     }}
                   />
-                  <button type="button" onClick={handleAddCustomSkillHave} className="btn-add-skill">
-                    + Add
+                  <button type="button" onClick={handleAddCustomSkillHave} className="btn-add-skill compact">
+                    + Add Skill
                   </button>
                 </div>
+                {skillHaveFeedback && (
+                  <div className="skill-feedback-msg success">{skillHaveFeedback}</div>
+                )}
               </div>
 
               {/* Skills Needed */}
               <div className="form-group">
-                <label>Skills Needed in Teammates</label>
-                <div className="skill-selector-box">
+                <label>Skills Needed in Teammate(s)</label>
+
+                {formData.skills_looking_for.length > 0 && (
+                  <div className="selected-skills-row">
+                    <span className="selected-skills-title">Needed:</span>
+                    {formData.skills_looking_for.map((skill) => (
+                      <span key={skill} className="selected-skill-pill needed">
+                        {skill}
+                        <button
+                          type="button"
+                          className="btn-remove-skill"
+                          onClick={() => handleRemoveSkillLooking(skill)}
+                          title="Remove skill"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <div className="skill-selector-box compact">
                   {DEFAULT_SKILLS.map((skill) => (
                     <button
                       type="button"
                       key={skill}
-                      className={`skill-select-pill needed ${formData.skills_looking_for.includes(skill) ? 'active' : ''}`}
+                      className={`skill-select-pill compact needed ${formData.skills_looking_for.includes(skill) ? 'active' : ''}`}
                       onClick={() => handleToggleSkillLooking(skill)}
                     >
-                      {formData.skills_looking_for.includes(skill) && <CheckIcon size={12} />} {skill}
+                      {formData.skills_looking_for.includes(skill) && <CheckIcon size={11} />} {skill}
                     </button>
                   ))}
                 </div>
-                <div className="custom-skill-input-row">
+
+                <div className="custom-skill-input-row compact">
                   <input
                     type="text"
-                    placeholder="Add custom skill needed..."
+                    placeholder="Type custom skill needed..."
                     value={formData.custom_skill_looking}
                     onChange={(e) => setFormData({ ...formData, custom_skill_looking: e.target.value })}
                     onKeyDown={(e) => {
@@ -691,26 +823,16 @@ export default function TeamFinderPage({ onBack }) {
                       }
                     }}
                   />
-                  <button type="button" onClick={handleAddCustomSkillLooking} className="btn-add-skill">
-                    + Add
+                  <button type="button" onClick={handleAddCustomSkillLooking} className="btn-add-skill compact">
+                    + Add Skill
                   </button>
                 </div>
+                {skillLookingFeedback && (
+                  <div className="skill-feedback-msg success">{skillLookingFeedback}</div>
+                )}
               </div>
 
-              <div className="form-row grid-3">
-                <div className="form-group">
-                  <label>Open Spots</label>
-                  <select
-                    value={formData.spots_left}
-                    onChange={(e) => setFormData({ ...formData, spots_left: e.target.value })}
-                  >
-                    <option value="1">1 Spot</option>
-                    <option value="2">2 Spots</option>
-                    <option value="3">3 Spots</option>
-                    <option value="4">4+ Spots</option>
-                  </select>
-                </div>
-
+              <div className="form-row grid-2">
                 <div className="form-group">
                   <label>Course</label>
                   <select
@@ -735,7 +857,7 @@ export default function TeamFinderPage({ onBack }) {
                 </div>
               </div>
 
-              <div className="modal-footer">
+              <div className="modal-footer compact">
                 <button
                   type="button"
                   className="btn-tf-secondary"
@@ -744,7 +866,7 @@ export default function TeamFinderPage({ onBack }) {
                 >
                   Cancel
                 </button>
-                <button type="submit" className="btn-tf-primary" disabled={submitting}>
+                <button type="submit" className="btn-tf-primary compact" disabled={submitting}>
                   {submitting ? 'Publishing…' : 'Publish Opening'}
                 </button>
               </div>
