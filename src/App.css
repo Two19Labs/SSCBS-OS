@@ -240,7 +240,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 16px;
+  padding: max(10px, env(safe-area-inset-top)) 16px 10px;
   background: var(--bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -309,6 +309,7 @@
   margin: 0 auto;
   width: 100%;
   flex: 1;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Tablet / large phone (still tab-bar UI): roomier gutters */
@@ -396,6 +397,10 @@
 .tools-hub-row:hover:not(.locked) {
   border-color: var(--border-strong);
   transform: translateY(-1px);
+}
+
+.tools-hub-row:active:not(.locked) {
+  transform: scale(0.98);
 }
 
 .tools-hub-row.locked {
