@@ -181,27 +181,33 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
   let nextClass = null;
   let activePeriodInfo = null;
 
-  if (timetable && !isWeekend && !todayHoliday) {
-    todayClasses.forEach((cls) => {
-      const periodInfo = PERIODS.find(p => p.id === cls.period || (cls.isBreak && p.id === 0));
-      if (!periodInfo) return;
+  if (!isWeekend && !todayHoliday) {
+    if (currentMinutes >= 720 && currentMinutes < 780) {
+      activeClass = { period: 0, isBreak: true, subject: "Infinity Hour (Break)", teacher: "-", room: "-" };
+      activePeriodInfo = PERIODS.find(p => p.id === 0);
+    } else if (timetable) {
+      todayClasses.forEach((cls) => {
+        const periodInfo = PERIODS.find(p => p.id === cls.period);
+        if (!periodInfo) return;
 
-      const startMin = parseTimeToMinutes(periodInfo.start);
-      const endMin = parseTimeToMinutes(periodInfo.end);
+        const startMin = parseTimeToMinutes(periodInfo.start);
+        const endMin = parseTimeToMinutes(periodInfo.end);
 
-      // Active check
-      if (currentMinutes >= startMin && currentMinutes < endMin) {
-        activeClass = cls;
-        activePeriodInfo = periodInfo;
-      }
-
-      // Next check (first class starting after current time)
-      if (startMin > currentMinutes) {
-        if (!nextClass || startMin < parseTimeToMinutes(PERIODS.find(p => p.id === nextClass.period || (nextClass.isBreak && p.id === 0)).start)) {
-          nextClass = cls;
+        // Active check
+        if (currentMinutes >= startMin && currentMinutes < endMin) {
+          activeClass = cls;
+          activePeriodInfo = periodInfo;
         }
-      }
-    });
+
+        // Next check (first class starting after current time)
+        if (startMin > currentMinutes) {
+          const nextStart = parseTimeToMinutes(PERIODS.find(p => p.id === (nextClass?.period || 0))?.start || '23:59');
+          if (!nextClass || startMin < nextStart) {
+            nextClass = cls;
+          }
+        }
+      });
+    }
   }
 
   const progressPercent = getProgressPercent(activePeriodInfo);
@@ -566,7 +572,9 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                       const dayClasses = timetable ? timetable[activeWeeklyTab] || [] : [];
                       
                       return PERIODS.map((period) => {
-                        const matchClass = dayClasses.find(c => c.period === period.id || (period.isBreak && c.isBreak));
+                        const matchClass = period.isBreak 
+                          ? { period: 0, isBreak: true, subject: "Infinity Hour (Break)", teacher: "-", room: "-" } 
+                          : dayClasses.find(c => c.period === period.id);
                         const isCurrentPeriod = dayOfWeek === activeWeeklyTab && 
                           (period.isBreak 
                             ? (activeClass && activeClass.isBreak) 
