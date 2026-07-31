@@ -372,6 +372,7 @@ export default function TeamFinderPage({ onBack }) {
         skills_have: formData.skills_have,
         skills_looking_for: formData.skills_looking_for,
         total_members: totalMem,
+        initial_open_spots: openSpots,
         spots_left: openSpots,
         course: userCourse,
         year: userSem,
@@ -408,6 +409,7 @@ export default function TeamFinderPage({ onBack }) {
       skills_have: formData.skills_have,
       skills_looking_for: formData.skills_looking_for,
       total_members: totalMem,
+      initial_open_spots: openSpots,
       spots_left: openSpots,
       course: userCourse,
       year: userSem,
@@ -599,7 +601,22 @@ export default function TeamFinderPage({ onBack }) {
     }, 2000);
   };
 
-  // ── HOST REVIEW & ACCEPTANCE FLOW ──
+// ── SPOT COUNT & STATUS HELPERS ──
+function getPostOpenSpots(post, applications) {
+  if (!post) return 0;
+  const initialOpen = parseInt(post.initial_open_spots, 10) || parseInt(post.spots_left, 10) || 1;
+  const acceptedApps = (applications || []).filter(
+    (a) => String(a.post_id) === String(post.id) && a.status === 'accepted'
+  );
+  return Math.max(0, initialOpen - acceptedApps.length);
+}
+
+function isPostOpen(post, applications) {
+  if (!post) return false;
+  if (post.is_closed_by_host) return false;
+  return getPostOpenSpots(post, applications) > 0;
+}
+
 function getUserApp(applications, postId, userEmail, userId) {
   if (!applications || !postId) return null;
   const emailLower = userEmail ? userEmail.toLowerCase() : '';
@@ -633,8 +650,6 @@ function getUserApp(applications, postId, userEmail, userId) {
     const post = posts.find((p) => String(p.id) === String(app.post_id));
     if (!post) return;
 
-    const currentOpen = Math.max(0, (post.spots_left || 1) - 1);
-    const isNowOpen = currentOpen > 0;
     const appEmailLower = (app.applicant_email || '').toLowerCase();
 
     const updatedApps = applications.map((a) =>
@@ -645,8 +660,11 @@ function getUserApp(applications, postId, userEmail, userId) {
     setApplications(updatedApps);
     localStorage.setItem('sscbs_squad_apps', JSON.stringify(updatedApps));
 
+    const newOpenSpots = getPostOpenSpots(post, updatedApps);
+    const isNowOpen = newOpenSpots > 0;
+
     const updatedPosts = posts.map((p) =>
-      String(p.id) === String(post.id) ? { ...p, spots_left: currentOpen, is_open: isNowOpen } : p
+      String(p.id) === String(post.id) ? { ...p, spots_left: newOpenSpots, is_open: isNowOpen } : p
     );
     setPosts(updatedPosts);
     localStorage.setItem('sscbs_squad_posts', JSON.stringify(updatedPosts));
@@ -665,7 +683,7 @@ function getUserApp(applications, postId, userEmail, userId) {
             .ilike('applicant_email', app.applicant_email);
         }
 
-        await supabase.from('squad_posts').update({ spots_left: currentOpen, is_open: isNowOpen }).eq('id', post.id);
+        await supabase.from('squad_posts').update({ spots_left: newOpenSpots, is_open: isNowOpen }).eq('id', post.id);
       }
     } catch (err) {
       console.warn('Supabase status update error:', err);
@@ -705,7 +723,6 @@ function getUserApp(applications, postId, userEmail, userId) {
     const post = posts.find((p) => String(p.id) === String(app.post_id));
     if (!post) return;
 
-    const currentOpen = Math.min((post.total_members || 4), (post.spots_left || 0) + 1);
     const appEmailLower = (app.applicant_email || '').toLowerCase();
 
     const updatedApps = applications.map((a) => {
@@ -718,8 +735,11 @@ function getUserApp(applications, postId, userEmail, userId) {
     setApplications(updatedApps);
     localStorage.setItem('sscbs_squad_apps', JSON.stringify(updatedApps));
 
+    const newOpenSpots = getPostOpenSpots(post, updatedApps);
+    const isNowOpen = newOpenSpots > 0;
+
     const updatedPosts = posts.map((p) =>
-      String(p.id) === String(post.id) ? { ...p, spots_left: currentOpen, is_open: true } : p
+      String(p.id) === String(post.id) ? { ...p, spots_left: newOpenSpots, is_open: isNowOpen } : p
     );
     setPosts(updatedPosts);
     localStorage.setItem('sscbs_squad_posts', JSON.stringify(updatedPosts));
@@ -745,7 +765,7 @@ function getUserApp(applications, postId, userEmail, userId) {
             .eq('applicant_id', app.applicant_id);
         }
 
-        await supabase.from('squad_posts').update({ spots_left: currentOpen, is_open: true }).eq('id', post.id);
+        await supabase.from('squad_posts').update({ spots_left: newOpenSpots, is_open: isNowOpen }).eq('id', post.id);
       }
     } catch (err) {
       console.warn('Supabase remove member error:', err);
@@ -970,19 +990,20 @@ function getUserApp(applications, postId, userEmail, userId) {
         <div className="tf-posts-grid">
           {filteredPosts.map((post) => {
             const isHost = post.created_by_email === user?.email || post.user_id === user?.id;
-            const isHostOrAdmin = isHost || isAdmin;
             const postApps = applications.filter((a) => a.post_id === post.id);
             const pendingAppsCount = postApps.filter((a) => a.status === 'pending').length;
             
             // Check if current user has already applied
             const userApp = getUserApp(applications, post.id, user?.email, user?.id);
+            const openSpots = getPostOpenSpots(post, applications);
+            const openStatus = isPostOpen(post, applications);
 
             return (
-              <div key={post.id} className={`tf-post-card ${!post.is_open ? 'closed' : ''}`}>
+              <div key={post.id} className={`tf-post-card ${!openStatus ? 'closed' : ''}`}>
                 <div className="card-top-bar">
                   <span className="comp-organizer">{post.organizer || 'Corporate / Society'}</span>
                   <div className="card-top-right">
-                    {renderSquadDots(post.total_members || 4, post.spots_left || 1, post.is_open)}
+                    {renderSquadDots(post.total_members || 4, openSpots, openStatus)}
                     {isAdmin && (
                       <div className="tf-admin-menu-wrapper">
                         <button
@@ -1014,10 +1035,10 @@ function getUserApp(applications, postId, userEmail, userId) {
                               className="tf-admin-menu-item"
                               onClick={() => {
                                 setActiveAdminMenuPostId(null);
-                                handleToggleStatus(post.id, post.is_open);
+                                handleToggleStatus(post.id, openStatus);
                               }}
                             >
-                              {post.is_open ? 'Close Listing' : 'Reopen Listing'}
+                              {openStatus ? 'Close Listing' : 'Reopen Listing'}
                             </button>
                             <button
                               className="tf-admin-menu-item danger"
@@ -1144,9 +1165,9 @@ function getUserApp(applications, postId, userEmail, userId) {
                         </button>
                         <button
                           className="btn-card-subtle"
-                          onClick={() => handleToggleStatus(post.id, post.is_open)}
+                          onClick={() => handleToggleStatus(post.id, openStatus)}
                         >
-                          {post.is_open ? 'Close' : 'Reopen'}
+                          {openStatus ? 'Close' : 'Reopen'}
                         </button>
                         <button
                           className="btn-card-subtle danger"
@@ -1171,7 +1192,7 @@ function getUserApp(applications, postId, userEmail, userId) {
                           </a>
                         )}
 
-                        {post.is_open && (!userApp || userApp.status === 'declined' || userApp.status === 'removed') && (
+                        {openStatus && (!userApp || userApp.status === 'declined' || userApp.status === 'removed') && (
                           <button
                             className="btn-tf-primary"
                             onClick={() => handleOpenApplyModal(post)}
@@ -1524,7 +1545,7 @@ function getUserApp(applications, postId, userEmail, userId) {
               <div>
                 <h3>Review Team Applicants</h3>
                 <p className="tf-modal-subtitle">
-                  {selectedPostForReview.competition_name} • {selectedPostForReview.spots_left} open spot(s)
+                  {selectedPostForReview.competition_name} • {getPostOpenSpots(selectedPostForReview, applications)} open spot(s)
                 </p>
               </div>
               <button className="tf-close-btn" onClick={() => setSelectedPostForReview(null)}>
