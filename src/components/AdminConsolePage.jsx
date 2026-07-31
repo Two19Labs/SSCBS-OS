@@ -1833,7 +1833,7 @@ STRICT EXTRACTION RULES:
               <div className="stat-card-admin highlight-online">
                 <div className="card-icon">🟢</div>
                 <h4>Online Right Now</h4>
-                <p className="stat-number live-pulse-text">{onlinePresence.length}</p>
+                <p className="stat-number">{onlinePresence.length}</p>
                 <p className="stat-subtitle">Students active on OS shell</p>
               </div>
               <div className="stat-card-admin">
@@ -1868,7 +1868,7 @@ STRICT EXTRACTION RULES:
                   </p>
                 </div>
                 <span className="live-presence-indicator">
-                  <span className="pulse-dot-green"></span> {onlinePresence.length} Active Now • Real-Time 1s
+                  {onlinePresence.length} Active Now • Real-Time 1s
                 </span>
               </div>
 
@@ -1942,7 +1942,6 @@ STRICT EXTRACTION RULES:
                               </td>
                               <td>
                                 <span className="ping-time-chip" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                                  <span className="pulse-dot-green" style={{ width: '6px', height: '6px' }}></span>
                                   {pingDiffSec === 0 ? 'Live (Just now)' : `${pingDiffSec}s ago`}
                                 </span>
                               </td>

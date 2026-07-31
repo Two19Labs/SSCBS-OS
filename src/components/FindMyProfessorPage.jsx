@@ -379,7 +379,6 @@ export default function FindMyProfessorPage({ onBack }) {
         </button>
         <div className="page-header-clock">
           <span className="live-pill-small">
-            <span className="live-dot-pulse-green"></span>
             {isSimulated ? 'Simulated' : 'IST Live'}
           </span>
           <span className="header-clock-digits">{clockHours}:{clockMin}:{clockSec} {clockAmPm}</span>
@@ -499,7 +498,7 @@ export default function FindMyProfessorPage({ onBack }) {
                     {currentStatus.status === 'teaching' ? (
                       <div className="alert-box-status teaching">
                         <div className="alert-badge-row">
-                          <span className="badge-live-teaching animate-pulse">Ongoing Class</span>
+                          <span className="badge-live-teaching">Ongoing Class</span>
                           <span className="room-label-badge">Room <strong className="room-bold">{currentStatus.room}</strong></span>
                         </div>
                         <h3 className="alert-subject">{currentStatus.subject}</h3>

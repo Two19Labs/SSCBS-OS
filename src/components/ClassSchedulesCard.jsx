@@ -251,7 +251,6 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
             <div className="tracker-header">
               <div className="tracker-title-group">
                 <span className="live-pill">
-                  <span className="live-dot-pulse"></span>
                   {isSimulated ? 'Simulated' : 'IST Live'}
                 </span>
                 <h2>Class Timetable</h2>
@@ -418,7 +417,6 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                         >
                           <div className="timeline-slot-time">
                             <span>{periodInfo.startLabel}</span>
-                            {isActive && <span className="active-glow-dot"></span>}
                           </div>
                           <div className="timeline-slot-content">
                             <h5 className="slot-subject" title={cls.isBreak ? "Break" : cls.subject}>
@@ -595,7 +593,6 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                               </span>
                               {isCurrentPeriod && (
                                 <span className="timeline-live-badge">
-                                  <span className="live-ping-dot"></span>
                                   LIVE NOW
                                 </span>
                               )}

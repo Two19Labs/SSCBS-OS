@@ -127,13 +127,7 @@
   font-family: var(--mono);
 }
 
-.live-dot-pulse {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: var(--accent-green);
-  animation: pulse 1.5s infinite;
-}
+
 
 .tracker-time-display {
   display: flex;
@@ -513,14 +507,7 @@
   color: var(--accent-gold);
 }
 
-.active-glow-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: var(--accent-gold);
-  box-shadow: 0 0 8px var(--accent-gold);
-  animation: pulse 1.5s infinite;
-}
+
 
 .timeline-slot-content {
   display: flex;

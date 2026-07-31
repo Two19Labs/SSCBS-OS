@@ -60,13 +60,7 @@
   font-family: var(--mono);
 }
 
-.live-dot-pulse-green {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: var(--accent-green);
-  animation: pulse-ring 1.5s infinite;
-}
+
 
 .header-clock-digits {
   font-family: var(--mono);
@@ -1029,11 +1023,7 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes pulse-ring {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(13, 138, 95, 0.4); }
-  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(13, 138, 95, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(13, 138, 95, 0); }
-}
+
 
 @keyframes fadeIn {
   from { opacity: 0; }

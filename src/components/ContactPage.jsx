@@ -66,7 +66,7 @@ export default function ContactPage({ onBack }) {
       {/* Main WhatsApp Card */}
       <div className="contact-card whatsapp-hero-card">
         <div className="whatsapp-card-badge">
-          <span className="pulse-dot"></span> Instant DM
+          Instant DM
         </div>
         <div className="whatsapp-card-content">
           <div className="whatsapp-icon-wrap">
