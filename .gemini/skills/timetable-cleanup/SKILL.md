@@ -57,7 +57,62 @@ Cells containing `/` (e.g. `G1: AM (534) / G2: MV (361)` or `Garima (Hin A) 607 
 4. Resolve teacher names and paper titles for each component.
 5. Format deduplicated `subject`, `teacher`, and `room` strings.
 
-### 7. Execution Checklist & Deployment Routine
+### 7. Find My Professor Faculty Roster Cleaning & Deduplication
+To ensure `FindMyProfessorPage.jsx` renders a 100% clean, pristine roster of official faculty members:
+1. **Initial & Short Name Expansion**:
+   - `AA` ➔ `Dr. Anamika Agarwal`
+   - `AG` / `Anamika Gupta` ➔ `Anamika Gupta`
+   - `AyG` / `Ayushi Gupta` ➔ `Dr. Ayushi Gupta`
+   - `DD` / `Deepali` ➔ `Dr. Deepali Dhaka`
+   - `AM` / `Anuja Mathur` ➔ `Dr. Anuja Mathur`
+   - `TA` ➔ `Dr. Tarannum Ahmad`
+   - `MV` / `MN` / `Mona Verma` ➔ `Dr. Mona Verma`
+   - `SJ` / `Saumya Jain` / `SG` ➔ `Dr. Saumya Jain`
+   - `SKG` ➔ `Dr. Satish Kumar Garg`
+   - `SK` / `PS` / `Praveen` ➔ `Mr. Praveen SK`
+   - `KR` / `KRS` ➔ `Kavita Rastogi`
+   - `OS` ➔ `Dr. Onkar Singh`
+   - `NG` / `NK` / `NKS` ➔ `Dr. Nidhi Kesari`
+   - `NB` / `Neha` ➔ `Dr. Neha Sharma`
+   - `ST` / `Sushmita` ➔ `Dr. Sushmita`
+   - `MA` ➔ `Dr. Mehak Aggarwal`
+   - `Azmi` ➔ `Dr. Azmi Ahmad`
+   - `AV` ➔ `Abhimanyu Verma`
+   - `PA` / `Priyanka` ➔ `Priyanka`
+   - `Komal` ➔ `Komal Sharma`
+   - `Garima` ➔ `Dr. Garima Tripathi`
+   - `SoG` / `Soumya` ➔ `Dr. Soumya Guliyan`
+   - `Vinayak` ➔ `Vinayak Gautam`
+   - `Nisha` / `NR` ➔ `Ms. Nisha Rajput`
+   - `Vipin` / `VP` ➔ `Mr. Vipin Patel`
+   - `Ishan` ➔ `Ishan Jain`
+   - `Ankit` ➔ `Ankit`
+   - `Seema` ➔ `Dr. Seema`
+   - `MT` ➔ `Dr. Madhu Totla`
+   - `SV` ➔ `Shikha Verma`
+   - `MR` / `RK` ➔ `Dr. Raj Kumar`
+   - `TM` ➔ `Mr. Tushar Marwaha`
+   - `Paridhi` ➔ `Paridhi`
+   - `Shipra` ➔ `Ms. Shipra Varshney`
+   - `Guncha` ➔ `Dr. Guncha`
+   - `SP` ➔ `Dr. Shalini Prakash`
+   - `KB` ➔ `Dr. Kumar Bijoy`
+   - `RRS` ➔ `Dr. Rishi Rajan Sahay`
+   - `Sanchi` ➔ `Ms. Sanchi Kalra`
+   - `Ayesha` ➔ `Ms. Ayesha S. Ansari`
+   - `RG` / `Rohan` ➔ `Mr. Rohan Gulati`
+   - `GS` ➔ `Gautam Sharma`
+
+2. **Non-Teacher Token Filter**:
+   - Filter out `GUEST`, `NS`, `EE`, `EE1`, `EE2`, `PG LAB`, `MA L`, `MA LAB`, `ROOM`, `HINDI`, `AECC`, `VAC`, `SEC`, `GE`, `EVS`, `UNSUPERVISED`, `FREE`, `OFF`.
+
+3. **Parenthetical & Group Artifact Stripping**:
+   - Strip leading/trailing colons (`:`), dashes (`-`), and slash artifacts (`G1:`, `G2:`, `P1:`, `P2:`, `GI:`, `GII:`).
+   - Strip parenthetical tags: `(P)`, `(Tute)`, `(L)`, `(Lab)`, `(Python)`, `(Room...)`, `(Hin...)`, `(SEC...)`, `(VAC...)`, `(GE...)`, `(AECC...)`, `(Merged...)`.
+
+---
+
+### 8. Execution Checklist & Deployment Routine
 1. Run `node scripts/parse_official_excels.cjs`.
 2. Verify `src/data/timetables.json` structure (`BMS`, `BBA FIA`, `Bsc Comp Sci` keys for Sems `1`, `3`, `5`, `7`).
 3. Increment `CURRENT_TIMETABLE_VERSION` in `src/context/TimetableContext.jsx` to invalidate client `localStorage` caches.
