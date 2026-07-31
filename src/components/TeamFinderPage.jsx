@@ -564,7 +564,11 @@ export default function TeamFinderPage({ onBack }) {
     const currentOpen = Math.max(0, (post.spots_left || 1) - 1);
     const isNowOpen = currentOpen > 0;
 
-    const updatedApps = applications.map((a) => (a.id === app.id ? { ...a, status: 'accepted' } : a));
+    const updatedApps = applications.map((a) =>
+      a.id === app.id || (a.post_id === app.post_id && a.applicant_email === app.applicant_email)
+        ? { ...a, status: 'accepted' }
+        : a
+    );
     setApplications(updatedApps);
     localStorage.setItem('sscbs_squad_apps', JSON.stringify(updatedApps));
 
@@ -576,14 +580,17 @@ export default function TeamFinderPage({ onBack }) {
 
     try {
       if (hasValidCredentials) {
-        const appQuery = app.id && typeof app.id === 'string' && !app.id.startsWith('app-')
-          ? supabase.from('squad_applications').update({ status: 'accepted' }).eq('id', app.id)
-          : supabase.from('squad_applications').update({ status: 'accepted' }).match({ post_id: app.post_id, applicant_email: app.applicant_email });
+        const isRealId = app.id && !String(app.id).startsWith('app-');
+        if (isRealId) {
+          await supabase.from('squad_applications').update({ status: 'accepted' }).eq('id', app.id);
+        }
+        await supabase
+          .from('squad_applications')
+          .update({ status: 'accepted' })
+          .eq('post_id', app.post_id)
+          .eq('applicant_email', app.applicant_email);
 
-        await Promise.all([
-          appQuery,
-          supabase.from('squad_posts').update({ spots_left: currentOpen, is_open: isNowOpen }).eq('id', post.id),
-        ]);
+        await supabase.from('squad_posts').update({ spots_left: currentOpen, is_open: isNowOpen }).eq('id', post.id);
       }
     } catch (err) {
       console.warn('Supabase status update error:', err);
@@ -591,17 +598,25 @@ export default function TeamFinderPage({ onBack }) {
   };
 
   const handleDeclineApplicant = async (app) => {
-    const updatedApps = applications.map((a) => (a.id === app.id ? { ...a, status: 'declined' } : a));
+    const updatedApps = applications.map((a) =>
+      a.id === app.id || (a.post_id === app.post_id && a.applicant_email === app.applicant_email)
+        ? { ...a, status: 'declined' }
+        : a
+    );
     setApplications(updatedApps);
     localStorage.setItem('sscbs_squad_apps', JSON.stringify(updatedApps));
 
     try {
       if (hasValidCredentials) {
-        if (app.id && typeof app.id === 'string' && !app.id.startsWith('app-')) {
+        const isRealId = app.id && !String(app.id).startsWith('app-');
+        if (isRealId) {
           await supabase.from('squad_applications').update({ status: 'declined' }).eq('id', app.id);
-        } else {
-          await supabase.from('squad_applications').update({ status: 'declined' }).match({ post_id: app.post_id, applicant_email: app.applicant_email });
         }
+        await supabase
+          .from('squad_applications')
+          .update({ status: 'declined' })
+          .eq('post_id', app.post_id)
+          .eq('applicant_email', app.applicant_email);
       }
     } catch (err) {
       console.warn('Supabase status update error:', err);
@@ -614,7 +629,11 @@ export default function TeamFinderPage({ onBack }) {
 
     const currentOpen = Math.min((post.total_members || 4), (post.spots_left || 0) + 1);
 
-    const updatedApps = applications.map((a) => (a.id === app.id ? { ...a, status: 'removed' } : a));
+    const updatedApps = applications.map((a) =>
+      a.id === app.id || (a.post_id === app.post_id && a.applicant_email === app.applicant_email)
+        ? { ...a, status: 'removed' }
+        : a
+    );
     setApplications(updatedApps);
     localStorage.setItem('sscbs_squad_apps', JSON.stringify(updatedApps));
 
@@ -626,14 +645,17 @@ export default function TeamFinderPage({ onBack }) {
 
     try {
       if (hasValidCredentials) {
-        const appQuery = app.id && typeof app.id === 'string' && !app.id.startsWith('app-')
-          ? supabase.from('squad_applications').update({ status: 'removed' }).eq('id', app.id)
-          : supabase.from('squad_applications').update({ status: 'removed' }).match({ post_id: app.post_id, applicant_email: app.applicant_email });
+        const isRealId = app.id && !String(app.id).startsWith('app-');
+        if (isRealId) {
+          await supabase.from('squad_applications').update({ status: 'removed' }).eq('id', app.id);
+        }
+        await supabase
+          .from('squad_applications')
+          .update({ status: 'removed' })
+          .eq('post_id', app.post_id)
+          .eq('applicant_email', app.applicant_email);
 
-        await Promise.all([
-          appQuery,
-          supabase.from('squad_posts').update({ spots_left: currentOpen, is_open: true }).eq('id', post.id),
-        ]);
+        await supabase.from('squad_posts').update({ spots_left: currentOpen, is_open: true }).eq('id', post.id);
       }
     } catch (err) {
       console.warn('Supabase remove member error:', err);
