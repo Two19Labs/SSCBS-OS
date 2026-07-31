@@ -82,6 +82,35 @@
   line-height: 1.4;
 }
 
+/* ── Teaming Guidelines & Auto-Cleanup Banner ── */
+.tf-cleanup-notice {
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.22);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+[data-theme='dark'] .tf-cleanup-notice {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.cleanup-notice-icon {
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.cleanup-notice-text strong {
+  color: var(--accent);
+}
+
 /* ── Standard SSCBS Buttons ── */
 .btn-tf-primary {
   display: inline-flex;

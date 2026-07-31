@@ -109,12 +109,20 @@ export default function TeamFinderPage({ onBack }) {
   const [applyError, setApplyError] = useState('');
   const [applySuccess, setApplySuccess] = useState('');
 
+  const POST_EXPIRATION_MS = 72 * 60 * 60 * 1000; // 72 hours (3 days)
+
   // Fetch real posts & applications from Supabase
   const fetchPostsAndApps = async (force = false) => {
+    const now = Date.now();
+
     if (!force && !hasValidCredentials) {
       const savedPosts = localStorage.getItem('sscbs_squad_posts');
       const savedApps = localStorage.getItem('sscbs_squad_apps');
-      if (savedPosts) setPosts(JSON.parse(savedPosts));
+      if (savedPosts) {
+        const parsed = JSON.parse(savedPosts);
+        const active = parsed.filter((p) => !p.created_at || now - new Date(p.created_at).getTime() <= POST_EXPIRATION_MS);
+        setPosts(active);
+      }
       if (savedApps) setApplications(JSON.parse(savedApps));
       setLoading(false);
       return;
@@ -129,7 +137,17 @@ export default function TeamFinderPage({ onBack }) {
         ]);
 
         if (!postsRes.error && postsRes.data) {
-          const enrichedPosts = postsRes.data.map((p) => ({
+          const expiredPosts = postsRes.data.filter((p) => p.created_at && now - new Date(p.created_at).getTime() > POST_EXPIRATION_MS);
+          const activePostsData = postsRes.data.filter((p) => !p.created_at || now - new Date(p.created_at).getTime() <= POST_EXPIRATION_MS);
+
+          // Auto-delete expired posts older than 72 hours from Supabase
+          if (expiredPosts.length > 0) {
+            const expiredIds = expiredPosts.map((p) => p.id);
+            supabase.from('squad_posts').delete().in('id', expiredIds).then();
+            supabase.from('squad_applications').delete().in('post_id', expiredIds).then();
+          }
+
+          const enrichedPosts = activePostsData.map((p) => ({
             ...p,
             created_by_name: p.created_by_name || (p.created_by_email ? p.created_by_email.split('@')[0] : 'Student Lead'),
             created_by_email: p.created_by_email || '',
@@ -150,7 +168,11 @@ export default function TeamFinderPage({ onBack }) {
       } else {
         const savedPosts = localStorage.getItem('sscbs_squad_posts');
         const savedApps = localStorage.getItem('sscbs_squad_apps');
-        if (savedPosts) setPosts(JSON.parse(savedPosts));
+        if (savedPosts) {
+          const parsed = JSON.parse(savedPosts);
+          const active = parsed.filter((p) => !p.created_at || now - new Date(p.created_at).getTime() <= POST_EXPIRATION_MS);
+          setPosts(active);
+        }
         if (savedApps) setApplications(JSON.parse(savedApps));
       }
     } catch (err) {
@@ -821,6 +843,14 @@ function getUserApp(applications, postId, userEmail, userId) {
           <span>Post Team Opening</span>
         </button>
       </header>
+
+      {/* ── Teaming Guidelines & Auto-Cleanup Banner ── */}
+      <div className="tf-cleanup-notice">
+        <div className="cleanup-notice-icon">🧹</div>
+        <div className="cleanup-notice-text">
+          <strong>Teaming Guidelines:</strong> Please delete your listing once your squad is sorted! To keep the feed fresh and prevent piling up, listings auto-delete after <strong>72 hours (3 days)</strong>.
+        </div>
+      </div>
 
       {/* ── Filter Bar ── */}
       <div className="tf-controls-bar">
