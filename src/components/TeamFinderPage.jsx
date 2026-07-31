@@ -14,6 +14,7 @@ import {
   FileIcon,
   MailIcon,
   MoreVerticalIcon,
+  RefreshIcon,
 } from './icons';
 import './TeamFinderPage.css';
 
@@ -61,6 +62,17 @@ export default function TeamFinderPage({ onBack }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all'); // 'all', 'open', 'my_posts', 'my_requests'
   const [selectedSkillFilter, setSelectedSkillFilter] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [refreshToast, setRefreshToast] = useState('');
+
+  const handleManualRefresh = async () => {
+    setIsRefreshing(true);
+    setRefreshToast('');
+    await fetchPostsAndApps(true);
+    setIsRefreshing(false);
+    setRefreshToast('✨ Listings updated!');
+    setTimeout(() => setRefreshToast(''), 2500);
+  };
   
   // Modals state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -838,10 +850,22 @@ function getUserApp(applications, postId, userEmail, userId) {
           </div>
         </div>
 
-        <button className="btn-tf-primary" onClick={handleOpenCreateModal}>
-          <UsersIcon size={16} />
-          <span>Post Team Opening</span>
-        </button>
+        <div className="tf-header-actions">
+          <button
+            className={`btn-tf-secondary btn-refresh-listings ${isRefreshing ? 'refreshing' : ''}`}
+            onClick={handleManualRefresh}
+            disabled={isRefreshing}
+            title="Fetch latest team openings and peer requests"
+          >
+            <RefreshIcon size={14} className={isRefreshing ? 'spin-icon' : ''} />
+            <span>{isRefreshing ? 'Refreshing…' : 'Refresh Listings'}</span>
+          </button>
+
+          <button className="btn-tf-primary" onClick={handleOpenCreateModal}>
+            <UsersIcon size={16} />
+            <span>Post Team Opening</span>
+          </button>
+        </div>
       </header>
 
       {/* ── Teaming Guidelines & Auto-Cleanup Banner ── */}
@@ -850,6 +874,12 @@ function getUserApp(applications, postId, userEmail, userId) {
         <div className="cleanup-notice-text">
           <strong>Teaming Guidelines:</strong> Please delete your listing once your squad is sorted! To keep the feed fresh and prevent piling up, listings auto-delete after <strong>72 hours (3 days)</strong>.
         </div>
+      </div>
+
+      {/* ── Refresh Tip Banner ── */}
+      <div className="tf-refresh-tip">
+        <span>💡 Been on this page for a while? Click <strong>Refresh Listings</strong> above to see recent moves by peers!</span>
+        {refreshToast && <span className="refresh-toast-msg">{refreshToast}</span>}
       </div>
 
       {/* ── Filter Bar ── */}

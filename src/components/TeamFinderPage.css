@@ -111,6 +111,66 @@
   color: var(--accent);
 }
 
+/* ── Refresh Tip Banner ── */
+.tf-refresh-tip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 14px;
+  font-size: 0.775rem;
+  color: var(--ink-dim);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tf-refresh-tip strong {
+  color: var(--ink);
+}
+
+.refresh-toast-msg {
+  color: var(--success);
+  font-weight: 700;
+  font-size: 0.75rem;
+  animation: tfPopToast 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tfPopToast {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.tf-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-refresh-listings {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 8px;
+}
+
+.btn-refresh-listings:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.spin-icon {
+  animation: tfSpin 0.75s linear infinite;
+}
+
+@keyframes tfSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* ── Standard SSCBS Buttons ── */
 .btn-tf-primary {
   display: inline-flex;

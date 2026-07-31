@@ -184,4 +184,11 @@ export const MoreVerticalIcon = ({ size = 18 }) => (
   </svg>
 );
 
+export const RefreshIcon = ({ size = 18, className = '' }) => (
+  <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21.5 2v6h-6M2.5 22v-6h6" />
+    <path d="M2 11.5a10 10 0 0 1 18.8-4.3L21.5 8M22 12.5a10 10 0 0 1-18.8 4.3L2.5 16" />
+  </svg>
+);
+
 
