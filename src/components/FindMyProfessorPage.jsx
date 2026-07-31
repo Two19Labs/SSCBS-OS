@@ -23,7 +23,7 @@ const NON_TEACHER_PATTERNS = [
   /^hindi\s*[a-d]?$/i,
   /^hindi\s.*/i,
   /^(aecc|vac|sec|ge|evs|sports|physical ed|value addition)$/i,
-  /^(free|unsupervised|break|infinity hour|merged|-|\)|\()$/i,
+  /^(free|unsupervised|break|infinity hour|merged|-|\)|\(|guest|ns|ee|ee1|ee2|pg lab|ma l|ma lab|room.*)$/i,
   /^ee[1-2]?$/i,
   /^social ent/i,
   /^\W*$/
@@ -37,64 +37,102 @@ const isNonTeacher = (name) => {
 
 const FACULTY_DISPLAY_MAP = {
   'aa': 'Dr. Anamika Agarwal',
-  'ag': 'Ayushi Goel',
-  'ayg': 'Ayushi Goel',
+  'ag': 'Anamika Gupta',
+  'anamika gupta': 'Anamika Gupta',
+  'ayg': 'Ayushi Gupta',
+  'ayushi gupta': 'Ayushi Gupta',
   'dd': 'Dr. Deepali Dhaka',
-  'am': 'Dr. Amit Kumar',
+  'deepali': 'Dr. Deepali Dhaka',
+  'am': 'Dr. Anuja Mathur',
+  'anuja mathur': 'Dr. Anuja Mathur',
   'ta': 'Dr. Tarannum Ahmad',
   'mv': 'Dr. Mona Verma',
-  'sj': 'Dr. Shikha Gupta',
-  'skg': 'Dr. Shikha Gupta',
+  'mona verma': 'Dr. Mona Verma',
+  'sj': 'Dr. Saumya Jain',
+  'saumya jain': 'Dr. Saumya Jain',
+  'skg': 'Dr. Satish Kumar Garg',
   'sk': 'Mr. Praveen SK',
   'ps': 'Mr. Praveen SK',
+  'praveen': 'Mr. Praveen SK',
   'kr': 'Kavita Rastogi',
   'krs': 'Dr. Kavita Rastogi',
-  'os': 'Onkar Singh',
-  'ng': 'Neha Gupta',
-  'nb': 'Dr. Neha Bhatia',
-  'st': 'Sonika Thakral',
-  'ma': 'Ms. Mohini Rajput',
+  'os': 'Dr. Onkar Singh',
+  'ng': 'Dr. Nidhi Kesari',
+  'nb': 'Dr. Neha Sharma',
+  'neha': 'Dr. Neha Sharma',
+  'st': 'Dr. Sushmita',
+  'sushmita': 'Dr. Sushmita',
+  'ma': 'Dr. Mehak Aggarwal',
   'mn': 'Dr. Mona Verma',
-  'azmi': 'Dr. Azmi Ashraf',
-  'av': 'Abhimanyu',
-  'pa': 'Dr. Preeti Rajpal',
-  'komal': 'Mr. Komal',
+  'azmi': 'Dr. Azmi Ahmad',
+  'av': 'Abhimanyu Verma',
+  'pa': 'Priyanka',
+  'priyanka': 'Priyanka',
+  'komal': 'Komal Sharma',
   'garima': 'Dr. Garima Tripathi',
-  'vinayak': 'Vinayak',
-  'nisha': 'Nisha',
-  'vipin': 'Vipin',
-  'ishan': 'Ishan',
+  'sog': 'Dr. Soumya Guliyan',
+  'soumya': 'Dr. Soumya Guliyan',
+  'vinayak': 'Vinayak Gautam',
+  'nisha': 'Ms. Nisha Rajput',
+  'vipin': 'Mr. Vipin Patel',
+  'ishan': 'Ishan Jain',
   'ankit': 'Ankit',
   'seema': 'Dr. Seema',
   'mt': 'Dr. Madhu Totla',
   'sv': 'Shikha Verma',
   'nks': 'Dr. Nidhi Kesari',
-  'mr': 'Ms. Mohini Rajput',
+  'mr': 'Mr. Raj Kumar',
   'tm': 'Mr. Tushar Marwaha',
-  'paridhi': 'Ms. Paridhi',
+  'paridhi': 'Paridhi',
+  'shipra': 'Ms. Shipra Varshney',
+  'guncha': 'Dr. Guncha',
   'sp': 'Dr. Shalini Prakash',
   'kb': 'Dr. Kumar Bijoy',
   'nk': 'Dr. Nidhi Kesari',
-  'rk': 'Dr. Ramesh Kumar'
+  'rk': 'Dr. Raj Kumar',
+  'rrs': 'Dr. Rishi Rajan Sahay',
+  'sanchi': 'Ms. Sanchi Kalra',
+  'ayesha': 'Ms. Ayesha S. Ansari',
+  'monu': 'Dr. Monu',
+  'ritika': 'Ritika',
+  'bhavya': 'Bhavya',
+  'kajol': 'Kajol',
+  'twinkle': 'Twinkle',
+  'vineet': 'Vineet',
+  'ankita': 'Ankita',
+  'rohan': 'Mr. Rohan Gulati',
+  'tatkarsh': 'Mr. Tatkarsh',
+  'monika': 'Ms. Monika',
+  'vp': 'Mr. Vipin Patel',
+  'nr': 'Ms. Nisha Rajput',
+  'gs': 'Gautam Sharma',
+  'rg': 'Mr. Rohan Gulati',
+  'sg': 'Dr. Saumya Jain'
 };
 
 // Clean display names (remove group suffixes, (P), (Tute), room numbers, and expand raw initials)
 const cleanDisplayName = (name) => {
   if (!name) return '';
   let cleaned = name
-    .replace(/\(((?:G1\s*\+\s*G2)|G1|G2|G\?|P|Practical|Tute|Tutorial|Merged[^\)]*|\d{3}(?:\/\d{3})*)\)/gi, '')
-    .replace(/merged\s+with\s+[^\)]*/gi, '')
-    .replace(/\b(g\d+)\b/gi, '')
+    .replace(/^[:\s\-]+|[:\s\-]+$/g, '')
     .replace(/g\d+:\s*/gi, '')
-    .replace(/\b(P|Practical|Tute|Tutorial|Lab)\b/gi, '')
+    .replace(/\b(g\d+)\b/gi, '')
+    .replace(/\(((?:G1\s*\+\s*G2)|G1|G2|G\?|P|Practical|Tute|Tutorial|Merged[^\)]*|\d{3}(?:\/\d{3})*|Room[^\)]*|Hin[^\)]*|Python|SEC[^\)]*|VAC[^\)]*|GE[^\)]*|AECC[^\)]*|Th)\)/gi, '')
+    .replace(/merged\s+with\s+[^\)]*/gi, '')
+    .replace(/\b(P|Practical|Tute|Tutorial|Lab|L)\b/gi, '')
     .replace(/\b[2-7]\d{2}\b/g, '')
-    .replace(/^[()\s\/-]+|[()\s\/-]+$/g, '')
+    .replace(/^[():\s\/-]+|[():\s\/-]+$/g, '')
     .replace(/[\s-]+/g, ' ')
     .trim();
 
   const lower = cleaned.toLowerCase();
   if (FACULTY_DISPLAY_MAP[lower]) {
     return FACULTY_DISPLAY_MAP[lower];
+  }
+
+  const firstWordKey = lower.split(' ')[0];
+  if (FACULTY_DISPLAY_MAP[firstWordKey]) {
+    return FACULTY_DISPLAY_MAP[firstWordKey];
   }
 
   return cleaned;

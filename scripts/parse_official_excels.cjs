@@ -1,8 +1,8 @@
-const xlsx = require('c:/Users/adity/Downloads/SSCBS OS/node_modules/xlsx');
+const xlsx = require('xlsx');
 const fs = require('fs');
 
-const FILE_1 = 'c:/Users/adity/Downloads/SSCBS OS/TT_wef _28.07.2026 .xlsx';
-const FILE_2 = 'c:/Users/adity/Downloads/SSCBS OS/TT_JULY 2026.xlsx';
+const FILE_1 = 'TT_wef _28.07.2026 .xlsx';
+const FILE_2 = 'TT_JULY 2026.xlsx';
 
 const DEFAULT_SECTION_ROOMS = {
   'BMS_1_A': 'Room 703',
@@ -34,37 +34,48 @@ const DEFAULT_SECTION_ROOMS = {
 const FACULTY_DIRECTORY = {
   'aa': 'Dr. Anamika Agarwal',
   'ag': 'Anamika Gupta',
+  'anamika gupta': 'Anamika Gupta',
   'ayg': 'Ayushi Gupta',
+  'ayushi gupta': 'Ayushi Gupta',
   'dd': 'Dr. Deepali Dhaka',
+  'deepali': 'Dr. Deepali Dhaka',
   'am': 'Dr. Anuja Mathur',
+  'anuja mathur': 'Dr. Anuja Mathur',
   'ta': 'Dr. Tarannum Ahmad',
   'mv': 'Dr. Mona Verma',
+  'mona verma': 'Dr. Mona Verma',
   'sj': 'Dr. Saumya Jain',
+  'saumya jain': 'Dr. Saumya Jain',
   'skg': 'Dr. Satish Kumar Garg',
   'sk': 'Mr. Praveen SK',
   'ps': 'Mr. Praveen SK',
+  'praveen': 'Mr. Praveen SK',
   'kr': 'Kavita Rastogi',
   'krs': 'Dr. Kavita Rastogi',
   'os': 'Dr. Onkar Singh',
   'ng': 'Dr. Nidhi Kesari',
   'nb': 'Dr. Neha Sharma',
+  'neha': 'Dr. Neha Sharma',
   'st': 'Dr. Sushmita',
   'ma': 'Dr. Mehak Aggarwal',
   'mn': 'Dr. Mona Verma',
   'azmi': 'Dr. Azmi Ahmad',
-  'av': 'Dr. Amit Verma',
+  'av': 'Abhimanyu Verma',
   'pa': 'Priyanka',
+  'priyanka': 'Priyanka',
   'komal': 'Komal Sharma',
   'garima': 'Dr. Garima Tripathi',
-  'vinayak': 'Vinayak',
+  'sog': 'Dr. Soumya Guliyan',
+  'soumya': 'Dr. Soumya Guliyan',
+  'vinayak': 'Vinayak Gautam',
   'nisha': 'Ms. Nisha Rajput',
   'vipin': 'Mr. Vipin Patel',
   'ishan': 'Ishan Jain',
   'ankit': 'Ankit',
-  'seema': 'Seema',
+  'seema': 'Dr. Seema',
   'mt': 'Dr. Madhu Totla',
   'sv': 'Shikha Verma',
-  'nks': 'Dr. Narander Kumar Nigam',
+  'nks': 'Dr. Nidhi Kesari',
   'mr': 'Mr. Raj Kumar',
   'tm': 'Mr. Tushar Marwaha',
   'paridhi': 'Paridhi',
@@ -72,9 +83,11 @@ const FACULTY_DIRECTORY = {
   'guncha': 'Dr. Guncha',
   'sp': 'Dr. Shalini Prakash',
   'kb': 'Dr. Kumar Bijoy',
+  'nk': 'Dr. Nidhi Kesari',
   'rk': 'Dr. Raj Kumar',
-  'rohan': 'Mr. Rohan Gulati',
-  'soumya': 'Dr. Soumya Guliyan',
+  'rrs': 'Dr. Rishi Rajan Sahay',
+  'sanchi': 'Ms. Sanchi Kalra',
+  'ayesha': 'Ms. Ayesha S. Ansari',
   'monu': 'Dr. Monu',
   'ritika': 'Ritika',
   'bhavya': 'Bhavya',
@@ -82,9 +95,7 @@ const FACULTY_DIRECTORY = {
   'twinkle': 'Twinkle',
   'vineet': 'Vineet',
   'ankita': 'Ankita',
-  'ayesha': 'Ayesha',
-  'rrs': 'Dr. Rishi Rajan Sahay',
-  'sanchi': 'Ms. Sanchi Kalra',
+  'rohan': 'Mr. Rohan Gulati',
   'tatkarsh': 'Mr. Tatkarsh',
   'monika': 'Ms. Monika',
   'vp': 'Mr. Vipin Patel',
@@ -93,6 +104,10 @@ const FACULTY_DIRECTORY = {
   'rg': 'Mr. Rohan Gulati',
   'sg': 'Dr. Saumya Jain'
 };
+
+const NON_TEACHER_KEYS = new Set([
+  'pg', 'ee', 'ee1', 'ee2', 'lab', 'room', 'hindi', 'hin', 'aecc', 'vac', 'sec', 'ge', 'evs', 'unsupervised', 'free', 'off', 'active class', 'guest', 'ns'
+]);
 
 const PERIOD_COL_MAP = [
   { period: 1, colIdx: 1 },
@@ -104,6 +119,39 @@ const PERIOD_COL_MAP = [
   { period: 6, colIdx: 7 },
   { period: 7, colIdx: 8 }
 ];
+
+function cleanTeacherName(rawPart, legendMap = {}) {
+  if (!rawPart) return null;
+  let cleaned = rawPart
+    .replace(/^[:\s\-]+|[:\s\-]+$/g, '')
+    .replace(/\b(G[1234]|P[1234]|GI|GII)\b:?/gi, '')
+    .replace(/\(((?:G1\s*\+\s*G2)|G1|G2|P[12]?|Practical|Tute|Tutorial|Merged[^\)]*|\d{3}(?:\/\d{3})*|Room[^\)]*|Hin[^\)]*|Python|SEC[^\)]*|Th)\)/gi, '')
+    .replace(/merged\s+with\s+[^\)]*/gi, '')
+    .replace(/\b(P|Practical|Tute|Tutorial|Lab|L)\b/gi, '')
+    .replace(/\b[2-7]\d{2}\b/g, '')
+    .replace(/^[():\s\/-]+|[():\s\/-]+$/g, '')
+    .replace(/[\s-]+/g, ' ')
+    .trim();
+
+  const key = cleaned.toLowerCase();
+  if (NON_TEACHER_KEYS.has(key)) return null;
+
+  if (legendMap[key] && legendMap[key].facName) {
+    return legendMap[key].facName;
+  }
+  if (FACULTY_DIRECTORY[key]) {
+    return FACULTY_DIRECTORY[key];
+  }
+
+  // Handle strings like "Garima (Hin A 607" or "Soumya (Hin C"
+  const firstWordKey = key.split(' ')[0];
+  if (FACULTY_DIRECTORY[firstWordKey]) {
+    return FACULTY_DIRECTORY[firstWordKey];
+  }
+
+  if (cleaned.length < 2) return null;
+  return cleaned;
+}
 
 function buildMasterTimetable() {
   const masterData = {};
@@ -233,25 +281,24 @@ function buildMasterTimetable() {
                     return;
                   }
 
-                  // Legend Map matching
+                  // Teacher name extraction
+                  const teacherName = cleanTeacherName(part, legendMap);
+
+                  // Paper Title extraction
                   const cleanKey = part.replace(/\s*\([^)]*\)/g, '').replace(/\b(G[1234])\b/gi, '').trim().toLowerCase();
                   const matchedInfo = legendMap[cleanKey];
-
-                  let teacherName = FACULTY_DIRECTORY[cleanKey] || part;
-                  let paperTitle = matchedInfo ? matchedInfo.paperName : part;
-
-                  if (matchedInfo && matchedInfo.facName) {
-                    teacherName = matchedInfo.facName;
-                  }
+                  const paperTitle = matchedInfo ? matchedInfo.paperName : part;
 
                   parsedSubjects.push(grpPrefix ? `${grpPrefix}${paperTitle}` : paperTitle);
-                  parsedTeachers.push(grpPrefix ? `${grpPrefix}${teacherName}` : teacherName);
+                  if (teacherName) {
+                    parsedTeachers.push(grpPrefix ? `${grpPrefix}${teacherName}` : teacherName);
+                  }
                   parsedRooms.push(compRoom);
                 });
 
                 // Format deduplicated strings
                 const finalSubject = [...new Set(parsedSubjects)].join(' / ');
-                const finalTeacher = [...new Set(parsedTeachers)].join(' / ');
+                const finalTeacher = parsedTeachers.length > 0 ? [...new Set(parsedTeachers)].join(' / ') : '-';
                 const finalRoom = [...new Set(parsedRooms)].join(' / ');
 
                 periodsList.push({
@@ -284,4 +331,4 @@ function buildMasterTimetable() {
 
 const master = buildMasterTimetable();
 fs.writeFileSync('src/data/timetables.json', JSON.stringify(master, null, 2));
-console.log('Fixed grid column timetable parser complete!');
+console.log('Clean master timetable JSON regenerated successfully!');
