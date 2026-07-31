@@ -290,9 +290,18 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                 <div className="status-hero ongoing">
                   <div className="hero-details">
                     <div className="hero-status-row">
-                      <span className="badge-status live">Ongoing Now</span>
+                      <span className="badge-status live">
+                        <span className="live-dot"></span>
+                        Ongoing Now
+                      </span>
                       {resolveRoom(activeClass.room) && resolveRoom(activeClass.room) !== '-' && (
-                        <span className="room-label">Room: <strong className="highlight-tag">{resolveRoom(activeClass.room)}</strong></span>
+                        <span className="room-label">
+                          <strong className="highlight-tag">
+                            {resolveRoom(activeClass.room).toLowerCase().startsWith('room')
+                              ? resolveRoom(activeClass.room)
+                              : `Room ${resolveRoom(activeClass.room)}`}
+                          </strong>
+                        </span>
                       )}
                     </div>
                     <h3>{activeClass.subject}</h3>

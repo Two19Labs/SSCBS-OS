@@ -218,15 +218,45 @@
 .status-hero.inactive::before { background-color: var(--text-dim); }
 
 .badge-status {
-  display: inline-block;
-  font-size: 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.68rem;
   font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
   text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  line-height: 1.2;
 }
 
-.badge-status.live { background: rgba(0, 0, 0, 0.08); color: var(--accent-gold); border: 1px solid rgba(0, 0, 0, 0.2); }
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+  box-shadow: 0 0 0 0 currentColor;
+  animation: live-pulse 1.8s infinite;
+}
+
+@keyframes live-pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(113, 34, 44, 0.4);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 5px rgba(113, 34, 44, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(113, 34, 44, 0);
+  }
+}
+
+.badge-status.live { background: var(--accent-tint); color: var(--accent); border: 1px solid rgba(113, 34, 44, 0.22); }
 .badge-status.break-badge { background: rgba(2, 132, 199, 0.08); color: var(--accent-cyan); border: 1px solid rgba(2, 132, 199, 0.2); }
 .badge-status.free { background: rgba(13, 138, 95, 0.08); color: var(--accent-green); border: 1px solid rgba(13, 138, 95, 0.2); }
 .badge-status.offline { background: rgba(94, 102, 113, 0.08); color: var(--text-dim); border: 1px solid rgba(94, 102, 113, 0.2); }
@@ -236,21 +266,30 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2px;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-bottom: 6px;
+  width: 100%;
 }
 
 .hero-status-row .room-label {
   font-size: 0.75rem;
   color: var(--text-dim);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .hero-status-row .highlight-tag {
-  color: var(--accent-gold);
+  color: var(--accent);
   font-weight: 700;
-  background: rgba(0, 0, 0, 0.06);
-  padding: 1px 6px;
-  border-radius: 4px;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: var(--tint);
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+  letter-spacing: 0.1px;
 }
 
 .status-hero h3 {
@@ -1329,11 +1368,21 @@
   }
 
   .status-hero h3 {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
+    line-height: 1.35;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
 
   .status-hero p {
-    font-size: 0.775rem;
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+
+  .status-hero .teacher-name {
+    font-size: 0.8rem;
+    line-height: 1.4;
+    word-break: break-word;
   }
 
   .timeline-grid {
