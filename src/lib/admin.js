@@ -12,6 +12,7 @@ export function isAdminEmail(email) {
 export const TEAM_FINDER_TESTERS = [
   ...ADMIN_EMAILS,
   'somya.25221@sscbs.du.ac.in',
+  'lorena.25131@sscbs.du.ac.in',
 ];
 
 export function canAccessTeamFinder(email) {
