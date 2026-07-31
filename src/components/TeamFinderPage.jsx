@@ -305,8 +305,9 @@ export default function TeamFinderPage({ onBack }) {
       setFormError('Please enter the competition name.');
       return;
     }
-    if (!formData.title.trim()) {
-      setFormError('Please enter a post title.');
+    const descText = (formData.description || formData.title || '').trim();
+    if (!descText) {
+      setFormError('Please write a brief description for your opening.');
       return;
     }
     const cleanPostPhone = (formData.phone_number || '').replace(/\D/g, '');
@@ -320,6 +321,11 @@ export default function TeamFinderPage({ onBack }) {
     const totalMem = parseInt(formData.total_members, 10) || 4;
     const openSpots = Math.min(totalMem, parseInt(formData.spots_left, 10) || 1);
 
+    const userCourse = user?.user_metadata?.course || 'BMS';
+    const userSem = user?.user_metadata?.semester
+      ? `Sem ${user.user_metadata.semester}${user?.user_metadata?.section ? ` · Sec ${user.user_metadata.section}` : ''}`
+      : (user?.user_metadata?.year || '2nd Year');
+
     if (editingPost) {
       // ── EDIT EXISTING POST ──
       const updatePayload = {
@@ -327,14 +333,14 @@ export default function TeamFinderPage({ onBack }) {
         organizer: formData.organizer.trim() || 'Corporate / Society',
         competition_link: formData.competition_link.trim(),
         phone_number: formData.phone_number.trim(),
-        title: formData.title.trim(),
-        description: formData.description.trim(),
+        title: descText,
+        description: descText,
         skills_have: formData.skills_have,
         skills_looking_for: formData.skills_looking_for,
         total_members: totalMem,
         spots_left: openSpots,
-        course: formData.course,
-        year: formData.year,
+        course: userCourse,
+        year: userSem,
         is_open: openSpots > 0,
       };
 
@@ -363,14 +369,14 @@ export default function TeamFinderPage({ onBack }) {
       organizer: formData.organizer.trim() || 'Corporate / Society',
       competition_link: formData.competition_link.trim(),
       phone_number: formData.phone_number.trim(),
-      title: formData.title.trim(),
-      description: formData.description.trim(),
+      title: descText,
+      description: descText,
       skills_have: formData.skills_have,
       skills_looking_for: formData.skills_looking_for,
       total_members: totalMem,
       spots_left: openSpots,
-      course: formData.course,
-      year: formData.year,
+      course: userCourse,
+      year: userSem,
       is_open: openSpots > 0,
       created_by_email: user.email,
       created_by_name: user.user_metadata?.full_name || user.email.split('@')[0],
@@ -1100,23 +1106,13 @@ export default function TeamFinderPage({ onBack }) {
               </div>
 
               <div className="tf-form-group">
-                <label>Listing Title *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Need 1 Financial Modeler for EY NextGen"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                />
-              </div>
-
-              <div className="tf-form-group">
-                <label>Team Overview & Strategy</label>
+                <label>Brief description, anything you want to state, etc *</label>
                 <textarea
-                  rows="2"
-                  placeholder="Describe your team composition, strategy, deadline..."
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  rows="3"
+                  required
+                  placeholder="Describe your team opening, requirements, strategy, or anything you want to state..."
+                  value={formData.description || formData.title}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value, title: e.target.value })}
                 />
               </div>
 
@@ -1263,30 +1259,7 @@ export default function TeamFinderPage({ onBack }) {
                 )}
               </div>
 
-              <div className="tf-form-row">
-                <div className="tf-form-group tf-flex-1">
-                  <label>Course</label>
-                  <select
-                    value={formData.course}
-                    onChange={(e) => setFormData({ ...formData, course: e.target.value })}
-                  >
-                    <option value="BMS">BMS</option>
-                    <option value="BFIA">BFIA</option>
-                    <option value="B.Sc. CS">B.Sc. CS</option>
-                    <option value="Cross-Course">Cross-Course</option>
-                  </select>
-                </div>
 
-                <div className="tf-form-group tf-flex-1">
-                  <label>Year / Semester</label>
-                  <input
-                    type="text"
-                    value={formData.year}
-                    onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                    placeholder="e.g. 2nd Year / Sem 4"
-                  />
-                </div>
-              </div>
 
               <div className="tf-modal-footer">
                 <button
