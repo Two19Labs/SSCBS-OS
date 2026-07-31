@@ -13,6 +13,7 @@ import {
   ShieldIcon,
   FileIcon,
   MailIcon,
+  MoreVerticalIcon,
 } from './icons';
 import './TeamFinderPage.css';
 
@@ -57,6 +58,13 @@ export default function TeamFinderPage({ onBack }) {
   const [editingPost, setEditingPost] = useState(null); // When editing a post
   const [selectedPostForApply, setSelectedPostForApply] = useState(null);
   const [selectedPostForReview, setSelectedPostForReview] = useState(null);
+  const [activeAdminMenuPostId, setActiveAdminMenuPostId] = useState(null);
+
+  useEffect(() => {
+    const handleOutsideClick = () => setActiveAdminMenuPostId(null);
+    window.addEventListener('click', handleOutsideClick);
+    return () => window.removeEventListener('click', handleOutsideClick);
+  }, []);
 
   // Create/Edit Form State
   const [formData, setFormData] = useState({
@@ -816,7 +824,58 @@ export default function TeamFinderPage({ onBack }) {
               <div key={post.id} className={`tf-post-card ${!post.is_open ? 'closed' : ''}`}>
                 <div className="card-top-bar">
                   <span className="comp-organizer">{post.organizer || 'Corporate / Society'}</span>
-                  {renderSquadDots(post.total_members || 4, post.spots_left || 1, post.is_open)}
+                  <div className="card-top-right">
+                    {renderSquadDots(post.total_members || 4, post.spots_left || 1, post.is_open)}
+                    {isAdmin && (
+                      <div className="tf-admin-menu-wrapper">
+                        <button
+                          className={`tf-admin-dots-btn ${activeAdminMenuPostId === post.id ? 'active' : ''}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveAdminMenuPostId(activeAdminMenuPostId === post.id ? null : post.id);
+                          }}
+                          title="Admin Moderation Menu"
+                        >
+                          <MoreVerticalIcon size={16} />
+                        </button>
+                        {activeAdminMenuPostId === post.id && (
+                          <div className="tf-admin-dropdown-menu" onClick={(e) => e.stopPropagation()}>
+                            <div className="tf-admin-menu-header">
+                              <ShieldIcon size={12} />
+                              <span>Admin Moderation</span>
+                            </div>
+                            <button
+                              className="tf-admin-menu-item"
+                              onClick={() => {
+                                setActiveAdminMenuPostId(null);
+                                setSelectedPostForReview(post);
+                              }}
+                            >
+                              <MailIcon size={13} /> Review Requests ({postApps.length})
+                            </button>
+                            <button
+                              className="tf-admin-menu-item"
+                              onClick={() => {
+                                setActiveAdminMenuPostId(null);
+                                handleToggleStatus(post.id, post.is_open);
+                              }}
+                            >
+                              {post.is_open ? 'Close Listing' : 'Reopen Listing'}
+                            </button>
+                            <button
+                              className="tf-admin-menu-item danger"
+                              onClick={() => {
+                                setActiveAdminMenuPostId(null);
+                                handleDeletePost(post.id);
+                              }}
+                            >
+                              Delete Listing
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <h2 className="comp-name">{post.competition_name}</h2>
@@ -893,8 +952,8 @@ export default function TeamFinderPage({ onBack }) {
                   </div>
 
                   <div className="card-actions">
-                    {/* Host or Admin Controls */}
-                    {isHostOrAdmin ? (
+                    {/* Host Controls */}
+                    {isHost ? (
                       <>
                         <button
                           className="btn-review-apps"
@@ -919,16 +978,15 @@ export default function TeamFinderPage({ onBack }) {
                           {post.is_open ? 'Close' : 'Reopen'}
                         </button>
                         <button
-                          className={`btn-card-subtle danger ${!isHost ? 'admin-mod-btn' : ''}`}
+                          className="btn-card-subtle danger"
                           onClick={() => handleDeletePost(post.id)}
-                          title={!isHost ? 'Admin Moderation Delete' : 'Delete Post'}
+                          title="Delete Post"
                         >
-                          {!isHost && <ShieldIcon size={13} className="admin-shield-icon" />}
-                          <span>Delete</span>
+                          Delete
                         </button>
                       </>
                     ) : (
-                      /* Peer Student Controls */
+                      /* Peer Student Controls (Visible to everyone including Admins) */
                       <>
                         {post.phone_number && (
                           <a
