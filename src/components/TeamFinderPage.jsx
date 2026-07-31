@@ -40,6 +40,15 @@ const PRESET_ORGANIZERS = [
   'L\'Oréal',
 ];
 
+function formatWhatsAppUrl(phone, textMessage = '') {
+  if (!phone) return '#';
+  let digits = String(phone).replace(/\D/g, '');
+  if (digits.length === 10) {
+    digits = '91' + digits;
+  }
+  return `https://wa.me/${digits}${textMessage ? `?text=${encodeURIComponent(textMessage)}` : ''}`;
+}
+
 export default function TeamFinderPage({ onBack }) {
   const { user } = useAuth();
   const { featureFlags } = useConfig();
@@ -300,8 +309,9 @@ export default function TeamFinderPage({ onBack }) {
       setFormError('Please enter a post title.');
       return;
     }
-    if (!formData.phone_number.trim()) {
-      setFormError('Please provide a contact phone / WhatsApp number.');
+    const cleanPostPhone = (formData.phone_number || '').replace(/\D/g, '');
+    if (!cleanPostPhone || cleanPostPhone.length !== 10) {
+      setFormError('Please enter a valid compulsory 10-digit WhatsApp phone number (e.g. 9876543210).');
       return;
     }
 
@@ -473,6 +483,11 @@ export default function TeamFinderPage({ onBack }) {
     e.preventDefault();
     if (!applyForm.pitch_note.trim()) {
       setApplyError('Please write a short pitch note.');
+      return;
+    }
+    const cleanApplyPhone = (applyForm.applicant_phone || '').replace(/\D/g, '');
+    if (!cleanApplyPhone || cleanApplyPhone.length !== 10) {
+      setApplyError('Please enter a valid compulsory 10-digit WhatsApp phone number (e.g. 9876543210).');
       return;
     }
 
@@ -990,9 +1005,7 @@ export default function TeamFinderPage({ onBack }) {
                       <>
                         {post.phone_number && (
                           <a
-                            href={`https://wa.me/${post.phone_number.replace(/\D/g, '')}?text=Hi!%20Saw%20your%20team%20post%20for%20${encodeURIComponent(
-                              post.competition_name
-                            )}%20on%20SSCBS%20OS.`}
+                            href={formatWhatsAppUrl(post.phone_number, `Hi! Saw your team post for ${post.competition_name} on SSCBS OS.`)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="wa-connect-btn"
@@ -1074,13 +1087,14 @@ export default function TeamFinderPage({ onBack }) {
                 </div>
 
                 <div className="tf-form-group tf-flex-1">
-                  <label>WhatsApp / Contact Phone *</label>
+                  <label>WhatsApp / Contact Phone (10 Digits) *</label>
                   <input
                     type="tel"
                     required
-                    placeholder="e.g. 919876543210"
+                    maxLength={10}
+                    placeholder="10-digit number (e.g. 9876543210)"
                     value={formData.phone_number}
-                    onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, phone_number: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                   />
                 </div>
               </div>
@@ -1322,12 +1336,14 @@ export default function TeamFinderPage({ onBack }) {
               </div>
 
               <div className="tf-form-group">
-                <label>Your WhatsApp / Contact Phone (Optional)</label>
+                <label>Your WhatsApp / Contact Phone (10 Digits) *</label>
                 <input
                   type="tel"
-                  placeholder="e.g. 919876543210"
+                  required
+                  maxLength={10}
+                  placeholder="10-digit phone (e.g. 9876543210)"
                   value={applyForm.applicant_phone}
-                  onChange={(e) => setApplyForm({ ...applyForm, applicant_phone: e.target.value })}
+                  onChange={(e) => setApplyForm({ ...applyForm, applicant_phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                 />
               </div>
 
@@ -1444,11 +1460,7 @@ export default function TeamFinderPage({ onBack }) {
                         <div className="app-card-actions">
                           {app.applicant_phone && (
                             <a
-                              href={`https://wa.me/${app.applicant_phone.replace(/\D/g, '')}?text=Hi%20${encodeURIComponent(
-                                app.applicant_name
-                              )}!%20Regarding%20your%20request%20to%20join%20our%20squad%20for%20${encodeURIComponent(
-                                selectedPostForReview.competition_name
-                              )}.`}
+                              href={formatWhatsAppUrl(app.applicant_phone, `Hi ${app.applicant_name}! Regarding your request to join our squad for ${selectedPostForReview.competition_name}.`)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="wa-connect-btn"
