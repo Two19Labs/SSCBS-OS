@@ -521,36 +521,59 @@
   border: 1px solid rgba(185, 28, 28, 0.2);
 }
 
-/* User Application Status Badge on Card */
-.user-app-status-row {
-  margin-bottom: 8px;
+/* User Application Status Callout Banner */
+.user-app-banner {
+  margin: 10px 0 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease;
 }
 
-.user-app-status-pill {
-  font-size: 0.725rem;
+.user-app-banner-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.user-app-banner-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-app-banner-title {
+  font-size: 0.8rem;
   font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 6px;
-  display: inline-block;
+  letter-spacing: -0.1px;
 }
 
-.user-app-status-pill.pending {
-  background: rgba(180, 83, 9, 0.1);
-  color: var(--amber);
-  border: 1px solid rgba(180, 83, 9, 0.25);
+.user-app-banner-sub {
+  font-size: 0.725rem;
+  font-weight: 500;
+  opacity: 0.88;
 }
 
-.user-app-status-pill.accepted {
-  background: var(--success-tint, rgba(11, 122, 84, 0.1));
-  color: var(--success);
-  border: 1px solid rgba(11, 122, 84, 0.25);
+/* Status variants */
+.user-app-banner.accepted {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #047857;
 }
 
-.user-app-status-pill.declined,
-.user-app-status-pill.removed {
-  background: rgba(185, 28, 28, 0.1);
-  color: var(--danger);
-  border: 1px solid rgba(185, 28, 28, 0.25);
+.user-app-banner.pending {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #b45309;
+}
+
+.user-app-banner.declined,
+.user-app-banner.removed {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #b91c1c;
 }
 
 /* Card Footer */

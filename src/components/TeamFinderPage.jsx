@@ -557,15 +557,38 @@ export default function TeamFinderPage({ onBack }) {
   };
 
   // ── HOST REVIEW & ACCEPTANCE FLOW ──
+function getUserApp(applications, postId, userEmail, userId) {
+  if (!applications || !postId) return null;
+  const emailLower = userEmail ? userEmail.toLowerCase() : '';
+
+  const matches = applications.filter((a) => {
+    if (a.post_id !== postId) return false;
+    const isEmail = a.applicant_email && emailLower && a.applicant_email.toLowerCase() === emailLower;
+    const isId = a.applicant_id && userId && a.applicant_id === userId;
+    return isEmail || isId;
+  });
+
+  if (matches.length === 0) return null;
+
+  matches.sort((a, b) => {
+    const timeA = new Date(a.created_at || 0).getTime() || (typeof a.id === 'number' ? a.id : 0);
+    const timeB = new Date(b.created_at || 0).getTime() || (typeof b.id === 'number' ? b.id : 0);
+    return timeB - timeA;
+  });
+
+  return matches[0];
+}
+
   const handleAcceptApplicant = async (app) => {
     const post = posts.find((p) => p.id === app.post_id);
     if (!post) return;
 
     const currentOpen = Math.max(0, (post.spots_left || 1) - 1);
     const isNowOpen = currentOpen > 0;
+    const appEmailLower = (app.applicant_email || '').toLowerCase();
 
     const updatedApps = applications.map((a) =>
-      a.id === app.id || (a.post_id === app.post_id && a.applicant_email === app.applicant_email)
+      a.id === app.id || (a.post_id === app.post_id && a.applicant_email?.toLowerCase() === appEmailLower)
         ? { ...a, status: 'accepted' }
         : a
     );
@@ -584,11 +607,13 @@ export default function TeamFinderPage({ onBack }) {
         if (isRealId) {
           await supabase.from('squad_applications').update({ status: 'accepted' }).eq('id', app.id);
         }
-        await supabase
-          .from('squad_applications')
-          .update({ status: 'accepted' })
-          .eq('post_id', app.post_id)
-          .eq('applicant_email', app.applicant_email);
+        if (app.applicant_email) {
+          await supabase
+            .from('squad_applications')
+            .update({ status: 'accepted' })
+            .eq('post_id', app.post_id)
+            .ilike('applicant_email', app.applicant_email);
+        }
 
         await supabase.from('squad_posts').update({ spots_left: currentOpen, is_open: isNowOpen }).eq('id', post.id);
       }
@@ -598,8 +623,9 @@ export default function TeamFinderPage({ onBack }) {
   };
 
   const handleDeclineApplicant = async (app) => {
+    const appEmailLower = (app.applicant_email || '').toLowerCase();
     const updatedApps = applications.map((a) =>
-      a.id === app.id || (a.post_id === app.post_id && a.applicant_email === app.applicant_email)
+      a.id === app.id || (a.post_id === app.post_id && a.applicant_email?.toLowerCase() === appEmailLower)
         ? { ...a, status: 'declined' }
         : a
     );
@@ -612,11 +638,13 @@ export default function TeamFinderPage({ onBack }) {
         if (isRealId) {
           await supabase.from('squad_applications').update({ status: 'declined' }).eq('id', app.id);
         }
-        await supabase
-          .from('squad_applications')
-          .update({ status: 'declined' })
-          .eq('post_id', app.post_id)
-          .eq('applicant_email', app.applicant_email);
+        if (app.applicant_email) {
+          await supabase
+            .from('squad_applications')
+            .update({ status: 'declined' })
+            .eq('post_id', app.post_id)
+            .ilike('applicant_email', app.applicant_email);
+        }
       }
     } catch (err) {
       console.warn('Supabase status update error:', err);
@@ -628,9 +656,10 @@ export default function TeamFinderPage({ onBack }) {
     if (!post) return;
 
     const currentOpen = Math.min((post.total_members || 4), (post.spots_left || 0) + 1);
+    const appEmailLower = (app.applicant_email || '').toLowerCase();
 
     const updatedApps = applications.map((a) =>
-      a.id === app.id || (a.post_id === app.post_id && a.applicant_email === app.applicant_email)
+      a.id === app.id || (a.post_id === app.post_id && a.applicant_email?.toLowerCase() === appEmailLower)
         ? { ...a, status: 'removed' }
         : a
     );
@@ -649,11 +678,13 @@ export default function TeamFinderPage({ onBack }) {
         if (isRealId) {
           await supabase.from('squad_applications').update({ status: 'removed' }).eq('id', app.id);
         }
-        await supabase
-          .from('squad_applications')
-          .update({ status: 'removed' })
-          .eq('post_id', app.post_id)
-          .eq('applicant_email', app.applicant_email);
+        if (app.applicant_email) {
+          await supabase
+            .from('squad_applications')
+            .update({ status: 'removed' })
+            .eq('post_id', app.post_id)
+            .ilike('applicant_email', app.applicant_email);
+        }
 
         await supabase.from('squad_posts').update({ spots_left: currentOpen, is_open: true }).eq('id', post.id);
       }
@@ -859,9 +890,7 @@ export default function TeamFinderPage({ onBack }) {
             const pendingAppsCount = postApps.filter((a) => a.status === 'pending').length;
             
             // Check if current user has already applied
-            const userApp = applications.find(
-              (a) => a.post_id === post.id && (a.applicant_email === user?.email || a.applicant_id === user?.id)
-            );
+            const userApp = getUserApp(applications, post.id, user?.email, user?.id);
 
             return (
               <div key={post.id} className={`tf-post-card ${!post.is_open ? 'closed' : ''}`}>
@@ -934,6 +963,35 @@ export default function TeamFinderPage({ onBack }) {
                   </a>
                 )}
 
+                {/* User Application Status Callout Banner */}
+                {userApp && !isHost && (
+                  <div className={`user-app-banner ${userApp.status}`}>
+                    <div className="user-app-banner-icon">
+                      {userApp.status === 'accepted' ? '🎉' : userApp.status === 'declined' ? '❌' : userApp.status === 'removed' ? '⚠️' : '⏳'}
+                    </div>
+                    <div className="user-app-banner-content">
+                      <span className="user-app-banner-title">
+                        {userApp.status === 'accepted'
+                          ? 'Accepted into Squad'
+                          : userApp.status === 'declined'
+                          ? 'Application Declined'
+                          : userApp.status === 'removed'
+                          ? 'Removed from Squad'
+                          : 'Request Pending Review'}
+                      </span>
+                      <span className="user-app-banner-sub">
+                        {userApp.status === 'accepted'
+                          ? 'You are part of this team! Connect on WhatsApp below.'
+                          : userApp.status === 'declined'
+                          ? 'The host declined your request.'
+                          : userApp.status === 'removed'
+                          ? 'You were removed from this squad by the host.'
+                          : 'The team lead is reviewing your application.'}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
                 <h3 className="post-title">{post.title}</h3>
                 {post.description && <p className="post-desc">{post.description}</p>}
 
@@ -962,21 +1020,6 @@ export default function TeamFinderPage({ onBack }) {
                         </span>
                       ))}
                     </div>
-                  </div>
-                )}
-
-                {/* Application Status Badge for User */}
-                {userApp && !isHost && (
-                  <div className="user-app-status-row">
-                    <span className={`user-app-status-pill ${userApp.status}`}>
-                      {userApp.status === 'accepted'
-                        ? '🎉 Accepted into Squad'
-                        : userApp.status === 'declined'
-                        ? 'Declined'
-                        : userApp.status === 'removed'
-                        ? 'Removed from Squad'
-                        : '⏳ Request Pending Review'}
-                    </span>
                   </div>
                 )}
 
