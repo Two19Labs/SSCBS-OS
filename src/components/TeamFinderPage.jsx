@@ -544,7 +544,16 @@ export default function TeamFinderPage({ onBack }) {
       console.warn('Saving local application:', err);
     }
 
-    const updatedApps = [appPayload, ...applications.filter((a) => a.id !== appPayload.id)];
+    const userEmailLower = user?.email?.toLowerCase();
+    const updatedApps = [
+      appPayload,
+      ...applications.filter((a) => {
+        const samePost = String(a.post_id) === String(selectedPostForApply.id);
+        const sameEmail = a.applicant_email && userEmailLower && a.applicant_email.toLowerCase() === userEmailLower;
+        const sameId = a.id === appPayload.id;
+        return !(sameId || (samePost && sameEmail));
+      }),
+    ];
     setApplications(updatedApps);
     localStorage.setItem('sscbs_squad_apps', JSON.stringify(updatedApps));
 
@@ -562,7 +571,7 @@ function getUserApp(applications, postId, userEmail, userId) {
   const emailLower = userEmail ? userEmail.toLowerCase() : '';
 
   const matches = applications.filter((a) => {
-    if (a.post_id !== postId) return false;
+    if (String(a.post_id) !== String(postId)) return false;
     const isEmail = a.applicant_email && emailLower && a.applicant_email.toLowerCase() === emailLower;
     const isId = a.applicant_id && userId && a.applicant_id === userId;
     return isEmail || isId;
@@ -570,6 +579,13 @@ function getUserApp(applications, postId, userEmail, userId) {
 
   if (matches.length === 0) return null;
 
+  // CRITICAL RULE:
+  // If ANY matching application for this user & post has status === 'removed',
+  // the host removed them from the team. Return the removed application record!
+  const removedApp = matches.find((m) => m.status === 'removed');
+  if (removedApp) return removedApp;
+
+  // Otherwise, sort by creation timestamp / ID descending to get latest status
   matches.sort((a, b) => {
     const timeA = new Date(a.created_at || 0).getTime() || (typeof a.id === 'number' ? a.id : 0);
     const timeB = new Date(b.created_at || 0).getTime() || (typeof b.id === 'number' ? b.id : 0);
@@ -580,7 +596,7 @@ function getUserApp(applications, postId, userEmail, userId) {
 }
 
   const handleAcceptApplicant = async (app) => {
-    const post = posts.find((p) => p.id === app.post_id);
+    const post = posts.find((p) => String(p.id) === String(app.post_id));
     if (!post) return;
 
     const currentOpen = Math.max(0, (post.spots_left || 1) - 1);
@@ -588,7 +604,7 @@ function getUserApp(applications, postId, userEmail, userId) {
     const appEmailLower = (app.applicant_email || '').toLowerCase();
 
     const updatedApps = applications.map((a) =>
-      a.id === app.id || (a.post_id === app.post_id && a.applicant_email?.toLowerCase() === appEmailLower)
+      a.id === app.id || (String(a.post_id) === String(app.post_id) && a.applicant_email?.toLowerCase() === appEmailLower)
         ? { ...a, status: 'accepted' }
         : a
     );
@@ -596,7 +612,7 @@ function getUserApp(applications, postId, userEmail, userId) {
     localStorage.setItem('sscbs_squad_apps', JSON.stringify(updatedApps));
 
     const updatedPosts = posts.map((p) =>
-      p.id === post.id ? { ...p, spots_left: currentOpen, is_open: isNowOpen } : p
+      String(p.id) === String(post.id) ? { ...p, spots_left: currentOpen, is_open: isNowOpen } : p
     );
     setPosts(updatedPosts);
     localStorage.setItem('sscbs_squad_posts', JSON.stringify(updatedPosts));
@@ -625,7 +641,7 @@ function getUserApp(applications, postId, userEmail, userId) {
   const handleDeclineApplicant = async (app) => {
     const appEmailLower = (app.applicant_email || '').toLowerCase();
     const updatedApps = applications.map((a) =>
-      a.id === app.id || (a.post_id === app.post_id && a.applicant_email?.toLowerCase() === appEmailLower)
+      a.id === app.id || (String(a.post_id) === String(app.post_id) && a.applicant_email?.toLowerCase() === appEmailLower)
         ? { ...a, status: 'declined' }
         : a
     );
@@ -652,22 +668,24 @@ function getUserApp(applications, postId, userEmail, userId) {
   };
 
   const handleRemoveAcceptedMember = async (app) => {
-    const post = posts.find((p) => p.id === app.post_id);
+    const post = posts.find((p) => String(p.id) === String(app.post_id));
     if (!post) return;
 
     const currentOpen = Math.min((post.total_members || 4), (post.spots_left || 0) + 1);
     const appEmailLower = (app.applicant_email || '').toLowerCase();
 
-    const updatedApps = applications.map((a) =>
-      a.id === app.id || (a.post_id === app.post_id && a.applicant_email?.toLowerCase() === appEmailLower)
-        ? { ...a, status: 'removed' }
-        : a
-    );
+    const updatedApps = applications.map((a) => {
+      const isMatch = a.id === app.id ||
+        (String(a.post_id) === String(app.post_id) && a.applicant_email?.toLowerCase() === appEmailLower) ||
+        (app.applicant_id && String(a.post_id) === String(app.post_id) && a.applicant_id === app.applicant_id);
+      return isMatch ? { ...a, status: 'removed' } : a;
+    });
+
     setApplications(updatedApps);
     localStorage.setItem('sscbs_squad_apps', JSON.stringify(updatedApps));
 
     const updatedPosts = posts.map((p) =>
-      p.id === post.id ? { ...p, spots_left: currentOpen, is_open: true } : p
+      String(p.id) === String(post.id) ? { ...p, spots_left: currentOpen, is_open: true } : p
     );
     setPosts(updatedPosts);
     localStorage.setItem('sscbs_squad_posts', JSON.stringify(updatedPosts));
@@ -684,6 +702,13 @@ function getUserApp(applications, postId, userEmail, userId) {
             .update({ status: 'removed' })
             .eq('post_id', app.post_id)
             .ilike('applicant_email', app.applicant_email);
+        }
+        if (app.applicant_id) {
+          await supabase
+            .from('squad_applications')
+            .update({ status: 'removed' })
+            .eq('post_id', app.post_id)
+            .eq('applicant_id', app.applicant_id);
         }
 
         await supabase.from('squad_posts').update({ spots_left: currentOpen, is_open: true }).eq('id', post.id);
