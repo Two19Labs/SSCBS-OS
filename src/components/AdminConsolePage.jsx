@@ -2541,6 +2541,7 @@ STRICT EXTRACTION RULES:
               {[
                 { id: 'timetable', label: 'Timetable & Class Schedules', desc: 'Display timetable on home page and navigation' },
                 { id: 'find-prof', label: 'Find My Professor', desc: 'Allow students to search for professor locations' },
+                { id: 'team-finder', label: 'Team Finder & Competition Hub', desc: 'Allow students to post and find competition team openings' },
                 { id: 'waiver', label: 'Waiver Tool', desc: 'Interactive attendance clearance tool' },
                 { id: 'gpa', label: 'GPA Calculator', desc: 'Official DU schema calculator' },
                 { id: 'pyqs', label: 'PYQs & Resources', desc: 'Access to previous year questions' },

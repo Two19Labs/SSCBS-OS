@@ -4,6 +4,7 @@ import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 const DEFAULT_FEATURE_FLAGS = {
   'timetable': true,
   'find-prof': true,
+  'team-finder': false,
   'waiver': false,
   'gpa': true,
   'pyqs': false,

@@ -8,7 +8,7 @@ import ProfilePage from './components/ProfilePage';
 import ProfileModal from './components/ProfileModal';
 import ClassSchedulesCard from './components/ClassSchedulesCard';
 import NoticeBoard from './components/NoticeBoard';
-import { isAdminEmail } from './lib/admin';
+import { isAdminEmail, canAccessTeamFinder } from './lib/admin';
 import {
   HomeIcon,
   CalendarIcon,
@@ -148,6 +148,7 @@ function App() {
 
   const displayName = user.user_metadata?.full_name || user.email.split('@')[0];
   const isAdmin = isAdminEmail(user.email);
+  const hasTeamFinderAccess = featureFlags['team-finder'] || canAccessTeamFinder(user.email);
 
   const openTool = (id) => {
     logFeatureView(id, user);
@@ -174,7 +175,7 @@ function App() {
     { id: 'home', label: 'Home', Icon: HomeIcon },
     { id: 'timetable', label: 'Timetable', Icon: CalendarIcon, locked: !featureFlags['timetable'] && !isAdmin },
     { id: 'find-prof', label: 'Find My Professor', Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
-    ...(isAdmin ? [{ id: 'team-finder', label: 'Team Finder (Beta)', Icon: TrophyIcon }] : []),
+    ...(hasTeamFinderAccess ? [{ id: 'team-finder', label: 'Team Finder (Beta)', Icon: TrophyIcon }] : []),
     { id: 'waiver', label: 'Waiver Tool', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
     { id: 'gpa', label: 'GPA Calculator', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
     { id: 'pyqs', label: 'PYQs & Resources', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
@@ -196,7 +197,7 @@ function App() {
     timetable: 'Timetable',
     tools: 'Tools',
     'find-prof': 'Find My Professor',
-    'team-finder': 'Team Finder (Admin Beta)',
+    'team-finder': 'Team Finder & Compete Hub',
     admin: 'Admin Console',
     buzz: 'Campus Buzz',
     profile: 'Profile',
@@ -243,7 +244,7 @@ function App() {
         return (
           <div className="tools-hub">
             {[
-              ...(isAdmin ? [{ id: 'team-finder', micro: 'BETA', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post case comp openings', Icon: TrophyIcon, locked: false }] : []),
+              ...(hasTeamFinderAccess ? [{ id: 'team-finder', micro: 'BETA', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post case comp openings', Icon: TrophyIcon, locked: false }] : []),
               { id: 'find-prof', micro: 'SEARCH', microClass: 'success', title: 'Find My Professor', desc: "Who's teaching where, right now", Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
               { id: 'waiver', micro: 'SOON', microClass: 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
               { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },

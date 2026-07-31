@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { isAdminEmail } from '../lib/admin';
+import { useConfig } from '../context/ConfigContext';
+import { isAdminEmail, canAccessTeamFinder } from '../lib/admin';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import {
   TrophyIcon,
@@ -40,7 +41,9 @@ const PRESET_ORGANIZERS = [
 
 export default function TeamFinderPage({ onBack }) {
   const { user } = useAuth();
+  const { featureFlags } = useConfig();
   const isAdmin = isAdminEmail(user?.email);
+  const hasAccess = featureFlags['team-finder'] || canAccessTeamFinder(user?.email);
 
   const [posts, setPosts] = useState([]);
   const [applications, setApplications] = useState([]);
@@ -656,18 +659,17 @@ export default function TeamFinderPage({ onBack }) {
     return true;
   });
 
-  if (!isAdmin) {
+  if (!hasAccess) {
     return (
       <div className="team-finder-container">
         <div className="admin-restricted-card">
           <div className="restricted-badge">
             <ShieldIcon size={18} />
-            <span>Admin Beta Restricted</span>
+            <span>Beta Restricted</span>
           </div>
           <h2>Team Finder & Competition Hub</h2>
           <p>
-            This feature is currently restricted to SSCBS OS administrators (
-            <code>aditya.25015</code>, <code>manthan.25138</code> & <code>somya.25221</code>).
+            This feature is currently in private beta testing.
           </p>
           {onBack && (
             <button className="btn-tf-primary" onClick={onBack} style={{ marginTop: '1rem' }}>

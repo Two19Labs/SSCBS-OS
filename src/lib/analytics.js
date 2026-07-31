@@ -4,6 +4,7 @@ export const FEATURE_NAMES = {
   home: 'Home Dashboard',
   timetable: 'Timetable',
   'find-prof': 'Find My Professor',
+  'team-finder': 'Team Finder & Compete Hub',
   waiver: 'Waiver Tool',
   gpa: 'GPA Calculator',
   buzz: 'Campus Buzz',
