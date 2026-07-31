@@ -450,7 +450,8 @@
   border: 1px solid rgba(11, 122, 84, 0.25);
 }
 
-.user-app-status-pill.declined {
+.user-app-status-pill.declined,
+.user-app-status-pill.removed {
   background: rgba(185, 28, 28, 0.1);
   color: var(--danger);
   border: 1px solid rgba(185, 28, 28, 0.25);
@@ -972,7 +973,8 @@
   color: var(--success);
 }
 
-.status-pill-badge.declined {
+.status-pill-badge.declined,
+.status-pill-badge.removed {
   color: var(--danger);
 }
 

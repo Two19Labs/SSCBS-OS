@@ -94,18 +94,13 @@ export default function TeamFinderPage({ onBack }) {
 
   // Fetch real posts & applications from Supabase
   const fetchPostsAndApps = async (force = false) => {
-    if (!force) {
-      const cachedTime = sessionStorage.getItem('sscbs_squad_fetched_time');
+    if (!force && !hasValidCredentials) {
       const savedPosts = localStorage.getItem('sscbs_squad_posts');
       const savedApps = localStorage.getItem('sscbs_squad_apps');
-      if (cachedTime && (Date.now() - Number(cachedTime)) < 60000 && savedPosts) {
-        try {
-          if (savedPosts) setPosts(JSON.parse(savedPosts));
-          if (savedApps) setApplications(JSON.parse(savedApps));
-          setLoading(false);
-          return;
-        } catch (e) {}
-      }
+      if (savedPosts) setPosts(JSON.parse(savedPosts));
+      if (savedApps) setApplications(JSON.parse(savedApps));
+      setLoading(false);
+      return;
     }
 
     setLoading(true);
@@ -135,7 +130,6 @@ export default function TeamFinderPage({ onBack }) {
         } else if (appsRes.error) {
           console.error('Supabase fetch apps error:', appsRes.error);
         }
-        sessionStorage.setItem('sscbs_squad_fetched_time', String(Date.now()));
       } else {
         const savedPosts = localStorage.getItem('sscbs_squad_posts');
         const savedApps = localStorage.getItem('sscbs_squad_apps');
@@ -553,8 +547,12 @@ export default function TeamFinderPage({ onBack }) {
 
     try {
       if (hasValidCredentials) {
+        const appQuery = app.id && typeof app.id === 'string' && !app.id.startsWith('app-')
+          ? supabase.from('squad_applications').update({ status: 'accepted' }).eq('id', app.id)
+          : supabase.from('squad_applications').update({ status: 'accepted' }).match({ post_id: app.post_id, applicant_email: app.applicant_email });
+
         await Promise.all([
-          supabase.from('squad_applications').update({ status: 'accepted' }).eq('id', app.id),
+          appQuery,
           supabase.from('squad_posts').update({ spots_left: currentOpen, is_open: isNowOpen }).eq('id', post.id),
         ]);
       }
@@ -570,7 +568,11 @@ export default function TeamFinderPage({ onBack }) {
 
     try {
       if (hasValidCredentials) {
-        await supabase.from('squad_applications').update({ status: 'declined' }).eq('id', app.id);
+        if (app.id && typeof app.id === 'string' && !app.id.startsWith('app-')) {
+          await supabase.from('squad_applications').update({ status: 'declined' }).eq('id', app.id);
+        } else {
+          await supabase.from('squad_applications').update({ status: 'declined' }).match({ post_id: app.post_id, applicant_email: app.applicant_email });
+        }
       }
     } catch (err) {
       console.warn('Supabase status update error:', err);
@@ -581,9 +583,9 @@ export default function TeamFinderPage({ onBack }) {
     const post = posts.find((p) => p.id === app.post_id);
     if (!post) return;
 
-    const currentOpen = (post.spots_left || 0) + 1;
+    const currentOpen = Math.min((post.total_members || 4), (post.spots_left || 0) + 1);
 
-    const updatedApps = applications.map((a) => (a.id === app.id ? { ...a, status: 'declined' } : a));
+    const updatedApps = applications.map((a) => (a.id === app.id ? { ...a, status: 'removed' } : a));
     setApplications(updatedApps);
     localStorage.setItem('sscbs_squad_apps', JSON.stringify(updatedApps));
 
@@ -595,8 +597,12 @@ export default function TeamFinderPage({ onBack }) {
 
     try {
       if (hasValidCredentials) {
+        const appQuery = app.id && typeof app.id === 'string' && !app.id.startsWith('app-')
+          ? supabase.from('squad_applications').update({ status: 'removed' }).eq('id', app.id)
+          : supabase.from('squad_applications').update({ status: 'removed' }).match({ post_id: app.post_id, applicant_email: app.applicant_email });
+
         await Promise.all([
-          supabase.from('squad_applications').update({ status: 'declined' }).eq('id', app.id),
+          appQuery,
           supabase.from('squad_posts').update({ spots_left: currentOpen, is_open: true }).eq('id', post.id),
         ]);
       }
@@ -865,6 +871,8 @@ export default function TeamFinderPage({ onBack }) {
                         ? '🎉 Accepted into Squad'
                         : userApp.status === 'declined'
                         ? 'Declined'
+                        : userApp.status === 'removed'
+                        ? 'Removed from Squad'
                         : '⏳ Request Pending Review'}
                     </span>
                   </div>
@@ -936,12 +944,12 @@ export default function TeamFinderPage({ onBack }) {
                           </a>
                         )}
 
-                        {post.is_open && !userApp && (
+                        {post.is_open && (!userApp || userApp.status === 'declined' || userApp.status === 'removed') && (
                           <button
                             className="btn-tf-primary"
                             onClick={() => handleOpenApplyModal(post)}
                           >
-                            <MailIcon size={13} /> Request to Join
+                            <MailIcon size={13} /> {userApp ? 'Re-apply to Join' : 'Request to Join'}
                           </button>
                         )}
                       </>
@@ -1358,7 +1366,7 @@ export default function TeamFinderPage({ onBack }) {
                           </div>
 
                           <span className={`status-pill-badge ${app.status}`}>
-                            {app.status === 'accepted' ? '✓ Accepted' : app.status === 'declined' ? 'Declined' : 'Pending'}
+                            {app.status === 'accepted' ? '✓ Accepted' : app.status === 'declined' ? 'Declined' : app.status === 'removed' ? 'Removed' : 'Pending'}
                           </span>
                         </div>
 
