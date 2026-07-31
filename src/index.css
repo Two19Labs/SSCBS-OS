@@ -185,5 +185,43 @@ a.linkedin-link,
   font-weight: 600;
 }
 
+/* ── Global Multi-Device Responsive Helpers ── */
+.table-responsive,
+.scroll-x-auto {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  position: relative;
+}
 
+/* Soft fading scroll indicator hints for horizontally scrollable wrappers */
+.scroll-x-auto::-webkit-scrollbar,
+.table-responsive::-webkit-scrollbar {
+  height: 5px;
+}
 
+.scroll-x-auto::-webkit-scrollbar-thumb,
+.table-responsive::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+}
+
+/* Prevent accidental horizontal page overflow on small devices while keeping flex items fluid */
+.prevent-clip {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Helper for smooth touch scroll snapping */
+.touch-scroll {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+}
+
+.touch-scroll > * {
+  scroll-snap-align: start;
+}
