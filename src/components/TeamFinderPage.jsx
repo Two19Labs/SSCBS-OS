@@ -904,11 +904,11 @@ function getUserApp(post, applications, userEmail, userId) {
         <div className="admin-restricted-card">
           <div className="restricted-badge">
             <ShieldIcon size={18} />
-            <span>Beta Restricted</span>
+            <span>Access Restricted</span>
           </div>
           <h2>Team Finder & Competition Hub</h2>
           <p>
-            This feature is currently in private beta testing.
+            This feature is currently restricted by the administrator.
           </p>
           {onBack && (
             <button className="btn-tf-primary" onClick={onBack} style={{ marginTop: '1rem' }}>
