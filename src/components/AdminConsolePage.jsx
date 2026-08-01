@@ -128,6 +128,10 @@ function AdminConsoleContent({ onBack }) {
   const [noticesList, setNoticesList] = useState([]);
   const [loadingNotices, setLoadingNotices] = useState(false);
   const [editingNoticeId, setEditingNoticeId] = useState(null);
+  const [noticeSubTab, setNoticeSubTab] = useState('live'); // 'live' | 'pending' | 'requests' | 'roster'
+  const [pendingNoticeDrafts, setPendingNoticeDrafts] = useState([]);
+  const [drafterAccessRequests, setDrafterAccessRequests] = useState([]);
+  const [approvedDrafters, setApprovedDrafters] = useState([]);
   const [noticeForm, setNoticeForm] = useState({
     title: '',
     category: 'General',
@@ -167,12 +171,13 @@ function AdminConsoleContent({ onBack }) {
   const fetchAdminNotices = async () => {
     if (!hasValidCredentials) {
       setNoticesList([]);
+      setPendingNoticeDrafts([]);
       return;
     }
     try {
       setLoadingNotices(true);
 
-      // Housekeeping: delete expired notices from the database
+      // Delete expired notices
       try {
         await supabase
           .from('notices')
@@ -187,37 +192,134 @@ function AdminConsoleContent({ onBack }) {
         .select('*')
         .order('display_order', { ascending: true })
         .order('created_at', { ascending: false });
+
       if (error) {
         console.error('Error fetching admin notices:', error);
-        if (error.message && (error.message.includes('schema cache') || error.message.includes('does not exist') || error.code === '42P01')) {
-          setSaveStatus({
-            type: 'error',
-            message: "The 'notices' table does not exist in your Supabase database. Please run the SQL migration in your Supabase SQL Editor to create it."
-          });
-        } else {
-          setSaveStatus({ type: 'error', message: error.message || 'Failed to load notices.' });
-        }
       } else {
-        const sorted = (data || []).sort((a, b) => {
+        const raw = data || [];
+        const live = raw.filter(n => !n.status || n.status === 'published');
+        const pending = raw.filter(n => n.status === 'pending');
+
+        const sortedLive = live.sort((a, b) => {
           const orderA = a.display_order ?? 0;
           const orderB = b.display_order ?? 0;
           if (orderA !== orderB) return orderA - orderB;
           return new Date(b.created_at || 0) - new Date(a.created_at || 0);
         });
-        setNoticesList(sorted);
+
+        setNoticesList(sortedLive);
+        setPendingNoticeDrafts(pending);
       }
     } catch (err) {
       console.error('Failed to load notices:', err);
-      if (err.message && err.message.includes('Failed to fetch')) {
-        setSaveStatus({
-          type: 'error',
-          message: 'Connection Failed (Failed to fetch): Please disable any ad blockers, privacy extensions, or Brave Shields blocking supabase.co and try again.'
-        });
-      } else {
-        setSaveStatus({ type: 'error', message: err.message || 'Failed to load notices.' });
-      }
     } finally {
       setLoadingNotices(false);
+    }
+  };
+
+  const fetchDrafterRequestsAndRoster = async () => {
+    if (!hasValidCredentials) return;
+    try {
+      const { data, error } = await supabase
+        .from('notice_drafter_requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        setDrafterAccessRequests(data.filter(r => r.status === 'pending'));
+        setApprovedDrafters(data.filter(r => r.status === 'approved'));
+      }
+    } catch (err) {
+      console.warn('Error fetching drafter requests & roster:', err);
+    }
+  };
+
+  const handleAcceptNoticeDraft = async (id) => {
+    try {
+      if (hasValidCredentials) {
+        const { error } = await supabase
+          .from('notices')
+          .update({ status: 'published' })
+          .eq('id', id);
+        if (error) throw error;
+      }
+      setPendingNoticeDrafts(prev => prev.filter(n => n.id !== id));
+      fetchAdminNotices();
+      setSaveStatus({ type: 'success', message: 'Notice accepted & published live!' });
+    } catch (err) {
+      console.error('Error accepting notice draft:', err);
+      setSaveStatus({ type: 'error', message: 'Failed to accept notice draft.' });
+    }
+  };
+
+  const handleRefuseNoticeDraft = async (id) => {
+    if (!window.confirm('Are you sure you want to refuse this notice draft?')) return;
+    try {
+      if (hasValidCredentials) {
+        const { error } = await supabase
+          .from('notices')
+          .update({ status: 'rejected' })
+          .eq('id', id);
+        if (error) throw error;
+      }
+      setPendingNoticeDrafts(prev => prev.filter(n => n.id !== id));
+      setSaveStatus({ type: 'success', message: 'Notice draft refused.' });
+    } catch (err) {
+      console.error('Error refusing notice draft:', err);
+      setSaveStatus({ type: 'error', message: 'Failed to refuse notice draft.' });
+    }
+  };
+
+  const handleGrantDrafterAccess = async (reqId) => {
+    try {
+      if (hasValidCredentials) {
+        const { error } = await supabase
+          .from('notice_drafter_requests')
+          .update({ status: 'approved', updated_at: new Date().toISOString() })
+          .eq('id', reqId);
+        if (error) throw error;
+      }
+      fetchDrafterRequestsAndRoster();
+      setSaveStatus({ type: 'success', message: 'Drafter access granted successfully!' });
+    } catch (err) {
+      console.error('Error granting access:', err);
+      setSaveStatus({ type: 'error', message: 'Failed to grant access.' });
+    }
+  };
+
+  const handleDeclineDrafterAccess = async (reqId) => {
+    if (!window.confirm('Decline this drafter access request?')) return;
+    try {
+      if (hasValidCredentials) {
+        const { error } = await supabase
+          .from('notice_drafter_requests')
+          .update({ status: 'rejected', updated_at: new Date().toISOString() })
+          .eq('id', reqId);
+        if (error) throw error;
+      }
+      fetchDrafterRequestsAndRoster();
+      setSaveStatus({ type: 'success', message: 'Drafter access request declined.' });
+    } catch (err) {
+      console.error('Error declining request:', err);
+      setSaveStatus({ type: 'error', message: 'Failed to decline request.' });
+    }
+  };
+
+  const handleRevokeDrafterAccess = async (reqId) => {
+    if (!window.confirm('Are you sure you want to REVOKE notice drafting access for this user?')) return;
+    try {
+      if (hasValidCredentials) {
+        const { error } = await supabase
+          .from('notice_drafter_requests')
+          .update({ status: 'rejected', updated_at: new Date().toISOString() })
+          .eq('id', reqId);
+        if (error) throw error;
+      }
+      fetchDrafterRequestsAndRoster();
+      setSaveStatus({ type: 'success', message: 'Notice drafting access revoked.' });
+    } catch (err) {
+      console.error('Error revoking access:', err);
+      setSaveStatus({ type: 'error', message: 'Failed to revoke access.' });
     }
   };
 
@@ -256,6 +358,7 @@ function AdminConsoleContent({ onBack }) {
   React.useEffect(() => {
     if (activeTab === 'notices') {
       fetchAdminNotices();
+      fetchDrafterRequestsAndRoster();
     } else if (activeTab === 'analytics') {
       fetchDemographicsData();
     }
@@ -1733,96 +1836,240 @@ STRICT EXTRACTION RULES:
             </div>
 
             <div className="pane-right notices-list-card">
-              <h3>Active Notices Board ({noticesList.length})</h3>
-              
+              {/* Sub-tabs Navigation */}
+              <div className="notice-subtabs-bar">
+                <button
+                  className={`notice-subtab-btn ${noticeSubTab === 'live' ? 'active' : ''}`}
+                  onClick={() => setNoticeSubTab('live')}
+                >
+                  🟢 Live Board ({noticesList.length})
+                </button>
+                <button
+                  className={`notice-subtab-btn ${noticeSubTab === 'pending' ? 'active' : ''}`}
+                  onClick={() => setNoticeSubTab('pending')}
+                >
+                  ⏳ Pending Drafts ({pendingNoticeDrafts.length})
+                </button>
+                <button
+                  className={`notice-subtab-btn ${noticeSubTab === 'requests' ? 'active' : ''}`}
+                  onClick={() => setNoticeSubTab('requests')}
+                >
+                  🙋 Access Requests ({drafterAccessRequests.length})
+                </button>
+                <button
+                  className={`notice-subtab-btn ${noticeSubTab === 'roster' ? 'active' : ''}`}
+                  onClick={() => setNoticeSubTab('roster')}
+                >
+                  🛡️ Drafters Roster ({approvedDrafters.length})
+                </button>
+              </div>
+
               <div className="notices-manager-list">
                 {loadingNotices ? (
                   <div className="notices-manager-loading">
                     <span className="console-spinner"></span>
-                    <p>Loading notices...</p>
+                    <p>Loading Campus Buzz management data...</p>
                   </div>
-                ) : noticesList.length === 0 ? (
-                  <div className="no-logs">No active notices found. Publish one to get started!</div>
-                ) : (
-                  <div className="admin-notices-grid">
-                    {noticesList.map((notice, index) => {
-                      const getNoticeStatus = (n) => {
-                        const now = new Date();
-                        if (n.active_from && new Date(n.active_from) > now) {
-                          return { label: 'Scheduled', class: 'status-scheduled' };
-                        }
-                        if (n.active_to && new Date(n.active_to) < now) {
-                          return { label: 'Expired', class: 'status-expired' };
-                        }
-                        return { label: 'Active', class: 'status-active' };
-                      };
-                      const status = getNoticeStatus(notice);
+                ) : noticeSubTab === 'live' ? (
+                  /* LIVE NOTICES & REORDERING VIEW */
+                  noticesList.length === 0 ? (
+                    <div className="no-logs">No live notices found. Publish one to get started!</div>
+                  ) : (
+                    <div className="admin-notices-grid">
+                      {noticesList.map((notice, index) => {
+                        const getNoticeStatus = (n) => {
+                          const now = new Date();
+                          if (n.active_from && new Date(n.active_from) > now) {
+                            return { label: 'Scheduled', class: 'status-scheduled' };
+                          }
+                          if (n.active_to && new Date(n.active_to) < now) {
+                            return { label: 'Expired', class: 'status-expired' };
+                          }
+                          return { label: 'Active', class: 'status-active' };
+                        };
+                        const status = getNoticeStatus(notice);
 
-                      return (
-                        <div key={notice.id} className="admin-notice-item">
-                          <div className="notice-item-meta">
-                            {notice.society && <span className="notice-item-society">@{notice.society}</span>}
-                            <span className={`admin-status-badge ${status.class}`}>{status.label}</span>
+                        return (
+                          <div key={notice.id} className="admin-notice-item">
+                            <div className="notice-item-meta">
+                              {notice.society && <span className="notice-item-society">@{notice.society}</span>}
+                              <span className={`admin-status-badge ${status.class}`}>{status.label}</span>
+                            </div>
+                            <h4 className="notice-item-title">{notice.title}</h4>
+                            {notice.content && (
+                              <p className="notice-item-desc">{notice.content.substring(0, 80)}{notice.content.length > 80 ? '...' : ''}</p>
+                            )}
+                            
+                            {(notice.event_date || notice.venue || notice.active_from || notice.active_to) && (
+                              <div className="notice-item-schedule-info">
+                                {notice.event_date && <div style={{ color: '#000000', fontWeight: 'bold' }}>📅 Event: {new Date(notice.event_date).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>}
+                                {notice.venue && <div style={{ color: '#000000' }}>📍 Venue: {notice.venue}</div>}
+                                {notice.active_from && <div>🟢 Start: {new Date(notice.active_from).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>}
+                                {notice.active_to && <div>🔴 Expire: {new Date(notice.active_to).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>}
+                              </div>
+                            )}
+
+                            <div className="notice-item-actions">
+                              <div className="notice-reorder-buttons">
+                                <button
+                                  type="button"
+                                  className="btn-reorder-notice"
+                                  title="Move Up"
+                                  disabled={index === 0 || isSaving}
+                                  onClick={() => handleReorderNotices(index, 'up')}
+                                >
+                                  ⬆️
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn-reorder-notice"
+                                  title="Move Down"
+                                  disabled={index === noticesList.length - 1 || isSaving}
+                                  onClick={() => handleReorderNotices(index, 'down')}
+                                >
+                                  ⬇️
+                                </button>
+                              </div>
+                              <span className="notice-item-date">{new Date(notice.created_at).toLocaleDateString()}</span>
+                              <div className="notice-action-buttons">
+                                <button
+                                  type="button"
+                                  className="btn-edit-notice"
+                                  onClick={() => handleEditNoticeClick(notice)}
+                                  disabled={isSaving}
+                                >
+                                  ✏️ Edit
+                                </button>
+                                <button 
+                                  type="button"
+                                  className="btn-delete-notice"
+                                  onClick={() => handleDeleteNotice(notice.id)}
+                                  disabled={isSaving}
+                                >
+                                  🗑️ Delete
+                                </button>
+                              </div>
+                            </div>
                           </div>
-                          <h4 className="notice-item-title">{notice.title}</h4>
-                          {notice.content && (
-                            <p className="notice-item-desc">{notice.content.substring(0, 80)}{notice.content.length > 80 ? '...' : ''}</p>
-                          )}
+                        );
+                      })}
+                    </div>
+                  )
+                ) : noticeSubTab === 'pending' ? (
+                  /* PENDING DRAFT SUBMISSIONS VIEW */
+                  pendingNoticeDrafts.length === 0 ? (
+                    <div className="no-logs">🎉 No pending notice drafts waiting for review.</div>
+                  ) : (
+                    <div className="admin-notices-grid">
+                      {pendingNoticeDrafts.map((draft) => (
+                        <div key={draft.id} className="admin-notice-item pending-card">
+                          <div className="author-banner">
+                            <span className="author-email">✉️ {draft.created_by_email || 'Student Submission'}</span>
+                            {draft.created_by_name && <span className="author-name">({draft.created_by_name})</span>}
+                          </div>
+                          <div className="notice-item-meta">
+                            {draft.society ? <span className="notice-item-society">@{draft.society}</span> : <span className="notice-item-society">No Society Specified</span>}
+                            <span className="admin-status-badge status-scheduled">Pending Review</span>
+                          </div>
+                          <h4 className="notice-item-title">{draft.title}</h4>
+                          <p className="notice-item-desc">{draft.content}</p>
                           
-                          {(notice.event_date || notice.venue || notice.active_from || notice.active_to) && (
+                          {(draft.event_date || draft.venue || draft.link_url) && (
                             <div className="notice-item-schedule-info">
-                              {notice.event_date && <div style={{ color: '#000000', fontWeight: 'bold' }}>📅 Event: {new Date(notice.event_date).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>}
-                              {notice.venue && <div style={{ color: '#000000' }}>📍 Venue: {notice.venue}</div>}
-                              {notice.active_from && <div>🟢 Start: {new Date(notice.active_from).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>}
-                              {notice.active_to && <div>🔴 Expire: {new Date(notice.active_to).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>}
+                              {draft.event_date && <div>📅 Event: {new Date(draft.event_date).toLocaleString()}</div>}
+                              {draft.venue && <div>📍 Venue: {draft.venue}</div>}
+                              {draft.link_url && <div>🔗 Link: <a href={draft.link_url} target="_blank" rel="noreferrer">{draft.link_url}</a></div>}
                             </div>
                           )}
 
-                          <div className="notice-item-actions">
-                            <div className="notice-reorder-buttons">
-                              <button
-                                type="button"
-                                className="btn-reorder-notice"
-                                title="Move Up"
-                                disabled={index === 0 || isSaving}
-                                onClick={() => handleReorderNotices(index, 'up')}
-                              >
-                                ⬆️
-                              </button>
-                              <button
-                                type="button"
-                                className="btn-reorder-notice"
-                                title="Move Down"
-                                disabled={index === noticesList.length - 1 || isSaving}
-                                onClick={() => handleReorderNotices(index, 'down')}
-                              >
-                                ⬇️
-                              </button>
-                            </div>
-                            <span className="notice-item-date">{new Date(notice.created_at).toLocaleDateString()}</span>
-                            <div className="notice-action-buttons">
-                              <button
-                                type="button"
-                                className="btn-edit-notice"
-                                onClick={() => handleEditNoticeClick(notice)}
-                                disabled={isSaving}
-                              >
-                                ✏️ Edit
-                              </button>
-                              <button 
-                                type="button"
-                                className="btn-delete-notice"
-                                onClick={() => handleDeleteNotice(notice.id)}
-                                disabled={isSaving}
-                              >
-                                Delete
-                              </button>
-                            </div>
+                          <div className="moderation-action-bar">
+                            <button
+                              type="button"
+                              className="btn-moderate-edit"
+                              onClick={() => handleEditNoticeClick(draft)}
+                            >
+                              ✏️ Edit Draft
+                            </button>
+                            <button
+                              type="button"
+                              className="btn-moderate-approve"
+                              onClick={() => handleAcceptNoticeDraft(draft.id)}
+                            >
+                              ✅ Accept & Publish
+                            </button>
+                            <button
+                              type="button"
+                              className="btn-moderate-refuse"
+                              onClick={() => handleRefuseNoticeDraft(draft.id)}
+                            >
+                              ❌ Refuse
+                            </button>
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
+                      ))}
+                    </div>
+                  )
+                ) : noticeSubTab === 'requests' ? (
+                  /* ACCESS REQUESTS VIEW */
+                  drafterAccessRequests.length === 0 ? (
+                    <div className="no-logs">No pending drafter access requests from students.</div>
+                  ) : (
+                    <div className="requests-grid">
+                      {drafterAccessRequests.map((req) => (
+                        <div key={req.id} className="request-admin-card">
+                          <div className="request-card-info">
+                            <div className="request-user-email">✉️ {req.user_email}</div>
+                            {req.full_name && <div className="request-user-name">Applicant: {req.full_name}</div>}
+                            <div className="request-society-note">
+                              <strong>Note / Role:</strong> "{req.society_note}"
+                            </div>
+                            <div className="request-date">Requested: {new Date(req.created_at).toLocaleString()}</div>
+                          </div>
+                          <div className="request-card-actions">
+                            <button
+                              type="button"
+                              className="btn-grant-access"
+                              onClick={() => handleGrantDrafterAccess(req.id)}
+                            >
+                              ✅ Grant Access
+                            </button>
+                            <button
+                              type="button"
+                              className="btn-decline-access"
+                              onClick={() => handleDeclineDrafterAccess(req.id)}
+                            >
+                              ❌ Decline
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )
+                ) : (
+                  /* APPROVED DRAFTERS ROSTER VIEW */
+                  approvedDrafters.length === 0 ? (
+                    <div className="no-logs">No approved notice drafters on roster yet.</div>
+                  ) : (
+                    <div className="roster-grid">
+                      {approvedDrafters.map((drafter) => (
+                        <div key={drafter.id} className="roster-admin-card">
+                          <div className="roster-card-info">
+                            <div className="roster-email">🛡️ {drafter.user_email}</div>
+                            {drafter.full_name && <div className="roster-name">{drafter.full_name}</div>}
+                            <div className="roster-role">"{drafter.society_note}"</div>
+                            <div className="roster-date">Approved: {new Date(drafter.updated_at || drafter.created_at).toLocaleDateString()}</div>
+                          </div>
+                          <button
+                            type="button"
+                            className="btn-revoke-access"
+                            onClick={() => handleRevokeDrafterAccess(drafter.id)}
+                          >
+                            🚫 Revoke Access
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )
                 )}
               </div>
             </div>

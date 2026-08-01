@@ -118,12 +118,18 @@ CREATE TABLE IF NOT EXISTS public.notices (
     active_to TIMESTAMP WITH TIME ZONE,   -- Display notice end date (Optional)
     display_order INT DEFAULT 0,          -- Custom ordering index
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-    created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL
+    created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    status TEXT DEFAULT 'published',      -- 'published', 'pending', 'rejected'
+    created_by_email TEXT,
+    created_by_name TEXT
 );
 
 -- Migration statements if table already exists:
 ALTER TABLE public.notices ADD COLUMN IF NOT EXISTS venue TEXT;
 ALTER TABLE public.notices ADD COLUMN IF NOT EXISTS display_order INT DEFAULT 0;
+ALTER TABLE public.notices ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'published';
+ALTER TABLE public.notices ADD COLUMN IF NOT EXISTS created_by_email TEXT;
+ALTER TABLE public.notices ADD COLUMN IF NOT EXISTS created_by_name TEXT;
 
 -- Enable Row Level Security (RLS)
 ALTER TABLE public.notices ENABLE ROW LEVEL SECURITY;
@@ -146,6 +152,36 @@ CREATE POLICY "Enable write access for admins on notices"
     TO authenticated 
     USING (auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'))
     WITH CHECK (auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'));
+
+-- 6b. Create a table to store notice drafter requests from students / society reps
+CREATE TABLE IF NOT EXISTS public.notice_drafter_requests (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_email TEXT NOT NULL,
+    full_name TEXT,
+    society_note TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending', -- 'pending', 'approved', 'rejected'
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.notice_drafter_requests ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Enable read access for notice drafter requests" ON public.notice_drafter_requests;
+DROP POLICY IF EXISTS "Enable all access for notice drafter requests" ON public.notice_drafter_requests;
+
+CREATE POLICY "Enable read access for notice drafter requests" 
+    ON public.notice_drafter_requests 
+    FOR SELECT 
+    TO authenticated 
+    USING (true);
+
+CREATE POLICY "Enable write access for notice drafter requests" 
+    ON public.notice_drafter_requests 
+    FOR ALL 
+    TO authenticated 
+    USING (true) 
+    WITH CHECK (true);
 
 -- Only admins can view all student progress for demographics/analytics
 CREATE POLICY "Enable read access for admin on user progress" 

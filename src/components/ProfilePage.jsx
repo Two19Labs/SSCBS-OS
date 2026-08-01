@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useTimetable } from '../context/TimetableContext';
 import { isAdminEmail, isTimeWarpEnabled, setTimeWarpEnabled } from '../lib/admin';
+import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import { ChevronRight } from './icons';
 import './ProfilePage.css';
 
@@ -38,6 +39,97 @@ export default function ProfilePage({ onNavigate }) {
   const saveTimer = useRef(null);
   const dirty = useRef(false);
 
+  // Drafter access request state
+  const [drafterRequest, setDrafterRequest] = useState(null);
+  const [societyNote, setSocietyNote] = useState('');
+  const [requestLoading, setRequestLoading] = useState(false);
+  const [requestMsg, setRequestMsg] = useState({ type: '', text: '' });
+
+  const email = user?.email || '';
+  const isAdmin = isAdminEmail(email);
+  const displayName = fullName || email.split('@')[0] || 'Student';
+
+  // Fetch notice drafter request status
+  useEffect(() => {
+    if (!email) return;
+    const fetchRequestStatus = async () => {
+      try {
+        if (!hasValidCredentials) {
+          const localReq = localStorage.getItem(`sscbs_drafter_req_${email}`);
+          if (localReq) setDrafterRequest(JSON.parse(localReq));
+          return;
+        }
+        const { data, error } = await supabase
+          .from('notice_drafter_requests')
+          .select('*')
+          .eq('user_email', email)
+          .maybeSingle();
+
+        if (!error && data) {
+          setDrafterRequest(data);
+          if (data.society_note) setSocietyNote(data.society_note);
+        }
+      } catch (err) {
+        console.warn('Error fetching drafter request status:', err);
+      }
+    };
+    fetchRequestStatus();
+  }, [email]);
+
+  const handleRequestDrafterAccess = async (e) => {
+    e.preventDefault();
+    if (!societyNote.trim()) {
+      setRequestMsg({ type: 'error', text: 'Please describe your society & position (e.g. President, Enactus SSCBS).' });
+      return;
+    }
+
+    setRequestLoading(true);
+    setRequestMsg({ type: '', text: '' });
+
+    const payload = {
+      user_id: user?.id || null,
+      user_email: email,
+      full_name: displayName,
+      society_note: societyNote.trim(),
+      status: 'pending',
+      updated_at: new Date().toISOString()
+    };
+
+    try {
+      if (!hasValidCredentials) {
+        localStorage.setItem(`sscbs_drafter_req_${email}`, JSON.stringify(payload));
+        setDrafterRequest(payload);
+        setRequestMsg({ type: 'success', text: 'Request submitted successfully to Admin! (Sandbox mode)' });
+        setRequestLoading(false);
+        return;
+      }
+
+      if (drafterRequest?.id) {
+        const { error } = await supabase
+          .from('notice_drafter_requests')
+          .update(payload)
+          .eq('id', drafterRequest.id);
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase
+          .from('notice_drafter_requests')
+          .insert([{ ...payload, created_at: new Date().toISOString() }])
+          .select()
+          .single();
+        if (error) throw error;
+        if (data) setDrafterRequest(data);
+      }
+
+      setDrafterRequest(prev => ({ ...(prev || {}), ...payload }));
+      setRequestMsg({ type: 'success', text: 'Request submitted! Admin will review your drafting access.' });
+    } catch (err) {
+      console.error('Failed to submit drafter request:', err);
+      setRequestMsg({ type: 'error', text: err.message || 'Failed to submit request. Please try again.' });
+    } finally {
+      setRequestLoading(false);
+    }
+  };
+
   const activeSemKeys = getActiveSemesters(course);
   const availableSemesters = ALL_SEMESTERS.filter(s => activeSemKeys.includes(s.value));
 
@@ -47,10 +139,6 @@ export default function ProfilePage({ onNavigate }) {
       setSemester(availableSemesters[0].value);
     }
   }, [course, activeSemKeys.join(',')]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const email = user?.email || '';
-  const isAdmin = isAdminEmail(email);
-  const displayName = fullName || email.split('@')[0] || 'Student';
 
   // Keep section valid when course changes
   useEffect(() => {
@@ -200,6 +288,74 @@ export default function ProfilePage({ onNavigate }) {
             ))}
           </div>
         </div>
+      </div>
+
+      <div className="profile-group-label">CAMPUS BUZZ & SOCIETIES</div>
+      <div className="profile-group drafter-request-group">
+        {isAdmin ? (
+          <div className="profile-row no-chevron">
+            <div className="profile-row-stack">
+              <span className="profile-row-label">Admin Access Granted</span>
+              <span className="profile-row-hint">As an admin, you have full privileges to publish and reorder notices directly.</span>
+            </div>
+            <span className="drafter-badge approved">Admin Access</span>
+          </div>
+        ) : (
+          <div className="drafter-request-container">
+            <div className="drafter-request-header">
+              <div className="drafter-request-title">
+                <span className="drafter-icon">📢</span>
+                <div>
+                  <h4>Request Notice Drafter Access</h4>
+                  <p className="drafter-subtitle">Society leads and members can request permission to draft notices for Campus Buzz.</p>
+                </div>
+              </div>
+              {drafterRequest?.status && (
+                <span className={`drafter-badge ${drafterRequest.status}`}>
+                  {drafterRequest.status === 'approved' && '✅ Access Granted'}
+                  {drafterRequest.status === 'pending' && '⏳ Pending Review'}
+                  {drafterRequest.status === 'rejected' && '❌ Declined'}
+                </span>
+              )}
+            </div>
+
+            {requestMsg.text && (
+              <div className={`drafter-status-alert ${requestMsg.type}`}>
+                {requestMsg.text}
+              </div>
+            )}
+
+            {drafterRequest?.status === 'approved' ? (
+              <div className="drafter-approved-box">
+                <p>🎉 You have notice drafting access! You can now create notice drafts on Campus Buzz for admin approval.</p>
+                <button className="btn-drafter-action" onClick={() => onNavigate('buzz')}>
+                  Go to Campus Buzz & Draft Notice →
+                </button>
+              </div>
+            ) : (
+              <form className="drafter-request-form" onSubmit={handleRequestDrafterAccess}>
+                <label className="drafter-form-label">
+                  <span>Society Name & Position (1 sentence)</span>
+                  <input
+                    type="text"
+                    className="drafter-input"
+                    placeholder="e.g. President, Enactus SSCBS or Member, MarkUs"
+                    value={societyNote}
+                    onChange={(e) => setSocietyNote(e.target.value)}
+                    required
+                  />
+                </label>
+                <button 
+                  type="submit" 
+                  className="btn-drafter-submit"
+                  disabled={requestLoading}
+                >
+                  {requestLoading ? 'Submitting...' : drafterRequest?.status === 'pending' ? 'Update Access Request' : 'Request Access to Draft Notices'}
+                </button>
+              </form>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="profile-group-label">HELP & SUPPORT</div>

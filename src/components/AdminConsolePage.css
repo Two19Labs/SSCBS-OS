@@ -685,6 +685,179 @@
   gap: 1rem;
 }
 
+/* Notice Subtabs Bar */
+.notice-subtabs-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+  overflow-x: auto;
+}
+
+.notice-subtab-btn {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--ink-dim);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.notice-subtab-btn:hover {
+  background: var(--tint);
+  color: var(--ink);
+}
+
+.notice-subtab-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+/* Author Banner & Moderation Cards */
+.pending-card {
+  border-left: 4px solid #f59e0b !important;
+}
+
+.author-banner {
+  background: rgba(113, 34, 44, 0.08);
+  border: 1px solid rgba(113, 34, 44, 0.15);
+  border-radius: 6px;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  margin-bottom: 6px;
+}
+
+.author-email {
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.author-name {
+  color: var(--ink-dim);
+}
+
+.moderation-action-bar {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-moderate-edit {
+  background: var(--tint);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-moderate-approve {
+  background: #047857;
+  color: #ffffff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-moderate-refuse {
+  background: #b91c1c;
+  color: #ffffff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Requests & Roster Cards */
+.requests-grid, .roster-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.request-admin-card, .roster-admin-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.request-card-info, .roster-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.request-user-email, .roster-email {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.request-user-name, .roster-name {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.request-society-note, .roster-role {
+  font-size: 0.78rem;
+  color: var(--ink-dim);
+}
+
+.request-date, .roster-date {
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+}
+
+.request-card-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-grant-access {
+  background: #047857;
+  color: #ffffff;
+  border: none;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-decline-access, .btn-revoke-access {
+  background: #b91c1c;
+  color: #ffffff;
+  border: none;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .admin-notice-item {
   background: var(--bg);
   border: 1px solid var(--border);

@@ -1,10 +1,34 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
+import { isAdminEmail } from '../lib/admin';
 import './NoticeBoard.css';
 
 export default function NoticeBoard() {
+  const { user } = useAuth();
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Drafter state
+  const [isApprovedDrafter, setIsApprovedDrafter] = useState(false);
+  const [myDrafts, setMyDrafts] = useState([]);
+  const [showDraftModal, setShowDraftModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState({ type: '', text: '' });
+  const [noticeForm, setNoticeForm] = useState({
+    title: '',
+    category: 'Event',
+    society: '',
+    venue: '',
+    content: '',
+    link_url: '',
+    event_date: '',
+    active_from: '',
+    active_to: '',
+  });
+
+  const userEmail = user?.email || '';
+  const isAdmin = isAdminEmail(userEmail);
 
   const sortNotices = (list) => {
     return [...list].sort((a, b) => {
@@ -15,11 +39,13 @@ export default function NoticeBoard() {
     });
   };
 
-  const getDefaultCampusNotices = () => [];
-
   const filterActiveNotices = (rawNotices) => {
     const now = new Date();
     return (rawNotices || []).filter(notice => {
+      // Must be published (or legacy notice without status)
+      if (notice.status && notice.status !== 'published') {
+        return false;
+      }
       if (notice.active_from && new Date(notice.active_from) > now) {
         return false;
       }
@@ -28,6 +54,60 @@ export default function NoticeBoard() {
       }
       return true;
     });
+  };
+
+  const checkDrafterStatus = async () => {
+    if (isAdmin) {
+      setIsApprovedDrafter(true);
+      return;
+    }
+    if (!userEmail) return;
+
+    try {
+      if (!hasValidCredentials) {
+        const localReq = localStorage.getItem(`sscbs_drafter_req_${userEmail}`);
+        if (localReq) {
+          const parsed = JSON.parse(localReq);
+          setIsApprovedDrafter(parsed.status === 'approved');
+        }
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('notice_drafter_requests')
+        .select('status')
+        .eq('user_email', userEmail)
+        .maybeSingle();
+
+      if (!error && data) {
+        setIsApprovedDrafter(data.status === 'approved');
+      }
+    } catch (err) {
+      console.warn('Error checking drafter status:', err);
+    }
+  };
+
+  const fetchMyDrafts = async () => {
+    if (!userEmail) return;
+    try {
+      if (!hasValidCredentials) {
+        const localDrafts = localStorage.getItem(`sscbs_user_drafts_${userEmail}`);
+        if (localDrafts) setMyDrafts(JSON.parse(localDrafts));
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('notices')
+        .select('*')
+        .eq('created_by_email', userEmail)
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        setMyDrafts(data);
+      }
+    } catch (err) {
+      console.warn('Error fetching my notice drafts:', err);
+    }
   };
 
   const fetchNotices = async (force = false) => {
@@ -46,7 +126,7 @@ export default function NoticeBoard() {
 
       setLoading(true);
       if (!hasValidCredentials) {
-        setNotices(filterActiveNotices(sortNotices(getDefaultCampusNotices())));
+        setNotices([]);
         setLoading(false);
         return;
       }
@@ -59,7 +139,7 @@ export default function NoticeBoard() {
 
       if (error) {
         console.error('Error loading notices from Supabase:', error);
-        setNotices(filterActiveNotices(sortNotices(getDefaultCampusNotices())));
+        setNotices([]);
       } else {
         const activeNotices = filterActiveNotices(sortNotices(data || []));
         setNotices(activeNotices);
@@ -68,7 +148,7 @@ export default function NoticeBoard() {
       }
     } catch (err) {
       console.error('Failed to fetch notices:', err);
-      setNotices(filterActiveNotices(sortNotices(getDefaultCampusNotices())));
+      setNotices([]);
     } finally {
       setLoading(false);
     }
@@ -76,13 +156,14 @@ export default function NoticeBoard() {
 
   useEffect(() => {
     fetchNotices();
+    checkDrafterStatus();
 
     if (hasValidCredentials) {
-      // Set up real-time listener for updates
       const channel = supabase
         .channel('public:notices')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'notices' }, () => {
           fetchNotices(true);
+          fetchMyDrafts();
         })
         .subscribe();
 
@@ -90,9 +171,87 @@ export default function NoticeBoard() {
         supabase.removeChannel(channel);
       };
     }
-  }, []);
+  }, [userEmail]);
+
+  useEffect(() => {
+    if (isApprovedDrafter) {
+      fetchMyDrafts();
+    }
+  }, [isApprovedDrafter, userEmail]);
+
+  const handleSubmitNoticeDraft = async (e) => {
+    e.preventDefault();
+    if (!noticeForm.title.trim() || !noticeForm.content.trim()) {
+      setSubmitStatus({ type: 'error', text: 'Title and description content are required.' });
+      return;
+    }
+
+    setSubmitting(true);
+    setSubmitStatus({ type: '', text: '' });
+
+    const newStatus = isAdmin ? 'published' : 'pending';
+    const payload = {
+      title: noticeForm.title.trim(),
+      category: noticeForm.category || 'Event',
+      society: noticeForm.society.trim() || null,
+      venue: noticeForm.venue.trim() || null,
+      content: noticeForm.content.trim(),
+      link_url: noticeForm.link_url.trim() || null,
+      event_date: noticeForm.event_date ? new Date(noticeForm.event_date).toISOString() : null,
+      active_from: noticeForm.active_from ? new Date(noticeForm.active_from).toISOString() : null,
+      active_to: noticeForm.active_to ? new Date(noticeForm.active_to).toISOString() : null,
+      status: newStatus,
+      created_by_email: userEmail,
+      created_by_name: user?.user_metadata?.full_name || userEmail.split('@')[0],
+      created_at: new Date().toISOString()
+    };
+
+    try {
+      if (!hasValidCredentials) {
+        const localDrafts = JSON.parse(localStorage.getItem(`sscbs_user_drafts_${userEmail}`) || '[]');
+        const mockDraft = { ...payload, id: `mock-${Date.now()}` };
+        const updated = [mockDraft, ...localDrafts];
+        localStorage.setItem(`sscbs_user_drafts_${userEmail}`, JSON.stringify(updated));
+        setMyDrafts(updated);
+        if (isAdmin) setNotices(prev => [mockDraft, ...prev]);
+        setSubmitStatus({ type: 'success', text: isAdmin ? 'Notice published live!' : 'Notice draft submitted to Admin for approval!' });
+        setTimeout(() => {
+          setShowDraftModal(false);
+          setNoticeForm({ title: '', category: 'Event', society: '', venue: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
+        }, 1200);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('notices')
+        .insert([payload])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        setMyDrafts(prev => [data, ...prev]);
+      }
+      setSubmitStatus({ 
+        type: 'success', 
+        text: isAdmin ? 'Notice published live!' : 'Notice draft submitted successfully to Admin for approval!' 
+      });
+      fetchNotices(true);
+      setTimeout(() => {
+        setShowDraftModal(false);
+        setNoticeForm({ title: '', category: 'Event', society: '', venue: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
+      }, 1200);
+    } catch (err) {
+      console.error('Failed to submit notice draft:', err);
+      setSubmitStatus({ type: 'error', text: err.message || 'Failed to submit notice draft. Please try again.' });
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const formatDate = (isoString) => {
+    if (!isoString) return '';
     const d = new Date(isoString);
     return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
   };
@@ -117,8 +276,166 @@ export default function NoticeBoard() {
           <h3>Campus Buzz & Notice Board</h3>
           <p className="notice-board-subtitle">Stay updated with the latest notices and activities across SSCBS.</p>
         </div>
+        {isApprovedDrafter && (
+          <button 
+            className="btn-create-notice-draft"
+            onClick={() => {
+              setSubmitStatus({ type: '', text: '' });
+              setShowDraftModal(true);
+            }}
+          >
+            <span className="btn-icon">➕</span> Draft Campus Notice
+          </button>
+        )}
       </div>
 
+      {/* Drafter Modal */}
+      {showDraftModal && (
+        <div className="notice-modal-backdrop" onClick={() => setShowDraftModal(false)}>
+          <div className="notice-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="notice-modal-header">
+              <h4>📢 Draft Campus Notice</h4>
+              <button className="btn-modal-close" onClick={() => setShowDraftModal(false)}>✕</button>
+            </div>
+            {submitStatus.text && (
+              <div className={`notice-alert ${submitStatus.type}`}>
+                {submitStatus.text}
+              </div>
+            )}
+            <form className="notice-draft-form" onSubmit={handleSubmitNoticeDraft}>
+              <div className="form-row-2col">
+                <label>
+                  <span>Title *</span>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Annual Hackathon 2026 Registration"
+                    value={noticeForm.title}
+                    onChange={(e) => setNoticeForm({ ...noticeForm, title: e.target.value })}
+                  />
+                </label>
+                <label>
+                  <span>Category</span>
+                  <select
+                    value={noticeForm.category}
+                    onChange={(e) => setNoticeForm({ ...noticeForm, category: e.target.value })}
+                  >
+                    <option value="Event">Event</option>
+                    <option value="Session">Session</option>
+                    <option value="Society">Society</option>
+                    <option value="Academic">Academic</option>
+                  </select>
+                </label>
+              </div>
+
+              <div className="form-row-2col">
+                <label>
+                  <span>Society / Department Name</span>
+                  <input
+                    type="text"
+                    placeholder="e.g. Enactus, Kronos, IFSA"
+                    value={noticeForm.society}
+                    onChange={(e) => setNoticeForm({ ...noticeForm, society: e.target.value })}
+                  />
+                </label>
+                <label>
+                  <span>Venue</span>
+                  <input
+                    type="text"
+                    placeholder="e.g. Auditorium, Room 408, Google Meet"
+                    value={noticeForm.venue}
+                    onChange={(e) => setNoticeForm({ ...noticeForm, venue: e.target.value })}
+                  />
+                </label>
+              </div>
+
+              <div className="form-row-2col">
+                <label>
+                  <span>Event Date & Time</span>
+                  <input
+                    type="datetime-local"
+                    value={noticeForm.event_date}
+                    onChange={(e) => setNoticeForm({ ...noticeForm, event_date: e.target.value })}
+                  />
+                </label>
+                <label>
+                  <span>Registration / Info Link URL</span>
+                  <input
+                    type="url"
+                    placeholder="https://forms.gle/..."
+                    value={noticeForm.link_url}
+                    onChange={(e) => setNoticeForm({ ...noticeForm, link_url: e.target.value })}
+                  />
+                </label>
+              </div>
+
+              <div className="form-row-2col">
+                <label>
+                  <span>Display From (Optional)</span>
+                  <input
+                    type="datetime-local"
+                    value={noticeForm.active_from}
+                    onChange={(e) => setNoticeForm({ ...noticeForm, active_from: e.target.value })}
+                  />
+                </label>
+                <label>
+                  <span>Display Until (Optional)</span>
+                  <input
+                    type="datetime-local"
+                    value={noticeForm.active_to}
+                    onChange={(e) => setNoticeForm({ ...noticeForm, active_to: e.target.value })}
+                  />
+                </label>
+              </div>
+
+              <label>
+                <span>Notice Description / Details *</span>
+                <textarea
+                  rows={4}
+                  required
+                  placeholder="Provide complete details about the event, rules, eligibility, or guidelines..."
+                  value={noticeForm.content}
+                  onChange={(e) => setNoticeForm({ ...noticeForm, content: e.target.value })}
+                />
+              </label>
+
+              <div className="modal-actions">
+                <button type="button" className="btn-cancel" onClick={() => setShowDraftModal(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn-submit-draft" disabled={submitting}>
+                  {submitting ? 'Submitting Draft...' : isAdmin ? 'Publish Notice Live' : 'Submit Draft for Admin Approval'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* My Submissions for Drafters */}
+      {isApprovedDrafter && myDrafts.length > 0 && (
+        <div className="my-drafts-section">
+          <h4 className="my-drafts-title">📋 My Notice Submissions ({myDrafts.length})</h4>
+          <div className="my-drafts-grid">
+            {myDrafts.map((draft) => (
+              <div key={draft.id} className={`my-draft-card ${draft.status || 'published'}`}>
+                <div className="draft-card-head">
+                  <span className="draft-title">{draft.title}</span>
+                  <span className={`draft-status-pill ${draft.status || 'published'}`}>
+                    {draft.status === 'published' && '✅ Approved & Live'}
+                    {draft.status === 'pending' && '⏳ Pending Review'}
+                    {draft.status === 'rejected' && '❌ Declined'}
+                  </span>
+                </div>
+                {draft.society && <div className="draft-meta">Society: {draft.society}</div>}
+                <div className="draft-date">Submitted: {formatDate(draft.created_at)}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Public Notices Feed */}
       {loading ? (
         <div className="notice-board-loading">
           <span className="notice-spinner"></span>
@@ -127,7 +444,7 @@ export default function NoticeBoard() {
       ) : notices.length === 0 ? (
         <div className="notice-board-empty">
           <div className="empty-icon">📢</div>
-          <p>No notices found.</p>
+          <p>No active notices found.</p>
         </div>
       ) : (
         <div className="notice-grid">
