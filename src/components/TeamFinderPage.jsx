@@ -629,10 +629,8 @@ export default function TeamFinderPage({ onBack }) {
 function getPostOpenSpots(post, applications) {
   if (!post) return 0;
   const initialOpen = parseInt(post.initial_open_spots, 10) || parseInt(post.spots_left, 10) || 1;
-  const acceptedApps = (applications || []).filter(
-    (a) => String(a.post_id) === String(post.id) && a.status === 'accepted'
-  );
-  return Math.max(0, initialOpen - acceptedApps.length);
+  const acceptedEmails = Array.isArray(post.accepted_emails) ? post.accepted_emails : [];
+  return Math.max(0, initialOpen - acceptedEmails.length);
 }
 
 function isPostOpen(post, applications) {
@@ -641,12 +639,12 @@ function isPostOpen(post, applications) {
   return getPostOpenSpots(post, applications) > 0;
 }
 
-function getUserApp(applications, postId, userEmail, userId) {
-  if (!applications || !postId) return null;
+function getUserApp(post, applications, userEmail, userId) {
+  if (!post || !applications) return null;
   const emailLower = userEmail ? userEmail.toLowerCase() : '';
 
   const matches = applications.filter((a) => {
-    if (String(a.post_id) !== String(postId)) return false;
+    if (String(a.post_id) !== String(post.id)) return false;
     const isEmail = a.applicant_email && emailLower && a.applicant_email.toLowerCase() === emailLower;
     const isId = a.applicant_id && userId && a.applicant_id === userId;
     return isEmail || isId;
@@ -654,11 +652,22 @@ function getUserApp(applications, postId, userEmail, userId) {
 
   if (matches.length === 0) return null;
 
-  // CRITICAL RULE:
-  // If ANY matching application for this user & post has status === 'removed',
-  // the host removed them from the team. Return the removed application record!
-  const removedApp = matches.find((m) => m.status === 'removed');
-  if (removedApp) return removedApp;
+  const acceptedEmails = Array.isArray(post.accepted_emails) ? post.accepted_emails : [];
+  const isAcceptedInPost = acceptedEmails.some(
+    (e) => e && emailLower && e.toLowerCase() === emailLower
+  );
+
+  // CRITICAL: If user's email is NOT in post.accepted_emails, they are NOT accepted into the squad!
+  if (!isAcceptedInPost) {
+    const removedApp = matches.find((m) => m.status === 'removed');
+    if (removedApp) return removedApp;
+
+    const acceptedApp = matches.find((m) => m.status === 'accepted');
+    if (acceptedApp) {
+      // User was accepted earlier, but host removed their email from post.accepted_emails!
+      return { ...acceptedApp, status: 'removed' };
+    }
+  }
 
   // Otherwise, sort by creation timestamp / ID descending to get latest status
   matches.sort((a, b) => {
@@ -667,7 +676,11 @@ function getUserApp(applications, postId, userEmail, userId) {
     return timeB - timeA;
   });
 
-  return matches[0];
+  const latest = { ...matches[0] };
+  if (isAcceptedInPost) {
+    latest.status = 'accepted';
+  }
+  return latest;
 }
 
   const handleAcceptApplicant = async (app) => {
@@ -675,6 +688,11 @@ function getUserApp(applications, postId, userEmail, userId) {
     if (!post) return;
 
     const appEmailLower = (app.applicant_email || '').toLowerCase();
+    const currentAcceptedEmails = Array.isArray(post.accepted_emails) ? post.accepted_emails : [];
+
+    const newAcceptedEmails = currentAcceptedEmails.some((e) => e?.toLowerCase() === appEmailLower)
+      ? currentAcceptedEmails
+      : [...currentAcceptedEmails, app.applicant_email];
 
     const updatedApps = applications.map((a) =>
       a.id === app.id || (String(a.post_id) === String(app.post_id) && a.applicant_email?.toLowerCase() === appEmailLower)
@@ -684,17 +702,25 @@ function getUserApp(applications, postId, userEmail, userId) {
     setApplications(updatedApps);
     localStorage.setItem('sscbs_squad_apps', JSON.stringify(updatedApps));
 
-    const newOpenSpots = getPostOpenSpots(post, updatedApps);
+    const initialOpen = parseInt(post.initial_open_spots, 10) || parseInt(post.spots_left, 10) || 1;
+    const newOpenSpots = Math.max(0, initialOpen - newAcceptedEmails.length);
     const isNowOpen = newOpenSpots > 0;
 
     const updatedPosts = posts.map((p) =>
-      String(p.id) === String(post.id) ? { ...p, spots_left: newOpenSpots, is_open: isNowOpen } : p
+      String(p.id) === String(post.id)
+        ? { ...p, accepted_emails: newAcceptedEmails, spots_left: newOpenSpots, is_open: isNowOpen }
+        : p
     );
     setPosts(updatedPosts);
     localStorage.setItem('sscbs_squad_posts', JSON.stringify(updatedPosts));
 
     try {
       if (hasValidCredentials) {
+        await supabase
+          .from('squad_posts')
+          .update({ accepted_emails: newAcceptedEmails, spots_left: newOpenSpots, is_open: isNowOpen })
+          .eq('id', post.id);
+
         const isRealId = app.id && !String(app.id).startsWith('app-');
         if (isRealId) {
           await supabase.from('squad_applications').update({ status: 'accepted' }).eq('id', app.id);
@@ -706,8 +732,6 @@ function getUserApp(applications, postId, userEmail, userId) {
             .eq('post_id', app.post_id)
             .ilike('applicant_email', app.applicant_email);
         }
-
-        await supabase.from('squad_posts').update({ spots_left: newOpenSpots, is_open: isNowOpen }).eq('id', post.id);
       }
     } catch (err) {
       console.warn('Supabase status update error:', err);
@@ -748,6 +772,11 @@ function getUserApp(applications, postId, userEmail, userId) {
     if (!post) return;
 
     const appEmailLower = (app.applicant_email || '').toLowerCase();
+    const currentAcceptedEmails = Array.isArray(post.accepted_emails) ? post.accepted_emails : [];
+
+    const newAcceptedEmails = currentAcceptedEmails.filter(
+      (e) => e && e.toLowerCase() !== appEmailLower
+    );
 
     const updatedApps = applications.map((a) => {
       const isMatch = a.id === app.id ||
@@ -759,17 +788,25 @@ function getUserApp(applications, postId, userEmail, userId) {
     setApplications(updatedApps);
     localStorage.setItem('sscbs_squad_apps', JSON.stringify(updatedApps));
 
-    const newOpenSpots = getPostOpenSpots(post, updatedApps);
+    const initialOpen = parseInt(post.initial_open_spots, 10) || parseInt(post.spots_left, 10) || 1;
+    const newOpenSpots = Math.max(0, initialOpen - newAcceptedEmails.length);
     const isNowOpen = newOpenSpots > 0;
 
     const updatedPosts = posts.map((p) =>
-      String(p.id) === String(post.id) ? { ...p, spots_left: newOpenSpots, is_open: isNowOpen } : p
+      String(p.id) === String(post.id)
+        ? { ...p, accepted_emails: newAcceptedEmails, spots_left: newOpenSpots, is_open: isNowOpen }
+        : p
     );
     setPosts(updatedPosts);
     localStorage.setItem('sscbs_squad_posts', JSON.stringify(updatedPosts));
 
     try {
       if (hasValidCredentials) {
+        await supabase
+          .from('squad_posts')
+          .update({ accepted_emails: newAcceptedEmails, spots_left: newOpenSpots, is_open: isNowOpen })
+          .eq('id', post.id);
+
         const isRealId = app.id && !String(app.id).startsWith('app-');
         if (isRealId) {
           await supabase.from('squad_applications').update({ status: 'removed' }).eq('id', app.id);
@@ -788,8 +825,6 @@ function getUserApp(applications, postId, userEmail, userId) {
             .eq('post_id', app.post_id)
             .eq('applicant_id', app.applicant_id);
         }
-
-        await supabase.from('squad_posts').update({ spots_left: newOpenSpots, is_open: isNowOpen }).eq('id', post.id);
       }
     } catch (err) {
       console.warn('Supabase remove member error:', err);
@@ -1022,7 +1057,7 @@ function getUserApp(applications, postId, userEmail, userId) {
             const pendingAppsCount = postApps.filter((a) => a.status === 'pending').length;
             
             // Check if current user has already applied
-            const userApp = getUserApp(applications, post.id, user?.email, user?.id);
+            const userApp = getUserApp(post, applications, user?.email, user?.id);
             const openSpots = getPostOpenSpots(post, applications);
             const openStatus = isPostOpen(post, applications);
 
