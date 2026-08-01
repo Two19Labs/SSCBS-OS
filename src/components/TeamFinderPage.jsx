@@ -1126,8 +1126,10 @@ function getUserApp(applications, postId, userEmail, userId) {
                   </div>
                 )}
 
-                <h3 className="post-title">{post.title}</h3>
-                {post.description && <p className="post-desc">{post.description}</p>}
+                <h3 className="post-title">{post.title || post.description}</h3>
+                {post.description && post.description !== post.title && (
+                  <p className="post-desc">{post.description}</p>
+                )}
 
                 {/* Skills Present */}
                 {post.skills_have && post.skills_have.length > 0 && (
