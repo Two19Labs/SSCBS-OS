@@ -370,6 +370,11 @@ export default function TeamFinderPage({ onBack }) {
       return;
     }
 
+    let formattedLink = (formData.competition_link || '').trim();
+    if (formattedLink && !/^https?:\/\//i.test(formattedLink)) {
+      formattedLink = 'https://' + formattedLink;
+    }
+
     setSubmitting(true);
 
     const totalMem = parseInt(formData.total_members, 10) || 4;
@@ -385,7 +390,7 @@ export default function TeamFinderPage({ onBack }) {
       const updatePayload = {
         competition_name: formData.competition_name.trim(),
         organizer: formData.organizer.trim() || 'Corporate / Society',
-        competition_link: formData.competition_link.trim(),
+        competition_link: formattedLink,
         phone_number: formData.phone_number.trim(),
         title: descText,
         description: descText,
@@ -424,7 +429,7 @@ export default function TeamFinderPage({ onBack }) {
       user_id: user?.id,
       competition_name: formData.competition_name.trim(),
       organizer: formData.organizer.trim() || 'Corporate / Society',
-      competition_link: formData.competition_link.trim(),
+      competition_link: formattedLink,
       phone_number: formData.phone_number.trim(),
       title: descText,
       description: descText,
@@ -1308,12 +1313,12 @@ function getUserApp(post, applications, userEmail, userId) {
                   {editingPost ? 'Update competition details & team requirements' : 'Find complementary teammates for your competition squad'}
                 </p>
               </div>
-              <button className="tf-close-btn" onClick={() => setIsCreateModalOpen(false)} aria-label="Close">
+              <button type="button" className="tf-close-btn" onClick={() => setIsCreateModalOpen(false)} aria-label="Close">
                 ×
               </button>
             </div>
 
-            <form onSubmit={handleSubmitPost} className="tf-modal-form">
+            <form onSubmit={handleSubmitPost} className="tf-modal-form" noValidate>
               {formError && <div className="form-error-banner">{formError}</div>}
 
               <div className="tf-form-row">
@@ -1546,12 +1551,12 @@ function getUserApp(post, applications, userEmail, userId) {
                 <h3>Request to Join Team</h3>
                 <p className="tf-modal-subtitle">{selectedPostForApply.competition_name}</p>
               </div>
-              <button className="tf-close-btn" onClick={() => setSelectedPostForApply(null)}>
+              <button type="button" className="tf-close-btn" onClick={() => setSelectedPostForApply(null)} aria-label="Close">
                 ×
               </button>
             </div>
 
-            <form onSubmit={handleSubmitJoinRequest} className="tf-modal-form">
+            <form onSubmit={handleSubmitJoinRequest} className="tf-modal-form" noValidate>
               {applyError && <div className="form-error-banner">{applyError}</div>}
               {applySuccess && <div className="skill-feedback-msg success" style={{ marginBottom: '12px', fontSize: '0.85rem' }}>{applySuccess}</div>}
 
@@ -1635,7 +1640,7 @@ function getUserApp(post, applications, userEmail, userId) {
                   {selectedPostForReview.competition_name} • {getPostOpenSpots(selectedPostForReview, applications)} open spot(s)
                 </p>
               </div>
-              <button className="tf-close-btn" onClick={() => setSelectedPostForReview(null)}>
+              <button type="button" className="tf-close-btn" onClick={() => setSelectedPostForReview(null)} aria-label="Close">
                 ×
               </button>
             </div>
