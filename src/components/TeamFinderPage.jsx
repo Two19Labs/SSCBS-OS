@@ -60,8 +60,7 @@ export default function TeamFinderPage({ onBack }) {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState('all'); // 'all', 'open', 'my_posts', 'my_requests'
-  const [selectedSkillFilter, setSelectedSkillFilter] = useState('');
+  const [activeTab, setActiveTab] = useState('other'); // 'other' (Other Listings), 'my' (My Listings)
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshToast, setRefreshToast] = useState('');
 
@@ -801,26 +800,39 @@ function getUserApp(applications, postId, userEmail, userId) {
     (a) => a.applicant_email === user?.email || a.applicant_id === user?.id
   );
 
+  // Counts
+  const myPosts = posts.filter(
+    (p) => p.created_by_email === user?.email || p.user_id === user?.id
+  );
+  const otherPosts = posts.filter(
+    (p) => p.created_by_email !== user?.email && p.user_id !== user?.id
+  );
+  const myPostsCount = myPosts.length;
+  const otherPostsCount = otherPosts.length;
+
+  // Pending incoming requests across all user's posts
+  const myPostIds = new Set(myPosts.map((p) => String(p.id)));
+  const pendingRequestsCount = applications.filter(
+    (a) => myPostIds.has(String(a.post_id)) && a.status === 'pending'
+  ).length;
+
   // Filtering
   const filteredPosts = posts.filter((post) => {
-    const matchesSearch =
-      (post.competition_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (post.organizer || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (post.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (post.skills_looking_for || []).some((s) => s.toLowerCase().includes(searchQuery.toLowerCase()));
+    const isMyPost = post.created_by_email === user?.email || post.user_id === user?.id;
 
-    if (!matchesSearch) return false;
+    if (activeTab === 'my' && !isMyPost) return false;
+    if (activeTab === 'other' && isMyPost) return false;
 
-    if (filterType === 'open' && !post.is_open) return false;
-    if (filterType === 'my_posts' && post.created_by_email !== user?.email && post.user_id !== user?.id) return false;
-    if (filterType === 'my_requests') {
-      const hasApplied = mySentApplications.some((a) => a.post_id === post.id);
-      if (!hasApplied) return false;
-    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const matchesSearch =
+        (post.competition_name || '').toLowerCase().includes(q) ||
+        (post.organizer || '').toLowerCase().includes(q) ||
+        (post.title || '').toLowerCase().includes(q) ||
+        (post.skills_looking_for || []).some((s) => s.toLowerCase().includes(q)) ||
+        (post.skills_have || []).some((s) => s.toLowerCase().includes(q));
 
-    if (selectedSkillFilter) {
-      const hasSkill = (post.skills_looking_for || []).includes(selectedSkillFilter);
-      if (!hasSkill) return false;
+      if (!matchesSearch) return false;
     }
 
     return true;
@@ -902,8 +914,30 @@ function getUserApp(applications, postId, userEmail, userId) {
         {refreshToast && <span className="refresh-toast-msg">{refreshToast}</span>}
       </div>
 
-      {/* ── Filter Bar ── */}
+      {/* ── Tab Switcher & Search Bar ── */}
       <div className="tf-controls-bar">
+        <div className="tf-tab-switcher">
+          <button
+            className={`tf-tab-btn ${activeTab === 'other' ? 'active' : ''}`}
+            onClick={() => setActiveTab('other')}
+          >
+            <span>🌐 Other Listings</span>
+            <span className="tf-tab-count">{otherPostsCount}</span>
+          </button>
+          <button
+            className={`tf-tab-btn ${activeTab === 'my' ? 'active' : ''}`}
+            onClick={() => setActiveTab('my')}
+          >
+            <span>📌 My Listings</span>
+            <span className="tf-tab-count">{myPostsCount}</span>
+            {pendingRequestsCount > 0 && (
+              <span className="tf-tab-pending-badge" title={`${pendingRequestsCount} pending applicant request(s)`}>
+                {pendingRequestsCount} new
+              </span>
+            )}
+          </button>
+        </div>
+
         <div className="tf-search-box">
           <SearchIcon size={15} />
           <input
@@ -918,53 +952,6 @@ function getUserApp(applications, postId, userEmail, userId) {
             </button>
           )}
         </div>
-
-        <div className="tf-filter-pills">
-          <button
-            className={`tf-filter-pill ${filterType === 'all' ? 'active' : ''}`}
-            onClick={() => setFilterType('all')}
-          >
-            All ({posts.length})
-          </button>
-          <button
-            className={`tf-filter-pill ${filterType === 'open' ? 'active' : ''}`}
-            onClick={() => setFilterType('open')}
-          >
-            Open ({posts.filter((p) => p.is_open).length})
-          </button>
-          <button
-            className={`tf-filter-pill ${filterType === 'my_posts' ? 'active' : ''}`}
-            onClick={() => setFilterType('my_posts')}
-          >
-            Mine ({posts.filter((p) => p.created_by_email === user?.email || p.user_id === user?.id).length})
-          </button>
-          <button
-            className={`tf-filter-pill ${filterType === 'my_requests' ? 'active' : ''}`}
-            onClick={() => setFilterType('my_requests')}
-          >
-            My Requests ({mySentApplications.length})
-          </button>
-        </div>
-      </div>
-
-      {/* ── Skill Tag Quick Filter Strip ── */}
-      <div className="tf-skills-strip">
-        <span className="strip-label">Skill needed:</span>
-        <button
-          className={`skill-tag-filter ${selectedSkillFilter === '' ? 'selected' : ''}`}
-          onClick={() => setSelectedSkillFilter('')}
-        >
-          All Skills
-        </button>
-        {DEFAULT_SKILLS.slice(0, 6).map((skill) => (
-          <button
-            key={skill}
-            className={`skill-tag-filter ${selectedSkillFilter === skill ? 'selected' : ''}`}
-            onClick={() => setSelectedSkillFilter(selectedSkillFilter === skill ? '' : skill)}
-          >
-            {skill}
-          </button>
-        ))}
       </div>
 
       {/* ── Feed Grid ── */}
@@ -976,15 +963,31 @@ function getUserApp(applications, postId, userEmail, userId) {
       ) : filteredPosts.length === 0 ? (
         <div className="tf-empty-state">
           <TrophyIcon size={32} />
-          <h3>No team postings found</h3>
-          <p>
-            {searchQuery || selectedSkillFilter || filterType !== 'all'
-              ? 'No team listings match your current filters.'
-              : 'There are currently no active team postings. Post a new opening to start building your squad!'}
-          </p>
-          <button className="btn-tf-primary" onClick={handleOpenCreateModal}>
-            Post Team Opening
-          </button>
+          {searchQuery ? (
+            <>
+              <h3>No matching listings found</h3>
+              <p>No team listings match "{searchQuery}" under {activeTab === 'my' ? 'My Listings' : 'Other Listings'}.</p>
+              <button className="btn-tf-secondary" onClick={() => setSearchQuery('')} style={{ marginTop: '1rem' }}>
+                Clear Search
+              </button>
+            </>
+          ) : activeTab === 'my' ? (
+            <>
+              <h3>You haven't posted any team openings yet</h3>
+              <p>Post a team opening to find complementary teammates for upcoming competitions!</p>
+              <button className="btn-tf-primary" onClick={handleOpenCreateModal} style={{ marginTop: '1rem' }}>
+                <UsersIcon size={16} /> Post Team Opening
+              </button>
+            </>
+          ) : (
+            <>
+              <h3>No other team listings available right now</h3>
+              <p>Be the first to create a team opening for your squad!</p>
+              <button className="btn-tf-primary" onClick={handleOpenCreateModal} style={{ marginTop: '1rem' }}>
+                <UsersIcon size={16} /> Post Team Opening
+              </button>
+            </>
+          )}
         </div>
       ) : (
         <div className="tf-posts-grid">
