@@ -17,8 +17,7 @@ export const TEAM_FINDER_TESTERS = [
 
 export function canAccessTeamFinder(email) {
   if (!email || typeof email !== 'string') return false;
-  const normalized = email.toLowerCase().trim();
-  return TEAM_FINDER_TESTERS.some((testerEmail) => testerEmail.toLowerCase() === normalized);
+  return true; // Team Finder & Competition Hub is live for all SSCBS students!
 }
 
 const TIMEWARP_KEY = 'sscbs-timewarp-enabled';

@@ -933,7 +933,7 @@ function getUserApp(post, applications, userEmail, userId) {
           <div>
             <div className="tf-badge">
               <ShieldIcon size={12} />
-              <span>ADMIN PREVIEW</span>
+              <span>LIVE • SSCBS OS</span>
             </div>
             <h1 className="tf-title">Team Finder & Competition Hub</h1>
             <p className="tf-subtitle">
