@@ -137,6 +137,8 @@ ALTER TABLE public.notices ENABLE ROW LEVEL SECURITY;
 -- Setup Security Policies
 DROP POLICY IF EXISTS "Enable read access for all authenticated users on notices" ON public.notices;
 DROP POLICY IF EXISTS "Enable write access for admins on notices" ON public.notices;
+DROP POLICY IF EXISTS "Enable insert access for pending notice drafts" ON public.notices;
+DROP POLICY IF EXISTS "Enable full access for admins on notices" ON public.notices;
 
 -- Anyone authenticated can read notices
 CREATE POLICY "Enable read access for all authenticated users on notices" 
@@ -145,11 +147,18 @@ CREATE POLICY "Enable read access for all authenticated users on notices"
     TO authenticated 
     USING (true);
 
--- Only admins can write (insert, update, delete) notices
-CREATE POLICY "Enable write access for admins on notices" 
-    ON public.notices 
-    FOR ALL 
-    TO authenticated 
+-- Anyone authenticated can submit pending notice drafts
+CREATE POLICY "Enable insert access for pending notice drafts"
+    ON public.notices
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (status = 'pending' OR auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'));
+
+-- Admins have full control (update, delete, publish)
+CREATE POLICY "Enable full access for admins on notices"
+    ON public.notices
+    FOR ALL
+    TO authenticated
     USING (auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'))
     WITH CHECK (auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'));
 
