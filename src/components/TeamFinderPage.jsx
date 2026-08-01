@@ -60,7 +60,7 @@ export default function TeamFinderPage({ onBack }) {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('other'); // 'other' (Other Listings), 'my' (My Listings)
+  const [activeTab, setActiveTab] = useState('my'); // 'my' (My Listings), 'other' (Other Listings)
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshToast, setRefreshToast] = useState('');
 
@@ -918,13 +918,6 @@ function getUserApp(applications, postId, userEmail, userId) {
       <div className="tf-controls-bar">
         <div className="tf-tab-switcher">
           <button
-            className={`tf-tab-btn ${activeTab === 'other' ? 'active' : ''}`}
-            onClick={() => setActiveTab('other')}
-          >
-            <span>🌐 Other Listings</span>
-            <span className="tf-tab-count">{otherPostsCount}</span>
-          </button>
-          <button
             className={`tf-tab-btn ${activeTab === 'my' ? 'active' : ''}`}
             onClick={() => setActiveTab('my')}
           >
@@ -935,6 +928,13 @@ function getUserApp(applications, postId, userEmail, userId) {
                 {pendingRequestsCount} new
               </span>
             )}
+          </button>
+          <button
+            className={`tf-tab-btn ${activeTab === 'other' ? 'active' : ''}`}
+            onClick={() => setActiveTab('other')}
+          >
+            <span>🌐 Other Listings</span>
+            <span className="tf-tab-count">{otherPostsCount}</span>
           </button>
         </div>
 
