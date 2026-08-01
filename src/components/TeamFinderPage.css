@@ -1284,7 +1284,12 @@
    RESPONSIVE DESIGN OVERHAUL (PC, TABLET & MOBILE)
    ═══════════════════════════════════════════════════════════ */
 
-@media (max-width: 640px) {
+/* ── Mobile Devices (<= 540px) ── */
+@media (max-width: 540px) {
+  .team-finder-container {
+    padding: 12px 12px 32px 12px;
+  }
+
   .tf-header {
     flex-direction: column;
     align-items: stretch;
@@ -1293,27 +1298,30 @@
 
   .tf-header .btn-tf-primary {
     width: 100%;
+    justify-content: center;
   }
 
   .tf-controls-bar {
     flex-direction: column;
     align-items: stretch;
-    gap: 8px;
+    gap: 10px;
+  }
+
+  .tf-tab-switcher {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .tf-tab-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 8px 10px;
+    font-size: 0.8rem;
   }
 
   .tf-search-box {
     width: 100%;
-  }
-
-  .tf-filter-pills {
-    width: 100%;
-    overflow-x: auto;
-    padding-bottom: 2px;
-    scrollbar-width: none;
-  }
-
-  .tf-filter-pill {
-    flex-shrink: 0;
   }
 
   .tf-posts-grid {
@@ -1323,13 +1331,22 @@
 
   .card-footer {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+    align-items: stretch;
+    gap: 12px;
   }
 
   .card-actions {
     width: 100%;
-    justify-content: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .card-actions .wa-connect-btn,
+  .card-actions .btn-tf-primary {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
   }
 
   .tf-form-row {
@@ -1357,6 +1374,37 @@
 
   .tf-modal-form {
     padding: 18px 20px calc(24px + env(safe-area-inset-bottom, 0px)) 20px;
+  }
+}
+
+/* ── Tablets & Small Screens (541px - 820px) ── */
+@media (min-width: 541px) and (max-width: 820px) {
+  .tf-posts-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  .tf-controls-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .tf-tab-switcher {
+    width: 100%;
+  }
+
+  .tf-tab-btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* ── Laptops & Desktop Wide Monitors (821px+) ── */
+@media (min-width: 821px) {
+  .tf-posts-grid {
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 16px;
   }
 }
 
