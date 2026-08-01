@@ -50,6 +50,23 @@ function formatWhatsAppUrl(phone, textMessage = '') {
   return `https://wa.me/${digits}${textMessage ? `?text=${encodeURIComponent(textMessage)}` : ''}`;
 }
 
+function formatStudentName(rawName, email) {
+  if (rawName && rawName !== 'Student Lead' && rawName !== 'Student' && rawName.trim()) {
+    return rawName.trim();
+  }
+  if (email && typeof email === 'string' && email.includes('@')) {
+    const handle = email.split('@')[0]; // e.g. "aditya.25015"
+    const parts = handle.split('.');
+    if (parts.length >= 2) {
+      const namePart = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+      const rollPart = parts[1];
+      return `${namePart} (${rollPart})`;
+    }
+    return handle.charAt(0).toUpperCase() + handle.slice(1);
+  }
+  return 'Student Lead';
+}
+
 export default function TeamFinderPage({ onBack }) {
   const { user } = useAuth();
   const { featureFlags } = useConfig();
@@ -158,12 +175,16 @@ export default function TeamFinderPage({ onBack }) {
             supabase.from('squad_applications').delete().in('post_id', expiredIds).then();
           }
 
-          const enrichedPosts = activePostsData.map((p) => ({
-            ...p,
-            created_by_name: p.created_by_name || (p.created_by_email ? p.created_by_email.split('@')[0] : 'Student Lead'),
-            created_by_email: p.created_by_email || '',
-            total_members: p.total_members || (p.spots_left ? p.spots_left + 1 : 4),
-          }));
+          const enrichedPosts = activePostsData.map((p) => {
+            const authorEmail = p.created_by_email || p.user_email || '';
+            const authorName = formatStudentName(p.created_by_name, authorEmail);
+            return {
+              ...p,
+              created_by_name: authorName,
+              created_by_email: authorEmail,
+              total_members: p.total_members || (p.spots_left ? p.spots_left + 1 : 4),
+            };
+          });
           setPosts(enrichedPosts);
           localStorage.setItem('sscbs_squad_posts', JSON.stringify(enrichedPosts));
         } else if (postsRes.error) {
@@ -396,6 +417,8 @@ export default function TeamFinderPage({ onBack }) {
       return;
     }
 
+    const authorDisplayName = formatStudentName(user?.user_metadata?.full_name, user?.email);
+
     // ── CREATE NEW POST ──
     const postPayload = {
       user_id: user?.id,
@@ -414,7 +437,7 @@ export default function TeamFinderPage({ onBack }) {
       year: userSem,
       is_open: openSpots > 0,
       created_by_email: user.email,
-      created_by_name: user.user_metadata?.full_name || user.email.split('@')[0],
+      created_by_name: authorDisplayName,
       created_at: new Date().toISOString(),
     };
 
@@ -441,6 +464,8 @@ export default function TeamFinderPage({ onBack }) {
             course: postPayload.course,
             year: postPayload.year,
             is_open: postPayload.is_open,
+            created_by_email: postPayload.created_by_email,
+            created_by_name: postPayload.created_by_name,
           };
           res = await supabase
             .from('squad_posts')
@@ -1133,80 +1158,87 @@ function getUserApp(applications, postId, userEmail, userId) {
                 )}
 
                 {/* Card Footer */}
-                <div className="card-footer">
-                  <div className="creator-info">
-                    <span className="creator-avatar">
-                      {(post.created_by_name || post.created_by_email || 'A').charAt(0).toUpperCase()}
-                    </span>
-                    <span className="creator-details">
-                      <span className="creator-name">{post.created_by_name || 'Student'}</span>
-                      <span className="creator-course">
-                        {post.course} • {post.year}
-                      </span>
-                    </span>
-                  </div>
+                {(() => {
+                  const authorName = formatStudentName(post.created_by_name, post.created_by_email);
+                  const avatarChar = (authorName || 'S').charAt(0).toUpperCase();
 
-                  <div className="card-actions">
-                    {/* Host Controls */}
-                    {isHost ? (
-                      <>
-                        <button
-                          className="btn-review-apps"
-                          onClick={() => setSelectedPostForReview(post)}
-                          title="Review Applicant Requests"
-                        >
-                          <MailIcon size={14} />
-                          <span>Requests</span>
-                          {pendingAppsCount > 0 && <span className="apps-count-badge">{pendingAppsCount}</span>}
-                        </button>
-                        <button
-                          className="btn-card-subtle"
-                          onClick={() => handleOpenEditModal(post)}
-                          title="Edit Listing Details"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="btn-card-subtle"
-                          onClick={() => handleToggleStatus(post.id, openStatus)}
-                        >
-                          {openStatus ? 'Close' : 'Reopen'}
-                        </button>
-                        <button
-                          className="btn-card-subtle danger"
-                          onClick={() => handleDeletePost(post.id)}
-                          title="Delete Post"
-                        >
-                          Delete
-                        </button>
-                      </>
-                    ) : (
-                      /* Peer Student Controls (Visible to everyone including Admins) */
-                      <>
-                        {post.phone_number && (
-                          <a
-                            href={formatWhatsAppUrl(post.phone_number, `Hi! Saw your team post for ${post.competition_name} on SSCBS OS.`)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="wa-connect-btn"
-                            title="Direct WhatsApp Connect"
-                          >
-                            <WhatsAppIcon size={14} /> WhatsApp
-                          </a>
-                        )}
+                  return (
+                    <div className="card-footer">
+                      <div className="creator-info">
+                        <span className="creator-avatar">
+                          {avatarChar}
+                        </span>
+                        <span className="creator-details">
+                          <span className="creator-name">{authorName}</span>
+                          <span className="creator-course">
+                            {post.course} • {post.year}
+                          </span>
+                        </span>
+                      </div>
 
-                        {openStatus && (!userApp || userApp.status === 'declined' || userApp.status === 'removed') && (
-                          <button
-                            className="btn-tf-primary"
-                            onClick={() => handleOpenApplyModal(post)}
-                          >
-                            <MailIcon size={13} /> {userApp ? 'Re-apply to Join' : 'Request to Join'}
-                          </button>
+                      <div className="card-actions">
+                        {/* Host Controls */}
+                        {isHost ? (
+                          <>
+                            <button
+                              className="btn-review-apps"
+                              onClick={() => setSelectedPostForReview(post)}
+                              title="Review Applicant Requests"
+                            >
+                              <MailIcon size={14} />
+                              <span>Requests</span>
+                              {pendingAppsCount > 0 && <span className="apps-count-badge">{pendingAppsCount}</span>}
+                            </button>
+                            <button
+                              className="btn-card-subtle"
+                              onClick={() => handleOpenEditModal(post)}
+                              title="Edit Listing Details"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              className="btn-card-subtle"
+                              onClick={() => handleToggleStatus(post.id, openStatus)}
+                            >
+                              {openStatus ? 'Close' : 'Reopen'}
+                            </button>
+                            <button
+                              className="btn-card-subtle danger"
+                              onClick={() => handleDeletePost(post.id)}
+                              title="Delete Post"
+                            >
+                              Delete
+                            </button>
+                          </>
+                        ) : (
+                          /* Peer Student Controls (Visible to everyone including Admins) */
+                          <>
+                            {post.phone_number && (
+                              <a
+                                href={formatWhatsAppUrl(post.phone_number, `Hi! Saw your team post for ${post.competition_name} on SSCBS OS.`)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="wa-connect-btn"
+                                title="Direct WhatsApp Connect"
+                              >
+                                <WhatsAppIcon size={14} /> WhatsApp
+                              </a>
+                            )}
+
+                            {openStatus && (!userApp || userApp.status === 'declined' || userApp.status === 'removed') && (
+                              <button
+                                className="btn-tf-primary"
+                                onClick={() => handleOpenApplyModal(post)}
+                              >
+                                <MailIcon size={13} /> {userApp ? 'Re-apply to Join' : 'Request to Join'}
+                              </button>
+                            )}
+                          </>
                         )}
-                      </>
-                    )}
-                  </div>
-                </div>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             );
           })}
