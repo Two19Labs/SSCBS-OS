@@ -960,6 +960,21 @@ function getUserApp(post, applications, userEmail, userId) {
         </div>
       </header>
 
+      {/* ── New Feature Feedback Notice ── */}
+      <div className="tf-feedback-banner">
+        <span>
+          🚀 <strong>New Feature!</strong> Team Finder is now live. If you spot any bugs, glitches, or have suggestions, please{' '}
+          <a
+            href="https://wa.me/917007679485?text=Hi%21%20Feedback%20for%20Team%20Finder%20on%20SSCBS%20OS%3A"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="wa-feedback-link"
+          >
+            <WhatsAppIcon size={13} /> DM 7007679485 on WhatsApp
+          </a>.
+        </span>
+      </div>
+
       {/* ── Teaming Guidelines & Auto-Cleanup Banner ── */}
       <div className="tf-cleanup-notice">
         <div className="cleanup-notice-icon">🧹</div>

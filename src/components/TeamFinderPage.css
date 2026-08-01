@@ -82,7 +82,6 @@
   line-height: 1.4;
 }
 
-/* ── Teaming Guidelines & Auto-Cleanup Banner ── */
 .tf-cleanup-notice {
   background: rgba(59, 130, 246, 0.08);
   border: 1px solid rgba(59, 130, 246, 0.22);
@@ -95,6 +94,41 @@
   font-size: 0.8rem;
   color: var(--ink);
   line-height: 1.4;
+}
+
+/* ── Feedback Notice Banner ── */
+.tf-feedback-banner {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  font-size: 0.78rem;
+  color: var(--ink-dim);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tf-feedback-banner strong {
+  color: var(--ink);
+}
+
+.wa-feedback-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #16a34a;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: all 0.15s ease;
+}
+
+.wa-feedback-link:hover {
+  color: #15803d;
+  text-decoration: none;
 }
 
 [data-theme='dark'] .tf-cleanup-notice {
