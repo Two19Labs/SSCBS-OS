@@ -373,7 +373,7 @@ export async function logFeatureClick(featureId, user) {
  * Supports hourly breakdown for daysCount = 1 (Last 24 Hours) as well as daily breakdown for 7, 30, 90 days.
  */
 export async function fetchAnalyticsData(daysCount = 7) {
-  const emptyFeatureSet = () => ({ home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 });
+  const emptyFeatureSet = () => ({ home: 0, timetable: 0, 'find-prof': 0, 'team-finder': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 });
 
   if (daysCount === 1) {
     // ----------------------------------------------------
@@ -528,6 +528,7 @@ export async function fetchAnalyticsData(daysCount = 7) {
       home: slots.map((s, idx) => slotMapVisits[idx].home),
       timetable: slots.map((s, idx) => slotMapVisits[idx].timetable),
       'find-prof': slots.map((s, idx) => slotMapVisits[idx]['find-prof']),
+      'team-finder': slots.map((s, idx) => slotMapVisits[idx]['team-finder']),
       waiver: slots.map((s, idx) => slotMapVisits[idx].waiver),
       gpa: slots.map((s, idx) => slotMapVisits[idx].gpa),
       buzz: slots.map((s, idx) => slotMapVisits[idx].buzz),
@@ -671,6 +672,7 @@ export async function fetchAnalyticsData(daysCount = 7) {
     home: dateList.map(d => dMap[d.dateStr].home),
     timetable: dateList.map(d => dMap[d.dateStr].timetable),
     'find-prof': dateList.map(d => dMap[d.dateStr]['find-prof']),
+    'team-finder': dateList.map(d => dMap[d.dateStr]['team-finder']),
     waiver: dateList.map(d => dMap[d.dateStr].waiver),
     gpa: dateList.map(d => dMap[d.dateStr].gpa),
     buzz: dateList.map(d => dMap[d.dateStr].buzz),
