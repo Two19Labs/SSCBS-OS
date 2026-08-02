@@ -305,7 +305,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
       </div>
 
       <div className="home-buzz-col">
-        <NoticeBoard />
+        <NoticeBoard onNavigate={onNavigate} />
       </div>
     </div>
   );

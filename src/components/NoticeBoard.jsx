@@ -4,7 +4,7 @@ import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import { isAdminEmail } from '../lib/admin';
 import './NoticeBoard.css';
 
-export default function NoticeBoard() {
+export default function NoticeBoard({ onNavigate }) {
   const { user } = useAuth();
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -530,12 +530,20 @@ export default function NoticeBoard() {
               {notice.content && <p className="notice-content">{notice.content}</p>}
               
               <div className="notice-card-footer">
-                <button 
-                  className="btn-read-full-notice" 
-                  onClick={() => setSelectedNotice(notice)}
-                >
-                  Read full notice 📖
-                </button>
+                {(notice.content && notice.content.length > 90 || onNavigate) ? (
+                  <button 
+                    className="btn-read-full-notice" 
+                    onClick={() => {
+                      if (onNavigate) {
+                        onNavigate('buzz');
+                      } else {
+                        setSelectedNotice(notice);
+                      }
+                    }}
+                  >
+                    Read full notice →
+                  </button>
+                ) : null}
                 {notice.link_url && (
                   <a 
                     href={notice.link_url} 
