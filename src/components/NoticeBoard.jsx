@@ -4,11 +4,10 @@ import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import { isAdminEmail } from '../lib/admin';
 import './NoticeBoard.css';
 
-export default function NoticeBoard({ onNavigate }) {
+export default function NoticeBoard({ onNavigate, compact = false }) {
   const { user } = useAuth();
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedNotice, setSelectedNotice] = useState(null);
   const [lastSeenTime, setLastSeenTime] = useState(() => {
     const saved = localStorage.getItem('sscbs_last_seen_notice_time');
     return saved ? Number(saved) : 0;
@@ -527,23 +526,25 @@ export default function NoticeBoard({ onNavigate }) {
                 </div>
               )}
               
-              {notice.content && <p className="notice-content">{notice.content}</p>}
+              {notice.content && (
+                <p className={`notice-content ${compact ? 'compact' : 'full'}`}>
+                  {notice.content}
+                </p>
+              )}
               
               <div className="notice-card-footer">
-                {(notice.content && notice.content.length > 90 || onNavigate) ? (
+                {compact && (
                   <button 
                     className="btn-read-full-notice" 
                     onClick={() => {
                       if (onNavigate) {
                         onNavigate('buzz');
-                      } else {
-                        setSelectedNotice(notice);
                       }
                     }}
                   >
                     Read full notice →
                   </button>
-                ) : null}
+                )}
                 {notice.link_url && (
                   <a 
                     href={notice.link_url} 
@@ -561,79 +562,6 @@ export default function NoticeBoard({ onNavigate }) {
               </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {/* Read Full Notice Modal */}
-      {selectedNotice && (
-        <div className="notice-modal-backdrop" onClick={() => setSelectedNotice(null)}>
-          <div className="notice-modal-card notice-detail-card" onClick={(e) => e.stopPropagation()}>
-            <div className="notice-modal-header">
-              <div className="notice-modal-meta-left">
-                {selectedNotice.society ? (
-                  <div className="notice-society">
-                    <span className="society-avatar">
-                      {selectedNotice.society.charAt(0).toUpperCase()}
-                    </span>
-                    <span className="society-name">{selectedNotice.society}</span>
-                  </div>
-                ) : (
-                  <span className="notice-badge-announcement">ANNOUNCEMENT</span>
-                )}
-                {isNoticeNew(selectedNotice) && (
-                  <span className="notice-badge-new">NEW</span>
-                )}
-              </div>
-              <button className="btn-modal-close" onClick={() => setSelectedNotice(null)}>✕</button>
-            </div>
-
-            <h3 className="notice-detail-title">{selectedNotice.title}</h3>
-            
-            <div className="notice-detail-date-badge">
-              Posted: {formatDate(selectedNotice.created_at)}
-            </div>
-
-            {(selectedNotice.event_date || selectedNotice.venue) && (
-              <div className="notice-details-row">
-                {selectedNotice.event_date && (
-                  <div className="notice-event-time">
-                    <span className="event-time-icon">📅</span>
-                    <span className="event-time-value">{formatEventDate(selectedNotice.event_date)}</span>
-                  </div>
-                )}
-                {selectedNotice.venue && (
-                  <div className="notice-venue">
-                    <span className="venue-icon">📍</span>
-                    <span className="venue-value">{selectedNotice.venue}</span>
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div className="notice-detail-body">
-              <p className="notice-full-text">{selectedNotice.content}</p>
-            </div>
-
-            <div className="modal-actions notice-detail-actions">
-              {selectedNotice.link_url && (
-                <a
-                  href={selectedNotice.link_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-notice-action btn-notice-action-link"
-                >
-                  Visit Link / Register
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="arrow-icon">
-                    <line x1="7" y1="17" x2="17" y2="7"></line>
-                    <polyline points="7 7 17 7 17 17"></polyline>
-                  </svg>
-                </a>
-              )}
-              <button type="button" className="btn-cancel" onClick={() => setSelectedNotice(null)}>
-                Close
-              </button>
-            </div>
-          </div>
         </div>
       )}
     </section>

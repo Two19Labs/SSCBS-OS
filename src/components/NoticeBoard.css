@@ -348,16 +348,28 @@
 }
 
 .notice-content {
+  margin: 0;
+  word-break: break-word;
+}
+
+.notice-content.compact {
   font-size: 0.825rem;
   color: var(--text-dim);
   line-height: 1.5;
-  margin: 0;
-  word-break: break-word;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.notice-content.full {
+  font-size: 0.85rem;
+  color: var(--text-main);
+  line-height: 1.6;
+  display: block;
+  overflow: visible;
+  white-space: pre-wrap;
 }
 
 .notice-card-footer {
