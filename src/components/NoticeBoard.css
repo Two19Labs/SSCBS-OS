@@ -176,7 +176,8 @@
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.015);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  flex-shrink: 0;
 }
 
 .notice-card:hover {
@@ -355,12 +356,8 @@
 .notice-content.compact {
   font-size: 0.825rem;
   color: var(--text-dim);
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.45;
+  display: block;
 }
 
 .notice-content.full {

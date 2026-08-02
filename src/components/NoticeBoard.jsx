@@ -528,12 +528,14 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
               
               {notice.content && (
                 <p className={`notice-content ${compact ? 'compact' : 'full'}`}>
-                  {notice.content}
+                  {compact && notice.content.length > 110
+                    ? notice.content.slice(0, 110).trim() + '...'
+                    : notice.content}
                 </p>
               )}
               
               <div className="notice-card-footer">
-                {compact && (
+                {compact && notice.content && notice.content.length > 110 && (
                   <button 
                     className="btn-read-full-notice" 
                     onClick={() => {
