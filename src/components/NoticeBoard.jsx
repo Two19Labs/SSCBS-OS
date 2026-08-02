@@ -8,6 +8,31 @@ export default function NoticeBoard() {
   const { user } = useAuth();
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedNotice, setSelectedNotice] = useState(null);
+  const [lastSeenTime, setLastSeenTime] = useState(() => {
+    const saved = localStorage.getItem('sscbs_last_seen_notice_time');
+    return saved ? Number(saved) : 0;
+  });
+
+  const newNoticesCount = notices.filter(notice => {
+    if (!notice.created_at) return false;
+    const noticeTime = new Date(notice.created_at).getTime();
+    const baseline = lastSeenTime || (Date.now() - 48 * 3600 * 1000);
+    return noticeTime > baseline;
+  }).length;
+
+  const handleMarkAllSeen = () => {
+    const now = Date.now();
+    localStorage.setItem('sscbs_last_seen_notice_time', String(now));
+    setLastSeenTime(now);
+  };
+
+  const isNoticeNew = (notice) => {
+    if (!notice.created_at) return false;
+    const noticeTime = new Date(notice.created_at).getTime();
+    const baseline = lastSeenTime || (Date.now() - 48 * 3600 * 1000);
+    return noticeTime > baseline;
+  };
 
   // Drafter state
   const [isApprovedDrafter, setIsApprovedDrafter] = useState(false);
@@ -289,6 +314,20 @@ export default function NoticeBoard() {
         )}
       </div>
 
+      {/* Top New Notices Banner */}
+      {newNoticesCount > 0 && (
+        <div className="new-notices-banner">
+          <div className="new-notices-banner-info">
+            <span className="new-notice-pulse-dot"></span>
+            <span className="new-notices-title">⚡ New notices!</span>
+            <span className="new-notices-count">{newNoticesCount} new {newNoticesCount === 1 ? 'notice' : 'notices'} available</span>
+          </div>
+          <button className="btn-mark-seen" onClick={handleMarkAllSeen}>
+            Mark as read ✓
+          </button>
+        </div>
+      )}
+
       {/* Drafter Modal */}
       {showDraftModal && (
         <div className="notice-modal-backdrop" onClick={() => setShowDraftModal(false)}>
@@ -451,16 +490,21 @@ export default function NoticeBoard() {
           {notices.map(notice => (
             <div key={notice.id} className="notice-card">
               <div className="notice-card-header">
-                {notice.society ? (
-                  <div className="notice-society">
-                    <span className="society-avatar">
-                      {notice.society.charAt(0).toUpperCase()}
-                    </span>
-                    <span className="society-name">{notice.society}</span>
-                  </div>
-                ) : (
-                  <span className="notice-badge-announcement">ANNOUNCEMENT</span>
-                )}
+                <div className="notice-header-left">
+                  {notice.society ? (
+                    <div className="notice-society">
+                      <span className="society-avatar">
+                        {notice.society.charAt(0).toUpperCase()}
+                      </span>
+                      <span className="society-name">{notice.society}</span>
+                    </div>
+                  ) : (
+                    <span className="notice-badge-announcement">ANNOUNCEMENT</span>
+                  )}
+                  {isNoticeNew(notice) && (
+                    <span className="notice-badge-new">NEW</span>
+                  )}
+                </div>
                 <span className="notice-date">{formatDate(notice.created_at)}</span>
               </div>
               
@@ -485,24 +529,103 @@ export default function NoticeBoard() {
               
               {notice.content && <p className="notice-content">{notice.content}</p>}
               
-              {notice.link_url && (
-                <div className="notice-card-footer">
+              <div className="notice-card-footer">
+                <button 
+                  className="btn-read-full-notice" 
+                  onClick={() => setSelectedNotice(notice)}
+                >
+                  Read full notice 📖
+                </button>
+                {notice.link_url && (
                   <a 
                     href={notice.link_url} 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="btn-notice-action"
                   >
-                    Learn More
+                    Link
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="arrow-icon">
                       <line x1="7" y1="17" x2="17" y2="7"></line>
                       <polyline points="7 7 17 7 17 17"></polyline>
                     </svg>
                   </a>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Read Full Notice Modal */}
+      {selectedNotice && (
+        <div className="notice-modal-backdrop" onClick={() => setSelectedNotice(null)}>
+          <div className="notice-modal-card notice-detail-card" onClick={(e) => e.stopPropagation()}>
+            <div className="notice-modal-header">
+              <div className="notice-modal-meta-left">
+                {selectedNotice.society ? (
+                  <div className="notice-society">
+                    <span className="society-avatar">
+                      {selectedNotice.society.charAt(0).toUpperCase()}
+                    </span>
+                    <span className="society-name">{selectedNotice.society}</span>
+                  </div>
+                ) : (
+                  <span className="notice-badge-announcement">ANNOUNCEMENT</span>
+                )}
+                {isNoticeNew(selectedNotice) && (
+                  <span className="notice-badge-new">NEW</span>
+                )}
+              </div>
+              <button className="btn-modal-close" onClick={() => setSelectedNotice(null)}>✕</button>
+            </div>
+
+            <h3 className="notice-detail-title">{selectedNotice.title}</h3>
+            
+            <div className="notice-detail-date-badge">
+              Posted: {formatDate(selectedNotice.created_at)}
+            </div>
+
+            {(selectedNotice.event_date || selectedNotice.venue) && (
+              <div className="notice-details-row">
+                {selectedNotice.event_date && (
+                  <div className="notice-event-time">
+                    <span className="event-time-icon">📅</span>
+                    <span className="event-time-value">{formatEventDate(selectedNotice.event_date)}</span>
+                  </div>
+                )}
+                {selectedNotice.venue && (
+                  <div className="notice-venue">
+                    <span className="venue-icon">📍</span>
+                    <span className="venue-value">{selectedNotice.venue}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="notice-detail-body">
+              <p className="notice-full-text">{selectedNotice.content}</p>
+            </div>
+
+            <div className="modal-actions notice-detail-actions">
+              {selectedNotice.link_url && (
+                <a
+                  href={selectedNotice.link_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-notice-action btn-notice-action-link"
+                >
+                  Visit Link / Register
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="arrow-icon">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7 7 17 7 17 17"></polyline>
+                  </svg>
+                </a>
+              )}
+              <button type="button" className="btn-cancel" onClick={() => setSelectedNotice(null)}>
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </section>
