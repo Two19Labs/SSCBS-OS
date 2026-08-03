@@ -337,18 +337,34 @@ function AdminConsoleContent({ onBack }) {
       display_order: idx
     }));
 
+    // 1. Instant local UI update
     setNoticesList(updatedList);
 
+    // 2. Clear local cache & broadcast update event immediately for instant UI sync
+    try {
+      sessionStorage.removeItem('sscbs_cached_notices');
+      sessionStorage.removeItem('sscbs_cached_notices_time');
+      window.dispatchEvent(new CustomEvent('sscbs-notices-updated', { detail: updatedList }));
+    } catch (e) {}
+
+    // 3. Fast single-batch upsert in Supabase
     if (hasValidCredentials) {
       try {
-        await Promise.all(
-          updatedList.map(item =>
-            supabase
-              .from('notices')
-              .update({ display_order: item.display_order })
-              .eq('id', item.id)
-          )
-        );
+        const payload = updatedList
+          .filter(item => item.id && !String(item.id).startsWith('mock-'))
+          .map(item => ({
+            id: item.id,
+            display_order: item.display_order
+          }));
+
+        if (payload.length > 0) {
+          const { error } = await supabase
+            .from('notices')
+            .upsert(payload, { onConflict: 'id' });
+          if (error) {
+            console.error('Failed to update notice display order in Supabase:', error);
+          }
+        }
       } catch (err) {
         console.error('Failed to update notice display order in Supabase:', err);
       }

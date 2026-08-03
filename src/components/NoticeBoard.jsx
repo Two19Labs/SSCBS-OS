@@ -139,7 +139,7 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
       if (!force) {
         const cached = sessionStorage.getItem('sscbs_cached_notices');
         const cachedTime = sessionStorage.getItem('sscbs_cached_notices_time');
-        if (cached && cachedTime && (Date.now() - Number(cachedTime)) < 120000) {
+        if (cached && cachedTime && (Date.now() - Number(cachedTime)) < 10000) {
           try {
             setNotices(JSON.parse(cached));
             setLoading(false);
@@ -182,6 +182,11 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
     fetchNotices();
     checkDrafterStatus();
 
+    const handleLocalNoticeUpdate = () => {
+      fetchNotices(true);
+    };
+    window.addEventListener('sscbs-notices-updated', handleLocalNoticeUpdate);
+
     if (hasValidCredentials) {
       const channel = supabase
         .channel('public:notices')
@@ -192,9 +197,13 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
         .subscribe();
 
       return () => {
+        window.removeEventListener('sscbs-notices-updated', handleLocalNoticeUpdate);
         supabase.removeChannel(channel);
       };
     }
+    return () => {
+      window.removeEventListener('sscbs-notices-updated', handleLocalNoticeUpdate);
+    };
   }, [userEmail]);
 
   useEffect(() => {
