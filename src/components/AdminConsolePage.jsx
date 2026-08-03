@@ -1635,31 +1635,36 @@ STRICT EXTRACTION RULES:
             className={`admin-tab-btn ${activeTab === 'editor' ? 'active' : ''}`}
             onClick={() => setActiveTab('editor')}
           >
-            Live Schedule Editor
+            <span className="tab-icon">🗓️</span>
+            <span className="tab-text">Schedule Editor</span>
           </button>
           <button 
             className={`admin-tab-btn ${activeTab === 'notices' ? 'active' : ''}`}
             onClick={() => setActiveTab('notices')}
           >
-            Campus Notice Board Manager
+            <span className="tab-icon">📢</span>
+            <span className="tab-text">Notices Manager</span>
           </button>
           <button 
             className={`admin-tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
             onClick={() => setActiveTab('analytics')}
           >
-            Student Demographics
+            <span className="tab-icon">📊</span>
+            <span className="tab-text">Analytics & Roster</span>
           </button>
           <button 
             className={`admin-tab-btn ${activeTab === 'holidays' ? 'active' : ''}`}
             onClick={() => setActiveTab('holidays')}
           >
-            Holidays & Fests
+            <span className="tab-icon">🏖️</span>
+            <span className="tab-text">Holidays & Events</span>
           </button>
           <button 
             className={`admin-tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
             onClick={() => setActiveTab('settings')}
           >
-            App Settings
+            <span className="tab-icon">⚙️</span>
+            <span className="tab-text">App Settings</span>
           </button>
         </nav>
 
@@ -1717,10 +1722,10 @@ STRICT EXTRACTION RULES:
                     const isEditing = editingSlotIdx === idx;
                     return (
                       <tr key={idx} className={slot.isBreak ? 'break-row-admin' : ''}>
-                        <td className="period-col-admin">
+                        <td className="period-col-admin" data-label="Period / Time">
                           <strong>{slot.isBreak ? 'Infinity Hour' : `Period ${slot.period}`}</strong>
                         </td>
-                        <td>
+                        <td data-label="Subject Title">
                           {isEditing ? (
                             <input 
                               type="text" 
@@ -1732,7 +1737,7 @@ STRICT EXTRACTION RULES:
                             <span>{slot.subject}</span>
                           )}
                         </td>
-                        <td>
+                        <td data-label="Professor Name">
                           {isEditing ? (
                             <input 
                               type="text" 
@@ -1745,7 +1750,7 @@ STRICT EXTRACTION RULES:
                             <span>{slot.teacher}</span>
                           )}
                         </td>
-                        <td>
+                        <td data-label="Classroom">
                           {isEditing ? (
                             <input 
                               type="text" 
@@ -1758,7 +1763,7 @@ STRICT EXTRACTION RULES:
                             <span>{slot.room}</span>
                           )}
                         </td>
-                        <td className="action-col-admin">
+                        <td className="action-col-admin" data-label="Action">
                           {isEditing ? (
                             <div className="edit-btn-row">
                               <button className="btn-action-save" onClick={handleManualSave} disabled={isSaving}>Save</button>
@@ -2226,7 +2231,7 @@ STRICT EXTRACTION RULES:
 
                           return (
                             <tr key={usr.session_id || usr.id || usr.email}>
-                              <td>
+                              <td data-label="Student">
                                 <div className="student-name-cell">
                                   <span className="online-avatar-badge">{usr.name ? usr.name.charAt(0).toUpperCase() : 'S'}</span>
                                   <div>
@@ -2235,12 +2240,12 @@ STRICT EXTRACTION RULES:
                                   </div>
                                 </div>
                               </td>
-                              <td>
+                              <td data-label="Course & Section">
                                 <span className="course-sem-chip">
                                   {usr.course} • Sem {usr.semester} {usr.section && usr.section !== 'N/A' ? `(${usr.section})` : ''}
                                 </span>
                               </td>
-                              <td>
+                              <td data-label="Active Feature">
                                 <span
                                   className="active-view-chip"
                                   style={{
@@ -2255,10 +2260,10 @@ STRICT EXTRACTION RULES:
                                   ⚡ {usr.viewLabel || FEATURE_NAMES[featKey] || 'Home Dashboard'}
                                 </span>
                               </td>
-                              <td>
+                              <td data-label="Device Shell">
                                 <span className="device-chip">{usr.device}</span>
                               </td>
-                              <td>
+                              <td data-label="Last Ping">
                                 <span className="ping-time-chip" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                                   {pingDiffSec === 0 ? 'Live (Just now)' : `${pingDiffSec}s ago`}
                                 </span>
@@ -2497,9 +2502,9 @@ STRICT EXTRACTION RULES:
 
                           return (
                             <tr key={id}>
-                              <td><strong style={{ color: 'var(--ink)' }}>{name}</strong></td>
-                              <td><span className="metric-badge-visit">{visits} visits</span></td>
-                              <td>
+                              <td data-label="Feature / Tool"><strong style={{ color: 'var(--ink)' }}>{name}</strong></td>
+                              <td data-label="Page Visits"><span className="metric-badge-visit">{visits} visits</span></td>
+                              <td data-label="Share %">
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                   <div style={{ flex: 1, height: '6px', background: 'var(--border)', borderRadius: '3px', overflow: 'hidden' }}>
                                     <div style={{ height: '100%', width: `${sharePct}%`, background: 'var(--accent)', borderRadius: '3px' }}></div>
@@ -2721,24 +2726,24 @@ STRICT EXTRACTION RULES:
                       <tbody>
                         {filtered.map(student => (
                           <tr key={student.id}>
-                            <td>
+                            <td data-label="Student Name">
                               <span className="registry-user-avatar">
                                 {student.name.charAt(0).toUpperCase()}
                               </span>
                               <strong>{student.name}</strong>
                             </td>
-                            <td>{student.email}</td>
-                            <td>
+                            <td data-label="Email Address">{student.email}</td>
+                            <td data-label="Course">
                               <span className="registry-badge-course">
                                 {student.course}
                               </span>
                             </td>
-                            <td>
+                            <td data-label="Class">
                               <span className="registry-badge-class">
                                 Sem {student.semester} - {student.section}
                               </span>
                             </td>
-                            <td>
+                            <td data-label="Last Activity">
                               {student.lastActive === 'Online' ? (
                                 <span className="registry-status-online">Online</span>
                               ) : (

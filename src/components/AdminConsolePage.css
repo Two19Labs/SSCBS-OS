@@ -1052,20 +1052,33 @@
   border: 1px solid var(--border);
 }
 
-/* Mobile responsive adjustments */
+/* ═══════════════════════════════════════════════════════════
+   COMPREHENSIVE MOBILE RESPONSIVE DESIGN SYSTEM (< 900px & < 768px)
+   ═══════════════════════════════════════════════════════════ */
+
+.tab-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.tab-text {
+  font-weight: 700;
+}
+
 @media (max-width: 900px) {
   .admin-console-container {
     height: auto;
     min-height: calc(100vh - 64px);
     min-height: calc(100dvh - 64px);
-    overflow: visible;
+    overflow-x: hidden;
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
   }
   
   .admin-console-header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     padding: 0.85rem 1rem;
-    gap: 10px;
+    gap: 12px;
   }
   
   .header-left-admin {
@@ -1078,30 +1091,43 @@
   }
 
   .header-left-admin h2 {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   .admin-tag-container {
     width: 100%;
+    display: flex;
+    align-items: center;
     justify-content: space-between;
     border-top: 1px solid var(--border);
-    padding-top: 8px;
+    padding-top: 10px;
+  }
+
+  .admin-email {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   
   .admin-console-content {
     padding: 0.85rem 0.75rem;
     gap: 1rem;
-    overflow: visible;
+    overflow-x: hidden;
   }
   
+  /* Scrollable Touch Navigation Tabs */
   .admin-tabs {
     display: flex;
     overflow-x: auto;
     white-space: nowrap;
     flex-wrap: nowrap;
-    gap: 0.5rem;
+    gap: 0.6rem;
     border-bottom: 1px solid var(--border);
-    padding: 0 4px 6px;
+    padding: 0 2px 8px;
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
@@ -1117,19 +1143,32 @@
     font-size: 0.85rem;
     flex: 0 0 auto;
     text-align: center;
-    border-radius: 10px;
+    border-radius: 12px;
     scroll-snap-align: start;
-    min-height: 42px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+  }
+
+  .admin-tab-btn.active {
+    background: var(--accent-tint);
+    border-color: var(--accent);
+    color: var(--accent);
   }
   
   .tab-pane {
     flex-direction: column;
     height: auto;
     gap: 1.25rem;
+    width: 100%;
   }
   
-  .upload-pane, .notices-pane {
+  .upload-pane, .notices-pane, .holidays-pane {
     grid-template-columns: 1fr;
+    flex-direction: column;
     gap: 1.25rem;
   }
 
@@ -1138,34 +1177,26 @@
   }
   
   .pane-left, .pane-right {
-    padding: 1rem;
+    padding: 1.1rem;
     min-height: auto;
-    border-radius: 12px;
+    border-radius: 14px;
+    width: 100%;
   }
   
   .editor-pane {
-    padding: 1rem;
-    border-radius: 12px;
+    padding: 1.1rem;
+    border-radius: 14px;
   }
   
   .editor-controls-row {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.85rem;
-    padding: 0.75rem;
+    padding: 0.85rem;
   }
   
   .control-item {
     width: 100%;
-  }
-  
-  .schedule-table-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border-radius: 10px;
-  }
-  
-  .admin-schedule-table {
-    min-width: 580px;
   }
   
   .form-row-admin {
@@ -1226,7 +1257,194 @@
   }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   TABLE TO RESPONSIVE CARD TRANSFORMATION FOR MOBILE (< 768px)
+   ═══════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .schedule-table-container,
+  .table-scroll-container-admin,
+  .table-responsive-admin {
+    overflow-x: visible;
+    border: none;
+    background: transparent;
+  }
+
+  .admin-schedule-table,
+  .presence-table-admin,
+  .feature-breakdown-table,
+  .registry-table-admin {
+    display: block;
+    width: 100%;
+    min-width: 0 !important;
+  }
+
+  .admin-schedule-table thead,
+  .presence-table-admin thead,
+  .feature-breakdown-table thead,
+  .registry-table-admin thead {
+    display: none;
+  }
+
+  .admin-schedule-table tbody,
+  .presence-table-admin tbody,
+  .feature-breakdown-table tbody,
+  .registry-table-admin tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    width: 100%;
+  }
+
+  .admin-schedule-table tr,
+  .presence-table-admin tr,
+  .feature-breakdown-table tr,
+  .registry-table-admin tr {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1rem;
+    gap: 0.65rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  }
+
+  .admin-schedule-table td,
+  .presence-table-admin td,
+  .feature-breakdown-table td,
+  .registry-table-admin td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.45rem 0;
+    border-bottom: 1px dashed var(--border);
+    width: 100%;
+    font-size: 0.88rem;
+  }
+
+  .admin-schedule-table td:last-child,
+  .presence-table-admin td:last-child,
+  .feature-breakdown-table td:last-child,
+  .registry-table-admin td:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .admin-schedule-table td[data-label]::before,
+  .presence-table-admin td[data-label]::before,
+  .feature-breakdown-table td[data-label]::before,
+  .registry-table-admin td[data-label]::before {
+    content: attr(data-label);
+    font-weight: 800;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    letter-spacing: 0.5px;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .action-col-admin {
+    width: 100% !important;
+    margin-top: 0.35rem;
+  }
+
+  .action-col-admin .edit-btn-row,
+  .action-col-admin .btn-action-edit {
+    width: 100%;
+    display: flex;
+  }
+
+  .btn-action-edit, .btn-action-save, .btn-action-cancel {
+    flex: 1;
+    text-align: center;
+    padding: 0.65rem 1rem;
+    font-size: 0.88rem;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Form & Control Input Touch Optimization */
+  .admin-select,
+  .admin-input-field,
+  .admin-textarea-field,
+  .admin-select-field {
+    font-size: 16px !important;
+    min-height: 44px;
+    border-radius: 10px;
+  }
+
+  /* Time range selectors and series toggles */
+  .graph-time-selectors {
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .btn-time-range {
+    flex: 0 0 auto;
+    min-height: 38px;
+    padding: 6px 12px;
+  }
+
+  .graph-legend-toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .legend-toggle-item {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 130px;
+    justify-content: flex-start;
+    padding: 6px 8px;
+    font-size: 0.72rem;
+  }
+
+  .line-graph-wrapper {
+    padding: 8px 4px 6px;
+    overflow: hidden;
+  }
+
+  .donut-chart-wrapper {
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  /* Notices subtabs & moderation bars */
+  .notice-subtabs-bar {
+    padding-bottom: 6px;
+    gap: 6px;
+  }
+
+  .notice-subtab-btn {
+    min-height: 40px;
+    padding: 8px 14px;
+  }
+
+  .moderation-action-bar {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .moderation-action-bar button {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
 @media (max-width: 540px) {
+  .editor-controls-row {
+    grid-template-columns: 1fr;
+  }
+
   .analytics-stats-grid {
     grid-template-columns: 1fr;
   }
@@ -1244,6 +1462,11 @@
   .btn-delete-notice {
     width: 100%;
     text-align: center;
+    min-height: 44px;
+  }
+
+  .legend-toggle-item {
+    flex: 1 1 100%;
   }
 }
 
