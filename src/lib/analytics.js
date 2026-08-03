@@ -271,9 +271,52 @@ function initGlobalPresenceTracker() {
   }
 }
 
+let lastTouchTimeMap = new Map();
+
+export async function touchUserActivity(user) {
+  if (!user || !user.id || !hasValidCredentials) return;
+
+  const now = Date.now();
+  const lastTouch = lastTouchTimeMap.get(user.id) || 0;
+  // Throttle to at most once per 60 seconds per user session
+  if (now - lastTouch < 60000) return;
+  lastTouchTimeMap.set(user.id, now);
+
+  try {
+    const nowIso = new Date().toISOString();
+    const { data, error } = await supabase
+      .from('user_progress')
+      .update({ updated_at: nowIso })
+      .eq('user_id', user.id)
+      .select('id');
+
+    if (!error && (!data || data.length === 0)) {
+      // Row didn't exist yet, insert profile
+      const profileData = {
+        email: user.email,
+        full_name: user.user_metadata?.full_name || user.email.split('@')[0] || 'Student',
+        course: user.user_metadata?.course || 'Unset',
+        semester: user.user_metadata?.semester ? String(user.user_metadata.semester) : 'Unset',
+        section: user.user_metadata?.section || 'Unset'
+      };
+      await supabase
+        .from('user_progress')
+        .insert([{
+          user_id: user.id,
+          settings: profileData,
+          updated_at: nowIso,
+          created_at: nowIso
+        }]);
+    }
+  } catch (e) {
+    // Non-blocking
+  }
+}
+
 export function subscribeToPresence(user, currentView, onPresenceSync) {
   if (user && user.email) {
     globalCurrentUser = user;
+    touchUserActivity(user);
   }
   if (currentView) {
     globalCurrentView = currentView;
@@ -297,6 +340,9 @@ export function subscribeToPresence(user, currentView, onPresenceSync) {
 const recentLogMap = new Map();
 
 export async function logFeatureView(featureId, user) {
+  if (user && user.id) {
+    touchUserActivity(user);
+  }
   if (!featureId || featureId === 'admin' || !FEATURE_NAMES[featureId]) return;
 
   const now = Date.now();

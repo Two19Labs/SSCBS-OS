@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
+import { touchUserActivity } from '../lib/analytics';
 
 const AuthContext = createContext({
   user: null,
@@ -67,6 +68,9 @@ export const AuthProvider = ({ children }) => {
           setSession(session ?? null);
           setUser(session?.user ?? null);
           setLoading(false);
+          if (session?.user) {
+            touchUserActivity(session.user);
+          }
         })
         .catch((err) => {
           console.warn('Auth getSession notice:', err);
@@ -87,6 +91,9 @@ export const AuthProvider = ({ children }) => {
         setSession(session ?? null);
         setUser(session?.user ?? null);
         setLoading(false);
+        if (session?.user) {
+          touchUserActivity(session.user);
+        }
       });
       subscription = res?.data?.subscription;
     } catch (err) {

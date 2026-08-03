@@ -169,7 +169,7 @@ const parseTimeToMinutes = (timeStr) => {
 };
 
 export default function FindMyProfessorPage({ onBack }) {
-  const { timetable: timetablesData } = useTimetable();
+  const { timetable: timetablesData, holidays } = useTimetable();
   const { user } = useAuth();
   const canTimeWarp = isAdminEmail(user?.email) && isTimeWarpEnabled();
   const [professorsList, setProfessorsList] = useState([]);
@@ -293,6 +293,10 @@ export default function FindMyProfessorPage({ onBack }) {
 
   const profSchedules = getProfessorSchedule(selectedProf);
 
+  // Check if today (or simulated date) is a holiday
+  const todayStr = time.getFullYear() + '-' + String(time.getMonth() + 1).padStart(2, '0') + '-' + String(time.getDate()).padStart(2, '0');
+  const todayHoliday = holidays?.find(h => h.date === todayStr);
+
   // Time metrics
   const dayOfWeek = isSimulated ? simulatedDay : DAYS[time.getDay() - 1] || 'Sunday';
   const isWeekend = dayOfWeek === 'Sunday' || dayOfWeek === 'Saturday';
@@ -300,6 +304,15 @@ export default function FindMyProfessorPage({ onBack }) {
 
   // Compute live tracking status
   const getLiveStatus = () => {
+    if (todayHoliday) {
+      return {
+        status: 'holiday',
+        holidayType: todayHoliday.type || 'Holiday',
+        title: todayHoliday.title,
+        message: todayHoliday.message || 'No lectures scheduled today due to holiday/fest.'
+      };
+    }
+
     if (isWeekend) {
       return { status: 'weekend', message: 'Weekend — No lectures scheduled today.' };
     }
@@ -346,7 +359,7 @@ export default function FindMyProfessorPage({ onBack }) {
 
   // Find next class today
   const getNextClass = () => {
-    if (isWeekend) return null;
+    if (isWeekend || todayHoliday) return null;
     let next = null;
     let nextStartMin = 1440; // End of day
 
@@ -571,6 +584,14 @@ export default function FindMyProfessorPage({ onBack }) {
                           </div>
                         )}
                       </div>
+                    ) : currentStatus.status === 'holiday' ? (
+                      <div className="alert-box-status weekend" style={{ borderColor: 'rgba(217, 119, 6, 0.3)', backgroundColor: 'rgba(251, 191, 36, 0.08)' }}>
+                        <span className="badge-generic break" style={{ background: '#d97706', color: '#ffffff' }}>
+                          {currentStatus.holidayType}
+                        </span>
+                        <h3 style={{ color: '#92400e', marginTop: '6px' }}>{currentStatus.title}</h3>
+                        <p>{currentStatus.message}</p>
+                      </div>
                     ) : currentStatus.status === 'weekend' ? (
                       <div className="alert-box-status weekend">
                         <span className="badge-generic weekend">Weekend</span>
@@ -590,7 +611,7 @@ export default function FindMyProfessorPage({ onBack }) {
                 {/* Next Lecture Panel */}
                 <div className="prof-page-next-card">
                   <h4>Upcoming Schedule</h4>
-                  {!isWeekend && nextClass ? (
+                  {!isWeekend && !todayHoliday && nextClass ? (
                     <div className="next-lecture-inner-card">
                       <div className="next-icon-circle">
                         <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none">
@@ -642,7 +663,15 @@ export default function FindMyProfessorPage({ onBack }) {
                 
                 {viewMode === 'today' ? (
                   <div className="spacious-timeline-wrapper">
-                    {isWeekend ? (
+                    {todayHoliday ? (
+                      <div className="timeline-empty-card" style={{ padding: '24px', textAlign: 'center' }}>
+                        <span className="badge-generic break" style={{ background: '#d97706', color: '#ffffff', marginBottom: '8px', display: 'inline-block' }}>
+                          {todayHoliday.type || 'Holiday'}
+                        </span>
+                        <h4 style={{ margin: '8px 0 4px', fontSize: '1.1rem', fontWeight: 700 }}>{todayHoliday.title}</h4>
+                        <p style={{ margin: 0, color: 'var(--text-muted)' }}>{todayHoliday.message || 'No lectures scheduled today due to the holiday/fest.'}</p>
+                      </div>
+                    ) : isWeekend ? (
                       <div className="timeline-empty-card">
                         <p>No timeline schedules available on weekends.</p>
                       </div>

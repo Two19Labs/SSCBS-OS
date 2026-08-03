@@ -78,6 +78,11 @@ CREATE OR REPLACE TRIGGER enforce_sscbs_email
     BEFORE INSERT ON auth.users
     FOR EACH ROW EXECUTE FUNCTION public.check_sscbs_email();
 
+-- Revoke default public execution privileges to secure the SECURITY DEFINER function
+REVOKE EXECUTE ON FUNCTION public.check_sscbs_email() FROM public;
+REVOKE EXECUTE ON FUNCTION public.check_sscbs_email() FROM authenticated;
+REVOKE EXECUTE ON FUNCTION public.check_sscbs_email() FROM anon;
+
 -- 5. Create a table to store system configurations (e.g. timetables)
 CREATE TABLE IF NOT EXISTS public.system_configs (
     key TEXT PRIMARY KEY,
@@ -178,6 +183,9 @@ ALTER TABLE public.notice_drafter_requests ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Enable read access for notice drafter requests" ON public.notice_drafter_requests;
 DROP POLICY IF EXISTS "Enable all access for notice drafter requests" ON public.notice_drafter_requests;
+DROP POLICY IF EXISTS "Enable write access for notice drafter requests" ON public.notice_drafter_requests;
+DROP POLICY IF EXISTS "Enable insert access for notice drafter requests" ON public.notice_drafter_requests;
+DROP POLICY IF EXISTS "Enable update/delete access for notice drafter requests" ON public.notice_drafter_requests;
 
 CREATE POLICY "Enable read access for notice drafter requests" 
     ON public.notice_drafter_requests 
@@ -185,12 +193,18 @@ CREATE POLICY "Enable read access for notice drafter requests"
     TO authenticated 
     USING (true);
 
-CREATE POLICY "Enable write access for notice drafter requests" 
+CREATE POLICY "Enable insert access for notice drafter requests" 
+    ON public.notice_drafter_requests 
+    FOR INSERT 
+    TO authenticated 
+    WITH CHECK (user_id = auth.uid() OR auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'));
+
+CREATE POLICY "Enable update/delete access for notice drafter requests" 
     ON public.notice_drafter_requests 
     FOR ALL 
     TO authenticated 
-    USING (true) 
-    WITH CHECK (true);
+    USING (user_id = auth.uid() OR auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'))
+    WITH CHECK (user_id = auth.uid() OR auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'));
 
 -- Only admins can view all student progress for demographics/analytics
 CREATE POLICY "Enable read access for admin on user progress" 
@@ -336,13 +350,14 @@ CREATE POLICY "Enable insert access for authenticated users on squad_posts"
     ON public.squad_posts 
     FOR INSERT 
     TO authenticated 
-    WITH CHECK (true);
+    WITH CHECK (user_id = auth.uid() OR user_id IS NULL OR auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'));
 
 CREATE POLICY "Enable update/delete access for creator or admin on squad_posts" 
     ON public.squad_posts 
     FOR ALL 
     TO authenticated 
-    USING (true);
+    USING (user_id = auth.uid() OR auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'))
+    WITH CHECK (user_id = auth.uid() OR auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'));
 
 
 -- 11. Create a table for Squad Join Applications & Host Approvals
@@ -377,11 +392,15 @@ CREATE POLICY "Enable read access on squad_applications"
 -- Allow authenticated users to create join requests
 CREATE POLICY "Enable insert access on squad_applications"
     ON public.squad_applications FOR INSERT TO authenticated
-    WITH CHECK (true);
+    WITH CHECK (applicant_id = auth.uid() OR applicant_id IS NULL OR auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in'));
 
--- Allow post creator or applicant or admin to update status
+-- Allow post creator or applicant or admin to update status / delete
 CREATE POLICY "Enable update/delete access on squad_applications"
     ON public.squad_applications FOR ALL TO authenticated
-    USING (true);
+    USING (
+        applicant_id = auth.uid() 
+        OR post_id IN (SELECT id FROM public.squad_posts WHERE user_id = auth.uid())
+        OR auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in')
+    );
 
 

@@ -612,51 +612,100 @@ function AdminConsoleContent({ onBack }) {
     setSaveStatus({ type: '', message: '' });
 
     if (!hasValidCredentials) {
-      // Mock demographic data for sandbox mode
+      // Mock demographic data sorted by last activity timestamp descending
+      const now = Date.now();
       const mockUsers = [
-        { id: 'm1', name: 'Aditya Singhani', email: 'aditya.25015@sscbs.du.ac.in', course: 'BMS', semester: '2', section: 'A', lastActive: 'Online' },
-        { id: 'm2', name: 'Manthan Kabra', email: 'manthan.25042@sscbs.du.ac.in', course: 'BMS', semester: '2', section: 'B', lastActive: '5 mins ago' },
-        { id: 'm3', name: 'Kunal Sharma', email: 'kunal.25055@sscbs.du.ac.in', course: 'BBA FIA', semester: '2', section: 'A', lastActive: '2 hours ago' },
-        { id: 'm4', name: 'Riya Gupta', email: 'riya.25078@sscbs.du.ac.in', course: 'BBA FIA', semester: '4', section: 'B', lastActive: 'Online' },
-        { id: 'm5', name: 'Arjun Verma', email: 'arjun.25091@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '6', section: 'A', lastActive: '1 day ago' },
-        { id: 'm6', name: 'Divya Sen', email: 'divya.25102@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '4', section: 'A', lastActive: '3 mins ago' },
-        { id: 'm7', name: 'Siddharth Jain', email: 'sid.25114@sscbs.du.ac.in', course: 'BMS', semester: '6', section: 'A', lastActive: 'Offline' },
-        { id: 'm8', name: 'Pooja Rawat', email: 'pooja.25123@sscbs.du.ac.in', course: 'BBA FIA', semester: '6', section: 'B', lastActive: 'Online' },
-        { id: 'm9', name: 'Ishaan Malhotra', email: 'ishaan.25145@sscbs.du.ac.in', course: 'BMS', semester: '4', section: 'D', lastActive: '12 mins ago' },
-        { id: 'm10', name: 'Ananya Roy', email: 'ananya.25156@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '2', section: 'A', lastActive: 'Offline' },
-        { id: 'm11', name: 'Kabir Dev', email: 'kabir.25178@sscbs.du.ac.in', course: 'BMS', semester: '8', section: 'A', lastActive: 'Online' },
-        { id: 'm12', name: 'Mehak Preet', email: 'mehak.25189@sscbs.du.ac.in', course: 'BMS', semester: '8', section: 'C', lastActive: '3 days ago' },
-        { id: 'm13', name: 'Neil Dsouza', email: 'neil.25199@sscbs.du.ac.in', course: 'BBA FIA', semester: '2', section: 'A', lastActive: 'Offline' },
-        { id: 'm14', name: 'Pranav Shah', email: 'pranav.25201@sscbs.du.ac.in', course: 'BMS', semester: '4', section: 'A', lastActive: '1 hour ago' },
-        { id: 'm15', name: 'Sanya Mirza', email: 'sanya.25220@sscbs.du.ac.in', course: 'BBA FIA', semester: '8', section: 'B', lastActive: 'Online' },
-        { id: 'm16', name: 'Tushar Mehta', email: 'tushar.25244@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '8', section: 'A', lastActive: '5 mins ago' },
-        { id: 'm17', name: 'Vanshika Goel', email: 'vansh.25255@sscbs.du.ac.in', course: 'BMS', semester: '6', section: 'C', lastActive: 'Offline' },
-        { id: 'm18', name: 'Yash Vardhan', email: 'yash.25266@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '6', section: 'A', lastActive: '4 hours ago' },
-        { id: 'm19', name: 'Zara Khan', email: 'zara.25277@sscbs.du.ac.in', course: 'BBA FIA', semester: '4', section: 'A', lastActive: 'Online' },
-        { id: 'm20', name: 'Rohan Mehra', email: 'rohan.25288@sscbs.du.ac.in', course: 'BMS', semester: '2', section: 'C', lastActive: 'Online' }
+        { id: 'm1', name: 'Aditya Singhani', email: 'aditya.25015@sscbs.du.ac.in', course: 'BMS', semester: '2', section: 'A', lastActiveMs: now - 60000 * 1, lastActive: 'Online' },
+        { id: 'm4', name: 'Riya Gupta', email: 'riya.25078@sscbs.du.ac.in', course: 'BBA FIA', semester: '4', section: 'B', lastActiveMs: now - 60000 * 2, lastActive: 'Online' },
+        { id: 'm6', name: 'Divya Sen', email: 'divya.25102@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '4', section: 'A', lastActiveMs: now - 60000 * 3, lastActive: '3 mins ago' },
+        { id: 'm2', name: 'Manthan Kabra', email: 'manthan.25042@sscbs.du.ac.in', course: 'BMS', semester: '2', section: 'B', lastActiveMs: now - 60000 * 5, lastActive: '5 mins ago' },
+        { id: 'm16', name: 'Tushar Mehta', email: 'tushar.25244@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '8', section: 'A', lastActiveMs: now - 60000 * 6, lastActive: '6 mins ago' },
+        { id: 'm9', name: 'Ishaan Malhotra', email: 'ishaan.25145@sscbs.du.ac.in', course: 'BMS', semester: '4', section: 'D', lastActiveMs: now - 60000 * 12, lastActive: '12 mins ago' },
+        { id: 'm14', name: 'Pranav Shah', email: 'pranav.25201@sscbs.du.ac.in', course: 'BMS', semester: '4', section: 'A', lastActiveMs: now - 60000 * 60, lastActive: '1 hour ago' },
+        { id: 'm3', name: 'Kunal Sharma', email: 'kunal.25055@sscbs.du.ac.in', course: 'BBA FIA', semester: '2', section: 'A', lastActiveMs: now - 60000 * 120, lastActive: '2 hours ago' },
+        { id: 'm18', name: 'Yash Vardhan', email: 'yash.25266@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '6', section: 'A', lastActiveMs: now - 60000 * 240, lastActive: '4 hours ago' },
+        { id: 'm5', name: 'Arjun Verma', email: 'arjun.25091@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '6', section: 'A', lastActiveMs: now - 60000 * 1440, lastActive: '1 day ago' },
+        { id: 'm12', name: 'Mehak Preet', email: 'mehak.25189@sscbs.du.ac.in', course: 'BMS', semester: '8', section: 'C', lastActiveMs: now - 60000 * 4320, lastActive: '3 days ago' },
+        { id: 'm7', name: 'Siddharth Jain', email: 'sid.25114@sscbs.du.ac.in', course: 'BMS', semester: '6', section: 'A', lastActiveMs: now - 60000 * 10000, lastActive: 'Offline' },
+        { id: 'm10', name: 'Ananya Roy', email: 'ananya.25156@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '2', section: 'A', lastActiveMs: now - 60000 * 12000, lastActive: 'Offline' },
+        { id: 'm13', name: 'Neil Dsouza', email: 'neil.25199@sscbs.du.ac.in', course: 'BBA FIA', semester: '2', section: 'A', lastActiveMs: now - 60000 * 15000, lastActive: 'Offline' },
+        { id: 'm17', name: 'Vanshika Goel', email: 'vansh.25255@sscbs.du.ac.in', course: 'BMS', semester: '6', section: 'C', lastActiveMs: now - 60000 * 20000, lastActive: 'Offline' }
       ];
+      mockUsers.sort((a, b) => b.lastActiveMs - a.lastActiveMs);
       setAnalyticsUsers(mockUsers);
       setLoadingAnalytics(false);
       return;
     }
 
     try {
-      const { data, error } = await supabase
+      // 1. Query registered users and profiles from user_progress
+      const { data: progressRows, error: progressError } = await supabase
         .from('user_progress')
-        .select('user_id, settings, updated_at')
-        .order('updated_at', { ascending: false });
+        .select('user_id, settings, updated_at');
 
-      if (error) {
-        console.error('Error fetching demographics:', error);
-        setSaveStatus({ type: 'error', message: error.message || 'Failed to load student demographics.' });
+      // 2. Fetch live presence ping timestamps from active_presence
+      let presenceMap = {};
+      try {
+        const { data: presenceRows } = await supabase
+          .from('active_presence')
+          .select('user_id, email, last_ping');
+        if (presenceRows) {
+          presenceRows.forEach(p => {
+            const key = p.user_id || p.email;
+            if (key) {
+              const pingMs = new Date(p.last_ping).getTime();
+              if (!isNaN(pingMs)) {
+                presenceMap[key] = Math.max(presenceMap[key] || 0, pingMs);
+              }
+            }
+          });
+        }
+      } catch (e) {}
+
+      // 3. Fetch latest feature activity logs from analytics_events
+      let analyticsMap = {};
+      try {
+        const { data: eventRows } = await supabase
+          .from('analytics_events')
+          .select('user_id, created_at')
+          .order('created_at', { ascending: false })
+          .limit(1000);
+        if (eventRows) {
+          eventRows.forEach(ev => {
+            if (ev.user_id) {
+              const evMs = new Date(ev.created_at).getTime();
+              if (!isNaN(evMs)) {
+                analyticsMap[ev.user_id] = Math.max(analyticsMap[ev.user_id] || 0, evMs);
+              }
+            }
+          });
+        }
+      } catch (e) {}
+
+      if (progressError) {
+        console.error('Error fetching demographics:', progressError);
+        setSaveStatus({ type: 'error', message: progressError.message || 'Failed to load student demographics.' });
       } else {
-        const formatted = (data || []).map(row => {
+        const now = Date.now();
+        const formatted = (progressRows || []).map(row => {
           const profile = row.settings || {};
-          const now = new Date();
-          const updated = new Date(row.updated_at);
-          const diffMs = now - updated;
-          let lastActive = 'Offline';
+          const updatedAtMs = new Date(row.updated_at).getTime();
+          const email = profile.email || '';
+          const userId = row.user_id;
 
+          const presenceMs = presenceMap[userId] || presenceMap[email] || 0;
+          const eventMs = analyticsMap[userId] || 0;
+
+          // Crucial: Determine absolute latest activity timestamp across all sources
+          const lastActiveMs = Math.max(
+            isNaN(updatedAtMs) ? 0 : updatedAtMs,
+            presenceMs,
+            eventMs
+          );
+
+          const diffMs = Math.max(0, now - lastActiveMs);
+
+          let lastActive = 'Offline';
           if (diffMs < 60000 * 5) {
             lastActive = 'Online';
           } else if (diffMs < 60000 * 60) {
@@ -670,13 +719,18 @@ function AdminConsoleContent({ onBack }) {
           return {
             id: row.user_id,
             name: profile.full_name || 'Anonymous Student',
-            email: profile.email || 'No Email Sync',
+            email: email || 'No Email Sync',
             course: profile.course || 'Unset',
             semester: profile.semester ? String(profile.semester) : 'Unset',
             section: profile.section || 'Unset',
-            lastActive
+            lastActive,
+            lastActiveMs
           };
         });
+
+        // SORT DESCENDING BY LAST ACTIVITY TIMESTAMP (MOST RECENT FIRST)
+        formatted.sort((a, b) => b.lastActiveMs - a.lastActiveMs);
+
         setAnalyticsUsers(formatted);
       }
     } catch (err) {
@@ -2634,13 +2688,15 @@ STRICT EXTRACTION RULES:
                   <p>Loading student directory...</p>
                 </div>
               ) : (() => {
-                const filtered = analyticsUsers.filter(u => {
-                  const matchSearch = u.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                                      u.email.toLowerCase().includes(searchQuery.toLowerCase());
-                  const matchCourse = filterCourse === 'All' || u.course === filterCourse;
-                  const matchSem = filterSem === 'All' || u.semester === filterSem;
-                  return matchSearch && matchCourse && matchSem;
-                });
+                const filtered = analyticsUsers
+                  .filter(u => {
+                    const matchSearch = u.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                        u.email.toLowerCase().includes(searchQuery.toLowerCase());
+                    const matchCourse = filterCourse === 'All' || u.course === filterCourse;
+                    const matchSem = filterSem === 'All' || u.semester === filterSem;
+                    return matchSearch && matchCourse && matchSem;
+                  })
+                  .sort((a, b) => (b.lastActiveMs || 0) - (a.lastActiveMs || 0));
 
                 if (filtered.length === 0) {
                   return (
