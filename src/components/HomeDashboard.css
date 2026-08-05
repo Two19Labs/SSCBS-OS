@@ -29,6 +29,11 @@
 
 .home-buzz-col {
   min-width: 0;
+  margin-bottom: 24px;
+}
+
+.home-tools-col {
+  min-width: 0;
 }
 
 /* Greeting */
@@ -219,16 +224,10 @@
   margin-bottom: 28px;
 }
 
-@media (min-width: 700px) {
+@media (min-width: 1080px) {
   .home-tools-grid {
+    grid-template-columns: 1fr;
     gap: 12px;
-  }
-}
-
-@media (min-width: 1200px) {
-  .home-tools-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 14px;
   }
 }
 

@@ -277,6 +277,12 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
 
         {renderLiveCard()}
 
+        <div className="home-buzz-col">
+          <NoticeBoard onNavigate={onNavigate} />
+        </div>
+      </div>
+
+      <div className="home-tools-col">
         <div className="home-section-head">
           <span className="home-section-title">Tools</span>
         </div>
@@ -295,17 +301,6 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
             </button>
           ))}
         </div>
-
-        <div className="home-buzz-mobile">
-          <div className="home-section-head">
-            <span className="home-section-title">Campus buzz</span>
-            <button className="link-accent" onClick={() => onNavigate('buzz')}>All →</button>
-          </div>
-        </div>
-      </div>
-
-      <div className="home-buzz-col">
-        <NoticeBoard onNavigate={onNavigate} />
       </div>
     </div>
   );
