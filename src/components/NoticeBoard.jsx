@@ -122,7 +122,7 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
 
       const { data, error } = await supabase
         .from('notices')
-        .select('*')
+        .select('id, title, category, society, venue, content, link_url, event_date, active_from, active_to, created_at, created_by_email, display_order, status')
         .eq('created_by_email', userEmail)
         .order('created_at', { ascending: false });
 
@@ -139,7 +139,7 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
       if (!force) {
         const cached = sessionStorage.getItem('sscbs_cached_notices');
         const cachedTime = sessionStorage.getItem('sscbs_cached_notices_time');
-        if (cached && cachedTime && (Date.now() - Number(cachedTime)) < 10000) {
+        if (cached && cachedTime && (Date.now() - Number(cachedTime)) < 30000) {
           try {
             setNotices(JSON.parse(cached));
             setLoading(false);
@@ -157,7 +157,7 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
 
       const { data, error } = await supabase
         .from('notices')
-        .select('*')
+        .select('id, title, category, society, venue, content, link_url, event_date, active_from, active_to, created_at, created_by_email, display_order, status')
         .order('display_order', { ascending: true })
         .order('created_at', { ascending: false });
 

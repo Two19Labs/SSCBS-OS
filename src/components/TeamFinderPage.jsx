@@ -143,6 +143,20 @@ export default function TeamFinderPage({ onBack }) {
   const fetchPostsAndApps = async (force = false) => {
     const now = Date.now();
 
+    if (!force) {
+      const cachedPosts = sessionStorage.getItem('sscbs_cached_team_posts');
+      const cachedApps = sessionStorage.getItem('sscbs_cached_team_apps');
+      const cachedTime = sessionStorage.getItem('sscbs_cached_team_time');
+      if (cachedPosts && cachedTime && (now - Number(cachedTime)) < 30000) {
+        try {
+          setPosts(JSON.parse(cachedPosts));
+          if (cachedApps) setApplications(JSON.parse(cachedApps));
+          setLoading(false);
+          return;
+        } catch (e) {}
+      }
+    }
+
     if (!force && !hasValidCredentials) {
       const savedPosts = localStorage.getItem('sscbs_squad_posts');
       const savedApps = localStorage.getItem('sscbs_squad_apps');
@@ -187,6 +201,10 @@ export default function TeamFinderPage({ onBack }) {
           });
           setPosts(enrichedPosts);
           localStorage.setItem('sscbs_squad_posts', JSON.stringify(enrichedPosts));
+          try {
+            sessionStorage.setItem('sscbs_cached_team_posts', JSON.stringify(enrichedPosts));
+            sessionStorage.setItem('sscbs_cached_team_time', String(now));
+          } catch (e) {}
         } else if (postsRes.error) {
           console.error('Supabase fetch posts error:', postsRes.error);
         }
@@ -194,6 +212,9 @@ export default function TeamFinderPage({ onBack }) {
         if (!appsRes.error && appsRes.data) {
           setApplications(appsRes.data);
           localStorage.setItem('sscbs_squad_apps', JSON.stringify(appsRes.data));
+          try {
+            sessionStorage.setItem('sscbs_cached_team_apps', JSON.stringify(appsRes.data));
+          } catch (e) {}
         } else if (appsRes.error) {
           console.error('Supabase fetch apps error:', appsRes.error);
         }

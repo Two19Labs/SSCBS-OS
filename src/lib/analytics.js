@@ -101,7 +101,7 @@ async function fetchActivePresenceFromDB() {
     const cutoff = new Date(Date.now() - 60000).toISOString();
     const { data, error } = await supabase
       .from('active_presence')
-      .select('*')
+      .select('id, user_id, session_id, name, email, course, semester, section, current_view, view_label, device, last_ping')
       .gte('last_ping', cutoff);
 
     if (!error && Array.isArray(data)) {
@@ -204,6 +204,9 @@ function updateLocalAndState(remoteList = []) {
 let lastDbPingTime = 0;
 
 function sendPresencePing() {
+  // Pause presence updates if tab is running in background to save WebSocket egress
+  if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+
   const payload = getPresencePayload();
   if (!payload) return;
 
@@ -223,12 +226,24 @@ function sendPresencePing() {
   }
 }
 
+let isVisibilityListenerAdded = false;
+
 function initGlobalPresenceTracker() {
   if (!presenceHeartbeatTimer) {
     // Lightweight local ping timer every 10 seconds for tab freshness
     presenceHeartbeatTimer = setInterval(() => {
       sendPresencePing();
     }, 10000);
+  }
+
+  // Resume presence ping immediately when student switches back to active tab
+  if (typeof document !== 'undefined' && !isVisibilityListenerAdded) {
+    isVisibilityListenerAdded = true;
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        sendPresencePing();
+      }
+    });
   }
 
   // Setup Singleton Supabase Realtime Channel if not yet created
@@ -347,8 +362,8 @@ export async function logFeatureView(featureId, user) {
 
   const now = Date.now();
   const lastTime = recentLogMap.get(featureId) || 0;
-  if (now - lastTime < 3000) {
-    // Session debounce: prevent double logging within 3 seconds for exact same feature
+  if (now - lastTime < 5000) {
+    // Session debounce: prevent double logging within 5 seconds for exact same feature
     return;
   }
   recentLogMap.set(featureId, now);

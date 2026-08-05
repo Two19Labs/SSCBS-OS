@@ -47,7 +47,7 @@ export const TimetableProvider = ({ children }) => {
       try {
         const { data, error } = await supabase
           .from('holidays')
-          .select('*')
+          .select('id, title, date, type')
           .order('date', { ascending: true });
         if (!error && data) {
           setHolidays(data);
