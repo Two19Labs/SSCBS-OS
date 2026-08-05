@@ -277,30 +277,30 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
 
         {renderLiveCard()}
 
-        <div className="home-buzz-col">
-          <NoticeBoard onNavigate={onNavigate} />
+        <div className="home-tools-section">
+          <div className="home-section-head">
+            <span className="home-section-title">Tools</span>
+          </div>
+          <div className="home-tools-grid">
+            {tools.map(({ id, micro, microClass, title, desc, Icon, locked }) => (
+              <button
+                key={id}
+                className={`home-tool-card ${locked ? 'locked' : ''}`}
+                onClick={() => !locked && onNavigate(id)}
+                disabled={locked}
+              >
+                <span className={`micro-label ${microClass}`}>{micro}</span>
+                <span className="tool-title">{title}</span>
+                <span className="tool-desc">{desc}</span>
+                {!locked && <span className="tool-launch">Launch →</span>}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="home-tools-col">
-        <div className="home-section-head">
-          <span className="home-section-title">Tools</span>
-        </div>
-        <div className="home-tools-grid">
-          {tools.map(({ id, micro, microClass, title, desc, Icon, locked }) => (
-            <button
-              key={id}
-              className={`home-tool-card ${locked ? 'locked' : ''}`}
-              onClick={() => !locked && onNavigate(id)}
-              disabled={locked}
-            >
-              <span className={`micro-label ${microClass}`}>{micro}</span>
-              <span className="tool-title">{title}</span>
-              <span className="tool-desc">{desc}</span>
-              {!locked && <span className="tool-launch">Launch →</span>}
-            </button>
-          ))}
-        </div>
+      <div className="home-buzz-col">
+        <NoticeBoard onNavigate={onNavigate} />
       </div>
     </div>
   );
