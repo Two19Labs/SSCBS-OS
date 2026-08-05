@@ -297,6 +297,9 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                       {(activeClass.isPractical || /\b\(P\)\b/i.test(activeClass.subject) || /\bPractical\b/i.test(activeClass.subject)) && (
                         <span className="badge-practical">🧪 Practical</span>
                       )}
+                      {(activeClass.isUnsupervised || activeClass.teacher === 'Unsupervised' || /\bunsupervised\b/i.test(activeClass.subject || '')) && (
+                        <span className="badge-unsupervised">👤 Unsupervised</span>
+                      )}
                       {resolveRoom(activeClass.room) && resolveRoom(activeClass.room) !== '-' && (
                         <span className="room-label">
                           <strong className="highlight-tag">
@@ -389,6 +392,9 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                         {(nextClass.isPractical || /\b\(P\)\b/i.test(nextClass.subject) || /\bPractical\b/i.test(nextClass.subject)) && (
                           <span className="badge-practical-sm">Practical</span>
                         )}
+                        {(nextClass.isUnsupervised || nextClass.teacher === 'Unsupervised' || /\bunsupervised\b/i.test(nextClass.subject || '')) && (
+                          <span className="badge-unsupervised-sm">Unsupervised</span>
+                        )}
                       </div>
                       <p className="next-details">
                         {resolveRoom(nextClass.room) && `${resolveRoom(nextClass.room)} • `} 
@@ -442,6 +448,9 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                               </h5>
                               {!cls.isBreak && (cls.isPractical || /\b\(P\)\b/i.test(cls.subject) || /\bPractical\b/i.test(cls.subject)) && (
                                 <span className="badge-practical-xs">Practical</span>
+                              )}
+                              {!cls.isBreak && (cls.isUnsupervised || cls.teacher === 'Unsupervised' || /\bunsupervised\b/i.test(cls.subject || '')) && (
+                                <span className="badge-unsupervised-xs">Unsupervised</span>
                               )}
                             </div>
                             {!cls.isBreak && cls.subject !== 'Free' && resolveRoom(cls.room) ? (
@@ -645,6 +654,9 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                                       {(matchClass.isPractical || /\b\(P\)\b/i.test(matchClass.subject) || /\bPractical\b/i.test(matchClass.subject)) && (
                                         <span className="badge-practical-sm">Practical</span>
                                       )}
+                                      {(matchClass.isUnsupervised || matchClass.teacher === 'Unsupervised' || /\bunsupervised\b/i.test(matchClass.subject || '')) && (
+                                        <span className="badge-unsupervised-sm">Unsupervised</span>
+                                      )}
                                     </div>
                                     <div className="timeline-card-meta">
                                       {matchClass.teacher && matchClass.teacher !== '-' && (
@@ -730,6 +742,9 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                                           {isCellActive && <span className="live-cell-badge">LIVE</span>}
                                           {(matchClass.isPractical || /\b\(P\)\b/i.test(matchClass.subject) || /\bPractical\b/i.test(matchClass.subject)) && (
                                             <span className="grid-practical-badge" title="Practical Class">P</span>
+                                          )}
+                                          {(matchClass.isUnsupervised || matchClass.teacher === 'Unsupervised' || /\bunsupervised\b/i.test(matchClass.subject || '')) && (
+                                            <span className="grid-unsupervised-badge" title="Unsupervised Class">U</span>
                                           )}
                                         </div>
                                         <div className="cell-subject">{matchClass.subject}</div>

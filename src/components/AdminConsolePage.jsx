@@ -755,6 +755,450 @@ function AdminConsoleContent({ onBack }) {
   const [showHfKeyInput, setShowHfKeyInput] = useState(false);
   const [aiParseProgress, setAiParseProgress] = useState({ current: 0, total: 0, status: '' });
 
+  // Text Parser Uploader states
+  const [textInputMgmt, setTextInputMgmt] = useState('');
+  const [textInputCs, setTextInputCs] = useState('');
+  const [textParsedMgmt, setTextParsedMgmt] = useState(null);
+  const [textParsedCs, setTextParsedCs] = useState(null);
+  const [isParsingTextMgmt, setIsParsingTextMgmt] = useState(false);
+  const [isParsingTextCs, setIsParsingTextCs] = useState(false);
+  const [textParserLogs, setTextParserLogs] = useState([]);
+  const [showPromptExpanded, setShowPromptExpanded] = useState(false);
+  const [promptCopied, setPromptCopied] = useState(false);
+
+  const addTextLog = (msg, type = 'info') => {
+    setTextParserLogs(prev => [{ msg, type, time: new Date().toLocaleTimeString() }, ...prev].slice(0, 100));
+  };
+
+  // ══════════════════════════════════════════════
+  // AI PROMPT FOR CLAUDE / CHATGPT
+  // ══════════════════════════════════════════════
+  const TIMETABLE_AI_PROMPT = `You are a precise timetable extractor for Shaheed Sukhdev College of Business Studies (SSCBS), University of Delhi.
+
+I have attached an Excel timetable file. Read EVERY sheet and extract ALL timetable blocks. Output them in the EXACT structured text format described below. Do NOT skip any section, semester, or day.
+
+═══════════════════════════════════════════════
+UNDERSTANDING THE EXCEL STRUCTURE
+═══════════════════════════════════════════════
+
+Each Excel file contains multiple timetable blocks. Each block has this layout:
+
+1. HEADER ROWS (first 3-4 rows of each block):
+   - Row 1: "SHAHEED SUKHDEV COLLEGE OF BUSINESS STUDIES (University of Delhi)"
+   - Row 2: "CLASS TIME TABLE"
+   - Row 3: Academic Session, Year, Semester, Section info
+   - Row 4: Course name (BMS / BBA(FIA) / B.SC.(H) COMPUTER SCIENCE), effective date, Room Name, Room Number
+
+2. PERIOD HEADER ROW:
+   - Columns: Day | I | II | III | Infinity Hour | IV | V | VI | VII
+   - Period timings: 9-10am, 10-11am, 11am-12pm, BREAK 12-1pm, 1-2pm, 2-3pm, 3-4pm, 4-5pm
+
+3. SCHEDULE ROWS (5 rows, one per weekday):
+   - Monday through Friday
+   - Each cell contains a faculty code (e.g., "MV", "SP", "RRS") that maps to a professor and subject via the LEGEND TABLE below
+
+4. LEGEND TABLE (below each timetable grid):
+   - Headers: S.No. | Paper Type | Paper Name | Faculty Name | Faculty Code | Faculty Load
+   - Maps each short faculty code to the full paper name and full faculty name
+   - Paper types include: Core, GE, SEC, DSE, VAC, AEC, AECC, DSC
+
+═══════════════════════════════════════════════
+CRITICAL EXTRACTION RULES
+═══════════════════════════════════════════════
+
+RULE 1 — FACULTY CODE RESOLUTION (MOST IMPORTANT):
+  Every cell in the timetable grid contains faculty codes (e.g., "MV", "SP", "Deepali", "Sanchi").
+  You MUST look up each code in that block's LEGEND TABLE to get:
+    - The FULL faculty name (e.g., "MV" → "Dr. Mona Verma")
+    - The FULL paper/subject name (e.g., "MV" → "Statistics for Business Decisions")
+  NEVER guess. ALWAYS use the legend.
+
+RULE 2 — COURSE NAME NORMALIZATION:
+  - "BMS" → output as "BMS"
+  - "BBA(FIA)" or "BBA (FIA)" → output as "BBA FIA"
+  - "B.SC.(H) COMPUTER SCIENCE" → output as "Bsc Comp Sci"
+
+RULE 3 — HANDLING ANNOTATIONS IN CELLS:
+  Cells often have annotations. Parse them carefully:
+  - "(P)" or "(Prac)" = Practical class. Include "(Practical)" in the subject name.
+  - "(Tute)" = Tutorial. Include "(Tutorial)" in the subject name.
+  - "(237)" or "(Room 651)" = Room number override. Extract as "Room 237" or "Room 651".
+  - "(703/651)" = Split rooms. Output as "Room 703 / Room 651".
+  - "(Merged with BMS 3A)" = Merged class info. Include in subject but NOT in teacher name.
+  - "(Unsupervised)" = No teacher present. Subject becomes "Free", teacher becomes "-".
+  - "EE-1 (P) (Unsupervised)" or "C&I (P) (Unsupervised)" or "SOFP (P) (Unsupervised)" = Free period, teacher is "-".
+  - "Lab 426" or "Lab 460" = Room override to "Lab 426" or "Lab 460".
+  - "(SEC Room)" = Use default room.
+
+RULE 4 — GROUP SPLITS (G1 / G2):
+  When a cell contains a "/" separating two group assignments:
+  Example: "SJ G1/ MV G2(337)"
+  This means:
+    - Group 1 (G1): Subject from SJ's legend entry, Teacher: full name of SJ, Room: default room
+    - Group 2 (G2): Subject from MV's legend entry, Teacher: full name of MV, Room: Room 337
+  Output format:
+    subject: "G1: [Subject1] | G2: [Subject2]"
+    teacher: "[Full Name 1] (G1) / [Full Name 2] (G2)"
+    room: "G1: Room XXX / G2: Room YYY"
+  
+  If both groups have the SAME subject, just write the subject once:
+    subject: "[Subject Name]"
+    teacher: "[Full Name 1] (G1) / [Full Name 2] (G2)"
+
+RULE 5 — ELECTIVE / LANGUAGE SPLITS:
+  Some cells list multiple language sections:
+  Example: "Garima (Hin A) 607 / Soumya (Hin C) 644 / Komal (Hin D) 648"
+  Output:
+    subject: "Hindi A / Hindi C / Hindi D"
+    teacher: "Dr. Garima Tripathi / Dr. Soumya Guliyan / Mr. Komal"
+    room: "Room 607 / Room 644 / Room 648"
+
+RULE 6 — EMPTY CELLS = FREE PERIOD:
+  If a cell for a period is empty or missing:
+    subject: "Free"
+    teacher: "-"
+    room: "-"
+
+RULE 7 — ROOM NUMBER FORMAT:
+  - Always prefix with "Room " (e.g., "Room 703", "Room 607")
+  - Exception: "Lab 426", "Lab 460" stay as-is
+  - If no room is specified in the cell, use the DEFAULT ROOM from the block header
+
+RULE 8 — PERIOD NUMBERING:
+  Period I = P1, Period II = P2, Period III = P3, then BREAK, then Period IV = P4, Period V = P5, Period VI = P6, Period VII = P7
+
+═══════════════════════════════════════════════
+REQUIRED OUTPUT FORMAT
+═══════════════════════════════════════════════
+
+Output EVERY timetable block in this EXACT format. Do not deviate.
+
+=== [COURSE] | Semester [N] | Section [X] | [Default Room] ===
+Monday:
+  P1: [Subject Name] | [Full Teacher Name] | [Room]
+  P2: [Subject Name] | [Full Teacher Name] | [Room]
+  P3: [Subject Name] | [Full Teacher Name] | [Room]
+  BREAK
+  P4: [Subject Name] | [Full Teacher Name] | [Room]
+  P5: [Subject Name] | [Full Teacher Name] | [Room]
+  P6: [Subject Name] | [Full Teacher Name] | [Room]
+  P7: [Subject Name] | [Full Teacher Name] | [Room]
+Tuesday:
+  P1: ...
+  ...
+Wednesday:
+  ...
+Thursday:
+  ...
+Friday:
+  ...
+
+IMPORTANT FORMATTING RULES:
+- Every day MUST have exactly 7 period lines (P1-P3, BREAK, P4-P7)
+- Use "Free | - | -" for empty/free periods
+- Use "Free | - | -" for unsupervised periods
+- The BREAK line has no subject/teacher/room, just the word "BREAK"
+- Separate blocks with a blank line
+- Use the FULL faculty name from the legend (e.g., "Dr. Mona Verma", NOT "MV")
+- Use the FULL subject name from the legend (e.g., "Statistics for Business Decisions", NOT "SBD")
+- Include "(Practical)" or "(Tutorial)" in the subject name where applicable
+- For teacher names, use the exact prefix from the legend: Dr., Mr., Ms., Prof.
+
+Now extract ALL timetable blocks from the attached Excel file.`;
+
+  // ══════════════════════════════════════════════
+  // DETERMINISTIC TEXT PARSER (Fallback / Primary)
+  // ══════════════════════════════════════════════
+  const parseStructuredText = (text) => {
+    const timetables = {};
+    const blocks = text.split(/^===\s*/m).filter(b => b.trim());
+    let parsedCount = 0;
+    let errorCount = 0;
+
+    for (const block of blocks) {
+      try {
+        // Parse header: [COURSE] | Semester [N] | Section [X] | [Room] ===
+        const headerEnd = block.indexOf('===');
+        const headerLine = headerEnd > -1 ? block.substring(0, headerEnd).trim() : block.split('\n')[0].trim();
+        const bodyText = headerEnd > -1 ? block.substring(headerEnd + 3).trim() : block.substring(block.indexOf('\n')).trim();
+
+        const headerParts = headerLine.split('|').map(s => s.trim());
+        if (headerParts.length < 3) continue;
+
+        let course = headerParts[0].trim();
+        // Normalize course names
+        if (course.includes('BBA') && (course.includes('FIA') || course.includes('(FIA)'))) course = 'BBA FIA';
+        else if (course.toLowerCase().includes('bsc') || course.toLowerCase().includes('comp') || course.toLowerCase().includes('computer')) course = 'Bsc Comp Sci';
+        else if (course.includes('BMS')) course = 'BMS';
+
+        const semMatch = headerParts[1].match(/(\d+)/);
+        const sem = semMatch ? semMatch[1] : '1';
+
+        const secMatch = headerParts[2].match(/([A-D])/i);
+        const section = secMatch ? secMatch[1].toUpperCase() : 'A';
+
+        let defaultRoom = headerParts.length >= 4 ? headerParts[3].trim() : 'Room 703';
+        if (defaultRoom.endsWith('===')) defaultRoom = defaultRoom.replace(/=+$/, '').trim();
+        if (!defaultRoom.toLowerCase().startsWith('room') && !defaultRoom.toLowerCase().startsWith('lab')) {
+          defaultRoom = 'Room ' + defaultRoom.replace(/^Room\s*/i, '');
+        }
+
+        // Parse days
+        const weekSchedule = {};
+        const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+        const dayPattern = /^(Monday|Tuesday|Wednesday|Thursday|Friday)\s*:/im;
+        
+        const dayBlocks = [];
+        const lines = bodyText.split('\n');
+        let currentDay = null;
+        let currentLines = [];
+
+        for (const line of lines) {
+          const dayMatch = line.match(dayPattern);
+          if (dayMatch) {
+            if (currentDay) dayBlocks.push({ day: currentDay, lines: currentLines });
+            currentDay = dayMatch[1];
+            currentLines = [];
+          } else if (currentDay) {
+            currentLines.push(line);
+          }
+        }
+        if (currentDay) dayBlocks.push({ day: currentDay, lines: currentLines });
+
+        for (const dayName of dayNames) {
+          const dayBlock = dayBlocks.find(d => d.day === dayName);
+          const dayClasses = [];
+
+          if (dayBlock) {
+            const periodLines = dayBlock.lines.filter(l => l.trim());
+            let periodIdx = 0;
+            const periodIds = [1, 2, 3, 0, 4, 5, 6, 7];
+
+            for (const pLine of periodLines) {
+              const trimmed = pLine.trim();
+              if (trimmed === 'BREAK' || trimmed.toLowerCase().includes('break')) {
+                dayClasses.push({ period: 0, isBreak: true, subject: 'Infinity Hour (Break)', teacher: '', room: '' });
+                periodIdx++;
+                continue;
+              }
+
+              const pMatch = trimmed.match(/^P(\d):\s*(.*)/);
+              if (pMatch) {
+                const pNum = parseInt(pMatch[1]);
+                const content = pMatch[2].trim();
+                const parts = content.split('|').map(s => s.trim());
+
+                const subject = parts[0] || 'Free';
+                const teacher = parts.length > 1 ? parts[1] : '-';
+                const room = parts.length > 2 ? parts[2] : (subject === 'Free' ? '-' : defaultRoom);
+
+                dayClasses.push({ period: pNum, subject, teacher, room });
+                periodIdx++;
+              }
+            }
+          }
+
+          // Fill missing periods
+          if (dayClasses.length === 0) {
+            [1, 2, 3].forEach(p => dayClasses.push({ period: p, subject: 'Free', teacher: '-', room: '-' }));
+            dayClasses.push({ period: 0, isBreak: true, subject: 'Infinity Hour (Break)', teacher: '', room: '' });
+            [4, 5, 6, 7].forEach(p => dayClasses.push({ period: p, subject: 'Free', teacher: '-', room: '-' }));
+          } else if (!dayClasses.find(c => c.isBreak)) {
+            // Insert break after P3 if missing
+            const breakIdx = dayClasses.findIndex(c => c.period === 4);
+            if (breakIdx > -1) {
+              dayClasses.splice(breakIdx, 0, { period: 0, isBreak: true, subject: 'Infinity Hour (Break)', teacher: '', room: '' });
+            }
+          }
+
+          weekSchedule[dayName] = dayClasses;
+        }
+
+        if (!timetables[course]) timetables[course] = {};
+        if (!timetables[course][sem]) timetables[course][sem] = {};
+        timetables[course][sem][section] = weekSchedule;
+        parsedCount++;
+      } catch (err) {
+        errorCount++;
+        console.warn('Error parsing block:', err);
+      }
+    }
+
+    return { timetables, parsedCount, errorCount };
+  };
+
+  // ══════════════════════════════════════════════
+  // HUGGING FACE TEXT-TO-JSON PARSER
+  // ══════════════════════════════════════════════
+  const parseTextWithHuggingFace = async (text, category) => {
+    const token = hfApiKey || import.meta.env.VITE_HF_API_KEY || '';
+    const isCs = category === 'cs';
+    const setIsParsingFn = isCs ? setIsParsingTextCs : setIsParsingTextMgmt;
+    const setParsedDataFn = isCs ? setTextParsedCs : setTextParsedMgmt;
+    const label = isCs ? 'B.Sc. CS' : 'Management';
+
+    setIsParsingFn(true);
+    addTextLog(`[${label}] Starting text parse...`, 'info');
+
+    try {
+      // ALWAYS try deterministic parser first (it's reliable for our format)
+      const { timetables, parsedCount, errorCount } = parseStructuredText(text);
+
+      if (parsedCount > 0) {
+        // Filter by category
+        const filtered = {};
+        for (const [courseName, sems] of Object.entries(timetables)) {
+          if (isCs && courseName === 'Bsc Comp Sci') {
+            filtered[courseName] = sems;
+          } else if (!isCs && (courseName === 'BMS' || courseName === 'BBA FIA')) {
+            filtered[courseName] = sems;
+          }
+        }
+
+        if (Object.keys(filtered).length > 0) {
+          setParsedDataFn(filtered);
+          const summary = Object.entries(filtered).map(([c, sems]) =>
+            `${c}: Sems [${Object.keys(sems).sort().join(', ')}] (${Object.values(sems).map(s => Object.keys(s).join(',')).join('; ')})`
+          ).join(' | ');
+          addTextLog(`[${label}] ✅ Parsed ${parsedCount} block(s) successfully! ${summary}`, 'success');
+          if (errorCount > 0) addTextLog(`[${label}] ⚠️ ${errorCount} block(s) had parsing errors.`, 'warning');
+        } else {
+          addTextLog(`[${label}] ⚠️ Parsed ${parsedCount} block(s) but none matched ${label} courses. Check that the text contains the right course blocks.`, 'warning');
+        }
+      } else {
+        // If deterministic parser finds nothing, try HF as fallback
+        if (token) {
+          addTextLog(`[${label}] Deterministic parser found no blocks. Trying Hugging Face...`, 'info');
+          try {
+            const systemPrompt = `Convert this structured timetable text into a JSON object. The JSON must have the structure: { "courseName": { "semesterNumber": { "sectionLetter": { "Monday": [...periods], "Tuesday": [...], "Wednesday": [...], "Thursday": [...], "Friday": [...] } } } }. Each period is: { "period": N, "subject": "...", "teacher": "...", "room": "..." }. The break period has: { "period": 0, "isBreak": true, "subject": "Infinity Hour (Break)", "teacher": "", "room": "" }. Course names must be exactly: "BMS", "BBA FIA", or "Bsc Comp Sci". Return ONLY the raw JSON, no markdown.`;
+
+            const res = await fetch('https://router.huggingface.co/v1/chat/completions', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+              body: JSON.stringify({
+                model: 'Qwen/Qwen2.5-72B-Instruct',
+                messages: [
+                  { role: 'system', content: systemPrompt },
+                  { role: 'user', content: `Convert this timetable text to JSON:\n\n${text}` }
+                ],
+                max_tokens: 8192,
+                temperature: 0.05
+              })
+            });
+
+            if (res.ok) {
+              const data = await res.json();
+              let rawText = data.choices?.[0]?.message?.content || '';
+              rawText = rawText.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+              rawText = rawText.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+              const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+              if (jsonMatch) {
+                const hfResult = JSON.parse(jsonMatch[0]);
+                const filtered = {};
+                for (const [courseName, sems] of Object.entries(hfResult)) {
+                  if (isCs && courseName === 'Bsc Comp Sci') filtered[courseName] = sems;
+                  else if (!isCs && (courseName === 'BMS' || courseName === 'BBA FIA')) filtered[courseName] = sems;
+                }
+                if (Object.keys(filtered).length > 0) {
+                  setParsedDataFn(filtered);
+                  addTextLog(`[${label}] ✅ HF AI parsed successfully!`, 'success');
+                } else {
+                  addTextLog(`[${label}] ⚠️ HF returned data but no matching ${label} courses found.`, 'warning');
+                }
+              } else {
+                addTextLog(`[${label}] ⚠️ HF response did not contain valid JSON.`, 'warning');
+              }
+            } else {
+              addTextLog(`[${label}] ⚠️ HF API error (${res.status}). Check your API key.`, 'warning');
+            }
+          } catch (hfErr) {
+            addTextLog(`[${label}] ❌ HF error: ${hfErr.message}`, 'error');
+          }
+        } else {
+          addTextLog(`[${label}] ❌ No timetable blocks found in the text. Make sure the text follows the === COURSE | Semester N | Section X | Room === format.`, 'error');
+        }
+      }
+    } catch (err) {
+      addTextLog(`[${label}] ❌ Parse error: ${err.message}`, 'error');
+    } finally {
+      setIsParsingFn(false);
+    }
+  };
+
+  // Publish text-parsed timetables
+  const handlePublishTextMgmt = async () => {
+    if (!textParsedMgmt) return;
+    setIsSaving(true);
+    setSaveStatus({ type: '', message: '' });
+    addTextLog('[Management] Publishing parsed timetables to SSCBS OS...', 'info');
+    try {
+      const merged = JSON.parse(JSON.stringify(timetable || {}));
+      if (!merged._meta) merged._meta = {};
+      Object.keys(textParsedMgmt).forEach(k => { merged[k] = textParsedMgmt[k]; });
+      merged._meta.mgmtUploadTime = new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+      merged._meta.mgmtSource = 'AI Text Parser';
+      await updateTimetable(merged);
+      setSaveStatus({ type: 'success', message: 'Management timetables published successfully! All student dashboards updated.' });
+      addTextLog('[Management] ✅ Published successfully!', 'success');
+    } catch (err) {
+      setSaveStatus({ type: 'error', message: err.message || 'Failed to publish Management timetables.' });
+      addTextLog(`[Management] ❌ Publish error: ${err.message}`, 'error');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handlePublishTextCs = async () => {
+    if (!textParsedCs) return;
+    setIsSaving(true);
+    setSaveStatus({ type: '', message: '' });
+    addTextLog('[B.Sc. CS] Publishing parsed timetables to SSCBS OS...', 'info');
+    try {
+      const merged = JSON.parse(JSON.stringify(timetable || {}));
+      if (!merged._meta) merged._meta = {};
+      Object.keys(textParsedCs).forEach(k => { merged[k] = textParsedCs[k]; });
+      merged._meta.csUploadTime = new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+      merged._meta.csSource = 'AI Text Parser';
+      await updateTimetable(merged);
+      setSaveStatus({ type: 'success', message: 'B.Sc. Computer Science timetables published successfully!' });
+      addTextLog('[B.Sc. CS] ✅ Published successfully!', 'success');
+    } catch (err) {
+      setSaveStatus({ type: 'error', message: err.message || 'Failed to publish B.Sc. CS timetables.' });
+      addTextLog(`[B.Sc. CS] ❌ Publish error: ${err.message}`, 'error');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCopyPrompt = async () => {
+    try {
+      await navigator.clipboard.writeText(TIMETABLE_AI_PROMPT);
+      setPromptCopied(true);
+      setTimeout(() => setPromptCopied(false), 2500);
+    } catch {
+      // Fallback for insecure contexts
+      const ta = document.createElement('textarea');
+      ta.value = TIMETABLE_AI_PROMPT;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      setPromptCopied(true);
+      setTimeout(() => setPromptCopied(false), 2500);
+    }
+  };
+
+  const getTextParseSummary = (parsed) => {
+    if (!parsed) return [];
+    const items = [];
+    for (const [course, sems] of Object.entries(parsed)) {
+      for (const [sem, sections] of Object.entries(sems)) {
+        items.push({ course, sem, sections: Object.keys(sections).sort().join(', ') });
+      }
+    }
+    return items;
+  };
+
   // Manual Editor Filters
   const [selectedCourse, setSelectedCourse] = useState('BMS');
   const [selectedSem, setSelectedSem] = useState('2');
@@ -1654,6 +2098,12 @@ STRICT EXTRACTION RULES:
             onClick={() => setActiveTab('holidays')}
           >
             Holidays & Fests
+          </button>
+          <button 
+            className={`admin-tab-btn ${activeTab === 'uploader' ? 'active' : ''}`}
+            onClick={() => setActiveTab('uploader')}
+          >
+            Schedule Uploader
           </button>
           <button 
             className={`admin-tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
@@ -2852,6 +3302,196 @@ STRICT EXTRACTION RULES:
                 )}
               </div>
             </div>
+          </div>
+        ) : activeTab === 'uploader' ? (
+          <div className="tab-pane uploader-pane">
+            {/* Prompt Section */}
+            <div className="uploader-prompt-section">
+              <div className="prompt-header-row">
+                <div>
+                  <h3>📋 AI Timetable Prompt</h3>
+                  <p className="section-desc-small">Copy this prompt, paste it into Claude or ChatGPT, attach the Excel timetable file, and copy the AI's output text back here.</p>
+                </div>
+                <div className="prompt-actions">
+                  <button className={`btn-copy-prompt ${promptCopied ? 'copied' : ''}`} onClick={handleCopyPrompt}>
+                    {promptCopied ? '✓ Copied!' : '📋 Copy Prompt to Clipboard'}
+                  </button>
+                  <button className="btn-toggle-prompt" onClick={() => setShowPromptExpanded(!showPromptExpanded)}>
+                    {showPromptExpanded ? '▲ Collapse' : '▼ Preview Prompt'}
+                  </button>
+                </div>
+              </div>
+              {showPromptExpanded && (
+                <pre className="prompt-preview-box">{TIMETABLE_AI_PROMPT}</pre>
+              )}
+            </div>
+
+            {/* Two Column Upload Cards */}
+            <div className="uploader-columns">
+              {/* Management Column */}
+              <div className="uploader-card">
+                <div className="uploader-card-header mgmt">
+                  <span className="uploader-card-icon">🏢</span>
+                  <div>
+                    <h4>Management (BMS + BBA FIA)</h4>
+                    <p>Paste the AI-generated text for Management timetables</p>
+                  </div>
+                </div>
+                <textarea
+                  className="text-parser-textarea"
+                  placeholder={`Paste the Claude/ChatGPT output here...\n\nExpected format:\n=== BMS | Semester 1 | Section A | Room 703 ===\nMonday:\n  P1: Subject | Teacher | Room\n  P2: ...`}
+                  value={textInputMgmt}
+                  onChange={(e) => { setTextInputMgmt(e.target.value); setTextParsedMgmt(null); }}
+                  rows={10}
+                />
+                <div className="uploader-card-actions">
+                  <button
+                    className="btn-parse-text"
+                    onClick={() => parseTextWithHuggingFace(textInputMgmt, 'mgmt')}
+                    disabled={!textInputMgmt.trim() || isParsingTextMgmt}
+                  >
+                    {isParsingTextMgmt ? '⏳ Parsing...' : '🔍 Parse Text'}
+                  </button>
+                  {textInputMgmt && (
+                    <button className="btn-clear-text" onClick={() => { setTextInputMgmt(''); setTextParsedMgmt(null); }}>
+                      Clear
+                    </button>
+                  )}
+                </div>
+
+                {/* Parse Preview */}
+                {textParsedMgmt && (
+                  <div className="parse-preview">
+                    <h5>✅ Ready to Publish</h5>
+                    <div className="parse-preview-list">
+                      {getTextParseSummary(textParsedMgmt).map((item, i) => (
+                        <div key={i} className="parse-preview-item">
+                          <span className="preview-badge">{item.course}</span>
+                          <span>Sem {item.sem}</span>
+                          <span className="preview-sections">Sections: {item.sections}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      className="btn-publish-timetable"
+                      onClick={handlePublishTextMgmt}
+                      disabled={isSaving}
+                    >
+                      {isSaving ? '⏳ Publishing...' : '🚀 Publish Management Timetables'}
+                    </button>
+                  </div>
+                )}
+
+                <div className="uploader-card-scrap">
+                  <button className="btn-scrap-timetable" onClick={handleScrapMgmtTimetable} disabled={isSaving}>
+                    🗑️ Scrap Management Timetables
+                  </button>
+                </div>
+              </div>
+
+              {/* B.Sc. CS Column */}
+              <div className="uploader-card">
+                <div className="uploader-card-header cs">
+                  <span className="uploader-card-icon">💻</span>
+                  <div>
+                    <h4>B.Sc. Computer Science</h4>
+                    <p>Paste the AI-generated text for B.Sc. CS timetables</p>
+                  </div>
+                </div>
+                <textarea
+                  className="text-parser-textarea"
+                  placeholder={`Paste the Claude/ChatGPT output here...\n\nExpected format:\n=== Bsc Comp Sci | Semester 1 | Section A | Room 403 ===\nMonday:\n  P1: Subject | Teacher | Room\n  P2: ...`}
+                  value={textInputCs}
+                  onChange={(e) => { setTextInputCs(e.target.value); setTextParsedCs(null); }}
+                  rows={10}
+                />
+                <div className="uploader-card-actions">
+                  <button
+                    className="btn-parse-text"
+                    onClick={() => parseTextWithHuggingFace(textInputCs, 'cs')}
+                    disabled={!textInputCs.trim() || isParsingTextCs}
+                  >
+                    {isParsingTextCs ? '⏳ Parsing...' : '🔍 Parse Text'}
+                  </button>
+                  {textInputCs && (
+                    <button className="btn-clear-text" onClick={() => { setTextInputCs(''); setTextParsedCs(null); }}>
+                      Clear
+                    </button>
+                  )}
+                </div>
+
+                {/* Parse Preview */}
+                {textParsedCs && (
+                  <div className="parse-preview">
+                    <h5>✅ Ready to Publish</h5>
+                    <div className="parse-preview-list">
+                      {getTextParseSummary(textParsedCs).map((item, i) => (
+                        <div key={i} className="parse-preview-item">
+                          <span className="preview-badge cs">{item.course}</span>
+                          <span>Sem {item.sem}</span>
+                          <span className="preview-sections">Sections: {item.sections}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      className="btn-publish-timetable"
+                      onClick={handlePublishTextCs}
+                      disabled={isSaving}
+                    >
+                      {isSaving ? '⏳ Publishing...' : '🚀 Publish B.Sc. CS Timetables'}
+                    </button>
+                  </div>
+                )}
+
+                <div className="uploader-card-scrap">
+                  <button className="btn-scrap-timetable" onClick={handleScrapCsTimetable} disabled={isSaving}>
+                    🗑️ Scrap B.Sc. CS Timetables
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Scrap All + HF Key */}
+            <div className="uploader-bottom-row">
+              <button className="btn-scrap-all" onClick={handleScrapActiveTimetables} disabled={isSaving}>
+                🗑️ Scrap ALL Active Timetables
+              </button>
+              <div className="hf-key-section">
+                {showHfKeyInput ? (
+                  <div className="hf-key-input-row">
+                    <input
+                      type="password"
+                      className="admin-input-field"
+                      placeholder="Paste your Hugging Face API token..."
+                      value={hfApiKey}
+                      onChange={(e) => setHfApiKey(e.target.value)}
+                    />
+                    <button className="btn-clear-text" onClick={() => setShowHfKeyInput(false)}>Done</button>
+                  </div>
+                ) : (
+                  <button className="btn-configure-hf" onClick={() => setShowHfKeyInput(true)}>
+                    ⚙️ {hfApiKey ? 'HF Token Set ✓' : 'Configure HF Token (Optional)'}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Parsing Logs */}
+            {textParserLogs.length > 0 && (
+              <div className="text-parser-logs">
+                <div className="logs-header">
+                  <h4>📜 Parsing Log</h4>
+                  <button className="btn-clear-text" onClick={() => setTextParserLogs([])}>Clear</button>
+                </div>
+                <div className="logs-list">
+                  {textParserLogs.map((log, i) => (
+                    <div key={i} className={`log-entry log-${log.type}`}>
+                      <span className="log-time">[{log.time}]</span> {log.msg}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         ) : activeTab === 'settings' ? (
           <div className="tab-pane flex-col gap-4">

@@ -40,8 +40,16 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
   }
 
   const isPracticalCell = /\b\(P\)\b/i.test(cellValue) || /\bPractical\b/i.test(cellValue) || /\bLab\b/i.test(cellValue) || cellValue.trim().endsWith('(P)');
+  const isUnsupervisedCell = /unsupervised|unsuprvised|\bee\b|\bei\b/i.test(cellValue);
 
-  const parts = splitOutsideParentheses(cellValue);
+  // Clean raw cell string of explicit unsupervised parenthetical tags for tidier subject titles
+  let cleanedValue = cellValue
+    .replace(/\(\s*\d*\s*practical\s+unsupervised\s*\)/gi, '')
+    .replace(/\(\s*unsupervised\s*\)/gi, '')
+    .replace(/\(\s*unsuprvised\s*\)/gi, '')
+    .trim();
+
+  const parts = splitOutsideParentheses(cleanedValue.length > 0 ? cleanedValue : cellValue);
   if (parts.length > 1) {
     const parsedParts = [];
 
@@ -105,13 +113,16 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
         subjectName = found.paperName;
         teacherName = found.facultyName;
       } else {
-        if (teacherCodeLower.includes('unsupervised') || teacherCodeLower.includes('unsuprvised')) {
-          subjectName = "Free";
-          teacherName = "-";
-        } else if (teacherCodeLower.includes('free') || teacherCodeLower === 'ei' || teacherCodeLower === 'ee') {
+        if (isUnsupervisedCell || teacherCodeLower.includes('unsupervised') || teacherCodeLower.includes('unsuprvised')) {
+          teacherName = "Unsupervised";
+        } else if (teacherCodeLower.includes('free')) {
           subjectName = "Unsupervised Class";
-          teacherName = "-";
+          teacherName = "Unsupervised";
         }
+      }
+
+      if (isUnsupervisedCell) {
+        teacherName = "Unsupervised";
       }
 
       parsedParts.push({
@@ -158,13 +169,17 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
       teacher: teacherMerged,
       room: roomMerged
     };
-    if (isPracticalCell) {
-      res.isPractical = true;
-    }
+    if (isPracticalCell) res.isPractical = true;
+    if (isUnsupervisedCell) res.isUnsupervised = true;
     return res;
   } else {
     // Single part
-    let text = cellValue.trim();
+    let text = cellValue
+      .replace(/\(\s*\d*\s*practical\s+unsupervised\s*\)/gi, '')
+      .replace(/\(\s*unsupervised\s*\)/gi, '')
+      .replace(/\(\s*unsuprvised\s*\)/gi, '')
+      .trim();
+
     let room = defaultRoom;
 
     let groupLabel = "";
@@ -206,7 +221,7 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
 
     const teacherCodeLower = text.toLowerCase();
     let subjectName = text;
-    let teacherName = text;
+    let teacherName = isUnsupervisedCell ? "Unsupervised" : text;
 
     let found = facultyMap[teacherCodeLower];
     if (!found) {
@@ -221,14 +236,13 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
 
     if (found) {
       subjectName = found.paperName;
-      teacherName = found.facultyName;
+      if (!isUnsupervisedCell) teacherName = found.facultyName;
     } else {
-      if (teacherCodeLower.includes('unsupervised') || teacherCodeLower.includes('unsuprvised')) {
-        subjectName = "Free";
-        teacherName = "-";
-      } else if (teacherCodeLower.includes('free') || teacherCodeLower === 'ei' || teacherCodeLower === 'ee') {
+      if (isUnsupervisedCell || teacherCodeLower.includes('unsupervised') || teacherCodeLower.includes('unsuprvised')) {
+        teacherName = "Unsupervised";
+      } else if (teacherCodeLower.includes('free')) {
         subjectName = "Unsupervised Class";
-        teacherName = "-";
+        teacherName = "Unsupervised";
       }
     }
 
@@ -242,9 +256,8 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
       teacher: teacherName,
       room: room
     };
-    if (isPracticalCell) {
-      res.isPractical = true;
-    }
+    if (isPracticalCell) res.isPractical = true;
+    if (isUnsupervisedCell) res.isUnsupervised = true;
     return res;
   }
 }

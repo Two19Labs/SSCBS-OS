@@ -12,7 +12,7 @@ const TimetableContext = createContext({
   deleteHoliday: async () => {},
 });
 
-const CURRENT_TIMETABLE_VERSION = '2026-08-05-wef-v14';
+const CURRENT_TIMETABLE_VERSION = '2026-08-05-wef-v15';
 
 export const TimetableProvider = ({ children }) => {
   const [timetable, setTimetable] = useState(() => {

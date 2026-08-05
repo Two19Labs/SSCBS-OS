@@ -498,9 +498,10 @@
           },
           {
             "period": 4,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "Room 707"
+            "subject": "EE -1",
+            "teacher": "Unsupervised",
+            "room": "Room 707",
+            "isUnsupervised": true
           },
           {
             "period": 5,
@@ -526,9 +527,10 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "Room 733"
+            "subject": "EE -1",
+            "teacher": "Unsupervised",
+            "room": "Room 733",
+            "isUnsupervised": true
           },
           {
             "period": 2,
@@ -619,9 +621,10 @@
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "Room 733"
+            "subject": "IT Tools",
+            "teacher": "Unsupervised",
+            "room": "Room 733",
+            "isUnsupervised": true
           },
           {
             "period": 7,
@@ -881,9 +884,10 @@
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "Room 737"
+            "subject": "EE -1",
+            "teacher": "Unsupervised",
+            "room": "Room 737",
+            "isUnsupervised": true
           },
           {
             "period": 7,
@@ -1222,9 +1226,10 @@
         "Thursday": [
           {
             "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "Room 607"
+            "subject": "C&I",
+            "teacher": "Unsupervised",
+            "room": "Room 607",
+            "isUnsupervised": true
           },
           {
             "period": 2,
@@ -1524,9 +1529,10 @@
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "Room 603"
+            "subject": "C&I",
+            "teacher": "Unsupervised",
+            "room": "Room 603",
+            "isUnsupervised": true
           },
           {
             "period": 7,
@@ -1728,9 +1734,10 @@
           },
           {
             "period": 5,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "Room 644"
+            "subject": "C&I",
+            "teacher": "Unsupervised",
+            "room": "Room 644",
+            "isUnsupervised": true
           },
           {
             "period": 6,
@@ -2103,9 +2110,10 @@
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "Room 648"
+            "subject": "C&I",
+            "teacher": "Unsupervised",
+            "room": "Room 648",
+            "isUnsupervised": true
           },
           {
             "period": 7,
@@ -2225,9 +2233,10 @@
         "Wednesday": [
           {
             "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "Room 523"
+            "subject": "SOFP",
+            "teacher": "Unsupervised",
+            "room": "Room 523",
+            "isUnsupervised": true
           },
           {
             "period": 2,
@@ -2422,9 +2431,10 @@
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "Room 307"
+            "subject": "SOFP",
+            "teacher": "Unsupervised",
+            "room": "Room 307",
+            "isUnsupervised": true
           },
           {
             "period": 7,
@@ -2680,9 +2690,10 @@
           },
           {
             "period": 5,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "Room 361"
+            "subject": "SOFP",
+            "teacher": "Unsupervised",
+            "room": "Room 361",
+            "isUnsupervised": true
           },
           {
             "period": 6,
@@ -2840,9 +2851,10 @@
           },
           {
             "period": 5,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "Room 361"
+            "subject": "Financial Analytics",
+            "teacher": "Unsupervised",
+            "room": "Room 361",
+            "isUnsupervised": true
           },
           {
             "period": 6,
@@ -2913,9 +2925,10 @@
         "Monday": [
           {
             "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "Room 257"
+            "subject": "SOFP",
+            "teacher": "Unsupervised",
+            "room": "Room 257",
+            "isUnsupervised": true
           },
           {
             "period": 2,
@@ -3281,9 +3294,10 @@
         "Wednesday": [
           {
             "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "Room 303"
+            "subject": "Marketing Analytics",
+            "teacher": "Unsupervised",
+            "room": "Room 303",
+            "isUnsupervised": true
           },
           {
             "period": 2,
@@ -3947,8 +3961,9 @@
           {
             "period": 5,
             "subject": "EE-1",
-            "teacher": "EE-1",
-            "room": "Unsupervised"
+            "teacher": "Unsupervised",
+            "room": "Room 253",
+            "isUnsupervised": true
           },
           {
             "period": 6,
@@ -4106,9 +4121,10 @@
           },
           {
             "period": 5,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "Room 553"
+            "subject": "C&I",
+            "teacher": "Unsupervised",
+            "room": "Room 553",
+            "isUnsupervised": true
           },
           {
             "period": 6,
@@ -4284,9 +4300,10 @@
         "Tuesday": [
           {
             "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "Room 557"
+            "subject": "C&I",
+            "teacher": "Unsupervised",
+            "room": "Room 557",
+            "isUnsupervised": true
           },
           {
             "period": 2,
@@ -4695,9 +4712,10 @@
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "Room 503"
+            "subject": "SOFP",
+            "teacher": "Unsupervised",
+            "room": "Room 503",
+            "isUnsupervised": true
           },
           {
             "period": 7,
@@ -4852,9 +4870,10 @@
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "Room 507"
+            "subject": "SOFP",
+            "teacher": "Unsupervised",
+            "room": "Room 507",
+            "isUnsupervised": true
           },
           {
             "period": 7,
@@ -4905,9 +4924,10 @@
           },
           {
             "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "Room 507"
+            "subject": "Financial Analytics",
+            "teacher": "Unsupervised",
+            "room": "Room 507",
+            "isUnsupervised": true
           },
           {
             "period": 7,
@@ -5139,9 +5159,10 @@
           },
           {
             "period": 3,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "Room 533"
+            "subject": "Marketing Analytics",
+            "teacher": "Unsupervised",
+            "room": "Room 533",
+            "isUnsupervised": true
           },
           {
             "period": 0,
@@ -5499,9 +5520,10 @@
           {
             "period": 2,
             "subject": "EE Lab",
-            "teacher": "EE Lab",
-            "room": "unsupervised",
-            "isPractical": true
+            "teacher": "Unsupervised",
+            "room": "Room 403",
+            "isPractical": true,
+            "isUnsupervised": true
           },
           {
             "period": 3,
@@ -5938,9 +5960,10 @@
           {
             "period": 4,
             "subject": "EE Lab",
-            "teacher": "EE Lab",
-            "room": "unsupervised",
-            "isPractical": true
+            "teacher": "Unsupervised",
+            "room": "Room 457",
+            "isPractical": true,
+            "isUnsupervised": true
           },
           {
             "period": 5,
@@ -6212,9 +6235,10 @@
           {
             "period": 5,
             "subject": "EE Lab",
-            "teacher": "EE Lab",
-            "room": "unsupervised",
-            "isPractical": true
+            "teacher": "Unsupervised",
+            "room": "Room 435",
+            "isPractical": true,
+            "isUnsupervised": true
           },
           {
             "period": 6,
