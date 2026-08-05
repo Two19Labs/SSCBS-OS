@@ -253,8 +253,8 @@ function App() {
               { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
               { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
               { id: 'empty-room', micro: 'SOON', microClass: 'dim', title: 'Empty Room Finder', desc: 'Spot vacant classrooms & labs in real-time', Icon: DoorIcon, locked: true },
-              { id: 'society-tracker', micro: 'SOON', microClass: 'dim', title: 'Society Recruitment Tracker', desc: 'Keep track of information and form deadlines for your preferred societies', Icon: UsersIcon, locked: true },
-              { id: 'confessions-matchmaker', micro: 'SOON', microClass: 'dim', title: 'Campus Confessions & Matchmaker', desc: "we're thinking on this, dm to let us know you'd like this", Icon: HeartIcon, locked: true },
+              { id: 'society-tracker', micro: 'SOON', microClass: 'dim', title: 'Society Recruitment Tracker', desc: 'Keep track of info & form deadlines for societies', Icon: UsersIcon, locked: true },
+              { id: 'confessions-matchmaker', micro: 'SOON', microClass: 'dim', title: 'Campus Confessions & Matchmaker', desc: "We're still thinking on this, DM to let us know you'd like this :)", Icon: HeartIcon, locked: true },
             ].map(({ id, micro, microClass, title, desc, Icon, locked }) => (
               <button
                 key={id}
