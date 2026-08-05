@@ -294,6 +294,9 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                         <span className="live-dot"></span>
                         Ongoing Now
                       </span>
+                      {(activeClass.isPractical || /\b\(P\)\b/i.test(activeClass.subject) || /\bPractical\b/i.test(activeClass.subject)) && (
+                        <span className="badge-practical">🧪 Practical</span>
+                      )}
                       {resolveRoom(activeClass.room) && resolveRoom(activeClass.room) !== '-' && (
                         <span className="room-label">
                           <strong className="highlight-tag">
@@ -381,7 +384,12 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                       </svg>
                     </div>
                     <div className="next-class-info">
-                      <p className="next-sub">{nextClass.subject}</p>
+                      <div className="next-sub-container" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <p className="next-sub">{nextClass.subject}</p>
+                        {(nextClass.isPractical || /\b\(P\)\b/i.test(nextClass.subject) || /\bPractical\b/i.test(nextClass.subject)) && (
+                          <span className="badge-practical-sm">Practical</span>
+                        )}
+                      </div>
                       <p className="next-details">
                         {resolveRoom(nextClass.room) && `${resolveRoom(nextClass.room)} • `} 
                         {PERIODS.find(p => p.id === nextClass.period || (nextClass.isBreak && p.id === 0))?.startLabel}
@@ -428,9 +436,14 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                             <span>{periodInfo.startLabel}</span>
                           </div>
                           <div className="timeline-slot-content">
-                            <h5 className="slot-subject" title={cls.isBreak ? "Break" : cls.subject}>
-                              {cls.isBreak ? "Break" : cls.subject}
-                            </h5>
+                            <div className="timeline-subject-header" style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                              <h5 className="slot-subject" title={cls.isBreak ? "Break" : cls.subject}>
+                                {cls.isBreak ? "Break" : cls.subject}
+                              </h5>
+                              {!cls.isBreak && (cls.isPractical || /\b\(P\)\b/i.test(cls.subject) || /\bPractical\b/i.test(cls.subject)) && (
+                                <span className="badge-practical-xs">Practical</span>
+                              )}
+                            </div>
                             {!cls.isBreak && cls.subject !== 'Free' && resolveRoom(cls.room) ? (
                               <p className="slot-meta" title={`${resolveRoom(cls.room)} • ${cls.teacher}`}>{resolveRoom(cls.room)} • {cls.teacher}</p>
                             ) : (
@@ -627,8 +640,11 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                                   </div>
                                 ) : (
                                   <div className="timeline-class-card">
-                                    <div className="timeline-card-header">
+                                    <div className="timeline-card-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
                                       <h4 className="timeline-subject">{matchClass.subject}</h4>
+                                      {(matchClass.isPractical || /\b\(P\)\b/i.test(matchClass.subject) || /\bPractical\b/i.test(matchClass.subject)) && (
+                                        <span className="badge-practical-sm">Practical</span>
+                                      )}
                                     </div>
                                     <div className="timeline-card-meta">
                                       {matchClass.teacher && matchClass.teacher !== '-' && (
@@ -710,7 +726,12 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
                                       </div>
                                     ) : (
                                       <div className="grid-cell-card">
-                                        {isCellActive && <span className="live-cell-badge">LIVE</span>}
+                                        <div className="grid-cell-badges" style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '2px' }}>
+                                          {isCellActive && <span className="live-cell-badge">LIVE</span>}
+                                          {(matchClass.isPractical || /\b\(P\)\b/i.test(matchClass.subject) || /\bPractical\b/i.test(matchClass.subject)) && (
+                                            <span className="grid-practical-badge" title="Practical Class">P</span>
+                                          )}
+                                        </div>
                                         <div className="cell-subject">{matchClass.subject}</div>
                                         <div className="cell-details-row">
                                           {matchClass.teacher && matchClass.teacher !== '-' && (

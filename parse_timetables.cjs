@@ -39,6 +39,8 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
     return { period: periodId, subject: "Free", teacher: "-", room: "-" };
   }
 
+  const isPracticalCell = /\b\(P\)\b/i.test(cellValue) || /\bPractical\b/i.test(cellValue) || /\bLab\b/i.test(cellValue) || cellValue.trim().endsWith('(P)');
+
   const parts = splitOutsideParentheses(cellValue);
   if (parts.length > 1) {
     const parsedParts = [];
@@ -62,18 +64,26 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
 
       const partRoomMatch = partText.match(/\(([^)]+)\)/);
       if (partRoomMatch) {
-        const roomVal = partRoomMatch[1];
-        partRoom = roomVal.split('/').map(r => {
-          let rClean = r.trim();
-          return rClean.match(/^\d+/) ? `Room ${rClean}` : rClean;
-        }).join(' / ');
-        partText = partText.replace(/\([^)]+\)/, '').trim();
+        const roomVal = partRoomMatch[1].trim();
+        if (roomVal.toUpperCase() === 'P' || roomVal.toLowerCase() === 'practical') {
+          partText = partText.replace(/\([^)]+\)/, '').trim();
+        } else {
+          partRoom = roomVal.split('/').map(r => {
+            let rClean = r.trim();
+            return rClean.match(/^\d+/) ? `Room ${rClean}` : rClean;
+          }).join(' / ');
+          partText = partText.replace(/\([^)]+\)/, '').trim();
+        }
       } else {
         const labRoomMatch = partText.match(/Lab\s*(\d{3})/i) || partText.match(/Room\s*(\d{3})/i) || partText.match(/\s+(\d{3})$/);
         if (labRoomMatch) {
           partRoom = `Room ${labRoomMatch[1]}`;
           partText = partText.replace(/Lab\s*\d{3}/i, '').replace(/Room\s*\d{3}/i, '').replace(/\s+\d{3}$/, '').trim();
         }
+      }
+
+      if (partRoom.toUpperCase() === 'ROOM P' || partRoom.toUpperCase() === 'P') {
+        partRoom = defaultRoom;
       }
 
       const teacherCodeLower = partText.trim().toLowerCase();
@@ -142,12 +152,16 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
       }).join(' / ');
     }
 
-    return {
+    const res = {
       period: periodId,
       subject: subjectMerged,
       teacher: teacherMerged,
       room: roomMerged
     };
+    if (isPracticalCell) {
+      res.isPractical = true;
+    }
+    return res;
   } else {
     // Single part
     let text = cellValue.trim();
@@ -168,18 +182,26 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
 
     const roomMatch = text.match(/\(([^)]+)\)/);
     if (roomMatch) {
-      const roomVal = roomMatch[1];
-      room = roomVal.split('/').map(r => {
-        let rClean = r.trim();
-        return rClean.match(/^\d+/) ? `Room ${rClean}` : rClean;
-      }).join(' / ');
-      text = text.replace(/\([^)]+\)/, '').trim();
+      const roomVal = roomMatch[1].trim();
+      if (roomVal.toUpperCase() === 'P' || roomVal.toLowerCase() === 'practical') {
+        text = text.replace(/\([^)]+\)/, '').trim();
+      } else {
+        room = roomVal.split('/').map(r => {
+          let rClean = r.trim();
+          return rClean.match(/^\d+/) ? `Room ${rClean}` : rClean;
+        }).join(' / ');
+        text = text.replace(/\([^)]+\)/, '').trim();
+      }
     } else {
       const labRoomMatch = text.match(/Lab\s*(\d{3})/i) || text.match(/Room\s*(\d{3})/i) || text.match(/\s+(\d{3})$/);
       if (labRoomMatch) {
         room = `Room ${labRoomMatch[1]}`;
         text = text.replace(/Lab\s*\d{3}/i, '').replace(/Room\s*\d{3}/i, '').replace(/\s+\d{3}$/, '').trim();
       }
+    }
+
+    if (room.toUpperCase() === 'ROOM P' || room.toUpperCase() === 'P') {
+      room = defaultRoom;
     }
 
     const teacherCodeLower = text.toLowerCase();
@@ -214,18 +236,22 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
       subjectName = `${subjectName} (${groupLabel})`;
     }
 
-    return {
+    const res = {
       period: periodId,
       subject: subjectName,
       teacher: teacherName,
       room: room
     };
+    if (isPracticalCell) {
+      res.isPractical = true;
+    }
+    return res;
   }
 }
 
-// 1. PARSE BBA & BMS WORKBOOK (`TT wef  28.07.2026.xlsx`)
-console.log('--- Processing TT wef  28.07.2026.xlsx ---');
-const wbBBA = XLSX.readFile('TT wef  28.07.2026.xlsx');
+// 1. PARSE BBA & BMS WORKBOOK (`TT_wef  05.08.2026.xlsx`)
+console.log('--- Processing TT_wef  05.08.2026.xlsx ---');
+const wbBBA = XLSX.readFile('TT_wef  05.08.2026.xlsx');
 
 const bbaSheets = [
   { name: 'BMS Sem-1', defaultCourse: 'BMS', defaultSem: '1' },
@@ -297,7 +323,6 @@ bbaSheets.forEach(({ name, defaultCourse, defaultSem }) => {
 
     if (periodRowIdx === -1) return;
 
-    // Dynamically find day rows and column offset for this block
     const dayRows = {};
     for (let r = timingsRowIdx + 1; r <= timingsRowIdx + 10; r++) {
       const row = data[r] || [];
@@ -310,7 +335,6 @@ bbaSheets.forEach(({ name, defaultCourse, defaultSem }) => {
       }
     }
 
-    // Extract faculty map for this block
     const facultyMap = {};
     for (let r = timingsRowIdx + 7; r < timingsRowIdx + 35; r++) {
       const row = data[r] || [];
@@ -394,9 +418,9 @@ bbaSheets.forEach(({ name, defaultCourse, defaultSem }) => {
   });
 });
 
-// 2. PARSE BSC COMP SCI WORKBOOK (`TT_JULY 2026.xlsx`)
-console.log('\n--- Processing TT_JULY 2026.xlsx ---');
-const wbBSC = XLSX.readFile('TT_JULY 2026.xlsx');
+// 2. PARSE BSC COMP SCI WORKBOOK (`TT_JULY 2026 (1).xlsx`)
+console.log('\n--- Processing TT_JULY 2026 (1).xlsx ---');
+const wbBSC = XLSX.readFile('TT_JULY 2026 (1).xlsx');
 const bscSheet = wbBSC.Sheets['Classwise'];
 
 if (bscSheet) {
