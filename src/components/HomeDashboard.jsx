@@ -4,7 +4,7 @@ import { useConfig } from '../context/ConfigContext';
 import { useTimetable } from '../context/TimetableContext';
 import { PERIODS, DAYS } from '../data/timetables';
 import NoticeBoard from './NoticeBoard';
-import { SearchIcon, PercentIcon, CalculatorIcon, FileIcon, TrophyIcon } from './icons';
+import { SearchIcon, PercentIcon, CalculatorIcon, FileIcon, TrophyIcon, DoorIcon, HeartIcon, UsersIcon } from './icons';
 import { isAdminEmail, canAccessTeamFinder } from '../lib/admin';
 import './HomeDashboard.css';
 
@@ -256,6 +256,9 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
     { id: 'waiver', micro: 'SOON', microClass: 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
     { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
     { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
+    { id: 'empty-room', micro: 'SOON', microClass: 'dim', title: 'Empty Room Finder', desc: 'Spot vacant classrooms & labs in real-time', Icon: DoorIcon, locked: true },
+    { id: 'society-tracker', micro: 'SOON', microClass: 'dim', title: 'Society Recruitment Tracker', desc: 'Keep track of information and form deadlines for your preferred societies', Icon: UsersIcon, locked: true },
+    { id: 'confessions-matchmaker', micro: 'SOON', microClass: 'dim', title: 'Campus Confessions & Matchmaker', desc: "we're thinking on this, dm to let us know you'd like this", Icon: HeartIcon, locked: true },
   ];
 
   return (

@@ -184,11 +184,26 @@ export const MoreVerticalIcon = ({ size = 18 }) => (
   </svg>
 );
 
+export const DoorIcon = ({ filled, size = 18 }) => (
+  <svg {...base(filled)} width={size} height={size}>
+    <path d="M18 20V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14" />
+    <path d="M2 20h20" />
+    <circle cx="14" cy="12" r="1" fill="currentColor" />
+  </svg>
+);
+
+export const HeartIcon = ({ filled, size = 18 }) => (
+  <svg {...base(filled)} width={size} height={size}>
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.78-8.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+  </svg>
+);
+
 export const RefreshIcon = ({ size = 18, className = '' }) => (
   <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M21.5 2v6h-6M2.5 22v-6h6" />
     <path d="M2 11.5a10 10 0 0 1 18.8-4.3L21.5 8M22 12.5a10 10 0 0 1-18.8 4.3L2.5 16" />
   </svg>
 );
+
 
 
