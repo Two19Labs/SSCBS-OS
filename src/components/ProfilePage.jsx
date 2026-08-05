@@ -79,7 +79,7 @@ export default function ProfilePage({ onNavigate }) {
   const handleRequestDrafterAccess = async (e) => {
     e.preventDefault();
     if (!societyNote.trim()) {
-      setRequestMsg({ type: 'error', text: 'Please describe your society & position (e.g. President, Enactus SSCBS).' });
+      setRequestMsg({ type: 'error', text: 'Please describe your society & position (e.g. Coordinator, Rotaract).' });
       return;
     }
 
@@ -339,7 +339,7 @@ export default function ProfilePage({ onNavigate }) {
                   <input
                     type="text"
                     className="drafter-input"
-                    placeholder="e.g. President, Enactus SSCBS or Member, MarkUs"
+                    placeholder="e.g. Coordinator, Rotaract"
                     value={societyNote}
                     onChange={(e) => setSocietyNote(e.target.value)}
                     required
