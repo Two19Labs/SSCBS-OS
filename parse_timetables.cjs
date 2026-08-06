@@ -98,9 +98,10 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
         partText = partText.replace(/Lab\s*\d{3}/i, '').replace(/Room\s*\d{3}/i, '').replace(/\s+\d{3}$/, '').trim();
       }
 
-      if (partRoom.toUpperCase() === 'ROOM P' || partRoom.toUpperCase() === 'P') {
+      if (!/\d{3}|Lab/i.test(partRoom)) {
         partRoom = defaultRoom;
       }
+
 
       const teacherCodeLower = partText.trim().toLowerCase();
       let subjectName = explicitSubject || partText.trim();
@@ -232,9 +233,10 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
       }
     }
 
-    if (room.toUpperCase() === 'ROOM P' || room.toUpperCase() === 'P') {
+    if (!/\d{3}|Lab/i.test(room)) {
       room = defaultRoom;
     }
+
 
     const teacherCodeLower = text.toLowerCase();
     let subjectName = text;

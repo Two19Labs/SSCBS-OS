@@ -21,27 +21,28 @@ export function extractRoomsFromText(roomStr) {
 
   const rooms = new Set();
 
+  // Match 3-digit room numbers (e.g. 203, 503, 703, 426)
+  const numMatches = text.match(/\b\d{3}\b/g);
+  if (numMatches) {
+    numMatches.forEach(num => {
+      rooms.add(`Room ${num}`);
+    });
+  }
+
   // Match Lab numbers e.g. "Lab 426", "Lab 460"
   const labMatches = text.match(/Lab\s*(\d{3})/gi);
   if (labMatches) {
     labMatches.forEach(lab => {
       const numMatch = lab.match(/\d{3}/);
-      if (numMatch) rooms.add(`Lab ${numMatch[0]}`);
-    });
-  }
-
-  // Match 3-digit room numbers
-  const numMatches = text.match(/\b\d{3}\b/g);
-  if (numMatches) {
-    numMatches.forEach(num => {
-      if (!rooms.has(`Lab ${num}`)) {
-        rooms.add(`Room ${num}`);
+      if (numMatch) {
+        rooms.add(`Room ${numMatch[0]}`);
       }
     });
   }
 
   return Array.from(rooms);
 }
+
 
 /**
  * Extract all unique active rooms directly from timetables data.

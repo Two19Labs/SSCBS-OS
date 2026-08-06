@@ -775,7 +775,7 @@
             "period": 5,
             "subject": "Statistics for Business Decisions",
             "teacher": "Dr. Satish Kumar Goel",
-            "room": "Tute"
+            "room": "Room 733"
           },
           {
             "period": 6,
@@ -1312,13 +1312,13 @@
             "period": 5,
             "subject": "Hindi B",
             "teacher": "Dr. Garima Tripathi",
-            "room": "Hin B"
+            "room": "Room 607"
           },
           {
             "period": 6,
             "subject": "Hindi B",
             "teacher": "Dr. Garima Tripathi",
-            "room": "Hin B"
+            "room": "Room 607"
           },
           {
             "period": 7,
@@ -1417,13 +1417,13 @@
             "period": 5,
             "subject": "Hindi C (Merged with BMS 3A)",
             "teacher": "Dr. Soumya Guliyan",
-            "room": "Hin B"
+            "room": "Room 603"
           },
           {
             "period": 6,
             "subject": "Hindi C (Merged with BMS 3A)",
             "teacher": "Dr. Soumya Guliyan",
-            "room": "Hin B"
+            "room": "Room 603"
           },
           {
             "period": 7,
@@ -1771,7 +1771,7 @@
             "period": 3,
             "subject": "The Art of Being Happy | Social and Emotional Learning (Merged with BBA 3B)",
             "teacher": "Ms. Kishori Ravi Shankar / Dr. Sushmita",
-            "room": "Room 644 / VAC"
+            "room": "Room 644"
           },
           {
             "period": 0,
@@ -1810,19 +1810,19 @@
             "period": 1,
             "subject": "Hindi B",
             "teacher": "Ms. Komal",
-            "room": "Hin B"
+            "room": "Room 644"
           },
           {
             "period": 2,
             "subject": "Hindi B",
             "teacher": "Ms. Komal",
-            "room": "Hin B"
+            "room": "Room 644"
           },
           {
             "period": 3,
             "subject": "Social and Emotional Learning (Merged with BBA 3B)",
             "teacher": "Dr. Sushmita",
-            "room": "VAC"
+            "room": "Room 644"
           },
           {
             "period": 0,
@@ -2053,13 +2053,13 @@
             "period": 5,
             "subject": "Hindi B",
             "teacher": "Dr. Garima TripathI",
-            "room": "Hin B"
+            "room": "Room 648"
           },
           {
             "period": 6,
             "subject": "Hindi B",
             "teacher": "Dr. Garima TripathI",
-            "room": "Hin B"
+            "room": "Room 648"
           },
           {
             "period": 7,
@@ -2299,7 +2299,7 @@
             "period": 3,
             "subject": "Startup Operations & Future Proofing",
             "teacher": "Dr. Paridhi",
-            "room": "Startup"
+            "room": "Room 523"
           },
           {
             "period": 0,
@@ -2508,7 +2508,7 @@
             "period": 2,
             "subject": "Legal Aspects of Business",
             "teacher": "Ms. Monu",
-            "room": "Tute"
+            "room": "Room 307"
           },
           {
             "period": 3,
@@ -2806,7 +2806,7 @@
             "period": 6,
             "subject": "Security Analysis & Portfolio Management | Marketing of Services",
             "teacher": "Dr. Neeraj Kumar Sehrawat / Mr. Tushar Marwaha",
-            "room": "Tute / Room 303"
+            "room": "Room 361 / Room 303"
           },
           {
             "period": 7,
@@ -2905,13 +2905,13 @@
             "period": 5,
             "subject": "New Age Marketing",
             "teacher": "Mr. Abhimanyu Verma",
-            "room": "Tute"
+            "room": "Room 361"
           },
           {
             "period": 6,
             "subject": "Security Analysis & Portfolio Management",
             "teacher": "Dr. Neeraj Kumar Sehrawat",
-            "room": "Tute"
+            "room": "Room 361"
           },
           {
             "period": 7,
@@ -3096,7 +3096,7 @@
             "period": 3,
             "subject": "G?: Consumer Behvaiour | G1: Marketing of Services",
             "teacher": "Dr. Anuja Mathur (G?) / Mr. Tushar Marwaha (G1)",
-            "room": "G?: Tute / G1: Room 257"
+            "room": "Room 257"
           },
           {
             "period": 0,
@@ -3237,7 +3237,7 @@
             "period": 7,
             "subject": "Research Methodology",
             "teacher": "Dr. Satish Kumar Goel",
-            "room": "Tute"
+            "room": "Room 303"
           }
         ],
         "Tuesday": [
@@ -3257,7 +3257,7 @@
             "period": 3,
             "subject": "Social Media Analytics (Merged with BBA 7A + BSc 7)",
             "teacher": "Mr. Rohan Gulati",
-            "room": "Tute"
+            "room": "Room 303"
           },
           {
             "period": 0,
@@ -3288,7 +3288,7 @@
             "period": 7,
             "subject": "Marketing of Services (Merged with BMS 5C)",
             "teacher": "Mr. Tushar Marwaha",
-            "room": "Tute"
+            "room": "Room 303"
           }
         ],
         "Wednesday": [
@@ -3548,13 +3548,13 @@
             "period": 6,
             "subject": "Constitutional Values and Fundamental Duties (Merged with BMS 1A) | Fit India",
             "teacher": "Ms. Sunita Tank / Ms. Nisha Rajput",
-            "room": "Merged with BMS 1A / Room 203"
+            "room": "Room 203"
           },
           {
             "period": 7,
             "subject": "Constitutional Values and Fundamental Duties (Merged with BMS 1A) | Fit India",
             "teacher": "Ms. Sunita Tank / Ms. Nisha Rajput",
-            "room": "Merged with BMS 1A / Room 203"
+            "room": "Room 203"
           }
         ],
         "Wednesday": [
@@ -3587,7 +3587,7 @@
             "period": 4,
             "subject": "Statistics for Business Decisions",
             "teacher": "Dr. Rishi Rajan Sahay",
-            "room": "T"
+            "room": "Room 203"
           },
           {
             "period": 5,
@@ -3651,7 +3651,7 @@
             "period": 6,
             "subject": "Constitutional Values and Fundamental Duties (Merged with BMS 1A) | Fit India",
             "teacher": "Ms. Sunita Tank / Ms. Nisha Rajput",
-            "room": "Merged with BMS 1A / Room 203"
+            "room": "Room 203"
           },
           {
             "period": 7,
@@ -4229,13 +4229,13 @@
             "period": 5,
             "subject": "Hindi C (Merged  BMS 3A)",
             "teacher": "Dr. Soumya Guliyan",
-            "room": "Hin B"
+            "room": "Room 553"
           },
           {
             "period": 6,
             "subject": "Hindi C (Merged  BMS 3A)",
             "teacher": "Dr. Soumya Guliyan",
-            "room": "Hin B"
+            "room": "Room 553"
           },
           {
             "period": 7,
@@ -4276,13 +4276,13 @@
             "period": 4,
             "subject": "Hindi D (Merged BMS 3D)",
             "teacher": "Mr. Komal",
-            "room": "Hin B"
+            "room": "Room 557"
           },
           {
             "period": 5,
             "subject": "Hindi D (Merged BMS 3D)",
             "teacher": "Mr. Komal",
-            "room": "Hin B"
+            "room": "Room 557"
           },
           {
             "period": 6,
@@ -4760,7 +4760,7 @@
             "period": 5,
             "subject": "Insurance Management",
             "teacher": "Dr. Ishan Luthra",
-            "room": "Tute"
+            "room": "Room 503"
           },
           {
             "period": 6,
@@ -5004,7 +5004,7 @@
             "period": 3,
             "subject": "Management of Financial Institutions | Insurance Management",
             "teacher": "Dr. Kumar Bijoy / Dr. Ishan Luthra",
-            "room": "Tute"
+            "room": "Room 507"
           },
           {
             "period": 0,
@@ -5110,7 +5110,7 @@
             "period": 3,
             "subject": "Social Media Analytics (Merged with BMS 7A + BSc 7)",
             "teacher": "Mr. Rohan Gulati",
-            "room": "Tute"
+            "room": "Room 533"
           },
           {
             "period": 0,
@@ -5141,7 +5141,7 @@
             "period": 7,
             "subject": "Infrastructure Finance",
             "teacher": "Dr. Amit Kumar",
-            "room": "Tute"
+            "room": "Room 533"
           }
         ],
         "Wednesday": [
@@ -5335,7 +5335,7 @@
             "period": 4,
             "subject": "Front End Programming",
             "teacher": "Kavita Rastogi",
-            "room": "SEC Room"
+            "room": "Room 403"
           },
           {
             "period": 5,
@@ -5419,7 +5419,7 @@
             "period": 2,
             "subject": "Front End Programming",
             "teacher": "Kavita Rastogi",
-            "room": "Python"
+            "room": "Room 403"
           },
           {
             "period": 3,
@@ -5470,7 +5470,7 @@
             "period": 2,
             "subject": "Front End Programming",
             "teacher": "Kavita Rastogi",
-            "room": "Python"
+            "room": "Room 403"
           },
           {
             "period": 3,
@@ -5515,7 +5515,7 @@
             "period": 1,
             "subject": "Front End Programming",
             "teacher": "Kavita Rastogi",
-            "room": "Python"
+            "room": "Room 403"
           },
           {
             "period": 2,
@@ -5529,7 +5529,7 @@
             "period": 3,
             "subject": "Front End Programming",
             "teacher": "Kavita Rastogi",
-            "room": "SEC Room"
+            "room": "Room 403"
           },
           {
             "period": 0,
@@ -5668,7 +5668,7 @@
             "period": 7,
             "subject": "Hindi C",
             "teacher": "Soumya Guliyan",
-            "room": "Hindi B"
+            "room": "Room 407"
           }
         ],
         "Wednesday": [
@@ -5707,7 +5707,7 @@
             "period": 5,
             "subject": "Hindi C",
             "teacher": "Soumya Guliyan",
-            "room": "Hindi B"
+            "room": "Room 407"
           },
           {
             "period": 6,
@@ -5864,13 +5864,13 @@
             "period": 5,
             "subject": "Introduction to Blockchain",
             "teacher": "Ayushi Gupta",
-            "room": "Th"
+            "room": "Room 457"
           },
           {
             "period": 6,
             "subject": "Introduction to Blockchain",
             "teacher": "Ayushi Gupta",
-            "room": "SEC Room"
+            "room": "Room 457"
           },
           {
             "period": 7,
@@ -5915,13 +5915,13 @@
             "period": 5,
             "subject": "Introduction to Blockchain",
             "teacher": "Ayushi Gupta",
-            "room": "Th"
+            "room": "Room 457"
           },
           {
             "period": 6,
             "subject": "Introduction to Blockchain",
             "teacher": "Ayushi Gupta",
-            "room": "SEC Room"
+            "room": "Room 457"
           },
           {
             "period": 7,
@@ -6043,7 +6043,7 @@
             "period": 1,
             "subject": "Introduction to Blockchain",
             "teacher": "Ayushi Gupta",
-            "room": "Th"
+            "room": "Room 457"
           },
           {
             "period": 2,
