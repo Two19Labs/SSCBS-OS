@@ -1,37 +1,46 @@
+/* ═══════════════════════════════════════════════════════════
+   Empty Room Finder — SSCBS Campus OS Design System Integration
+   ═══════════════════════════════════════════════════════════ */
+
 .empty-room-page {
-  padding: 16px;
-  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: var(--content-max, 1160px);
   margin: 0 auto;
-  min-height: calc(100vh - 70px);
-  padding-bottom: 80px;
+  padding: 0 var(--page-pad-x, 16px) 80px var(--page-pad-x, 16px);
+  animation: fadeIn 0.25s ease-in-out forwards;
 }
 
-/* Header */
+/* Nav Header */
 .empty-room-header {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 16px;
+  margin-bottom: 4px;
 }
 
 .empty-room-back-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: var(--surface);
+  gap: 8px;
+  background: var(--tint);
   border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 6px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-primary);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 0.825rem;
+  padding: 8px 16px;
+  border-radius: 8px;
   cursor: pointer;
   width: fit-content;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
 }
 
 .empty-room-back-btn:hover {
-  background: var(--surface-hover, rgba(255, 255, 255, 0.08));
+  background: var(--border);
   transform: translateX(-2px);
 }
 
@@ -54,44 +63,59 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: rgba(184, 134, 11, 0.15);
-  color: var(--accent-gold, #b8860b);
+  background: var(--gold-tint);
+  color: var(--gold-text);
 }
 
 .empty-room-title-row h2 {
-  font-size: 22px;
+  font-size: 1.5rem;
   font-weight: 800;
   margin: 0;
-  color: var(--text-primary);
+  color: var(--ink);
   letter-spacing: -0.02em;
 }
 
 .empty-room-subtitle {
-  font-size: 13px;
-  color: var(--text-secondary);
+  font-size: 0.85rem;
+  color: var(--ink-dim);
   margin: 0;
+}
+
+/* Micro label badge */
+.micro-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.micro-label.success {
+  background: var(--success-tint);
+  color: var(--success);
+  border: 1px solid rgba(11, 122, 84, 0.2);
 }
 
 /* Controls Card */
 .empty-room-controls-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 14px;
+  border-radius: 14px;
+  padding: 14px 18px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  margin-bottom: 14px;
 }
 
 .empty-room-mode-toggle {
   display: inline-flex;
-  background: var(--surface-card, rgba(0, 0, 0, 0.06));
+  background: var(--tint);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 4px;
+  border-radius: 10px;
+  padding: 3px;
   gap: 4px;
 }
 
@@ -100,35 +124,35 @@
   align-items: center;
   gap: 6px;
   padding: 7px 16px;
-  border-radius: 8px;
+  border-radius: 7px;
   border: none;
   background: transparent;
-  color: var(--text-secondary);
-  font-size: 13px;
+  color: var(--ink-dim);
+  font-size: 0.825rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .mode-btn:hover:not(.active) {
-  background: var(--surface-hover, rgba(0, 0, 0, 0.05));
-  color: var(--text-primary);
+  color: var(--ink);
+  background: var(--border);
 }
 
 .mode-btn.active {
-  background: var(--text-primary, #111827);
-  color: var(--surface, #ffffff);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 .live-dot {
-  color: #10b981;
-  font-size: 10px;
+  color: var(--success);
+  font-size: 9px;
   animation: livePulse 1.8s infinite;
 }
 
 .mode-btn.active .live-dot {
-  color: #34d399;
+  color: #a7f3d0;
 }
 
 @keyframes livePulse {
@@ -137,46 +161,47 @@
   100% { opacity: 1; transform: scale(1); }
 }
 
-
-/* Real-time IST Clock Badge */
+/* IST Clock Badge */
 .ist-clock-badge {
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(184, 134, 11, 0.12);
-  border: 1px solid rgba(184, 134, 11, 0.3);
+  gap: 8px;
+  background: var(--tint);
+  border: 1px solid var(--border);
   border-radius: 20px;
   padding: 6px 14px;
-  font-size: 13px;
+  font-size: 0.825rem;
   font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: 0.02em;
+  color: var(--ink);
 }
 
 .ist-clock-icon {
-  font-size: 13px;
+  font-size: 0.85rem;
 }
 
 .ist-clock-label {
-  font-size: 10px;
+  font-size: 0.65rem;
   font-weight: 900;
-  color: var(--accent-gold, #b8860b);
+  color: var(--gold-text);
   letter-spacing: 0.08em;
-  background: rgba(184, 134, 11, 0.2);
-  padding: 1px 5px;
+  background: var(--gold-tint);
+  padding: 1px 6px;
   border-radius: 4px;
 }
 
 .ist-clock-time {
-  font-family: var(--font-mono, monospace), sans-serif;
-  color: var(--text-primary);
+  font-family: var(--mono);
+  color: var(--ink);
+  font-size: 0.875rem;
 }
 
+/* Slot Selectors */
 .empty-room-slot-selectors {
   display: flex;
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
+  animation: fadeIn 0.2s ease;
 }
 
 .selector-group {
@@ -186,130 +211,71 @@
 }
 
 .selector-group label {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-secondary);
+  font-size: 0.725rem;
+  font-weight: 800;
+  color: var(--ink-dim);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
 .selector-group select {
   background: var(--surface);
   border: 1px solid var(--border);
-  color: var(--text-primary);
+  color: var(--ink);
   border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 13px;
-  font-weight: 600;
+  padding: 6px 12px;
+  font-size: 0.825rem;
+  font-weight: 700;
   outline: none;
   cursor: pointer;
+  font-family: inherit;
 }
 
-/* College Closed State Card */
-.college-closed-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 30px 10px;
-  width: 100%;
-}
-
-.college-closed-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 36px 24px;
-  text-align: center;
-  max-width: 480px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 0.25s ease;
-}
-
-.closed-icon-badge {
-  font-size: 40px;
-  line-height: 1;
-  background: rgba(184, 134, 11, 0.12);
-  border-radius: 50%;
-  width: 72px;
-  height: 72px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.college-closed-card h3 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--text-primary);
-  letter-spacing: -0.01em;
-}
-
-.college-closed-card p {
-  margin: 0;
-  font-size: 13.5px;
-  color: var(--text-secondary);
-  line-height: 1.5;
-}
-
-.switch-slot-btn {
-  margin-top: 8px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--accent-gold, #b8860b);
-  color: #ffffff;
-  border: none;
-  border-radius: 12px;
-  padding: 10px 20px;
-  font-size: 13.5px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.switch-slot-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(184, 134, 11, 0.35);
+.selector-group select:focus {
+  border-color: var(--accent);
 }
 
 /* Active Banner */
 .empty-room-active-banner {
-
-  background: linear-gradient(135deg, rgba(184, 134, 11, 0.1) 0%, rgba(139, 0, 0, 0.1) 100%);
-  border: 1px solid rgba(184, 134, 11, 0.25);
+  background: var(--tint);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 10px 14px;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 10px;
+}
+
+.empty-room-active-banner.holiday {
+  background: var(--gold-tint);
+  border-color: rgba(176, 141, 62, 0.3);
+}
+
+.empty-room-active-banner.closed {
+  background: var(--tint);
+  border-color: var(--border-strong);
 }
 
 .banner-left {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--ink);
 }
 
 .banner-divider {
-  color: var(--text-secondary);
+  color: var(--ink-dim);
   opacity: 0.5;
 }
 
 .banner-time {
-  font-size: 12.5px;
+  font-size: 0.8rem;
   font-weight: 500;
-  color: var(--text-secondary);
+  color: var(--ink-dim);
 }
 
 .banner-right {
@@ -319,22 +285,34 @@
 }
 
 .stat-pill {
-  font-size: 12px;
+  font-size: 0.775rem;
   font-weight: 700;
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 20px;
 }
 
 .stat-pill.vacant {
-  background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  background: var(--success-tint);
+  color: var(--success);
+  border: 1px solid rgba(11, 122, 84, 0.25);
 }
 
 .stat-pill.occupied {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(185, 28, 28, 0.08);
+  color: var(--danger);
+  border: 1px solid rgba(185, 28, 28, 0.25);
+}
+
+.stat-pill.holiday {
+  background: var(--gold-tint);
+  color: var(--gold-text);
+  border: 1px solid rgba(176, 141, 62, 0.3);
+}
+
+.stat-pill.closed {
+  background: var(--tint);
+  color: var(--ink-dim);
+  border: 1px solid var(--border);
 }
 
 /* Filter Bar */
@@ -342,17 +320,16 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-bottom: 16px;
 }
 
 .room-search-box {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 8px 12px;
+  padding: 10px 14px;
 }
 
 .room-search-box input {
@@ -360,15 +337,20 @@
   background: transparent;
   border: none;
   outline: none;
-  color: var(--text-primary);
-  font-size: 13.5px;
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-family: inherit;
+}
+
+.room-search-box input::placeholder {
+  color: var(--ink-faint);
 }
 
 .search-clear-btn {
   background: transparent;
   border: none;
-  color: var(--text-secondary);
-  font-size: 16px;
+  color: var(--ink-dim);
+  font-size: 1.1rem;
   cursor: pointer;
   padding: 0 4px;
 }
@@ -379,13 +361,15 @@
   align-items: center;
   gap: 6px;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding-bottom: 2px;
 }
 
 .floor-label {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   margin-right: 4px;
 }
 
@@ -393,64 +377,70 @@
 .floor-pill {
   background: var(--surface);
   border: 1px solid var(--border);
-  color: var(--text-secondary);
+  color: var(--ink-dim);
   border-radius: 8px;
-  padding: 5px 12px;
-  font-size: 12.5px;
-  font-weight: 600;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
   transition: all 0.15s ease;
+  font-family: inherit;
 }
 
 .filter-pill.active,
 .floor-pill.active {
-  background: var(--accent-gold, #b8860b);
-  border-color: var(--accent-gold, #b8860b);
-  color: #fff;
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--on-ink);
+}
+
+.filter-pill:hover:not(.active),
+.floor-pill:hover:not(.active) {
+  background: var(--tint);
+  color: var(--ink);
 }
 
 /* Room Grid */
 .room-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 12px;
+  gap: 14px;
 }
 
 .room-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
-  padding: 14px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .room-card.vacant {
-  border-left: 4px solid #10b981;
+  border-left: 4px solid var(--success);
 }
 
 .room-card.occupied {
-  border-left: 4px solid #ef4444;
+  border-left: 4px solid var(--danger);
 }
 
 .room-card.closed {
-  border-left: 4px solid #6b7280;
-  opacity: 0.9;
+  border-left: 4px solid var(--ink-faint);
 }
 
 .room-card.holiday {
-  border-left: 4px solid #eab308;
+  border-left: 4px solid var(--gold);
 }
 
 .room-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
-  border-color: var(--accent-gold, #b8860b);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  border-color: var(--border-strong);
 }
 
 .room-card-header {
@@ -467,98 +457,86 @@
 }
 
 .room-name {
-  font-size: 18px;
+  font-size: 1.15rem;
   font-weight: 800;
-  color: var(--text-primary);
+  color: var(--ink);
   letter-spacing: -0.01em;
 }
 
 .room-floor-tag {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-secondary);
+  font-size: 0.675rem;
+  font-weight: 700;
+  color: var(--ink-dim);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
 }
 
 .room-status-badge {
-  font-size: 10px;
+  font-size: 0.65rem;
   font-weight: 800;
   letter-spacing: 0.06em;
   padding: 3px 8px;
   border-radius: 6px;
+  text-transform: uppercase;
 }
 
 .room-status-badge.vacant {
-  background: rgba(16, 185, 129, 0.18);
-  color: #10b981;
+  background: var(--success-tint);
+  color: var(--success);
 }
 
 .room-status-badge.occupied {
-  background: rgba(239, 68, 68, 0.18);
-  color: #ef4444;
+  background: rgba(185, 28, 28, 0.08);
+  color: var(--danger);
 }
 
 .room-status-badge.closed {
-  background: rgba(107, 114, 128, 0.18);
-  color: #9ca3af;
+  background: var(--tint);
+  color: var(--ink-dim);
 }
 
 .room-status-badge.holiday {
-  background: rgba(234, 179, 8, 0.18);
-  color: #eab308;
+  background: var(--gold-tint);
+  color: var(--gold-text);
 }
-
-.stat-pill.holiday {
-  background: rgba(234, 179, 8, 0.15);
-  color: #eab308;
-  border: 1px solid rgba(234, 179, 8, 0.3);
-}
-
-.stat-pill.closed {
-  background: rgba(107, 114, 128, 0.15);
-  color: #9ca3af;
-  border: 1px solid rgba(107, 114, 128, 0.3);
-}
-
-.vacancy-main-status.closed {
-  color: #9ca3af;
-}
-
-.vacancy-main-status.holiday {
-  color: #eab308;
-}
-
 
 .room-card-body {
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .vacancy-main-status {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
+  font-size: 0.85rem;
   font-weight: 700;
-  color: #10b981;
+  color: var(--success);
+}
+
+.vacancy-main-status.closed {
+  color: var(--ink-dim);
+}
+
+.vacancy-main-status.holiday {
+  color: var(--gold-text);
 }
 
 .vacancy-subtext {
-  font-size: 11.5px;
-  color: var(--text-secondary);
+  font-size: 0.75rem;
+  color: var(--ink-dim);
   margin-top: 3px;
 }
 
 .class-subject {
-  font-size: 13.5px;
+  font-size: 0.875rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--ink);
   line-height: 1.3;
 }
 
 .class-meta {
-  font-size: 11.5px;
-  color: var(--text-secondary);
+  font-size: 0.75rem;
+  color: var(--ink-dim);
   margin-top: 4px;
   display: flex;
   flex-wrap: wrap;
@@ -566,65 +544,64 @@
 }
 
 .room-card-footer {
-  border-top: 1px dashed var(--border);
-  padding-top: 8px;
-  margin-top: 4px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  margin-top: 2px;
 }
 
 .view-timeline-btn {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 11.5px;
+  font-size: 0.775rem;
   font-weight: 700;
-  color: var(--accent-gold, #b8860b);
+  color: var(--accent);
   transition: opacity 0.15s ease;
 }
 
 .room-card:hover .view-timeline-btn {
-  opacity: 0.9;
-  text-decoration: underline;
+  opacity: 0.85;
 }
 
-/* Daily Timeline Modal */
+/* ═══════════════════════════════════════════════════════════
+   Daily Schedule Timeline Modal (Aligned with SSCBS OS theme)
+   ═══════════════════════════════════════════════════════════ */
+
 .timeline-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
-  z-index: 999;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
-  animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  animation: fadeIn 0.2s ease-out;
 }
 
 .timeline-modal-card {
-  background: var(--surface-card, #18181c);
-  border: 1px solid var(--border);
-  border-radius: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
   width: 100%;
-  max-width: 580px;
+  max-width: 540px;
   max-height: 85vh;
+  max-height: 85dvh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   overflow: hidden;
-  animation: slideUp 0.25s ease;
+  color: var(--ink);
+  animation: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+@keyframes scaleIn {
+  from { transform: scale(0.96); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 .timeline-modal-header {
@@ -644,37 +621,42 @@
 
 .timeline-modal-title h3 {
   margin: 0;
-  font-size: 18px;
+  font-size: 1.15rem;
   font-weight: 800;
-  color: var(--text-primary);
+  color: var(--ink);
 }
 
 .timeline-modal-title p {
   margin: 2px 0 0 0;
-  font-size: 12px;
-  color: var(--text-secondary);
+  font-size: 0.775rem;
+  color: var(--ink-dim);
   font-weight: 600;
 }
 
 .timeline-modal-close {
-  background: transparent;
-  border: none;
-  font-size: 24px;
-  color: var(--text-secondary);
+  background: var(--tint);
+  border: 1px solid var(--border);
+  font-size: 1.25rem;
+  color: var(--ink-dim);
   cursor: pointer;
-  padding: 4px 8px;
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
-  transition: background 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: all 0.15s ease;
 }
 
 .timeline-modal-close:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
+  background: var(--border);
+  color: var(--ink);
 }
 
 .timeline-summary-banner {
   padding: 12px 20px;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--tint);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -682,7 +664,7 @@
 }
 
 .summary-badge {
-  font-size: 12px;
+  font-size: 0.775rem;
   font-weight: 700;
   padding: 4px 10px;
   border-radius: 20px;
@@ -690,28 +672,31 @@
 }
 
 .summary-badge.vacant {
-  background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
+  background: var(--success-tint);
+  color: var(--success);
+  border: 1px solid rgba(11, 122, 84, 0.2);
 }
 
 .summary-badge.occupied {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
+  background: rgba(185, 28, 28, 0.08);
+  color: var(--danger);
+  border: 1px solid rgba(185, 28, 28, 0.2);
 }
 
 .free-periods-summary {
-  padding: 12px 20px;
-  background: rgba(16, 185, 129, 0.08);
-  border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+  padding: 14px 20px;
+  background: var(--success-tint);
+  border-bottom: 1px solid rgba(11, 122, 84, 0.2);
 }
 
 .summary-heading {
-  font-size: 12px;
+  font-size: 0.775rem;
   font-weight: 800;
-  color: #10b981;
+  color: var(--success);
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 .free-tags-list {
@@ -721,12 +706,12 @@
 }
 
 .free-tag-pill {
-  background: rgba(16, 185, 129, 0.18);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  color: #10b981;
-  font-size: 11.5px;
+  background: var(--surface);
+  border: 1px solid var(--success);
+  color: var(--success);
+  font-size: 0.75rem;
   font-weight: 700;
-  padding: 3px 8px;
+  padding: 4px 10px;
   border-radius: 6px;
 }
 
@@ -737,13 +722,14 @@
   flex-direction: column;
   gap: 10px;
   flex: 1;
+  background: var(--bg);
 }
 
 .timeline-row {
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  padding: 12px;
+  padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -751,9 +737,8 @@
 }
 
 .timeline-row.active-now {
-  border-color: var(--accent-gold, #b8860b);
-  box-shadow: 0 0 0 1px var(--accent-gold, #b8860b);
-  background: rgba(184, 134, 11, 0.08);
+  border: 1.5px solid var(--accent);
+  background: var(--accent-tint);
 }
 
 .slot-time-col {
@@ -763,24 +748,24 @@
 }
 
 .slot-period-name {
-  font-size: 13px;
+  font-size: 0.85rem;
   font-weight: 800;
-  color: var(--text-primary);
+  color: var(--ink);
 }
 
 .slot-time-range {
-  font-size: 11px;
-  color: var(--text-secondary);
+  font-size: 0.725rem;
+  color: var(--ink-dim);
   margin-top: 2px;
 }
 
 .now-indicator-tag {
   display: inline-block;
   margin-top: 4px;
-  font-size: 9px;
+  font-size: 0.6rem;
   font-weight: 900;
-  background: var(--accent-gold, #b8860b);
-  color: #fff;
+  background: var(--accent);
+  color: var(--on-accent);
   padding: 2px 6px;
   border-radius: 4px;
   letter-spacing: 0.06em;
@@ -792,10 +777,10 @@
 }
 
 .slot-vacant-badge {
-  font-size: 12.5px;
+  font-size: 0.8rem;
   font-weight: 700;
-  color: #10b981;
-  padding: 4px 0;
+  color: var(--success);
+  padding: 2px 0;
 }
 
 .slot-occupied-details {
@@ -805,21 +790,22 @@
 }
 
 .slot-occupied-badge {
-  font-size: 10px;
+  font-size: 0.65rem;
   font-weight: 800;
-  color: #ef4444;
+  color: var(--danger);
   letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .slot-class-title {
-  font-size: 13px;
+  font-size: 0.85rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--ink);
 }
 
 .slot-class-sub {
-  font-size: 11.5px;
-  color: var(--text-secondary);
+  font-size: 0.75rem;
+  color: var(--ink-dim);
 }
 
 .timeline-modal-footer {
@@ -831,19 +817,20 @@
 }
 
 .timeline-close-btn {
-  background: var(--surface-card, #25252a);
-  border: 1px solid var(--border);
-  color: var(--text-primary);
-  border-radius: 10px;
-  padding: 8px 18px;
-  font-size: 13px;
+  background: var(--ink);
+  color: var(--on-ink);
+  border: none;
+  border-radius: 8px;
+  padding: 9px 22px;
+  font-size: 0.825rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
+  font-family: inherit;
 }
 
 .timeline-close-btn:hover {
-  background: var(--surface-hover, rgba(255, 255, 255, 0.1));
+  opacity: 0.9;
 }
 
 .empty-rooms-placeholder {
@@ -853,7 +840,7 @@
   background: var(--surface);
   border: 1px dashed var(--border);
   border-radius: 16px;
-  color: var(--text-secondary);
+  color: var(--ink-dim);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -862,12 +849,24 @@
 
 .empty-rooms-placeholder h3 {
   margin: 0;
-  color: var(--text-primary);
-  font-size: 16px;
+  color: var(--ink);
+  font-size: 1rem;
 }
 
 .empty-rooms-placeholder p {
   margin: 0;
-  font-size: 13px;
+  font-size: 0.825rem;
   max-width: 400px;
+}
+
+@media (max-width: 480px) {
+  .timeline-modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .timeline-modal-card {
+    border-radius: 16px 16px 0 0;
+    max-height: 90vh;
+  }
 }
