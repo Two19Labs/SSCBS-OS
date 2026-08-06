@@ -288,14 +288,13 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
             <span className="home-section-title">Tools</span>
           </div>
           <div className="home-tools-grid">
-            {tools.map(({ id, micro, microClass, title, desc, Icon, locked }) => (
+            {tools.map(({ id, title, desc, Icon, locked }) => (
               <button
                 key={id}
                 className={`home-tool-card ${locked ? 'locked' : ''}`}
                 onClick={() => !locked && onNavigate(id)}
                 disabled={locked}
               >
-                <span className={`micro-label ${microClass}`}>{micro}</span>
                 <span className="tool-title">{title}</span>
                 <span className="tool-desc">{desc}</span>
                 {!locked && <span className="tool-launch">Launch →</span>}

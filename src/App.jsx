@@ -268,7 +268,7 @@ function App() {
               { id: 'confessions-matchmaker', micro: 'SOON', microClass: 'dim', title: 'Campus Confessions & Matchmaker', desc: "We're still thinking on this, DM to let us know you'd like this :)", Icon: HeartIcon, locked: true },
               { id: 'find-prof', micro: 'SEARCH', microClass: 'success', title: 'Find My Professor', desc: "Who's teaching where, right now", Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
               { id: 'empty-room', micro: 'LIVE', microClass: 'success', title: 'Empty Room Finder', desc: 'Spot vacant classrooms in real-time or well in advance', Icon: DoorIcon, locked: false },
-            ].map(({ id, micro, microClass, title, desc, Icon, locked }) => (
+            ].map(({ id, title, desc, Icon, locked }) => (
               <button
                 key={id}
                 className={`tools-hub-row ${locked ? 'locked' : ''}`}
@@ -280,7 +280,6 @@ function App() {
                   <span className="tools-hub-title">{title}</span>
                   <span className="tools-hub-desc">{desc}</span>
                 </span>
-                <span className={`micro-label ${microClass}`}>{micro}</span>
               </button>
             ))}
           </div>
