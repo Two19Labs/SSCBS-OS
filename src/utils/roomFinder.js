@@ -192,3 +192,39 @@ export function getFloorFromRoom(roomStr) {
   }
   return 0;
 }
+
+/**
+ * Get complete daily timeline for a specific room on a given day.
+ */
+export function getRoomDailyTimeline(timetableData, day, roomName) {
+  const periodOrder = [1, 2, 3, 0, 4, 5, 6, 7];
+  
+  const timeline = periodOrder.map(periodId => {
+    const periodInfo = PERIODS.find(p => p.id === periodId);
+    const occupiedMap = getOccupiedRoomsMap(timetableData, day, periodId);
+    const occupancy = occupiedMap.get(roomName);
+
+    return {
+      periodId,
+      periodLabel: periodInfo ? periodInfo.label : `Period ${periodId}`,
+      timeRange: periodInfo ? `${periodInfo.startLabel} – ${periodInfo.endLabel}` : '',
+      isBreak: periodInfo ? !!periodInfo.isBreak : false,
+      isVacant: !occupancy,
+      occupiedBy: occupancy || null
+    };
+  });
+
+  const vacantPeriods = timeline.filter(t => t.isVacant);
+  const occupiedPeriods = timeline.filter(t => !t.isVacant);
+
+  return {
+    room: roomName,
+    floor: getFloorFromRoom(roomName),
+    day,
+    timeline,
+    vacantCount: vacantPeriods.length,
+    occupiedCount: occupiedPeriods.length,
+    vacantPeriodLabels: vacantPeriods.map(t => `${t.periodLabel} (${t.timeRange})`),
+  };
+}
+

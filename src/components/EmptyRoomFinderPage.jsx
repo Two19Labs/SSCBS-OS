@@ -2,8 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useTimetable } from '../context/TimetableContext';
 import { useAuth } from '../context/AuthContext';
 import { PERIODS, DAYS } from '../data/timetables';
-import { getRoomStatuses, extractAllRoomsFromTimetable } from '../utils/roomFinder';
-import { DoorIcon, SearchIcon, BackIcon, RefreshIcon } from './icons';
+import { getRoomStatuses, extractAllRoomsFromTimetable, getRoomDailyTimeline } from '../utils/roomFinder';
+import { DoorIcon, SearchIcon, BackIcon, RefreshIcon, CalendarIcon } from './icons';
 import './EmptyRoomFinderPage.css';
 
 export function EmptyRoomFinderPage({ onBack }) {
@@ -22,14 +22,29 @@ export function EmptyRoomFinderPage({ onBack }) {
   const [statusFilter, setStatusFilter] = useState('VACANT'); // 'ALL' | 'VACANT' | 'OCCUPIED'
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Live Time state
+  // Selected room modal for complete daily timeline
+  const [selectedRoomForTimeline, setSelectedRoomForTimeline] = useState(null);
+
+  // Live IST Time state - updates every second
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Update clock every minute
   useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 30000);
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Format live IST clock
+  const istTimeString = useMemo(() => {
+    return currentTime.toLocaleTimeString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+    }).toUpperCase();
+  }, [currentTime]);
 
   // Determine current day & period from live clock
   const liveDay = useMemo(() => {
@@ -41,7 +56,6 @@ export function EmptyRoomFinderPage({ onBack }) {
   const livePeriod = useMemo(() => {
     const nowMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
     
-    // Check which period covers nowMinutes
     for (const p of PERIODS) {
       const [sH, sM] = p.start.split(':').map(Number);
       const [eH, eM] = p.end.split(':').map(Number);
@@ -51,8 +65,7 @@ export function EmptyRoomFinderPage({ onBack }) {
         return p;
       }
     }
-    // Default fallback to Period 1 if outside regular college hours
-    return PERIODS[0]; // Period 1
+    return PERIODS[0]; // Fallback to Period I
   }, [currentTime]);
 
   // Set active day & period based on mode
@@ -69,15 +82,12 @@ export function EmptyRoomFinderPage({ onBack }) {
   // Filter rooms
   const filteredRooms = useMemo(() => {
     return roomStatuses.filter(item => {
-      // Floor filter
       if (floorFilter !== 'ALL' && item.floor !== Number(floorFilter)) {
         return false;
       }
-      // Status filter
       if (statusFilter === 'VACANT' && !item.isVacant) return false;
       if (statusFilter === 'OCCUPIED' && item.isVacant) return false;
 
-      // Search filter
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
         const roomMatch = item.room.toLowerCase().includes(q);
@@ -94,6 +104,12 @@ export function EmptyRoomFinderPage({ onBack }) {
   const vacantCount = roomStatuses.filter(r => r.isVacant).length;
   const occupiedCount = roomStatuses.length - vacantCount;
 
+  // Daily timeline data for modal
+  const roomTimelineData = useMemo(() => {
+    if (!selectedRoomForTimeline || !timetable) return null;
+    return getRoomDailyTimeline(timetable, activeDay, selectedRoomForTimeline);
+  }, [selectedRoomForTimeline, timetable, activeDay]);
+
   return (
     <div className="empty-room-page">
       {/* Top Header */}
@@ -107,9 +123,9 @@ export function EmptyRoomFinderPage({ onBack }) {
           <div className="empty-room-title-row">
             <span className="empty-room-header-icon"><DoorIcon size={22} /></span>
             <h2>Empty Room Finder</h2>
-            <span className="micro-label success">TESTING</span>
+            <span className="micro-label success">LIVE DATA</span>
           </div>
-          <p className="empty-room-subtitle">Spot vacant classrooms & labs dynamically extracted from college schedules</p>
+          <p className="empty-room-subtitle">Spot vacant classrooms & labs powered by official college timetables</p>
         </div>
       </div>
 
@@ -130,6 +146,13 @@ export function EmptyRoomFinderPage({ onBack }) {
           >
             Select Slot
           </button>
+        </div>
+
+        {/* Real-time IST Clock */}
+        <div className="ist-clock-badge">
+          <span className="ist-clock-icon">🕒</span>
+          <span className="ist-clock-label">IST</span>
+          <span className="ist-clock-time">{istTimeString}</span>
         </div>
 
         {/* Slot Selectors */}
@@ -243,6 +266,7 @@ export function EmptyRoomFinderPage({ onBack }) {
             <div
               key={item.room}
               className={`room-card ${item.isVacant ? 'vacant' : 'occupied'}`}
+              onClick={() => setSelectedRoomForTimeline(item.room)}
             >
               <div className="room-card-header">
                 <div className="room-title-box">
@@ -262,7 +286,7 @@ export function EmptyRoomFinderPage({ onBack }) {
                       <span className="vacancy-icon">🟢</span>
                       <span className="vacancy-text">
                         {item.isFreeRestOfDay
-                          ? 'Free for the rest of the day'
+                          ? 'Free for rest of the day'
                           : `Free until ${item.freeUntilPeriodLabel}`}
                       </span>
                     </div>
@@ -285,6 +309,12 @@ export function EmptyRoomFinderPage({ onBack }) {
                   </div>
                 )}
               </div>
+
+              <div className="room-card-footer">
+                <span className="view-timeline-btn">
+                  <CalendarIcon size={14} /> View Daily Timeline & Full Free Schedule →
+                </span>
+              </div>
             </div>
           ))
         ) : (
@@ -295,6 +325,94 @@ export function EmptyRoomFinderPage({ onBack }) {
           </div>
         )}
       </div>
+
+      {/* Daily Timeline Modal */}
+      {selectedRoomForTimeline && roomTimelineData && (
+        <div className="timeline-modal-overlay" onClick={() => setSelectedRoomForTimeline(null)}>
+          <div className="timeline-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="timeline-modal-header">
+              <div className="timeline-modal-title">
+                <DoorIcon size={22} />
+                <div>
+                  <h3>{roomTimelineData.room} — Daily Schedule</h3>
+                  <p>{activeDay} • {roomTimelineData.floor > 0 ? `${roomTimelineData.floor}th Floor` : 'Campus'}</p>
+                </div>
+              </div>
+
+              <button
+                className="timeline-modal-close"
+                onClick={() => setSelectedRoomForTimeline(null)}
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Summary Stats */}
+            <div className="timeline-summary-banner">
+              <div className="summary-left">
+                <span className="summary-badge vacant">🟢 Free for {roomTimelineData.vacantCount} periods</span>
+                <span className="summary-badge occupied">🔴 Busy for {roomTimelineData.occupiedCount} periods</span>
+              </div>
+            </div>
+
+            {/* When free summary box */}
+            {roomTimelineData.vacantCount > 0 && (
+              <div className="free-periods-summary">
+                <span className="summary-heading">✨ Free Today During:</span>
+                <div className="free-tags-list">
+                  {roomTimelineData.vacantPeriodLabels.map((lbl, idx) => (
+                    <span key={idx} className="free-tag-pill">{lbl}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Timeline Rows */}
+            <div className="timeline-rows-container">
+              {roomTimelineData.timeline.map((slot) => (
+                <div
+                  key={slot.periodId}
+                  className={`timeline-row ${slot.isVacant ? 'vacant' : 'occupied'} ${slot.periodId === activePeriodId ? 'active-now' : ''}`}
+                >
+                  <div className="slot-time-col">
+                    <span className="slot-period-name">{slot.periodLabel}</span>
+                    <span className="slot-time-range">{slot.timeRange}</span>
+                    {slot.periodId === activePeriodId && (
+                      <span className="now-indicator-tag">NOW</span>
+                    )}
+                  </div>
+
+                  <div className="slot-status-col">
+                    {slot.isVacant ? (
+                      <div className="slot-vacant-badge">
+                        <span>🟢 VACANT / FREE</span>
+                      </div>
+                    ) : (
+                      <div className="slot-occupied-details">
+                        <span className="slot-occupied-badge">🔴 IN CLASS</span>
+                        <div className="slot-class-title">{slot.occupiedBy.subject}</div>
+                        <div className="slot-class-sub">
+                          {slot.occupiedBy.course} Sem {slot.occupiedBy.sem} ({slot.occupiedBy.sec})
+                          {slot.occupiedBy.teacher && ` • ${slot.occupiedBy.teacher}`}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="timeline-modal-footer">
+              <button
+                className="timeline-close-btn"
+                onClick={() => setSelectedRoomForTimeline(null)}
+              >
+                Close Schedule
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
