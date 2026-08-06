@@ -155,40 +155,37 @@ export function EmptyRoomFinderPage({ onBack }) {
           <span className="ist-clock-time">{istTimeString}</span>
         </div>
 
-        {/* Slot Selectors */}
-        <div className="empty-room-slot-selectors">
-          <div className="selector-group">
-            <label>Day</label>
-            <select
-              value={selectedDay}
-              onChange={(e) => {
-                setSelectedDay(e.target.value);
-                if (mode === 'live') setMode('slot');
-              }}
-            >
-              {DAYS.map(day => (
-                <option key={day} value={day}>{day}</option>
-              ))}
-            </select>
-          </div>
+        {/* Slot Selectors - ONLY shown when mode === 'slot' */}
+        {mode === 'slot' && (
+          <div className="empty-room-slot-selectors">
+            <div className="selector-group">
+              <label>Day</label>
+              <select
+                value={selectedDay}
+                onChange={(e) => setSelectedDay(e.target.value)}
+              >
+                {DAYS.map(day => (
+                  <option key={day} value={day}>{day}</option>
+                ))}
+              </select>
+            </div>
 
-          <div className="selector-group">
-            <label>Period</label>
-            <select
-              value={selectedPeriodId}
-              onChange={(e) => {
-                setSelectedPeriodId(Number(e.target.value));
-                if (mode === 'live') setMode('slot');
-              }}
-            >
-              {PERIODS.map(p => (
-                <option key={p.id} value={p.id}>
-                  {p.label} ({p.startLabel} - {p.endLabel})
-                </option>
-              ))}
-            </select>
+            <div className="selector-group">
+              <label>Period</label>
+              <select
+                value={selectedPeriodId}
+                onChange={(e) => setSelectedPeriodId(Number(e.target.value))}
+              >
+                {PERIODS.map(p => (
+                  <option key={p.id} value={p.id}>
+                    {p.label} ({p.startLabel} - {p.endLabel})
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-        </div>
+        )}
+
       </div>
 
       {/* Live Active Banner */}

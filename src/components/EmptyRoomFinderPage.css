@@ -87,19 +87,19 @@
 }
 
 .empty-room-mode-toggle {
-  display: flex;
-  background: rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  background: var(--surface-card, rgba(0, 0, 0, 0.06));
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 3px;
-  gap: 2px;
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
 }
 
 .mode-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 14px;
+  padding: 7px 16px;
   border-radius: 8px;
   border: none;
   background: transparent;
@@ -110,10 +110,15 @@
   transition: all 0.15s ease;
 }
 
-.mode-btn.active {
-  background: var(--surface-card, #1e1e24);
+.mode-btn:hover:not(.active) {
+  background: var(--surface-hover, rgba(0, 0, 0, 0.05));
   color: var(--text-primary);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.mode-btn.active {
+  background: var(--text-primary, #111827);
+  color: var(--surface, #ffffff);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .live-dot {
@@ -122,11 +127,16 @@
   animation: livePulse 1.8s infinite;
 }
 
+.mode-btn.active .live-dot {
+  color: #34d399;
+}
+
 @keyframes livePulse {
   0% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.4; transform: scale(1.2); }
   100% { opacity: 1; transform: scale(1); }
 }
+
 
 /* Real-time IST Clock Badge */
 .ist-clock-badge {
