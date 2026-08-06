@@ -356,7 +356,7 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Annual Hackathon 2026 Registration"
+                    placeholder="e.g. Blood Donation Drive"
                     value={noticeForm.title}
                     onChange={(e) => setNoticeForm({ ...noticeForm, title: e.target.value })}
                   />
@@ -380,7 +380,7 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
                   <span>Society / Department Name</span>
                   <input
                     type="text"
-                    placeholder="e.g. Enactus, Kronos, IFSA"
+                    placeholder="e.g. Rotaract"
                     value={noticeForm.society}
                     onChange={(e) => setNoticeForm({ ...noticeForm, society: e.target.value })}
                   />
