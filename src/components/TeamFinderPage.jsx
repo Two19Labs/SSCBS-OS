@@ -137,7 +137,7 @@ export default function TeamFinderPage({ onBack }) {
   const [applyError, setApplyError] = useState('');
   const [applySuccess, setApplySuccess] = useState('');
 
-  const POST_EXPIRATION_MS = 72 * 60 * 60 * 1000; // 72 hours (3 days)
+  const POST_EXPIRATION_MS = 168 * 60 * 60 * 1000; // 168 hours (7 days / 1 week)
 
   // Fetch real posts & applications from Supabase
   const fetchPostsAndApps = async (force = false) => {
@@ -182,7 +182,7 @@ export default function TeamFinderPage({ onBack }) {
           const expiredPosts = postsRes.data.filter((p) => p.created_at && now - new Date(p.created_at).getTime() > POST_EXPIRATION_MS);
           const activePostsData = postsRes.data.filter((p) => !p.created_at || now - new Date(p.created_at).getTime() <= POST_EXPIRATION_MS);
 
-          // Auto-delete expired posts older than 72 hours from Supabase
+          // Auto-delete expired posts older than 168 hours (7 days) from Supabase
           if (expiredPosts.length > 0) {
             const expiredIds = expiredPosts.map((p) => p.id);
             supabase.from('squad_posts').delete().in('id', expiredIds).then();
@@ -1005,7 +1005,7 @@ function getUserApp(post, applications, userEmail, userId) {
       <div className="tf-cleanup-notice">
         <div className="cleanup-notice-icon">🧹</div>
         <div className="cleanup-notice-text">
-          <strong>Teaming Guidelines:</strong> Please delete your listing once your squad is sorted! To keep the feed fresh and prevent piling up, listings auto-delete after <strong>72 hours (3 days)</strong>.
+          <strong>Teaming Guidelines:</strong> Please delete your listing once your squad is sorted! To keep the feed fresh and prevent piling up, listings auto-delete after <strong>168 hours (7 days)</strong>.
         </div>
       </div>
 

@@ -358,7 +358,7 @@ export async function logFeatureView(featureId, user) {
   if (user && user.id) {
     touchUserActivity(user);
   }
-  if (!featureId || featureId === 'admin' || !FEATURE_NAMES[featureId]) return;
+  if (!featureId || featureId === 'admin' || featureId === 'home' || !FEATURE_NAMES[featureId]) return;
 
   const now = Date.now();
   const lastTime = recentLogMap.get(featureId) || 0;
@@ -377,18 +377,18 @@ export async function logFeatureView(featureId, user) {
     const localMap = getLocalAnalyticsMap();
     if (!localMap[dateStr]) {
       localMap[dateStr] = {
-        visits: { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 },
+        visits: { timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 },
         hourly: {}
       };
     }
     if (!localMap[dateStr].visits) {
-      localMap[dateStr].visits = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 };
+      localMap[dateStr].visits = { timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 };
     }
     if (!localMap[dateStr].hourly) {
       localMap[dateStr].hourly = {};
     }
     if (!localMap[dateStr].hourly[hourKey]) {
-      localMap[dateStr].hourly[hourKey] = { home: 0, timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 };
+      localMap[dateStr].hourly[hourKey] = { timetable: 0, 'find-prof': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 };
     }
 
     localMap[dateStr].visits[featureId] = (localMap[dateStr].visits[featureId] || 0) + 1;
@@ -434,7 +434,7 @@ export async function logFeatureClick(featureId, user) {
  * Supports hourly breakdown for daysCount = 1 (Last 24 Hours) as well as daily breakdown for 7, 30, 90 days.
  */
 export async function fetchAnalyticsData(daysCount = 7) {
-  const emptyFeatureSet = () => ({ home: 0, timetable: 0, 'find-prof': 0, 'team-finder': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 });
+  const emptyFeatureSet = () => ({ timetable: 0, 'find-prof': 0, 'team-finder': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 });
 
   if (daysCount === 1) {
     // ----------------------------------------------------
@@ -586,7 +586,6 @@ export async function fetchAnalyticsData(daysCount = 7) {
     });
 
     const buildSeries = () => ({
-      home: slots.map((s, idx) => slotMapVisits[idx].home),
       timetable: slots.map((s, idx) => slotMapVisits[idx].timetable),
       'find-prof': slots.map((s, idx) => slotMapVisits[idx]['find-prof']),
       'team-finder': slots.map((s, idx) => slotMapVisits[idx]['team-finder']),
@@ -602,7 +601,7 @@ export async function fetchAnalyticsData(daysCount = 7) {
     };
 
     const topKey = Object.keys(totalsVisits)
-      .filter(k => k !== 'total' && k !== 'admin')
+      .filter(k => k !== 'total' && k !== 'admin' && k !== 'home')
       .sort((a, b) => totalsVisits[b] - totalsVisits[a])[0] || 'timetable';
 
     return {
@@ -730,7 +729,6 @@ export async function fetchAnalyticsData(daysCount = 7) {
   });
 
   const buildSeries = (dMap) => ({
-    home: dateList.map(d => dMap[d.dateStr].home),
     timetable: dateList.map(d => dMap[d.dateStr].timetable),
     'find-prof': dateList.map(d => dMap[d.dateStr]['find-prof']),
     'team-finder': dateList.map(d => dMap[d.dateStr]['team-finder']),
@@ -746,7 +744,7 @@ export async function fetchAnalyticsData(daysCount = 7) {
   };
 
   const topKey = Object.keys(totalsVisits)
-    .filter(k => k !== 'total' && k !== 'admin')
+    .filter(k => k !== 'total' && k !== 'admin' && k !== 'home')
     .sort((a, b) => totalsVisits[b] - totalsVisits[a])[0] || 'timetable';
 
   return {
