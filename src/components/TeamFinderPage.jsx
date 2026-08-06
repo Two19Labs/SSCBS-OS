@@ -1210,16 +1210,23 @@ function getUserApp(post, applications, userEmail, userId) {
                   )}
 
                   {/* Title & Description rendering */}
-                  {post.title ? (
-                    <>
-                      <h3 className="post-title">{post.title}</h3>
-                      {post.description && post.description !== post.title && (
-                        <p className="post-desc">{post.description}</p>
-                      )}
-                    </>
-                  ) : (
-                    <p className="post-desc post-desc-standalone">{post.description}</p>
-                  )}
+                  {(() => {
+                    const hasDistinctTitle = Boolean(
+                      post.title &&
+                      post.title.trim() &&
+                      post.description &&
+                      post.title.trim().toLowerCase() !== post.description.trim().toLowerCase()
+                    );
+
+                    return hasDistinctTitle ? (
+                      <>
+                        <h3 className="post-title">{post.title}</h3>
+                        {post.description && <p className="post-desc">{post.description}</p>}
+                      </>
+                    ) : (
+                      <p className="post-desc post-desc-standalone">{post.description || post.title}</p>
+                    );
+                  })()}
 
                   {/* Read More Trigger */}
                   {((post.description && post.description.length > 50) || (post.title && post.title.length > 35)) && (
@@ -1838,15 +1845,28 @@ function getUserApp(post, applications, userEmail, userId) {
                   </div>
                 )}
 
-                {post.title && (
-                  <h4 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--ink)', marginBottom: '8px' }}>
-                    {post.title}
-                  </h4>
-                )}
+                {(() => {
+                  const hasDistinctTitle = Boolean(
+                    post.title &&
+                    post.title.trim() &&
+                    post.description &&
+                    post.title.trim().toLowerCase() !== post.description.trim().toLowerCase()
+                  );
 
-                <div style={{ fontSize: '0.9rem', color: 'var(--ink)', lineHeight: '1.6', whiteSpace: 'pre-line', marginBottom: '16px' }}>
-                  {post.description || post.title}
-                </div>
+                  return (
+                    <>
+                      {hasDistinctTitle && (
+                        <h4 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--ink)', marginBottom: '8px' }}>
+                          {post.title}
+                        </h4>
+                      )}
+
+                      <div style={{ fontSize: '0.9rem', color: 'var(--ink)', lineHeight: '1.6', whiteSpace: 'pre-line', marginBottom: '16px' }}>
+                        {post.description || post.title}
+                      </div>
+                    </>
+                  );
+                })()}
 
                 {/* Skills Present */}
                 {post.skills_have && post.skills_have.length > 0 && (
