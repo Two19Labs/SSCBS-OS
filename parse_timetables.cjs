@@ -56,6 +56,14 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
     parts.forEach(part => {
       let partText = part.trim();
       let partRoom = defaultRoom;
+      let explicitSubject = "";
+
+      // Extract explicit subject tags like (Hin A), (Hin B), (Hin C), (Hin D)
+      const hinMatch = partText.match(/\((Hin(?:di)?\s*([A-D]))\)/i);
+      if (hinMatch) {
+        explicitSubject = `Hindi ${hinMatch[2].toUpperCase()}`;
+        partText = partText.replace(/\(Hin(?:di)?\s*[A-D]\)/i, '').trim();
+      }
 
       let groupLabel = "";
       const parenGroupMatch = partText.match(/\(((?:G1\s*\+\s*G2)|G1|G2)\)/i);
@@ -82,12 +90,12 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
           }).join(' / ');
           partText = partText.replace(/\([^)]+\)/, '').trim();
         }
-      } else {
-        const labRoomMatch = partText.match(/Lab\s*(\d{3})/i) || partText.match(/Room\s*(\d{3})/i) || partText.match(/\s+(\d{3})$/);
-        if (labRoomMatch) {
-          partRoom = `Room ${labRoomMatch[1]}`;
-          partText = partText.replace(/Lab\s*\d{3}/i, '').replace(/Room\s*\d{3}/i, '').replace(/\s+\d{3}$/, '').trim();
-        }
+      }
+
+      const labRoomMatch = partText.match(/Lab\s*(\d{3})/i) || partText.match(/Room\s*(\d{3})/i) || partText.match(/\s+(\d{3})$/);
+      if (labRoomMatch) {
+        partRoom = `Room ${labRoomMatch[1]}`;
+        partText = partText.replace(/Lab\s*\d{3}/i, '').replace(/Room\s*\d{3}/i, '').replace(/\s+\d{3}$/, '').trim();
       }
 
       if (partRoom.toUpperCase() === 'ROOM P' || partRoom.toUpperCase() === 'P') {
@@ -95,7 +103,7 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
       }
 
       const teacherCodeLower = partText.trim().toLowerCase();
-      let subjectName = partText.trim();
+      let subjectName = explicitSubject || partText.trim();
       let teacherName = partText.trim();
 
       let found = facultyMap[teacherCodeLower];
@@ -110,7 +118,16 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
       }
 
       if (found) {
-        subjectName = found.paperName;
+        if (!explicitSubject) {
+          subjectName = found.paperName;
+        } else {
+          if (found.paperName.includes('Merged with')) {
+            const mergeMatch = found.paperName.match(/\(Merged with [^)]+\)/);
+            if (mergeMatch) {
+              subjectName = `${explicitSubject} ${mergeMatch[0]}`;
+            }
+          }
+        }
         teacherName = found.facultyName;
       } else {
         if (isUnsupervisedCell || teacherCodeLower.includes('unsupervised') || teacherCodeLower.includes('unsuprvised')) {

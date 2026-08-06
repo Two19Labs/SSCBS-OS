@@ -1212,15 +1212,15 @@
           },
           {
             "period": 6,
-            "subject": "Hindi B | Hindi C | Hindi D (Merged with BMS 3D)",
+            "subject": "Hindi A | Hindi C | Hindi D (Merged with BMS 3D)",
             "teacher": "Dr. Garima Tripathi / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 7,
-            "subject": "Hindi B | Hindi C | Hindi D (Merged with BMS 3D)",
+            "subject": "Hindi A | Hindi C | Hindi D (Merged with BMS 3D)",
             "teacher": "Dr. Garima Tripathi / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "room": "Room 607 / Room 644 / Room 648"
           }
         ],
         "Thursday": [
@@ -1476,15 +1476,15 @@
           },
           {
             "period": 6,
-            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Komal  648",
-            "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Komal  648",
-            "room": "Hin A / Hin C / Hin D"
+            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Hindi D",
+            "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Komal",
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 7,
-            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Komal  648",
-            "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Komal  648",
-            "room": "Hin A / Hin C / Hin D"
+            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Hindi D",
+            "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Komal",
+            "room": "Room 607 / Room 644 / Room 648"
           }
         ],
         "Thursday": [
@@ -1741,15 +1741,15 @@
           },
           {
             "period": 6,
-            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Hindi B",
+            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Hindi D",
             "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Ms. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 7,
-            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Hindi B",
+            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Hindi D",
             "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Ms. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "room": "Room 607 / Room 644 / Room 648"
           }
         ],
         "Thursday": [
@@ -2006,15 +2006,15 @@
           },
           {
             "period": 6,
-            "subject": "Hindi B | Hindi C (Merged with BMS 3A) | Hindi D (Merged with BMS 3A)",
+            "subject": "Hindi A | Hindi C (Merged with BMS 3A) | Hindi D (Merged with BMS 3A)",
             "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 7,
-            "subject": "Hindi B | Hindi C (Merged with BMS 3A) | Hindi D (Merged with BMS 3A)",
+            "subject": "Hindi A | Hindi C (Merged with BMS 3A) | Hindi D (Merged with BMS 3A)",
             "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "room": "Room 607 / Room 644 / Room 648"
           }
         ],
         "Thursday": [
@@ -4128,15 +4128,15 @@
           },
           {
             "period": 6,
-            "subject": "Garima  607 | Hindi C (Merged  BMS 3A) | Hindi D (Merged BMS 3D)",
-            "teacher": "Garima  607 / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "subject": "Hindi A | Hindi C | Hindi D",
+            "teacher": "Garima / Dr. Soumya Guliyan / Mr. Komal",
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 7,
-            "subject": "Garima  607 | Hindi C (Merged  BMS 3A) | Hindi D (Merged BMS 3D)",
-            "teacher": "Garima  607 / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "subject": "Hindi A | Hindi C | Hindi D",
+            "teacher": "Garima / Dr. Soumya Guliyan / Mr. Komal",
+            "room": "Room 607 / Room 644 / Room 648"
           }
         ],
         "Thursday": [
@@ -4390,15 +4390,15 @@
           },
           {
             "period": 6,
-            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged  BMS 3A) | Hindi D (Merged BMS 3D)",
+            "subject": "Hindi A (Merged with BMS 3A) | Hindi C | Hindi D",
             "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 7,
-            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged  BMS 3A) | Hindi D (Merged BMS 3D)",
+            "subject": "Hindi A (Merged with BMS 3A) | Hindi C | Hindi D",
             "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Mr. Komal",
-            "room": "Hin A / Hin C / Hin D"
+            "room": "Room 607 / Room 644 / Room 648"
           }
         ],
         "Thursday": [

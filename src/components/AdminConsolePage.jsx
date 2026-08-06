@@ -755,6 +755,76 @@ function AdminConsoleContent({ onBack }) {
   const [showHfKeyInput, setShowHfKeyInput] = useState(false);
   const [aiParseProgress, setAiParseProgress] = useState({ current: 0, total: 0, status: '' });
 
+  // Live Schedule Draft State (combines uploader + live editor)
+  const [draftTimetable, setDraftTimetable] = useState(() => JSON.parse(JSON.stringify(timetable || {})));
+  const [hasUnpublishedChanges, setHasUnpublishedChanges] = useState(false);
+
+  useEffect(() => {
+    if (!hasUnpublishedChanges && timetable && Object.keys(timetable).length > 0) {
+      setDraftTimetable(JSON.parse(JSON.stringify(timetable)));
+    }
+  }, [timetable, hasUnpublishedChanges]);
+
+  const applyParsedDataToDraft = (filtered, category) => {
+    setDraftTimetable(prev => {
+      const nextDraft = JSON.parse(JSON.stringify(prev || {}));
+      if (!nextDraft._meta) nextDraft._meta = {};
+      Object.keys(filtered).forEach(k => {
+        nextDraft[k] = filtered[k];
+      });
+      const catKey = category === 'cs' ? 'cs' : 'mgmt';
+      nextDraft._meta[`${catKey}UploadTime`] = new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+      nextDraft._meta[`${catKey}Source`] = 'AI Text Parser (Draft)';
+      return nextDraft;
+    });
+    setHasUnpublishedChanges(true);
+
+    const firstCourse = Object.keys(filtered)[0];
+    if (firstCourse) {
+      setSelectedCourse(firstCourse);
+      const sems = filtered[firstCourse];
+      if (sems) {
+        const firstSem = Object.keys(sems)[0];
+        if (firstSem) {
+          setSelectedSem(firstSem);
+          const secs = sems[firstSem];
+          if (secs) {
+            const firstSec = Object.keys(secs)[0];
+            if (firstSec) setSelectedSection(firstSec);
+          }
+        }
+      }
+    }
+  };
+
+  const handlePublishDraftTimetable = async () => {
+    if (!draftTimetable) return;
+    setIsSaving(true);
+    setSaveStatus({ type: '', message: '' });
+    try {
+      const mergedToPublish = JSON.parse(JSON.stringify(draftTimetable));
+      if (!mergedToPublish._meta) mergedToPublish._meta = {};
+      mergedToPublish._meta.lastPublishedAt = new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+      await updateTimetable(mergedToPublish);
+      setHasUnpublishedChanges(false);
+      setSaveStatus({ type: 'success', message: '🎉 Master Timetable published successfully! All student dashboards updated.' });
+    } catch (err) {
+      setSaveStatus({ type: 'error', message: err.message || 'Failed to publish timetable.' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDiscardDraftChanges = () => {
+    if (window.confirm('Are you sure you want to discard all unpublished draft changes?')) {
+      setDraftTimetable(JSON.parse(JSON.stringify(timetable || {})));
+      setHasUnpublishedChanges(false);
+      setTextParsedMgmt(null);
+      setTextParsedCs(null);
+      setSaveStatus({ type: 'info', message: 'Draft changes discarded. Reset to live timetable.' });
+    }
+  };
+
   // Text Parser Uploader states
   const [textInputMgmt, setTextInputMgmt] = useState('');
   const [textInputCs, setTextInputCs] = useState('');
@@ -1057,10 +1127,12 @@ Now extract ALL timetable blocks from the attached Excel file.`;
 
         if (Object.keys(filtered).length > 0) {
           setParsedDataFn(filtered);
+          applyParsedDataToDraft(filtered, category);
           const summary = Object.entries(filtered).map(([c, sems]) =>
             `${c}: Sems [${Object.keys(sems).sort().join(', ')}] (${Object.values(sems).map(s => Object.keys(s).join(',')).join('; ')})`
           ).join(' | ');
-          addTextLog(`[${label}] ✅ Parsed ${parsedCount} block(s) successfully! ${summary}`, 'success');
+          addTextLog(`[${label}] ✅ Parsed ${parsedCount} block(s) and auto-loaded into Live Editor draft below! ${summary}`, 'success');
+          setSaveStatus({ type: 'success', message: `Parsed ${label} schedule and auto-loaded into Live Editor draft. Review below and click "Publish Timetable to Live OS".` });
           if (errorCount > 0) addTextLog(`[${label}] ⚠️ ${errorCount} block(s) had parsing errors.`, 'warning');
         } else {
           addTextLog(`[${label}] ⚠️ Parsed ${parsedCount} block(s) but none matched ${label} courses. Check that the text contains the right course blocks.`, 'warning');
@@ -1101,7 +1173,9 @@ Now extract ALL timetable blocks from the attached Excel file.`;
                 }
                 if (Object.keys(filtered).length > 0) {
                   setParsedDataFn(filtered);
-                  addTextLog(`[${label}] ✅ HF AI parsed successfully!`, 'success');
+                  applyParsedDataToDraft(filtered, category);
+                  addTextLog(`[${label}] ✅ HF AI parsed successfully and loaded into Live Editor draft below!`, 'success');
+                  setSaveStatus({ type: 'success', message: `Parsed ${label} schedule via HF AI and loaded into Live Editor draft. Review below and click "Publish Timetable to Live OS".` });
                 } else {
                   addTextLog(`[${label}] ⚠️ HF returned data but no matching ${label} courses found.`, 'warning');
                 }
@@ -1236,6 +1310,15 @@ Now extract ALL timetable blocks from the attached Excel file.`;
   function parseSinglePart(text, defaultRoom, facultyMap) {
     let partText = text.trim();
     let partRoom = defaultRoom;
+    let explicitSubject = "";
+
+    // Extract explicit subject tags like (Hin A), (Hin B), (Hin C), (Hin D)
+    const hinMatch = partText.match(/\((Hin(?:di)?\s*([A-D]))\)/i);
+    if (hinMatch) {
+      explicitSubject = `Hindi ${hinMatch[2].toUpperCase()}`;
+      partText = partText.replace(/\(Hin(?:di)?\s*[A-D]\)/i, '').trim();
+    }
+
     let groupLabel = '';
 
     const parenGroupMatch = partText.match(/\(((?:G1\s*\+\s*G2)|G1|G2)\)/i) || partText.match(/\b((?:G1\s*\+\s*G2)|G1|G2)\b/i);
@@ -1249,16 +1332,16 @@ Now extract ALL timetable blocks from the attached Excel file.`;
       const roomVal = roomMatch[1];
       partRoom = roomVal.split('/').map(r => r.trim().match(/^\d+/) ? 'Room ' + r.trim() : r.trim()).join(' / ');
       partText = partText.replace(/\([^)]+\)/, '').trim();
-    } else {
-      const endRoomMatch = partText.match(/\b(?:L|R|Room)?\s*(\d{3})\b/i);
-      if (endRoomMatch) {
-        partRoom = 'Room ' + endRoomMatch[1];
-        partText = partText.replace(endRoomMatch[0], '').trim();
-      }
+    }
+
+    const endRoomMatch = partText.match(/\b(?:L|R|Room)?\s*(\d{3})\b/i);
+    if (endRoomMatch) {
+      partRoom = 'Room ' + endRoomMatch[1];
+      partText = partText.replace(endRoomMatch[0], '').trim();
     }
 
     let teacherCodeLower = partText.trim().toLowerCase();
-    let subjectName = partText.trim();
+    let subjectName = explicitSubject || partText.trim();
     let teacherName = partText.trim();
 
     const codeParenMatch = partText.match(/^([A-Za-z0-9\s]+)\s*\(([^)]+)\)$/);
@@ -1267,19 +1350,29 @@ Now extract ALL timetable blocks from the attached Excel file.`;
       const c2 = codeParenMatch[2].trim().toLowerCase();
       if (facultyMap[c1]) {
         teacherName = facultyMap[c1].facultyName;
-        subjectName = facultyMap[c2] ? facultyMap[c2].paperName : (facultyMap[c1].paperName || codeParenMatch[2]);
+        subjectName = explicitSubject || (facultyMap[c2] ? facultyMap[c2].paperName : (facultyMap[c1].paperName || codeParenMatch[2]));
       } else if (facultyMap[c2]) {
         teacherName = facultyMap[c2].facultyName;
-        subjectName = facultyMap[c2].paperName;
+        subjectName = explicitSubject || facultyMap[c2].paperName;
       }
     } else if (facultyMap[teacherCodeLower]) {
-      subjectName = facultyMap[teacherCodeLower].paperName;
+      if (!explicitSubject) {
+        subjectName = facultyMap[teacherCodeLower].paperName;
+      } else if (facultyMap[teacherCodeLower].paperName.includes('Merged with')) {
+        const mergeMatch = facultyMap[teacherCodeLower].paperName.match(/\(Merged with [^)]+\)/);
+        if (mergeMatch) subjectName = `${explicitSubject} ${mergeMatch[0]}`;
+      }
       teacherName = facultyMap[teacherCodeLower].facultyName;
     } else {
       const keys = Object.keys(facultyMap);
       for (let k of keys) {
         if (teacherCodeLower && (teacherCodeLower.includes(k) || k.includes(teacherCodeLower))) {
-          subjectName = facultyMap[k].paperName;
+          if (!explicitSubject) {
+            subjectName = facultyMap[k].paperName;
+          } else if (facultyMap[k].paperName.includes('Merged with')) {
+            const mergeMatch = facultyMap[k].paperName.match(/\(Merged with [^)]+\)/);
+            if (mergeMatch) subjectName = `${explicitSubject} ${mergeMatch[0]}`;
+          }
           teacherName = facultyMap[k].facultyName;
           break;
         }
@@ -1996,22 +2089,28 @@ STRICT EXTRACTION RULES:
     }
   };
 
-  // Manual editor handlers
-  const getCourses = () => Object.keys(timetable || {}).filter(k => k !== '_meta' && typeof timetable[k] === 'object');
+  // Manual editor handlers reading from draft
+  const getCourses = () => {
+    const data = draftTimetable || timetable || {};
+    return Object.keys(data).filter(k => k !== '_meta' && typeof data[k] === 'object');
+  };
   const getSemesters = () => {
-    if (!timetable || !timetable[selectedCourse]) return [];
-    return Object.keys(timetable[selectedCourse]);
+    const data = draftTimetable || timetable || {};
+    if (!data || !data[selectedCourse]) return [];
+    return Object.keys(data[selectedCourse]);
   };
   const getSections = () => {
-    if (!timetable || !timetable[selectedCourse] || !timetable[selectedCourse][selectedSem]) return [];
-    return Object.keys(timetable[selectedCourse][selectedSem]);
+    const data = draftTimetable || timetable || {};
+    if (!data || !data[selectedCourse] || !data[selectedCourse][selectedSem]) return [];
+    return Object.keys(data[selectedCourse][selectedSem]);
   };
 
   const getActiveDayClasses = () => {
-    if (!timetable || !timetable[selectedCourse] || !timetable[selectedCourse][selectedSem] || !timetable[selectedCourse][selectedSem][selectedSection]) {
+    const data = draftTimetable || timetable || {};
+    if (!data || !data[selectedCourse] || !data[selectedCourse][selectedSem] || !data[selectedCourse][selectedSem][selectedSection]) {
       return [];
     }
-    return timetable[selectedCourse][selectedSem][selectedSection][selectedDay] || [];
+    return data[selectedCourse][selectedSem][selectedSection][selectedDay] || [];
   };
 
   const handleEditClick = (idx, slot) => {
@@ -2023,30 +2122,24 @@ STRICT EXTRACTION RULES:
     });
   };
 
-  const handleManualSave = async () => {
+  const handleManualSave = () => {
     try {
-      setIsSaving(true);
-      setSaveStatus({ type: '', message: '' });
-      
-      // Clone master timetable
-      const updatedTimetable = JSON.parse(JSON.stringify(timetable));
-      
-      // Update cell values
-      const dayClasses = updatedTimetable[selectedCourse][selectedSem][selectedSection][selectedDay];
+      const data = draftTimetable || timetable || {};
+      const updated = JSON.parse(JSON.stringify(data));
+      if (!updated[selectedCourse]?.[selectedSem]?.[selectedSection]?.[selectedDay]) return;
+      const dayClasses = updated[selectedCourse][selectedSem][selectedSection][selectedDay];
       dayClasses[editingSlotIdx] = {
         ...dayClasses[editingSlotIdx],
         subject: editFields.subject,
         teacher: editFields.teacher,
         room: editFields.room
       };
-
-      await updateTimetable(updatedTimetable);
+      setDraftTimetable(updated);
+      setHasUnpublishedChanges(true);
       setEditingSlotIdx(null);
-      setSaveStatus({ type: 'success', message: 'Class slot updated successfully in database!' });
+      setSaveStatus({ type: 'success', message: 'Slot updated in draft preview. Click "Publish Timetable to Live OS" to save changes live.' });
     } catch (err) {
-      setSaveStatus({ type: 'error', message: err.message || 'Failed to update slot.' });
-    } finally {
-      setIsSaving(false);
+      setSaveStatus({ type: 'error', message: err.message || 'Failed to update slot in draft.' });
     }
   };
 
@@ -2076,10 +2169,10 @@ STRICT EXTRACTION RULES:
         {/* Navigation Tabs */}
         <nav className="admin-tabs">
           <button 
-            className={`admin-tab-btn ${activeTab === 'editor' ? 'active' : ''}`}
+            className={`admin-tab-btn ${activeTab === 'editor' || activeTab === 'uploader' ? 'active' : ''}`}
             onClick={() => setActiveTab('editor')}
           >
-            Live Schedule Editor
+            Schedule & Timetable Manager
           </button>
           <button 
             className={`admin-tab-btn ${activeTab === 'notices' ? 'active' : ''}`}
@@ -2100,12 +2193,6 @@ STRICT EXTRACTION RULES:
             Holidays & Fests
           </button>
           <button 
-            className={`admin-tab-btn ${activeTab === 'uploader' ? 'active' : ''}`}
-            onClick={() => setActiveTab('uploader')}
-          >
-            Schedule Uploader
-          </button>
-          <button 
             className={`admin-tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
             onClick={() => setActiveTab('settings')}
           >
@@ -2121,109 +2208,346 @@ STRICT EXTRACTION RULES:
         )}
 
         {/* Tab contents */}
-        {activeTab === 'editor' ? (
-          <div className="tab-pane editor-pane">
-            <div className="editor-controls-row">
-              <div className="control-item">
-                <label>Course</label>
-                <select value={selectedCourse} onChange={(e) => { setSelectedCourse(e.target.value); setEditingSlotIdx(null); }} className="admin-select">
-                  {getCourses().map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
+        {activeTab === 'editor' || activeTab === 'uploader' ? (
+          <div className="tab-pane schedules-manager-pane">
+            
+            {/* Top Bar for Draft Status & Publish Action */}
+            <div className="schedule-publish-bar">
+              <div className="publish-bar-info">
+                <span className="publish-status-icon">{hasUnpublishedChanges ? '🟡' : '🟢'}</span>
+                <div>
+                  <h3 className="publish-status-title">
+                    {hasUnpublishedChanges ? 'Unpublished Schedule Draft Active' : 'Live Schedule Active'}
+                  </h3>
+                  <p className="publish-status-sub">
+                    {hasUnpublishedChanges
+                      ? 'Schedule changes from AI Uploader or Live Editor are loaded in draft. Click "Publish Timetable to Live OS" to send to student dashboards.'
+                      : 'Current timetable in database is live and active on all student dashboards.'}
+                  </p>
+                </div>
               </div>
-              <div className="control-item">
-                <label>Semester</label>
-                <select value={selectedSem} onChange={(e) => { setSelectedSem(e.target.value); setEditingSlotIdx(null); }} className="admin-select">
-                  {getSemesters().map(s => <option key={s} value={s}>Sem {s}</option>)}
-                </select>
-              </div>
-              <div className="control-item">
-                <label>Section</label>
-                <select value={selectedSection} onChange={(e) => { setSelectedSection(e.target.value); setEditingSlotIdx(null); }} className="admin-select">
-                  {getSections().map(s => <option key={s} value={s}>Section {s}</option>)}
-                </select>
-              </div>
-              <div className="control-item">
-                <label>Day of Week</label>
-                <select value={selectedDay} onChange={(e) => { setSelectedDay(e.target.value); setEditingSlotIdx(null); }} className="admin-select">
-                  {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map(d => <option key={d} value={d}>{d}</option>)}
-                </select>
+              <div className="publish-bar-actions">
+                {hasUnpublishedChanges && (
+                  <button className="btn-discard-draft" onClick={handleDiscardDraftChanges} disabled={isSaving}>
+                    ↺ Discard Draft
+                  </button>
+                )}
+                <button 
+                  className={`btn-publish-all-master ${hasUnpublishedChanges ? 'has-changes' : ''}`}
+                  onClick={handlePublishDraftTimetable} 
+                  disabled={isSaving}
+                >
+                  {isSaving ? '⏳ Publishing Live...' : '🚀 Publish Timetable to Live OS'}
+                </button>
               </div>
             </div>
 
-            {/* Timetable Slots Table */}
-            <div className="schedule-table-container">
-              <table className="admin-schedule-table">
-                <thead>
-                  <tr>
-                    <th>Period / Time</th>
-                    <th>Subject Title</th>
-                    <th>Professor Name</th>
-                    <th>Classroom</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {getActiveDayClasses().map((slot, idx) => {
-                    const isEditing = editingSlotIdx === idx;
-                    return (
-                      <tr key={idx} className={slot.isBreak ? 'break-row-admin' : ''}>
-                        <td className="period-col-admin">
-                          <strong>{slot.isBreak ? 'Infinity Hour' : `Period ${slot.period}`}</strong>
-                        </td>
-                        <td>
-                          {isEditing ? (
-                            <input 
-                              type="text" 
-                              value={editFields.subject} 
-                              onChange={(e) => setEditFields(prev => ({ ...prev, subject: e.target.value }))}
-                              className="admin-edit-input"
-                            />
-                          ) : (
-                            <span>{slot.subject}</span>
-                          )}
-                        </td>
-                        <td>
-                          {isEditing ? (
-                            <input 
-                              type="text" 
-                              value={editFields.teacher} 
-                              onChange={(e) => setEditFields(prev => ({ ...prev, teacher: e.target.value }))}
-                              className="admin-edit-input"
-                              disabled={slot.isBreak}
-                            />
-                          ) : (
-                            <span>{slot.teacher}</span>
-                          )}
-                        </td>
-                        <td>
-                          {isEditing ? (
-                            <input 
-                              type="text" 
-                              value={editFields.room} 
-                              onChange={(e) => setEditFields(prev => ({ ...prev, room: e.target.value }))}
-                              className="admin-edit-input"
-                              disabled={slot.isBreak}
-                            />
-                          ) : (
-                            <span>{slot.room}</span>
-                          )}
-                        </td>
-                        <td className="action-col-admin">
-                          {isEditing ? (
-                            <div className="edit-btn-row">
-                              <button className="btn-action-save" onClick={handleManualSave} disabled={isSaving}>Save</button>
-                              <button className="btn-action-cancel" onClick={() => setEditingSlotIdx(null)} disabled={isSaving}>Cancel</button>
-                            </div>
-                          ) : (
-                            <button className="btn-action-edit" onClick={() => handleEditClick(idx, slot)}>Edit</button>
-                          )}
+            {/* AI Schedule Uploader Card */}
+            <div className="schedule-section-card uploader-card-wrapper">
+              <div className="schedule-section-header">
+                <span className="section-header-icon">📥</span>
+                <div>
+                  <h3>AI Schedule Uploader</h3>
+                  <p>Paste structured AI output text below. Text is automatically parsed and loaded directly into the Live Schedule Editor draft below.</p>
+                </div>
+              </div>
+
+              {/* Prompt Section */}
+              <div className="uploader-prompt-section">
+                <div className="prompt-header-row">
+                  <div>
+                    <h3>📋 AI Timetable Prompt</h3>
+                    <p className="section-desc-small">Copy this prompt, paste it into Claude or ChatGPT with the Excel timetable file, and paste the output back here.</p>
+                  </div>
+                  <div className="prompt-actions">
+                    <button className={`btn-copy-prompt ${promptCopied ? 'copied' : ''}`} onClick={handleCopyPrompt}>
+                      {promptCopied ? '✓ Copied!' : '📋 Copy Prompt to Clipboard'}
+                    </button>
+                    <button className="btn-toggle-prompt" onClick={() => setShowPromptExpanded(!showPromptExpanded)}>
+                      {showPromptExpanded ? '▲ Collapse' : '▼ Preview Prompt'}
+                    </button>
+                  </div>
+                </div>
+                {showPromptExpanded && (
+                  <pre className="prompt-preview-box">{TIMETABLE_AI_PROMPT}</pre>
+                )}
+              </div>
+
+              {/* Two Column Upload Cards */}
+              <div className="uploader-columns">
+                {/* Management Column */}
+                <div className="uploader-card">
+                  <div className="uploader-card-header mgmt">
+                    <span className="uploader-card-icon">🏢</span>
+                    <div>
+                      <h4>Management (BMS + BBA FIA)</h4>
+                      <p>Paste the AI-generated text for Management timetables</p>
+                    </div>
+                  </div>
+                  <textarea
+                    className="text-parser-textarea"
+                    placeholder={`Paste the Claude/ChatGPT output here...\n\nExpected format:\n=== BMS | Semester 1 | Section A | Room 703 ===\nMonday:\n  P1: Subject | Teacher | Room\n  P2: ...`}
+                    value={textInputMgmt}
+                    onChange={(e) => { setTextInputMgmt(e.target.value); setTextParsedMgmt(null); }}
+                    rows={8}
+                  />
+                  <div className="uploader-card-actions">
+                    <button
+                      className="btn-parse-text"
+                      onClick={() => parseTextWithHuggingFace(textInputMgmt, 'mgmt')}
+                      disabled={!textInputMgmt.trim() || isParsingTextMgmt}
+                    >
+                      {isParsingTextMgmt ? '⏳ Parsing & Loading...' : '🔍 Parse Text & Auto-Populate'}
+                    </button>
+                    {textInputMgmt && (
+                      <button className="btn-clear-text" onClick={() => { setTextInputMgmt(''); setTextParsedMgmt(null); }}>
+                        Clear
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Parse Preview Summary */}
+                  {textParsedMgmt && (
+                    <div className="parse-preview">
+                      <h5>✅ Loaded into Live Editor Draft below</h5>
+                      <div className="parse-preview-list">
+                        {getTextParseSummary(textParsedMgmt).map((item, i) => (
+                          <div key={i} className="parse-preview-item">
+                            <span className="preview-badge">{item.course}</span>
+                            <span>Sem {item.sem}</span>
+                            <span className="preview-sections">Sections: {item.sections}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="uploader-card-scrap">
+                    <button className="btn-scrap-timetable" onClick={handleScrapMgmtTimetable} disabled={isSaving}>
+                      🗑️ Scrap Management Draft
+                    </button>
+                  </div>
+                </div>
+
+                {/* B.Sc. CS Column */}
+                <div className="uploader-card">
+                  <div className="uploader-card-header cs">
+                    <span className="uploader-card-icon">💻</span>
+                    <div>
+                      <h4>B.Sc. Computer Science</h4>
+                      <p>Paste the AI-generated text for B.Sc. CS timetables</p>
+                    </div>
+                  </div>
+                  <textarea
+                    className="text-parser-textarea"
+                    placeholder={`Paste the Claude/ChatGPT output here...\n\nExpected format:\n=== Bsc Comp Sci | Semester 1 | Section A | Room 403 ===\nMonday:\n  P1: Subject | Teacher | Room\n  P2: ...`}
+                    value={textInputCs}
+                    onChange={(e) => { setTextInputCs(e.target.value); setTextParsedCs(null); }}
+                    rows={8}
+                  />
+                  <div className="uploader-card-actions">
+                    <button
+                      className="btn-parse-text"
+                      onClick={() => parseTextWithHuggingFace(textInputCs, 'cs')}
+                      disabled={!textInputCs.trim() || isParsingTextCs}
+                    >
+                      {isParsingTextCs ? '⏳ Parsing & Loading...' : '🔍 Parse Text & Auto-Populate'}
+                    </button>
+                    {textInputCs && (
+                      <button className="btn-clear-text" onClick={() => { setTextInputCs(''); setTextParsedCs(null); }}>
+                        Clear
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Parse Preview Summary */}
+                  {textParsedCs && (
+                    <div className="parse-preview">
+                      <h5>✅ Loaded into Live Editor Draft below</h5>
+                      <div className="parse-preview-list">
+                        {getTextParseSummary(textParsedCs).map((item, i) => (
+                          <div key={i} className="parse-preview-item">
+                            <span className="preview-badge cs">{item.course}</span>
+                            <span>Sem {item.sem}</span>
+                            <span className="preview-sections">Sections: {item.sections}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="uploader-card-scrap">
+                    <button className="btn-scrap-timetable" onClick={handleScrapCsTimetable} disabled={isSaving}>
+                      🗑️ Scrap B.Sc. CS Draft
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Scrap All + HF Key */}
+              <div className="uploader-bottom-row">
+                <button className="btn-scrap-all" onClick={handleScrapActiveTimetables} disabled={isSaving}>
+                  🗑️ Clear ALL Timetables from Draft
+                </button>
+                <div className="hf-key-section">
+                  {showHfKeyInput ? (
+                    <div className="hf-key-input-row">
+                      <input
+                        type="password"
+                        className="admin-input-field"
+                        placeholder="Paste your Hugging Face API token..."
+                        value={hfApiKey}
+                        onChange={(e) => setHfApiKey(e.target.value)}
+                      />
+                      <button className="btn-clear-text" onClick={() => setShowHfKeyInput(false)}>Done</button>
+                    </div>
+                  ) : (
+                    <button className="btn-configure-hf" onClick={() => setShowHfKeyInput(true)}>
+                      ⚙️ {hfApiKey ? 'HF Token Set ✓' : 'Configure HF Token (Optional)'}
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Parsing Logs */}
+              {textParserLogs.length > 0 && (
+                <div className="text-parser-logs">
+                  <div className="logs-header">
+                    <h4>📜 Parsing Log</h4>
+                    <button className="btn-clear-text" onClick={() => setTextParserLogs([])}>Clear</button>
+                  </div>
+                  <div className="logs-list">
+                    {textParserLogs.map((log, i) => (
+                      <div key={i} className={`log-entry log-${log.type}`}>
+                        <span className="log-time">[{log.time}]</span> {log.msg}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Live Schedule Editor & Interactive Preview Section */}
+            <div className="schedule-section-card editor-card-wrapper">
+              <div className="schedule-section-header">
+                <span className="section-header-icon">✏️</span>
+                <div>
+                  <h3>Live Schedule Editor & Interactive Preview</h3>
+                  <p>Filter by Course, Semester, Section, and Day to inspect automatically populated slots or edit individual class periods.</p>
+                </div>
+              </div>
+
+              <div className="editor-controls-row">
+                <div className="control-item">
+                  <label>Course</label>
+                  <select value={selectedCourse} onChange={(e) => { setSelectedCourse(e.target.value); setEditingSlotIdx(null); }} className="admin-select">
+                    {getCourses().map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div className="control-item">
+                  <label>Semester</label>
+                  <select value={selectedSem} onChange={(e) => { setSelectedSem(e.target.value); setEditingSlotIdx(null); }} className="admin-select">
+                    {getSemesters().map(s => <option key={s} value={s}>Sem {s}</option>)}
+                  </select>
+                </div>
+                <div className="control-item">
+                  <label>Section</label>
+                  <select value={selectedSection} onChange={(e) => { setSelectedSection(e.target.value); setEditingSlotIdx(null); }} className="admin-select">
+                    {getSections().map(s => <option key={s} value={s}>Section {s}</option>)}
+                  </select>
+                </div>
+                <div className="control-item">
+                  <label>Day of Week</label>
+                  <select value={selectedDay} onChange={(e) => { setSelectedDay(e.target.value); setEditingSlotIdx(null); }} className="admin-select">
+                    {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* Timetable Slots Table */}
+              <div className="schedule-table-container">
+                <table className="admin-schedule-table">
+                  <thead>
+                    <tr>
+                      <th>Period / Time</th>
+                      <th>Subject Title</th>
+                      <th>Professor Name</th>
+                      <th>Classroom</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {getActiveDayClasses().length === 0 ? (
+                      <tr>
+                        <td colSpan="5" className="empty-schedule-td" style={{ textAlign: 'center', padding: '32px', color: 'var(--ink-dim)' }}>
+                          No classes found for {selectedCourse} Sem {selectedSem} Section {selectedSection} on {selectedDay}. Paste schedule text in the uploader above to parse & populate automatically.
                         </td>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                    ) : (
+                      getActiveDayClasses().map((slot, idx) => {
+                        const isEditing = editingSlotIdx === idx;
+                        return (
+                          <tr key={idx} className={slot.isBreak ? 'break-row-admin' : ''}>
+                            <td className="period-col-admin">
+                              <strong>{slot.isBreak ? 'Infinity Hour' : `Period ${slot.period}`}</strong>
+                            </td>
+                            <td>
+                              {isEditing ? (
+                                <input 
+                                  type="text" 
+                                  value={editFields.subject} 
+                                  onChange={(e) => setEditFields(prev => ({ ...prev, subject: e.target.value }))}
+                                  className="admin-edit-input"
+                                />
+                              ) : (
+                                <span>{slot.subject}</span>
+                              )}
+                            </td>
+                            <td>
+                              {isEditing ? (
+                                <input 
+                                  type="text" 
+                                  value={editFields.teacher} 
+                                  onChange={(e) => setEditFields(prev => ({ ...prev, teacher: e.target.value }))}
+                                  className="admin-edit-input"
+                                  disabled={slot.isBreak}
+                                />
+                              ) : (
+                                <span>{slot.teacher}</span>
+                              )}
+                            </td>
+                            <td>
+                              {isEditing ? (
+                                <input 
+                                  type="text" 
+                                  value={editFields.room} 
+                                  onChange={(e) => setEditFields(prev => ({ ...prev, room: e.target.value }))}
+                                  className="admin-edit-input"
+                                  disabled={slot.isBreak}
+                                />
+                              ) : (
+                                <span>{slot.room}</span>
+                              )}
+                            </td>
+                            <td className="action-col-admin">
+                              {isEditing ? (
+                                <div className="edit-btn-row">
+                                  <button className="btn-action-save" onClick={handleManualSave}>Save Slot</button>
+                                  <button className="btn-action-cancel" onClick={() => setEditingSlotIdx(null)}>Cancel</button>
+                                </div>
+                              ) : (
+                                <button className="btn-action-edit" onClick={() => handleEditClick(idx, slot)}>Edit Slot</button>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
+
           </div>
         ) : activeTab === 'notices' ? (
           <div className="tab-pane notices-pane">
@@ -3302,197 +3626,6 @@ STRICT EXTRACTION RULES:
                 )}
               </div>
             </div>
-          </div>
-        ) : activeTab === 'uploader' ? (
-          <div className="tab-pane uploader-pane">
-            {/* Prompt Section */}
-            <div className="uploader-prompt-section">
-              <div className="prompt-header-row">
-                <div>
-                  <h3>📋 AI Timetable Prompt</h3>
-                  <p className="section-desc-small">Copy this prompt, paste it into Claude or ChatGPT, attach the Excel timetable file, and copy the AI's output text back here.</p>
-                </div>
-                <div className="prompt-actions">
-                  <button className={`btn-copy-prompt ${promptCopied ? 'copied' : ''}`} onClick={handleCopyPrompt}>
-                    {promptCopied ? '✓ Copied!' : '📋 Copy Prompt to Clipboard'}
-                  </button>
-                  <button className="btn-toggle-prompt" onClick={() => setShowPromptExpanded(!showPromptExpanded)}>
-                    {showPromptExpanded ? '▲ Collapse' : '▼ Preview Prompt'}
-                  </button>
-                </div>
-              </div>
-              {showPromptExpanded && (
-                <pre className="prompt-preview-box">{TIMETABLE_AI_PROMPT}</pre>
-              )}
-            </div>
-
-            {/* Two Column Upload Cards */}
-            <div className="uploader-columns">
-              {/* Management Column */}
-              <div className="uploader-card">
-                <div className="uploader-card-header mgmt">
-                  <span className="uploader-card-icon">🏢</span>
-                  <div>
-                    <h4>Management (BMS + BBA FIA)</h4>
-                    <p>Paste the AI-generated text for Management timetables</p>
-                  </div>
-                </div>
-                <textarea
-                  className="text-parser-textarea"
-                  placeholder={`Paste the Claude/ChatGPT output here...\n\nExpected format:\n=== BMS | Semester 1 | Section A | Room 703 ===\nMonday:\n  P1: Subject | Teacher | Room\n  P2: ...`}
-                  value={textInputMgmt}
-                  onChange={(e) => { setTextInputMgmt(e.target.value); setTextParsedMgmt(null); }}
-                  rows={10}
-                />
-                <div className="uploader-card-actions">
-                  <button
-                    className="btn-parse-text"
-                    onClick={() => parseTextWithHuggingFace(textInputMgmt, 'mgmt')}
-                    disabled={!textInputMgmt.trim() || isParsingTextMgmt}
-                  >
-                    {isParsingTextMgmt ? '⏳ Parsing...' : '🔍 Parse Text'}
-                  </button>
-                  {textInputMgmt && (
-                    <button className="btn-clear-text" onClick={() => { setTextInputMgmt(''); setTextParsedMgmt(null); }}>
-                      Clear
-                    </button>
-                  )}
-                </div>
-
-                {/* Parse Preview */}
-                {textParsedMgmt && (
-                  <div className="parse-preview">
-                    <h5>✅ Ready to Publish</h5>
-                    <div className="parse-preview-list">
-                      {getTextParseSummary(textParsedMgmt).map((item, i) => (
-                        <div key={i} className="parse-preview-item">
-                          <span className="preview-badge">{item.course}</span>
-                          <span>Sem {item.sem}</span>
-                          <span className="preview-sections">Sections: {item.sections}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <button
-                      className="btn-publish-timetable"
-                      onClick={handlePublishTextMgmt}
-                      disabled={isSaving}
-                    >
-                      {isSaving ? '⏳ Publishing...' : '🚀 Publish Management Timetables'}
-                    </button>
-                  </div>
-                )}
-
-                <div className="uploader-card-scrap">
-                  <button className="btn-scrap-timetable" onClick={handleScrapMgmtTimetable} disabled={isSaving}>
-                    🗑️ Scrap Management Timetables
-                  </button>
-                </div>
-              </div>
-
-              {/* B.Sc. CS Column */}
-              <div className="uploader-card">
-                <div className="uploader-card-header cs">
-                  <span className="uploader-card-icon">💻</span>
-                  <div>
-                    <h4>B.Sc. Computer Science</h4>
-                    <p>Paste the AI-generated text for B.Sc. CS timetables</p>
-                  </div>
-                </div>
-                <textarea
-                  className="text-parser-textarea"
-                  placeholder={`Paste the Claude/ChatGPT output here...\n\nExpected format:\n=== Bsc Comp Sci | Semester 1 | Section A | Room 403 ===\nMonday:\n  P1: Subject | Teacher | Room\n  P2: ...`}
-                  value={textInputCs}
-                  onChange={(e) => { setTextInputCs(e.target.value); setTextParsedCs(null); }}
-                  rows={10}
-                />
-                <div className="uploader-card-actions">
-                  <button
-                    className="btn-parse-text"
-                    onClick={() => parseTextWithHuggingFace(textInputCs, 'cs')}
-                    disabled={!textInputCs.trim() || isParsingTextCs}
-                  >
-                    {isParsingTextCs ? '⏳ Parsing...' : '🔍 Parse Text'}
-                  </button>
-                  {textInputCs && (
-                    <button className="btn-clear-text" onClick={() => { setTextInputCs(''); setTextParsedCs(null); }}>
-                      Clear
-                    </button>
-                  )}
-                </div>
-
-                {/* Parse Preview */}
-                {textParsedCs && (
-                  <div className="parse-preview">
-                    <h5>✅ Ready to Publish</h5>
-                    <div className="parse-preview-list">
-                      {getTextParseSummary(textParsedCs).map((item, i) => (
-                        <div key={i} className="parse-preview-item">
-                          <span className="preview-badge cs">{item.course}</span>
-                          <span>Sem {item.sem}</span>
-                          <span className="preview-sections">Sections: {item.sections}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <button
-                      className="btn-publish-timetable"
-                      onClick={handlePublishTextCs}
-                      disabled={isSaving}
-                    >
-                      {isSaving ? '⏳ Publishing...' : '🚀 Publish B.Sc. CS Timetables'}
-                    </button>
-                  </div>
-                )}
-
-                <div className="uploader-card-scrap">
-                  <button className="btn-scrap-timetable" onClick={handleScrapCsTimetable} disabled={isSaving}>
-                    🗑️ Scrap B.Sc. CS Timetables
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Scrap All + HF Key */}
-            <div className="uploader-bottom-row">
-              <button className="btn-scrap-all" onClick={handleScrapActiveTimetables} disabled={isSaving}>
-                🗑️ Scrap ALL Active Timetables
-              </button>
-              <div className="hf-key-section">
-                {showHfKeyInput ? (
-                  <div className="hf-key-input-row">
-                    <input
-                      type="password"
-                      className="admin-input-field"
-                      placeholder="Paste your Hugging Face API token..."
-                      value={hfApiKey}
-                      onChange={(e) => setHfApiKey(e.target.value)}
-                    />
-                    <button className="btn-clear-text" onClick={() => setShowHfKeyInput(false)}>Done</button>
-                  </div>
-                ) : (
-                  <button className="btn-configure-hf" onClick={() => setShowHfKeyInput(true)}>
-                    ⚙️ {hfApiKey ? 'HF Token Set ✓' : 'Configure HF Token (Optional)'}
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Parsing Logs */}
-            {textParserLogs.length > 0 && (
-              <div className="text-parser-logs">
-                <div className="logs-header">
-                  <h4>📜 Parsing Log</h4>
-                  <button className="btn-clear-text" onClick={() => setTextParserLogs([])}>Clear</button>
-                </div>
-                <div className="logs-list">
-                  {textParserLogs.map((log, i) => (
-                    <div key={i} className={`log-entry log-${log.type}`}>
-                      <span className="log-time">[{log.time}]</span> {log.msg}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
         ) : activeTab === 'settings' ? (
           <div className="tab-pane flex-col gap-4">
             <div className="chart-header-admin">
