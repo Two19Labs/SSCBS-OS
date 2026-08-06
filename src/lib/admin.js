@@ -22,6 +22,7 @@ export function canAccessTeamFinder(email) {
 
 export const EMPTY_ROOM_TESTERS = [
   'aditya.25015@sscbs.du.ac.in',
+  'lorena.25131@sscbs.du.ac.in',
 ];
 
 export function canAccessEmptyRoom(email) {
