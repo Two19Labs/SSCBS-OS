@@ -15,6 +15,7 @@ import {
   MailIcon,
   MoreVerticalIcon,
   RefreshIcon,
+  ExternalLinkIcon,
 } from './icons';
 import './TeamFinderPage.css';
 
@@ -865,17 +866,17 @@ function getUserApp(post, applications, userEmail, userId) {
 
     const dots = [];
     for (let i = 0; i < filled; i++) {
-      dots.push(<span key={`f-${i}`} className="squad-dot filled" title="Filled Member Spot">●</span>);
+      dots.push(<span key={`f-${i}`} className="squad-dot-pill filled" title="Filled Member Spot" />);
     }
     for (let i = 0; i < open; i++) {
-      dots.push(<span key={`o-${i}`} className="squad-dot open" title="Open Slot Looking for Member">○</span>);
+      dots.push(<span key={`o-${i}`} className="squad-dot-pill open" title="Open Slot Looking for Member" />);
     }
 
     return (
       <div className="squad-dots-wrapper" title={`${filled}/${total} slots filled (${open} open)`}>
         <div className="squad-dots">{dots}</div>
         <span className="squad-dots-subtext">
-          {open > 0 ? `${open} open` : 'Full'}
+          {open > 0 ? `${open} OPEN` : 'FULL'}
         </span>
       </div>
     );
@@ -1160,80 +1161,93 @@ function getUserApp(post, applications, userEmail, userId) {
                   </div>
                 </div>
 
-                <h2 className="comp-name">{post.competition_name}</h2>
+                <div className="card-main-content">
+                  <div className="comp-title-row">
+                    <h2 className="comp-name">{post.competition_name}</h2>
 
-                {post.competition_link && (
-                  <a
-                    href={post.competition_link.startsWith('http') ? post.competition_link : `https://${post.competition_link}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="comp-link-blue"
-                  >
-                    Click to visit ↗
-                  </a>
-                )}
-
-                {/* User Application Status Callout Banner */}
-                {userApp && !isHost && (
-                  <div className={`user-app-banner ${userApp.status}`}>
-                    <div className="user-app-banner-icon">
-                      {userApp.status === 'accepted' ? '🎉' : userApp.status === 'declined' ? '❌' : userApp.status === 'removed' ? '⚠️' : '⏳'}
-                    </div>
-                    <div className="user-app-banner-content">
-                      <span className="user-app-banner-title">
-                        {userApp.status === 'accepted'
-                          ? 'Accepted into Squad'
-                          : userApp.status === 'declined'
-                          ? 'Application Declined'
-                          : userApp.status === 'removed'
-                          ? 'Removed from Squad'
-                          : 'Request Pending Review'}
-                      </span>
-                      <span className="user-app-banner-sub">
-                        {userApp.status === 'accepted'
-                          ? 'You are part of this team! Connect on WhatsApp below.'
-                          : userApp.status === 'declined'
-                          ? 'The host declined your request.'
-                          : userApp.status === 'removed'
-                          ? 'You were removed from this squad by the host.'
-                          : 'The team lead is reviewing your application.'}
-                      </span>
-                    </div>
+                    {post.competition_link && (
+                      <a
+                        href={post.competition_link.startsWith('http') ? post.competition_link : `https://${post.competition_link}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="comp-link-pill"
+                        title="Visit Competition Website"
+                      >
+                        <span>Click to visit</span>
+                        <ExternalLinkIcon size={12} />
+                      </a>
+                    )}
                   </div>
-                )}
 
-                <h3 className="post-title">{post.title || post.description}</h3>
-                {post.description && post.description !== post.title && (
-                  <p className="post-desc">{post.description}</p>
-                )}
-
-                {/* Skills Present */}
-                {post.skills_have && post.skills_have.length > 0 && (
-                  <div className="skills-group">
-                    <span className="skills-group-label">Skills Present:</span>
-                    <div className="skills-pills">
-                      {post.skills_have.map((s, idx) => (
-                        <span key={idx} className="skill-pill present">
-                          ✓ {s}
+                  {/* User Application Status Callout Banner */}
+                  {userApp && !isHost && (
+                    <div className={`user-app-banner ${userApp.status}`}>
+                      <div className="user-app-banner-icon">
+                        {userApp.status === 'accepted' ? '🎉' : userApp.status === 'declined' ? '❌' : userApp.status === 'removed' ? '⚠️' : '⏳'}
+                      </div>
+                      <div className="user-app-banner-content">
+                        <span className="user-app-banner-title">
+                          {userApp.status === 'accepted'
+                            ? 'Accepted into Squad'
+                            : userApp.status === 'declined'
+                            ? 'Application Declined'
+                            : userApp.status === 'removed'
+                            ? 'Removed from Squad'
+                            : 'Request Pending Review'}
                         </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Skills Needed */}
-                {post.skills_looking_for && post.skills_looking_for.length > 0 && (
-                  <div className="skills-group">
-                    <span className="skills-group-label">Looking For:</span>
-                    <div className="skills-pills">
-                      {post.skills_looking_for.map((s, idx) => (
-                        <span key={idx} className="skill-pill needed">
-                          ⚡ {s}
+                        <span className="user-app-banner-sub">
+                          {userApp.status === 'accepted'
+                            ? 'You are part of this team! Connect on WhatsApp below.'
+                            : userApp.status === 'declined'
+                            ? 'The host declined your request.'
+                            : userApp.status === 'removed'
+                            ? 'You were removed from this squad by the host.'
+                            : 'The team lead is reviewing your application.'}
                         </span>
-                      ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+
+                  {/* Title & Description rendering */}
+                  {post.title ? (
+                    <>
+                      <h3 className="post-title">{post.title}</h3>
+                      {post.description && post.description !== post.title && (
+                        <p className="post-desc">{post.description}</p>
+                      )}
+                    </>
+                  ) : (
+                    <p className="post-desc post-desc-standalone">{post.description}</p>
+                  )}
+
+                  {/* Skills Present */}
+                  {post.skills_have && post.skills_have.length > 0 && (
+                    <div className="skills-group">
+                      <span className="skills-group-label">Skills Present:</span>
+                      <div className="skills-pills">
+                        {post.skills_have.map((s, idx) => (
+                          <span key={idx} className="skill-pill present">
+                            ✓ {s}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Skills Needed */}
+                  {post.skills_looking_for && post.skills_looking_for.length > 0 && (
+                    <div className="skills-group">
+                      <span className="skills-group-label">Looking For:</span>
+                      <div className="skills-pills">
+                        {post.skills_looking_for.map((s, idx) => (
+                          <span key={idx} className="skill-pill needed">
+                            ⚡ {s}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 {/* Card Footer */}
                 {(() => {
