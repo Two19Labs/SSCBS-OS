@@ -2930,8 +2930,10 @@ STRICT EXTRACTION RULES:
               <div className="stat-card-admin">
                 <div className="card-icon">👥</div>
                 <h4>Total Students</h4>
-                <p className="stat-number">{analyticsUsers.length}</p>
-                <p className="stat-subtitle">Registered profiles</p>
+                <p className="stat-number">
+                  {analyticsUsers.filter(u => ['BMS', 'BBA FIA', 'Bsc Comp Sci'].includes(u.course)).length}
+                </p>
+                <p className="stat-subtitle">Verified student profiles</p>
               </div>
               <div className="stat-card-admin">
                 <div className="card-icon">🏆</div>
