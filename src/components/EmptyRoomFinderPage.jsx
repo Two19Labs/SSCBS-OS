@@ -65,13 +65,26 @@ export function EmptyRoomFinderPage({ onBack }) {
         return p;
       }
     }
-    return PERIODS[0]; // Fallback to Period I
+    return null; // Return null outside class hours
   }, [currentTime]);
+
+  // Check if college is closed (e.g. after 7:00 PM, before 9:00 AM, or on weekends)
+  const isCollegeClosedNow = useMemo(() => {
+    const dayIndex = currentTime.getDay();
+    if (dayIndex === 0 || dayIndex === 6) return true; // Weekend
+
+    const nowMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+    const collegeStartMinutes = 9 * 60;  // 9:00 AM
+    const collegeEndMinutes = 19 * 60;   // 7:00 PM
+
+    return nowMinutes < collegeStartMinutes || nowMinutes >= collegeEndMinutes || livePeriod === null;
+  }, [currentTime, livePeriod]);
 
   // Set active day & period based on mode
   const activeDay = mode === 'live' ? (DAYS.includes(liveDay) ? liveDay : 'Monday') : selectedDay;
-  const activePeriodId = mode === 'live' ? livePeriod.id : selectedPeriodId;
+  const activePeriodId = mode === 'live' ? (livePeriod ? livePeriod.id : 1) : selectedPeriodId;
   const activePeriod = PERIODS.find(p => p.id === activePeriodId) || PERIODS[0];
+
 
   // Calculate room statuses
   const roomStatuses = useMemo(() => {
@@ -188,73 +201,93 @@ export function EmptyRoomFinderPage({ onBack }) {
 
       </div>
 
-      {/* Live Active Banner */}
-      <div className="empty-room-active-banner">
-        <div className="banner-left">
-          <span className="banner-day">{activeDay}</span>
-          <span className="banner-divider">•</span>
-          <span className="banner-period">{activePeriod.label}</span>
-          <span className="banner-time">({activePeriod.startLabel} – {activePeriod.endLabel})</span>
-        </div>
-
-        <div className="banner-right">
-          <span className="stat-pill vacant">🟢 {vacantCount} Free</span>
-          <span className="stat-pill occupied">🔴 {occupiedCount} Occupied</span>
-        </div>
-      </div>
-
-      {/* Filter Bar */}
-      <div className="empty-room-filter-bar">
-        {/* Search */}
-        <div className="room-search-box">
-          <SearchIcon size={16} />
-          <input
-            type="text"
-            placeholder="Search room (e.g. 503, 703, Lab 426)..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {searchQuery && (
-            <button className="search-clear-btn" onClick={() => setSearchQuery('')}>×</button>
-          )}
-        </div>
-
-        {/* Status Pills */}
-        <div className="filter-pills-row">
-          <button
-            className={`filter-pill ${statusFilter === 'VACANT' ? 'active' : ''}`}
-            onClick={() => setStatusFilter('VACANT')}
-          >
-            Vacant Only ({vacantCount})
-          </button>
-          <button
-            className={`filter-pill ${statusFilter === 'ALL' ? 'active' : ''}`}
-            onClick={() => setStatusFilter('ALL')}
-          >
-            All Rooms ({roomStatuses.length})
-          </button>
-          <button
-            className={`filter-pill ${statusFilter === 'OCCUPIED' ? 'active' : ''}`}
-            onClick={() => setStatusFilter('OCCUPIED')}
-          >
-            Occupied ({occupiedCount})
-          </button>
-        </div>
-
-        {/* Floor Pills */}
-        <div className="floor-pills-row">
-          <span className="floor-label">Floor:</span>
-          {['ALL', '2', '3', '4', '5', '6', '7'].map(fl => (
-            <button
-              key={fl}
-              className={`floor-pill ${floorFilter === fl ? 'active' : ''}`}
-              onClick={() => setFloorFilter(fl)}
-            >
-              {fl === 'ALL' ? 'All' : `${fl}F`}
+      {/* Main Content Area: Live Closed vs Active Grid */}
+      {mode === 'live' && isCollegeClosedNow ? (
+        <div className="college-closed-container">
+          <div className="college-closed-card">
+            <div className="closed-icon-badge">🏛️</div>
+            <h3>College is currently closed for the day</h3>
+            <p>
+              Regular classes run Monday – Friday, 9:00 AM to 5:00 PM IST.
+              Live tracking automatically re-activates tomorrow at 9:00 AM.
+            </p>
+            <button className="switch-slot-btn" onClick={() => setMode('slot')}>
+              <CalendarIcon size={16} /> Switch to 'Select Slot' to view room availability
             </button>
-          ))}
+          </div>
         </div>
-      </div>
+      ) : (
+        <>
+          {/* Live Active Banner */}
+          <div className="empty-room-active-banner">
+            <div className="banner-left">
+              <span className="banner-day">{activeDay}</span>
+              <span className="banner-divider">•</span>
+              <span className="banner-period">{activePeriod.label}</span>
+              <span className="banner-time">({activePeriod.startLabel} – {activePeriod.endLabel})</span>
+            </div>
+
+            <div className="banner-right">
+              <span className="stat-pill vacant">🟢 {vacantCount} Free</span>
+              <span className="stat-pill occupied">🔴 {occupiedCount} Occupied</span>
+            </div>
+          </div>
+
+          {/* Filter Bar */}
+          <div className="empty-room-filter-bar">
+            {/* Search */}
+            <div className="room-search-box">
+              <SearchIcon size={16} />
+              <input
+                type="text"
+                placeholder="Search room (e.g. 503, 703, Lab 426)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <button className="search-clear-btn" onClick={() => setSearchQuery('')}>×</button>
+              )}
+            </div>
+
+            {/* Status Pills */}
+            <div className="filter-pills-row">
+              <button
+                className={`filter-pill ${statusFilter === 'VACANT' ? 'active' : ''}`}
+                onClick={() => setStatusFilter('VACANT')}
+              >
+                Vacant Only ({vacantCount})
+              </button>
+              <button
+                className={`filter-pill ${statusFilter === 'ALL' ? 'active' : ''}`}
+                onClick={() => setStatusFilter('ALL')}
+              >
+                All Rooms ({roomStatuses.length})
+              </button>
+              <button
+                className={`filter-pill ${statusFilter === 'OCCUPIED' ? 'active' : ''}`}
+                onClick={() => setStatusFilter('OCCUPIED')}
+              >
+                Occupied ({occupiedCount})
+              </button>
+            </div>
+
+            {/* Floor Pills */}
+            <div className="floor-pills-row">
+              <span className="floor-label">Floor:</span>
+              {['ALL', '2', '3', '4', '5', '6', '7'].map(fl => (
+                <button
+                  key={fl}
+                  className={`floor-pill ${floorFilter === fl ? 'active' : ''}`}
+                  onClick={() => setFloorFilter(fl)}
+                >
+                  {fl === 'ALL' ? 'All' : `${fl}F`}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
 
       {/* Room Grid */}
       <div className="room-grid">

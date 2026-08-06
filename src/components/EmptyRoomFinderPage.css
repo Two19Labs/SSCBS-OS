@@ -205,8 +205,81 @@
   cursor: pointer;
 }
 
+/* College Closed State Card */
+.college-closed-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 10px;
+  width: 100%;
+}
+
+.college-closed-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 24px;
+  text-align: center;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.25s ease;
+}
+
+.closed-icon-badge {
+  font-size: 40px;
+  line-height: 1;
+  background: rgba(184, 134, 11, 0.12);
+  border-radius: 50%;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.college-closed-card h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.college-closed-card p {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.switch-slot-btn {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent-gold, #b8860b);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.switch-slot-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(184, 134, 11, 0.35);
+}
+
 /* Active Banner */
 .empty-room-active-banner {
+
   background: linear-gradient(135deg, rgba(184, 134, 11, 0.1) 0%, rgba(139, 0, 0, 0.1) 100%);
   border: 1px solid rgba(184, 134, 11, 0.25);
   border-radius: 12px;
