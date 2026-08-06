@@ -111,8 +111,13 @@ export function EmptyRoomFinderPage({ onBack }) {
       if (floorFilter !== 'ALL' && item.floor !== Number(floorFilter)) {
         return false;
       }
-      if (statusFilter === 'VACANT' && !item.isVacant) return false;
-      if (statusFilter === 'OCCUPIED' && item.isVacant) return false;
+
+      if (mode === 'live' && (isCollegeClosedNow || activeHoliday)) {
+        // Bypasses vacant/occupied split during off-hours & holidays
+      } else {
+        if (statusFilter === 'VACANT' && !item.isVacant) return false;
+        if (statusFilter === 'OCCUPIED' && item.isVacant) return false;
+      }
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
@@ -124,7 +129,8 @@ export function EmptyRoomFinderPage({ onBack }) {
 
       return true;
     });
-  }, [roomStatuses, floorFilter, statusFilter, searchQuery]);
+  }, [roomStatuses, floorFilter, statusFilter, searchQuery, mode, isCollegeClosedNow, activeHoliday]);
+
 
   // Stats
   const vacantCount = roomStatuses.filter(r => r.isVacant).length;
@@ -277,18 +283,31 @@ export function EmptyRoomFinderPage({ onBack }) {
           >
             All Rooms ({roomStatuses.length})
           </button>
-          <button
-            className={`filter-pill ${statusFilter === 'VACANT' ? 'active' : ''}`}
-            onClick={() => setStatusFilter('VACANT')}
-          >
-            Vacant ({vacantCount})
-          </button>
-          <button
-            className={`filter-pill ${statusFilter === 'OCCUPIED' ? 'active' : ''}`}
-            onClick={() => setStatusFilter('OCCUPIED')}
-          >
-            Occupied ({occupiedCount})
-          </button>
+
+          {mode === 'live' && activeHoliday ? (
+            <button className="filter-pill active">
+              Holiday ({roomStatuses.length})
+            </button>
+          ) : mode === 'live' && isCollegeClosedNow ? (
+            <button className="filter-pill active">
+              Closed ({roomStatuses.length})
+            </button>
+          ) : (
+            <>
+              <button
+                className={`filter-pill ${statusFilter === 'VACANT' ? 'active' : ''}`}
+                onClick={() => setStatusFilter('VACANT')}
+              >
+                Vacant ({vacantCount})
+              </button>
+              <button
+                className={`filter-pill ${statusFilter === 'OCCUPIED' ? 'active' : ''}`}
+                onClick={() => setStatusFilter('OCCUPIED')}
+              >
+                Occupied ({occupiedCount})
+              </button>
+            </>
+          )}
         </div>
 
         {/* Floor Pills */}
