@@ -156,7 +156,6 @@ export function EmptyRoomFinderPage({ onBack }) {
           <div className="empty-room-title-row">
             <span className="empty-room-header-icon"><DoorIcon size={22} /></span>
             <h2>Empty Room Finder</h2>
-            <span className="micro-label success">LIVE DATA</span>
           </div>
           <p className="empty-room-subtitle">Spot vacant classrooms & labs powered by official college timetables</p>
         </div>
