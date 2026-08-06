@@ -169,19 +169,11 @@ function App() {
 
   const goBack = () => setView(returnView);
 
-  // Waiver & Empty Room tools ship their own full-page layout
+  // Waiver Tool ships its own full-page layout
   if (view === 'waiver') {
     return (
       <Suspense fallback={<PageLoader />}>
         <WaiverToolPage onBack={goBack} />
-      </Suspense>
-    );
-  }
-
-  if (view === 'empty-room') {
-    return (
-      <Suspense fallback={<PageLoader />}>
-        <EmptyRoomFinderPage onBack={goBack} />
       </Suspense>
     );
   }
@@ -215,6 +207,7 @@ function App() {
     tools: 'Tools',
     'find-prof': 'Find My Professor',
     'team-finder': 'Team Finder & Compete Hub',
+    'empty-room': 'Empty Room Finder',
     admin: 'Admin Console',
     buzz: 'Campus Buzz',
     profile: 'Profile',
@@ -235,6 +228,12 @@ function App() {
         return (
           <Suspense fallback={<PageLoader />}>
             <TeamFinderPage onBack={goBack} />
+          </Suspense>
+        );
+      case 'empty-room':
+        return (
+          <Suspense fallback={<PageLoader />}>
+            <EmptyRoomFinderPage onBack={goBack} />
           </Suspense>
         );
       case 'contact':
