@@ -5,7 +5,8 @@ import { useTimetable } from '../context/TimetableContext';
 import { PERIODS, DAYS } from '../data/timetables';
 import NoticeBoard from './NoticeBoard';
 import { SearchIcon, PercentIcon, CalculatorIcon, FileIcon, TrophyIcon, DoorIcon, HeartIcon, UsersIcon } from './icons';
-import { isAdminEmail, canAccessTeamFinder } from '../lib/admin';
+import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom } from '../lib/admin';
+
 import './HomeDashboard.css';
 
 
@@ -249,6 +250,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
   };
 
   const hasTeamFinderAccess = featureFlags['team-finder'] || canAccessTeamFinder(user?.email);
+  const hasEmptyRoomAccess = featureFlags['empty-room'] || canAccessEmptyRoom(user?.email);
 
   const tools = [
     { id: 'society-tracker', micro: 'SOON', microClass: 'dim', title: 'Society Recruitment Tracker', desc: 'Keep track of info & form deadlines for societies', Icon: UsersIcon, locked: true },
@@ -258,8 +260,9 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
     { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
     { id: 'confessions-matchmaker', micro: 'SOON', microClass: 'dim', title: 'Campus Confessions & Matchmaker', desc: "We're still thinking on this, DM to let us know you'd like this :)", Icon: HeartIcon, locked: true },
     { id: 'find-prof', micro: 'SEARCH', microClass: 'success', title: 'Find My Professor', desc: "Who's teaching where, right now", Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
-    { id: 'empty-room', micro: 'SOON', microClass: 'dim', title: 'Empty Room Finder', desc: 'Spot vacant classrooms in real-time or well in advance', Icon: DoorIcon, locked: true },
+    { id: 'empty-room', micro: hasEmptyRoomAccess ? 'TEST' : 'SOON', microClass: hasEmptyRoomAccess ? 'success' : 'dim', title: 'Empty Room Finder', desc: 'Spot vacant classrooms in real-time or well in advance', Icon: DoorIcon, locked: !hasEmptyRoomAccess },
   ];
+
 
   return (
     <div className="home-dashboard">

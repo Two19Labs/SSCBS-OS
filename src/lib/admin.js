@@ -20,6 +20,20 @@ export function canAccessTeamFinder(email) {
   return true; // Team Finder & Competition Hub is live for all SSCBS students!
 }
 
+export const EMPTY_ROOM_TESTERS = [
+  'aditya.25015@sscbs.du.ac.in',
+];
+
+export function canAccessEmptyRoom(email) {
+  if (!email || typeof email !== 'string') return false;
+  const normalized = email.toLowerCase().trim();
+  return (
+    EMPTY_ROOM_TESTERS.some((tester) => tester.toLowerCase() === normalized) ||
+    normalized.includes('aditya.25015') ||
+    isAdminEmail(normalized)
+  );
+}
+
 const TIMEWARP_KEY = 'sscbs-timewarp-enabled';
 
 export function isTimeWarpEnabled() {
@@ -29,3 +43,4 @@ export function isTimeWarpEnabled() {
 export function setTimeWarpEnabled(enabled) {
   localStorage.setItem(TIMEWARP_KEY, enabled ? 'true' : 'false');
 }
+

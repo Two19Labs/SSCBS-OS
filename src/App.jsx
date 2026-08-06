@@ -8,7 +8,7 @@ import ProfilePage from './components/ProfilePage';
 import ProfileModal from './components/ProfileModal';
 import ClassSchedulesCard from './components/ClassSchedulesCard';
 import NoticeBoard from './components/NoticeBoard';
-import { isAdminEmail, canAccessTeamFinder } from './lib/admin';
+import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom } from './lib/admin';
 import {
   HomeIcon,
   CalendarIcon,
@@ -39,6 +39,8 @@ const AdminConsolePage = lazy(() => import('./components/AdminConsolePage'));
 const GpaCalculatorModal = lazy(() => import('./components/GpaCalculatorModal'));
 const ContactPage = lazy(() => import('./components/ContactPage'));
 const TeamFinderPage = lazy(() => import('./components/TeamFinderPage'));
+const EmptyRoomFinderPage = lazy(() => import('./components/EmptyRoomFinderPage').then(m => ({ default: m.EmptyRoomFinderPage })));
+
 
 const PageLoader = () => (
   <div className="loading-screen" style={{ minHeight: '300px' }}>
@@ -50,8 +52,9 @@ const PageLoader = () => (
   </div>
 );
 
-const TOOL_VIEWS = ['find-prof', 'waiver', 'admin', 'team-finder'];
-const VALID_VIEWS = ['home', 'timetable', 'find-prof', 'waiver', 'tools', 'buzz', 'profile', 'admin', 'contact', 'team-finder'];
+const TOOL_VIEWS = ['find-prof', 'waiver', 'admin', 'team-finder', 'empty-room'];
+const VALID_VIEWS = ['home', 'timetable', 'find-prof', 'waiver', 'tools', 'buzz', 'profile', 'admin', 'contact', 'team-finder', 'empty-room'];
+
 
 
 const getInitialView = () => {
@@ -152,6 +155,7 @@ function App() {
   const displayName = user.user_metadata?.full_name || user.email.split('@')[0];
   const isAdmin = isAdminEmail(user.email);
   const hasTeamFinderAccess = featureFlags['team-finder'] || canAccessTeamFinder(user.email);
+  const hasEmptyRoomAccess = featureFlags['empty-room'] || canAccessEmptyRoom(user.email);
 
   const openTool = (id) => {
     logFeatureView(id, user);
@@ -165,7 +169,7 @@ function App() {
 
   const goBack = () => setView(returnView);
 
-  // Waiver tool ships its own full-page layout
+  // Waiver & Empty Room tools ship their own full-page layout
   if (view === 'waiver') {
     return (
       <Suspense fallback={<PageLoader />}>
@@ -173,6 +177,15 @@ function App() {
       </Suspense>
     );
   }
+
+  if (view === 'empty-room') {
+    return (
+      <Suspense fallback={<PageLoader />}>
+        <EmptyRoomFinderPage onBack={goBack} />
+      </Suspense>
+    );
+  }
+
 
   const navItems = [
     { id: 'home', label: 'Home', Icon: HomeIcon },
@@ -254,7 +267,7 @@ function App() {
               { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
               { id: 'confessions-matchmaker', micro: 'SOON', microClass: 'dim', title: 'Campus Confessions & Matchmaker', desc: "We're still thinking on this, DM to let us know you'd like this :)", Icon: HeartIcon, locked: true },
               { id: 'find-prof', micro: 'SEARCH', microClass: 'success', title: 'Find My Professor', desc: "Who's teaching where, right now", Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
-              { id: 'empty-room', micro: 'SOON', microClass: 'dim', title: 'Empty Room Finder', desc: 'Spot vacant classrooms in real-time or well in advance', Icon: DoorIcon, locked: true },
+              { id: 'empty-room', micro: hasEmptyRoomAccess ? 'TEST' : 'SOON', microClass: hasEmptyRoomAccess ? 'success' : 'dim', title: 'Empty Room Finder', desc: 'Spot vacant classrooms in real-time or well in advance', Icon: DoorIcon, locked: !hasEmptyRoomAccess },
             ].map(({ id, micro, microClass, title, desc, Icon, locked }) => (
               <button
                 key={id}
