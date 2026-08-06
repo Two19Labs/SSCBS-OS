@@ -27,12 +27,7 @@ export const EMPTY_ROOM_TESTERS = [
 
 export function canAccessEmptyRoom(email) {
   if (!email || typeof email !== 'string') return false;
-  const normalized = email.toLowerCase().trim();
-  return (
-    EMPTY_ROOM_TESTERS.some((tester) => tester.toLowerCase() === normalized) ||
-    normalized.includes('aditya.25015') ||
-    isAdminEmail(normalized)
-  );
+  return true; // Empty Room Finder is now live for all SSCBS students!
 }
 
 const TIMEWARP_KEY = 'sscbs-timewarp-enabled';
