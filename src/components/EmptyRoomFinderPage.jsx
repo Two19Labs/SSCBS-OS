@@ -7,7 +7,7 @@ import { DoorIcon, SearchIcon, BackIcon, RefreshIcon, CalendarIcon } from './ico
 import './EmptyRoomFinderPage.css';
 
 export function EmptyRoomFinderPage({ onBack }) {
-  const { timetable } = useTimetable();
+  const { timetable, holidays } = useTimetable();
   const { user } = useAuth();
 
   // Mode: 'live' or 'slot'
@@ -19,7 +19,7 @@ export function EmptyRoomFinderPage({ onBack }) {
 
   // Filters
   const [floorFilter, setFloorFilter] = useState('ALL'); // 'ALL' | 2 | 3 | 4 | 5 | 6 | 7
-  const [statusFilter, setStatusFilter] = useState('VACANT'); // 'ALL' | 'VACANT' | 'OCCUPIED'
+  const [statusFilter, setStatusFilter] = useState('ALL'); // 'ALL' | 'VACANT' | 'OCCUPIED'
   const [searchQuery, setSearchQuery] = useState('');
 
   // Selected room modal for complete daily timeline
@@ -45,6 +45,20 @@ export function EmptyRoomFinderPage({ onBack }) {
       hour12: true,
     }).toUpperCase();
   }, [currentTime]);
+
+  // YYYY-MM-DD string for today's holiday lookup
+  const todayStr = useMemo(() => {
+    const y = currentTime.getFullYear();
+    const m = String(currentTime.getMonth() + 1).padStart(2, '0');
+    const d = String(currentTime.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }, [currentTime]);
+
+  // Check if today is an Admin-configured Holiday or Fest
+  const activeHoliday = useMemo(() => {
+    if (!holidays || !Array.isArray(holidays)) return null;
+    return holidays.find(h => h.date === todayStr);
+  }, [holidays, todayStr]);
 
   // Determine current day & period from live clock
   const liveDay = useMemo(() => {
@@ -85,7 +99,6 @@ export function EmptyRoomFinderPage({ onBack }) {
   const activePeriodId = mode === 'live' ? (livePeriod ? livePeriod.id : 1) : selectedPeriodId;
   const activePeriod = PERIODS.find(p => p.id === activePeriodId) || PERIODS[0];
 
-
   // Calculate room statuses
   const roomStatuses = useMemo(() => {
     if (!timetable) return [];
@@ -122,6 +135,7 @@ export function EmptyRoomFinderPage({ onBack }) {
     if (!selectedRoomForTimeline || !timetable) return null;
     return getRoomDailyTimeline(timetable, activeDay, selectedRoomForTimeline);
   }, [selectedRoomForTimeline, timetable, activeDay]);
+
 
   return (
     <div className="empty-room-page">
@@ -198,155 +212,188 @@ export function EmptyRoomFinderPage({ onBack }) {
             </div>
           </div>
         )}
-
       </div>
 
-      {/* Main Content Area: Live Closed vs Active Grid */}
-      {mode === 'live' && isCollegeClosedNow ? (
-        <div className="college-closed-container">
-          <div className="college-closed-card">
-            <div className="closed-icon-badge">🏛️</div>
-            <h3>College is currently closed for the day</h3>
-            <p>
-              Regular classes run Monday – Friday, 9:00 AM to 5:00 PM IST.
-              Live tracking automatically re-activates tomorrow at 9:00 AM.
-            </p>
-            <button className="switch-slot-btn" onClick={() => setMode('slot')}>
-              <CalendarIcon size={16} /> Switch to 'Select Slot' to view room availability
-            </button>
-          </div>
-        </div>
-      ) : (
-        <>
-          {/* Live Active Banner */}
-          <div className="empty-room-active-banner">
-            <div className="banner-left">
+      {/* Live Active Banner */}
+      <div className={`empty-room-active-banner ${mode === 'live' && activeHoliday ? 'holiday' : mode === 'live' && isCollegeClosedNow ? 'closed' : ''}`}>
+        <div className="banner-left">
+          {mode === 'live' && activeHoliday ? (
+            <>
+              <span className="banner-day">🎉 HOLIDAY: {activeHoliday.title.toUpperCase()}</span>
+              <span className="banner-divider">•</span>
+              <span className="banner-time">Regular classes suspended today</span>
+            </>
+          ) : mode === 'live' && isCollegeClosedNow ? (
+            <>
+              <span className="banner-day">🔒 COLLEGE CLOSED FOR THE DAY</span>
+              <span className="banner-divider">•</span>
+              <span className="banner-time">Re-opens tomorrow at 9:00 AM IST</span>
+            </>
+          ) : (
+            <>
               <span className="banner-day">{activeDay}</span>
               <span className="banner-divider">•</span>
               <span className="banner-period">{activePeriod.label}</span>
               <span className="banner-time">({activePeriod.startLabel} – {activePeriod.endLabel})</span>
-            </div>
+            </>
+          )}
+        </div>
 
-            <div className="banner-right">
+        <div className="banner-right">
+          {mode === 'live' && activeHoliday ? (
+            <span className="stat-pill holiday">🟡 Holiday / Fest</span>
+          ) : mode === 'live' && isCollegeClosedNow ? (
+            <span className="stat-pill closed">🔒 College Closed</span>
+          ) : (
+            <>
               <span className="stat-pill vacant">🟢 {vacantCount} Free</span>
               <span className="stat-pill occupied">🔴 {occupiedCount} Occupied</span>
-            </div>
-          </div>
+            </>
+          )}
+        </div>
+      </div>
 
-          {/* Filter Bar */}
-          <div className="empty-room-filter-bar">
-            {/* Search */}
-            <div className="room-search-box">
-              <SearchIcon size={16} />
-              <input
-                type="text"
-                placeholder="Search room (e.g. 503, 703, Lab 426)..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              {searchQuery && (
-                <button className="search-clear-btn" onClick={() => setSearchQuery('')}>×</button>
-              )}
-            </div>
+      {/* Filter Bar */}
+      <div className="empty-room-filter-bar">
+        {/* Search */}
+        <div className="room-search-box">
+          <SearchIcon size={16} />
+          <input
+            type="text"
+            placeholder="Search room (e.g. 503, 703, Lab 426)..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button className="search-clear-btn" onClick={() => setSearchQuery('')}>×</button>
+          )}
+        </div>
 
-            {/* Status Pills */}
-            <div className="filter-pills-row">
-              <button
-                className={`filter-pill ${statusFilter === 'VACANT' ? 'active' : ''}`}
-                onClick={() => setStatusFilter('VACANT')}
-              >
-                Vacant Only ({vacantCount})
-              </button>
-              <button
-                className={`filter-pill ${statusFilter === 'ALL' ? 'active' : ''}`}
-                onClick={() => setStatusFilter('ALL')}
-              >
-                All Rooms ({roomStatuses.length})
-              </button>
-              <button
-                className={`filter-pill ${statusFilter === 'OCCUPIED' ? 'active' : ''}`}
-                onClick={() => setStatusFilter('OCCUPIED')}
-              >
-                Occupied ({occupiedCount})
-              </button>
-            </div>
+        {/* Status Pills */}
+        <div className="filter-pills-row">
+          <button
+            className={`filter-pill ${statusFilter === 'ALL' ? 'active' : ''}`}
+            onClick={() => setStatusFilter('ALL')}
+          >
+            All Rooms ({roomStatuses.length})
+          </button>
+          <button
+            className={`filter-pill ${statusFilter === 'VACANT' ? 'active' : ''}`}
+            onClick={() => setStatusFilter('VACANT')}
+          >
+            Vacant ({vacantCount})
+          </button>
+          <button
+            className={`filter-pill ${statusFilter === 'OCCUPIED' ? 'active' : ''}`}
+            onClick={() => setStatusFilter('OCCUPIED')}
+          >
+            Occupied ({occupiedCount})
+          </button>
+        </div>
 
-            {/* Floor Pills */}
-            <div className="floor-pills-row">
-              <span className="floor-label">Floor:</span>
-              {['ALL', '2', '3', '4', '5', '6', '7'].map(fl => (
-                <button
-                  key={fl}
-                  className={`floor-pill ${floorFilter === fl ? 'active' : ''}`}
-                  onClick={() => setFloorFilter(fl)}
-                >
-                  {fl === 'ALL' ? 'All' : `${fl}F`}
-                </button>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-
+        {/* Floor Pills */}
+        <div className="floor-pills-row">
+          <span className="floor-label">Floor:</span>
+          {['ALL', '2', '3', '4', '5', '6', '7'].map(fl => (
+            <button
+              key={fl}
+              className={`floor-pill ${floorFilter === fl ? 'active' : ''}`}
+              onClick={() => setFloorFilter(fl)}
+            >
+              {fl === 'ALL' ? 'All' : `${fl}F`}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Room Grid */}
       <div className="room-grid">
         {filteredRooms.length > 0 ? (
-          filteredRooms.map(item => (
-            <div
-              key={item.room}
-              className={`room-card ${item.isVacant ? 'vacant' : 'occupied'}`}
-              onClick={() => setSelectedRoomForTimeline(item.room)}
-            >
-              <div className="room-card-header">
-                <div className="room-title-box">
-                  <span className="room-name">{item.room}</span>
-                  <span className="room-floor-tag">{item.floor > 0 ? `${item.floor}th Floor` : 'Campus'}</span>
+          filteredRooms.map(item => {
+            // Determine card status badge & text for Live mode (Holiday / Closed / Normal)
+            const isLiveClosed = mode === 'live' && isCollegeClosedNow;
+            const isLiveHoliday = mode === 'live' && activeHoliday;
+
+            return (
+              <div
+                key={item.room}
+                className={`room-card ${isLiveHoliday ? 'holiday' : isLiveClosed ? 'closed' : item.isVacant ? 'vacant' : 'occupied'}`}
+                onClick={() => setSelectedRoomForTimeline(item.room)}
+              >
+                <div className="room-card-header">
+                  <div className="room-title-box">
+                    <span className="room-name">{item.room}</span>
+                    <span className="room-floor-tag">{item.floor > 0 ? `${item.floor}th Floor` : 'Campus'}</span>
+                  </div>
+
+                  <span className={`room-status-badge ${isLiveHoliday ? 'holiday' : isLiveClosed ? 'closed' : item.isVacant ? 'vacant' : 'occupied'}`}>
+                    {isLiveHoliday ? 'HOLIDAY' : isLiveClosed ? 'CLOSED' : item.isVacant ? 'VACANT' : 'IN CLASS'}
+                  </span>
                 </div>
 
-                <span className={`room-status-badge ${item.isVacant ? 'vacant' : 'occupied'}`}>
-                  {item.isVacant ? 'VACANT' : 'IN CLASS'}
-                </span>
-              </div>
-
-              <div className="room-card-body">
-                {item.isVacant ? (
-                  <div className="vacancy-info">
-                    <div className="vacancy-main-status">
-                      <span className="vacancy-icon">🟢</span>
-                      <span className="vacancy-text">
-                        {item.isFreeRestOfDay
-                          ? 'Free for rest of the day'
-                          : `Free until ${item.freeUntilPeriodLabel}`}
-                      </span>
-                    </div>
-
-                    {item.consecutiveFreePeriods > 1 && (
-                      <div className="vacancy-subtext">
-                        Available for {item.consecutiveFreePeriods} consecutive periods
+                <div className="room-card-body">
+                  {isLiveHoliday ? (
+                    <div className="vacancy-info">
+                      <div className="vacancy-main-status holiday">
+                        <span className="vacancy-icon">🟡</span>
+                        <span className="vacancy-text">
+                          Classes cancelled today ({activeHoliday.title})
+                        </span>
                       </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="occupancy-info">
-                    <div className="class-subject">{item.occupiedBy.subject}</div>
-                    <div className="class-meta">
-                      <span className="class-sec">{item.occupiedBy.course} Sem {item.occupiedBy.sem} ({item.occupiedBy.sec})</span>
-                      {item.occupiedBy.teacher && (
-                        <span className="class-teacher">• {item.occupiedBy.teacher}</span>
+                      <div className="vacancy-subtext">
+                        Open for self-study / events • Tap to view daily schedule
+                      </div>
+                    </div>
+                  ) : isLiveClosed ? (
+                    <div className="vacancy-info">
+                      <div className="vacancy-main-status closed">
+                        <span className="vacancy-icon">🔒</span>
+                        <span className="vacancy-text">
+                          College is closed, it'll open 9am
+                        </span>
+                      </div>
+                      <div className="vacancy-subtext">
+                        Tap room card to view full daily timeline schedule
+                      </div>
+                    </div>
+                  ) : item.isVacant ? (
+                    <div className="vacancy-info">
+                      <div className="vacancy-main-status">
+                        <span className="vacancy-icon">🟢</span>
+                        <span className="vacancy-text">
+                          {item.isFreeRestOfDay
+                            ? 'Free for rest of the day'
+                            : `Free until ${item.freeUntilPeriodLabel}`}
+                        </span>
+                      </div>
+
+                      {item.consecutiveFreePeriods > 1 && (
+                        <div className="vacancy-subtext">
+                          Available for {item.consecutiveFreePeriods} consecutive periods
+                        </div>
                       )}
                     </div>
-                  </div>
-                )}
-              </div>
+                  ) : (
+                    <div className="occupancy-info">
+                      <div className="class-subject">{item.occupiedBy.subject}</div>
+                      <div className="class-meta">
+                        <span className="class-sec">{item.occupiedBy.course} Sem {item.occupiedBy.sem} ({item.occupiedBy.sec})</span>
+                        {item.occupiedBy.teacher && (
+                          <span className="class-teacher">• {item.occupiedBy.teacher}</span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-              <div className="room-card-footer">
-                <span className="view-timeline-btn">
-                  <CalendarIcon size={14} /> View Daily Timeline & Full Free Schedule →
-                </span>
+                <div className="room-card-footer">
+                  <span className="view-timeline-btn">
+                    <CalendarIcon size={14} /> View Daily Timeline & Schedule →
+                  </span>
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         ) : (
           <div className="empty-rooms-placeholder">
             <DoorIcon size={36} />

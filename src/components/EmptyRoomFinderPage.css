@@ -438,6 +438,15 @@
   border-left: 4px solid #ef4444;
 }
 
+.room-card.closed {
+  border-left: 4px solid #6b7280;
+  opacity: 0.9;
+}
+
+.room-card.holiday {
+  border-left: 4px solid #eab308;
+}
+
 .room-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
@@ -489,6 +498,37 @@
   background: rgba(239, 68, 68, 0.18);
   color: #ef4444;
 }
+
+.room-status-badge.closed {
+  background: rgba(107, 114, 128, 0.18);
+  color: #9ca3af;
+}
+
+.room-status-badge.holiday {
+  background: rgba(234, 179, 8, 0.18);
+  color: #eab308;
+}
+
+.stat-pill.holiday {
+  background: rgba(234, 179, 8, 0.15);
+  color: #eab308;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.stat-pill.closed {
+  background: rgba(107, 114, 128, 0.15);
+  color: #9ca3af;
+  border: 1px solid rgba(107, 114, 128, 0.3);
+}
+
+.vacancy-main-status.closed {
+  color: #9ca3af;
+}
+
+.vacancy-main-status.holiday {
+  color: #eab308;
+}
+
 
 .room-card-body {
   margin-top: 4px;
