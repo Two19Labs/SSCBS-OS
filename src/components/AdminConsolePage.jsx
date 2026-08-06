@@ -3626,6 +3626,7 @@ STRICT EXTRACTION RULES:
                 )}
               </div>
             </div>
+          </div>
         ) : activeTab === 'settings' ? (
           <div className="tab-pane flex-col gap-4">
             <div className="chart-header-admin">

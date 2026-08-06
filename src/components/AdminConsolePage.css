@@ -2579,3 +2579,139 @@ input:checked + .admin-slider:before {
   opacity: 0.55;
   margin-right: 4px;
 }
+
+/* ══════════════════════════════════════════════
+   COMBINED SCHEDULE & TIMETABLE MANAGER STYLES
+   ══════════════════════════════════════════════ */
+
+.schedules-manager-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.schedule-publish-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border-strong, var(--border));
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.publish-bar-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.publish-status-icon {
+  font-size: 1.6rem;
+}
+
+.publish-status-title {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.publish-status-sub {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+}
+
+.publish-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-discard-draft {
+  background: transparent;
+  color: var(--ink-dim);
+  border: 1px solid var(--border);
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-discard-draft:hover {
+  background: var(--bg);
+  color: var(--danger, #ef4444);
+  border-color: var(--danger, #ef4444);
+}
+
+.btn-publish-all-master {
+  background: var(--accent);
+  color: var(--on-accent, #ffffff);
+  border: none;
+  padding: 11px 22px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.btn-publish-all-master.has-changes {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35);
+}
+
+.btn-publish-all-master:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.btn-publish-all-master:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.schedule-section-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.schedule-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.section-header-icon {
+  font-size: 1.5rem;
+}
+
+.schedule-section-header h3 {
+  margin: 0 0 2px 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.schedule-section-header p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+}
