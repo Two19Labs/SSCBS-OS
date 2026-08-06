@@ -96,6 +96,7 @@ export default function TeamFinderPage({ onBack }) {
   const [editingPost, setEditingPost] = useState(null); // When editing a post
   const [selectedPostForApply, setSelectedPostForApply] = useState(null);
   const [selectedPostForReview, setSelectedPostForReview] = useState(null);
+  const [selectedPostForView, setSelectedPostForView] = useState(null);
   const [activeAdminMenuPostId, setActiveAdminMenuPostId] = useState(null);
 
   useEffect(() => {
@@ -1220,6 +1221,20 @@ function getUserApp(post, applications, userEmail, userId) {
                     <p className="post-desc post-desc-standalone">{post.description}</p>
                   )}
 
+                  {/* Read More Trigger */}
+                  {((post.description && post.description.length > 50) || (post.title && post.title.length > 35)) && (
+                    <button
+                      type="button"
+                      className="tf-read-more-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedPostForView(post);
+                      }}
+                    >
+                      Read full opening →
+                    </button>
+                  )}
+
                   {/* Skills Present */}
                   {post.skills_have && post.skills_have.length > 0 && (
                     <div className="skills-group">
@@ -1781,6 +1796,130 @@ function getUserApp(post, applications, userEmail, userId) {
           </div>
         </div>
       )}
+
+      {/* ── FULL OPENING DETAILS MODAL ── */}
+      {selectedPostForView && (() => {
+        const post = selectedPostForView;
+        const isHost = post.created_by_email === user?.email || post.user_id === user?.id;
+        const userApp = getUserApp(post, applications, user?.email, user?.id);
+        const openSpots = getPostOpenSpots(post, applications);
+        const openStatus = isPostOpen(post, applications);
+        const authorName = formatStudentName(post.created_by_name, post.created_by_email);
+        const avatarChar = (authorName || 'S').charAt(0).toUpperCase();
+
+        return (
+          <div className="tf-modal-overlay" onClick={() => setSelectedPostForView(null)}>
+            <div className="tf-modal-card tf-view-modal-card" onClick={(e) => e.stopPropagation()}>
+              <div className="tf-modal-header">
+                <div>
+                  <div className="tf-modal-badges" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span className="comp-organizer">{post.organizer || 'Corporate / Society'}</span>
+                    {renderSquadDots(post.total_members || 4, openSpots, openStatus)}
+                  </div>
+                  <h3 style={{ marginTop: '8px', fontSize: '1.25rem' }}>{post.competition_name}</h3>
+                </div>
+                <button type="button" className="tf-close-btn" onClick={() => setSelectedPostForView(null)} aria-label="Close">
+                  ×
+                </button>
+              </div>
+
+              <div className="tf-modal-body tf-view-modal-body" style={{ padding: '20px 24px', maxHeight: '65vh', overflowY: 'auto' }}>
+                {post.competition_link && (
+                  <div style={{ marginBottom: '14px' }}>
+                    <a
+                      href={post.competition_link.startsWith('http') ? post.competition_link : `https://${post.competition_link}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="comp-link-pill"
+                    >
+                      <span>Visit Competition Page</span>
+                      <ExternalLinkIcon size={12} />
+                    </a>
+                  </div>
+                )}
+
+                {post.title && (
+                  <h4 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--ink)', marginBottom: '8px' }}>
+                    {post.title}
+                  </h4>
+                )}
+
+                <div style={{ fontSize: '0.9rem', color: 'var(--ink)', lineHeight: '1.6', whiteSpace: 'pre-line', marginBottom: '16px' }}>
+                  {post.description || post.title}
+                </div>
+
+                {/* Skills Present */}
+                {post.skills_have && post.skills_have.length > 0 && (
+                  <div className="skills-group" style={{ marginTop: '16px' }}>
+                    <span className="skills-group-label">Skills Present in Squad:</span>
+                    <div className="skills-pills">
+                      {post.skills_have.map((s, idx) => (
+                        <span key={idx} className="skill-pill present">
+                          ✓ {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Skills Needed */}
+                {post.skills_looking_for && post.skills_looking_for.length > 0 && (
+                  <div className="skills-group" style={{ marginTop: '12px' }}>
+                    <span className="skills-group-label">Looking For Teammates With:</span>
+                    <div className="skills-pills">
+                      {post.skills_looking_for.map((s, idx) => (
+                        <span key={idx} className="skill-pill needed">
+                          ⚡ {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Host Info */}
+                <div style={{ marginTop: '20px', paddingTop: '14px', borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div className="creator-avatar" style={{ width: '32px', height: '32px', fontSize: '0.85rem' }}>
+                    {avatarChar}
+                  </div>
+                  <div className="creator-details">
+                    <span className="creator-name" style={{ fontSize: '0.825rem' }}>Posted by {authorName}</span>
+                    <span className="creator-course" style={{ fontSize: '0.725rem' }}>
+                      {post.course} • {post.year}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="tf-modal-footer" style={{ padding: '14px 24px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                {post.phone_number && (
+                  <a
+                    href={formatWhatsAppUrl(post.phone_number, `Hi! Saw your team post for ${post.competition_name} on SSCBS OS.`)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="wa-connect-btn"
+                    style={{ height: '36px', padding: '0 16px', fontSize: '0.8rem' }}
+                  >
+                    <WhatsAppIcon size={16} /> WhatsApp Connect
+                  </a>
+                )}
+
+                {openStatus && (!userApp || userApp.status === 'declined' || userApp.status === 'removed') && !isHost && (
+                  <button
+                    className="btn-tf-primary"
+                    style={{ height: '36px', padding: '0 16px', fontSize: '0.8rem' }}
+                    onClick={() => {
+                      setSelectedPostForView(null);
+                      handleOpenApplyModal(post);
+                    }}
+                  >
+                    <MailIcon size={14} /> {userApp ? 'Re-apply to Join' : 'Request to Join'}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

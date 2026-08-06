@@ -1489,6 +1489,33 @@
   }
 }
 
+/* ── Read More Button & View Modal ── */
+.tf-read-more-btn {
+  background: transparent;
+  border: none;
+  color: var(--accent, var(--maroon));
+  font-size: 0.775rem;
+  font-weight: 700;
+  padding: 0;
+  margin: 0 0 10px 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: opacity 0.15s ease;
+  text-align: left;
+}
+
+.tf-read-more-btn:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.tf-view-modal-card {
+  max-width: 560px;
+  width: 92%;
+}
+
 /* ── Tablets & Small Screens (541px - 820px) ── */
 @media (min-width: 541px) and (max-width: 820px) {
   .tf-posts-grid {
