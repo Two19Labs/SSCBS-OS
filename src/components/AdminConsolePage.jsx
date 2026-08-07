@@ -340,36 +340,36 @@ function AdminConsoleContent({ onBack }) {
     // 1. Instant local UI update
     setNoticesList(updatedList);
 
-    // 2. Clear local cache & broadcast update event immediately for instant UI sync
-    try {
-      sessionStorage.removeItem('sscbs_cached_notices');
-      sessionStorage.removeItem('sscbs_cached_notices_time');
-      window.dispatchEvent(new CustomEvent('sscbs-notices-updated', { detail: updatedList }));
-    } catch (e) {}
-
-    // 3. Fast single-batch upsert in Supabase
+    // 2. Persist display_order updates to Supabase
     if (hasValidCredentials) {
       try {
-        const payload = updatedList
+        const updatePromises = updatedList
           .filter(item => item.id && !String(item.id).startsWith('mock-'))
-          .map(item => ({
-            id: item.id,
-            display_order: item.display_order
-          }));
+          .map(item =>
+            supabase
+              .from('notices')
+              .update({ display_order: item.display_order })
+              .eq('id', item.id)
+          );
 
-        if (payload.length > 0) {
-          const { error } = await supabase
-            .from('notices')
-            .upsert(payload, { onConflict: 'id' });
-          if (error) {
-            console.error('Failed to update notice display order in Supabase:', error);
-          }
+        const results = await Promise.all(updatePromises);
+        const hasError = results.some(res => res.error);
+        if (hasError) {
+          console.error('One or more notice display order updates failed in Supabase');
         }
       } catch (err) {
         console.error('Failed to update notice display order in Supabase:', err);
       }
     }
+
+    // 3. Clear local cache & broadcast update event for live notice board sync
+    try {
+      sessionStorage.removeItem('sscbs_cached_notices');
+      sessionStorage.removeItem('sscbs_cached_notices_time');
+      window.dispatchEvent(new CustomEvent('sscbs-notices-updated', { detail: updatedList }));
+    } catch (e) {}
   };
+
 
   React.useEffect(() => {
     if (activeTab === 'notices') {
