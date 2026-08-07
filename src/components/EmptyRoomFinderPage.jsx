@@ -425,6 +425,9 @@ export function EmptyRoomFinderPage({ onBack }) {
       {selectedRoomForTimeline && roomTimelineData && (
         <div className="timeline-modal-overlay" onClick={() => setSelectedRoomForTimeline(null)}>
           <div className="timeline-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-sheet-handle-bar">
+              <span className="sheet-drag-handle"></span>
+            </div>
             <div className="timeline-modal-header">
               <div className="timeline-modal-title">
                 <DoorIcon size={22} />

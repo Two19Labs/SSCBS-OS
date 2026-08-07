@@ -1,5 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
    Empty Room Finder — SSCBS Campus OS Design System Integration
+   Optimized for All Devices: PCs, Laptops, Tablets, Mobiles
    ═══════════════════════════════════════════════════════════ */
 
 .empty-room-page {
@@ -13,7 +14,7 @@
   animation: fadeIn 0.25s ease-in-out forwards;
 }
 
-/* Nav Header */
+/* ── Nav Header ── */
 .empty-room-header {
   display: flex;
   flex-direction: column;
@@ -36,6 +37,7 @@
   border-radius: 8px;
   cursor: pointer;
   width: fit-content;
+  min-height: 38px;
   transition: all 0.2s ease;
 }
 
@@ -60,11 +62,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 10px;
   background: var(--gold-tint);
   color: var(--gold-text);
+  flex-shrink: 0;
 }
 
 .empty-room-title-row h2 {
@@ -79,25 +82,10 @@
   font-size: 0.85rem;
   color: var(--ink-dim);
   margin: 0;
+  line-height: 1.4;
 }
 
-/* Micro label badge */
-.micro-label {
-  font-size: 0.65rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  padding: 2px 8px;
-  border-radius: 20px;
-  text-transform: uppercase;
-}
-
-.micro-label.success {
-  background: var(--success-tint);
-  color: var(--success);
-  border: 1px solid rgba(11, 122, 84, 0.2);
-}
-
-/* Controls Card */
+/* ── Controls Card ── */
 .empty-room-controls-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -122,8 +110,9 @@
 .mode-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 7px 16px;
+  padding: 8px 18px;
   border-radius: 7px;
   border: none;
   background: transparent;
@@ -131,7 +120,9 @@
   font-size: 0.825rem;
   font-weight: 700;
   cursor: pointer;
+  min-height: 38px;
   transition: all 0.15s ease;
+  font-family: inherit;
 }
 
 .mode-btn:hover:not(.active) {
@@ -173,6 +164,7 @@
   font-size: 0.825rem;
   font-weight: 700;
   color: var(--ink);
+  min-height: 38px;
 }
 
 .ist-clock-icon {
@@ -201,6 +193,9 @@
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
+  width: 100%;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
   animation: fadeIn 0.2s ease;
 }
 
@@ -208,6 +203,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 1;
+  min-width: 140px;
 }
 
 .selector-group label {
@@ -216,26 +213,30 @@
   color: var(--ink-dim);
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  white-space: nowrap;
 }
 
 .selector-group select {
+  width: 100%;
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--ink);
   border-radius: 8px;
-  padding: 6px 12px;
-  font-size: 0.825rem;
+  padding: 8px 12px;
+  font-size: 0.85rem;
   font-weight: 700;
   outline: none;
   cursor: pointer;
   font-family: inherit;
+  min-height: 40px;
+  transition: border-color 0.15s ease;
 }
 
 .selector-group select:focus {
   border-color: var(--accent);
 }
 
-/* Active Banner */
+/* ── Active Banner ── */
 .empty-room-active-banner {
   background: var(--tint);
   border: 1px solid var(--border);
@@ -265,6 +266,7 @@
   font-size: 0.875rem;
   font-weight: 700;
   color: var(--ink);
+  flex-wrap: wrap;
 }
 
 .banner-divider {
@@ -289,6 +291,7 @@
   font-weight: 700;
   padding: 4px 12px;
   border-radius: 20px;
+  white-space: nowrap;
 }
 
 .stat-pill.vacant {
@@ -315,7 +318,7 @@
   border: 1px solid var(--border);
 }
 
-/* Filter Bar */
+/* ── Filter Bar & Search ── */
 .empty-room-filter-bar {
   display: flex;
   flex-direction: column;
@@ -329,7 +332,8 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 10px 14px;
+  padding: 8px 14px;
+  min-height: 44px;
 }
 
 .room-search-box input {
@@ -350,9 +354,12 @@
   background: transparent;
   border: none;
   color: var(--ink-dim);
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   cursor: pointer;
-  padding: 0 4px;
+  padding: 0 6px;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
 }
 
 .filter-pills-row,
@@ -361,7 +368,15 @@
   align-items: center;
   gap: 6px;
   overflow-x: auto;
-  padding-bottom: 2px;
+  padding: 2px 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+}
+
+.filter-pills-row::-webkit-scrollbar,
+.floor-pills-row::-webkit-scrollbar {
+  display: none;
 }
 
 .floor-label {
@@ -371,6 +386,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-right: 4px;
+  flex-shrink: 0;
 }
 
 .filter-pill,
@@ -386,6 +402,16 @@
   cursor: pointer;
   transition: all 0.15s ease;
   font-family: inherit;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+.floor-pill {
+  min-width: 40px;
 }
 
 .filter-pill.active,
@@ -401,7 +427,7 @@
   color: var(--ink);
 }
 
-/* Room Grid */
+/* ── Room Grid Layout ── */
 .room-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -419,6 +445,7 @@
   gap: 14px;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  min-height: 160px;
 }
 
 .room-card.vacant {
@@ -478,6 +505,7 @@
   padding: 3px 8px;
   border-radius: 6px;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .room-status-badge.vacant {
@@ -511,6 +539,7 @@
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--success);
+  line-height: 1.35;
 }
 
 .vacancy-main-status.closed {
@@ -525,13 +554,14 @@
   font-size: 0.75rem;
   color: var(--ink-dim);
   margin-top: 3px;
+  line-height: 1.35;
 }
 
 .class-subject {
   font-size: 0.875rem;
   font-weight: 700;
   color: var(--ink);
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 .class-meta {
@@ -550,21 +580,49 @@
 }
 
 .view-timeline-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
   font-size: 0.775rem;
   font-weight: 700;
   color: var(--accent);
   transition: opacity 0.15s ease;
+  min-height: 24px;
 }
 
 .room-card:hover .view-timeline-btn {
   opacity: 0.85;
 }
 
+/* Placeholder Empty State */
+.empty-rooms-placeholder {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+  color: var(--ink-dim);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.empty-rooms-placeholder h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.empty-rooms-placeholder p {
+  margin: 0;
+  font-size: 0.825rem;
+  max-width: 400px;
+}
+
 /* ═══════════════════════════════════════════════════════════
-   Daily Schedule Timeline Modal (Aligned with SSCBS OS theme)
+   Daily Schedule Timeline Modal (Centered Desktop / Bottom Sheet Mobile)
    ═══════════════════════════════════════════════════════════ */
 
 .timeline-modal-overlay {
@@ -599,9 +657,28 @@
   animation: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.modal-sheet-handle-bar {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0 2px 0;
+}
+
+.sheet-drag-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--border-strong);
+}
+
 @keyframes scaleIn {
   from { transform: scale(0.96); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideUpSheet {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
 }
 
 .timeline-modal-header {
@@ -639,8 +716,8 @@
   font-size: 1.25rem;
   color: var(--ink-dim);
   cursor: pointer;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -661,6 +738,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.summary-left {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .summary-badge {
@@ -668,7 +753,7 @@
   font-weight: 700;
   padding: 4px 10px;
   border-radius: 20px;
-  margin-right: 8px;
+  white-space: nowrap;
 }
 
 .summary-badge.vacant {
@@ -723,6 +808,7 @@
   gap: 10px;
   flex: 1;
   background: var(--bg);
+  -webkit-overflow-scrolling: touch;
 }
 
 .timeline-row {
@@ -821,52 +907,205 @@
   color: var(--on-ink);
   border: none;
   border-radius: 8px;
-  padding: 9px 22px;
-  font-size: 0.825rem;
+  padding: 10px 24px;
+  font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
   font-family: inherit;
+  min-height: 40px;
 }
 
 .timeline-close-btn:hover {
   opacity: 0.9;
 }
 
-.empty-rooms-placeholder {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 40px 20px;
-  background: var(--surface);
-  border: 1px dashed var(--border);
-  border-radius: 16px;
-  color: var(--ink-dim);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS (All Devices: PCs, Laptops, Tabs, Mobile)
+   ═══════════════════════════════════════════════════════════ */
+
+/* Large Desktop / Monitors (≥ 1200px) */
+@media (min-width: 1200px) {
+  .room-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
-.empty-rooms-placeholder h3 {
-  margin: 0;
-  color: var(--ink);
-  font-size: 1rem;
+/* Laptops & Standard Desktops (900px - 1199px) */
+@media (min-width: 900px) and (max-width: 1199px) {
+  .room-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
-.empty-rooms-placeholder p {
-  margin: 0;
-  font-size: 0.825rem;
-  max-width: 400px;
+/* Tablets & Small Laptops (641px - 899px) */
+@media (min-width: 641px) and (max-width: 899px) {
+  .room-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .empty-room-controls-card {
+    padding: 12px 14px;
+  }
 }
 
-@media (max-width: 480px) {
+/* Mobile & Small Phones (≤ 640px) */
+@media (max-width: 640px) {
+  .empty-room-page {
+    padding: 0 12px 90px 12px;
+    gap: 14px;
+  }
+
+  .empty-room-header {
+    padding-bottom: 12px;
+  }
+
+  .empty-room-title-row h2 {
+    font-size: 1.25rem;
+  }
+
+  .empty-room-subtitle {
+    font-size: 0.775rem;
+  }
+
+  .empty-room-controls-card {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .empty-room-mode-toggle {
+    width: 100%;
+  }
+
+  .mode-btn {
+    flex: 1;
+    text-align: center;
+    padding: 8px 10px;
+    min-height: 42px;
+  }
+
+  .ist-clock-badge {
+    justify-content: center;
+    width: 100%;
+    min-height: 38px;
+  }
+
+  .empty-room-slot-selectors {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .selector-group {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .selector-group label {
+    font-size: 0.675rem;
+  }
+
+  .selector-group select {
+    min-height: 44px;
+    font-size: 16px !important; /* Prevents auto-zoom on iOS Safari */
+  }
+
+  .empty-room-active-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .banner-left {
+    font-size: 0.8rem;
+  }
+
+  .banner-right {
+    width: 100%;
+  }
+
+  .stat-pill {
+    width: 100%;
+    text-align: center;
+  }
+
+  .room-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .room-card {
+    padding: 14px;
+    min-height: auto;
+  }
+
+  .view-timeline-btn {
+    font-size: 0.75rem;
+  }
+
+  /* ── Mobile Bottom Sheet Modal ── */
   .timeline-modal-overlay {
     padding: 0;
     align-items: flex-end;
   }
 
   .timeline-modal-card {
-    border-radius: 16px 16px 0 0;
-    max-height: 90vh;
+    border-radius: 20px 20px 0 0;
+    max-height: 88vh;
+    max-height: 88dvh;
+    animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .modal-sheet-handle-bar {
+    display: flex;
+  }
+
+  .timeline-modal-header {
+    padding: 14px 16px;
+  }
+
+  .timeline-modal-title h3 {
+    font-size: 1rem;
+  }
+
+  .timeline-summary-banner,
+  .free-periods-summary,
+  .timeline-rows-container {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .timeline-row {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .slot-time-col {
+    min-width: 90px;
+  }
+
+  .slot-period-name {
+    font-size: 0.8rem;
+  }
+
+  .slot-time-range {
+    font-size: 0.675rem;
+  }
+
+  .timeline-modal-footer {
+    padding: 12px 14px calc(14px + env(safe-area-inset-bottom, 0px)) 14px;
+  }
+
+  .timeline-close-btn {
+    width: 100%;
+    min-height: 46px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
