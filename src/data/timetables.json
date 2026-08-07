@@ -1091,9 +1091,9 @@
           },
           {
             "period": 4,
-            "subject": "G1: Organizational Behaviour | G?: Introduction to Business Analytics",
-            "teacher": "Dr. Anuja Mathur (G1) / Dr. Rishi Rajan Sahay (G?)",
-            "room": "G1: Room 607 / G?: Room 226"
+            "subject": "G1: Organizational Behaviour | P2: Introduction to Business Analytics",
+            "teacher": "Dr. Anuja Mathur (G1) / Dr. Rishi Rajan Sahay (P2)",
+            "room": "G1: Room 607 / P2: Room 226"
           },
           {
             "period": 5,
@@ -1285,9 +1285,9 @@
           },
           {
             "period": 2,
-            "subject": "G2: Macroeconomics | G?: Introduction to Business Analytics",
-            "teacher": "Dr. Shalini Prakash (G2) / Dr. Rishi Rajan Sahay (G?)",
-            "room": "G2: Room 607 / G?: Room 326"
+            "subject": "G2: Macroeconomics | P1: Introduction to Business Analytics",
+            "teacher": "Dr. Shalini Prakash (G2) / Dr. Rishi Rajan Sahay (P1)",
+            "room": "G2: Room 607 / P1: Room 326"
           },
           {
             "period": 3,
@@ -1364,15 +1364,15 @@
           },
           {
             "period": 5,
-            "subject": "G2: Organizational Behaviour | G?: Introduction to Business Analytics",
-            "teacher": "Dr. Anuja Mathur (G2) / Dr. Rishi Rajan Sahay (G?)",
-            "room": "G2: Room 603 / G?: Room 226"
+            "subject": "G2: Organizational Behaviour | P1: Introduction to Business Analytics",
+            "teacher": "Dr. Anuja Mathur (G2) / Dr. Rishi Rajan Sahay (P1)",
+            "room": "G2: Room 603 / P1: Room 226"
           },
           {
             "period": 6,
-            "subject": "G1: Organizational Behaviour | G?: Introduction to Business Analytics",
-            "teacher": "Dr. Anuja Mathur (G1) / Dr. Rishi Rajan Sahay (G?)",
-            "room": "G1: Room 603 / G?: Room 226"
+            "subject": "G1: Organizational Behaviour | P2: Introduction to Business Analytics",
+            "teacher": "Dr. Anuja Mathur (G1) / Dr. Rishi Rajan Sahay (P2)",
+            "room": "G1: Room 603 / P2: Room 226"
           },
           {
             "period": 7,
@@ -1927,9 +1927,9 @@
           },
           {
             "period": 3,
-            "subject": "G1: Organizational Behaviour | G?: Introduction to Business Analytics",
-            "teacher": "Mr. Abhimanyu Verma (G1) / Dr. Satish Kumar Goel (G?)",
-            "room": "G1: Room 648 / G?: Room 226"
+            "subject": "G1: Organizational Behaviour | P2: Introduction to Business Analytics",
+            "teacher": "Mr. Abhimanyu Verma (G1) / Dr. Satish Kumar Goel (P2)",
+            "room": "G1: Room 648 / P2: Room 226"
           },
           {
             "period": 0,
@@ -2026,9 +2026,9 @@
           },
           {
             "period": 2,
-            "subject": "G2: Organizational Behaviour | G?: Introduction to Business Analytics",
-            "teacher": "Mr. Abhimanyu Verma (G2) / Dr. Satish Kumar Goel (G?)",
-            "room": "G2: Room 648 / G?: Room 226"
+            "subject": "G2: Organizational Behaviour | P1: Introduction to Business Analytics",
+            "teacher": "Mr. Abhimanyu Verma (G2) / Dr. Satish Kumar Goel (P1)",
+            "room": "G2: Room 648 / P1: Room 226"
           },
           {
             "period": 3,
@@ -3094,8 +3094,8 @@
           },
           {
             "period": 3,
-            "subject": "G?: Consumer Behvaiour | G1: Marketing of Services",
-            "teacher": "Dr. Anuja Mathur (G?) / Mr. Tushar Marwaha (G1)",
+            "subject": "P2: Consumer Behvaiour | G1: Marketing of Services",
+            "teacher": "Dr. Anuja Mathur (P2) / Mr. Tushar Marwaha (G1)",
             "room": "Room 257"
           },
           {
@@ -5776,8 +5776,8 @@
         "Friday": [
           {
             "period": 1,
-            "subject": "G?: Artificial Intelligence | G2: Operating Systems",
-            "teacher": "Onkar Singh (G?) / Nidhi Seth (G2)",
+            "subject": "P1: Artificial Intelligence | G2: Operating Systems",
+            "teacher": "Onkar Singh (P1) / Nidhi Seth (G2)",
             "room": "Room 407"
           },
           {

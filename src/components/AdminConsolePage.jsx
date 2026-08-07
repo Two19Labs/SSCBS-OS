@@ -1320,7 +1320,9 @@ Now extract ALL timetable blocks from the attached Excel file.`;
 
     let groupLabel = '';
 
-    const parenGroupMatch = partText.match(/\(((?:G1\s*\+\s*G2)|G1|G2)\)/i) || partText.match(/\b((?:G1\s*\+\s*G2)|G1|G2)\b/i);
+    const groupRegexPattern = /\(((?:[GP][1-4]\s*[\+\/]\s*[GP][1-4])|[GP][1-4])\)/i;
+    const groupRegexRawPattern = /\b((?:[GP][1-4]\s*[\+\/]\s*[GP][1-4])|[GP][1-4])\b/i;
+    const parenGroupMatch = partText.match(groupRegexPattern) || partText.match(groupRegexRawPattern);
     if (parenGroupMatch) {
       groupLabel = parenGroupMatch[1].toUpperCase().replace(/\s+/g, '');
       partText = partText.replace(parenGroupMatch[0], '').trim();
@@ -1396,9 +1398,26 @@ Now extract ALL timetable blocks from the attached Excel file.`;
       const allRoomsSame = parsedParts.every(p => p.room === parsedParts[0].room);
       const hasGroup = parsedParts.some(p => p.group);
 
-      let subjectMerged = allSubjectsSame ? parsedParts[0].subject : parsedParts.map(p => hasGroup ? `${p.group || 'G?'}: ${p.subject}` : p.subject).join(' | ');
-      let teacherMerged = parsedParts.map(p => hasGroup ? `${p.teacher} (${p.group || 'G?'})` : p.teacher).join(' / ');
-      let roomMerged = allRoomsSame ? parsedParts[0].room : parsedParts.map(p => hasGroup ? `${p.group || 'G?'}: ${p.room}` : p.room).join(' / ');
+      if (hasGroup) {
+        parsedParts.forEach((p, idx) => {
+          if (!p.group) {
+            const sibling = parsedParts.find((sp, sIdx) => sIdx !== idx && sp.group);
+            if (sibling && sibling.group) {
+              if (sibling.group === 'G1') p.group = 'P2';
+              else if (sibling.group === 'G2') p.group = 'P1';
+              else if (sibling.group === 'P1') p.group = 'P2';
+              else if (sibling.group === 'P2') p.group = 'P1';
+              else p.group = idx === 0 ? 'P1' : 'P2';
+            } else {
+              p.group = idx === 0 ? 'P1' : 'P2';
+            }
+          }
+        });
+      }
+
+      let subjectMerged = allSubjectsSame ? parsedParts[0].subject : parsedParts.map((p, idx) => hasGroup ? `${p.group || (idx === 0 ? 'P1' : 'P2')}: ${p.subject}` : p.subject).join(' | ');
+      let teacherMerged = parsedParts.map((p, idx) => hasGroup ? `${p.teacher} (${p.group || (idx === 0 ? 'P1' : 'P2')})` : p.teacher).join(' / ');
+      let roomMerged = allRoomsSame ? parsedParts[0].room : parsedParts.map((p, idx) => hasGroup ? `${p.group || (idx === 0 ? 'P1' : 'P2')}: ${p.room}` : p.room).join(' / ');
 
       return { period: periodId, subject: subjectMerged, teacher: teacherMerged, room: roomMerged };
     } else {

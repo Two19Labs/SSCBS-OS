@@ -66,15 +66,17 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
       }
 
       let groupLabel = "";
-      const parenGroupMatch = partText.match(/\(((?:G1\s*\+\s*G2)|G1|G2)\)/i);
+      const groupRegexParen = /\(((?:[GP][1-4]\s*[\+\/]\s*[GP][1-4])|[GP][1-4])\)/i;
+      const groupRegexRaw = /\b((?:[GP][1-4]\s*[\+\/]\s*[GP][1-4])|[GP][1-4])\b/i;
+      const parenGroupMatch = partText.match(groupRegexParen);
       if (parenGroupMatch) {
         groupLabel = parenGroupMatch[1].toUpperCase().replace(/\s+/g, '');
-        partText = partText.replace(/\(((?:G1\s*\+\s*G2)|G1|G2)\)/i, '').trim();
+        partText = partText.replace(groupRegexParen, '').trim();
       } else {
-        const rawGroupMatch = partText.match(/\b((?:G1\s*\+\s*G2)|G1|G2)\b/i);
+        const rawGroupMatch = partText.match(groupRegexRaw);
         if (rawGroupMatch) {
           groupLabel = rawGroupMatch[1].toUpperCase().replace(/\s+/g, '');
-          partText = partText.replace(/\b((?:G1\s*\+\s*G2)|G1|G2)\b/i, '').trim();
+          partText = partText.replace(groupRegexRaw, '').trim();
         }
       }
 
@@ -159,25 +161,46 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
     const allRoomsSame = parsedParts.every(p => p.room === parsedParts[0].room);
     const hasAnyGroup = parsedParts.some(p => p.group);
 
+    if (hasAnyGroup) {
+      parsedParts.forEach((p, idx) => {
+        if (!p.group) {
+          const sibling = parsedParts.find((sp, sIdx) => sIdx !== idx && sp.group);
+          if (sibling && sibling.group) {
+            if (sibling.group === 'G1') p.group = 'P2';
+            else if (sibling.group === 'G2') p.group = 'P1';
+            else if (sibling.group === 'P1') p.group = 'P2';
+            else if (sibling.group === 'P2') p.group = 'P1';
+            else p.group = idx === 0 ? 'P1' : 'P2';
+          } else {
+            p.group = idx === 0 ? 'P1' : 'P2';
+          }
+        }
+      });
+    }
+
     if (allSubjectsSame) {
       subjectMerged = parsedParts[0].subject;
-      teacherMerged = parsedParts.map(p => {
-        return hasAnyGroup ? `${p.teacher} (${p.group || 'G?'})` : p.teacher;
+      teacherMerged = parsedParts.map((p, idx) => {
+        const grp = p.group || (idx === 0 ? 'P1' : 'P2');
+        return hasAnyGroup ? `${p.teacher} (${grp})` : p.teacher;
       }).join(' / ');
     } else {
-      subjectMerged = parsedParts.map(p => {
-        return hasAnyGroup ? `${p.group || 'G?'}: ${p.subject}` : p.subject;
+      subjectMerged = parsedParts.map((p, idx) => {
+        const grp = p.group || (idx === 0 ? 'P1' : 'P2');
+        return hasAnyGroup ? `${grp}: ${p.subject}` : p.subject;
       }).join(' | ');
-      teacherMerged = parsedParts.map(p => {
-        return hasAnyGroup ? `${p.teacher} (${p.group || 'G?'})` : p.teacher;
+      teacherMerged = parsedParts.map((p, idx) => {
+        const grp = p.group || (idx === 0 ? 'P1' : 'P2');
+        return hasAnyGroup ? `${p.teacher} (${grp})` : p.teacher;
       }).join(' / ');
     }
 
     if (allRoomsSame) {
       roomMerged = parsedParts[0].room;
     } else {
-      roomMerged = parsedParts.map(p => {
-        return hasAnyGroup ? `${p.group || 'G?'}: ${p.room}` : p.room;
+      roomMerged = parsedParts.map((p, idx) => {
+        const grp = p.group || (idx === 0 ? 'P1' : 'P2');
+        return hasAnyGroup ? `${grp}: ${p.room}` : p.room;
       }).join(' / ');
     }
 
@@ -201,15 +224,17 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
     let room = defaultRoom;
 
     let groupLabel = "";
-    const parenGroupMatch = text.match(/\(((?:G1\s*\+\s*G2)|G1|G2)\)/i);
+    const groupRegexParenSingle = /\(((?:[GP][1-4]\s*[\+\/]\s*[GP][1-4])|[GP][1-4])\)/i;
+    const groupRegexRawSingle = /\b((?:[GP][1-4]\s*[\+\/]\s*[GP][1-4])|[GP][1-4])\b/i;
+    const parenGroupMatch = text.match(groupRegexParenSingle);
     if (parenGroupMatch) {
       groupLabel = parenGroupMatch[1].toUpperCase().replace(/\s+/g, '');
-      text = text.replace(/\(((?:G1\s*\+\s*G2)|G1|G2)\)/i, '').trim();
+      text = text.replace(groupRegexParenSingle, '').trim();
     } else {
-      const rawGroupMatch = text.match(/\b((?:G1\s*\+\s*G2)|G1|G2)\b/i);
+      const rawGroupMatch = text.match(groupRegexRawSingle);
       if (rawGroupMatch) {
         groupLabel = rawGroupMatch[1].toUpperCase().replace(/\s+/g, '');
-        text = text.replace(/\b((?:G1\s*\+\s*G2)|G1|G2)\b/i, '').trim();
+        text = text.replace(groupRegexRawSingle, '').trim();
       }
     }
 

@@ -116,8 +116,9 @@ const cleanDisplayName = (name) => {
   let cleaned = name
     .replace(/^[:\s\-]+|[:\s\-]+$/g, '')
     .replace(/g\d+:\s*/gi, '')
-    .replace(/\b(g\d+)\b/gi, '')
-    .replace(/\(((?:G1\s*\+\s*G2)|G1|G2|G\?|P|Practical|Tute|Tutorial|Merged[^\)]*|\d{3}(?:\/\d{3})*|Room[^\)]*|Hin[^\)]*|Python|SEC[^\)]*|VAC[^\)]*|GE[^\)]*|AECC[^\)]*|Th)\)/gi, '')
+    .replace(/p\d+:\s*/gi, '')
+    .replace(/\b([gp]\d+)\b/gi, '')
+    .replace(/\(((?:[GP]1\s*[\+\/]\s*[GP]2)|[GP]\d+|G\?|P|Practical|Tute|Tutorial|Merged[^\)]*|\d{3}(?:\/\d{3})*|Room[^\)]*|Hin[^\)]*|Python|SEC[^\)]*|VAC[^\)]*|GE[^\)]*|AECC[^\)]*|Th)\)/gi, '')
     .replace(/merged\s+with\s+[^\)]*/gi, '')
     .replace(/\b(P|Practical|Tute|Tutorial|Lab|L)\b/gi, '')
     .replace(/\b[2-7]\d{2}\b/g, '')
