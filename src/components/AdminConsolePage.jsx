@@ -557,12 +557,13 @@ function AdminConsoleContent({ onBack }) {
     visits: { totals: {}, series: {} },
     clicks: { totals: {}, series: {} },
     combined: { totals: {}, series: {} },
-    series: { total: [], timetable: [], 'find-prof': [], 'team-finder': [], waiver: [], gpa: [], buzz: [], profile: [], admin: [] },
-    totals: { timetable: 0, 'find-prof': 0, 'team-finder': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, grandTotal: 0 },
+    series: { total: [], home: [], timetable: [], 'find-prof': [], 'team-finder': [], waiver: [], gpa: [], buzz: [], profile: [], admin: [] },
+    totals: { home: 0, timetable: 0, 'find-prof': 0, 'team-finder': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, grandTotal: 0 },
     topFeatureName: 'Timetable',
     topFeatureCount: 0
   });
   const [enabledSeries, setEnabledSeries] = useState({
+    home: true,
     timetable: true,
     'find-prof': true,
     'team-finder': true,
@@ -3102,6 +3103,7 @@ STRICT EXTRACTION RULES:
                   const activeTotals = analyticsSummary.totals || {};
 
                   const legendItems = [
+                    { key: 'home', label: 'Home OS Dashboard', color: '#3b82f6' },
                     { key: 'timetable', label: 'Timetable', color: '#8b5cf6' },
                     { key: 'find-prof', label: 'Find My Professor', color: '#10b981' },
                     { key: 'team-finder', label: 'Team Finder & Compete Hub', color: '#f43f5e' },
@@ -3146,6 +3148,7 @@ STRICT EXTRACTION RULES:
                   const graphHeight = height - paddingTop - paddingBottom;
 
                   const seriesColors = {
+                    home: '#3b82f6',
                     timetable: '#8b5cf6',
                     'find-prof': '#10b981',
                     'team-finder': '#f43f5e',
@@ -3273,6 +3276,7 @@ STRICT EXTRACTION RULES:
                           .reduce((acc, k) => acc + (vTotals[k] || 0), 0) || 1;
 
                         const toolsList = [
+                          { id: 'home', name: 'Home OS Dashboard' },
                           { id: 'timetable', name: 'Timetable' },
                           { id: 'find-prof', name: 'Find My Professor' },
                           { id: 'team-finder', name: 'Team Finder & Compete Hub' },
