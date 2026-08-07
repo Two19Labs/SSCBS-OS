@@ -1,7 +1,7 @@
 const xlsx = require('xlsx');
 const fs = require('fs');
 
-const FILE_1 = 'TT_wef _28.07.2026 .xlsx';
+const FILE_1 = 'TT_wef  05.08.2026.xlsx';
 const FILE_2 = 'TT_JULY 2026.xlsx';
 
 const DEFAULT_SECTION_ROOMS = {
@@ -206,6 +206,14 @@ function buildMasterTimetable() {
               let paperName = '';
               let facName = '';
               let facCode = '';
+              let paperType = '';
+
+              for (let pIdx = 0; pIdx < lRow.length; pIdx++) {
+                const val = String(lRow[pIdx] || '').trim();
+                if (['Core', 'GE', 'SEC', 'VAC', 'AEC', 'DSE'].includes(val)) {
+                  paperType = val;
+                }
+              }
 
               if (nonEmpties[0].match(/^\d+$/)) {
                 // BMS/BBA format: S.No | Type | Paper Name | Faculty Name | Code
@@ -220,11 +228,18 @@ function buildMasterTimetable() {
               }
 
               if (paperName && (facName || facCode)) {
-                const info = { paperName, facName: facName || facCode };
+                const info = { paperName, facName: facName || facCode, paperType };
                 const cleanCode = facCode.replace(/\(.*\)/, '').trim().toLowerCase();
                 const cleanName = facName.replace(/\(.*\)/, '').trim().toLowerCase();
-                if (cleanCode) legendMap[cleanCode] = info;
-                if (cleanName) legendMap[cleanName] = info;
+                
+                [cleanCode, cleanName].forEach(k => {
+                  if (k) {
+                    if (!legendMap[k]) legendMap[k] = [];
+                    if (!legendMap[k].some(e => e.paperName === paperName)) {
+                      legendMap[k].push(info);
+                    }
+                  }
+                });
               }
             }
           }
@@ -282,11 +297,28 @@ function buildMasterTimetable() {
                   }
 
                   // Teacher name extraction
-                  const teacherName = cleanTeacherName(part, legendMap);
-
-                  // Paper Title extraction
                   const cleanKey = part.replace(/\s*\([^)]*\)/g, '').replace(/\b(G[1234])\b/gi, '').trim().toLowerCase();
-                  const matchedInfo = legendMap[cleanKey];
+                  let matchedEntries = legendMap[cleanKey];
+                  let matchedInfo = null;
+                  if (matchedEntries && matchedEntries.length > 0) {
+                    const lowerPart = part.toLowerCase();
+                    if (/\bvac\b/i.test(lowerPart) || lowerPart.includes('social and emotional')) {
+                      matchedInfo = matchedEntries.find(e => e.paperType === 'VAC' || /social|vac/i.test(e.paperName));
+                    } else if (/\bstartup\b/i.test(lowerPart) || /\bsofp\b/i.test(lowerPart)) {
+                      matchedInfo = matchedEntries.find(e => e.paperType === 'DSE' || e.paperType === 'GE' || /startup/i.test(e.paperName));
+                    } else {
+                      const hinMatch = lowerPart.match(/\bhin(?:di)?\s*([a-d])\b/i);
+                      if (hinMatch) {
+                        const letter = hinMatch[1].toUpperCase();
+                        matchedInfo = matchedEntries.find(e => new RegExp('hindi\\s*' + letter, 'i').test(e.paperName));
+                      }
+                    }
+                    if (!matchedInfo) {
+                      matchedInfo = matchedEntries.find(e => e.paperType === 'Core') || matchedEntries[0];
+                    }
+                  }
+
+                  const teacherName = matchedInfo ? matchedInfo.facName : cleanTeacherName(part, legendMap);
                   const paperTitle = matchedInfo ? matchedInfo.paperName : part;
 
                   parsedSubjects.push(grpPrefix ? `${grpPrefix}${paperTitle}` : paperTitle);

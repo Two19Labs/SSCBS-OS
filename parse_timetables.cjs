@@ -34,6 +34,51 @@ function splitOutsideParentheses(str) {
   return parts.filter(p => p.length > 0);
 }
 
+function resolveFacultyInfo(teacherCodeLower, rawPartText, facultyMap) {
+  let cleanCode = teacherCodeLower.replace(/\s*\([^)]*\)/g, '').replace(/\b(vac|ge|sec|aec|startup)\b/gi, '').trim();
+  let entries = facultyMap[cleanCode] || facultyMap[teacherCodeLower];
+  if (!entries) {
+    const keys = Object.keys(facultyMap);
+    for (let k of keys) {
+      if (cleanCode === k || cleanCode.startsWith(k + ' ') || cleanCode.endsWith(' ' + k) || cleanCode.includes(k)) {
+        entries = facultyMap[k];
+        break;
+      }
+    }
+  }
+  if (!entries) return null;
+  if (!Array.isArray(entries)) entries = [entries];
+  if (entries.length === 1) return entries[0];
+
+  const lowerRaw = (rawPartText || '').toLowerCase();
+
+  // Check VAC
+  if (/\bvac\b/i.test(lowerRaw) || lowerRaw.includes('social and emotional')) {
+    const vacMatch = entries.find(e => e.paperType === 'VAC' || /social|vac/i.test(e.paperName));
+    if (vacMatch) return vacMatch;
+  }
+
+  // Check Startup / DSE / GE
+  if (/\bstartup\b/i.test(lowerRaw) || /\bsofp\b/i.test(lowerRaw)) {
+    const startupMatch = entries.find(e => e.paperType === 'DSE' || e.paperType === 'GE' || /startup/i.test(e.paperName));
+    if (startupMatch) return startupMatch;
+  }
+
+  // Check Hindi
+  const hinMatch = lowerRaw.match(/\bhin(?:di)?\s*([a-d])\b/i);
+  if (hinMatch) {
+    const letter = hinMatch[1].toUpperCase();
+    const match = entries.find(e => new RegExp('hindi\\s*' + letter, 'i').test(e.paperName));
+    if (match) return match;
+  }
+
+  // Default to Core paper if available
+  const coreMatch = entries.find(e => e.paperType === 'Core');
+  if (coreMatch) return coreMatch;
+
+  return entries[0];
+}
+
 function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
   if (!cellValue) {
     return { period: periodId, subject: "Free", teacher: "-", room: "-" };
@@ -54,6 +99,7 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
     const parsedParts = [];
 
     parts.forEach(part => {
+      let originalPart = part.trim();
       let partText = part.trim();
       let partRoom = defaultRoom;
       let explicitSubject = "";
@@ -85,7 +131,7 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
         const roomVal = partRoomMatch[1].trim();
         if (roomVal.toUpperCase() === 'P' || roomVal.toLowerCase() === 'practical') {
           partText = partText.replace(/\([^)]+\)/, '').trim();
-        } else {
+        } else if (/\d{3}|Lab/i.test(roomVal)) {
           partRoom = roomVal.split('/').map(r => {
             let rClean = r.trim();
             return rClean.match(/^\d+/) ? `Room ${rClean}` : rClean;
@@ -109,16 +155,7 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
       let subjectName = explicitSubject || partText.trim();
       let teacherName = partText.trim();
 
-      let found = facultyMap[teacherCodeLower];
-      if (!found) {
-        const keys = Object.keys(facultyMap);
-        for (let k of keys) {
-          if (teacherCodeLower === k || teacherCodeLower.startsWith(k + ' ') || teacherCodeLower.endsWith(' ' + k) || teacherCodeLower.includes(k)) {
-            found = facultyMap[k];
-            break;
-          }
-        }
-      }
+      let found = resolveFacultyInfo(teacherCodeLower, originalPart, facultyMap);
 
       if (found) {
         if (!explicitSubject) {
@@ -215,6 +252,7 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
     return res;
   } else {
     // Single part
+    let originalText = cellValue.trim();
     let text = cellValue
       .replace(/\(\s*\d*\s*practical\s+unsupervised\s*\)/gi, '')
       .replace(/\(\s*unsupervised\s*\)/gi, '')
@@ -243,7 +281,7 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
       const roomVal = roomMatch[1].trim();
       if (roomVal.toUpperCase() === 'P' || roomVal.toLowerCase() === 'practical') {
         text = text.replace(/\([^)]+\)/, '').trim();
-      } else {
+      } else if (/\d{3}|Lab/i.test(roomVal)) {
         room = roomVal.split('/').map(r => {
           let rClean = r.trim();
           return rClean.match(/^\d+/) ? `Room ${rClean}` : rClean;
@@ -267,16 +305,7 @@ function parseUnifiedCell(cellValue, periodId, facultyMap, defaultRoom) {
     let subjectName = text;
     let teacherName = isUnsupervisedCell ? "Unsupervised" : text;
 
-    let found = facultyMap[teacherCodeLower];
-    if (!found) {
-      const keys = Object.keys(facultyMap);
-      for (let k of keys) {
-        if (teacherCodeLower === k || teacherCodeLower.startsWith(k + ' ') || teacherCodeLower.endsWith(' ' + k) || teacherCodeLower.includes(k)) {
-          found = facultyMap[k];
-          break;
-        }
-      }
-    }
+    let found = resolveFacultyInfo(teacherCodeLower, originalText, facultyMap);
 
     if (found) {
       subjectName = found.paperName;
@@ -404,14 +433,18 @@ bbaSheets.forEach(({ name, defaultCourse, defaultSem }) => {
       let paperName = '';
       let facultyName = '';
       let facultyCode = '';
+      let paperType = '';
 
       for (let c = 0; c < row.length; c++) {
         const val = clean(row[c]);
+        if (['Core', 'GE', 'SEC', 'VAC', 'AEC', 'DSE'].includes(val)) {
+          paperType = val;
+        }
         if (val.startsWith('Dr.') || val.startsWith('Mr.') || val.startsWith('Ms.') || val.startsWith('Prof.')) {
           facultyName = val;
           for (let p = c - 1; p >= 0; p--) {
             const pVal = clean(row[p]);
-            if (pVal && pVal !== 'Core' && pVal !== 'GE' && pVal !== 'SEC' && pVal !== 'VAC' && pVal !== 'AEC' && !pVal.match(/^\d+$/)) {
+            if (pVal && !['Core', 'GE', 'SEC', 'VAC', 'AEC', 'DSE'].includes(pVal) && !pVal.match(/^\d+$/)) {
               paperName = pVal;
               break;
             }
@@ -428,7 +461,13 @@ bbaSheets.forEach(({ name, defaultCourse, defaultSem }) => {
       }
 
       if (facultyCode && paperName && facultyName) {
-        facultyMap[facultyCode.toLowerCase()] = { facultyName, paperName };
+        const key = facultyCode.toLowerCase();
+        if (!facultyMap[key]) {
+          facultyMap[key] = [];
+        }
+        if (!facultyMap[key].some(e => e.paperName === paperName)) {
+          facultyMap[key].push({ facultyName, paperName, paperType });
+        }
       }
     }
 
@@ -476,9 +515,10 @@ bbaSheets.forEach(({ name, defaultCourse, defaultSem }) => {
 });
 
 // 2. PARSE BSC COMP SCI WORKBOOK (`TT_JULY 2026 (1).xlsx`)
-console.log('\n--- Processing TT_JULY 2026 (1).xlsx ---');
-const wbBSC = XLSX.readFile('TT_JULY 2026 (1).xlsx');
-const bscSheet = wbBSC.Sheets['Classwise'];
+if (fs.existsSync('TT_JULY 2026 (1).xlsx')) {
+  console.log('\n--- Processing TT_JULY 2026 (1).xlsx ---');
+  const wbBSC = XLSX.readFile('TT_JULY 2026 (1).xlsx');
+  const bscSheet = wbBSC.Sheets['Classwise'];
 
 if (bscSheet) {
   const data = XLSX.utils.sheet_to_json(bscSheet, { header: 1 });
@@ -549,6 +589,7 @@ if (bscSheet) {
       }
 
       const paperName = clean(row[1]);
+      const paperType = clean(row[0]);
       let facultyName = '';
       let facultyCode = '';
 
@@ -570,7 +611,13 @@ if (bscSheet) {
       }
 
       if (facultyCode && paperName && facultyName) {
-        facultyMap[facultyCode.toLowerCase()] = { facultyName, paperName };
+        const key = facultyCode.toLowerCase();
+        if (!facultyMap[key]) {
+          facultyMap[key] = [];
+        }
+        if (!facultyMap[key].some(e => e.paperName === paperName)) {
+          facultyMap[key].push({ facultyName, paperName, paperType });
+        }
       }
     }
 
@@ -616,6 +663,7 @@ if (bscSheet) {
     if (!timetables[course][sem]) timetables[course][sem] = {};
     timetables[course][sem][section] = weekSchedule;
   });
+}
 }
 
 console.log('\n--- Writing output to src/data/timetables.json ---');

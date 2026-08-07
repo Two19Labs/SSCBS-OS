@@ -404,14 +404,14 @@
           },
           {
             "period": 6,
-            "subject": "Funadamentals of Management",
-            "teacher": "Dr. Tarannum Ahmad",
+            "subject": "Constitutional Values and Fundamental Duties",
+            "teacher": "Ms. Sunita Tank",
             "room": "Room 707"
           },
           {
             "period": 7,
-            "subject": "Funadamentals of Management",
-            "teacher": "Dr. Tarannum Ahmad",
+            "subject": "Constitutional Values and Fundamental Duties",
+            "teacher": "Ms. Sunita Tank",
             "room": "Room 707"
           }
         ],
@@ -517,8 +517,8 @@
           },
           {
             "period": 7,
-            "subject": "Funadamentals of Management",
-            "teacher": "Dr. Tarannum Ahmad",
+            "subject": "Constitutional Values and Fundamental Duties",
+            "teacher": "Ms. Sunita Tank",
             "room": "Room 707"
           }
         ]
@@ -1415,13 +1415,13 @@
           },
           {
             "period": 5,
-            "subject": "Hindi C (Merged with BMS 3A)",
+            "subject": "Hindi B",
             "teacher": "Dr. Soumya Guliyan",
             "room": "Room 603"
           },
           {
             "period": 6,
-            "subject": "Hindi C (Merged with BMS 3A)",
+            "subject": "Hindi B",
             "teacher": "Dr. Soumya Guliyan",
             "room": "Room 603"
           },
@@ -1477,13 +1477,13 @@
           {
             "period": 6,
             "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Hindi D",
-            "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Komal",
+            "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Mr. Komal",
             "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 7,
             "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Hindi D",
-            "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Komal",
+            "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Mr. Komal",
             "room": "Room 607 / Room 644 / Room 648"
           }
         ],
@@ -1605,7 +1605,7 @@
           },
           {
             "period": 2,
-            "subject": "Social and Emotional Learning (Merged with BBA 3B)",
+            "subject": "Macroeconomics",
             "teacher": "Dr. Sushmita",
             "room": "Room 644"
           },
@@ -1630,7 +1630,7 @@
           },
           {
             "period": 5,
-            "subject": "Introduction to Business Analytics",
+            "subject": "Introduction to Business Analytics (P1)",
             "teacher": "Dr. Satish Kumar Goel",
             "room": "Room 644"
           },
@@ -1682,13 +1682,13 @@
           },
           {
             "period": 5,
-            "subject": "G1: Organizational Behaviour | G2: Social and Emotional Learning (Merged with BBA 3B)",
+            "subject": "G1: Organizational Behaviour | G2: Macroeconomics",
             "teacher": "Dr.  Seema Kataria (G1) / Dr. Sushmita (G2)",
             "room": "G1: Room 644 / G2: Room 236"
           },
           {
             "period": 6,
-            "subject": "G2: Organizational Behaviour | G1: Social and Emotional Learning (Merged with BBA 3B)",
+            "subject": "G2: Organizational Behaviour | G1: Macroeconomics",
             "teacher": "Dr.  Seema Kataria (G2) / Dr. Sushmita (G1)",
             "room": "G2: Room 644 / G1: Room 236"
           },
@@ -1715,7 +1715,7 @@
           },
           {
             "period": 3,
-            "subject": "Social and Emotional Learning (Merged with BBA 3B)",
+            "subject": "Macroeconomics",
             "teacher": "Dr. Sushmita",
             "room": "Room 644"
           },
@@ -1833,7 +1833,7 @@
           },
           {
             "period": 4,
-            "subject": "Social and Emotional Learning (Merged with BBA 3B)",
+            "subject": "Macroeconomics",
             "teacher": "Dr. Sushmita",
             "room": "Room 644"
           },
@@ -1851,7 +1851,7 @@
           },
           {
             "period": 7,
-            "subject": "Introduction to Business Analytics",
+            "subject": "Introduction to Business Analytics (P2)",
             "teacher": "Dr. Satish Kumar Goel",
             "room": "Room 326"
           }
@@ -2006,13 +2006,13 @@
           },
           {
             "period": 6,
-            "subject": "Hindi A | Hindi C (Merged with BMS 3A) | Hindi D (Merged with BMS 3A)",
+            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Hindi D (Merged with BMS 3A)",
             "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Mr. Komal",
             "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 7,
-            "subject": "Hindi A | Hindi C (Merged with BMS 3A) | Hindi D (Merged with BMS 3A)",
+            "subject": "Hindi A (Merged with BMS 3A) | Hindi C (Merged with BMS 3A) | Hindi D (Merged with BMS 3A)",
             "teacher": "Dr. Garima TripathI / Dr. Soumya Guliyan / Mr. Komal",
             "room": "Room 607 / Room 644 / Room 648"
           }
@@ -2161,7 +2161,7 @@
           },
           {
             "period": 5,
-            "subject": "Startup Operations & Future Proofing",
+            "subject": "Business Ethics & Governance",
             "teacher": "Dr. Paridhi",
             "room": "Room 523"
           },
@@ -2188,7 +2188,7 @@
           },
           {
             "period": 2,
-            "subject": "G1: Startup Operations & Future Proofing | G2: Legal Aspects of Business",
+            "subject": "G1: Business Ethics & Governance | G2: Legal Aspects of Business",
             "teacher": "Dr. Paridhi (G1) / Mr. Mohd. Rashid (G2)",
             "room": "G1: Room 523 / G2: Room 338"
           },
@@ -2207,7 +2207,7 @@
           },
           {
             "period": 4,
-            "subject": "Startup Operations & Future Proofing",
+            "subject": "Business Ethics & Governance",
             "teacher": "Dr. Paridhi",
             "room": "Room 523"
           },
@@ -2240,7 +2240,7 @@
           },
           {
             "period": 2,
-            "subject": "G2: Startup Operations & Future Proofing | G1: Legal Aspects of Business",
+            "subject": "G2: Business Ethics & Governance | G1: Legal Aspects of Business",
             "teacher": "Dr. Paridhi (G2) / Mr. Mohd. Rashid (G1)",
             "room": "G2: Room 523 / G1: Room 338"
           },
@@ -2316,7 +2316,7 @@
           },
           {
             "period": 5,
-            "subject": "Startup Operations & Future Proofing",
+            "subject": "Business Ethics & Governance",
             "teacher": "Dr. Paridhi",
             "room": "Room 523"
           },
@@ -4023,14 +4023,14 @@
           },
           {
             "period": 6,
-            "subject": "Corporate Law",
-            "teacher": "Dr. Nidhi Kesari",
+            "subject": "Communication in Professional Life (Merged with BMS3C)",
+            "teacher": "Ms. Ankita Arora",
             "room": "Room 553"
           },
           {
             "period": 7,
-            "subject": "Corporate Law",
-            "teacher": "Dr. Nidhi Kesari",
+            "subject": "Communication in Professional Life (Merged with BMS3C)",
+            "teacher": "Ms. Ankita Arora",
             "room": "Room 553"
           }
         ],
@@ -4129,13 +4129,13 @@
           {
             "period": 6,
             "subject": "Hindi A | Hindi C | Hindi D",
-            "teacher": "Garima / Dr. Soumya Guliyan / Mr. Komal",
+            "teacher": "Dr. Garima Tripathi / Dr. Soumya Guliyan / Mr. Komal",
             "room": "Room 607 / Room 644 / Room 648"
           },
           {
             "period": 7,
             "subject": "Hindi A | Hindi C | Hindi D",
-            "teacher": "Garima / Dr. Soumya Guliyan / Mr. Komal",
+            "teacher": "Dr. Garima Tripathi / Dr. Soumya Guliyan / Mr. Komal",
             "room": "Room 607 / Room 644 / Room 648"
           }
         ],
@@ -4174,14 +4174,14 @@
           },
           {
             "period": 5,
-            "subject": "Business Intelligence and Data Visualization | Corporate Law",
-            "teacher": "Mr. Vineet / Dr. Nidhi Kesari",
+            "subject": "Business Intelligence and Data Visualization | Communication in Professional Life (Merged with BMS3C)",
+            "teacher": "Mr. Vineet / Ms. Ankita Arora",
             "room": "Room 553"
           },
           {
             "period": 6,
-            "subject": "Business Intelligence and Data Visualization | Corporate Law",
-            "teacher": "Mr. Vineet / Dr. Nidhi Kesari",
+            "subject": "Business Intelligence and Data Visualization | Communication in Professional Life (Merged with BMS3C)",
+            "teacher": "Mr. Vineet / Ms. Ankita Arora",
             "room": "Room 553"
           },
           {
@@ -4227,13 +4227,13 @@
           },
           {
             "period": 5,
-            "subject": "Hindi C (Merged  BMS 3A)",
+            "subject": "Hindi B",
             "teacher": "Dr. Soumya Guliyan",
             "room": "Room 553"
           },
           {
             "period": 6,
-            "subject": "Hindi C (Merged  BMS 3A)",
+            "subject": "Hindi B",
             "teacher": "Dr. Soumya Guliyan",
             "room": "Room 553"
           },
@@ -4274,14 +4274,14 @@
           },
           {
             "period": 4,
-            "subject": "Hindi D (Merged BMS 3D)",
-            "teacher": "Mr. Komal",
+            "subject": "Hindi B",
+            "teacher": "Ms. Komal",
             "room": "Room 557"
           },
           {
             "period": 5,
-            "subject": "Hindi D (Merged BMS 3D)",
-            "teacher": "Mr. Komal",
+            "subject": "Hindi B",
+            "teacher": "Ms. Komal",
             "room": "Room 557"
           },
           {
@@ -4516,7 +4516,7 @@
           {
             "period": 1,
             "subject": "Azmi",
-            "teacher": "Azmi",
+            "teacher": "Mohd. Azmi Khan",
             "room": "Room 503"
           },
           {
@@ -4541,7 +4541,7 @@
           {
             "period": 4,
             "subject": "Azmi",
-            "teacher": "Azmi",
+            "teacher": "Mohd. Azmi Khan",
             "room": "Room 503"
           },
           {
@@ -4573,14 +4573,14 @@
           {
             "period": 2,
             "subject": "Azmi",
-            "teacher": "Azmi",
+            "teacher": "Mohd. Azmi Khan",
             "room": "Room 503",
             "isPractical": true
           },
           {
             "period": 3,
             "subject": "Azmi",
-            "teacher": "Azmi",
+            "teacher": "Mohd. Azmi Khan",
             "room": "Room 503",
             "isPractical": true
           },
@@ -4687,7 +4687,7 @@
           {
             "period": 3,
             "subject": "Azmi",
-            "teacher": "Azmi",
+            "teacher": "Mohd. Azmi Khan",
             "room": "Room 503",
             "isPractical": true
           },
@@ -4786,14 +4786,14 @@
           },
           {
             "period": 2,
-            "subject": "Azmi | Corporate Restructuring",
-            "teacher": "Azmi / Dr. Nidhi Kesari",
+            "subject": "Financial Analytics (Merged with BMS 5C)",
+            "teacher": "Mohd. Azmi Khan / Mr. Ankit Bisht",
             "room": "Room 507 / Room 237"
           },
           {
             "period": 3,
-            "subject": "Azmi | Corporate Restructuring",
-            "teacher": "Azmi / Dr. Nidhi Kesari",
+            "subject": "Financial Analytics (Merged with BMS 5C)",
+            "teacher": "Mohd. Azmi Khan / Mr. Ankit Bisht",
             "room": "Room 507 / Room 237"
           },
           {
@@ -4859,7 +4859,7 @@
           {
             "period": 4,
             "subject": "Azmi",
-            "teacher": "Azmi",
+            "teacher": "Mohd. Azmi Khan",
             "room": "Room 507"
           },
           {
@@ -4939,14 +4939,14 @@
         "Thursday": [
           {
             "period": 1,
-            "subject": "Azmi | Corporate Restructuring",
-            "teacher": "Azmi / Dr. Nidhi Kesari",
+            "subject": "Financial Analytics (Merged with BMS 5C)",
+            "teacher": "Mohd. Azmi Khan / Mr. Ankit Bisht",
             "room": "Room 507 / Room 237"
           },
           {
             "period": 2,
-            "subject": "Azmi | Corporate Restructuring",
-            "teacher": "Azmi / Dr. Nidhi Kesari",
+            "subject": "Financial Analytics (Merged with BMS 5C)",
+            "teacher": "Mohd. Azmi Khan / Mr. Ankit Bisht",
             "room": "Room 507"
           },
           {
@@ -5248,1273 +5248,6 @@
           }
         ],
         "Friday": [
-          {
-            "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 2,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 3,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 5,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ]
-      }
-    }
-  },
-  "Bsc Comp Sci": {
-    "1": {
-      "A": {
-        "Monday": [
-          {
-            "period": 1,
-            "subject": "Computer System Architecture (Lab)",
-            "teacher": "Onkar Singh (G1)",
-            "room": "Room 426",
-            "isPractical": true
-          },
-          {
-            "period": 2,
-            "subject": "G1: Object Oriented Programming Using Python | P2: Computer System Architecture (Lab)",
-            "teacher": "Dr. Kavita Rastogi (G1) / Onkar Singh (P2)",
-            "room": "G1: Room 426 / P2: Room 460"
-          },
-          {
-            "period": 3,
-            "subject": "Entrepreneurship Essentials - I (GE-Entrepreneurship) | Fundamentals of Organizational Behaviour (GE-Management)",
-            "teacher": "Mehak Aggarwal / Guest",
-            "room": "Room 403"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Mathematics for Computing",
-            "teacher": "Neha Bhatia",
-            "room": "Room 403"
-          },
-          {
-            "period": 5,
-            "subject": "Mathematics for Computing",
-            "teacher": "Neha Bhatia",
-            "room": "Room 403"
-          },
-          {
-            "period": 6,
-            "subject": "Mathematics for Computing (Lab)",
-            "teacher": "Neha Bhatia",
-            "room": "Room 403",
-            "isPractical": true
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ],
-        "Tuesday": [
-          {
-            "period": 1,
-            "subject": "EVS I",
-            "teacher": "Guncha Sharma",
-            "room": "Room 403"
-          },
-          {
-            "period": 2,
-            "subject": "Entrepreneurship Essentials - I (GE-Entrepreneurship) | Fundamentals of Organizational Behaviour (GE-Management)",
-            "teacher": "Mehak Aggarwal / Guest",
-            "room": "Room 403"
-          },
-          {
-            "period": 3,
-            "subject": "Entrepreneurship Essentials - I (GE-Entrepreneurship) | Fundamentals of Organizational Behaviour (GE-Management)",
-            "teacher": "Mehak Aggarwal / Guest",
-            "room": "Room 403"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Entrepreneurship Essentials - I (GE-Entrepreneurship) | Fundamentals of Organizational Behaviour (GE-Management)",
-            "teacher": "Mehak Aggarwal / Guest",
-            "room": "Room 403"
-          },
-          {
-            "period": 5,
-            "subject": "Object Oriented Programming Using Python (G1)",
-            "teacher": "Dr. Kavita Rastogi (G1)",
-            "room": "Room 426",
-            "isPractical": true
-          },
-          {
-            "period": 6,
-            "subject": "Object Oriented Programming Using Python (G2)",
-            "teacher": "Dr. Kavita Rastogi (G2)",
-            "room": "Room 460",
-            "isPractical": true
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ],
-        "Wednesday": [
-          {
-            "period": 1,
-            "subject": "Object Oriented Programming Using Python",
-            "teacher": "Dr. Kavita Rastogi",
-            "room": "Room 403"
-          },
-          {
-            "period": 2,
-            "subject": "Front End Programming",
-            "teacher": "Dr. Kavita Rastogi",
-            "room": "Room 403",
-            "isPractical": true
-          },
-          {
-            "period": 3,
-            "subject": "Computer System Architecture (Theory)",
-            "teacher": "Deepali Dhaka",
-            "room": "Room 403"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Mathematics for Computing (Lab) (G1)",
-            "teacher": "Anamika Gupta (G1)",
-            "room": "Room 403",
-            "isPractical": true
-          },
-          {
-            "period": 5,
-            "subject": "G1: Computer System Architecture (Lab) | P2: Mathematics for Computing (Lab)",
-            "teacher": "Onkar Singh (G1) / Anamika Gupta (P2)",
-            "room": "G1: Room 426 / P2: Room 460"
-          },
-          {
-            "period": 6,
-            "subject": "Constitutional Values and Fundamental Duties | Fit India",
-            "teacher": "Sunita Tank / Nisha Rajput",
-            "room": "Sunita: Room 203 / NR: Room 403"
-          },
-          {
-            "period": 7,
-            "subject": "Constitutional Values and Fundamental Duties | Fit India",
-            "teacher": "Sunita Tank / Nisha Rajput",
-            "room": "Sunita: Room 203 / NR: Room 403"
-          }
-        ],
-        "Thursday": [
-          {
-            "period": 1,
-            "subject": "Mathematics for Computing",
-            "teacher": "Neha Bhatia",
-            "room": "Room 403"
-          },
-          {
-            "period": 2,
-            "subject": "Computer System Architecture (Theory)",
-            "teacher": "Deepali Dhaka",
-            "room": "Room 403"
-          },
-          {
-            "period": 3,
-            "subject": "Computer System Architecture (Theory)",
-            "teacher": "Deepali Dhaka",
-            "room": "Room 403"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Object Oriented Programming Using Python",
-            "teacher": "Dr. Kavita Rastogi",
-            "room": "Room 403"
-          },
-          {
-            "period": 5,
-            "subject": "EVS I",
-            "teacher": "Guncha Sharma",
-            "room": "Room 403"
-          },
-          {
-            "period": 6,
-            "subject": "EVS I",
-            "teacher": "Guncha Sharma",
-            "room": "Room 403"
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ],
-        "Friday": [
-          {
-            "period": 1,
-            "subject": "Object Oriented Programming Using Python",
-            "teacher": "Dr. Kavita Rastogi",
-            "room": "Room 403"
-          },
-          {
-            "period": 2,
-            "subject": "Front End Programming",
-            "teacher": "Dr. Kavita Rastogi",
-            "room": "Room 403",
-            "isPractical": true
-          },
-          {
-            "period": 3,
-            "subject": "G1: Object Oriented Programming Using Python | P2: Computer System Architecture (Lab)",
-            "teacher": "Dr. Kavita Rastogi (G1) / Onkar Singh (P2)",
-            "room": "G1: Room 426 / P2: Room 460"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Front End Programming",
-            "teacher": "Pushkar Gole",
-            "room": "Room 403"
-          },
-          {
-            "period": 5,
-            "subject": "Front End Programming",
-            "teacher": "Pushkar Gole",
-            "room": "Room 403"
-          },
-          {
-            "period": 6,
-            "subject": "Constitutional Values and Fundamental Duties | Fit India",
-            "teacher": "Sunita Tank / Nisha Rajput",
-            "room": "Sunita: Room 203 / NR: Room 403"
-          },
-          {
-            "period": 7,
-            "subject": "Constitutional Values and Fundamental Duties | Fit India",
-            "teacher": "Sunita Tank / Nisha Rajput",
-            "room": "Sunita: Room 203 / NR: Room 403"
-          }
-        ],
-        "Saturday": [
-          {
-            "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 2,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 3,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 5,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ]
-      }
-    },
-    "3": {
-      "A": {
-        "Monday": [
-          {
-            "period": 1,
-            "subject": "Business Intelligence and Data Visualization",
-            "teacher": "Pushkar Gole",
-            "room": "Room 407"
-          },
-          {
-            "period": 2,
-            "subject": "Business Intelligence and Data Visualization",
-            "teacher": "Pushkar Gole",
-            "room": "Room 407"
-          },
-          {
-            "period": 3,
-            "subject": "Data Mining",
-            "teacher": "Anamika Gupta",
-            "room": "Room 407"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "G1: Artificial Intelligence | G2: Data Structures",
-            "teacher": "Onkar Singh (G1) / Sonika Thakral (G2)",
-            "room": "G1: Room 426 / G2: Room 460"
-          },
-          {
-            "period": 5,
-            "subject": "Data Mining (G2)",
-            "teacher": "Anamika Gupta (G2)",
-            "room": "Room 460",
-            "isPractical": true
-          },
-          {
-            "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ],
-        "Tuesday": [
-          {
-            "period": 1,
-            "subject": "Operating Systems",
-            "teacher": "Nidhi Seth",
-            "room": "Room 407"
-          },
-          {
-            "period": 2,
-            "subject": "Operating Systems",
-            "teacher": "Nidhi Seth",
-            "room": "Room 407"
-          },
-          {
-            "period": 3,
-            "subject": "Data Mining",
-            "teacher": "Anamika Gupta",
-            "room": "Room 407"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "G1: Data Mining | G2: Data Structures",
-            "teacher": "Anamika Gupta (G1) / Sonika Thakral (G2)",
-            "room": "G1: Room 426 / G2: Room 460"
-          },
-          {
-            "period": 5,
-            "subject": "Art of Being Happy",
-            "teacher": "Ms. Kajol",
-            "room": "Room 407"
-          },
-          {
-            "period": 6,
-            "subject": "Art of Being Happy",
-            "teacher": "Ms. Kajol",
-            "room": "Room 407"
-          },
-          {
-            "period": 7,
-            "subject": "Hindi B",
-            "teacher": "Soumya Guliyan",
-            "room": "Room 407"
-          }
-        ],
-        "Wednesday": [
-          {
-            "period": 1,
-            "subject": "Business Intelligence and Data Visualization",
-            "teacher": "Pushkar Gole",
-            "room": "Room 407"
-          },
-          {
-            "period": 2,
-            "subject": "Business Intelligence and Data Visualization",
-            "teacher": "Pushkar Gole",
-            "room": "Room 407"
-          },
-          {
-            "period": 3,
-            "subject": "Art of Being Happy",
-            "teacher": "Ms. Kajol",
-            "room": "Room 407"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "G1: Data Structures | G2: Artificial Intelligence",
-            "teacher": "Sonika Thakral (G1) / Onkar Singh (G2)",
-            "room": "G1: Room 426 / G2: Room 460"
-          },
-          {
-            "period": 5,
-            "subject": "Hindi B",
-            "teacher": "Soumya Guliyan",
-            "room": "Room 407"
-          },
-          {
-            "period": 6,
-            "subject": "Hindi A | Hindi C | Hindi D",
-            "teacher": "Garima Tripathi / Soumya Guliyan / Komal",
-            "room": "Room 607 / Room 644 / Room 648"
-          },
-          {
-            "period": 7,
-            "subject": "Hindi A | Hindi C | Hindi D",
-            "teacher": "Garima Tripathi / Soumya Guliyan / Komal",
-            "room": "Room 607 / Room 644 / Room 648"
-          }
-        ],
-        "Thursday": [
-          {
-            "period": 1,
-            "subject": "Artificial Intelligence",
-            "teacher": "Onkar Singh",
-            "room": "Room 407"
-          },
-          {
-            "period": 2,
-            "subject": "Artificial Intelligence",
-            "teacher": "Onkar Singh",
-            "room": "Room 407"
-          },
-          {
-            "period": 3,
-            "subject": "Data Mining (G1)",
-            "teacher": "Anamika Gupta (G1)",
-            "room": "Room 426",
-            "isPractical": true
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Data Structures",
-            "teacher": "Sonika Thakral",
-            "room": "Room 407"
-          },
-          {
-            "period": 5,
-            "subject": "G1: Data Structures | G2: Data Mining",
-            "teacher": "Sonika Thakral (G1) / Anamika Gupta (G2)",
-            "room": "G1: Room 426 / G2: Room 460"
-          },
-          {
-            "period": 6,
-            "subject": "Operating Systems",
-            "teacher": "Nidhi Seth",
-            "room": "Room 407"
-          },
-          {
-            "period": 7,
-            "subject": "Operating Systems (Lab)",
-            "teacher": "Nidhi Seth",
-            "room": "Room 407",
-            "isPractical": true
-          }
-        ],
-        "Friday": [
-          {
-            "period": 1,
-            "subject": "G1: Operating Systems | G2: Artificial Intelligence",
-            "teacher": "Nidhi Seth (G1) / Onkar Singh (G2)",
-            "room": "G1: Room 426 / G2: Room 460"
-          },
-          {
-            "period": 2,
-            "subject": "G1: Artificial Intelligence | G2: Operating Systems",
-            "teacher": "Onkar Singh (G1) / Nidhi Seth (G2)",
-            "room": "G1: Room 426 / G2: Room 460"
-          },
-          {
-            "period": 3,
-            "subject": "Data Mining",
-            "teacher": "Anamika Gupta",
-            "room": "Room 407"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Artificial Intelligence",
-            "teacher": "Onkar Singh",
-            "room": "Room 407"
-          },
-          {
-            "period": 5,
-            "subject": "Data Structures",
-            "teacher": "Sonika Thakral",
-            "room": "Room 407"
-          },
-          {
-            "period": 6,
-            "subject": "Data Structures",
-            "teacher": "Sonika Thakral",
-            "room": "Room 407"
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ],
-        "Saturday": [
-          {
-            "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 2,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 3,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 5,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ]
-      }
-    },
-    "5": {
-      "A": {
-        "Monday": [
-          {
-            "period": 1,
-            "subject": "Software Engineering",
-            "teacher": "Dr. Kavita Rastogi",
-            "room": "Room 457"
-          },
-          {
-            "period": 2,
-            "subject": "Social Media Analytics | Entrepreneurship Essentials - I",
-            "teacher": "Rohan Gulati / Mehak Aggarwal",
-            "room": "Room 457",
-            "isPractical": true
-          },
-          {
-            "period": 3,
-            "subject": "Social Media Analytics | Entrepreneurship Essentials - I",
-            "teacher": "Rohan Gulati / Mehak Aggarwal",
-            "room": "Room 457"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Machine Learning",
-            "teacher": "Anamika Gupta",
-            "room": "Room 457"
-          },
-          {
-            "period": 5,
-            "subject": "Algorithms and Advanced DS (G2)",
-            "teacher": "Sonika Thakral (G2)",
-            "room": "Room 460",
-            "isPractical": true
-          },
-          {
-            "period": 6,
-            "subject": "Algorithms and Advanced DS (G2)",
-            "teacher": "Sonika Thakral (G2)",
-            "room": "Room 460",
-            "isPractical": true
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ],
-        "Tuesday": [
-          {
-            "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 2,
-            "subject": "Social Media Analytics | Entrepreneurship Essentials - I",
-            "teacher": "Rohan Gulati / Mehak Aggarwal",
-            "room": "Room 457"
-          },
-          {
-            "period": 3,
-            "subject": "Social Media Analytics | Entrepreneurship Essentials - I",
-            "teacher": "Rohan Gulati / Mehak Aggarwal",
-            "room": "Room 457"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Entrepreneurship Essentials - I | G1: Software Engineering",
-            "teacher": "Mehak Aggarwal / Dr. Kavita Rastogi (G1)",
-            "room": "Room 457 / G1: Room 426"
-          },
-          {
-            "period": 5,
-            "subject": "G1: Algorithms and Advanced DS | G2: Machine Learning",
-            "teacher": "Sonika Thakral (G1) / Anamika Gupta (G2)",
-            "room": "G1: Room 426 / G2: Room 460"
-          },
-          {
-            "period": 6,
-            "subject": "Algorithms and Advanced DS",
-            "teacher": "Sonika Thakral",
-            "room": "Room 457"
-          },
-          {
-            "period": 7,
-            "subject": "Algorithms and Advanced DS",
-            "teacher": "Sonika Thakral",
-            "room": "Room 457"
-          }
-        ],
-        "Wednesday": [
-          {
-            "period": 1,
-            "subject": "Data Privacy",
-            "teacher": "Ayushi Gupta",
-            "room": "Room 457"
-          },
-          {
-            "period": 2,
-            "subject": "Data Privacy",
-            "teacher": "Ayushi Gupta",
-            "room": "Room 457"
-          },
-          {
-            "period": 3,
-            "subject": "G1: Software Engineering | G2: Data Privacy",
-            "teacher": "Dr. Kavita Rastogi (G1) / Ayushi Gupta (G2)",
-            "room": "G1: Room 426 / G2: Room 460"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Software Engineering",
-            "teacher": "Dr. Kavita Rastogi",
-            "room": "Room 457"
-          },
-          {
-            "period": 5,
-            "subject": "Algorithms and Advanced DS",
-            "teacher": "Sonika Thakral",
-            "room": "Room 457"
-          },
-          {
-            "period": 6,
-            "subject": "Machine Learning",
-            "teacher": "Anamika Gupta",
-            "room": "Room 457"
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ],
-        "Thursday": [
-          {
-            "period": 1,
-            "subject": "Software Engineering (G2)",
-            "teacher": "Dr. Kavita Rastogi (G2)",
-            "room": "Room 460",
-            "isPractical": true
-          },
-          {
-            "period": 2,
-            "subject": "Software Engineering (G2)",
-            "teacher": "Dr. Kavita Rastogi (G2)",
-            "room": "Room 460",
-            "isPractical": true
-          },
-          {
-            "period": 3,
-            "subject": "Software Engineering",
-            "teacher": "Dr. Kavita Rastogi",
-            "room": "Room 457"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "G1: Data Privacy | G2: Machine Learning",
-            "teacher": "Ayushi Gupta (G1) / Anamika Gupta (G2)",
-            "room": "G1: Room 426 / G2: Room 460"
-          },
-          {
-            "period": 5,
-            "subject": "Data Privacy",
-            "teacher": "Ayushi Gupta",
-            "room": "Room 457"
-          },
-          {
-            "period": 6,
-            "subject": "Introduction to Blockchain",
-            "teacher": "Ayushi Gupta",
-            "room": "Room 457"
-          },
-          {
-            "period": 7,
-            "subject": "Introduction to Blockchain",
-            "teacher": "Ayushi Gupta",
-            "room": "Room 457"
-          }
-        ],
-        "Friday": [
-          {
-            "period": 1,
-            "subject": "Introduction to Blockchain",
-            "teacher": "Ayushi Gupta",
-            "room": "Room 457"
-          },
-          {
-            "period": 2,
-            "subject": "Introduction to Blockchain",
-            "teacher": "Ayushi Gupta",
-            "room": "Room 457"
-          },
-          {
-            "period": 3,
-            "subject": "Data Privacy (Lab)",
-            "teacher": "Ayushi Gupta",
-            "room": "Room 457",
-            "isPractical": true
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Machine Learning",
-            "teacher": "Anamika Gupta",
-            "room": "Room 457"
-          },
-          {
-            "period": 5,
-            "subject": "Machine Learning (G1)",
-            "teacher": "Anamika Gupta (G1)",
-            "room": "Room 426",
-            "isPractical": true
-          },
-          {
-            "period": 6,
-            "subject": "Machine Learning (G1)",
-            "teacher": "Anamika Gupta (G1)",
-            "room": "Room 426",
-            "isPractical": true
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ],
-        "Saturday": [
-          {
-            "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 2,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 3,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 5,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ]
-      }
-    },
-    "7": {
-      "A": {
-        "Monday": [
-          {
-            "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 2,
-            "subject": "Research Methodology (Lab)",
-            "teacher": "Shikha Gupta",
-            "room": "Room 435",
-            "isPractical": true
-          },
-          {
-            "period": 3,
-            "subject": "Entrepreneurship Essentials-1 | Compiler Design (Lab)",
-            "teacher": "Mehak Aggarwal / Onkar Singh",
-            "room": "Room 435",
-            "isPractical": true
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 5,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ],
-        "Tuesday": [
-          {
-            "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 2,
-            "subject": "Entrepreneurship Essentials-1 | Compiler Design (Lab)",
-            "teacher": "Mehak Aggarwal / Onkar Singh",
-            "room": "Room 435",
-            "isPractical": true
-          },
-          {
-            "period": 3,
-            "subject": "Entrepreneurship Essentials-1 | Compiler Design (Lab)",
-            "teacher": "Mehak Aggarwal / Onkar Singh",
-            "room": "Room 435",
-            "isPractical": true
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Entrepreneurship Essentials-1 | Compiler Design",
-            "teacher": "Mehak Aggarwal / Onkar Singh",
-            "room": "Room 435"
-          },
-          {
-            "period": 5,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ],
-        "Wednesday": [
-          {
-            "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 2,
-            "subject": "Research Methodology (Lab)",
-            "teacher": "Shikha Gupta",
-            "room": "Room 435",
-            "isPractical": true
-          },
-          {
-            "period": 3,
-            "subject": "Research Methodology",
-            "teacher": "Shikha Gupta",
-            "room": "Room 435"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Deep Learning",
-            "teacher": "Mogana Neelkandan",
-            "room": "Room 435"
-          },
-          {
-            "period": 5,
-            "subject": "Deep Learning",
-            "teacher": "Mogana Neelkandan",
-            "room": "Room 435"
-          },
-          {
-            "period": 6,
-            "subject": "Compiler Design",
-            "teacher": "Onkar Singh",
-            "room": "Room 435"
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ],
-        "Thursday": [
-          {
-            "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 2,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 3,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 5,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 6,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ],
-        "Friday": [
-          {
-            "period": 1,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          },
-          {
-            "period": 2,
-            "subject": "Research Methodology",
-            "teacher": "Shikha Gupta",
-            "room": "Room 435"
-          },
-          {
-            "period": 3,
-            "subject": "Research Methodology",
-            "teacher": "Shikha Gupta",
-            "room": "Room 435"
-          },
-          {
-            "period": 0,
-            "isBreak": true,
-            "subject": "Infinity Hour (Break)",
-            "teacher": "",
-            "room": ""
-          },
-          {
-            "period": 4,
-            "subject": "Deep Learning",
-            "teacher": "Mogana Neelkandan",
-            "room": "Room 435"
-          },
-          {
-            "period": 5,
-            "subject": "Deep Learning (Lab)",
-            "teacher": "Mogana Neelkandan",
-            "room": "Room 435",
-            "isPractical": true
-          },
-          {
-            "period": 6,
-            "subject": "Deep Learning (Lab)",
-            "teacher": "Mogana Neelkandan",
-            "room": "Room 435",
-            "isPractical": true
-          },
-          {
-            "period": 7,
-            "subject": "Free",
-            "teacher": "-",
-            "room": "-"
-          }
-        ],
-        "Saturday": [
           {
             "period": 1,
             "subject": "Free",
