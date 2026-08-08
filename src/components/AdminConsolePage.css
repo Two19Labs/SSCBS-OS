@@ -2530,29 +2530,6 @@ input:checked + .admin-slider:before {
 }
 .btn-scrap-all:disabled { opacity: 0.4; cursor: not-allowed; }
 
-.hf-key-section { display: flex; align-items: center; }
-
-.hf-key-input-row {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-.hf-key-input-row .admin-input-field {
-  min-width: 280px;
-}
-
-.btn-configure-hf {
-  background: var(--surface);
-  color: var(--ink-dim);
-  border: 1px solid var(--border);
-  padding: 8px 16px;
-  border-radius: 10px;
-  font-size: 0.82rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-configure-hf:hover { background: var(--border); color: var(--ink); }
-
 /* Parsing Logs */
 .text-parser-logs {
   background: var(--surface);

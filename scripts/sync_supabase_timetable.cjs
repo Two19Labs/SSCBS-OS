@@ -1,8 +1,14 @@
-const { createClient } = require('c:/Users/adity/Downloads/SSCBS OS/node_modules/@supabase/supabase-js');
+const { createClient } = require('@supabase/supabase-js');
 const fs = require('fs');
 
-const SUPABASE_URL = 'https://vsmxgcncmhxwwmnyicna.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzbXhnY25jbWh4d3dtbnlpY25hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTQxNDksImV4cCI6MjA5OTA3MDE0OX0.Kh8emr9ZpNiGBdEOG4QQ08kjmPGWdYUA4aUWoDeWkik';
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.error('Missing VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY environment variables.');
+  console.error('Set them in your shell before running this script.');
+  process.exit(1);
+}
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
