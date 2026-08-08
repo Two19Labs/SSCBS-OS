@@ -231,20 +231,10 @@ CREATE POLICY "drafter_write"
 -- --------------------------------------------------------------------
 -- Was: SECURITY DEFINER (bypasses RLS), granted to anon, no search_path.
 -- That let ANY visitor read aggregated analytics regardless of the policies above.
--- REVOKE errors if the function was never created, so only run it if present.
-DO $$
-BEGIN
-  IF EXISTS (
-      SELECT 1 FROM pg_proc p
-      JOIN pg_namespace n ON n.oid = p.pronamespace
-      WHERE n.nspname = 'public' AND p.proname = 'get_analytics_summary'
-  ) THEN
-    EXECUTE 'REVOKE EXECUTE ON FUNCTION public.get_analytics_summary(TIMESTAMP WITH TIME ZONE) FROM anon';
-    EXECUTE 'REVOKE EXECUTE ON FUNCTION public.get_analytics_summary(TIMESTAMP WITH TIME ZONE) FROM PUBLIC';
-  END IF;
-END $$;
-
 -- Recreated (or created) with an admin guard, pinned search_path, and no anon grant.
+-- ORDER MATTERS: the REVOKE must come AFTER this statement. Supabase sets
+-- default privileges that grant EXECUTE on new public functions to anon, so
+-- revoking first just gets undone by the CREATE.
 CREATE OR REPLACE FUNCTION public.get_analytics_summary(start_date TIMESTAMP WITH TIME ZONE)
 RETURNS TABLE (date_str TEXT, feature_id TEXT, visit_count BIGINT)
 LANGUAGE plpgsql
@@ -268,7 +258,11 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.get_analytics_summary(TIMESTAMP WITH TIME ZONE) TO authenticated;
+-- Now lock it down. PUBLIC must go first: anon inherits EXECUTE through
+-- PUBLIC, so revoking anon alone leaves the function reachable.
+REVOKE EXECUTE ON FUNCTION public.get_analytics_summary(TIMESTAMP WITH TIME ZONE) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.get_analytics_summary(TIMESTAMP WITH TIME ZONE) FROM anon;
+GRANT  EXECUTE ON FUNCTION public.get_analytics_summary(TIMESTAMP WITH TIME ZONE) TO authenticated;
 
 
 -- ====================================================================
