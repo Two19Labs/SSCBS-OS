@@ -176,8 +176,16 @@ export default function TeamFinderPage({ onBack }) {
     try {
       if (hasValidCredentials) {
         const [postsRes, appsRes] = await Promise.all([
-          supabase.from('squad_posts').select('*').order('created_at', { ascending: false }),
-          supabase.from('squad_applications').select('*').order('created_at', { ascending: false }),
+          supabase
+            .from('squad_posts')
+            .select('id, user_id, competition_name, organizer, competition_link, phone_number, title, description, skills_have, skills_looking_for, total_members, spots_left, course, year, is_open, created_by_email, created_by_name, created_at, updated_at')
+            .order('created_at', { ascending: false })
+            .limit(50),
+          supabase
+            .from('squad_applications')
+            .select('id, post_id, applicant_id, applicant_name, applicant_email, applicant_phone, applicant_course, applicant_year, pitch_note, highlighted_skills, status, created_at, updated_at')
+            .order('created_at', { ascending: false })
+            .limit(100),
         ]);
 
         if (!postsRes.error && postsRes.data) {

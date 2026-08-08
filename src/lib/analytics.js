@@ -96,8 +96,10 @@ function getPresencePayload() {
   };
 }
 
+let isPresenceTableAvailable = true;
+
 async function fetchActivePresenceFromDB() {
-  if (!hasValidCredentials) return [];
+  if (!hasValidCredentials || !isPresenceTableAvailable) return [];
   try {
     const cutoff = new Date(Date.now() - 60000).toISOString();
     const { data, error } = await supabase
@@ -105,7 +107,14 @@ async function fetchActivePresenceFromDB() {
       .select('id, user_id, session_id, name, email, course, semester, section, current_view, view_label, device, last_ping')
       .gte('last_ping', cutoff);
 
-    if (!error && Array.isArray(data)) {
+    if (error) {
+      if (error.code === 'PGRST205' || error.message?.includes('schema cache')) {
+        isPresenceTableAvailable = false;
+      }
+      return [];
+    }
+
+    if (Array.isArray(data)) {
       return data.map(item => ({
         id: item.user_id || item.session_id,
         session_id: item.session_id,
@@ -231,10 +240,10 @@ let isVisibilityListenerAdded = false;
 
 function initGlobalPresenceTracker() {
   if (!presenceHeartbeatTimer) {
-    // Lightweight local ping timer every 10 seconds for tab freshness
+    // Lightweight local ping timer every 30 seconds for tab freshness & bandwidth efficiency
     presenceHeartbeatTimer = setInterval(() => {
       sendPresencePing();
-    }, 10000);
+    }, 30000);
   }
 
   // Resume presence ping immediately when student switches back to active tab
@@ -550,22 +559,45 @@ export async function fetchAnalyticsData(daysCount = 7) {
           });
         }
 
-        // Query analytics_events table directly using created_at timestamp
+        // Query analytics_events: Try RPC aggregation first (saves >99% egress), fallback to capped limit query
         const startIso = new Date(slots[0].startMs).toISOString();
-        const { data: dbEvents } = await supabase
-          .from('analytics_events')
-          .select('feature_id, created_at')
-          .gte('created_at', startIso);
+        let rpcSuccess = false;
+        try {
+          const { data: rpcSummary, error: rpcErr } = await supabase
+            .rpc('get_analytics_summary', { start_date: startIso });
+          if (!rpcErr && Array.isArray(rpcSummary)) {
+            rpcSuccess = true;
+            rpcSummary.forEach(row => {
+              const dateStr = row.date_str;
+              const feat = row.feature_id;
+              const count = Number(row.visit_count) || 0;
+              slots.forEach((s, targetSlotIdx) => {
+                if (s.dateStr === dateStr && dbCounts[targetSlotIdx][feat] !== undefined) {
+                  dbCounts[targetSlotIdx][feat] += count;
+                }
+              });
+            });
+          }
+        } catch (e) {}
 
-        if (Array.isArray(dbEvents) && dbEvents.length > 0) {
-          dbEvents.forEach(evt => {
-            if (!evt.created_at || !evt.feature_id || evt.feature_id === 'admin') return;
-            const evtMs = new Date(evt.created_at).getTime();
-            const targetSlotIdx = slots.findIndex(s => evtMs >= s.startMs && evtMs < s.endMs);
-            if (targetSlotIdx >= 0 && dbCounts[targetSlotIdx][evt.feature_id] !== undefined) {
-              dbCounts[targetSlotIdx][evt.feature_id] += 1;
-            }
-          });
+        if (!rpcSuccess) {
+          const { data: dbEvents } = await supabase
+            .from('analytics_events')
+            .select('feature_id, created_at')
+            .gte('created_at', startIso)
+            .order('created_at', { ascending: false })
+            .limit(2000);
+
+          if (Array.isArray(dbEvents) && dbEvents.length > 0) {
+            dbEvents.forEach(evt => {
+              if (!evt.created_at || !evt.feature_id || evt.feature_id === 'admin') return;
+              const evtMs = new Date(evt.created_at).getTime();
+              const targetSlotIdx = slots.findIndex(s => evtMs >= s.startMs && evtMs < s.endMs);
+              if (targetSlotIdx >= 0 && dbCounts[targetSlotIdx][evt.feature_id] !== undefined) {
+                dbCounts[targetSlotIdx][evt.feature_id] += 1;
+              }
+            });
+          }
         }
       } catch (e) {
         console.warn('Analytics fetch notice (hourly):', e);
@@ -693,22 +725,44 @@ export async function fetchAnalyticsData(daysCount = 7) {
         });
       }
 
-      // Query analytics_events table directly
+      // Query analytics_events table using RPC aggregation first, fallback to capped select query
       const startDateStr = dateList[0]?.dateStr;
       if (startDateStr) {
-        const { data: dbEvents } = await supabase
-          .from('analytics_events')
-          .select('feature_id, created_at')
-          .gte('created_at', `${startDateStr}T00:00:00.000Z`);
+        const startIso = `${startDateStr}T00:00:00.000Z`;
+        let rpcSuccess = false;
+        try {
+          const { data: rpcSummary, error: rpcErr } = await supabase
+            .rpc('get_analytics_summary', { start_date: startIso });
+          if (!rpcErr && Array.isArray(rpcSummary)) {
+            rpcSuccess = true;
+            rpcSummary.forEach(row => {
+              const dateStr = row.date_str;
+              const feat = row.feature_id;
+              const count = Number(row.visit_count) || 0;
+              if (dbCounts[dateStr] && feat && feat !== 'admin' && dbCounts[dateStr][feat] !== undefined) {
+                dbCounts[dateStr][feat] += count;
+              }
+            });
+          }
+        } catch (e) {}
 
-        if (Array.isArray(dbEvents) && dbEvents.length > 0) {
-          dbEvents.forEach(evt => {
-            const evtDate = evt.created_at?.split('T')[0];
-            const feat = evt.feature_id;
-            if (evtDate && dbCounts[evtDate] && feat && feat !== 'admin' && dbCounts[evtDate][feat] !== undefined) {
-              dbCounts[evtDate][feat] += 1;
-            }
-          });
+        if (!rpcSuccess) {
+          const { data: dbEvents } = await supabase
+            .from('analytics_events')
+            .select('feature_id, created_at')
+            .gte('created_at', startIso)
+            .order('created_at', { ascending: false })
+            .limit(2000);
+
+          if (Array.isArray(dbEvents) && dbEvents.length > 0) {
+            dbEvents.forEach(evt => {
+              const evtDate = evt.created_at?.split('T')[0];
+              const feat = evt.feature_id;
+              if (evtDate && dbCounts[evtDate] && feat && feat !== 'admin' && dbCounts[evtDate][feat] !== undefined) {
+                dbCounts[evtDate][feat] += 1;
+              }
+            });
+          }
         }
       }
     } catch (e) {

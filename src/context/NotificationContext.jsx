@@ -75,7 +75,7 @@ export function NotificationProvider({ children }) {
       try {
         const { data, error } = await supabase
           .from('user_notifications')
-          .select('*')
+          .select('id, user_email, type, category, title, body, action_type, action_data, read, created_at')
           .eq('user_email', user.email)
           .order('created_at', { ascending: false })
           .limit(40);
