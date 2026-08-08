@@ -206,12 +206,12 @@ function App() {
     {
       title: 'Academic & Tools',
       items: [
-        { id: 'find-prof', label: 'Find My Professor', Icon: SearchIcon, badge: 'SEARCH', badgeClass: 'success', locked: !featureFlags['find-prof'] && !isAdmin },
-        { id: 'empty-room', label: 'Empty Room Finder', Icon: DoorIcon, badge: 'LIVE', badgeClass: 'success' },
-        ...(hasTeamFinderAccess ? [{ id: 'team-finder', label: 'Team Finder', Icon: TrophyIcon, badge: 'NEW', badgeClass: 'success' }] : []),
-        { id: 'waiver', label: 'Waiver Tool', Icon: PercentIcon, badge: 'SOON', badgeClass: 'dim', locked: !featureFlags['waiver'] && !isAdmin },
-        { id: 'gpa', label: 'GPA Calculator', Icon: CalculatorIcon, badge: 'DU', badgeClass: 'maroon', locked: !featureFlags['gpa'] && !isAdmin },
-        { id: 'pyqs', label: 'PYQs & Resources', Icon: FileIcon, badge: 'SOON', badgeClass: 'dim', locked: !featureFlags['pyqs'] && !isAdmin },
+        { id: 'find-prof', label: 'Find My Professor', Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
+        { id: 'empty-room', label: 'Empty Room Finder', Icon: DoorIcon },
+        ...(hasTeamFinderAccess ? [{ id: 'team-finder', label: 'Team Finder', Icon: TrophyIcon }] : []),
+        { id: 'waiver', label: 'Waiver Tool', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
+        { id: 'gpa', label: 'GPA Calculator', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
+        { id: 'pyqs', label: 'PYQs & Resources', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
       ],
     },
     {
@@ -401,7 +401,7 @@ function App() {
             {navSections.map((section, idx) => (
               <div key={idx} className="mobile-sidebar-section">
                 <div className="mobile-section-header">{section.title}</div>
-                {section.items.map(({ id, label, Icon, badge, badgeClass, locked }) => (
+                {section.items.map(({ id, label, Icon, locked }) => (
                   <button
                     key={id}
                     className={`mobile-sidebar-item ${view === id ? 'active' : ''} ${locked ? 'locked' : ''}`}
@@ -417,10 +417,7 @@ function App() {
                       <Icon filled={view === id} size={18} />
                       <span>{label}</span>
                     </div>
-                    {badge && (
-                      <span className={`mobile-item-badge micro-label ${badgeClass || ''}`}>{badge}</span>
-                    )}
-                    {locked && !badge && <span className="sidebar-soon">SOON</span>}
+                    {locked && <span className="sidebar-soon">SOON</span>}
                   </button>
                 ))}
               </div>
