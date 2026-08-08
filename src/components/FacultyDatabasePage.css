@@ -1,5 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
-   SSCBS Faculty Directory — Campus OS Native Design System
+   SSCBS Faculty Directory — Multi-Device Design System Integration
+   Optimized for PC, Laptop, Tablet, and Mobile
    ═══════════════════════════════════════════════════════════ */
 
 .faculty-db-page {
@@ -9,7 +10,7 @@
   width: 100%;
   max-width: var(--content-max, 1160px);
   margin: 0 auto;
-  padding: 0 var(--page-pad-x, 16px) 80px var(--page-pad-x, 16px);
+  padding: 0 var(--page-pad-x, 16px) 100px var(--page-pad-x, 16px);
   animation: fadeIn 0.25s ease-in-out forwards;
 }
 
@@ -146,8 +147,8 @@
   transform: translateY(-50%);
   background: var(--track);
   border: none;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -169,12 +170,13 @@
   align-items: center;
   gap: 8px;
   overflow-x: auto;
-  padding-bottom: 2px;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
 }
 
 .faculty-filter-chip {
-  padding: 6px 14px;
+  padding: 7px 14px;
   border-radius: 9999px;
   font-size: 0.8rem;
   font-weight: 700;
@@ -188,6 +190,7 @@
   align-items: center;
   gap: 6px;
   font-family: inherit;
+  min-height: 34px;
 }
 
 .faculty-filter-chip:hover {
@@ -203,9 +206,10 @@
 
 .chip-count-badge {
   background: rgba(0, 0, 0, 0.12);
-  padding: 2px 6px;
+  padding: 2px 7px;
   border-radius: 9999px;
   font-size: 0.725rem;
+  font-weight: 800;
 }
 
 .faculty-filter-chip.active .chip-count-badge {
@@ -224,7 +228,7 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
-  padding: 16px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -295,6 +299,7 @@
   color: var(--ink-dim);
   font-weight: 500;
   margin: 0 0 8px 0;
+  line-height: 1.3;
 }
 
 /* ── Designation Badges ── */
@@ -358,16 +363,18 @@
   gap: 6px;
   background: var(--tint);
   border: 1px solid var(--border);
-  padding: 5px 10px;
+  padding: 6px 12px;
   border-radius: 8px;
   font-size: 0.8rem;
   font-weight: 700;
   color: var(--ink);
   width: fit-content;
+  max-width: 100%;
 }
 
 .faculty-room-pill svg {
   color: var(--accent);
+  flex-shrink: 0;
 }
 
 .faculty-email-row {
@@ -379,6 +386,7 @@
   border: 1px solid var(--border);
   padding: 6px 10px;
   border-radius: 8px;
+  min-height: 38px;
 }
 
 .faculty-email-link {
@@ -400,36 +408,20 @@
   border: none;
   color: var(--ink-dim);
   cursor: pointer;
-  padding: 2px 4px;
-  border-radius: 4px;
+  padding: 4px 6px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.85rem;
   transition: all 0.2s;
+  min-width: 28px;
+  min-height: 28px;
 }
 
 .copy-email-btn:hover {
   background: var(--border);
   color: var(--ink);
-}
-
-/* ── Expertise Tags ── */
-.faculty-expertise-wrap {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 16px;
-}
-
-.expertise-tag {
-  background: var(--tint);
-  color: var(--ink-dim);
-  font-size: 0.725rem;
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-weight: 600;
-  border: 1px solid var(--border);
 }
 
 /* ── Card Buttons ── */
@@ -440,13 +432,12 @@
   border-top: 1px solid var(--border);
 }
 
-.faculty-btn-secondary,
 .faculty-btn-primary {
   flex: 1;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-radius: 8px;
-  font-size: 0.825rem;
-  font-weight: 700;
+  font-size: 0.85rem;
+  font-weight: 800;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -455,23 +446,10 @@
   transition: all 0.2s ease;
   text-decoration: none;
   font-family: inherit;
-}
-
-.faculty-btn-secondary {
-  background: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--border);
-}
-
-.faculty-btn-secondary:hover {
-  background: var(--tint);
-  border-color: var(--border-strong);
-}
-
-.faculty-btn-primary {
   background: var(--accent);
   color: var(--on-accent);
   border: none;
+  min-height: 40px;
 }
 
 .faculty-btn-primary:hover {
@@ -529,75 +507,6 @@
   color: var(--ink);
 }
 
-.faculty-modal-header {
-  display: flex;
-  gap: 18px;
-  align-items: flex-start;
-  margin-bottom: 20px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid var(--border);
-}
-
-.faculty-modal-avatar {
-  width: 96px;
-  height: 96px;
-  border-radius: 16px;
-  overflow: hidden;
-  flex-shrink: 0;
-  border: 1px solid var(--border);
-}
-
-.faculty-modal-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.faculty-modal-section-title {
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--ink);
-  margin: 20px 0 8px 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.faculty-modal-section-title svg {
-  color: var(--accent);
-}
-
-.faculty-modal-text {
-  font-size: 0.875rem;
-  color: var(--ink-dim);
-  line-height: 1.6;
-  background: var(--tint);
-  padding: 12px 16px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-}
-
-.faculty-modal-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.faculty-modal-list-item {
-  background: var(--tint);
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  color: var(--ink);
-  border-left: 3px solid var(--accent);
-  border-top: 1px solid var(--border);
-  border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-
 /* ── Toast Alert ── */
 .faculty-toast {
   position: fixed;
@@ -625,15 +534,87 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Responsive adjustments ── */
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS (PC, Laptop, Tablet, Mobile)
+   ═══════════════════════════════════════════════════════════ */
+
+/* PC & Ultra-wide Displays (≥ 1280px) */
+@media (min-width: 1280px) {
+  .faculty-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Laptops & Standard Desktops (900px – 1279px) */
+@media (min-width: 900px) and (max-width: 1279px) {
+  .faculty-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}
+
+/* Tablets & iPads (641px – 899px) */
+@media (min-width: 641px) and (max-width: 899px) {
+  .faculty-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .faculty-card {
+    padding: 16px;
+  }
+}
+
+/* Mobile Devices (≤ 640px) */
 @media (max-width: 640px) {
+  .faculty-db-page {
+    padding-bottom: 110px; /* Safe distance for mobile bottom navigation */
+  }
+
   .faculty-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
+
   .faculty-db-title-row h2 {
     font-size: 1.25rem;
   }
-  .faculty-modal-card {
-    padding: 20px;
+
+  .faculty-controls-card {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .faculty-search-input {
+    font-size: 0.85rem;
+    padding: 10px 36px 10px 38px;
+  }
+
+  .faculty-search-icon {
+    left: 12px;
+  }
+
+  .faculty-card {
+    padding: 14px;
+  }
+
+  .faculty-avatar-container {
+    width: 64px;
+    height: 64px;
+    border-radius: 10px;
+  }
+
+  .faculty-name {
+    font-size: 0.975rem;
+  }
+
+  .faculty-degree {
+    font-size: 0.775rem;
+    margin-bottom: 6px;
+  }
+
+  .faculty-toast {
+    bottom: 80px;
+    left: 16px;
+    right: 16px;
+    text-align: center;
   }
 }
