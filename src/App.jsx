@@ -1,7 +1,7 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useAuth } from './context/AuthContext';
 import { useConfig } from './context/ConfigContext';
-import { logFeatureView, logFeatureClick, subscribeToPresence } from './lib/analytics';
+import { logFeatureView, logFeatureClick, subscribeToPresence, FEATURE_NAMES } from './lib/analytics';
 import Auth from './components/Auth';
 import HomeDashboard from './components/HomeDashboard';
 import ProfilePage from './components/ProfilePage';
@@ -467,7 +467,31 @@ function App() {
         {isGpaOpen && <GpaCalculatorModal isOpen={isGpaOpen} onClose={() => setIsGpaOpen(false)} />}
       </Suspense>
       <InstallPwaPrompt />
-      <Analytics />
+      <Analytics beforeSend={(event) => {
+        try {
+          if (event && event.url) {
+            const urlObj = new URL(event.url);
+            const hashRoute = urlObj.hash ? urlObj.hash.replace(/^#\/?/, '').trim() : '';
+            if (hashRoute && FEATURE_NAMES && FEATURE_NAMES[hashRoute]) {
+              urlObj.pathname = `/${hashRoute}`;
+              urlObj.hash = '';
+              event.url = urlObj.toString();
+              return event;
+            }
+            if (typeof window !== 'undefined' && window.location.hash) {
+              const activeHash = window.location.hash.replace(/^#\/?/, '').trim();
+              if (activeHash && FEATURE_NAMES && FEATURE_NAMES[activeHash]) {
+                urlObj.pathname = `/${activeHash}`;
+                event.url = urlObj.toString();
+                return event;
+              }
+            }
+          }
+        } catch (e) {
+          // Ignore URL parse errors
+        }
+        return event;
+      }} />
     </>
   );
 }

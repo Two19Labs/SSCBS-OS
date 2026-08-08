@@ -1,4 +1,5 @@
 import { supabase, hasValidCredentials } from './supabaseClient';
+import { track } from '@vercel/analytics';
 
 export const FEATURE_NAMES = {
   home: 'Home Dashboard',
@@ -418,6 +419,20 @@ export async function logFeatureView(featureId, user) {
     } catch (e) {
       // Completely non-blocking
     }
+  }
+
+  // 3. Send real-time pageview and custom event to Vercel Web Analytics
+  try {
+    const routePath = `/${featureId}`;
+    if (typeof window !== 'undefined' && typeof window.va === 'function') {
+      window.va('pageview', { route: routePath, path: routePath });
+    }
+    track('page_view', {
+      feature_id: featureId,
+      feature_name: FEATURE_NAMES[featureId] || featureId
+    });
+  } catch (e) {
+    // Non-blocking for Vercel analytics
   }
 }
 
