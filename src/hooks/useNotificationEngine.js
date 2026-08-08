@@ -191,11 +191,17 @@ export function useNotificationEngine() {
           try {
             const { data: post } = await supabase
               .from('squad_posts')
-              .select('id, user_email, competition_name, title')
+              .select('id, user_id, created_by_email, user_email, competition_name, title')
               .eq('id', app.post_id)
               .single();
 
-            if (post && post.user_email === userEmail && app.applicant_email !== userEmail) {
+            const isHost = post && (
+              (post.created_by_email && post.created_by_email.toLowerCase() === userEmail.toLowerCase()) ||
+              (post.user_id && post.user_id === user?.id) ||
+              (post.user_email && post.user_email.toLowerCase() === userEmail.toLowerCase())
+            );
+
+            if (isHost && app.applicant_email?.toLowerCase() !== userEmail.toLowerCase()) {
               const postTitle = post.competition_name || post.title || 'Team';
               addNotification({
                 id: `team_req_${app.id}`,
@@ -215,7 +221,7 @@ export function useNotificationEngine() {
         { event: 'UPDATE', schema: 'public', table: 'squad_applications' },
         async (payload) => {
           const app = payload.new;
-          if (!app || app.applicant_email !== userEmail) return;
+          if (!app || app.applicant_email?.toLowerCase() !== userEmail.toLowerCase()) return;
 
           try {
             const { data: post } = await supabase
@@ -266,12 +272,17 @@ export function useNotificationEngine() {
     const pollTeamFinderNotifications = async () => {
       try {
         // A. Fetch squad posts created by current user
-        const { data: myPosts } = await supabase
+        const { data: allPosts } = await supabase
           .from('squad_posts')
-          .select('id, title, competition_name')
-          .eq('user_email', userEmail);
+          .select('id, title, competition_name, created_by_email, user_id, user_email');
 
-        if (myPosts && myPosts.length > 0) {
+        const myPosts = (allPosts || []).filter(p =>
+          (p.created_by_email && p.created_by_email.toLowerCase() === userEmail.toLowerCase()) ||
+          (p.user_id && p.user_id === user?.id) ||
+          (p.user_email && p.user_email.toLowerCase() === userEmail.toLowerCase())
+        );
+
+        if (myPosts.length > 0) {
           const postIds = myPosts.map(p => p.id);
           const postMap = {};
           myPosts.forEach(p => { postMap[p.id] = p.competition_name || p.title || 'Team'; });
@@ -285,7 +296,7 @@ export function useNotificationEngine() {
 
           if (incomingApps && incomingApps.length > 0) {
             incomingApps.forEach(app => {
-              if (app.applicant_email !== userEmail) {
+              if (app.applicant_email?.toLowerCase() !== userEmail.toLowerCase()) {
                 const notifKey = `team_req_${app.id}`;
                 if (!firedAlertsRef.current.has(notifKey)) {
                   markAlertFired(notifKey);

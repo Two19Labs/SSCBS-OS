@@ -605,27 +605,56 @@ export default function TeamFinderPage({ onBack }) {
 
     try {
       if (hasValidCredentials) {
-        const { data, error } = await supabase
-          .from('squad_applications')
-          .insert([{
-            post_id: selectedPostForApply.id,
-            applicant_id: user?.id,
-            applicant_name: appPayload.applicant_name,
-            applicant_email: appPayload.applicant_email,
-            applicant_phone: appPayload.applicant_phone,
-            applicant_course: appPayload.applicant_course,
-            applicant_year: appPayload.applicant_year,
-            pitch_note: appPayload.pitch_note,
-            highlighted_skills: appPayload.highlighted_skills,
-            status: 'pending',
-          }])
-          .select();
+        const userEmailLower = user?.email?.toLowerCase();
+        const existingApp = applications.find((a) => {
+          const samePost = String(a.post_id) === String(selectedPostForApply.id);
+          const sameEmail = a.applicant_email && userEmailLower && a.applicant_email.toLowerCase() === userEmailLower;
+          return samePost && sameEmail;
+        });
 
-        if (error) {
-          console.error('Supabase application insert error:', error);
-          setApplyError('Could not save application online. Saving locally...');
-        } else if (data && data[0]) {
-          appPayload.id = data[0].id;
+        let res;
+        if (existingApp && existingApp.id && !String(existingApp.id).startsWith('app-')) {
+          // Update existing application row back to 'pending'
+          res = await supabase
+            .from('squad_applications')
+            .update({
+              applicant_name: appPayload.applicant_name,
+              applicant_phone: appPayload.applicant_phone,
+              applicant_course: appPayload.applicant_course,
+              applicant_year: appPayload.applicant_year,
+              pitch_note: appPayload.pitch_note,
+              highlighted_skills: appPayload.highlighted_skills,
+              status: 'pending',
+              created_at: new Date().toISOString(),
+            })
+            .eq('id', existingApp.id)
+            .select();
+        } else {
+          // Insert new application row
+          res = await supabase
+            .from('squad_applications')
+            .insert([{
+              post_id: selectedPostForApply.id,
+              applicant_id: user?.id,
+              applicant_name: appPayload.applicant_name,
+              applicant_email: appPayload.applicant_email,
+              applicant_phone: appPayload.applicant_phone,
+              applicant_course: appPayload.applicant_course,
+              applicant_year: appPayload.applicant_year,
+              pitch_note: appPayload.pitch_note,
+              highlighted_skills: appPayload.highlighted_skills,
+              status: 'pending',
+            }])
+            .select();
+        }
+
+        if (res.error) {
+          console.error('Supabase application submit error:', res.error);
+          setApplyError('Could not save application online: ' + (res.error.message || 'Database error'));
+          setApplySubmitting(false);
+          return;
+        } else if (res.data && res.data[0]) {
+          appPayload.id = res.data[0].id;
         }
       }
     } catch (err) {
