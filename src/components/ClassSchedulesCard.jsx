@@ -250,9 +250,9 @@ export default function ClassSchedulesCard({ onOpenProfile }) {
             {/* Header info */}
             <div className="tracker-header">
               <div className="tracker-title-group">
-                <span className="live-pill">
-                  {isSimulated ? 'Simulated' : 'IST Live'}
-                </span>
+                {isSimulated && (
+                  <span className="live-pill">Simulated</span>
+                )}
                 <h2>Class Timetable</h2>
                 <p className="subtitle">{course} Sem {semester} Section {section}</p>
               </div>

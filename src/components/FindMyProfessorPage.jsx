@@ -438,9 +438,9 @@ export default function FindMyProfessorPage({ onBack }) {
           <span>Back to Dashboard</span>
         </button>
         <div className="page-header-clock">
-          <span className="live-pill-small">
-            {isSimulated ? 'Simulated' : 'IST Live'}
-          </span>
+          {isSimulated && (
+            <span className="live-pill-small">Simulated</span>
+          )}
           <span className="header-clock-digits">{clockHours}:{clockMin}:{clockSec} {clockAmPm}</span>
         </div>
       </div>
