@@ -7,11 +7,16 @@ export const FEATURE_NAMES = {
   timetable: 'Timetable',
   'find-prof': 'Find My Professor',
   'team-finder': 'Team Finder & Compete Hub',
+  'empty-room': 'Empty Room Finder',
   waiver: 'Waiver Tool',
   gpa: 'GPA Calculator',
   buzz: 'Campus Buzz',
   profile: 'Profile Page',
-  admin: 'Admin Console'
+  admin: 'Admin Console',
+  'faculty-db': 'Faculty Directory',
+  contact: 'Contact Us',
+  tools: 'Tools Hub',
+  pyqs: 'PYQs & Resources'
 };
 
 const LOCAL_ANALYTICS_KEY = 'sscbs_analytics_daily_v5';
@@ -384,7 +389,7 @@ export async function logFeatureView(featureId, user) {
   if (user && user.id) {
     touchUserActivity(user);
   }
-  if (!featureId || featureId === 'admin' || !FEATURE_NAMES[featureId]) return;
+  if (!featureId) return;
 
   const now = Date.now();
   const lastTime = recentLogMap.get(featureId) || 0;
@@ -394,67 +399,60 @@ export async function logFeatureView(featureId, user) {
   }
   recentLogMap.set(featureId, now);
 
-  const nowDate = new Date();
-  const dateStr = nowDate.toISOString().split('T')[0];
-  const hourKey = `${dateStr}-${nowDate.getHours().toString().padStart(2, '0')}`;
+  // 1. Record in client LocalStorage and Supabase (skipping admin from internal student totals)
+  if (featureId !== 'admin' && FEATURE_NAMES[featureId]) {
+    const nowDate = new Date();
+    const dateStr = nowDate.toISOString().split('T')[0];
+    const hourKey = `${dateStr}-${nowDate.getHours().toString().padStart(2, '0')}`;
 
-  // 1. Record in client LocalStorage immediately
-  try {
-    const localMap = getLocalAnalyticsMap();
-    if (!localMap[dateStr]) {
-      localMap[dateStr] = {
-        visits: { home: 0, timetable: 0, 'find-prof': 0, 'team-finder': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 },
-        hourly: {}
-      };
-    }
-    if (!localMap[dateStr].visits) {
-      localMap[dateStr].visits = { home: 0, timetable: 0, 'find-prof': 0, 'team-finder': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 };
-    }
-    if (!localMap[dateStr].hourly) {
-      localMap[dateStr].hourly = {};
-    }
-    if (!localMap[dateStr].hourly[hourKey]) {
-      localMap[dateStr].hourly[hourKey] = { home: 0, timetable: 0, 'find-prof': 0, 'team-finder': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 };
-    }
-
-    localMap[dateStr].visits[featureId] = (localMap[dateStr].visits[featureId] || 0) + 1;
-    localMap[dateStr].visits.total = (localMap[dateStr].visits.total || 0) + 1;
-
-    localMap[dateStr].hourly[hourKey][featureId] = (localMap[dateStr].hourly[hourKey][featureId] || 0) + 1;
-    localMap[dateStr].hourly[hourKey].total = (localMap[dateStr].hourly[hourKey].total || 0) + 1;
-
-    saveLocalAnalyticsMap(localMap);
-  } catch (e) {
-    // Non-blocking
-  }
-
-  // 2. Attempt remote Supabase insertion
-  if (hasValidCredentials) {
     try {
-      supabase
-        .from('analytics_events')
-        .insert([{
-          user_id: user?.id || null,
-          feature_id: featureId,
-          event_type: 'visit',
-          created_at: new Date().toISOString()
-        }])
-        .then(() => {})
-        .catch(() => {});
+      const localMap = getLocalAnalyticsMap();
+      if (!localMap[dateStr]) {
+        localMap[dateStr] = { visits: {}, hourly: {} };
+      }
+      if (!localMap[dateStr].visits) localMap[dateStr].visits = {};
+      if (!localMap[dateStr].hourly) localMap[dateStr].hourly = {};
+      if (!localMap[dateStr].hourly[hourKey]) localMap[dateStr].hourly[hourKey] = {};
+
+      localMap[dateStr].visits[featureId] = (localMap[dateStr].visits[featureId] || 0) + 1;
+      localMap[dateStr].visits.total = (localMap[dateStr].visits.total || 0) + 1;
+
+      localMap[dateStr].hourly[hourKey][featureId] = (localMap[dateStr].hourly[hourKey][featureId] || 0) + 1;
+      localMap[dateStr].hourly[hourKey].total = (localMap[dateStr].hourly[hourKey].total || 0) + 1;
+
+      saveLocalAnalyticsMap(localMap);
     } catch (e) {
-      // Completely non-blocking
+      // Non-blocking
+    }
+
+    if (hasValidCredentials) {
+      try {
+        supabase
+          .from('analytics_events')
+          .insert([{
+            user_id: user?.id || null,
+            feature_id: featureId,
+            event_type: 'visit',
+            created_at: new Date().toISOString()
+          }])
+          .then(() => {})
+          .catch(() => {});
+      } catch (e) {
+        // Completely non-blocking
+      }
     }
   }
 
-  // 3. Send real-time pageview and custom event to Vercel Web Analytics
+  // 2. Send real-time pageview and custom event to Vercel Web Analytics for ALL pages
   try {
-    const routePath = `/${featureId}`;
+    const routePath = (featureId === 'home' || !featureId) ? '/' : `/${featureId}`;
     if (typeof window !== 'undefined' && typeof window.va === 'function') {
       window.va('pageview', { route: routePath, path: routePath });
     }
     track('page_view', {
       feature_id: featureId,
-      feature_name: FEATURE_NAMES[featureId] || featureId
+      feature_name: FEATURE_NAMES[featureId] || featureId,
+      path: routePath
     });
   } catch (e) {
     // Non-blocking for Vercel analytics

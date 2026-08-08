@@ -474,20 +474,16 @@ function App() {
         try {
           if (event && event.url) {
             const urlObj = new URL(event.url);
-            const hashRoute = urlObj.hash ? urlObj.hash.replace(/^#\/?/, '').trim() : '';
-            if (hashRoute && FEATURE_NAMES && FEATURE_NAMES[hashRoute]) {
-              urlObj.pathname = `/${hashRoute}`;
+            let rawRoute = urlObj.hash ? urlObj.hash.replace(/^#\/?/, '').trim() : '';
+            if (!rawRoute && typeof window !== 'undefined' && window.location.hash) {
+              rawRoute = window.location.hash.replace(/^#\/?/, '').trim();
+            }
+            if (rawRoute) {
+              const route = (rawRoute === 'home') ? '' : rawRoute;
+              urlObj.pathname = route ? `/${route}` : '/';
               urlObj.hash = '';
               event.url = urlObj.toString();
               return event;
-            }
-            if (typeof window !== 'undefined' && window.location.hash) {
-              const activeHash = window.location.hash.replace(/^#\/?/, '').trim();
-              if (activeHash && FEATURE_NAMES && FEATURE_NAMES[activeHash]) {
-                urlObj.pathname = `/${activeHash}`;
-                event.url = urlObj.toString();
-                return event;
-              }
             }
           }
         } catch (e) {
