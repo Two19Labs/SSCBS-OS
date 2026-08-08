@@ -36,8 +36,7 @@ export const FACULTY_DB_TESTERS = [
 
 export function canAccessFacultyDatabase(email) {
   if (!email || typeof email !== 'string') return false;
-  const normalized = email.toLowerCase().trim();
-  return FACULTY_DB_TESTERS.some((tester) => tester.toLowerCase() === normalized);
+  return true; // Faculty Directory is live for all SSCBS users!
 }
 
 const TIMEWARP_KEY = 'sscbs-timewarp-enabled';
