@@ -13,21 +13,27 @@ export default function FacultyDatabasePage({ onBack }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [designationFilter, setDesignationFilter] = useState('all');
   const [selectedProf, setSelectedProf] = useState(null);
+  const [toastMessage, setToastMessage] = useState(null);
 
   const facultyList = useMemo(() => {
     return Array.isArray(facultyDataRaw) ? facultyDataRaw : [];
   }, []);
 
-  // Compute unique designations for filter chips
-  const designations = useMemo(() => {
-    const set = new Set();
+  // Compute designation counts for filter chips
+  const designationCounts = useMemo(() => {
+    const counts = { all: facultyList.length };
     facultyList.forEach((f) => {
-      if (f.designation) set.add(f.designation);
+      const d = f.designation || 'Faculty Member';
+      counts[d] = (counts[d] || 0) + 1;
     });
-    return ['all', ...Array.from(set)];
+    return counts;
   }, [facultyList]);
 
-  // Filter faculty based on search and designation
+  const filterKeys = useMemo(() => {
+    return Object.keys(designationCounts);
+  }, [designationCounts]);
+
+  // Filter faculty based on search query and designation
   const filteredFaculty = useMemo(() => {
     return facultyList.filter((f) => {
       const matchesSearch =
@@ -45,6 +51,23 @@ export default function FacultyDatabasePage({ onBack }) {
     });
   }, [facultyList, searchQuery, designationFilter]);
 
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 2500);
+  };
+
+  const handleCopyEmail = (e, email) => {
+    e.stopPropagation();
+    if (!email || email === 'cbs@sscbsdu.ac.in') {
+      showToast('General college email');
+      return;
+    }
+    navigator.clipboard.writeText(email);
+    showToast(`Copied ${email}!`);
+  };
+
   const getInitials = (name) => {
     if (!name) return 'FC';
     const clean = name.replace(/^(Dr\.|Prof\.|Mr\.|Ms\.|Mrs\.)\s+/i, '');
@@ -53,11 +76,21 @@ export default function FacultyDatabasePage({ onBack }) {
     return parts[0].substring(0, 2).toUpperCase();
   };
 
+  const getDesignationClass = (desig) => {
+    if (!desig) return 'badge-default';
+    const lower = desig.toLowerCase();
+    if (lower.includes('principal')) return 'badge-principal';
+    if (lower.includes('associate')) return 'badge-associate';
+    if (lower.includes('assistant')) return 'badge-assistant';
+    if (lower.includes('professor')) return 'badge-professor';
+    return 'badge-default';
+  };
+
   return (
     <div className="faculty-db-container">
       {/* Header Section */}
       <div className="faculty-db-header">
-        <button onClick={onBack} className="faculty-db-back-btn" aria-label="Go Back">
+        <button onClick={onBack} className="faculty-db-back-btn" aria-label="Go Back to Dashboard">
           <BackIcon /> Back to Dashboard
         </button>
 
@@ -67,7 +100,7 @@ export default function FacultyDatabasePage({ onBack }) {
               <UserIcon /> SSCBS Faculty Directory
             </h1>
             <p className="faculty-subheading">
-              Official database of professors, room numbers, contact info, expertise, and research publications.
+              Comprehensive database of SSCBS professors, official emails, room locations, areas of expertise, and research profiles.
             </p>
           </div>
 
@@ -88,10 +121,15 @@ export default function FacultyDatabasePage({ onBack }) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
+          {searchQuery && (
+            <button className="faculty-search-clear" onClick={() => setSearchQuery('')} aria-label="Clear Search">
+              ✕
+            </button>
+          )}
         </div>
 
         <div className="faculty-filter-chips">
-          {designations.map((desig) => (
+          {filterKeys.map((desig) => (
             <button
               key={desig}
               className={`faculty-filter-chip ${
@@ -99,7 +137,8 @@ export default function FacultyDatabasePage({ onBack }) {
               }`}
               onClick={() => setDesignationFilter(desig)}
             >
-              {desig === 'all' ? 'All Faculty' : desig}
+              {desig === 'all' ? 'All Professors' : desig}
+              <span className="chip-count-badge">{designationCounts[desig]}</span>
             </button>
           ))}
         </div>
@@ -107,14 +146,19 @@ export default function FacultyDatabasePage({ onBack }) {
 
       {/* Faculty Cards Grid */}
       {filteredFaculty.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#64748b' }}>
-          <p style={{ fontSize: '1.1rem', fontWeight: '600' }}>No faculty members found</p>
-          <p style={{ fontSize: '0.9rem' }}>Try clearing your search query or changing filters.</p>
+        <div style={{ textAlign: 'center', padding: '4rem 1rem', color: '#64748b' }}>
+          <p style={{ fontSize: '1.2rem', fontWeight: '700', margin: '0 0 0.5rem 0' }}>No matching professors found</p>
+          <p style={{ fontSize: '0.9rem', margin: 0 }}>Try clearing your search query or switching filters.</p>
         </div>
       ) : (
         <div className="faculty-grid">
           {filteredFaculty.map((prof) => (
-            <div key={prof.id || prof.name} className="faculty-card">
+            <div
+              key={prof.id || prof.name}
+              className="faculty-card"
+              onClick={() => setSelectedProf(prof)}
+              style={{ cursor: 'pointer' }}
+            >
               <div>
                 <div className="faculty-card-top">
                   <div className="faculty-avatar-container">
@@ -126,7 +170,9 @@ export default function FacultyDatabasePage({ onBack }) {
                         onError={(e) => {
                           e.target.onerror = null;
                           e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'flex';
+                          if (e.target.nextSibling) {
+                            e.target.nextSibling.style.display = 'flex';
+                          }
                         }}
                       />
                     ) : null}
@@ -145,7 +191,9 @@ export default function FacultyDatabasePage({ onBack }) {
                     {prof.qualification && (
                       <p className="faculty-degree">{prof.qualification}</p>
                     )}
-                    <span className="faculty-designation-badge">{prof.designation}</span>
+                    <span className={`faculty-designation-badge ${getDesignationClass(prof.designation)}`}>
+                      {prof.designation}
+                    </span>
                   </div>
                 </div>
 
@@ -154,14 +202,22 @@ export default function FacultyDatabasePage({ onBack }) {
                     <DoorIcon /> {prof.room}
                   </div>
 
-                  <div className="faculty-detail-item">
+                  <div className="faculty-email-row">
                     <a
                       href={`mailto:${prof.email}`}
                       className="faculty-email-link"
                       onClick={(e) => e.stopPropagation()}
+                      title={`Send email to ${prof.email}`}
                     >
                       ✉️ {prof.email}
                     </a>
+                    <button
+                      className="copy-email-btn"
+                      onClick={(e) => handleCopyEmail(e, prof.email)}
+                      title="Copy Email Address"
+                    >
+                      📋
+                    </button>
                   </div>
                 </div>
 
@@ -190,7 +246,10 @@ export default function FacultyDatabasePage({ onBack }) {
 
                 <button
                   className="faculty-btn-primary"
-                  onClick={() => setSelectedProf(prof)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedProf(prof);
+                  }}
                 >
                   View Profile
                 </button>
@@ -215,26 +274,36 @@ export default function FacultyDatabasePage({ onBack }) {
             <div className="faculty-modal-header">
               <div className="faculty-modal-avatar">
                 {selectedProf.photoUrl ? (
-                  <img src={selectedProf.photoUrl} alt={selectedProf.name} />
-                ) : (
-                  <div className="faculty-avatar-placeholder">
-                    {getInitials(selectedProf.name)}
-                  </div>
-                )}
+                  <img
+                    src={selectedProf.photoUrl}
+                    alt={selectedProf.name}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.style.display = 'none';
+                      if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div
+                  className="faculty-avatar-placeholder"
+                  style={{ display: selectedProf.photoUrl ? 'none' : 'flex' }}
+                >
+                  {getInitials(selectedProf.name)}
+                </div>
               </div>
 
               <div>
-                <h2 style={{ margin: '0 0 0.25rem 0', fontSize: '1.4rem', color: '#0f172a' }}>
+                <h2 style={{ margin: '0 0 0.25rem 0', fontSize: '1.45rem', color: '#0f172a', fontWeight: '800' }}>
                   {selectedProf.name}
                 </h2>
-                <p style={{ margin: '0 0 0.5rem 0', color: '#64748b', fontSize: '0.9rem' }}>
+                <p style={{ margin: '0 0 0.5rem 0', color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>
                   {selectedProf.qualification}
                 </p>
-                <span className="faculty-designation-badge">
+                <span className={`faculty-designation-badge ${getDesignationClass(selectedProf.designation)}`}>
                   {selectedProf.designation}
                 </span>
 
-                <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <div style={{ marginTop: '0.85rem', display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
                   <span className="faculty-room-pill">
                     <DoorIcon /> {selectedProf.room}
                   </span>
@@ -280,7 +349,7 @@ export default function FacultyDatabasePage({ onBack }) {
                 <ul className="faculty-modal-list">
                   {selectedProf.education.map((edu, idx) => (
                     <li key={idx} className="faculty-modal-list-item">
-                      {edu}
+                      🎓 {edu}
                     </li>
                   ))}
                 </ul>
@@ -301,18 +370,25 @@ export default function FacultyDatabasePage({ onBack }) {
               </div>
             )}
 
-            <div style={{ marginTop: '1.5rem', textAlign: 'right' }}>
+            <div style={{ marginTop: '1.75rem', textAlign: 'right' }}>
               <a
                 href={selectedProf.profileUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="faculty-btn-primary"
-                style={{ display: 'inline-flex', width: 'auto', padding: '0.65rem 1.25rem' }}
+                style={{ display: 'inline-flex', width: 'auto', padding: '0.7rem 1.35rem' }}
               >
                 View Official DU Profile ↗
               </a>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Toast Alert */}
+      {toastMessage && (
+        <div className="faculty-toast">
+          {toastMessage}
         </div>
       )}
     </div>
