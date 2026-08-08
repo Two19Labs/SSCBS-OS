@@ -26,6 +26,8 @@ import {
   DoorIcon,
   HeartIcon,
   UsersIcon,
+  MenuIcon,
+  CloseIcon,
 } from './components/icons';
 import './App.css';
 import InstallPwaPrompt from './components/InstallPwaPrompt';
@@ -77,10 +79,12 @@ function App() {
   const [view, setViewState] = useState(getInitialView);
   const [returnView, setReturnView] = useState('home');
   const [isGpaOpen, setIsGpaOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const setView = (newView) => {
     if (VALID_VIEWS.includes(newView)) {
       setViewState(newView);
+      setIsMobileSidebarOpen(false);
       if (typeof window !== 'undefined') {
         window.location.hash = newView === 'home' ? '' : newView;
         localStorage.setItem('sscbs_active_view', newView);
@@ -103,6 +107,17 @@ function App() {
 
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  // Escape key handler to close mobile sidebar
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsMobileSidebarOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   // Ensure current view is recorded in URL hash & localStorage on mount
@@ -158,6 +173,7 @@ function App() {
   const hasEmptyRoomAccess = featureFlags['empty-room'] || canAccessEmptyRoom(user.email);
 
   const openTool = (id) => {
+    setIsMobileSidebarOpen(false);
     logFeatureView(id, user);
     if (id === 'gpa') {
       setIsGpaOpen(true);
@@ -178,26 +194,38 @@ function App() {
     );
   }
 
-
-  const navItems = [
-    { id: 'home', label: 'Home', Icon: HomeIcon },
-    { id: 'timetable', label: 'Timetable', Icon: CalendarIcon, locked: !featureFlags['timetable'] && !isAdmin },
-    { id: 'find-prof', label: 'Find My Professor', Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
-    ...(hasTeamFinderAccess ? [{ id: 'team-finder', label: 'Team Finder', Icon: TrophyIcon }] : []),
-    { id: 'empty-room', label: 'Empty Room Finder', Icon: DoorIcon },
-    { id: 'waiver', label: 'Waiver Tool', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
-    { id: 'gpa', label: 'GPA Calculator', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
-    { id: 'pyqs', label: 'PYQs & Resources', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
-    { id: 'buzz', label: 'Campus Buzz', Icon: MegaphoneIcon, locked: !featureFlags['buzz'] && !isAdmin },
-    { id: 'contact', label: 'Contact Us', Icon: MessageIcon, locked: !featureFlags['contact'] && !isAdmin },
-  ];
-
-  const tabs = [
-    { id: 'home', label: 'Home', Icon: HomeIcon },
-    { id: 'timetable', label: 'Timetable', Icon: CalendarIcon },
-    { id: 'tools', label: 'Tools', Icon: GridIcon },
-    { id: 'contact', label: 'Contact', Icon: MessageIcon },
-    { id: 'profile', label: 'Profile', Icon: UserIcon },
+  const navSections = [
+    {
+      title: 'Main Navigation',
+      items: [
+        { id: 'home', label: 'Home', Icon: HomeIcon },
+        { id: 'timetable', label: 'Timetable', Icon: CalendarIcon, locked: !featureFlags['timetable'] && !isAdmin },
+        { id: 'buzz', label: 'Campus Buzz', Icon: MegaphoneIcon, locked: !featureFlags['buzz'] && !isAdmin },
+      ],
+    },
+    {
+      title: 'Academic & Tools',
+      items: [
+        { id: 'find-prof', label: 'Find My Professor', Icon: SearchIcon, badge: 'SEARCH', badgeClass: 'success', locked: !featureFlags['find-prof'] && !isAdmin },
+        { id: 'empty-room', label: 'Empty Room Finder', Icon: DoorIcon, badge: 'LIVE', badgeClass: 'success' },
+        ...(hasTeamFinderAccess ? [{ id: 'team-finder', label: 'Team Finder', Icon: TrophyIcon, badge: 'NEW', badgeClass: 'success' }] : []),
+        { id: 'waiver', label: 'Waiver Tool', Icon: PercentIcon, badge: 'SOON', badgeClass: 'dim', locked: !featureFlags['waiver'] && !isAdmin },
+        { id: 'gpa', label: 'GPA Calculator', Icon: CalculatorIcon, badge: 'DU', badgeClass: 'maroon', locked: !featureFlags['gpa'] && !isAdmin },
+        { id: 'pyqs', label: 'PYQs & Resources', Icon: FileIcon, badge: 'SOON', badgeClass: 'dim', locked: !featureFlags['pyqs'] && !isAdmin },
+      ],
+    },
+    {
+      title: 'Support',
+      items: [
+        { id: 'contact', label: 'Contact Us', Icon: MessageIcon, locked: !featureFlags['contact'] && !isAdmin },
+      ],
+    },
+    ...(isAdmin ? [{
+      title: 'Administration',
+      items: [
+        { id: 'admin', label: 'Admin Console', Icon: ShieldIcon },
+      ],
+    }] : []),
   ];
 
   const activeTab = TOOL_VIEWS.includes(view) || view === 'tools' ? 'tools' : view === 'buzz' ? 'home' : view;
@@ -295,7 +323,7 @@ function App() {
       <div className="app-shell">
         {/* ── Desktop sidebar ── */}
         <aside className="app-sidebar">
-          <div className="sidebar-brand" onClick={() => setView('home')}>
+          <div className="sidebar-brand" onClick={() => { setView('home'); setIsMobileSidebarOpen(false); }}>
             <img src="/sscbs_logo.png" alt="" width="30" height="30" />
             <div className="sidebar-brand-text">
               <span className="sidebar-brand-name">SSCBS OS</span>
@@ -304,27 +332,23 @@ function App() {
           </div>
 
           <nav className="sidebar-nav">
-            {navItems.map(({ id, label, Icon, locked }) => (
-              <button
-                key={id}
-                className={`sidebar-item ${view === id ? 'active' : ''} ${locked ? 'locked' : ''}`}
-                onClick={() => !locked && openTool(id)}
-                disabled={locked}
-              >
-                <Icon filled={view === id} />
-                <span>{label}</span>
-                {locked && <span className="sidebar-soon">SOON</span>}
-              </button>
+            {navSections.map((section, idx) => (
+              <div key={idx} className="sidebar-section">
+                <span className="sidebar-section-title">{section.title}</span>
+                {section.items.map(({ id, label, Icon, locked }) => (
+                  <button
+                    key={id}
+                    className={`sidebar-item ${view === id ? 'active' : ''} ${locked ? 'locked' : ''}`}
+                    onClick={() => !locked && openTool(id)}
+                    disabled={locked}
+                  >
+                    <Icon filled={view === id} />
+                    <span>{label}</span>
+                    {locked && <span className="sidebar-soon">SOON</span>}
+                  </button>
+                ))}
+              </div>
             ))}
-            {isAdmin && (
-              <button
-                className={`sidebar-item ${view === 'admin' ? 'active' : ''}`}
-                onClick={() => openTool('admin')}
-              >
-                <ShieldIcon filled={view === 'admin'} />
-                <span>Admin Console</span>
-              </button>
-            )}
           </nav>
 
           <button
@@ -339,17 +363,91 @@ function App() {
           </button>
         </aside>
 
+        {/* ── Mobile sidebar drawer backdrop ── */}
+        <div
+          className={`mobile-sidebar-backdrop ${isMobileSidebarOpen ? 'show' : ''}`}
+          onClick={() => setIsMobileSidebarOpen(false)}
+        />
+
+        {/* ── Mobile slide-out sidebar drawer ── */}
+        <aside className={`app-sidebar-mobile ${isMobileSidebarOpen ? 'open' : ''}`}>
+          <div className="mobile-sidebar-header">
+            <div className="sidebar-brand" onClick={() => { setView('home'); setIsMobileSidebarOpen(false); }}>
+              <img src="/sscbs_logo.png" alt="" width="28" height="28" />
+              <div className="sidebar-brand-text">
+                <span className="sidebar-brand-name">SSCBS OS</span>
+                <span className="sidebar-brand-sub">CAMPUS WORKSPACE</span>
+              </div>
+            </div>
+            <button
+              className="mobile-sidebar-close"
+              onClick={() => setIsMobileSidebarOpen(false)}
+              aria-label="Close Navigation"
+            >
+              <CloseIcon size={20} />
+            </button>
+          </div>
+
+          <div className="mobile-sidebar-user-card" onClick={() => { setView('profile'); setIsMobileSidebarOpen(false); }}>
+            <span className="sidebar-avatar">{displayName.charAt(0).toUpperCase()}</span>
+            <div className="mobile-user-details">
+              <span className="mobile-user-name">{displayName}</span>
+              <span className="mobile-user-email">{user.email}</span>
+            </div>
+            <span className="mobile-profile-tag">Profile</span>
+          </div>
+
+          <nav className="mobile-sidebar-nav">
+            {navSections.map((section, idx) => (
+              <div key={idx} className="mobile-sidebar-section">
+                <div className="mobile-section-header">{section.title}</div>
+                {section.items.map(({ id, label, Icon, badge, badgeClass, locked }) => (
+                  <button
+                    key={id}
+                    className={`mobile-sidebar-item ${view === id ? 'active' : ''} ${locked ? 'locked' : ''}`}
+                    onClick={() => {
+                      if (!locked) {
+                        setIsMobileSidebarOpen(false);
+                        openTool(id);
+                      }
+                    }}
+                    disabled={locked}
+                  >
+                    <div className="mobile-item-left">
+                      <Icon filled={view === id} size={18} />
+                      <span>{label}</span>
+                    </div>
+                    {badge && (
+                      <span className={`mobile-item-badge micro-label ${badgeClass || ''}`}>{badge}</span>
+                    )}
+                    {locked && !badge && <span className="sidebar-soon">SOON</span>}
+                  </button>
+                ))}
+              </div>
+            ))}
+          </nav>
+        </aside>
+
         {/* ── Mobile top bar ── */}
         <header className="app-topbar">
-          {view !== 'home' && activeTab !== view ? (
-            <button className="topbar-back" onClick={goBack} aria-label="Back">
-              <BackIcon />
-            </button>
-          ) : (
-            <img src="/sscbs_logo.png" alt="" width="26" height="26" />
-          )}
-          <span className="topbar-title">{pageTitle || 'SSCBS OS'}</span>
-          <button className="topbar-avatar" onClick={() => setView('profile')} aria-label="Profile">
+          <button
+            className="topbar-menu-btn"
+            onClick={() => setIsMobileSidebarOpen(prev => !prev)}
+            aria-label="Toggle Menu"
+          >
+            <MenuIcon size={22} />
+          </button>
+          
+          <div className="topbar-title-group" onClick={() => setView('home')}>
+            <img src="/sscbs_logo.png" alt="" width="24" height="24" />
+            <span className="topbar-title">{pageTitle || 'SSCBS OS'}</span>
+          </div>
+
+          <button
+            className="topbar-avatar"
+            onClick={() => setView('profile')}
+            aria-label="Profile"
+          >
             {displayName.charAt(0).toUpperCase()}
           </button>
         </header>
@@ -364,20 +462,6 @@ function App() {
           {renderView()}
           <FooterCredit />
         </main>
-
-        {/* ── Mobile bottom tabs ── */}
-        <nav className="app-tabbar">
-          {tabs.map(({ id, label, Icon }) => (
-            <button
-              key={id}
-              className={`tabbar-item ${activeTab === id ? 'active' : ''}`}
-              onClick={() => setView(id)}
-            >
-              <Icon filled={activeTab === id} size={20} />
-              <span>{label}</span>
-            </button>
-          ))}
-        </nav>
       </div>
 
       <ProfileModal isOpen={needsProfileSetup} isFirstTimeSetup={needsProfileSetup} />
