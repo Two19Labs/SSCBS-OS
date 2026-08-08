@@ -6,7 +6,6 @@ import Auth from './components/Auth';
 import HomeDashboard from './components/HomeDashboard';
 import ProfilePage from './components/ProfilePage';
 import ProfileModal from './components/ProfileModal';
-import ClassSchedulesCard from './components/ClassSchedulesCard';
 import NoticeBoard from './components/NoticeBoard';
 import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom } from './lib/admin';
 import {
@@ -57,9 +56,7 @@ const PageLoader = () => (
 );
 
 const TOOL_VIEWS = ['find-prof', 'waiver', 'admin', 'team-finder', 'empty-room'];
-const VALID_VIEWS = ['home', 'timetable', 'find-prof', 'waiver', 'tools', 'buzz', 'profile', 'admin', 'contact', 'team-finder', 'empty-room'];
-
-
+const VALID_VIEWS = ['home', 'find-prof', 'waiver', 'tools', 'buzz', 'profile', 'admin', 'contact', 'team-finder', 'empty-room'];
 
 const getInitialView = () => {
   if (typeof window !== 'undefined') {
@@ -102,7 +99,7 @@ function App() {
       if (hash && VALID_VIEWS.includes(hash)) {
         setViewState(hash);
         localStorage.setItem('sscbs_active_view', hash);
-      } else if (!hash) {
+      } else {
         setViewState('home');
         localStorage.setItem('sscbs_active_view', 'home');
       }
@@ -202,7 +199,6 @@ function App() {
       title: 'Main Navigation',
       items: [
         { id: 'home', label: 'Home', Icon: HomeIcon },
-        { id: 'timetable', label: 'Timetable', Icon: CalendarIcon, locked: !featureFlags['timetable'] && !isAdmin },
         { id: 'buzz', label: 'Campus Buzz', Icon: MegaphoneIcon, locked: !featureFlags['buzz'] && !isAdmin },
       ],
     },
@@ -234,7 +230,6 @@ function App() {
   const activeTab = TOOL_VIEWS.includes(view) || view === 'tools' ? 'tools' : view === 'buzz' ? 'home' : view;
 
   const pageTitle = {
-    timetable: 'Timetable',
     tools: 'Tools',
     'find-prof': 'Find My Professor',
     'team-finder': 'Team Finder & Compete Hub',
@@ -247,8 +242,6 @@ function App() {
 
   const renderView = () => {
     switch (view) {
-      case 'timetable':
-        return <ClassSchedulesCard onOpenProfile={() => setView('profile')} />;
       case 'find-prof':
         return (
           <Suspense fallback={<PageLoader />}>
