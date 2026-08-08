@@ -87,37 +87,36 @@ export default function FacultyDatabasePage({ onBack }) {
   };
 
   return (
-    <div className="faculty-db-container">
+    <div className="faculty-db-page">
       {/* Header Section */}
       <div className="faculty-db-header">
         <button onClick={onBack} className="faculty-db-back-btn" aria-label="Go Back to Dashboard">
-          <BackIcon /> Back to Dashboard
+          <BackIcon size={16} />
+          <span>Back to Dashboard</span>
         </button>
 
-        <div className="faculty-title-row">
-          <div>
-            <h1 className="faculty-main-heading">
-              <UserIcon /> SSCBS Faculty Directory
-            </h1>
-            <p className="faculty-subheading">
-              Comprehensive database of SSCBS professors, official emails, room locations, areas of expertise, and research profiles.
-            </p>
+        <div className="faculty-db-title-section">
+          <div className="faculty-db-title-row">
+            <div className="faculty-header-icon">
+              <UserIcon size={20} />
+            </div>
+            <h2>SSCBS Faculty Directory</h2>
+            <span className="micro-label success">● ADMIN PREVIEW</span>
           </div>
-
-          <span className="exclusive-preview-badge">
-            ⚡ Admin Exclusive Preview
-          </span>
+          <p className="faculty-db-subtitle">
+            Official directory of SSCBS professors, office room numbers, contact details, subject expertise, and research publications.
+          </p>
         </div>
       </div>
 
-      {/* Control Bar (Search & Filters) */}
+      {/* Control Bar (Search & Filter Chips) */}
       <div className="faculty-controls-card">
         <div className="faculty-search-box">
-          <SearchIcon className="faculty-search-icon" />
+          <SearchIcon className="faculty-search-icon" size={18} />
           <input
             type="text"
             className="faculty-search-input"
-            placeholder="Search by Professor Name, Room No., Email, or Subject Expertise..."
+            placeholder="Search by professor name, room no., email, or subject..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -137,7 +136,7 @@ export default function FacultyDatabasePage({ onBack }) {
               }`}
               onClick={() => setDesignationFilter(desig)}
             >
-              {desig === 'all' ? 'All Professors' : desig}
+              <span>{desig === 'all' ? 'All Professors' : desig}</span>
               <span className="chip-count-badge">{designationCounts[desig]}</span>
             </button>
           ))}
@@ -146,9 +145,9 @@ export default function FacultyDatabasePage({ onBack }) {
 
       {/* Faculty Cards Grid */}
       {filteredFaculty.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '4rem 1rem', color: '#64748b' }}>
-          <p style={{ fontSize: '1.2rem', fontWeight: '700', margin: '0 0 0.5rem 0' }}>No matching professors found</p>
-          <p style={{ fontSize: '0.9rem', margin: 0 }}>Try clearing your search query or switching filters.</p>
+        <div style={{ textAlign: 'center', padding: '3.5rem 1rem', color: 'var(--ink-dim)' }}>
+          <p style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 0.25rem 0', color: 'var(--ink)' }}>No matching professors found</p>
+          <p style={{ fontSize: '0.85rem', margin: 0 }}>Try clearing your search query or switching filters.</p>
         </div>
       ) : (
         <div className="faculty-grid">
@@ -199,7 +198,8 @@ export default function FacultyDatabasePage({ onBack }) {
 
                 <div className="faculty-details-row">
                   <div className="faculty-room-pill" title="Office / Room Location">
-                    <DoorIcon /> {prof.room}
+                    <DoorIcon size={14} />
+                    <span>{prof.room}</span>
                   </div>
 
                   <div className="faculty-email-row">
@@ -268,7 +268,7 @@ export default function FacultyDatabasePage({ onBack }) {
               onClick={() => setSelectedProf(null)}
               aria-label="Close modal"
             >
-              <CloseIcon />
+              <CloseIcon size={18} />
             </button>
 
             <div className="faculty-modal-header">
@@ -293,24 +293,24 @@ export default function FacultyDatabasePage({ onBack }) {
               </div>
 
               <div>
-                <h2 style={{ margin: '0 0 0.25rem 0', fontSize: '1.45rem', color: '#0f172a', fontWeight: '800' }}>
+                <h3 style={{ margin: '0 0 4px 0', fontSize: '1.35rem', color: 'var(--ink)', fontWeight: '800' }}>
                   {selectedProf.name}
-                </h2>
-                <p style={{ margin: '0 0 0.5rem 0', color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>
+                </h3>
+                <p style={{ margin: '0 0 8px 0', color: 'var(--ink-dim)', fontSize: '0.85rem', fontWeight: '500' }}>
                   {selectedProf.qualification}
                 </p>
                 <span className={`faculty-designation-badge ${getDesignationClass(selectedProf.designation)}`}>
                   {selectedProf.designation}
                 </span>
 
-                <div style={{ marginTop: '0.85rem', display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                <div style={{ marginTop: '12px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   <span className="faculty-room-pill">
-                    <DoorIcon /> {selectedProf.room}
+                    <DoorIcon size={14} /> {selectedProf.room}
                   </span>
                   <a
                     href={`mailto:${selectedProf.email}`}
                     className="faculty-room-pill"
-                    style={{ textDecoration: 'none', color: '#2563eb' }}
+                    style={{ textDecoration: 'none', color: 'var(--accent)' }}
                   >
                     ✉️ {selectedProf.email}
                   </a>
@@ -322,7 +322,7 @@ export default function FacultyDatabasePage({ onBack }) {
             {selectedProf.expertise && selectedProf.expertise.length > 0 && (
               <div>
                 <h4 className="faculty-modal-section-title">
-                  <UserIcon /> Areas of Expertise
+                  <UserIcon size={16} /> Areas of Expertise
                 </h4>
                 <div className="faculty-expertise-wrap">
                   {selectedProf.expertise.map((exp, i) => (
@@ -370,13 +370,13 @@ export default function FacultyDatabasePage({ onBack }) {
               </div>
             )}
 
-            <div style={{ marginTop: '1.75rem', textAlign: 'right' }}>
+            <div style={{ marginTop: '24px', textAlign: 'right' }}>
               <a
                 href={selectedProf.profileUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="faculty-btn-primary"
-                style={{ display: 'inline-flex', width: 'auto', padding: '0.7rem 1.35rem' }}
+                style={{ display: 'inline-flex', width: 'auto', padding: '10px 18px' }}
               >
                 View Official DU Profile ↗
               </a>
