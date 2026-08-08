@@ -23,6 +23,9 @@
   .home-tools-section {
     order: 4;
   }
+  .home-greeting-actions .notif-center-wrapper {
+    display: none !important;
+  }
 }
 
 /* Two-column desktop layout (restored PC layout) */
