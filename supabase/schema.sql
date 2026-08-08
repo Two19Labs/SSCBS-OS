@@ -403,4 +403,39 @@ CREATE POLICY "Enable update/delete access on squad_applications"
         OR auth.jwt() ->> 'email' IN ('aditya.25015@sscbs.du.ac.in', 'manthan.25138@sscbs.du.ac.in')
     );
 
+-- 12. Create a table for Notifications Hub persistence & Cloud Sync
+CREATE TABLE IF NOT EXISTS public.user_notifications (
+    id TEXT PRIMARY KEY,
+    user_email TEXT NOT NULL,
+    type TEXT NOT NULL,
+    category TEXT DEFAULT 'General',
+    title TEXT NOT NULL,
+    body TEXT NOT NULL,
+    action_type TEXT,
+    action_data JSONB,
+    read BOOLEAN DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS
+ALTER TABLE public.user_notifications ENABLE ROW LEVEL SECURITY;
+
+-- Security Policies
+CREATE POLICY "Users can view their own notifications"
+    ON public.user_notifications FOR SELECT TO authenticated
+    USING (user_email = auth.jwt() ->> 'email');
+
+CREATE POLICY "Users can insert their own notifications"
+    ON public.user_notifications FOR INSERT TO authenticated
+    WITH CHECK (user_email = auth.jwt() ->> 'email');
+
+CREATE POLICY "Users can update their own notifications"
+    ON public.user_notifications FOR UPDATE TO authenticated
+    USING (user_email = auth.jwt() ->> 'email');
+
+CREATE POLICY "Users can delete their own notifications"
+    ON public.user_notifications FOR DELETE TO authenticated
+    USING (user_email = auth.jwt() ->> 'email');
+
+
 

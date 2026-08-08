@@ -33,6 +33,8 @@ import './App.css';
 import InstallPwaPrompt from './components/InstallPwaPrompt';
 import FooterCredit from './components/FooterCredit';
 import { Analytics } from '@vercel/analytics/react';
+import NotificationCenter from './components/NotificationCenter';
+import { useNotificationEngine } from './hooks/useNotificationEngine';
 
 // Lazy-loaded heavy page & tool chunks for fast initial app shell booting
 const WaiverToolPage = lazy(() => import('./components/WaiverToolPage'));
@@ -76,6 +78,7 @@ const getInitialView = () => {
 function App() {
   const { user, loading, isPasswordRecovery } = useAuth();
   const { featureFlags } = useConfig();
+  useNotificationEngine();
   const [view, setViewState] = useState(getInitialView);
   const [returnView, setReturnView] = useState('home');
   const [isGpaOpen, setIsGpaOpen] = useState(false);
@@ -440,22 +443,24 @@ function App() {
             <span className="topbar-title">{pageTitle || 'SSCBS OS'}</span>
           </div>
 
-          <button
-            className="topbar-avatar"
-            onClick={() => setView('profile')}
-            aria-label="Profile"
-          >
-            {displayName.charAt(0).toUpperCase()}
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <NotificationCenter onNavigate={openTool} />
+            <button
+              className="topbar-avatar"
+              onClick={() => setView('profile')}
+              aria-label="Profile"
+            >
+              {displayName.charAt(0).toUpperCase()}
+            </button>
+          </div>
         </header>
 
         {/* ── Main content ── */}
         <main className="app-main">
-          {pageTitle && (
-            <div className="page-heading-desktop">
-              <h1>{pageTitle}</h1>
-            </div>
-          )}
+          <div className="page-heading-desktop" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h1 style={{ margin: 0 }}>{pageTitle || 'Home Workspace'}</h1>
+            <NotificationCenter onNavigate={openTool} />
+          </div>
           {renderView()}
           <FooterCredit />
         </main>

@@ -6,6 +6,7 @@ import { AuthProvider } from './context/AuthContext.jsx'
 import { TimetableProvider } from './context/TimetableContext.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
 import { ConfigProvider } from './context/ConfigContext.jsx'
+import { NotificationProvider } from './context/NotificationContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -13,11 +14,14 @@ createRoot(document.getElementById('root')).render(
       <AuthProvider>
         <ConfigProvider>
           <TimetableProvider>
-            <App />
+            <NotificationProvider>
+              <App />
+            </NotificationProvider>
           </TimetableProvider>
         </ConfigProvider>
       </AuthProvider>
     </ThemeProvider>
   </StrictMode>,
 )
+
 
