@@ -99,11 +99,13 @@
 .faculty-search-box {
   position: relative;
   width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .faculty-search-input {
   width: 100%;
-  padding: 10px 38px 10px 42px;
+  padding: 11px 38px 11px 42px;
   background: var(--tint);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -112,6 +114,7 @@
   color: var(--ink);
   transition: all 0.2s ease;
   font-family: inherit;
+  line-height: 1.4;
 }
 
 .faculty-search-input:focus {
@@ -128,6 +131,12 @@
   transform: translateY(-50%);
   color: var(--ink-dim);
   pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  height: 18px;
+  width: 18px;
 }
 
 .faculty-search-clear {

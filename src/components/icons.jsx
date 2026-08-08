@@ -52,8 +52,8 @@ export const UserIcon = ({ filled, size = 18 }) => (
   </svg>
 );
 
-export const SearchIcon = ({ filled, size = 18 }) => (
-  <svg {...base(false)} width={size} height={size}>
+export const SearchIcon = ({ className, filled, size = 18 }) => (
+  <svg {...base(false)} className={className} width={size} height={size}>
     <circle cx="11" cy="11" r="7" fill={filled ? 'currentColor' : 'none'} />
     <line x1="16.5" y1="16.5" x2="21" y2="21" />
   </svg>

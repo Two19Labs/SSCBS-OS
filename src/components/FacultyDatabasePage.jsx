@@ -113,7 +113,9 @@ export default function FacultyDatabasePage({ onBack }) {
       {/* Control Bar (Search & Filter Chips) */}
       <div className="faculty-controls-card">
         <div className="faculty-search-box">
-          <SearchIcon className="faculty-search-icon" size={18} />
+          <span className="faculty-search-icon">
+            <SearchIcon size={18} />
+          </span>
           <input
             type="text"
             className="faculty-search-input"
