@@ -699,21 +699,19 @@
 .micro-label.gold { color: var(--gold-text); }
 .micro-label.maroon { color: var(--accent); }
 
-.desktop-top-header {
-  display: none;
+.desktop-only-notif {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 899px) {
+  .desktop-only-notif {
+    display: none;
+  }
 }
 
 /* ═══ Laptop / desktop ≥ 900px — sidebar UI ═══ */
 @media (min-width: 900px) {
-  .desktop-top-header {
-    display: flex;
-    position: absolute;
-    top: 24px;
-    right: 32px;
-    z-index: 100;
-    align-items: center;
-  }
-
   .app-sidebar {
     display: flex;
   }
