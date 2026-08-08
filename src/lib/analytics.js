@@ -1,5 +1,6 @@
 import { supabase, hasValidCredentials } from './supabaseClient';
 import { track } from '@vercel/analytics';
+import { isAdminEmail } from './admin';
 
 export const FEATURE_NAMES = {
   home: 'Home Dashboard',
@@ -237,13 +238,46 @@ function sendPresencePing() {
 }
 
 let isVisibilityListenerAdded = false;
+let hasAttachedPresenceListeners = false;
+
+function attachPresenceListenersIfNeeded() {
+  if (!activePresenceChannel || hasAttachedPresenceListeners) return;
+  const userEmail = globalCurrentUser?.email;
+  const isUserAdmin = isAdminEmail(userEmail);
+
+  // Attach presence sync listeners ONLY for admins or active subscriber callbacks (Admin Console)
+  if (isUserAdmin || presenceSubscribers.size > 0) {
+    hasAttachedPresenceListeners = true;
+    const handlePresenceSync = () => {
+      try {
+        const state = activePresenceChannel.presenceState();
+        const onlineList = [];
+        if (state) {
+          Object.values(state).forEach(presences => {
+            if (Array.isArray(presences)) {
+              presences.forEach(p => {
+                if (p && p.name && p.email) onlineList.push(p);
+              });
+            }
+          });
+        }
+        updateLocalAndState(onlineList);
+      } catch (e) {}
+    };
+
+    activePresenceChannel
+      .on('presence', { event: 'sync' }, handlePresenceSync)
+      .on('presence', { event: 'join' }, handlePresenceSync)
+      .on('presence', { event: 'leave' }, handlePresenceSync);
+  }
+}
 
 function initGlobalPresenceTracker() {
   if (!presenceHeartbeatTimer) {
-    // Lightweight local ping timer every 30 seconds for tab freshness & bandwidth efficiency
+    // Lightweight local ping timer every 60 seconds for tab freshness & maximum bandwidth efficiency
     presenceHeartbeatTimer = setInterval(() => {
       sendPresencePing();
-    }, 30000);
+    }, 60000);
   }
 
   // Resume presence ping immediately when student switches back to active tab
@@ -264,32 +298,13 @@ function initGlobalPresenceTracker() {
         config: { presence: { key: sid } }
       });
 
-      const handlePresenceSync = () => {
-        try {
-          const state = activePresenceChannel.presenceState();
-          const onlineList = [];
-          if (state) {
-            Object.values(state).forEach(presences => {
-              if (Array.isArray(presences)) {
-                presences.forEach(p => {
-                  if (p && p.name && p.email) onlineList.push(p);
-                });
-              }
-            });
-          }
-          updateLocalAndState(onlineList);
-        } catch (e) {}
-      };
+      attachPresenceListenersIfNeeded();
 
-      activePresenceChannel
-        .on('presence', { event: 'sync' }, handlePresenceSync)
-        .on('presence', { event: 'join' }, handlePresenceSync)
-        .on('presence', { event: 'leave' }, handlePresenceSync)
-        .subscribe(status => {
-          if (status === 'SUBSCRIBED') {
-            sendPresencePing();
-          }
-        });
+      activePresenceChannel.subscribe(status => {
+        if (status === 'SUBSCRIBED') {
+          sendPresencePing();
+        }
+      });
     } catch (err) {
       console.warn('Realtime presence notice:', err);
     }
@@ -353,6 +368,7 @@ export function subscribeToPresence(user, currentView, onPresenceSync) {
   }
 
   initGlobalPresenceTracker();
+  attachPresenceListenersIfNeeded();
   sendPresencePing();
 
   return () => {
