@@ -219,6 +219,30 @@ export default function FacultyDatabasePage({ onBack }) {
                       📋
                     </button>
                   </div>
+
+                  {prof.phone && (
+                    <div className="faculty-email-row" style={{ marginTop: '4px' }}>
+                      <a
+                        href={`tel:${prof.phone.replace(/[\s-]/g, '')}`}
+                        className="faculty-email-link"
+                        style={{ color: 'var(--success)' }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        📞 {prof.phone}
+                      </a>
+                      <button
+                        className="copy-email-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText(prof.phone);
+                          showToast(`Copied ${prof.phone}!`);
+                        }}
+                        title="Copy Phone Number"
+                      >
+                        📋
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {prof.expertise && prof.expertise.length > 0 && (
@@ -314,6 +338,15 @@ export default function FacultyDatabasePage({ onBack }) {
                   >
                     ✉️ {selectedProf.email}
                   </a>
+                  {selectedProf.phone && (
+                    <a
+                      href={`tel:${selectedProf.phone.replace(/[\s-]/g, '')}`}
+                      className="faculty-room-pill"
+                      style={{ textDecoration: 'none', color: 'var(--success)' }}
+                    >
+                      📞 {selectedProf.phone}
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
