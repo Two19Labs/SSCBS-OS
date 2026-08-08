@@ -256,4 +256,109 @@ export function useNotificationEngine() {
       supabase.removeChannel(channel);
     };
   }, [user, addNotification]);
+
+  // 3. Periodic Smart Polling for Team Finder Applications & Status Updates
+  useEffect(() => {
+    if (!user || !user.email || !hasValidCredentials) return;
+
+    const userEmail = user.email;
+
+    const pollTeamFinderNotifications = async () => {
+      try {
+        // A. Fetch squad posts created by current user
+        const { data: myPosts } = await supabase
+          .from('squad_posts')
+          .select('id, title, competition_name')
+          .eq('user_email', userEmail);
+
+        if (myPosts && myPosts.length > 0) {
+          const postIds = myPosts.map(p => p.id);
+          const postMap = {};
+          myPosts.forEach(p => { postMap[p.id] = p.competition_name || p.title || 'Team'; });
+
+          // Fetch pending applications for user's posts
+          const { data: incomingApps } = await supabase
+            .from('squad_applications')
+            .select('*')
+            .in('post_id', postIds)
+            .eq('status', 'pending');
+
+          if (incomingApps && incomingApps.length > 0) {
+            incomingApps.forEach(app => {
+              if (app.applicant_email !== userEmail) {
+                const notifKey = `team_req_${app.id}`;
+                if (!firedAlertsRef.current.has(notifKey)) {
+                  markAlertFired(notifKey);
+                  const postTitle = postMap[app.post_id] || 'Team';
+                  addNotification({
+                    id: notifKey,
+                    type: 'team_req',
+                    category: 'Team Finder',
+                    title: `📥 New Team Application`,
+                    body: `${app.applicant_name || 'A student'} requested to join your team for "${postTitle}"`,
+                    actionType: 'team_action',
+                    actionData: { appId: app.id, postId: app.post_id, applicantName: app.applicant_name, applicantEmail: app.applicant_email },
+                  });
+                }
+              }
+            });
+          }
+        }
+
+        // B. Fetch applications submitted by user to check for accept / decline updates
+        const { data: mySubmittedApps } = await supabase
+          .from('squad_applications')
+          .select('*')
+          .eq('applicant_email', userEmail)
+          .in('status', ['accepted', 'declined']);
+
+        if (mySubmittedApps && mySubmittedApps.length > 0) {
+          const postIds = [...new Set(mySubmittedApps.map(a => a.post_id))];
+          const { data: posts } = await supabase
+            .from('squad_posts')
+            .select('id, title, competition_name')
+            .in('id', postIds);
+
+          const postMap = {};
+          if (posts) posts.forEach(p => { postMap[p.id] = p.competition_name || p.title || 'Team'; });
+
+          mySubmittedApps.forEach(app => {
+            const notifKey = `team_${app.status}_${app.id}`;
+            if (!firedAlertsRef.current.has(notifKey)) {
+              markAlertFired(notifKey);
+              const postTitle = postMap[app.post_id] || 'Team';
+
+              if (app.status === 'accepted') {
+                addNotification({
+                  id: notifKey,
+                  type: 'team_accepted',
+                  category: 'Team Finder',
+                  title: `🎉 Application Accepted!`,
+                  body: `Your request to join "${postTitle}" was accepted by the team host!`,
+                  actionType: 'team_view',
+                  actionData: { postId: app.post_id },
+                });
+              } else if (app.status === 'declined') {
+                addNotification({
+                  id: notifKey,
+                  type: 'team_declined',
+                  category: 'Team Finder',
+                  title: `ℹ️ Application Status`,
+                  body: `Your request to join "${postTitle}" was declined.`,
+                  actionType: 'team_view',
+                  actionData: { postId: app.post_id },
+                });
+              }
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('Error polling Team Finder notifications:', err);
+      }
+    };
+
+    pollTeamFinderNotifications();
+    const interval = setInterval(pollTeamFinderNotifications, 15000); // Polls every 15s
+    return () => clearInterval(interval);
+  }, [user, addNotification]);
 }
