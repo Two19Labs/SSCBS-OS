@@ -159,7 +159,6 @@ export default function FacultyDatabasePage({ onBack }) {
               onClick={() => setSelectedProf(prof)}
               style={{ cursor: 'pointer' }}
             >
-              <div>
                 <div className="faculty-card-top">
                   <div className="faculty-avatar-container">
                     {prof.photoUrl ? (
@@ -245,20 +244,6 @@ export default function FacultyDatabasePage({ onBack }) {
                     </div>
                   )}
                 </div>
-
-                {prof.expertise && prof.expertise.length > 0 && (
-                  <div className="faculty-expertise-wrap">
-                    {prof.expertise.slice(0, 3).map((exp, idx) => (
-                      <span key={idx} className="expertise-tag">
-                        {exp}
-                      </span>
-                    ))}
-                    {prof.expertise.length > 3 && (
-                      <span className="expertise-tag">+{prof.expertise.length - 3} more</span>
-                    )}
-                  </div>
-                )}
-              </div>
 
               <div className="faculty-card-actions">
                 <a
