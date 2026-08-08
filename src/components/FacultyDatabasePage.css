@@ -10,7 +10,7 @@
   width: 100%;
   max-width: var(--content-max, 1160px);
   margin: 0 auto;
-  padding: 0 var(--page-pad-x, 16px) 100px var(--page-pad-x, 16px);
+  padding: 0 var(--page-pad-x, 16px) 120px var(--page-pad-x, 16px);
   animation: fadeIn 0.25s ease-in-out forwards;
 }
 
@@ -37,7 +37,7 @@
   border-radius: 8px;
   cursor: pointer;
   width: fit-content;
-  min-height: 38px;
+  min-height: 40px;
   transition: all 0.2s ease;
 }
 
@@ -116,6 +116,7 @@
   transition: all 0.2s ease;
   font-family: inherit;
   line-height: 1.4;
+  height: 44px;
 }
 
 .faculty-search-input:focus {
@@ -147,16 +148,17 @@
   transform: translateY(-50%);
   background: var(--track);
   border: none;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--ink-dim);
   cursor: pointer;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   transition: all 0.2s;
+  z-index: 2;
 }
 
 .faculty-search-clear:hover {
@@ -172,7 +174,11 @@
   overflow-x: auto;
   padding-bottom: 4px;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+}
+
+.faculty-filter-chips::-webkit-scrollbar {
+  display: none;
 }
 
 .faculty-filter-chip {
@@ -190,7 +196,8 @@
   align-items: center;
   gap: 6px;
   font-family: inherit;
-  min-height: 34px;
+  min-height: 36px;
+  flex-shrink: 0;
 }
 
 .faculty-filter-chip:hover {
@@ -234,6 +241,7 @@
   justify-content: space-between;
   transition: all 0.2s ease;
   position: relative;
+  min-width: 0;
 }
 
 .faculty-card:hover {
@@ -247,6 +255,7 @@
   gap: 14px;
   align-items: flex-start;
   margin-bottom: 14px;
+  min-width: 0;
 }
 
 .faculty-avatar-container {
@@ -281,6 +290,7 @@
 .faculty-info-header {
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 .faculty-name {
@@ -289,9 +299,8 @@
   color: var(--ink);
   margin: 0 0 2px 0;
   line-height: 1.3;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .faculty-degree {
@@ -311,6 +320,10 @@
   font-weight: 800;
   letter-spacing: 0.02em;
   text-transform: uppercase;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .badge-principal {
@@ -355,6 +368,7 @@
   flex-direction: column;
   gap: 8px;
   margin-bottom: 14px;
+  min-width: 0;
 }
 
 .faculty-room-pill {
@@ -370,6 +384,9 @@
   color: var(--ink);
   width: fit-content;
   max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .faculty-room-pill svg {
@@ -387,6 +404,7 @@
   padding: 6px 10px;
   border-radius: 8px;
   min-height: 38px;
+  min-width: 0;
 }
 
 .faculty-email-link {
@@ -397,6 +415,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex: 1;
+  min-width: 0;
 }
 
 .faculty-email-link:hover {
@@ -404,19 +424,20 @@
 }
 
 .copy-email-btn {
-  background: transparent;
-  border: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
   color: var(--ink-dim);
   cursor: pointer;
-  padding: 4px 6px;
+  padding: 4px 8px;
   border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.85rem;
   transition: all 0.2s;
-  min-width: 28px;
-  min-height: 28px;
+  min-width: 32px;
+  min-height: 32px;
+  flex-shrink: 0;
 }
 
 .copy-email-btn:hover {
@@ -449,7 +470,8 @@
   background: var(--accent);
   color: var(--on-accent);
   border: none;
-  min-height: 40px;
+  min-height: 42px;
+  width: 100%;
 }
 
 .faculty-btn-primary:hover {
@@ -489,8 +511,8 @@
   position: absolute;
   top: 16px;
   right: 16px;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: var(--tint);
   border: 1px solid var(--border);
@@ -566,7 +588,10 @@
 /* Mobile Devices (≤ 640px) */
 @media (max-width: 640px) {
   .faculty-db-page {
-    padding-bottom: 110px; /* Safe distance for mobile bottom navigation */
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-bottom: 120px; /* Safe clearance for mobile bottom nav bar */
+    gap: 14px;
   }
 
   .faculty-grid {
@@ -574,18 +599,30 @@
     gap: 12px;
   }
 
+  .faculty-db-header {
+    gap: 10px;
+    padding-bottom: 12px;
+  }
+
   .faculty-db-title-row h2 {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
+  }
+
+  .faculty-db-subtitle {
+    font-size: 0.8rem;
+    line-height: 1.35;
   }
 
   .faculty-controls-card {
     padding: 12px;
     gap: 10px;
+    border-radius: 12px;
   }
 
   .faculty-search-input {
     font-size: 0.85rem;
     padding: 10px 36px 10px 38px;
+    height: 42px;
   }
 
   .faculty-search-icon {
@@ -594,25 +631,56 @@
 
   .faculty-card {
     padding: 14px;
+    border-radius: 12px;
+  }
+
+  .faculty-card-top {
+    gap: 12px;
+    margin-bottom: 12px;
   }
 
   .faculty-avatar-container {
-    width: 64px;
-    height: 64px;
+    width: 58px;
+    height: 58px;
     border-radius: 10px;
   }
 
   .faculty-name {
-    font-size: 0.975rem;
+    font-size: 0.95rem;
   }
 
   .faculty-degree {
-    font-size: 0.775rem;
+    font-size: 0.75rem;
     margin-bottom: 6px;
   }
 
+  .faculty-designation-badge {
+    font-size: 0.675rem;
+    padding: 2px 6px;
+  }
+
+  .faculty-email-row {
+    padding: 5px 8px;
+    min-height: 36px;
+  }
+
+  .faculty-email-link {
+    font-size: 0.775rem;
+  }
+
+  .copy-email-btn {
+    min-width: 30px;
+    min-height: 30px;
+    padding: 2px 4px;
+  }
+
+  .faculty-btn-primary {
+    min-height: 42px;
+    font-size: 0.825rem;
+  }
+
   .faculty-toast {
-    bottom: 80px;
+    bottom: 84px;
     left: 16px;
     right: 16px;
     text-align: center;

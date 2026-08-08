@@ -431,7 +431,6 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
             <span className="ist-pill">
               IST {String(hour % 12 || 12).padStart(2, '0')}:{String(time.getMinutes()).padStart(2, '0')}:{String(time.getSeconds()).padStart(2, '0')} {hour >= 12 ? 'PM' : 'AM'}
             </span>
-            <NotificationCenter onNavigate={onNavigate} />
           </div>
         </div>
 
