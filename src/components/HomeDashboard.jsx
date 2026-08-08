@@ -405,7 +405,6 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
 
   const tools = [
     { id: 'society-tracker', micro: 'SOON', microClass: 'dim', title: 'Society Recruitment Tracker', desc: 'Keep track of info & form deadlines for societies', Icon: UsersIcon, locked: true },
-    ...(hasFacultyDbAccess ? [{ id: 'faculty-db', micro: 'PREVIEW', microClass: 'success', title: 'Faculty Database', desc: 'Professors, room numbers, emails & bios', Icon: UserIcon, locked: false }] : []),
     ...(hasTeamFinderAccess ? [{ id: 'team-finder', micro: 'NEW', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post comp openings', Icon: TrophyIcon, locked: false }] : []),
     { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
     { id: 'waiver', micro: 'SOON', microClass: 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },

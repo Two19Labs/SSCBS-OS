@@ -172,6 +172,7 @@ function App() {
   const isAdmin = isAdminEmail(user.email);
   const hasTeamFinderAccess = featureFlags['team-finder'] || canAccessTeamFinder(user.email);
   const hasEmptyRoomAccess = featureFlags['empty-room'] || canAccessEmptyRoom(user.email);
+  const hasFacultyDbAccess = canAccessFacultyDatabase(user.email);
 
   const openTool = (id) => {
     setIsMobileSidebarOpen(false);
@@ -208,6 +209,7 @@ function App() {
       items: [
         { id: 'find-prof', label: 'Find My Professor', Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
         { id: 'empty-room', label: 'Empty Room Finder', Icon: DoorIcon },
+        ...(hasFacultyDbAccess ? [{ id: 'faculty-db', label: 'Faculty Directory', Icon: UserIcon }] : []),
         ...(hasTeamFinderAccess ? [{ id: 'team-finder', label: 'Team Finder', Icon: TrophyIcon }] : []),
         { id: 'waiver', label: 'Waiver Tool', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
         { id: 'gpa', label: 'GPA Calculator', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
@@ -233,6 +235,7 @@ function App() {
   const pageTitle = {
     tools: 'Tools',
     'find-prof': 'Find My Professor',
+    'faculty-db': 'Faculty Directory',
     'team-finder': 'Team Finder & Compete Hub',
     'empty-room': 'Empty Room Finder',
     admin: 'Admin Console',
