@@ -260,7 +260,15 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
       return (
         <div className="home-live-card">
           <div className="live-topline">
-            <span className="micro-label success">● IN CLASS</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+              <span className="micro-label success">● IN CLASS</span>
+              {(activeClass.isPractical || /\b\(P\)\b/i.test(activeClass.subject) || /\bPractical\b/i.test(activeClass.subject)) && (
+                <span className="badge-practical">🧪 Practical</span>
+              )}
+              {(activeClass.isUnsupervised || activeClass.teacher === 'Unsupervised' || /\bunsupervised\b/i.test(activeClass.subject || '')) && (
+                <span className="badge-unsupervised">👤 Unsupervised</span>
+              )}
+            </div>
             <span className="live-countdown">{remaining()}</span>
           </div>
           <div className="live-subject">{activeClass.subject}</div>
@@ -276,9 +284,15 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
           </div>
           {nextClass && nextPeriod && (
             <div className="live-next-row">
-              <span className="live-next-label">
+              <span className="live-next-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                 Next — {nextClass.isBreak ? 'Break' : nextClass.subject}
                 {resolveRoom(nextClass.room) && !nextClass.isBreak ? ` · ${resolveRoom(nextClass.room)}` : ''}
+                {(!nextClass.isBreak && (nextClass.isPractical || /\b\(P\)\b/i.test(nextClass.subject) || /\bPractical\b/i.test(nextClass.subject))) && (
+                  <span className="badge-practical-sm">Practical</span>
+                )}
+                {(!nextClass.isBreak && (nextClass.isUnsupervised || nextClass.teacher === 'Unsupervised' || /\bunsupervised\b/i.test(nextClass.subject || ''))) && (
+                  <span className="badge-unsupervised-sm">Unsupervised</span>
+                )}
               </span>
               <span className="live-next-time">{nextPeriod.startLabel}</span>
             </div>
@@ -303,9 +317,15 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
           </div>
           {nextClass && nextPeriod && (
             <div className="live-next-row">
-              <span className="live-next-label">
+              <span className="live-next-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                 Next — {nextClass.subject}
                 {resolveRoom(nextClass.room) ? ` · ${resolveRoom(nextClass.room)}` : ''}
+                {(nextClass.isPractical || /\b\(P\)\b/i.test(nextClass.subject) || /\bPractical\b/i.test(nextClass.subject)) && (
+                  <span className="badge-practical-sm">Practical</span>
+                )}
+                {(nextClass.isUnsupervised || nextClass.teacher === 'Unsupervised' || /\bunsupervised\b/i.test(nextClass.subject || '')) && (
+                  <span className="badge-unsupervised-sm">Unsupervised</span>
+                )}
               </span>
               <span className="live-next-time">{nextPeriod.startLabel}</span>
             </div>
@@ -330,9 +350,15 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
           </div>
           {nextClass && nextPeriod && (
             <div className="live-next-row">
-              <span className="live-next-label">
+              <span className="live-next-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                 Next — {nextClass.subject}
                 {resolveRoom(nextClass.room) ? ` · ${resolveRoom(nextClass.room)}` : ''}
+                {(nextClass.isPractical || /\b\(P\)\b/i.test(nextClass.subject) || /\bPractical\b/i.test(nextClass.subject)) && (
+                  <span className="badge-practical-sm">Practical</span>
+                )}
+                {(nextClass.isUnsupervised || nextClass.teacher === 'Unsupervised' || /\bunsupervised\b/i.test(nextClass.subject || '')) && (
+                  <span className="badge-unsupervised-sm">Unsupervised</span>
+                )}
               </span>
               <span className="live-next-time">{nextPeriod.startLabel}</span>
             </div>
@@ -640,7 +666,17 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
                                   </div>
                                 ) : (
                                   <div className="timeline-class-card">
-                                    <h4 className="timeline-subject">{matchClass.subject}</h4>
+                                    <div className="card-top-bar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px', marginBottom: '4px' }}>
+                                      <h4 className="timeline-subject" style={{ margin: 0 }}>{matchClass.subject}</h4>
+                                      <div className="badges-group" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                        {(matchClass.isPractical || /\b\(P\)\b/i.test(matchClass.subject) || /\bPractical\b/i.test(matchClass.subject)) && (
+                                          <span className="badge-practical-sm">Practical</span>
+                                        )}
+                                        {(matchClass.isUnsupervised || matchClass.teacher === 'Unsupervised' || /\bunsupervised\b/i.test(matchClass.subject || '')) && (
+                                          <span className="badge-unsupervised-sm">Unsupervised</span>
+                                        )}
+                                      </div>
+                                    </div>
                                     <div className="timeline-card-meta">
                                       {matchClass.teacher && matchClass.teacher !== '-' && (
                                         <div className="timeline-meta-item">
