@@ -4,6 +4,7 @@ import { useConfig } from '../context/ConfigContext';
 import { useTimetable } from '../context/TimetableContext';
 import { PERIODS, DAYS } from '../data/timetables';
 import NoticeBoard from './NoticeBoard';
+import NotificationCenter from './NotificationCenter';
 import { SearchIcon, PercentIcon, CalculatorIcon, FileIcon, TrophyIcon, DoorIcon, HeartIcon, UsersIcon } from './icons';
 import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom } from '../lib/admin';
 
@@ -276,9 +277,12 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
                 : 'PROFILE NOT CONFIGURED'}
             </div>
           </div>
-          <span className="ist-pill">
-            IST {String(hour % 12 || 12).padStart(2, '0')}:{String(time.getMinutes()).padStart(2, '0')}:{String(time.getSeconds()).padStart(2, '0')} {hour >= 12 ? 'PM' : 'AM'}
-          </span>
+          <div className="home-greeting-actions" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span className="ist-pill">
+              IST {String(hour % 12 || 12).padStart(2, '0')}:{String(time.getMinutes()).padStart(2, '0')}:{String(time.getSeconds()).padStart(2, '0')} {hour >= 12 ? 'PM' : 'AM'}
+            </span>
+            <NotificationCenter onNavigate={onNavigate} />
+          </div>
         </div>
 
         {renderLiveCard()}

@@ -443,24 +443,17 @@ function App() {
             <span className="topbar-title">{pageTitle || 'SSCBS OS'}</span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <NotificationCenter onNavigate={openTool} />
-            <button
-              className="topbar-avatar"
-              onClick={() => setView('profile')}
-              aria-label="Profile"
-            >
-              {displayName.charAt(0).toUpperCase()}
-            </button>
-          </div>
+          <NotificationCenter onNavigate={openTool} />
         </header>
 
         {/* ── Main content ── */}
         <main className="app-main">
-          <div className="page-heading-desktop" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h1 style={{ margin: 0 }}>{pageTitle || 'Home Workspace'}</h1>
-            <NotificationCenter onNavigate={openTool} />
-          </div>
+          {pageTitle && (
+            <div className="page-heading-desktop" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h1 style={{ margin: 0 }}>{pageTitle}</h1>
+              <NotificationCenter onNavigate={openTool} />
+            </div>
+          )}
           {renderView()}
           <FooterCredit />
         </main>
