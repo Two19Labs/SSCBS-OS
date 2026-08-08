@@ -51,7 +51,6 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
 
   // Timetable UI states
   const [showTimeline, setShowTimeline] = useState(false);
-  const [selectedDay, setSelectedDay] = useState(null); // defaults to current day
   const [showWeeklyModal, setShowWeeklyModal] = useState(false);
   const [weeklyLayoutMode, setWeeklyLayoutMode] = useState('grid');
   const [activeWeeklyTab, setActiveWeeklyTab] = useState('Monday');
@@ -95,12 +94,8 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
   const isWeekend = currentDayName === 'Sunday' || currentDayName === 'Saturday';
   const currentMinutes = hour * 60 + time.getMinutes();
 
-  // Active viewing day (defaults to currentDayName if valid day, else Monday)
-  const activeViewingDay = selectedDay || (DAYS.includes(currentDayName) ? currentDayName : 'Monday');
-
   const timetable = hasProfile ? getTimetable(course, semester, section) : null;
   const todayClasses = timetable ? timetable[currentDayName] || [] : [];
-  const selectedDayClasses = timetable ? timetable[activeViewingDay] || [] : [];
 
   // Check holiday
   const todayStr = time.getFullYear() + '-' + String(time.getMonth() + 1).padStart(2, '0') + '-' + String(time.getDate()).padStart(2, '0');
@@ -226,7 +221,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
           className={`home-tt-btn ${showTimeline ? 'active' : ''}`}
           onClick={() => setShowTimeline(!showTimeline)}
         >
-          {showTimeline ? 'Hide Schedule ▲' : "View Today's Schedule ▼"}
+          {showTimeline ? 'Hide Today Schedule ▲' : "View Today Schedule ▼"}
         </button>
         <button
           className="home-tt-btn primary"
@@ -416,94 +411,62 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
         {/* Live Class Card */}
         {renderLiveCard()}
 
-        {/* Expandable Daily Timetable Breakdown */}
-        {hasProfile && showTimeline && (
-          <div className="home-timeline-container animate-fade-in">
-            <div className="home-timeline-header">
-              <h3>Timetable Schedule</h3>
-              {/* Day Selector Pills */}
-              <div className="home-day-pills">
-                {DAYS.map((d) => {
-                  const isSelected = activeViewingDay === d;
-                  const isToday = currentDayName === d;
+        {/* Original Daily Timeline Tracker */}
+        {hasProfile && showTimeline && !isWeekend && !todayHoliday && (
+          <div className="daily-timeline-section animate-fade-in" style={{ marginBottom: '24px' }}>
+            <h3>Today's Timeline</h3>
+            <div className="timeline-trail-container">
+              <div className="timeline-trail">
+                {todayClasses.map((cls) => {
+                  const periodInfo = PERIODS.find(p => p.id === cls.period || (cls.isBreak && p.id === 0));
+                  if (!periodInfo) return null;
+                  
+                  const startMin = parseTimeToMinutes(periodInfo.start);
+                  const endMin = parseTimeToMinutes(periodInfo.end);
+                  
+                  const isPast = currentMinutes >= endMin;
+                  const isActive = currentMinutes >= startMin && currentMinutes < endMin;
+                  const isUpcoming = currentMinutes < startMin;
+                  
                   return (
-                    <button
-                      key={d}
-                      className={`home-day-pill ${isSelected ? 'selected' : ''} ${isToday ? 'is-today' : ''}`}
-                      onClick={() => setSelectedDay(d)}
+                    <div 
+                      key={cls.period} 
+                      className={`timeline-slot-card ${isActive ? 'active' : ''} ${isPast ? 'past' : ''} ${isUpcoming ? 'upcoming' : ''}`}
                     >
-                      <span>{d.substring(0, 3)}</span>
-                      {isToday && <span className="today-dot"></span>}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* List of periods for selected day */}
-            <div className="home-timeline-list">
-              {selectedDayClasses.length === 0 ? (
-                <div className="timeline-empty-slot">
-                  <p>No scheduled classes for {activeViewingDay}.</p>
-                </div>
-              ) : (
-                selectedDayClasses.map((cls) => {
-                  const p = PERIODS.find(x => x.id === cls.period || (cls.isBreak && x.id === 0));
-                  if (!p) return null;
-                  const startMin = parseTimeToMinutes(p.start);
-                  const endMin = parseTimeToMinutes(p.end);
-
-                  const isViewingCurrentDay = activeViewingDay === currentDayName && !isWeekend && !todayHoliday;
-                  const isPast = isViewingCurrentDay && currentMinutes >= endMin;
-                  const isActive = isViewingCurrentDay && currentMinutes >= startMin && currentMinutes < endMin;
-                  const isUpcoming = isViewingCurrentDay && currentMinutes < startMin;
-
-                  const roomStr = resolveRoom(cls.room);
-
-                  return (
-                    <div
-                      key={cls.period}
-                      className={`home-timeline-card ${isActive ? 'active' : ''} ${isPast ? 'past' : ''} ${isUpcoming ? 'upcoming' : ''}`}
-                    >
-                      <div className="ht-time-col">
-                        <span className="ht-start">{p.startLabel}</span>
-                        <span className="ht-end">{p.endLabel}</span>
+                      <div className="timeline-slot-time">
+                        <span>{periodInfo.startLabel}</span>
                       </div>
-                      <div className="ht-info-col">
-                        <div className="ht-subject-row">
-                          <h4 className="ht-subject">{cls.isBreak ? 'Break (Infinity Hour)' : cls.subject}</h4>
-                          {isActive && <span className="ht-badge active">ONGOING</span>}
+                      <div className="timeline-slot-content">
+                        <div className="timeline-subject-header" style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                          <h5 className="slot-subject" title={cls.isBreak ? "Break" : cls.subject}>
+                            {cls.isBreak ? "Break" : cls.subject}
+                          </h5>
                           {!cls.isBreak && (cls.isPractical || /\b\(P\)\b/i.test(cls.subject) || /\bPractical\b/i.test(cls.subject)) && (
-                            <span className="ht-badge practical">Practical</span>
+                            <span className="badge-practical-xs">Practical</span>
                           )}
                           {!cls.isBreak && (cls.isUnsupervised || cls.teacher === 'Unsupervised' || /\bunsupervised\b/i.test(cls.subject || '')) && (
-                            <span className="ht-badge unsupervised">Unsupervised</span>
+                            <span className="badge-unsupervised-xs">Unsupervised</span>
                           )}
                         </div>
-                        {!cls.isBreak && cls.subject !== 'Free' ? (
-                          <div className="ht-meta-row">
-                            {cls.teacher && cls.teacher !== '-' && <span>Prof. {cls.teacher}</span>}
-                            {roomStr && <span>{roomStr.toLowerCase().startsWith('room') ? roomStr : `Room ${roomStr}`}</span>}
-                          </div>
-                        ) : cls.isBreak ? (
-                          <div className="ht-meta-row dim">Nescafe / Amul / Lawn</div>
+                        {!cls.isBreak && cls.subject !== 'Free' && resolveRoom(cls.room) ? (
+                          <p className="slot-meta" title={`${resolveRoom(cls.room)} • ${cls.teacher}`}>{resolveRoom(cls.room)} • {cls.teacher}</p>
                         ) : (
-                          <div className="ht-meta-row dim">No lecture scheduled</div>
+                          <p className="slot-meta-empty">-</p>
                         )}
                       </div>
                     </div>
                   );
-                })
-              )}
+                })}
+              </div>
             </div>
           </div>
         )}
 
         {/* Time Warp Testing Debugger for Admins */}
         {canTimeWarp && (
-          <div className="debugger-collapsible" style={{ marginTop: '12px' }}>
+          <div className="debugger-collapsible" style={{ marginBottom: '20px' }}>
             <button className="btn-toggle-debugger" onClick={() => setShowDebugger(!showDebugger)}>
-              {showDebugger ? 'Hide Time Warp Controls ▲' : 'Show Time Warp Controls (Admin Debug) ▼'}
+              {showDebugger ? 'Hide Time Warp Controls ▲' : 'Show Time Warp Controls (Test timewarp/weekends) ▼'}
             </button>
             {showDebugger && (
               <div className="debugger-panel animate-slide-down">
@@ -574,7 +537,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
         <NoticeBoard onNavigate={onNavigate} />
       </div>
 
-      {/* Full Weekly Timetable Modal Overlay */}
+      {/* Original Full Weekly Timetable Modal Dialog */}
       {showWeeklyModal && hasProfile && (
         <div className="weekly-modal-overlay" onClick={() => setShowWeeklyModal(false)}>
           <div className="weekly-modal-card" onClick={(e) => e.stopPropagation()}>
@@ -584,7 +547,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
                 <p>{course} Sem {semester} Section {section}</p>
               </div>
               <div className="weekly-layout-toggle-group">
-                <button
+                <button 
                   className={`btn-layout-toggle ${weeklyLayoutMode === 'grid' ? 'active' : ''}`}
                   onClick={() => setWeeklyLayoutMode('grid')}
                   title="Grid View"
@@ -597,7 +560,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
                   </svg>
                   <span>Grid</span>
                 </button>
-                <button
+                <button 
                   className={`btn-layout-toggle ${weeklyLayoutMode === 'list' ? 'active' : ''}`}
                   onClick={() => setWeeklyLayoutMode('list')}
                   title="List View"
@@ -606,16 +569,20 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
                     <line x1="8" y1="6" x2="21" y2="6" />
                     <line x1="8" y1="12" x2="21" y2="12" />
                     <line x1="8" y1="18" x2="21" y2="18" />
+                    <line x1="3" y1="6" x2="3.01" y2="6" strokeWidth="3" />
+                    <line x1="3" y1="12" x2="3.01" y2="12" strokeWidth="3" />
+                    <line x1="3" y1="18" x2="3.01" y2="18" strokeWidth="3" />
                   </svg>
                   <span>List</span>
                 </button>
               </div>
               <button className="close-btn" onClick={() => setShowWeeklyModal(false)}>×</button>
             </header>
-
+            
             <div className="weekly-modal-body">
               {weeklyLayoutMode === 'list' ? (
                 <div className="weekly-list-view">
+                  {/* Day tabs selector */}
                   <div className="weekly-tabs-container">
                     {DAYS.map((day) => {
                       const isTabActive = activeWeeklyTab === day;
@@ -628,84 +595,189 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
                         >
                           <span className="tab-day-name">{day.substring(0, 3)}</span>
                           <span className="tab-day-full">{day}</span>
-                          {isToday && <span className="today-dot"></span>}
                         </button>
                       );
                     })}
                   </div>
 
+                  {/* List of periods for selected day */}
                   <div className="weekly-list-timeline">
-                    {(timetable ? timetable[activeWeeklyTab] || [] : []).map((cls) => {
-                      const p = PERIODS.find(x => x.id === cls.period || (cls.isBreak && x.id === 0));
-                      if (!p) return null;
-                      const roomStr = resolveRoom(cls.room);
-                      return (
-                        <div key={cls.period} className="list-slot-row">
-                          <div className="slot-time-col">
-                            <span className="slot-time-start">{p.startLabel}</span>
-                            <span className="slot-time-end">{p.endLabel}</span>
-                          </div>
-                          <div className="slot-details-col">
-                            <div className="slot-title-line">
-                              <span className="slot-subject-title">{cls.isBreak ? 'Break' : cls.subject}</span>
-                              {!cls.isBreak && (cls.isPractical || /\b\(P\)\b/i.test(cls.subject)) && (
-                                <span className="badge-practical-xs">Practical</span>
+                    {(() => {
+                      const dayClasses = timetable ? timetable[activeWeeklyTab] || [] : [];
+                      return PERIODS.map((period) => {
+                        const isBreakPeriod = period.isBreak;
+                        const matchClass = dayClasses.find(c => c.period === period.id || (isBreakPeriod && c.isBreak));
+                        const isSlotActive = activeWeeklyTab === currentDayName && activeClass && activeClass.period === period.id;
+                        
+                        return (
+                          <div 
+                            key={period.id} 
+                            className={`list-timeline-item ${isSlotActive ? 'active-timeline-item' : ''}`}
+                          >
+                            <div className="timeline-time-col">
+                              <span className="timeline-period-label">{period.isBreak ? 'Break' : period.label}</span>
+                              <span className="timeline-time-label">{period.startLabel} - {period.endLabel}</span>
+                              {isSlotActive && <span className="timeline-live-badge">LIVE NOW</span>}
+                            </div>
+                            
+                            <div className="timeline-card-col">
+                              {isBreakPeriod ? (
+                                <div className="timeline-break-card">
+                                  <span className="break-card-emoji">🍽️</span>
+                                  <div>
+                                    <h5>Infinity Hour (Break)</h5>
+                                    <p>Nescafe, Amul, or Lawn chill period</p>
+                                  </div>
+                                </div>
+                              ) : matchClass ? (
+                                matchClass.subject === 'Free' ? (
+                                  <div className="timeline-free-card">
+                                    <span className="free-card-emoji">☕</span>
+                                    <div>
+                                      <h5>Free Block</h5>
+                                      <p>No lecture scheduled</p>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="timeline-class-card">
+                                    <h4 className="timeline-subject">{matchClass.subject}</h4>
+                                    <div className="timeline-card-meta">
+                                      {matchClass.teacher && matchClass.teacher !== '-' && (
+                                        <div className="timeline-meta-item">
+                                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                                          </svg>
+                                          <span>{matchClass.teacher}</span>
+                                        </div>
+                                      )}
+                                      {resolveRoom(matchClass.room) && resolveRoom(matchClass.room) !== '-' && (
+                                        <div className="timeline-meta-item room-tag">
+                                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+                                          </svg>
+                                          <span>{resolveRoom(matchClass.room)}</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                )
+                              ) : (
+                                <div className="timeline-empty-card">
+                                  <span className="empty-dash">-</span>
+                                </div>
                               )}
                             </div>
-                            {!cls.isBreak && cls.subject !== 'Free' ? (
-                              <p className="slot-teacher-room">
-                                {cls.teacher && cls.teacher !== '-' ? `Prof. ${cls.teacher}` : ''}
-                                {cls.teacher && roomStr ? ' · ' : ''}
-                                {roomStr ? (roomStr.toLowerCase().startsWith('room') ? roomStr : `Room ${roomStr}`) : ''}
-                              </p>
-                            ) : (
-                              <p className="slot-teacher-room dim">{cls.isBreak ? 'Infinity Hour' : 'Free period'}</p>
-                            )}
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      });
+                    })()}
                   </div>
                 </div>
               ) : (
-                /* Grid view of all days */
-                <div className="weekly-grid-view">
-                  <div className="weekly-grid-table">
-                    <div className="grid-header-row">
-                      <div className="grid-time-cell">Period</div>
-                      {DAYS.map(day => (
-                        <div key={day} className={`grid-day-header ${currentDayName === day ? 'today' : ''}`}>
-                          {day.substring(0, 3)}
-                        </div>
-                      ))}
-                    </div>
-                    {PERIODS.map(p => (
-                      <div key={p.id} className="grid-body-row">
-                        <div className="grid-time-cell">
-                          <span className="p-name">{p.label}</span>
-                          <span className="p-range">{p.start}</span>
-                        </div>
-                        {DAYS.map(day => {
-                          const clsList = timetable ? timetable[day] || [] : [];
-                          const cls = clsList.find(x => x.period === p.id || (p.id === 0 && x.isBreak));
-                          if (!cls) return <div key={day} className="grid-class-cell empty">-</div>;
-
-                          const roomStr = resolveRoom(cls.room);
-                          return (
-                            <div key={day} className={`grid-class-cell ${cls.isBreak ? 'break' : cls.subject === 'Free' ? 'free' : 'subject'}`}>
-                              <span className="cell-subject">{cls.isBreak ? 'Break' : cls.subject}</span>
-                              {!cls.isBreak && cls.subject !== 'Free' && (
-                                <span className="cell-subtext">{roomStr || cls.teacher}</span>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    ))}
-                  </div>
+                <div className="table-responsive">
+                  <table className="weekly-timetable-table">
+                    <thead>
+                      <tr>
+                        <th className="sticky-corner-cell">Day</th>
+                        {PERIODS.map((period) => (
+                          <th key={period.id} className={period.isBreak ? 'th-break-col' : ''}>
+                            <div className="th-period-label">{period.isBreak ? 'Break' : period.label}</div>
+                            <div className="th-time-label">{period.startLabel} - {period.endLabel}</div>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {DAYS.map((day) => {
+                        const dayCls = timetable ? timetable[day] || [] : [];
+                        const isToday = currentDayName === day;
+                        return (
+                          <tr key={day} className={isToday ? 'today-row' : ''}>
+                            <td className="day-name-cell">
+                              <strong>{day}</strong>
+                              {isToday && <span className="today-badge">TODAY</span>}
+                            </td>
+                            {PERIODS.map((period) => {
+                              if (period.isBreak) {
+                                return (
+                                  <td key={period.id} className="weekly-class-cell break-grid-cell">
+                                    <div className="cell-free-box break-box">
+                                      <span className="free-emoji">🍽️</span>
+                                      <span className="free-text">Infinity Hour</span>
+                                    </div>
+                                  </td>
+                                );
+                              }
+                              const matchClass = dayCls.find(c => c.period === period.id);
+                              const isCellActive = currentDayName === day && activeClass && activeClass.period === period.id;
+                              return (
+                                <td key={period.id} className={`weekly-class-cell ${matchClass?.subject === 'Free' ? 'free' : ''} ${isCellActive ? 'active-class-cell' : ''}`}>
+                                  {matchClass ? (
+                                    matchClass.subject === 'Free' ? (
+                                      <div className="cell-free-box">
+                                        <span className="free-emoji">☕</span>
+                                        <span className="free-text">Free Block</span>
+                                      </div>
+                                    ) : (
+                                      <div className="grid-cell-card">
+                                        <div className="grid-cell-badges" style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '2px' }}>
+                                          {isCellActive && <span className="live-cell-badge">LIVE</span>}
+                                          {(matchClass.isPractical || /\b\(P\)\b/i.test(matchClass.subject) || /\bPractical\b/i.test(matchClass.subject)) && (
+                                            <span className="grid-practical-badge" title="Practical Class">P</span>
+                                          )}
+                                          {(matchClass.isUnsupervised || matchClass.teacher === 'Unsupervised' || /\bunsupervised\b/i.test(matchClass.subject || '')) && (
+                                            <span className="grid-unsupervised-badge" title="Unsupervised Class">U</span>
+                                          )}
+                                        </div>
+                                        <div className="cell-subject">{matchClass.subject}</div>
+                                        <div className="cell-details-row">
+                                          {matchClass.teacher && matchClass.teacher !== '-' && (
+                                            <div className="cell-teacher" title="Teacher">
+                                              <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" strokeWidth="2.0" fill="none" className="cell-svg-icon">
+                                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                                <circle cx="12" cy="7" r="4" />
+                                              </svg>
+                                              {matchClass.teacher}
+                                            </div>
+                                          )}
+                                          {resolveRoom(matchClass.room) && resolveRoom(matchClass.room) !== '-' && (
+                                            <div className="cell-room" title="Room">
+                                              <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" strokeWidth="2.0" fill="none" className="cell-svg-icon">
+                                                <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+                                                <circle cx="12" cy="10" r="3" />
+                                              </svg>
+                                              {resolveRoom(matchClass.room)}
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    )
+                                  ) : (
+                                    <div className="cell-empty">-</div>
+                                  )}
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>
+            
+            <footer className="weekly-modal-footer">
+              <span className="break-info-note">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" strokeWidth="2" fill="none" style={{ flexShrink: 0, verticalAlign: 'middle', marginRight: '5px' }}>
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="16" x2="12" y2="12" />
+                  <line x1="12" y1="8" x2="12.01" y2="8" />
+                </svg>
+                Uses latest college email schedule (NOT real-time tracking; subject to professor changes/cancellation). Infinity Hour break: 12:00 PM – 1:00 PM.
+              </span>
+              <button className="btn-close-modal" onClick={() => setShowWeeklyModal(false)}>Close View</button>
+            </footer>
           </div>
         </div>
       )}
