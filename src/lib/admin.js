@@ -30,6 +30,16 @@ export function canAccessEmptyRoom(email) {
   return true; // Empty Room Finder is now live for all SSCBS students!
 }
 
+export const FACULTY_DB_TESTERS = [
+  'aditya.25015@sscbs.du.ac.in',
+];
+
+export function canAccessFacultyDatabase(email) {
+  if (!email || typeof email !== 'string') return false;
+  const normalized = email.toLowerCase().trim();
+  return FACULTY_DB_TESTERS.some((tester) => tester.toLowerCase() === normalized);
+}
+
 const TIMEWARP_KEY = 'sscbs-timewarp-enabled';
 
 export function isTimeWarpEnabled() {
@@ -39,4 +49,5 @@ export function isTimeWarpEnabled() {
 export function setTimeWarpEnabled(enabled) {
   localStorage.setItem(TIMEWARP_KEY, enabled ? 'true' : 'false');
 }
+
 

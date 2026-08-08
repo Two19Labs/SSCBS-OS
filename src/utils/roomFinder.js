@@ -195,6 +195,25 @@ export function getFloorFromRoom(roomStr) {
 }
 
 /**
+ * Get ordinal suffix for a number (e.g. 1 -> "1st", 2 -> "2nd", 3 -> "3rd", 4 -> "4th")
+ */
+export function getOrdinalSuffix(n) {
+  const num = Number(n);
+  if (isNaN(num) || num <= 0) return '';
+  const j = num % 10, k = num % 100;
+  if (j === 1 && k !== 11) {
+    return num + "st";
+  }
+  if (j === 2 && k !== 12) {
+    return num + "nd";
+  }
+  if (j === 3 && k !== 13) {
+    return num + "rd";
+  }
+  return num + "th";
+}
+
+/**
  * Get complete daily timeline for a specific room on a given day.
  */
 export function getRoomDailyTimeline(timetableData, day, roomName) {

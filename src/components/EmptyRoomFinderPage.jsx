@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useTimetable } from '../context/TimetableContext';
 import { useAuth } from '../context/AuthContext';
 import { PERIODS, DAYS } from '../data/timetables';
-import { getRoomStatuses, extractAllRoomsFromTimetable, getRoomDailyTimeline } from '../utils/roomFinder';
+import { getRoomStatuses, extractAllRoomsFromTimetable, getRoomDailyTimeline, getOrdinalSuffix } from '../utils/roomFinder';
 import { DoorIcon, SearchIcon, BackIcon, RefreshIcon, CalendarIcon } from './icons';
 import './EmptyRoomFinderPage.css';
 
@@ -128,7 +128,7 @@ export function EmptyRoomFinderPage({ onBack }) {
         isWeekend: false,
         bannerTitle: '🔒 COLLEGE NOT OPEN YET',
         reopenText: 'Re-opens today at 9:00 AM IST',
-        cardText: "College is closed, it'll open today at 9:00 AM"
+        cardText: "College is closed; it will open today at 9:00 AM"
       };
     }
 
@@ -138,7 +138,7 @@ export function EmptyRoomFinderPage({ onBack }) {
       isWeekend: false,
       bannerTitle: '🔒 COLLEGE CLOSED FOR THE DAY',
       reopenText: 'Re-opens tomorrow at 9:00 AM IST',
-      cardText: "College is closed, it'll open tomorrow at 9:00 AM"
+      cardText: "College is closed; it will open tomorrow at 9:00 AM"
     };
   }, [currentTime, livePeriod]);
 
@@ -219,7 +219,7 @@ export function EmptyRoomFinderPage({ onBack }) {
           <line x1="12" y1="8" x2="12.01" y2="8" />
         </svg>
         <span>
-          <strong>Note:</strong> Uses the latest official timetable sent by college via email. Classroom schedules and availability are subject to change or cancellation at the discretion of professors.
+          <strong>Note:</strong> Uses the latest official timetable sent by the college via email. Classroom schedules and availability are subject to change or cancellation at the discretion of professors.
         </span>
       </div>
 
@@ -403,7 +403,7 @@ export function EmptyRoomFinderPage({ onBack }) {
                 <div className="room-card-header">
                   <div className="room-title-box">
                     <span className="room-name">{item.room}</span>
-                    <span className="room-floor-tag">{item.floor > 0 ? `${item.floor}th Floor` : 'Campus'}</span>
+                    <span className="room-floor-tag">{item.floor > 0 ? `${getOrdinalSuffix(item.floor)} Floor` : 'Campus'}</span>
                   </div>
 
                   <span className={`room-status-badge ${isLiveHoliday ? 'holiday' : isLiveClosed ? 'closed' : item.isVacant ? 'vacant' : 'occupied'}`}>
@@ -495,7 +495,7 @@ export function EmptyRoomFinderPage({ onBack }) {
                 <DoorIcon size={22} />
                 <div>
                   <h3>{roomTimelineData.room} — Daily Schedule</h3>
-                  <p>{activeDay} • {roomTimelineData.floor > 0 ? `${roomTimelineData.floor}th Floor` : 'Campus'}</p>
+                  <p>{activeDay} • {roomTimelineData.floor > 0 ? `${getOrdinalSuffix(roomTimelineData.floor)} Floor` : 'Campus'}</p>
                 </div>
               </div>
 

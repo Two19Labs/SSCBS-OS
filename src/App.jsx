@@ -7,7 +7,7 @@ import HomeDashboard from './components/HomeDashboard';
 import ProfilePage from './components/ProfilePage';
 import ProfileModal from './components/ProfileModal';
 import NoticeBoard from './components/NoticeBoard';
-import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom } from './lib/admin';
+import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFacultyDatabase } from './lib/admin';
 import {
   HomeIcon,
   CalendarIcon,
@@ -38,6 +38,7 @@ import { useNotificationEngine } from './hooks/useNotificationEngine';
 // Lazy-loaded heavy page & tool chunks for fast initial app shell booting
 const WaiverToolPage = lazy(() => import('./components/WaiverToolPage'));
 const FindMyProfessorPage = lazy(() => import('./components/FindMyProfessorPage'));
+const FacultyDatabasePage = lazy(() => import('./components/FacultyDatabasePage'));
 const AdminConsolePage = lazy(() => import('./components/AdminConsolePage'));
 const GpaCalculatorModal = lazy(() => import('./components/GpaCalculatorModal'));
 const ContactPage = lazy(() => import('./components/ContactPage'));
@@ -55,8 +56,8 @@ const PageLoader = () => (
   </div>
 );
 
-const TOOL_VIEWS = ['find-prof', 'waiver', 'admin', 'team-finder', 'empty-room'];
-const VALID_VIEWS = ['home', 'find-prof', 'waiver', 'tools', 'buzz', 'profile', 'admin', 'contact', 'team-finder', 'empty-room'];
+const TOOL_VIEWS = ['find-prof', 'waiver', 'admin', 'team-finder', 'empty-room', 'faculty-db'];
+const VALID_VIEWS = ['home', 'find-prof', 'waiver', 'tools', 'buzz', 'profile', 'admin', 'contact', 'team-finder', 'empty-room', 'faculty-db'];
 
 const getInitialView = () => {
   if (typeof window !== 'undefined') {
@@ -248,6 +249,12 @@ function App() {
             <FindMyProfessorPage onBack={goBack} />
           </Suspense>
         );
+      case 'faculty-db':
+        return canAccessFacultyDatabase(user?.email) ? (
+          <Suspense fallback={<PageLoader />}>
+            <FacultyDatabasePage onBack={goBack} />
+          </Suspense>
+        ) : <HomeDashboard onNavigate={openTool} onOpenProfile={() => setView('profile')} />;
       case 'team-finder':
         return (
           <Suspense fallback={<PageLoader />}>

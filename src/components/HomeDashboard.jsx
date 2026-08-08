@@ -5,8 +5,8 @@ import { useTimetable } from '../context/TimetableContext';
 import { PERIODS, DAYS } from '../data/timetables';
 import NoticeBoard from './NoticeBoard';
 import NotificationCenter from './NotificationCenter';
-import { SearchIcon, PercentIcon, CalculatorIcon, FileIcon, TrophyIcon, DoorIcon, HeartIcon, UsersIcon } from './icons';
-import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, isTimeWarpEnabled } from '../lib/admin';
+import { SearchIcon, PercentIcon, CalculatorIcon, FileIcon, TrophyIcon, DoorIcon, HeartIcon, UsersIcon, UserIcon } from './icons';
+import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFacultyDatabase, isTimeWarpEnabled } from '../lib/admin';
 
 import './HomeDashboard.css';
 
@@ -221,7 +221,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
           className={`home-tt-btn ${showTimeline ? 'active' : ''}`}
           onClick={() => setShowTimeline(!showTimeline)}
         >
-          {showTimeline ? 'Hide Today Schedule ▲' : "View Today Schedule ▼"}
+          {showTimeline ? "Hide Today's Schedule ▲" : "View Today's Schedule ▼"}
         </button>
         <button
           className="home-tt-btn primary"
@@ -401,9 +401,11 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
 
   const hasTeamFinderAccess = featureFlags['team-finder'] || canAccessTeamFinder(user?.email);
   const hasEmptyRoomAccess = featureFlags['empty-room'] || canAccessEmptyRoom(user?.email);
+  const hasFacultyDbAccess = canAccessFacultyDatabase(user?.email);
 
   const tools = [
     { id: 'society-tracker', micro: 'SOON', microClass: 'dim', title: 'Society Recruitment Tracker', desc: 'Keep track of info & form deadlines for societies', Icon: UsersIcon, locked: true },
+    ...(hasFacultyDbAccess ? [{ id: 'faculty-db', micro: 'PREVIEW', microClass: 'success', title: 'Faculty Database', desc: 'Professors, room numbers, emails & bios', Icon: UserIcon, locked: false }] : []),
     ...(hasTeamFinderAccess ? [{ id: 'team-finder', micro: 'NEW', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post comp openings', Icon: TrophyIcon, locked: false }] : []),
     { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
     { id: 'waiver', micro: 'SOON', microClass: 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
