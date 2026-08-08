@@ -129,6 +129,7 @@ function AdminConsoleContent({ onBack }) {
   const [loadingNotices, setLoadingNotices] = useState(false);
   const [editingNoticeId, setEditingNoticeId] = useState(null);
   const [noticeSubTab, setNoticeSubTab] = useState('live'); // 'live' | 'pending' | 'requests' | 'roster'
+  const [noticeMobileSection, setNoticeMobileSection] = useState('list'); // 'list' | 'form'
   const [pendingNoticeDrafts, setPendingNoticeDrafts] = useState([]);
   const [drafterAccessRequests, setDrafterAccessRequests] = useState([]);
   const [approvedDrafters, setApprovedDrafters] = useState([]);
@@ -157,6 +158,7 @@ function AdminConsoleContent({ onBack }) {
       active_from: notice.active_from || '',
       active_to: notice.active_to || ''
     });
+    setNoticeMobileSection('form');
     const element = document.querySelector('.notice-creator-card');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -166,6 +168,7 @@ function AdminConsoleContent({ onBack }) {
   const handleCancelEdit = () => {
     setEditingNoticeId(null);
     setNoticeForm({ title: '', category: 'General', society: '', venue: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
+    setNoticeMobileSection('list');
   };
 
   const fetchAdminNotices = async () => {
@@ -2491,93 +2494,185 @@ STRICT EXTRACTION RULES:
                 </div>
               </div>
 
-              {/* Timetable Slots Table */}
+              {/* Timetable Slots Table & Mobile Cards */}
               <div className="schedule-table-container">
-                <table className="admin-schedule-table">
-                  <thead>
-                    <tr>
-                      <th>Period / Time</th>
-                      <th>Subject Title</th>
-                      <th>Professor Name</th>
-                      <th>Classroom</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {getActiveDayClasses().length === 0 ? (
+                <div className="desktop-schedule-table">
+                  <table className="admin-schedule-table">
+                    <thead>
                       <tr>
-                        <td colSpan="5" className="empty-schedule-td" style={{ textAlign: 'center', padding: '32px', color: 'var(--ink-dim)' }}>
-                          No classes found for {selectedCourse} Sem {selectedSem} Section {selectedSection} on {selectedDay}. Paste schedule text in the uploader above to parse & populate automatically.
-                        </td>
+                        <th>Period / Time</th>
+                        <th>Subject Title</th>
+                        <th>Professor Name</th>
+                        <th>Classroom</th>
+                        <th>Action</th>
                       </tr>
-                    ) : (
-                      getActiveDayClasses().map((slot, idx) => {
-                        const isEditing = editingSlotIdx === idx;
-                        return (
-                          <tr key={idx} className={slot.isBreak ? 'break-row-admin' : ''}>
-                            <td className="period-col-admin">
-                              <strong>{slot.isBreak ? 'Infinity Hour' : `Period ${slot.period}`}</strong>
-                            </td>
-                            <td>
-                              {isEditing ? (
-                                <input 
-                                  type="text" 
-                                  value={editFields.subject} 
+                    </thead>
+                    <tbody>
+                      {getActiveDayClasses().length === 0 ? (
+                        <tr>
+                          <td colSpan="5" className="empty-schedule-td" style={{ textAlign: 'center', padding: '32px', color: 'var(--ink-dim)' }}>
+                            No classes found for {selectedCourse} Sem {selectedSem} Section {selectedSection} on {selectedDay}. Paste schedule text in the uploader above to parse & populate automatically.
+                          </td>
+                        </tr>
+                      ) : (
+                        getActiveDayClasses().map((slot, idx) => {
+                          const isEditing = editingSlotIdx === idx;
+                          return (
+                            <tr key={idx} className={slot.isBreak ? 'break-row-admin' : ''}>
+                              <td className="period-col-admin">
+                                <strong>{slot.isBreak ? 'Infinity Hour' : `Period ${slot.period}`}</strong>
+                              </td>
+                              <td>
+                                {isEditing ? (
+                                  <input 
+                                    type="text" 
+                                    value={editFields.subject} 
+                                    onChange={(e) => setEditFields(prev => ({ ...prev, subject: e.target.value }))}
+                                    className="admin-edit-input"
+                                  />
+                                ) : (
+                                  <span>{slot.subject}</span>
+                                )}
+                              </td>
+                              <td>
+                                {isEditing ? (
+                                  <input 
+                                    type="text" 
+                                    value={editFields.teacher} 
+                                    onChange={(e) => setEditFields(prev => ({ ...prev, teacher: e.target.value }))}
+                                    className="admin-edit-input"
+                                    disabled={slot.isBreak}
+                                  />
+                                ) : (
+                                  <span>{slot.teacher}</span>
+                                )}
+                              </td>
+                              <td>
+                                {isEditing ? (
+                                  <input 
+                                    type="text" 
+                                    value={editFields.room} 
+                                    onChange={(e) => setEditFields(prev => ({ ...prev, room: e.target.value }))}
+                                    className="admin-edit-input"
+                                    disabled={slot.isBreak}
+                                  />
+                                ) : (
+                                  <span>{slot.room}</span>
+                                )}
+                              </td>
+                              <td className="action-col-admin">
+                                {isEditing ? (
+                                  <div className="edit-btn-row">
+                                    <button className="btn-action-save" onClick={handleManualSave}>Save Slot</button>
+                                    <button className="btn-action-cancel" onClick={() => setEditingSlotIdx(null)}>Cancel</button>
+                                  </div>
+                                ) : (
+                                  <button className="btn-action-edit" onClick={() => handleEditClick(idx, slot)}>Edit Slot</button>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile Cards View */}
+                <div className="schedule-cards-mobile">
+                  {getActiveDayClasses().length === 0 ? (
+                    <div className="empty-schedule-card">
+                      No classes found for {selectedCourse} Sem {selectedSem} Section {selectedSection} on {selectedDay}.
+                    </div>
+                  ) : (
+                    getActiveDayClasses().map((slot, idx) => {
+                      const isEditing = editingSlotIdx === idx;
+                      return (
+                        <div key={idx} className={`mobile-slot-card ${slot.isBreak ? 'is-break' : ''}`}>
+                          <div className="slot-card-header">
+                            <span className="slot-period-badge">
+                              {slot.isBreak ? 'Infinity Hour' : `Period ${slot.period}`}
+                            </span>
+                            {!isEditing && (
+                              <button className="btn-action-edit-mobile" onClick={() => handleEditClick(idx, slot)}>
+                                ✏️ Edit
+                              </button>
+                            )}
+                          </div>
+                          {isEditing ? (
+                            <div className="slot-card-edit-form">
+                              <label>
+                                <span>Subject Title</span>
+                                <input
+                                  type="text"
+                                  value={editFields.subject}
                                   onChange={(e) => setEditFields(prev => ({ ...prev, subject: e.target.value }))}
                                   className="admin-edit-input"
                                 />
-                              ) : (
-                                <span>{slot.subject}</span>
-                              )}
-                            </td>
-                            <td>
-                              {isEditing ? (
-                                <input 
-                                  type="text" 
-                                  value={editFields.teacher} 
+                              </label>
+                              <label>
+                                <span>Professor Name</span>
+                                <input
+                                  type="text"
+                                  value={editFields.teacher}
                                   onChange={(e) => setEditFields(prev => ({ ...prev, teacher: e.target.value }))}
                                   className="admin-edit-input"
                                   disabled={slot.isBreak}
                                 />
-                              ) : (
-                                <span>{slot.teacher}</span>
-                              )}
-                            </td>
-                            <td>
-                              {isEditing ? (
-                                <input 
-                                  type="text" 
-                                  value={editFields.room} 
+                              </label>
+                              <label>
+                                <span>Classroom</span>
+                                <input
+                                  type="text"
+                                  value={editFields.room}
                                   onChange={(e) => setEditFields(prev => ({ ...prev, room: e.target.value }))}
                                   className="admin-edit-input"
                                   disabled={slot.isBreak}
                                 />
-                              ) : (
-                                <span>{slot.room}</span>
-                              )}
-                            </td>
-                            <td className="action-col-admin">
-                              {isEditing ? (
-                                <div className="edit-btn-row">
-                                  <button className="btn-action-save" onClick={handleManualSave}>Save Slot</button>
-                                  <button className="btn-action-cancel" onClick={() => setEditingSlotIdx(null)}>Cancel</button>
+                              </label>
+                              <div className="slot-edit-actions">
+                                <button className="btn-action-save" onClick={handleManualSave}>Save Slot</button>
+                                <button className="btn-action-cancel" onClick={() => setEditingSlotIdx(null)}>Cancel</button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="slot-card-details">
+                              <div className="slot-subject">{slot.subject}</div>
+                              {!slot.isBreak && (
+                                <div className="slot-meta-row">
+                                  {slot.teacher && <span className="slot-teacher">👨‍🏫 {slot.teacher}</span>}
+                                  {slot.room && <span className="slot-room">📍 Room {slot.room}</span>}
                                 </div>
-                              ) : (
-                                <button className="btn-action-edit" onClick={() => handleEditClick(idx, slot)}>Edit Slot</button>
                               )}
-                            </td>
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
               </div>
             </div>
 
           </div>
         ) : activeTab === 'notices' ? (
-          <div className="tab-pane notices-pane">
+          <div className={`tab-pane notices-pane ${noticeMobileSection === 'form' ? 'show-form' : 'show-list'}`}>
+            <div className="admin-mobile-notice-switcher">
+              <button
+                type="button"
+                className={`mobile-switcher-btn ${noticeMobileSection === 'list' ? 'active' : ''}`}
+                onClick={() => setNoticeMobileSection('list')}
+              >
+                📋 Notice Board ({noticesList.length})
+              </button>
+              <button
+                type="button"
+                className={`mobile-switcher-btn ${noticeMobileSection === 'form' ? 'active' : ''}`}
+                onClick={() => setNoticeMobileSection('form')}
+              >
+                {editingNoticeId ? '✏️ Edit Notice' : '➕ Create Notice'}
+              </button>
+            </div>
             <div className="pane-left notice-creator-card">
               <h3>{editingNoticeId ? 'Edit Campus Notice' : 'Publish New Notice'}</h3>
               <p className="subtitle-admin">
@@ -2773,10 +2868,10 @@ STRICT EXTRACTION RULES:
                             
                             {(notice.event_date || notice.venue || notice.active_from || notice.active_to) && (
                               <div className="notice-item-schedule-info">
-                                {notice.event_date && <div style={{ color: '#000000', fontWeight: 'bold' }}>📅 Event: {new Date(notice.event_date).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>}
-                                {notice.venue && <div style={{ color: '#000000' }}>📍 Venue: {notice.venue}</div>}
-                                {notice.active_from && <div>🟢 Start: {new Date(notice.active_from).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>}
-                                {notice.active_to && <div>🔴 Expire: {new Date(notice.active_to).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>}
+                                {notice.event_date && <div className="notice-info-item notice-info-event">📅 Event: {new Date(notice.event_date).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>}
+                                {notice.venue && <div className="notice-info-item notice-info-venue">📍 Venue: {notice.venue}</div>}
+                                {notice.active_from && <div className="notice-info-item notice-info-start">🟢 Start: {new Date(notice.active_from).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>}
+                                {notice.active_to && <div className="notice-info-item notice-info-expire">🔴 Expire: {new Date(notice.active_to).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>}
                               </div>
                             )}
 
@@ -3665,7 +3760,7 @@ STRICT EXTRACTION RULES:
                         <h4 className="notice-item-title">{holiday.title}</h4>
                         {holiday.message && <p className="notice-item-desc">{holiday.message}</p>}
                         <div className="notice-item-schedule-info">
-                          <div style={{ color: '#000000', fontWeight: 'bold' }}>📅 {new Date(holiday.date).toDateString()}</div>
+                          <div className="notice-info-item notice-info-event">📅 {new Date(holiday.date).toDateString()}</div>
                         </div>
                         <div className="notice-item-actions" style={{ justifyContent: 'flex-end', marginTop: '10px' }}>
                           <button 

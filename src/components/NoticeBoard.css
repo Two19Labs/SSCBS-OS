@@ -778,4 +778,62 @@
   cursor: not-allowed;
 }
 
+@media (max-width: 540px) {
+  .notice-modal-backdrop {
+    padding: 10px;
+    align-items: flex-end;
+  }
+
+  .notice-modal-card {
+    max-height: 85vh;
+    padding: 16px 14px;
+    border-radius: 20px 20px 0 0;
+    gap: 12px;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .btn-cancel,
+  .btn-submit-draft {
+    width: 100%;
+    padding: 11px 16px;
+    font-size: 0.85rem;
+    text-align: center;
+    border-radius: 10px;
+  }
+
+  .notice-card {
+    padding: 14px 14px;
+    gap: 10px;
+  }
+
+  .notice-title {
+    font-size: 0.98rem;
+  }
+
+  .notice-details-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .notice-card-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .btn-notice-action,
+  .btn-read-full-notice {
+    width: 100%;
+    justify-content: center;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+}
+
 

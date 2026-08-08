@@ -1042,14 +1042,35 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 0.7rem;
-  color: var(--ink-dim);
+  font-size: 0.76rem;
+  color: var(--ink);
   background: var(--tint);
-  padding: 6px 10px;
-  border-radius: 6px;
+  padding: 8px 12px;
+  border-radius: 8px;
   font-family: var(--mono);
-  margin-top: 4px;
+  margin-top: 6px;
   border: 1px solid var(--border);
+}
+
+.notice-info-item {
+  color: var(--ink);
+}
+
+.notice-info-event {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.notice-info-venue {
+  color: var(--ink-dim);
+}
+
+.notice-info-start {
+  color: var(--success);
+}
+
+.notice-info-expire {
+  color: var(--danger);
 }
 
 /* Mobile responsive adjustments */
@@ -2854,3 +2875,250 @@ input:checked + .admin-slider:before {
     flex-direction: column !important;
   }
 }
+
+/* Mobile Notice Board Mode Switcher & Card Layouts */
+.admin-mobile-notice-switcher {
+  display: none;
+}
+
+.schedule-cards-mobile {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .admin-mobile-notice-switcher {
+    display: flex;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 6px;
+    margin-bottom: 12px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .mobile-switcher-btn {
+    flex: 1;
+    padding: 10px 14px;
+    border: none;
+    background: transparent;
+    color: var(--ink-dim);
+    font-weight: 700;
+    font-size: 0.85rem;
+    border-radius: 9px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-switcher-btn.active {
+    background: var(--accent);
+    color: var(--on-accent);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .notices-pane {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .notices-pane.show-list .notice-creator-card {
+    display: none !important;
+  }
+
+  .notices-pane.show-list .notices-list-card {
+    display: flex !important;
+    width: 100%;
+  }
+
+  .notices-pane.show-form .notice-creator-card {
+    display: flex !important;
+    width: 100%;
+  }
+
+  .notices-pane.show-form .notices-list-card {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .desktop-schedule-table {
+    display: none;
+  }
+
+  .schedule-cards-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 4px;
+  }
+
+  .empty-schedule-card {
+    text-align: center;
+    padding: 24px 16px;
+    color: var(--ink-dim);
+    font-size: 0.88rem;
+    background: var(--bg);
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+  }
+
+  .mobile-slot-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-slot-card.is-break {
+    background: var(--tint);
+    border-style: dashed;
+  }
+
+  .slot-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .slot-period-badge {
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--accent);
+    background: var(--accent-tint);
+    padding: 4px 10px;
+    border-radius: 6px;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-action-edit-mobile {
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    color: var(--accent);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .slot-card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .slot-subject {
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: var(--ink);
+  }
+
+  .slot-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.82rem;
+    color: var(--ink-dim);
+    flex-wrap: wrap;
+  }
+
+  .slot-teacher, .slot-room {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .slot-card-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 4px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  .slot-card-edit-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--ink-dim);
+    text-transform: uppercase;
+  }
+
+  .slot-edit-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .slot-edit-actions button {
+    flex: 1;
+    padding: 10px 12px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    border-radius: 8px;
+  }
+}
+
+@media (max-width: 640px) {
+  .notice-item-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .notice-reorder-buttons {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .btn-reorder-notice {
+    flex: 1;
+    padding: 8px;
+    text-align: center;
+    font-size: 0.95rem;
+    background: var(--tint);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .notice-action-buttons {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+  }
+
+  .notice-action-buttons button {
+    flex: 1;
+    padding: 9px 12px;
+    text-align: center;
+    font-size: 0.82rem;
+    border-radius: 8px;
+  }
+
+  .moderation-action-bar {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .moderation-action-bar button {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 0.82rem;
+    border-radius: 8px;
+  }
+}
+
