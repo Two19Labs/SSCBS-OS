@@ -33,9 +33,10 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
     return noticeTime > baseline;
   };
 
-  // Drafter state
+  // Drafter state & auto-dismiss after 3 minutes (180,000 ms) of being seen
   const [isApprovedDrafter, setIsApprovedDrafter] = useState(false);
   const [myDrafts, setMyDrafts] = useState([]);
+  const [now, setNow] = useState(Date.now());
   const [showDraftModal, setShowDraftModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState({ type: '', text: '' });
@@ -49,6 +50,38 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
     event_date: '',
     active_from: '',
     active_to: '',
+  });
+
+  const THREE_MINUTES_MS = 3 * 60 * 1000;
+
+  useEffect(() => {
+    if (!myDrafts || myDrafts.length === 0) return;
+
+    const currentTime = Date.now();
+    myDrafts.forEach((draft) => {
+      const key = `sscbs_submission_seen_${draft.id}`;
+      if (!localStorage.getItem(key)) {
+        localStorage.setItem(key, String(currentTime));
+      }
+    });
+
+    const interval = setInterval(() => {
+      setNow(Date.now());
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [myDrafts]);
+
+  const handleDismissDraft = (draftId) => {
+    localStorage.setItem(`sscbs_submission_seen_${draftId}`, '0');
+    setNow(Date.now());
+  };
+
+  const visibleMyDrafts = myDrafts.filter((draft) => {
+    const key = `sscbs_submission_seen_${draft.id}`;
+    const seenAt = localStorage.getItem(key);
+    if (!seenAt) return true;
+    return (now - Number(seenAt)) < THREE_MINUTES_MS;
   });
 
   const userEmail = user?.email || '';
@@ -459,20 +492,30 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
         </div>
       )}
 
-      {/* My Submissions for Drafters */}
-      {isApprovedDrafter && myDrafts.length > 0 && (
+      {/* My Submissions for Drafters (Auto-disappears 3 mins after first seen) */}
+      {isApprovedDrafter && visibleMyDrafts.length > 0 && (
         <div className="my-drafts-section">
-          <h4 className="my-drafts-title">📋 My Notice Submissions ({myDrafts.length})</h4>
+          <h4 className="my-drafts-title">📋 My Notice Submissions ({visibleMyDrafts.length})</h4>
           <div className="my-drafts-grid">
-            {myDrafts.map((draft) => (
+            {visibleMyDrafts.map((draft) => (
               <div key={draft.id} className={`my-draft-card ${draft.status || 'published'}`}>
                 <div className="draft-card-head">
                   <span className="draft-title">{draft.title}</span>
-                  <span className={`draft-status-pill ${draft.status || 'published'}`}>
-                    {draft.status === 'published' && '✅ Approved & Live'}
-                    {draft.status === 'pending' && '⏳ Pending Review'}
-                    {draft.status === 'rejected' && '❌ Declined'}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span className={`draft-status-pill ${draft.status || 'published'}`}>
+                      {draft.status === 'published' && '✅ Approved & Live'}
+                      {draft.status === 'pending' && '⏳ Pending Review'}
+                      {draft.status === 'rejected' && '❌ Declined'}
+                    </span>
+                    <button
+                      type="button"
+                      className="draft-dismiss-btn"
+                      title="Dismiss notice status"
+                      onClick={() => handleDismissDraft(draft.id)}
+                    >
+                      ✕
+                    </button>
+                  </div>
                 </div>
                 {draft.society && <div className="draft-meta">Society: {draft.society}</div>}
                 <div className="draft-date">Submitted: {formatDate(draft.created_at)}</div>

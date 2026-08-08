@@ -1,0 +1,142 @@
+[
+  {
+    "tableIndex": 1,
+    "cells": [
+      {
+        "text": "Cookie",
+        "img": null,
+        "link": null
+      },
+      {
+        "text": "Duration",
+        "img": null,
+        "link": null
+      },
+      {
+        "text": "Description",
+        "img": null,
+        "link": null
+      }
+    ]
+  },
+  {
+    "tableIndex": 1,
+    "cells": [
+      {
+        "text": "cookielawinfo-checkbox-analytics",
+        "img": null,
+        "link": null
+      },
+      {
+        "text": "11 months",
+        "img": null,
+        "link": null
+      },
+      {
+        "text": "This cookie is set by GDPR Cookie Consent plugin. The cookie is used to store the user consent for the cookies in the category \"Analytics\".",
+        "img": null,
+        "link": null
+      }
+    ]
+  },
+  {
+    "tableIndex": 1,
+    "cells": [
+      {
+        "text": "cookielawinfo-checkbox-functional",
+        "img": null,
+        "link": null
+      },
+      {
+        "text": "11 months",
+        "img": null,
+        "link": null
+      },
+      {
+        "text": "The cookie is set by GDPR cookie consent to record the user consent for the cookies in the category \"Functional\".",
+        "img": null,
+        "link": null
+      }
+    ]
+  },
+  {
+    "tableIndex": 1,
+    "cells": [
+      {
+        "text": "cookielawinfo-checkbox-necessary",
+        "img": null,
+        "link": null
+      },
+      {
+        "text": "11 months",
+        "img": null,
+        "link": null
+      },
+      {
+        "text": "This cookie is set by GDPR Cookie Consent plugin. The cookies is used to store the user consent for the cookies in the category \"Necessary\".",
+        "img": null,
+        "link": null
+      }
+    ]
+  },
+  {
+    "tableIndex": 1,
+    "cells": [
+      {
+        "text": "cookielawinfo-checkbox-others",
+        "img": null,
+        "link": null
+      },
+      {
+        "text": "11 months",
+        "img": null,
+        "link": null
+      },
+      {
+        "text": "This cookie is set by GDPR Cookie Consent plugin. The cookie is used to store the user consent for the cookies in the category \"Other.",
+        "img": null,
+        "link": null
+      }
+    ]
+  },
+  {
+    "tableIndex": 1,
+    "cells": [
+      {
+        "text": "cookielawinfo-checkbox-performance",
+        "img": null,
+        "link": null
+      },
+      {
+        "text": "11 months",
+        "img": null,
+        "link": null
+      },
+      {
+        "text": "This cookie is set by GDPR Cookie Consent plugin. The cookie is used to store the user consent for the cookies in the category \"Performance\".",
+        "img": null,
+        "link": null
+      }
+    ]
+  },
+  {
+    "tableIndex": 1,
+    "cells": [
+      {
+        "text": "viewed_cookie_policy",
+        "img": null,
+        "link": null
+      },
+      {
+        "text": "11 months",
+        "img": null,
+        "link": null
+      },
+      {
+        "text": "The cookie is set by the GDPR Cookie Consent plugin and is used to store whether or not user has consented to the use of cookies. It does not store any personal data.",
+        "img": null,
+        "link": null
+      }
+    ]
+  }
+]

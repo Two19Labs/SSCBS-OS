@@ -1,0 +1,212 @@
+Checked all 29 SSCBS professor profiles on sscbs.du.ac.in.
+Profiles with personal phone numbers listed: 29
+Data: [
+  {
+    "name": "Abhimanyu Verma, MBA",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Ajay Jaiswal, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Amit Kumar, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573",
+      "9490152412"
+    ]
+  },
+  {
+    "name": "Amrina Kausar, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Anamika Gupta, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Anuja Mathur, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Kavita Rastogi, M.Sc.",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Kishori Ravi Shankar, M.Phil. (Retd.)",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Kumar Bijoy, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573",
+      "9722629145"
+    ]
+  },
+  {
+    "name": "Madhu Totla, Ph.D., CA",
+    "numbers": [
+      "9978777891",
+      "8814790573",
+      "9722629221"
+    ]
+  },
+  {
+    "name": "Md Rashid Shamim, MBA",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Mona Verma, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Narander Kumar Nigam, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Neeraj Sehrawat, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573",
+      "7868212110"
+    ]
+  },
+  {
+    "name": "Nidhi Kesari, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Onkar Singh, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Paridhi, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Poonam Verma, Professor-Principal",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Raj Kumar, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Ramesh Kumar, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Rishi Rajan Sahay, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Satish Kumar Goel, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Saumya Jain, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Shalini Prakash, M.Phil.",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Shikha Gupta, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573",
+      "6555152311"
+    ]
+  },
+  {
+    "name": "Sonika Thakral, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Sushmita, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Tarannum Ahmad, Ph.D.",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  },
+  {
+    "name": "Tushar Marwaha, MBA",
+    "numbers": [
+      "9978777891",
+      "8814790573"
+    ]
+  }
+]
