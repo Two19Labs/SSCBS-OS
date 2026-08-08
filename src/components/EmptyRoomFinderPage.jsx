@@ -101,24 +101,23 @@ export function EmptyRoomFinderPage({ onBack }) {
     }
 
     if (isWeekend) {
-      const isSunday = dayIndex === 0;
       return {
         isClosed: true,
         isWeekend: true,
         bannerTitle: '🔒 WEEKEND — COLLEGE CLOSED',
-        reopenText: isSunday ? 'Re-opens tomorrow (Monday) at 9:00 AM IST' : 'Re-opens Monday at 9:00 AM IST',
-        cardText: 'College is closed for the weekend (Re-opens Monday 9:00 AM)'
+        reopenText: 'Closed for the weekend',
+        cardText: 'College is closed for the weekend'
       };
     }
 
     if (dayIndex === 5 && isAfterHours) {
-      // Friday after class hours -> Next open day is Monday
+      // Friday after class hours -> Weekend
       return {
         isClosed: true,
         isWeekend: true,
         bannerTitle: '🔒 COLLEGE CLOSED FOR THE WEEKEND',
-        reopenText: 'Re-opens Monday at 9:00 AM IST',
-        cardText: 'College is closed for the weekend (Re-opens Monday 9:00 AM)'
+        reopenText: 'Closed for the weekend',
+        cardText: 'College is closed for the weekend'
       };
     }
 
