@@ -82,17 +82,68 @@ export function EmptyRoomFinderPage({ onBack }) {
     return null; // Return null outside class hours
   }, [currentTime]);
 
-  // Check if college is closed (e.g. after 7:00 PM, before 9:00 AM, or on weekends)
-  const isCollegeClosedNow = useMemo(() => {
-    const dayIndex = currentTime.getDay();
-    if (dayIndex === 0 || dayIndex === 6) return true; // Weekend
+  // Detailed status & reopen info when college is closed (after hours, before 9am, or weekends)
+  const collegeClosedInfo = useMemo(() => {
+    const dayIndex = currentTime.getDay(); // 0 = Sun, 1 = Mon, ..., 5 = Fri, 6 = Sat
+    const isWeekend = dayIndex === 0 || dayIndex === 6;
 
     const nowMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
     const collegeStartMinutes = 9 * 60;  // 9:00 AM
-    const collegeEndMinutes = 19 * 60;   // 7:00 PM
+    const collegeEndMinutes = 17 * 60;   // 5:00 PM (end of Period VII)
 
-    return nowMinutes < collegeStartMinutes || nowMinutes >= collegeEndMinutes || livePeriod === null;
+    const isBeforeHours = !isWeekend && nowMinutes < collegeStartMinutes;
+    const isAfterHours = !isWeekend && (nowMinutes >= collegeEndMinutes || livePeriod === null);
+
+    const isClosed = isWeekend || isBeforeHours || isAfterHours;
+
+    if (!isClosed) {
+      return { isClosed: false, bannerTitle: '', reopenText: '', cardText: '', isWeekend: false };
+    }
+
+    if (isWeekend) {
+      const isSunday = dayIndex === 0;
+      return {
+        isClosed: true,
+        isWeekend: true,
+        bannerTitle: '🔒 WEEKEND — COLLEGE CLOSED',
+        reopenText: isSunday ? 'Re-opens tomorrow (Monday) at 9:00 AM IST' : 'Re-opens Monday at 9:00 AM IST',
+        cardText: 'College is closed for the weekend (Re-opens Monday 9:00 AM)'
+      };
+    }
+
+    if (dayIndex === 5 && isAfterHours) {
+      // Friday after class hours -> Next open day is Monday
+      return {
+        isClosed: true,
+        isWeekend: true,
+        bannerTitle: '🔒 COLLEGE CLOSED FOR THE WEEKEND',
+        reopenText: 'Re-opens Monday at 9:00 AM IST',
+        cardText: 'College is closed for the weekend (Re-opens Monday 9:00 AM)'
+      };
+    }
+
+    if (isBeforeHours) {
+      // Weekday before 9:00 AM -> opens TODAY at 9:00 AM IST
+      return {
+        isClosed: true,
+        isWeekend: false,
+        bannerTitle: '🔒 COLLEGE NOT OPEN YET',
+        reopenText: 'Re-opens today at 9:00 AM IST',
+        cardText: "College is closed, it'll open today at 9:00 AM"
+      };
+    }
+
+    // Mon-Thu after class hours -> opens tomorrow at 9:00 AM IST
+    return {
+      isClosed: true,
+      isWeekend: false,
+      bannerTitle: '🔒 COLLEGE CLOSED FOR THE DAY',
+      reopenText: 'Re-opens tomorrow at 9:00 AM IST',
+      cardText: "College is closed, it'll open tomorrow at 9:00 AM"
+    };
   }, [currentTime, livePeriod]);
+
+  const isCollegeClosedNow = collegeClosedInfo.isClosed;
 
   // Set active day & period based on mode
   const activeDay = mode === 'live' ? (DAYS.includes(liveDay) ? liveDay : 'Monday') : selectedDay;
@@ -242,9 +293,9 @@ export function EmptyRoomFinderPage({ onBack }) {
             </>
           ) : mode === 'live' && isCollegeClosedNow ? (
             <>
-              <span className="banner-day">🔒 COLLEGE CLOSED FOR THE DAY</span>
+              <span className="banner-day">{collegeClosedInfo.bannerTitle}</span>
               <span className="banner-divider">•</span>
-              <span className="banner-time">Re-opens tomorrow at 9:00 AM IST</span>
+              <span className="banner-time">{collegeClosedInfo.reopenText}</span>
             </>
           ) : (
             <>
@@ -260,7 +311,7 @@ export function EmptyRoomFinderPage({ onBack }) {
           {mode === 'live' && activeHoliday ? (
             <span className="stat-pill holiday">🟡 Holiday / Fest</span>
           ) : mode === 'live' && isCollegeClosedNow ? (
-            <span className="stat-pill closed">🔒 College Closed</span>
+            <span className="stat-pill closed">{collegeClosedInfo.isWeekend ? '🔒 Weekend' : '🔒 College Closed'}</span>
           ) : (
             <>
               <span className="stat-pill vacant">🟢 {vacantCount} Free</span>
@@ -301,7 +352,7 @@ export function EmptyRoomFinderPage({ onBack }) {
             </button>
           ) : mode === 'live' && isCollegeClosedNow ? (
             <button className="filter-pill active">
-              Closed ({roomStatuses.length})
+              {collegeClosedInfo.isWeekend ? 'Weekend' : 'Closed'} ({roomStatuses.length})
             </button>
           ) : (
             <>
@@ -357,7 +408,7 @@ export function EmptyRoomFinderPage({ onBack }) {
                   </div>
 
                   <span className={`room-status-badge ${isLiveHoliday ? 'holiday' : isLiveClosed ? 'closed' : item.isVacant ? 'vacant' : 'occupied'}`}>
-                    {isLiveHoliday ? 'HOLIDAY' : isLiveClosed ? 'CLOSED' : item.isVacant ? 'VACANT' : 'IN CLASS'}
+                    {isLiveHoliday ? 'HOLIDAY' : isLiveClosed ? (collegeClosedInfo.isWeekend ? 'WEEKEND' : 'CLOSED') : item.isVacant ? 'VACANT' : 'IN CLASS'}
                   </span>
                 </div>
 
@@ -379,7 +430,7 @@ export function EmptyRoomFinderPage({ onBack }) {
                       <div className="vacancy-main-status closed">
                         <span className="vacancy-icon">🔒</span>
                         <span className="vacancy-text">
-                          College is closed, it'll open 9am
+                          {collegeClosedInfo.cardText}
                         </span>
                       </div>
                       <div className="vacancy-subtext">
