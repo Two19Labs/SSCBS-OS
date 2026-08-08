@@ -156,7 +156,7 @@ export default function FacultyDatabasePage({ onBack }) {
             <div
               key={prof.id || prof.name}
               className="faculty-card"
-              onClick={() => setSelectedProf(prof)}
+              onClick={() => window.open(prof.profileUrl || 'https://sscbs.du.ac.in/faculty/', '_blank')}
               style={{ cursor: 'pointer' }}
             >
                 <div className="faculty-card-top">
@@ -247,22 +247,15 @@ export default function FacultyDatabasePage({ onBack }) {
 
               <div className="faculty-card-actions">
                 <a
-                  href={`mailto:${prof.email}`}
-                  className="faculty-btn-secondary"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  Email
-                </a>
-
-                <button
+                  href={prof.profileUrl || 'https://sscbs.du.ac.in/faculty/'}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="faculty-btn-primary"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedProf(prof);
-                  }}
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ width: '100%', textDecoration: 'none' }}
                 >
-                  View Profile
-                </button>
+                  View Profile ↗
+                </a>
               </div>
             </div>
           ))}
