@@ -2761,12 +2761,11 @@ Now extract ALL timetable blocks from the attached Excel file.`;
                 <div>
                   <h3>🟢 Real-Time Online Presence Roster</h3>
                   <p className="section-desc-small">
-                    Active students & visitors connected to SSCBS OS shell (updates instantly via WebSocket).
+                    Active students currently connected to SSCBS OS shell & features (refreshes live every 1s).
                   </p>
                 </div>
                 <span className="live-presence-indicator">
-                  <span className="live-pulse-dot"></span>
-                  {onlinePresence.length} Active Now • Instant Real-Time
+                  {onlinePresence.length} Active Now • Real-Time 1s
                 </span>
               </div>
 

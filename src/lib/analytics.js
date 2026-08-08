@@ -57,8 +57,6 @@ let presenceHeartbeatTimer = null;
 let dbPresencePollingTimer = null;
 let lastTrackedView = null;
 let lastTrackTime = 0;
-let isChannelSubscribed = false;
-let isUnloadListenerAdded = false;
 
 function broadcastPresenceToSubscribers() {
   const list = Object.values(latestPresenceMap);
@@ -143,10 +141,29 @@ async function fetchActivePresenceFromDB() {
 
 function updateLocalAndState(remoteList = []) {
   try {
+    const payload = getPresencePayload();
     const now = Date.now();
     const merged = {};
 
-    // 1. Direct WebSocket presence from Supabase Realtime channel state
+    // 1. Local Storage active sessions (60s drift tolerance across browser tabs)
+    const raw = localStorage.getItem('sscbs_online_presence_v5');
+    let localMap = raw ? JSON.parse(raw) : {};
+    if (typeof localMap !== 'object' || !localMap) localMap = {};
+
+    if (payload) {
+      localMap[payload.session_id] = payload;
+    }
+
+    const cleanLocalMap = {};
+    Object.keys(localMap).forEach(sid => {
+      if (Math.abs(now - (localMap[sid].lastPing || 0)) < 60000) {
+        cleanLocalMap[sid] = localMap[sid];
+        merged[sid] = localMap[sid];
+      }
+    });
+    localStorage.setItem('sscbs_online_presence_v5', JSON.stringify(cleanLocalMap));
+
+    // 2. Extract active WebSocket presence from activePresenceChannel directly
     if (activePresenceChannel && typeof activePresenceChannel.presenceState === 'function') {
       try {
         const state = activePresenceChannel.presenceState();
@@ -154,11 +171,11 @@ function updateLocalAndState(remoteList = []) {
           Object.values(state).forEach(presences => {
             if (Array.isArray(presences)) {
               presences.forEach(p => {
-                if (p && (p.email || p.id)) {
+                if (p && p.email) {
                   const sid = p.session_id || p.id || p.email;
                   merged[sid] = {
                     ...p,
-                    lastPing: p.lastPing || now
+                    lastPing: now
                   };
                 }
               });
@@ -168,36 +185,28 @@ function updateLocalAndState(remoteList = []) {
       } catch (e) {}
     }
 
-    // 2. Merge event list if available
+    // 3. Merge active WebSocket presence list passed via events
     if (Array.isArray(remoteList)) {
       remoteList.forEach(item => {
-        if (item && (item.email || item.id)) {
+        if (item && item.email) {
           const sid = item.session_id || item.id || item.email;
-          if (!merged[sid]) {
-            merged[sid] = {
-              ...item,
-              lastPing: item.lastPing || now
-            };
-          }
+          merged[sid] = {
+            ...item,
+            lastPing: now
+          };
         }
       });
     }
 
-    // 3. Include current tab's active session
-    const payload = getPresencePayload();
-    if (payload && (payload.email || payload.session_id)) {
-      const selfSid = payload.session_id || payload.id;
-      merged[selfSid] = payload;
-    }
-
-    // 4. Map per user email / guest session (1 active card per student showing latest page)
+    // 4. Group by user email (1 active presence card per student showing latest page)
     const userMap = {};
     Object.values(merged).forEach(p => {
-      if (!p || (!p.email && !p.id)) return;
-      const key = p.email || p.id;
-      const existing = userMap[key];
+      if (!p || !p.email) return;
+      if (Math.abs(now - (p.lastPing || 0)) > 60000) return;
+
+      const existing = userMap[p.email];
       if (!existing || (p.lastPing || 0) >= (existing.lastPing || 0)) {
-        userMap[key] = p;
+        userMap[p.email] = p;
       }
     });
 
@@ -208,43 +217,29 @@ function updateLocalAndState(remoteList = []) {
   }
 }
 
-function sendPresencePing(forceTrack = false) {
+let lastDbPingTime = 0;
+
+function sendPresencePing() {
+  // Pause presence updates if tab is running in background to save WebSocket egress
   if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
 
   const payload = getPresencePayload();
   if (!payload) return;
 
-  // 1. Immediate local memory & state update
+  // 1. Immediate local memory & storage update
   updateLocalAndState([]);
 
-  // 2. Track over WebSocket immediately on view change or when forceTrack requested
+  // 2. Track over WebSocket ONLY on view change or every 60 seconds
   const now = Date.now();
-  if (hasValidCredentials && activePresenceChannel && isChannelSubscribed) {
-    if (forceTrack || lastTrackedView !== payload.currentView || (now - lastTrackTime) > 30000) {
+  if (hasValidCredentials && activePresenceChannel) {
+    if (lastTrackedView !== payload.currentView || (now - lastTrackTime) > 60000) {
+      lastTrackedView = payload.currentView;
+      lastTrackTime = now;
       try {
-        activePresenceChannel.track(payload).then(() => {
-          lastTrackedView = payload.currentView;
-          lastTrackTime = Date.now();
-        }).catch(() => {});
+        activePresenceChannel.track(payload).catch(() => {});
       } catch (e) {}
     }
   }
-}
-
-function setupUnloadListener() {
-  if (typeof window === 'undefined' || isUnloadListenerAdded) return;
-  isUnloadListenerAdded = true;
-
-  const handleUnload = () => {
-    if (activePresenceChannel && isChannelSubscribed) {
-      try {
-        activePresenceChannel.untrack();
-      } catch (e) {}
-    }
-  };
-
-  window.addEventListener('beforeunload', handleUnload);
-  window.addEventListener('pagehide', handleUnload);
 }
 
 let isVisibilityListenerAdded = false;
@@ -252,46 +247,50 @@ let hasAttachedPresenceListeners = false;
 
 function attachPresenceListenersIfNeeded() {
   if (!activePresenceChannel || hasAttachedPresenceListeners) return;
+  const userEmail = globalCurrentUser?.email;
+  const isUserAdmin = isAdminEmail(userEmail);
 
-  hasAttachedPresenceListeners = true;
-  const handlePresenceSync = () => {
-    try {
-      const state = activePresenceChannel.presenceState();
-      const onlineList = [];
-      if (state) {
-        Object.values(state).forEach(presences => {
-          if (Array.isArray(presences)) {
-            presences.forEach(p => {
-              if (p && (p.name || p.email)) onlineList.push(p);
-            });
-          }
-        });
-      }
-      updateLocalAndState(onlineList);
-    } catch (e) {}
-  };
+  // Attach presence sync listeners ONLY for admins or active subscriber callbacks (Admin Console)
+  if (isUserAdmin || presenceSubscribers.size > 0) {
+    hasAttachedPresenceListeners = true;
+    const handlePresenceSync = () => {
+      try {
+        const state = activePresenceChannel.presenceState();
+        const onlineList = [];
+        if (state) {
+          Object.values(state).forEach(presences => {
+            if (Array.isArray(presences)) {
+              presences.forEach(p => {
+                if (p && p.name && p.email) onlineList.push(p);
+              });
+            }
+          });
+        }
+        updateLocalAndState(onlineList);
+      } catch (e) {}
+    };
 
-  activePresenceChannel
-    .on('presence', { event: 'sync' }, handlePresenceSync)
-    .on('presence', { event: 'join' }, handlePresenceSync)
-    .on('presence', { event: 'leave' }, handlePresenceSync);
+    activePresenceChannel
+      .on('presence', { event: 'sync' }, handlePresenceSync)
+      .on('presence', { event: 'join' }, handlePresenceSync)
+      .on('presence', { event: 'leave' }, handlePresenceSync);
+  }
 }
 
 function initGlobalPresenceTracker() {
-  setupUnloadListener();
-
   if (!presenceHeartbeatTimer) {
+    // Lightweight local ping timer every 60 seconds for tab freshness & maximum bandwidth efficiency
     presenceHeartbeatTimer = setInterval(() => {
       sendPresencePing();
-    }, 30000);
+    }, 60000);
   }
 
-  // Resume presence ping immediately when user switches back to active tab
+  // Resume presence ping immediately when student switches back to active tab
   if (typeof document !== 'undefined' && !isVisibilityListenerAdded) {
     isVisibilityListenerAdded = true;
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
-        sendPresencePing(true);
+        sendPresencePing();
       }
     });
   }
@@ -300,7 +299,7 @@ function initGlobalPresenceTracker() {
   if (hasValidCredentials && !activePresenceChannel) {
     try {
       const sid = getTabSessionId();
-      activePresenceChannel = supabase.channel('sscbs-online-presence-v8', {
+      activePresenceChannel = supabase.channel('sscbs-online-presence-v7', {
         config: { presence: { key: sid } }
       });
 
@@ -308,17 +307,12 @@ function initGlobalPresenceTracker() {
 
       activePresenceChannel.subscribe(status => {
         if (status === 'SUBSCRIBED') {
-          isChannelSubscribed = true;
-          sendPresencePing(true);
-        } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
-          isChannelSubscribed = false;
+          sendPresencePing();
         }
       });
     } catch (err) {
       console.warn('Realtime presence notice:', err);
     }
-  } else if (activePresenceChannel && isChannelSubscribed) {
-    sendPresencePing();
   }
 }
 
@@ -329,6 +323,7 @@ export async function touchUserActivity(user) {
 
   const now = Date.now();
   const lastTouch = lastTouchTimeMap.get(user.id) || 0;
+  // Throttle to at most once per 60 seconds per user session
   if (now - lastTouch < 60000) return;
   lastTouchTimeMap.set(user.id, now);
 
@@ -341,6 +336,7 @@ export async function touchUserActivity(user) {
       .select('id');
 
     if (!error && (!data || data.length === 0)) {
+      // Row didn't exist yet, insert profile
       const profileData = {
         email: user.email,
         full_name: user.user_metadata?.full_name || user.email.split('@')[0] || 'Student',
@@ -363,14 +359,12 @@ export async function touchUserActivity(user) {
 }
 
 export function subscribeToPresence(user, currentView, onPresenceSync) {
-  let viewChanged = false;
   if (user && user.email) {
     globalCurrentUser = user;
     touchUserActivity(user);
   }
-  if (currentView && currentView !== globalCurrentView) {
+  if (currentView) {
     globalCurrentView = currentView;
-    viewChanged = true;
   }
 
   if (onPresenceSync) {
@@ -380,8 +374,7 @@ export function subscribeToPresence(user, currentView, onPresenceSync) {
 
   initGlobalPresenceTracker();
   attachPresenceListenersIfNeeded();
-  setupUnloadListener();
-  sendPresencePing(viewChanged);
+  sendPresencePing();
 
   return () => {
     if (onPresenceSync) {

@@ -138,14 +138,14 @@ function App() {
 
   // 🟢 Real-Time Presence & Feature Usage Logger across SSCBS OS
   useEffect(() => {
-    const activeViewName = isGpaOpen ? 'gpa' : view;
     if (user && user.email) {
+      const activeViewName = isGpaOpen ? 'gpa' : view;
       logFeatureView(activeViewName, user);
+      const unsubscribe = subscribeToPresence(user, activeViewName);
+      return () => {
+        if (typeof unsubscribe === 'function') unsubscribe();
+      };
     }
-    const unsubscribe = subscribeToPresence(user, activeViewName);
-    return () => {
-      if (typeof unsubscribe === 'function') unsubscribe();
-    };
   }, [user, view, isGpaOpen]);
 
   if (loading) {
