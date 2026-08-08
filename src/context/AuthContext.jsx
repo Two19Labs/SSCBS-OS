@@ -126,16 +126,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   const signIn = async (email, password) => {
-    if (email === 'two19labs@gmail.com' && password === 'huddlestaynash') {
-      const mockUser = {
-        id: 'two19labs-admin',
-        email: 'two19labs@gmail.com',
-        user_metadata: { full_name: 'Two19 Labs Admin', course: 'BMS', semester: 2, section: 'A' }
-      };
-      setUser(mockUser);
-      setSession({ user: mockUser });
-      return { user: mockUser, session: { user: mockUser } };
-    }
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,

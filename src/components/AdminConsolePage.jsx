@@ -754,9 +754,6 @@ function AdminConsoleContent({ onBack }) {
   const [isParsingCs, setIsParsingCs] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState({ type: '', message: '' });
-  const [hfApiKey, setHfApiKey] = useState(() => import.meta.env.VITE_HF_API_KEY || '');
-  const [showHfKeyInput, setShowHfKeyInput] = useState(false);
-  const [aiParseProgress, setAiParseProgress] = useState({ current: 0, total: 0, status: '' });
 
   // Live Schedule Draft State (combines uploader + live editor)
   const [draftTimetable, setDraftTimetable] = useState(() => JSON.parse(JSON.stringify(timetable || {})));
@@ -1103,8 +1100,7 @@ Now extract ALL timetable blocks from the attached Excel file.`;
   // ══════════════════════════════════════════════
   // HUGGING FACE TEXT-TO-JSON PARSER
   // ══════════════════════════════════════════════
-  const parseTextWithHuggingFace = async (text, category) => {
-    const token = hfApiKey || import.meta.env.VITE_HF_API_KEY || '';
+  const parseTimetableText = async (text, category) => {
     const isCs = category === 'cs';
     const setIsParsingFn = isCs ? setIsParsingTextCs : setIsParsingTextMgmt;
     const setParsedDataFn = isCs ? setTextParsedCs : setTextParsedMgmt;
@@ -1141,59 +1137,7 @@ Now extract ALL timetable blocks from the attached Excel file.`;
           addTextLog(`[${label}] ⚠️ Parsed ${parsedCount} block(s) but none matched ${label} courses. Check that the text contains the right course blocks.`, 'warning');
         }
       } else {
-        // If deterministic parser finds nothing, try HF as fallback
-        if (token) {
-          addTextLog(`[${label}] Deterministic parser found no blocks. Trying Hugging Face...`, 'info');
-          try {
-            const systemPrompt = `Convert this structured timetable text into a JSON object. The JSON must have the structure: { "courseName": { "semesterNumber": { "sectionLetter": { "Monday": [...periods], "Tuesday": [...], "Wednesday": [...], "Thursday": [...], "Friday": [...] } } } }. Each period is: { "period": N, "subject": "...", "teacher": "...", "room": "..." }. The break period has: { "period": 0, "isBreak": true, "subject": "Infinity Hour (Break)", "teacher": "", "room": "" }. Course names must be exactly: "BMS", "BBA FIA", or "Bsc Comp Sci". Return ONLY the raw JSON, no markdown.`;
-
-            const res = await fetch('https://router.huggingface.co/v1/chat/completions', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-              body: JSON.stringify({
-                model: 'Qwen/Qwen2.5-72B-Instruct',
-                messages: [
-                  { role: 'system', content: systemPrompt },
-                  { role: 'user', content: `Convert this timetable text to JSON:\n\n${text}` }
-                ],
-                max_tokens: 8192,
-                temperature: 0.05
-              })
-            });
-
-            if (res.ok) {
-              const data = await res.json();
-              let rawText = data.choices?.[0]?.message?.content || '';
-              rawText = rawText.replace(/```json\s*/g, '').replace(/```\s*/g, '');
-              rawText = rawText.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
-              const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-              if (jsonMatch) {
-                const hfResult = JSON.parse(jsonMatch[0]);
-                const filtered = {};
-                for (const [courseName, sems] of Object.entries(hfResult)) {
-                  if (isCs && courseName === 'Bsc Comp Sci') filtered[courseName] = sems;
-                  else if (!isCs && (courseName === 'BMS' || courseName === 'BBA FIA')) filtered[courseName] = sems;
-                }
-                if (Object.keys(filtered).length > 0) {
-                  setParsedDataFn(filtered);
-                  applyParsedDataToDraft(filtered, category);
-                  addTextLog(`[${label}] ✅ HF AI parsed successfully and loaded into Live Editor draft below!`, 'success');
-                  setSaveStatus({ type: 'success', message: `Parsed ${label} schedule via HF AI and loaded into Live Editor draft. Review below and click "Publish Timetable to Live OS".` });
-                } else {
-                  addTextLog(`[${label}] ⚠️ HF returned data but no matching ${label} courses found.`, 'warning');
-                }
-              } else {
-                addTextLog(`[${label}] ⚠️ HF response did not contain valid JSON.`, 'warning');
-              }
-            } else {
-              addTextLog(`[${label}] ⚠️ HF API error (${res.status}). Check your API key.`, 'warning');
-            }
-          } catch (hfErr) {
-            addTextLog(`[${label}] ❌ HF error: ${hfErr.message}`, 'error');
-          }
-        } else {
-          addTextLog(`[${label}] ❌ No timetable blocks found in the text. Make sure the text follows the === COURSE | Semester N | Section X | Room === format.`, 'error');
-        }
+        addTextLog(`[${label}] ❌ No timetable blocks found in the text. Make sure the text follows the === COURSE | Semester N | Section X | Room === format.`, 'error');
       }
     } catch (err) {
       addTextLog(`[${label}] ❌ Parse error: ${err.message}`, 'error');
@@ -1595,237 +1539,6 @@ Now extract ALL timetable blocks from the attached Excel file.`;
   };
 
   // AI-Powered Timetable Parser (Hugging Face Inference API)
-  const parseFileWithHuggingFace = async (selectedFile) => {
-    if (!selectedFile) return;
-    const token = hfApiKey || import.meta.env.VITE_HF_API_KEY || '';
-    if (!token) {
-      addLog('[AI Parser] ⚠️ No Hugging Face API key configured. Click "⚙️ Configure HF Token" to add your free token from huggingface.co/settings/tokens', 'warning');
-      addLog('[AI Parser] Falling back to smart rule-based parser...', 'info');
-    }
-    addLog(`[AI Parser] Reading file "${selectedFile.name}"...`, 'info');
-    setIsParsingMgmt(true);
-    setAiParseProgress({ current: 0, total: 0, status: 'Reading Excel...' });
-
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      try {
-        const workbook = XLSX.read(e.target.result, { type: 'array' });
-        const timetables = {};
-        let totalBlocks = 0;
-        let processedBlocks = 0;
-
-        // First pass: count all blocks
-        const allSheetBlocks = [];
-        for (const sheetName of workbook.SheetNames) {
-          if (isIgnoredSheet(sheetName)) continue;
-          const sheet = workbook.Sheets[sheetName];
-          if (!sheet) continue;
-          const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-          const blockStarts = [];
-          sheetData.forEach((row, idx) => {
-            const rowStr = row.map(c => clean(c)).join(' ').toUpperCase();
-            if (rowStr.includes('SHAHEED SUKHDEV') || rowStr.includes('CLASS TIME TABLE')) {
-              if (blockStarts.length === 0 || idx - blockStarts[blockStarts.length - 1] > 15) {
-                blockStarts.push(idx);
-              }
-            }
-          });
-
-          if (blockStarts.length > 0) {
-            allSheetBlocks.push({ sheetName, sheetData, blockStarts });
-            totalBlocks += blockStarts.length;
-          }
-        }
-
-        setAiParseProgress({ current: 0, total: totalBlocks, status: `Found ${totalBlocks} timetable blocks...` });
-        addLog(`[AI Parser] Found ${totalBlocks} timetable block(s) across ${allSheetBlocks.length} sheet(s).`, 'info');
-
-        for (const { sheetName, sheetData, blockStarts } of allSheetBlocks) {
-          for (let bIdx = 0; bIdx < blockStarts.length; bIdx++) {
-            processedBlocks++;
-            const startRow = blockStarts[bIdx];
-            const nextStartRow = blockStarts[bIdx + 1] || sheetData.length;
-            const blockRows = sheetData.slice(startRow, Math.min(nextStartRow, startRow + 40));
-
-            setAiParseProgress({ current: processedBlocks, total: totalBlocks, status: `Parsing block ${processedBlocks}/${totalBlocks} from "${sheetName}"...` });
-
-            let parsedOk = false;
-
-            // Try Hugging Face AI parsing
-            if (token) {
-              try {
-                // Convert block rows to structured text for the LLM
-                let blockText = '';
-                blockRows.forEach((r, idx) => {
-                  const nonEmpty = r.map((c, colIdx) => {
-                    if (c === null || c === undefined || String(c).trim() === '') return null;
-                    return `[C${colIdx}]${String(c).trim()}`;
-                  }).filter(Boolean);
-                  if (nonEmpty.length > 0) blockText += `R${idx}: ${nonEmpty.join(' | ')}\n`;
-                });
-
-                const systemPrompt = `You are a precise timetable data extractor for Shaheed Sukhdev College of Business Studies (SSCBS, Delhi University). You will receive raw cell data from an Excel timetable block.
-
-Extract and return a raw JSON object with EXACTLY this structure:
-{
-  "course": "BMS" or "BBA FIA" or "Bsc Comp Sci",
-  "semester": "1" or "3" or "5" or "7" (string),
-  "section": "A" or "B" or "C" or "D" (string),
-  "room": "Room 703",
-  "weekSchedule": {
-    "Monday": [
-      {"period": 1, "subject": "Subject Name", "teacher": "Dr. Full Name", "room": "Room 703"},
-      {"period": 2, "subject": "...", "teacher": "...", "room": "..."},
-      {"period": 3, "subject": "...", "teacher": "...", "room": "..."},
-      {"period": 0, "isBreak": true, "subject": "Infinity Hour (Break)", "teacher": "", "room": ""},
-      {"period": 4, "subject": "...", "teacher": "...", "room": "..."},
-      {"period": 5, "subject": "...", "teacher": "...", "room": "..."},
-      {"period": 6, "subject": "...", "teacher": "...", "room": "..."},
-      {"period": 7, "subject": "...", "teacher": "...", "room": "..."}
-    ],
-    "Tuesday": [...same 8 entries...],
-    "Wednesday": [...],
-    "Thursday": [...],
-    "Friday": [...]
-  }
-}
-
-STRICT EXTRACTION RULES:
-1. LEGEND TABLE MATCHING (MOST IMPORTANT):
-   - At the bottom of each timetable block, there is a paper/faculty legend table mapping short teacher codes (e.g. "SP", "AM", "RRS", "TA", "MV", "SJ", "AyG", "DD") to paper names and full faculty names.
-   - ALWAYS look up short codes in that block's legend table and return the full faculty name (e.g., "SP" -> "Dr. Shalini Prakash", "RRS" -> "Dr. Rishi Rajan Sahay", "AM" -> "Dr. Anuja Mathur" or "Dr. Amit Kumar" based on the legend).
-   - Never guess or confuse teacher names; strictly rely on the legend table provided in the raw block.
-
-2. CLEAN TEACHER NAMES:
-   - Do NOT attach "(Tute)", "(P)", "(Practical)", "(Tutorial)", "(G1)", "(G2)", or room numbers to the teacher's name.
-   - Example: If a cell says "SP (Tute)" or "SP (P)", teacher must be "Dr. Shalini Prakash". Put "(Tutorial)" or "(Practical)" in subject.
-
-3. ROOM NUMBER EXTRACTION:
-   - If a 3-digit number (e.g., 607, 648, 703, 361) or "(607/226)" appears inside the cell, place it cleanly in the "room" field as "Room 607" (or "Room 607 / Room 226"). Do not leave room numbers inside subject or teacher names.
-
-4. ELECTIVES VS FACULTY:
-   - Elective course names (e.g. "Hindi A", "Hindi B", "Hindi C", "Hindi D", "AECC", "VAC", "SEC", "GE") are subjects, NOT teachers. Put them in "subject". If no professor is specified for an elective slot, set "teacher" to "-".
-
-5. SPLIT GROUP (G1 / G2) CLASSES:
-   - If a cell has a split class for Group 1 and Group 2 (e.g., G1 taught by Dr. Anuja Mathur in 607, G2 taught by Dr. Rishi Rajan Sahay in 226):
-     * subject: "G1: Subject1 | G2: Subject2" (or "Subject Name" if same)
-     * teacher: "Dr. Anuja Mathur (G1) / Dr. Rishi Rajan Sahay (G2)"
-     * room: "G1: Room 607 / G2: Room 226"
-
-6. FORMAT & DAY STRUCTURE:
-   - Each day (Monday to Friday) MUST have 8 period objects: period 1, 2, 3, 0 (isBreak), 4, 5, 6, 7.
-   - Return ONLY the raw JSON object, no markdown code fences, no extra text.`;
-
-                const res = await fetch('https://router.huggingface.co/v1/chat/completions', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                  },
-                  body: JSON.stringify({
-                    model: 'Qwen/Qwen2.5-72B-Instruct',
-                    messages: [
-                      { role: 'system', content: systemPrompt },
-                      { role: 'user', content: `Parse this timetable block:\n\n${blockText}` }
-                    ],
-                    max_tokens: 4096,
-                    temperature: 0.1
-                  })
-                });
-
-                if (res.ok) {
-                  const data = await res.json();
-                  let rawText = data.choices?.[0]?.message?.content || '';
-                  
-                  // Strip markdown code fences and thinking tags if present
-                  rawText = rawText.replace(/```json\s*/g, '').replace(/```\s*/g, '');
-                  rawText = rawText.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
-                  
-                  // Find JSON object in the response
-                  const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-                  if (jsonMatch) {
-                    const aiResult = JSON.parse(jsonMatch[0]);
-                    if (aiResult && aiResult.course && aiResult.weekSchedule) {
-                      const course = aiResult.course;
-                      const sem = String(aiResult.semester || '1');
-                      const section = aiResult.section || 'A';
-                      if (!timetables[course]) timetables[course] = {};
-                      if (!timetables[course][sem]) timetables[course][sem] = {};
-                      
-                      timetables[course][sem][section] = aiResult.weekSchedule;
-                      addLog(`  ✓ [AI Block ${processedBlocks}] ${course} Sem ${sem} Sec ${section}`, 'success');
-                      parsedOk = true;
-                    }
-                  }
-                } else {
-                  const errText = await res.text();
-                  addLog(`  ⚠️ [AI Block ${processedBlocks}] HF API error (${res.status}). Using fallback parser.`, 'warning');
-                  console.warn('HF API error:', errText);
-                }
-              } catch (aiErr) {
-                addLog(`  ⚠️ [AI Block ${processedBlocks}] AI parse error: ${aiErr.message}. Using fallback.`, 'warning');
-              }
-            }
-
-            // Fallback to smart rule-based parser
-            if (!parsedOk) {
-              let defaultSem = '1';
-              let defaultCourse = sheetName.toUpperCase().includes('BBA') ? 'BBA FIA' : sheetName.toUpperCase().includes('CS') || sheetName.toUpperCase().includes('CLASSWISE') ? 'Bsc Comp Sci' : 'BMS';
-              const result = parseSheetBlock(sheetData, startRow, defaultCourse, defaultSem);
-              if (result) {
-                const { course, sem, section, weekSchedule } = result;
-                if (!timetables[course]) timetables[course] = {};
-                if (!timetables[course][sem]) timetables[course][sem] = {};
-                timetables[course][sem][section] = weekSchedule;
-                addLog(`  → [Fallback Block ${processedBlocks}] ${course} Sem ${sem} Sec ${section}`, 'info');
-              }
-            }
-
-            // Small delay between API calls to respect rate limits
-            if (token && bIdx < blockStarts.length - 1) {
-              await new Promise(r => setTimeout(r, 500));
-            }
-          }
-        }
-
-        if (Object.keys(timetables).length > 0) {
-          // Merge with existing parsed data (mgmt + cs)
-          const mgmtData = {};
-          const csData = {};
-          for (const [courseName, sems] of Object.entries(timetables)) {
-            if (courseName === 'Bsc Comp Sci') {
-              csData[courseName] = sems;
-            } else {
-              mgmtData[courseName] = sems;
-            }
-          }
-          if (Object.keys(mgmtData).length > 0) {
-            setMgmtParsedData(prev => ({ ...(prev || {}), ...mgmtData }));
-          }
-          if (Object.keys(csData).length > 0) {
-            setCsParsedData(prev => ({ ...(prev || {}), ...csData }));
-          }
-
-          const summary = Object.entries(timetables).map(([c, sems]) => 
-            `${c}: Sems [${Object.keys(sems).sort().join(', ')}]`
-          ).join(' | ');
-          addLog(`[AI Parser] ✅ Successfully parsed! ${summary}`, 'success');
-          setAiParseProgress({ current: totalBlocks, total: totalBlocks, status: 'Complete!' });
-        } else {
-          addLog(`[AI Parser] ⚠️ No timetable blocks recognized in file.`, 'warning');
-          setAiParseProgress({ current: 0, total: 0, status: '' });
-        }
-      } catch (err) {
-        addLog(`[AI Parser] ❌ Error: ${err.message}`, 'error');
-        setAiParseProgress({ current: 0, total: 0, status: '' });
-      } finally {
-        setIsParsingMgmt(false);
-      }
-    };
-    reader.readAsArrayBuffer(selectedFile);
-  };
-
   // Parser for Management (BBA FIA & BMS) Excel
   const selectAndParseMgmtFile = (selectedFile) => {
     setMgmtFile(selectedFile);
@@ -2324,7 +2037,7 @@ STRICT EXTRACTION RULES:
                   <div className="uploader-card-actions">
                     <button
                       className="btn-parse-text"
-                      onClick={() => parseTextWithHuggingFace(textInputMgmt, 'mgmt')}
+                      onClick={() => parseTimetableText(textInputMgmt, 'mgmt')}
                       disabled={!textInputMgmt.trim() || isParsingTextMgmt}
                     >
                       {isParsingTextMgmt ? '⏳ Parsing & Loading...' : '🔍 Parse Text & Auto-Populate'}
@@ -2378,7 +2091,7 @@ STRICT EXTRACTION RULES:
                   <div className="uploader-card-actions">
                     <button
                       className="btn-parse-text"
-                      onClick={() => parseTextWithHuggingFace(textInputCs, 'cs')}
+                      onClick={() => parseTimetableText(textInputCs, 'cs')}
                       disabled={!textInputCs.trim() || isParsingTextCs}
                     >
                       {isParsingTextCs ? '⏳ Parsing & Loading...' : '🔍 Parse Text & Auto-Populate'}
@@ -2414,29 +2127,11 @@ STRICT EXTRACTION RULES:
                 </div>
               </div>
 
-              {/* Scrap All + HF Key */}
+              {/* Scrap All */}
               <div className="uploader-bottom-row">
                 <button className="btn-scrap-all" onClick={handleScrapActiveTimetables} disabled={isSaving}>
                   🗑️ Clear ALL Timetables from Draft
                 </button>
-                <div className="hf-key-section">
-                  {showHfKeyInput ? (
-                    <div className="hf-key-input-row">
-                      <input
-                        type="password"
-                        className="admin-input-field"
-                        placeholder="Paste your Hugging Face API token..."
-                        value={hfApiKey}
-                        onChange={(e) => setHfApiKey(e.target.value)}
-                      />
-                      <button className="btn-clear-text" onClick={() => setShowHfKeyInput(false)}>Done</button>
-                    </div>
-                  ) : (
-                    <button className="btn-configure-hf" onClick={() => setShowHfKeyInput(true)}>
-                      ⚙️ {hfApiKey ? 'HF Token Set ✓' : 'Configure HF Token (Optional)'}
-                    </button>
-                  )}
-                </div>
               </div>
 
               {/* Parsing Logs */}
