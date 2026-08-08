@@ -391,15 +391,6 @@ function App() {
             </button>
           </div>
 
-          <div className="mobile-sidebar-user-card" onClick={() => { setView('profile'); setIsMobileSidebarOpen(false); }}>
-            <span className="sidebar-avatar">{displayName.charAt(0).toUpperCase()}</span>
-            <div className="mobile-user-details">
-              <span className="mobile-user-name">{displayName}</span>
-              <span className="mobile-user-email">{user.email}</span>
-            </div>
-            <span className="mobile-profile-tag">Profile</span>
-          </div>
-
           <nav className="mobile-sidebar-nav">
             {navSections.map((section, idx) => (
               <div key={idx} className="mobile-sidebar-section">
@@ -426,6 +417,18 @@ function App() {
               </div>
             ))}
           </nav>
+
+          <div
+            className={`mobile-sidebar-user-card ${view === 'profile' ? 'active' : ''}`}
+            onClick={() => { setView('profile'); setIsMobileSidebarOpen(false); }}
+          >
+            <span className="sidebar-avatar">{displayName.charAt(0).toUpperCase()}</span>
+            <div className="mobile-user-details">
+              <span className="mobile-user-name">{displayName}</span>
+              <span className="mobile-user-email">{user.email}</span>
+            </div>
+            <span className="mobile-profile-tag">Profile</span>
+          </div>
         </aside>
 
         {/* ── Mobile top bar ── */}
