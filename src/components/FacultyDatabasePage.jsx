@@ -82,6 +82,7 @@ export default function FacultyDatabasePage({ onBack }) {
     if (lower.includes('principal')) return 'badge-principal';
     if (lower.includes('associate')) return 'badge-associate';
     if (lower.includes('assistant')) return 'badge-assistant';
+    if (lower.includes('guest')) return 'badge-guest';
     if (lower.includes('professor')) return 'badge-professor';
     return 'badge-default';
   };
