@@ -2191,31 +2191,39 @@ STRICT EXTRACTION RULES:
             className={`admin-tab-btn ${activeTab === 'editor' || activeTab === 'uploader' ? 'active' : ''}`}
             onClick={() => setActiveTab('editor')}
           >
-            Schedule & Timetable Manager
+            <span className="tab-icon">📅</span>
+            <span className="tab-label">Schedules</span>
+            <span className="tab-label-full"> & Timetable Manager</span>
           </button>
           <button 
             className={`admin-tab-btn ${activeTab === 'notices' ? 'active' : ''}`}
             onClick={() => setActiveTab('notices')}
           >
-            Campus Notice Board Manager
+            <span className="tab-icon">📢</span>
+            <span className="tab-label">Notices</span>
+            <span className="tab-label-full"> Board Manager</span>
           </button>
           <button 
             className={`admin-tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
             onClick={() => setActiveTab('analytics')}
           >
-            Student Demographics
+            <span className="tab-icon">👥</span>
+            <span className="tab-label">Demographics</span>
           </button>
           <button 
             className={`admin-tab-btn ${activeTab === 'holidays' ? 'active' : ''}`}
             onClick={() => setActiveTab('holidays')}
           >
-            Holidays & Fests
+            <span className="tab-icon">🎉</span>
+            <span className="tab-label">Holidays</span>
+            <span className="tab-label-full"> & Fests</span>
           </button>
           <button 
             className={`admin-tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
             onClick={() => setActiveTab('settings')}
           >
-            App Settings
+            <span className="tab-icon">⚙️</span>
+            <span className="tab-label">Settings</span>
           </button>
         </nav>
 
@@ -3502,49 +3510,76 @@ STRICT EXTRACTION RULES:
                 }
 
                 return (
-                  <div className="table-scroll-container-admin">
-                    <table className="registry-table-admin">
-                      <thead>
-                        <tr>
-                          <th>Student Name</th>
-                          <th>Email Address</th>
-                          <th>Course</th>
-                          <th>Class</th>
-                          <th>Last Activity</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filtered.map(student => (
-                          <tr key={student.id}>
-                            <td>
-                              <span className="registry-user-avatar">
-                                {student.name.charAt(0).toUpperCase()}
-                              </span>
-                              <strong>{student.name}</strong>
-                            </td>
-                            <td>{student.email}</td>
-                            <td>
-                              <span className="registry-badge-course">
-                                {student.course}
-                              </span>
-                            </td>
-                            <td>
-                              <span className="registry-badge-class">
-                                Sem {student.semester} - {student.section}
-                              </span>
-                            </td>
-                            <td>
-                              {student.lastActive === 'Online' ? (
-                                <span className="registry-status-online">Online</span>
-                              ) : (
-                                <span className="registry-status-offline">{student.lastActive}</span>
-                              )}
-                            </td>
+                  <>
+                    <div className="table-scroll-container-admin">
+                      <table className="registry-table-admin">
+                        <thead>
+                          <tr>
+                            <th>Student Name</th>
+                            <th>Email Address</th>
+                            <th>Course</th>
+                            <th>Class</th>
+                            <th>Last Activity</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody>
+                          {filtered.map(student => (
+                            <tr key={student.id}>
+                              <td>
+                                <span className="registry-user-avatar">
+                                  {student.name.charAt(0).toUpperCase()}
+                                </span>
+                                <strong>{student.name}</strong>
+                              </td>
+                              <td>{student.email}</td>
+                              <td>
+                                <span className="registry-badge-course">
+                                  {student.course}
+                                </span>
+                              </td>
+                              <td>
+                                <span className="registry-badge-class">
+                                  Sem {student.semester} - {student.section}
+                                </span>
+                              </td>
+                              <td>
+                                {student.lastActive === 'Online' ? (
+                                  <span className="registry-status-online">Online</span>
+                                ) : (
+                                  <span className="registry-status-offline">{student.lastActive}</span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div className="registry-cards-mobile">
+                      {filtered.map(student => (
+                        <div className="registry-student-card" key={student.id}>
+                          <div className="student-card-header">
+                            <span className="registry-user-avatar">
+                              {student.name.charAt(0).toUpperCase()}
+                            </span>
+                            <div className="student-card-info">
+                              <strong className="student-card-name">{student.name}</strong>
+                              <span className="student-card-email">{student.email}</span>
+                            </div>
+                            {student.lastActive === 'Online' ? (
+                              <span className="registry-status-online">Online</span>
+                            ) : (
+                              <span className="registry-status-offline">{student.lastActive}</span>
+                            )}
+                          </div>
+                          <div className="student-card-meta">
+                            <span className="registry-badge-course">{student.course}</span>
+                            <span className="registry-badge-class">Sem {student.semester} - {student.section}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 );
               })()}
             </div>
