@@ -278,10 +278,14 @@ export default function NotificationCenter({ onNavigate }) {
 
                   <button
                     className="notif-card-dismiss"
-                    onClick={() => deleteNotification(notif.id)}
-                    title="Dismiss"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteNotification(notif.id);
+                    }}
+                    title="Remove notification"
+                    aria-label="Remove notification"
                   >
-                    ×
+                    <CloseIcon size={12} />
                   </button>
                 </div>
               ))

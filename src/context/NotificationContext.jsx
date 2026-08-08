@@ -151,24 +151,25 @@ export function NotificationProvider({ children }) {
     };
 
     setNotifications(prev => {
-      // Prevent exact duplicates by id or recent identical title within 1 min
-      const exists = prev.some(n => n.id === newId || (n.title === newNotif.title && (new Date() - new Date(n.created_at)) < 60000));
+      // Prevent duplicate by unique ID
+      const exists = prev.some(n => n.id === newId);
       if (exists) return prev;
+
+      // Trigger Device OS Push if user opted-in & permission granted
+      if (deviceNotificationsEnabled && typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+        try {
+          new Notification(item.title, {
+            body: item.body,
+            icon: '/sscbs_logo.png',
+            tag: newId,
+          });
+        } catch (e) {
+          console.warn('Native notification failed:', e);
+        }
+      }
+
       return [newNotif, ...prev].slice(0, 50); // Keep max 50 items
     });
-
-    // Trigger Device OS Push if user opted-in & permission granted
-    if (deviceNotificationsEnabled && typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-      try {
-        new Notification(item.title, {
-          body: item.body,
-          icon: '/sscbs_logo.png',
-          tag: newId,
-        });
-      } catch (e) {
-        console.warn('Native notification failed:', e);
-      }
-    }
 
     // Persist to Supabase if credentials valid
     if (user && hasValidCredentials) {
