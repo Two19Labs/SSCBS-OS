@@ -137,9 +137,12 @@ DROP POLICY IF EXISTS "analytics_insert" ON public.analytics_events;
 DROP POLICY IF EXISTS "analytics_select" ON public.analytics_events;
 
 -- You may only log events attributed to yourself (was: WITH CHECK (true)).
+-- NOTE: analytics_events.user_id is TEXT in the live database (schema.sql
+-- claims UUID), so auth.uid() must be cast or Postgres raises
+-- "operator does not exist: text = uuid".
 CREATE POLICY "analytics_insert"
     ON public.analytics_events FOR INSERT TO authenticated
-    WITH CHECK (user_id = auth.uid());
+    WITH CHECK (user_id = auth.uid()::text);
 
 -- Only the Admin Console reads this table (was: readable by every student).
 CREATE POLICY "analytics_select"
@@ -150,23 +153,37 @@ CREATE POLICY "analytics_select"
 -- --------------------------------------------------------------------
 -- 6. active_presence — stop user enumeration
 -- --------------------------------------------------------------------
-DROP POLICY IF EXISTS "Enable read access for authenticated users on active_presence"          ON public.active_presence;
-DROP POLICY IF EXISTS "Enable insert/update access for authenticated users on active_presence" ON public.active_presence;
-DROP POLICY IF EXISTS "presence_select" ON public.active_presence;
-DROP POLICY IF EXISTS "presence_write"  ON public.active_presence;
+-- This table may not exist yet (the app tolerates its absence via PGRST205),
+-- and DROP POLICY IF EXISTS still errors on a missing relation — so the whole
+-- block is skipped unless the table is actually present.
+DO $$
+BEGIN
+  IF to_regclass('public.active_presence') IS NULL THEN
+    RAISE NOTICE 'active_presence does not exist — skipping (nothing to secure).';
+    RETURN;
+  END IF;
 
--- Was USING (true): any student could list every user's email and online status.
-CREATE POLICY "presence_select"
-    ON public.active_presence FOR SELECT TO authenticated
-    USING (
-        auth.jwt() ->> 'email' = email
-        OR public.is_sscbs_admin()
-    );
+  EXECUTE 'DROP POLICY IF EXISTS "Enable read access for authenticated users on active_presence" ON public.active_presence';
+  EXECUTE 'DROP POLICY IF EXISTS "Enable insert/update access for authenticated users on active_presence" ON public.active_presence';
+  EXECUTE 'DROP POLICY IF EXISTS "presence_select" ON public.active_presence';
+  EXECUTE 'DROP POLICY IF EXISTS "presence_write" ON public.active_presence';
 
-CREATE POLICY "presence_write"
-    ON public.active_presence FOR ALL TO authenticated
-    USING (auth.jwt() ->> 'email' = email OR user_id = auth.uid()::text)
-    WITH CHECK (auth.jwt() ->> 'email' = email OR user_id = auth.uid()::text);
+  EXECUTE 'ALTER TABLE public.active_presence ENABLE ROW LEVEL SECURITY';
+
+  -- Was USING (true): any student could list every user's email and online status.
+  EXECUTE $p$
+    CREATE POLICY "presence_select"
+        ON public.active_presence FOR SELECT TO authenticated
+        USING (auth.jwt() ->> 'email' = email OR public.is_sscbs_admin())
+  $p$;
+
+  EXECUTE $p$
+    CREATE POLICY "presence_write"
+        ON public.active_presence FOR ALL TO authenticated
+        USING (auth.jwt() ->> 'email' = email OR user_id = auth.uid()::text)
+        WITH CHECK (auth.jwt() ->> 'email' = email OR user_id = auth.uid()::text)
+  $p$;
+END $$;
 
 
 -- --------------------------------------------------------------------
@@ -214,9 +231,20 @@ CREATE POLICY "drafter_write"
 -- --------------------------------------------------------------------
 -- Was: SECURITY DEFINER (bypasses RLS), granted to anon, no search_path.
 -- That let ANY visitor read aggregated analytics regardless of the policies above.
-REVOKE EXECUTE ON FUNCTION public.get_analytics_summary(TIMESTAMP WITH TIME ZONE) FROM anon;
-REVOKE EXECUTE ON FUNCTION public.get_analytics_summary(TIMESTAMP WITH TIME ZONE) FROM PUBLIC;
+-- REVOKE errors if the function was never created, so only run it if present.
+DO $$
+BEGIN
+  IF EXISTS (
+      SELECT 1 FROM pg_proc p
+      JOIN pg_namespace n ON n.oid = p.pronamespace
+      WHERE n.nspname = 'public' AND p.proname = 'get_analytics_summary'
+  ) THEN
+    EXECUTE 'REVOKE EXECUTE ON FUNCTION public.get_analytics_summary(TIMESTAMP WITH TIME ZONE) FROM anon';
+    EXECUTE 'REVOKE EXECUTE ON FUNCTION public.get_analytics_summary(TIMESTAMP WITH TIME ZONE) FROM PUBLIC';
+  END IF;
+END $$;
 
+-- Recreated (or created) with an admin guard, pinned search_path, and no anon grant.
 CREATE OR REPLACE FUNCTION public.get_analytics_summary(start_date TIMESTAMP WITH TIME ZONE)
 RETURNS TABLE (date_str TEXT, feature_id TEXT, visit_count BIGINT)
 LANGUAGE plpgsql

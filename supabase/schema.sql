@@ -217,7 +217,8 @@ CREATE POLICY "Enable read access for admin on user progress"
 CREATE TABLE IF NOT EXISTS public.analytics_events (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     feature_id TEXT NOT NULL,
-    user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    -- TEXT, not UUID: this is what the live database actually uses.
+    user_id TEXT,
     event_type TEXT DEFAULT 'visit',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
