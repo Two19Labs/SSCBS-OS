@@ -252,7 +252,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
         <div className="home-live-card">
           <span className="micro-label dim">WEEKEND</span>
           <div className="live-subject">No classes today</div>
-          <div className="live-meta">Relax, catch up on projects, and enjoy your weekend!</div>
+          <div className="live-meta">Catch up on work/assignments, or go and chill at Nescafe/Amul!</div>
           {renderActionButtons()}
           {renderLiveDisclaimer()}
         </div>
@@ -392,11 +392,29 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
       );
     }
 
+    let offClassLabel = 'DONE FOR TODAY';
+    let offClassSubject = 'Classes completed';
+    let offClassMeta = 'Done for the day, catch up with work or rest!';
+
+    if (hour >= 23 || hour < 5) {
+      offClassLabel = 'MIDNIGHT OIL';
+      offClassSubject = 'Late Night';
+      offClassMeta = 'Burning the midnight oil? Life of an average CBSite.';
+    } else if (hour >= 5 && hour < 9) {
+      offClassLabel = 'GOOD MORNING';
+      offClassSubject = 'Getting ready';
+      offClassMeta = 'Good morning! Getting ready for classes?';
+    } else if (hour >= 17 && hour < 23) {
+      offClassLabel = 'DONE FOR TODAY';
+      offClassSubject = 'Classes completed';
+      offClassMeta = 'Done for the day, catch up with work or rest!';
+    }
+
     return (
       <div className="home-live-card">
-        <span className="micro-label dim">DONE FOR TODAY</span>
-        <div className="live-subject">Classes completed</div>
-        <div className="live-meta">All scheduled sessions for today have concluded. Have a great evening!</div>
+        <span className="micro-label dim">{offClassLabel}</span>
+        <div className="live-subject">{offClassSubject}</div>
+        <div className="live-meta">{offClassMeta}</div>
         {renderActionButtons()}
         {renderLiveDisclaimer()}
       </div>
