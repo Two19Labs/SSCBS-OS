@@ -1595,6 +1595,30 @@
   background: var(--tint);
 }
 
+.registry-serial-num {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink-dim);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.registry-card-serial {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-tint);
+  border: 1px solid var(--border);
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  margin-right: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+}
+
 .registry-user-avatar {
   width: 28px;
   height: 28px;

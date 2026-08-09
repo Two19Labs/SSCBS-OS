@@ -3048,6 +3048,7 @@ Now extract ALL timetable blocks from the attached Excel file.`;
                       <table className="registry-table-admin">
                         <thead>
                           <tr>
+                            <th style={{ width: '60px', textAlign: 'center' }}>S.No.</th>
                             <th>Student Name</th>
                             <th>Email Address</th>
                             <th>Course</th>
@@ -3056,8 +3057,13 @@ Now extract ALL timetable blocks from the attached Excel file.`;
                           </tr>
                         </thead>
                         <tbody>
-                          {filtered.map(student => (
+                          {filtered.map((student, idx) => (
                             <tr key={student.id}>
+                              <td style={{ textAlign: 'center' }}>
+                                <span className="registry-serial-num">
+                                  #{idx + 1}
+                                </span>
+                              </td>
                               <td>
                                 <span className="registry-user-avatar">
                                   {student.name.charAt(0).toUpperCase()}
@@ -3089,9 +3095,10 @@ Now extract ALL timetable blocks from the attached Excel file.`;
                     </div>
 
                     <div className="registry-cards-mobile">
-                      {filtered.map(student => (
+                      {filtered.map((student, idx) => (
                         <div className="registry-student-card" key={student.id}>
                           <div className="student-card-header">
+                            <span className="registry-card-serial">#{idx + 1}</span>
                             <span className="registry-user-avatar">
                               {student.name.charAt(0).toUpperCase()}
                             </span>
