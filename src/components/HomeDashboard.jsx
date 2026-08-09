@@ -87,7 +87,11 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
   const firstName = displayName.split(' ')[0];
 
   const hour = time.getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const greeting = (hour >= 5 && hour < 12)
+    ? 'Good morning'
+    : (hour >= 12 && hour < 17)
+    ? 'Good afternoon'
+    : 'Good evening';
 
   const realTodayDay = DAYS[time.getDay() - 1] || 'Sunday';
   const currentDayName = isSimulated ? simulatedDay : realTodayDay;
