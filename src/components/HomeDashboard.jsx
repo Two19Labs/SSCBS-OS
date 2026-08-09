@@ -252,7 +252,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
         <div className="home-live-card">
           <span className="micro-label dim">WEEKEND</span>
           <div className="live-subject">No classes today</div>
-          <div className="live-meta">Catch up on work/assignments, or go and chill at Nescafe/Amul!</div>
+          <div className="live-meta">Relax, catch up on projects, and enjoy your weekend!</div>
           {renderActionButtons()}
           {renderLiveDisclaimer()}
         </div>
@@ -315,7 +315,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
             <span className="live-countdown">{remaining()}</span>
           </div>
           <div className="live-subject">Break</div>
-          <div className="live-meta">Go to Nescafe or Amul and chill! :)</div>
+          <div className="live-meta">Catch up on work/assignments, or go and chill at Nescafe/Amul!</div>
           <div className="live-progress">
             <div className="live-progress-fill" style={{ width: `${progress()}%` }}></div>
           </div>
