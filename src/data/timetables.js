@@ -14,24 +14,11 @@ const PERIODS = [
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
 export function getTimetable(course, semester, section) {
-  // Safe lookup with robust fallbacks
-  const cData = timetablesData[course];
-  if (!cData) return null;
-  const sData = cData[semester];
-  if (!sData) {
-    // If exact semester not found, fallback to first available semester
-    const firstSemKey = Object.keys(cData)[0];
-    const firstSemData = cData[firstSemKey];
-    const firstSecKey = Object.keys(firstSemData)[0];
-    return firstSemData[section] || firstSemData[firstSecKey] || null;
-  }
-  const secData = sData[section];
-  if (!secData) {
-    // Fallback to section A or first available section
-    const firstSecKey = Object.keys(sData)[0];
-    return sData[firstSecKey] || null;
-  }
-  return secData;
+  // Exact lookup only — never substitute another course/semester's timetable.
+  const sData = timetablesData[course]?.[semester];
+  if (!sData) return null;
+  const sectionKeys = Object.keys(sData);
+  return sData[section] || (sectionKeys.length === 1 ? sData[sectionKeys[0]] : null);
 }
 
 export { PERIODS, DAYS };

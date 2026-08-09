@@ -208,6 +208,19 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
       );
     }
 
+    if (!timetable) {
+      return (
+        <div className="home-live-card">
+          <span className="micro-label dim">TIMETABLE UNAVAILABLE</span>
+          <div className="live-subject">Not published yet</div>
+          <div className="live-meta">
+            The official timetable for {course} · Sem {semester} · Section {section} hasn't been published to SSCBS OS yet.
+            We'll switch this on as soon as it's out.
+          </div>
+        </div>
+      );
+    }
+
     const renderLiveDisclaimer = () => (
       <div className="live-card-disclaimer">
         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2" fill="none" style={{ flexShrink: 0, marginTop: '2px' }}>
@@ -463,7 +476,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
         {renderLiveCard()}
 
         {/* Original Daily Timeline Tracker */}
-        {hasProfile && showTimeline && !isWeekend && !todayHoliday && (
+        {hasProfile && timetable && showTimeline && !isWeekend && !todayHoliday && (
           <div className="daily-timeline-section animate-fade-in" style={{ marginBottom: '24px' }}>
             <h3>Today's Timeline</h3>
             <div className="timeline-trail-container">
@@ -589,7 +602,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
       </div>
 
       {/* Original Full Weekly Timetable Modal Dialog */}
-      {showWeeklyModal && hasProfile && (
+      {showWeeklyModal && hasProfile && timetable && (
         <div className="weekly-modal-overlay" onClick={() => setShowWeeklyModal(false)}>
           <div className="weekly-modal-card" onClick={(e) => e.stopPropagation()}>
             <header className="weekly-modal-header">

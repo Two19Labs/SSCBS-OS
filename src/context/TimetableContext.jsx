@@ -14,6 +14,35 @@ const TimetableContext = createContext({
 
 const CURRENT_TIMETABLE_VERSION = '2026-08-07-wef-v16';
 
+// Course keys as stored in timetables.json, mapped from the variants that show
+// up in profiles and uploads. Returns null when the course is unknown.
+const COURSE_ALIASES = {
+  'bms': 'BMS',
+  'bba fia': 'BBA FIA',
+  'bba(fia)': 'BBA FIA',
+  'bba-fia': 'BBA FIA',
+  'fia': 'BBA FIA',
+  'bsc comp sci': 'Bsc Comp Sci',
+  'bsc cs': 'Bsc Comp Sci',
+  'b.sc. cs': 'Bsc Comp Sci',
+  'cs': 'Bsc Comp Sci',
+  'computer science': 'Bsc Comp Sci',
+};
+
+export const normalizeCourse = (course, data) => {
+  if (!course) return null;
+  if (data && data[course]) return course;
+  return COURSE_ALIASES[String(course).trim().toLowerCase()] || null;
+};
+
+// Profiles store bare keys ('1', 'A'), but some callers still pass the older
+// 'Semester 1' / 'Section A' labels.
+const normalizeSemester = (semester) =>
+  String(semester ?? '').trim().replace(/^sem(ester)?\s*/i, '');
+
+const normalizeSection = (section) =>
+  String(section ?? '').trim().replace(/^sec(tion)?\s*/i, '').toUpperCase();
+
 export const TimetableProvider = ({ children }) => {
   const [timetable, setTimetable] = useState(() => {
     try {
@@ -127,23 +156,22 @@ export const TimetableProvider = ({ children }) => {
     const dataToSearch = (timetable && Object.keys(timetable).length > 0) ? timetable : timetablesData;
     if (!dataToSearch) return null;
 
-    // Standardize course name variations
-    let matchedCourse = course;
-    if (!dataToSearch[course]) {
-      if (course === 'BBA(FIA)' || course === 'BBA-FIA' || course === 'FIA') {
-        matchedCourse = 'BBA FIA';
-      } else if (course === 'BSc CS' || course === 'CS' || course === 'Computer Science' || course === 'BSc Comp Sci') {
-        matchedCourse = 'Bsc Comp Sci';
-      }
-    }
+    const matchedCourse = normalizeCourse(course, dataToSearch);
 
-    const cData = dataToSearch[matchedCourse] || dataToSearch['BMS'] || dataToSearch[Object.keys(dataToSearch)[0]];
+    // Never fall back to another course: a student must see their own course's
+    // timetable or nothing at all (previously B.Sc. CS silently rendered BMS).
+    const cData = matchedCourse ? dataToSearch[matchedCourse] : null;
     if (!cData) return null;
 
-    const sData = cData[semester] || cData[Object.keys(cData)[0]];
+    const sData = cData[semester] || cData[normalizeSemester(semester)];
     if (!sData) return null;
 
-    const secData = sData[section] || sData[Object.keys(sData)[0]];
+    // Section fallback only when the semester is published as a single combined
+    // block (e.g. B.Sc. CS / Sem 7), never to mask a genuinely missing section.
+    const sectionKeys = Object.keys(sData);
+    const secData = sData[section]
+      || sData[normalizeSection(section)]
+      || (sectionKeys.length === 1 ? sData[sectionKeys[0]] : null);
     return secData || null;
   };
 
