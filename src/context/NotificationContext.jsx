@@ -118,13 +118,24 @@ export function NotificationProvider({ children }) {
         setDeviceNotificationsEnabled(true);
         localStorage.setItem(deviceKey, 'true');
         
-        // Show test native notification
-        try {
-          new Notification('🔔 Device Alerts Enabled!', {
-            body: 'You will now receive class countdowns, team requests, and event alerts directly on your device.',
-            icon: '/sscbs_logo.png'
+        // Show test native notification via ServiceWorker or fallback
+        const testTitle = '🔔 Device Alerts Enabled!';
+        const testOptions = {
+          body: 'You will now receive class countdowns, team requests, and event alerts directly on your device.',
+          icon: '/sscbs_logo.png',
+          badge: '/sscbs_logo.png',
+          tag: 'sscbs_test_notif'
+        };
+
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.ready.then(reg => {
+            reg.showNotification(testTitle, testOptions);
+          }).catch(() => {
+            try { new Notification(testTitle, testOptions); } catch (e) {}
           });
-        } catch (e) {}
+        } else {
+          try { new Notification(testTitle, testOptions); } catch (e) {}
+        }
         return true;
       } else {
         alert('Notification permission was blocked. Please enable notifications in your browser site settings.');
@@ -150,21 +161,37 @@ export function NotificationProvider({ children }) {
       read: false,
     };
 
+    // Check device notification setting directly from localStorage for current freshness
+    const isDeviceEnabled = typeof window !== 'undefined' && localStorage.getItem(deviceKey) === 'true';
+
     setNotifications(prev => {
       // Prevent duplicate by unique ID
       const exists = prev.some(n => n.id === newId);
       if (exists) return prev;
 
       // Trigger Device OS Push if user opted-in & permission granted
-      if (deviceNotificationsEnabled && typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-        try {
-          new Notification(item.title, {
-            body: item.body,
-            icon: '/sscbs_logo.png',
-            tag: newId,
+      if (isDeviceEnabled && typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+        const notifOptions = {
+          body: item.body,
+          icon: '/sscbs_logo.png',
+          badge: '/sscbs_logo.png',
+          tag: newId,
+          renotify: true,
+          data: { actionType: item.actionType, actionData: item.actionData }
+        };
+
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.ready.then(reg => {
+            reg.showNotification(item.title, notifOptions);
+          }).catch(() => {
+            try { new Notification(item.title, notifOptions); } catch (e) {}
           });
-        } catch (e) {
-          console.warn('Native notification failed:', e);
+        } else {
+          try {
+            new Notification(item.title, notifOptions);
+          } catch (e) {
+            console.warn('Native notification failed:', e);
+          }
         }
       }
 
@@ -185,7 +212,7 @@ export function NotificationProvider({ children }) {
         read: false,
       }]).then();
     }
-  }, [deviceNotificationsEnabled, user]);
+  }, [user, deviceKey]);
 
   const markAsRead = useCallback((id) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));

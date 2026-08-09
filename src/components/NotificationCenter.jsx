@@ -59,9 +59,8 @@ export default function NotificationCenter({ onNavigate }) {
           .eq('id', appId);
       }
 
-      // Mark notification as read and update title
+      // Mark notification as read
       markAsRead(notifId);
-      alert(newStatus === 'accepted' ? '🎉 Application Accepted!' : 'Application Declined.');
     } catch (err) {
       console.error('Failed to update application status:', err);
     } finally {

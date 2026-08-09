@@ -455,9 +455,8 @@ function App() {
         {/* ── Main content ── */}
         <main className="app-main">
           {pageTitle && (
-            <div className="page-heading-desktop" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <div className="page-heading-desktop" style={{ marginBottom: '20px' }}>
               <h1 style={{ margin: 0 }}>{pageTitle}</h1>
-              <NotificationCenter onNavigate={openTool} />
             </div>
           )}
           {renderView()}

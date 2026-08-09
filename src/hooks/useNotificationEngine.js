@@ -64,24 +64,32 @@ export function useNotificationEngine() {
       const userSchedule = getTimetable ? getTimetable(course, semester, section) : null;
       const todayClasses = userSchedule && userSchedule[currentDay] ? userSchedule[currentDay] : [];
 
-      // ── [#1] Upcoming Class Countdown (10 mins before start) ──
+      // ── [#1] Upcoming Class Countdown (Resilient catch-up window) ──
       todayClasses.forEach((period) => {
         if (!period || !period.start || period.isBreak || period.subject === 'No Class' || period.subject === 'Break') return;
 
         const startMin = parseTimeToMinutes(period.start);
         const diffMins = startMin - currentMinutes;
 
-        // Trigger alert when diff is between 9 and 10 minutes
-        if (diffMins >= 9 && diffMins <= 10) {
+        // Catch-up window: Class starting in <= 20 mins OR started in last 5 mins
+        if (diffMins >= -5 && diffMins <= 20) {
           const alertKey = `class_10m_${todayDateStr}_${period.start}_${period.subject}`;
           if (!firedAlertsRef.current.has(alertKey)) {
             markAlertFired(alertKey);
+
+            let titleText = `⏰ Class in ${diffMins} minutes`;
+            if (diffMins <= 0) {
+              titleText = `⏰ Class Started (${period.start})`;
+            } else if (diffMins <= 3) {
+              titleText = `⏰ Class Starting NOW (${period.start})`;
+            }
+
             addNotification({
               id: alertKey,
               type: 'class',
               category: 'Class Schedule',
-              title: `⏰ Class in 10 minutes`,
-              body: `${period.subject} starts at ${period.start} in Room ${period.room || 'TBA'}`,
+              title: titleText,
+              body: `${period.subject} ${diffMins <= 0 ? 'started' : 'starts'} at ${period.start} in Room ${period.room || 'TBA'}`,
               actionType: 'view_room',
               actionData: { room: period.room, subject: period.subject },
             });
@@ -89,7 +97,7 @@ export function useNotificationEngine() {
         }
       });
 
-      // ── [#4] Free Slot / Study Gap Alert (10 mins before gap starts) ──
+      // ── [#4] Free Slot / Study Gap Alert (Resilient catch-up window) ──
       // Check for gaps >= 60 mins between classes
       if (todayClasses.length >= 2) {
         for (let i = 0; i < todayClasses.length - 1; i++) {
@@ -107,7 +115,7 @@ export function useNotificationEngine() {
 
             if (gapLength >= 60) {
               const diffMins = currentEndMin - currentMinutes;
-              if (diffMins >= 9 && diffMins <= 10) {
+              if (diffMins >= -10 && diffMins <= 20) {
                 const alertKey = `gap_10m_${todayDateStr}_${currentPeriod.end}`;
                 if (!firedAlertsRef.current.has(alertKey)) {
                   markAlertFired(alertKey);
@@ -115,7 +123,7 @@ export function useNotificationEngine() {
                     id: alertKey,
                     type: 'gap',
                     category: 'Study Assistant',
-                    title: `☕ Free Gap Starting in 10 mins`,
+                    title: `☕ Free Gap ${diffMins <= 0 ? 'Started' : `Starting in ${diffMins} mins`}`,
                     body: `You have a ${Math.round(gapLength / 60)}h free slot after ${currentPeriod.end}. Click to find an empty room!`,
                     actionType: 'empty_room',
                     actionData: { gapLength },
@@ -127,8 +135,10 @@ export function useNotificationEngine() {
         }
       }
 
-      // ── [#15] Notice Event Starting Soon (15 mins before event date/time) ──
+      // ── [#15] Notice Event Starting Soon / Recently Started (Resilient catch-up window) ──
       try {
+        let publishedNotices = [];
+
         if (hasValidCredentials) {
           const { data: notices } = await supabase
             .from('notices')
@@ -136,30 +146,60 @@ export function useNotificationEngine() {
             .filter('status', 'eq', 'published')
             .not('event_date', 'is', null);
 
-          if (notices && notices.length > 0) {
-            notices.forEach((notice) => {
-              if (!notice.event_date) return;
-              const eventTime = new Date(notice.event_date).getTime();
-              const nowTime = Date.now();
-              const diffMinutes = Math.round((eventTime - nowTime) / (60 * 1000));
+          if (notices) publishedNotices = notices;
+        }
 
-              if (diffMinutes >= 14 && diffMinutes <= 15) {
-                const alertKey = `event_15m_${notice.id}`;
-                if (!firedAlertsRef.current.has(alertKey)) {
-                  markAlertFired(alertKey);
-                  addNotification({
-                    id: alertKey,
-                    type: 'event',
-                    category: 'Notice Board',
-                    title: `🎟️ Event Starting in 15 mins`,
-                    body: `"${notice.title}" by ${notice.society || 'College'} is starting at ${notice.venue || 'Campus'}!`,
-                    actionType: 'read_notice',
-                    actionData: { noticeId: notice.id, title: notice.title },
-                  });
-                }
+        // Merge with local cached notices if present
+        try {
+          const cached = sessionStorage.getItem('sscbs_cached_notices');
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            parsed.forEach(cn => {
+              if (cn.event_date && (cn.status === 'published' || !cn.status) && !publishedNotices.some(n => n.id === cn.id)) {
+                publishedNotices.push(cn);
               }
             });
           }
+        } catch (e) {}
+
+        if (publishedNotices.length > 0) {
+          publishedNotices.forEach((notice) => {
+            if (!notice.event_date) return;
+            const eventTime = new Date(notice.event_date).getTime();
+            if (isNaN(eventTime)) return;
+
+            const nowTime = Date.now();
+            const diffMinutes = Math.round((eventTime - nowTime) / (60 * 1000));
+
+            // Broad catch-up window: Event starts in next 45 mins OR started in last 60 mins!
+            if (diffMinutes >= -60 && diffMinutes <= 45) {
+              const alertKey = `event_15m_${notice.id}`;
+              if (!firedAlertsRef.current.has(alertKey)) {
+                markAlertFired(alertKey);
+
+                let eventTitle = `🎟️ Event Starting in ${diffMinutes} mins`;
+                let eventBody = `"${notice.title}" by ${notice.society || 'College'} is starting at ${notice.venue || 'Campus'}!`;
+
+                if (diffMinutes <= 0 && diffMinutes >= -60) {
+                  const eventTimeFormatted = new Date(notice.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                  eventTitle = `🎟️ Event Today (${eventTimeFormatted})`;
+                  eventBody = `"${notice.title}" by ${notice.society || 'College'} started at ${eventTimeFormatted} (${notice.venue || 'Campus'})`;
+                } else if (diffMinutes <= 5) {
+                  eventTitle = `🎟️ Event Starting NOW`;
+                }
+
+                addNotification({
+                  id: alertKey,
+                  type: 'event',
+                  category: 'Notice Board',
+                  title: eventTitle,
+                  body: eventBody,
+                  actionType: 'read_notice',
+                  actionData: { noticeId: notice.id, title: notice.title },
+                });
+              }
+            }
+          });
         }
       } catch (err) {
         console.warn('Notice event check warning:', err);
