@@ -897,8 +897,7 @@ RULE 3 — ANNOTATIONS, ROOM OVERRIDES & CS LAB RULES:
     Output rooms separated by "/": "Room 361 / Room 326 / Room 715" (or map per group if specified).
   - B.SC. CS LAB DEFAULT ROOMS: For B.Sc. Computer Science practical/lab classes without an explicit room number in the cell: Group 1 (G1 / Batch P1) defaults to "Lab 426", Group 2 (G2 / Batch P2) defaults to "Lab 460". Combined/theory classes go to the block default classroom.
   - "(Merged with BMS 3A)" = Merged class info. Include in subject but NOT in teacher name.
-  - "(Unsupervised)" = No teacher present. If subject is known (e.g., SOFP (P)), output "[Subject] (Practical)", teacher "-". If unknown, subject becomes "Free", teacher "-".
-  - "EE-1 (P) (Unsupervised)" or "C&I (P) (Unsupervised)" = Free period, teacher is "-".
+  - "(Unsupervised)" = No teacher present. Include subject title if known (e.g. "EE-1 (Practical) (Unsupervised)"), set teacher to "Unsupervised", room to "-".
 
 RULE 4 — BATCH & GROUP SPLITS (G1/G2 vs PERIOD NAMES):
   - IMPORTANT: Daily class periods MUST be named "Period 1:" through "Period 7:".
@@ -906,8 +905,9 @@ RULE 4 — BATCH & GROUP SPLITS (G1/G2 vs PERIOD NAMES):
   - Leading Slashes (e.g. "/NR"): Output as "/ Ms. Nisha Rajput".
   - Trailing Slashes (e.g. "ST G1/"): Output G1 assignment for Sonika Thakral (G1), and leave G2 out or set as Free.
   - When a cell contains a "/" separating group assignments (e.g., "SJ G1/ MV G2(337)" or "AM G1/ RRS P2 (226)"):
+    Use slashes "/" for subjects (DO NOT use pipes "|" inside subject names):
     Output format:
-      subject: "G1: [Subject1] | G2: [Subject2]"
+      subject: "G1: [Subject1] / G2: [Subject2]"
       teacher: "[Full Name 1] (G1) / [Full Name 2] (P2)"
       room: "G1: Room XXX / G2: Room YYY"
     If both groups have the SAME subject, write the subject once:
@@ -1066,9 +1066,28 @@ Extract ALL timetable blocks from the attached Excel file now:`;
                 const content = pMatch[2].trim();
                 const parts = content.split('|').map(s => s.trim());
 
-                const subject = parts[0] || 'Free';
-                const teacher = parts.length > 1 ? parts[1] : '-';
-                const room = parts.length > 2 ? parts[2] : (subject === 'Free' ? '-' : defaultRoom);
+                let subject = 'Free';
+                let teacher = '-';
+                let room = defaultRoom;
+
+                if (parts.length >= 4) {
+                  // If line has 4+ parts due to pipe inside subject ("G1: Subj1 | G2: Subj2 | Teachers | Rooms")
+                  subject = `${parts[0]} / ${parts[1]}`;
+                  teacher = parts[2];
+                  room = parts[3];
+                } else if (parts.length === 3) {
+                  subject = parts[0] || 'Free';
+                  teacher = parts[1] || '-';
+                  room = parts[2] || (subject === 'Free' ? '-' : defaultRoom);
+                } else if (parts.length === 2) {
+                  subject = parts[0] || 'Free';
+                  teacher = parts[1] || '-';
+                  room = subject === 'Free' ? '-' : defaultRoom;
+                } else if (parts.length === 1) {
+                  subject = parts[0] || 'Free';
+                  teacher = '-';
+                  room = '-';
+                }
 
                 const slot = { period: pNum, subject, teacher, room };
                 
