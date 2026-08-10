@@ -231,12 +231,27 @@ export default function FindMyProfessorPage({ onBack }) {
   // Parse list of unique professors
   useEffect(() => {
     const uniqueProfs = new Map();
+    if (!timetablesData || typeof timetablesData !== 'object') return;
+
     for (const course in timetablesData) {
-      for (const sem in timetablesData[course]) {
-        for (const sec in timetablesData[course][sem]) {
-          for (const day in timetablesData[course][sem][sec]) {
-            const classes = timetablesData[course][sem][sec][day];
+      if (course === '_meta') continue;
+      const cData = timetablesData[course];
+      if (!cData || typeof cData !== 'object') continue;
+
+      for (const sem in cData) {
+        const sData = cData[sem];
+        if (!sData || typeof sData !== 'object') continue;
+
+        for (const sec in sData) {
+          const secData = sData[sec];
+          if (!secData || typeof secData !== 'object') continue;
+
+          for (const day in secData) {
+            const classes = secData[day];
+            if (!Array.isArray(classes)) continue;
+
             classes.forEach(c => {
+              if (!c || !c.teacher) return;
               const teachers = splitTeachers(c.teacher);
               teachers.forEach(t => {
                 const cleanName = cleanDisplayName(t);
@@ -268,16 +283,29 @@ export default function FindMyProfessorPage({ onBack }) {
 
   // Extract selected professor schedule
   const getProfessorSchedule = (profName) => {
-    if (!profName) return [];
+    if (!profName || !timetablesData || typeof timetablesData !== 'object') return [];
     const normSelected = normalizeName(profName);
     const schedules = [];
 
     for (const course in timetablesData) {
-      for (const sem in timetablesData[course]) {
-        for (const sec in timetablesData[course][sem]) {
-          for (const day in timetablesData[course][sem][sec]) {
-            const classes = timetablesData[course][sem][sec][day];
+      if (course === '_meta') continue;
+      const cData = timetablesData[course];
+      if (!cData || typeof cData !== 'object') continue;
+
+      for (const sem in cData) {
+        const sData = cData[sem];
+        if (!sData || typeof sData !== 'object') continue;
+
+        for (const sec in sData) {
+          const secData = sData[sec];
+          if (!secData || typeof secData !== 'object') continue;
+
+          for (const day in secData) {
+            const classes = secData[day];
+            if (!Array.isArray(classes)) continue;
+
             classes.forEach(c => {
+              if (!c || !c.teacher) return;
               const teachers = splitTeachers(c.teacher);
               const isTeaching = teachers.some(t => normalizeName(cleanDisplayName(t)) === normSelected);
               if (isTeaching) {
