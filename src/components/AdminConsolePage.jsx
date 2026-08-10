@@ -1697,31 +1697,32 @@ Extract ALL timetable blocks from the attached Excel file now:`;
     reader.readAsArrayBuffer(selectedFile);
   };
 
-  // Scrap / Wipe only Management timetables (BBA FIA & BMS)
+  // Scrap / Wipe only Management timetables (BBA FIA & BMS) from draft
   const handleScrapMgmtTimetable = async () => {
-    if (!window.confirm("Are you sure you want to scrap and remove all active Management timetables (BBA FIA & BMS) from the OS?")) {
+    if (!window.confirm("Are you sure you want to scrap and remove all Management timetables (BBA FIA & BMS) from your draft preview?")) {
       return;
     }
     try {
       setIsSaving(true);
       setSaveStatus({ type: '', message: '' });
-      addLog("[System Admin] Scrapping Management timetables from active storage...", "warning");
 
-      const updated = JSON.parse(JSON.stringify(timetable || {}));
-      delete updated['BBA FIA'];
-      delete updated['BMS'];
-      if (updated._meta) {
-        delete updated._meta.mgmtFileName;
-        delete updated._meta.mgmtUploadTime;
+      const updatedDraft = JSON.parse(JSON.stringify(draftTimetable || timetable || {}));
+      delete updatedDraft['BBA FIA'];
+      delete updatedDraft['BMS'];
+      if (updatedDraft._meta) {
+        delete updatedDraft._meta.mgmtFileName;
+        delete updatedDraft._meta.mgmtUploadTime;
       }
 
-      await updateTimetable(updated);
-
+      setDraftTimetable(updatedDraft);
+      setHasUnpublishedChanges(true);
+      setTextInputMgmt('');
+      setTextParsedMgmt(null);
       setMgmtFile(null);
       setMgmtParsedData(null);
 
-      setSaveStatus({ type: 'success', message: 'Management timetables (BBA FIA & BMS) scrapped successfully!' });
-      addLog("[System Admin] ✓ Scrapped Management timetables from active storage.", "success");
+      setSaveStatus({ type: 'success', message: 'Management timetables (BBA FIA & BMS) scrapped from draft! Click "Publish Timetable to Live OS" to apply live.' });
+      addLog("[System Admin] ✓ Scrapped Management timetables from draft preview.", "success");
     } catch (err) {
       setSaveStatus({ type: 'error', message: err.message || 'Failed to scrap Management timetables.' });
       addLog(`[System Admin] Error scrapping Management timetables: ${err.message}`, "error");
@@ -1730,30 +1731,31 @@ Extract ALL timetable blocks from the attached Excel file now:`;
     }
   };
 
-  // Scrap / Wipe only B.Sc. Computer Science timetables
+  // Scrap / Wipe only B.Sc. Computer Science timetables from draft
   const handleScrapCsTimetable = async () => {
-    if (!window.confirm("Are you sure you want to scrap and remove all active B.Sc. Computer Science timetables from the OS?")) {
+    if (!window.confirm("Are you sure you want to scrap and remove all B.Sc. Computer Science timetables from your draft preview?")) {
       return;
     }
     try {
       setIsSaving(true);
       setSaveStatus({ type: '', message: '' });
-      addLog("[System Admin] Scrapping B.Sc. Computer Science timetables from active storage...", "warning");
 
-      const updated = JSON.parse(JSON.stringify(timetable || {}));
-      delete updated['Bsc Comp Sci'];
-      if (updated._meta) {
-        delete updated._meta.csFileName;
-        delete updated._meta.csUploadTime;
+      const updatedDraft = JSON.parse(JSON.stringify(draftTimetable || timetable || {}));
+      delete updatedDraft['Bsc Comp Sci'];
+      if (updatedDraft._meta) {
+        delete updatedDraft._meta.csFileName;
+        delete updatedDraft._meta.csUploadTime;
       }
 
-      await updateTimetable(updated);
-
+      setDraftTimetable(updatedDraft);
+      setHasUnpublishedChanges(true);
+      setTextInputCs('');
+      setTextParsedCs(null);
       setCsFile(null);
       setCsParsedData(null);
 
-      setSaveStatus({ type: 'success', message: 'B.Sc. Computer Science timetables scrapped successfully!' });
-      addLog("[System Admin] ✓ Scrapped B.Sc. Computer Science timetables from active storage.", "success");
+      setSaveStatus({ type: 'success', message: 'B.Sc. Computer Science timetables scrapped from draft! Click "Publish Timetable to Live OS" to apply live.' });
+      addLog("[System Admin] ✓ Scrapped B.Sc. Computer Science timetables from draft preview.", "success");
     } catch (err) {
       setSaveStatus({ type: 'error', message: err.message || 'Failed to scrap B.Sc. CS timetables.' });
       addLog(`[System Admin] Error scrapping B.Sc. CS timetables: ${err.message}`, "error");
@@ -1762,25 +1764,28 @@ Extract ALL timetable blocks from the attached Excel file now:`;
     }
   };
 
-  // Scrap / Wipe all active timetables
+  // Scrap / Wipe all active timetables from draft
   const handleScrapActiveTimetables = async () => {
-    if (!window.confirm("Are you sure you want to scrap and wipe all active timetables across the entire SSCBS OS? This action resets the master timetable storage.")) {
+    if (!window.confirm("Are you sure you want to scrap and clear all timetable data from your draft preview?")) {
       return;
     }
     try {
       setIsSaving(true);
       setSaveStatus({ type: '', message: '' });
-      addLog("[System Admin] Scrapping and clearing all active timetables from storage...", "warning");
 
-      await updateTimetable({});
-
+      setDraftTimetable({});
+      setHasUnpublishedChanges(true);
+      setTextInputMgmt('');
+      setTextInputCs('');
+      setTextParsedMgmt(null);
+      setTextParsedCs(null);
       setMgmtFile(null);
       setCsFile(null);
       setMgmtParsedData(null);
       setCsParsedData(null);
 
-      setSaveStatus({ type: 'success', message: 'All active timetables have been scrapped and reset across the entire OS!' });
-      addLog("[System Admin] ✓ Successfully scrapped and cleared all active timetables!", "success");
+      setSaveStatus({ type: 'success', message: 'All timetable data cleared from draft! Click "Publish Timetable to Live OS" to apply to live database.' });
+      addLog("[System Admin] ✓ Successfully cleared all timetable data from draft!", "success");
     } catch (err) {
       setSaveStatus({ type: 'error', message: err.message || 'Failed to scrap timetables.' });
       addLog(`[System Admin] Error scrapping timetables: ${err.message}`, "error");
