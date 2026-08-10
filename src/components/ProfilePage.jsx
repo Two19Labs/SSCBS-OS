@@ -61,7 +61,7 @@ export default function ProfilePage({ onNavigate }) {
         }
         const { data, error } = await supabase
           .from('notice_drafter_requests')
-          .select('id, user_name, user_email, course, year, reason, society_note, status, created_at')
+          .select('id, user_id, user_email, full_name, society_note, status, created_at, updated_at')
           .eq('user_email', email)
           .maybeSingle();
 

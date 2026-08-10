@@ -155,7 +155,7 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
 
       const { data, error } = await supabase
         .from('notices')
-        .select('id, title, category, society, venue, content, link_url, event_date, active_from, active_to, created_at, created_by_email, display_order, status')
+        .select('id, title, category, society, venue, content, link_url, event_date, active_from, active_to, created_at, created_by_email, created_by_name, display_order, status')
         .eq('created_by_email', userEmail)
         .order('created_at', { ascending: false });
 
@@ -190,7 +190,7 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
 
       const { data, error } = await supabase
         .from('notices')
-        .select('id, title, category, society, venue, content, link_url, event_date, active_from, active_to, created_at, created_by_email, display_order, status')
+        .select('id, title, category, society, venue, content, link_url, event_date, active_from, active_to, created_at, created_by_email, created_by_name, display_order, status')
         .order('display_order', { ascending: true })
         .order('created_at', { ascending: false });
 

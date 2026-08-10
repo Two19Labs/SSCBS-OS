@@ -192,7 +192,7 @@ function AdminConsoleContent({ onBack }) {
 
       const { data, error } = await supabase
         .from('notices')
-        .select('id, title, category, society, venue, content, link_url, event_date, active_from, active_to, created_at, created_by_email, display_order, status')
+        .select('id, title, category, society, venue, content, link_url, event_date, active_from, active_to, created_at, created_by_email, created_by_name, display_order, status')
         .order('display_order', { ascending: true })
         .order('created_at', { ascending: false });
 
@@ -225,7 +225,7 @@ function AdminConsoleContent({ onBack }) {
     try {
       const { data, error } = await supabase
         .from('notice_drafter_requests')
-        .select('id, user_name, user_email, course, year, reason, society_note, status, created_at, updated_at')
+        .select('id, user_id, user_email, full_name, society_note, status, created_at, updated_at')
         .order('created_at', { ascending: false });
 
       if (!error && data) {
