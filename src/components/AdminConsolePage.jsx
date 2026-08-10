@@ -904,15 +904,18 @@ RULE 4 — BATCH & GROUP SPLITS (G1/G2 vs PERIOD NAMES):
   - Practical batch/group labels inside cells (like "P1", "P2", "G1", "G2") represent Practical Batches (e.g. Batch P1, Batch P2, Group G1, Group G2). Do NOT confuse batch labels ("P1"/"P2") with daily Class Periods ("Period 1" - "Period 7").
   - Leading Slashes (e.g. "/NR"): Output as "/ Ms. Nisha Rajput".
   - Trailing Slashes (e.g. "ST G1/"): Output G1 assignment for Sonika Thakral (G1), and leave G2 out or set as Free.
-  - When a cell contains a "/" separating group assignments (e.g., "SJ G1/ MV G2(337)" or "AM G1/ RRS P2 (226)"):
-    Use slashes "/" for subjects (DO NOT use pipes "|" inside subject names):
+  - GROUP SPLIT SUBJECTS: ALWAYS prefix group subjects with "G1:" and "G2:"! Use slashes "/" between groups (DO NOT use pipes "|"):
     Output format:
       subject: "G1: [Subject1] / G2: [Subject2]"
-      teacher: "[Full Name 1] (G1) / [Full Name 2] (P2)"
+      teacher: "[Full Name 1] (G1) / [Full Name 2] (G2)"
       room: "G1: Room XXX / G2: Room YYY"
     If both groups have the SAME subject, write the subject once:
       subject: "[Subject Name]"
-      teacher: "[Full Name 1] (G1) / [Full Name 2] (P2)"
+      teacher: "[Full Name 1] (G1) / [Full Name 2] (G2)"
+      room: "G1: Room XXX / G2: Room YYY"
+  - ALWAYS INCLUDE BOTH ROOMS FOR GROUP SPLITS:
+    If Group 1 has no explicit room written in the cell, it uses the block DEFAULT ROOM (e.g. Room 703).
+    Output room as: "G1: Room 703 / G2: Room 226" (NEVER output just one room).
 
 RULE 5 — ELECTIVE / LANGUAGE SPLITS:
   Some cells list multiple language/elective sections:
@@ -1072,7 +1075,11 @@ Extract ALL timetable blocks from the attached Excel file now:`;
 
                 if (parts.length >= 4) {
                   // If line has 4+ parts due to pipe inside subject ("G1: Subj1 | G2: Subj2 | Teachers | Rooms")
-                  subject = `${parts[0]} / ${parts[1]}`;
+                  let sub1 = parts[0];
+                  let sub2 = parts[1];
+                  if (!/^(?:G\d|P\d):/i.test(sub1)) sub1 = `G1: ${sub1}`;
+                  if (!/^(?:G\d|P\d):/i.test(sub2)) sub2 = `G2: ${sub2}`;
+                  subject = `${sub1} / ${sub2}`;
                   teacher = parts[2];
                   room = parts[3];
                 } else if (parts.length === 3) {
@@ -1087,6 +1094,19 @@ Extract ALL timetable blocks from the attached Excel file now:`;
                   subject = parts[0] || 'Free';
                   teacher = '-';
                   room = '-';
+                }
+
+                // Auto-prefix G1: / G2: to group split subjects if LLM omitted them
+                if (/(?:\(G[12]\)|\(P[12]\))/i.test(teacher) && subject.includes(' / ') && !/^(?:G\d|P\d):/i.test(subject)) {
+                  const subParts = subject.split(' / ').map(s => s.trim());
+                  if (subParts.length >= 2) {
+                    subject = `G1: ${subParts[0]} / G2: ${subParts[1]}`;
+                  }
+                }
+
+                // If teacher contains group indicators (e.g. (G1)/(G2) or (P1)/(P2)) but room is single room (e.g. Room 226), expand room with defaultRoom
+                if (/(?:\(G[12]\)|\(P[12]\))/i.test(teacher) && room !== '-' && !room.includes('/') && !room.toLowerCase().includes('g1:')) {
+                  room = `G1: ${defaultRoom} / G2: ${room}`;
                 }
 
                 const slot = { period: pNum, subject, teacher, room };
