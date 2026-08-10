@@ -312,15 +312,12 @@ export function useNotificationEngine() {
     const pollTeamFinderNotifications = async () => {
       try {
         // A. Fetch squad posts created by current user
-        const { data: allPosts } = await supabase
+        const { data: myPostsData } = await supabase
           .from('squad_posts')
-          .select('id, title, competition_name, created_by_email, user_id, user_email');
+          .select('id, title, competition_name, created_by_email, user_id, user_email')
+          .or(`created_by_email.ilike.${userEmail},user_email.ilike.${userEmail},user_id.eq.${user.id}`);
 
-        const myPosts = (allPosts || []).filter(p =>
-          (p.created_by_email && p.created_by_email.toLowerCase() === userEmail.toLowerCase()) ||
-          (p.user_id && p.user_id === user?.id) ||
-          (p.user_email && p.user_email.toLowerCase() === userEmail.toLowerCase())
-        );
+        const myPosts = myPostsData || [];
 
         if (myPosts.length > 0) {
           const postIds = myPosts.map(p => p.id);

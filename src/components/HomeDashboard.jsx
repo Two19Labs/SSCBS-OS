@@ -141,25 +141,24 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
     if (currentMinutes >= 720 && currentMinutes < 780) {
       activeClass = { period: 0, isBreak: true, subject: 'Infinity Hour (Break)', teacher: '-', room: '-' };
       activePeriod = PERIODS.find(p => p.id === 0);
-    } else {
-      todayClasses.forEach((cls) => {
-        const p = PERIODS.find((x) => x.id === cls.period);
-        if (!p) return;
-        const startMin = parseTimeToMinutes(p.start);
-        const endMin = parseTimeToMinutes(p.end);
-        if (currentMinutes >= startMin && currentMinutes < endMin) {
-          activeClass = cls;
-          activePeriod = p;
-        }
-        if (startMin > currentMinutes) {
-          const nextStart = parseTimeToMinutes(PERIODS.find(x => x.id === (nextClass?.period || 0))?.start || '23:59');
-          if (!nextClass || startMin < nextStart) {
-            nextClass = cls;
-            nextPeriod = p;
-          }
-        }
-      });
     }
+    todayClasses.forEach((cls) => {
+      const p = PERIODS.find((x) => x.id === cls.period);
+      if (!p) return;
+      const startMin = parseTimeToMinutes(p.start);
+      const endMin = parseTimeToMinutes(p.end);
+      if (!activeClass && currentMinutes >= startMin && currentMinutes < endMin) {
+        activeClass = cls;
+        activePeriod = p;
+      }
+      if (startMin > currentMinutes) {
+        const nextStart = parseTimeToMinutes(PERIODS.find(x => x.id === (nextClass?.period || 0))?.start || '23:59');
+        if (!nextClass || startMin < nextStart) {
+          nextClass = cls;
+          nextPeriod = p;
+        }
+      }
+    });
   }
 
   const remaining = () => {
