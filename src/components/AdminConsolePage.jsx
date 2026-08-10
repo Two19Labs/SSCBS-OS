@@ -1092,6 +1092,13 @@ Extract ALL timetable blocks from the attached Excel file now:`;
             }
           }
 
+          // Guarantee strict period order: P1, P2, P3, BREAK (weight 3.5), P4, P5, P6, P7
+          dayClasses.sort((a, b) => {
+            const wA = a.isBreak ? 3.5 : (a.period || 0);
+            const wB = b.isBreak ? 3.5 : (b.period || 0);
+            return wA - wB;
+          });
+
           weekSchedule[dayName] = dayClasses;
         }
 
@@ -1843,18 +1850,21 @@ Extract ALL timetable blocks from the attached Excel file now:`;
 
   // Manual editor handlers reading from draft
   const getCourses = () => {
-    const data = draftTimetable || timetable || {};
-    return Object.keys(data).filter(k => k !== '_meta' && typeof data[k] === 'object');
+    const data = (draftTimetable && Object.keys(draftTimetable).length > 0) ? draftTimetable : (timetable && Object.keys(timetable).length > 0 ? timetable : {});
+    const keys = Object.keys(data).filter(k => k !== '_meta' && typeof data[k] === 'object');
+    return keys.length > 0 ? keys : ['BMS', 'BBA FIA', 'Bsc Comp Sci'];
   };
   const getSemesters = () => {
-    const data = draftTimetable || timetable || {};
-    if (!data || !data[selectedCourse]) return [];
-    return Object.keys(data[selectedCourse]);
+    const data = (draftTimetable && Object.keys(draftTimetable).length > 0) ? draftTimetable : (timetable && Object.keys(timetable).length > 0 ? timetable : {});
+    if (!data || !data[selectedCourse]) return ['1', '2', '3', '4', '5', '6', '7', '8'];
+    const sems = Object.keys(data[selectedCourse]);
+    return sems.length > 0 ? sems : ['1', '2', '3', '4', '5', '6', '7', '8'];
   };
   const getSections = () => {
-    const data = draftTimetable || timetable || {};
-    if (!data || !data[selectedCourse] || !data[selectedCourse][selectedSem]) return [];
-    return Object.keys(data[selectedCourse][selectedSem]);
+    const data = (draftTimetable && Object.keys(draftTimetable).length > 0) ? draftTimetable : (timetable && Object.keys(timetable).length > 0 ? timetable : {});
+    if (!data || !data[selectedCourse] || !data[selectedCourse][selectedSem]) return ['A', 'B', 'C', 'D'];
+    const secs = Object.keys(data[selectedCourse][selectedSem]);
+    return secs.length > 0 ? secs : ['A', 'B', 'C', 'D'];
   };
 
   const getActiveDayClasses = () => {
