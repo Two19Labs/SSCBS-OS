@@ -178,7 +178,7 @@ export default function TeamFinderPage({ onBack }) {
         const [postsRes, appsRes] = await Promise.all([
           supabase
             .from('squad_posts')
-            .select('id, user_id, competition_name, organizer, competition_link, phone_number, title, description, skills_have, skills_looking_for, total_members, spots_left, course, year, is_open, created_by_email, created_by_name, created_at, updated_at')
+            .select('id, user_id, competition_name, organizer, competition_link, phone_number, title, description, skills_have, skills_looking_for, total_members, initial_open_spots, spots_left, accepted_emails, course, year, is_open, created_by_email, created_by_name, created_at, updated_at')
             .order('created_at', { ascending: false })
             .limit(50),
           supabase
@@ -195,15 +195,21 @@ export default function TeamFinderPage({ onBack }) {
           // Auto-delete expired posts older than 168 hours (7 days) from Supabase
           if (expiredPosts.length > 0) {
             const expiredIds = expiredPosts.map((p) => p.id);
-            supabase.from('squad_posts').delete().in('id', expiredIds).then();
-            supabase.from('squad_applications').delete().in('post_id', expiredIds).then();
+            supabase.from('squad_posts').delete().in('id', expiredIds).catch(() => {});
+            supabase.from('squad_applications').delete().in('post_id', expiredIds).catch(() => {});
           }
 
           const enrichedPosts = activePostsData.map((p) => {
             const authorEmail = p.created_by_email || p.user_email || '';
             const authorName = formatStudentName(p.created_by_name, authorEmail);
+            const acceptedEmails = Array.isArray(p.accepted_emails) ? p.accepted_emails : [];
+            const initialOpen = p.initial_open_spots !== undefined && p.initial_open_spots !== null
+              ? p.initial_open_spots
+              : Math.max(1, (p.spots_left || 0) + acceptedEmails.length);
             return {
               ...p,
+              accepted_emails: acceptedEmails,
+              initial_open_spots: initialOpen,
               created_by_name: authorName,
               created_by_email: authorEmail,
               total_members: p.total_members || (p.spots_left ? p.spots_left + 1 : 4),
@@ -728,8 +734,8 @@ function getUserApp(post, applications, userEmail, userId) {
     if (removedApp) return removedApp;
 
     const acceptedApp = matches.find((m) => m.status === 'accepted');
-    if (acceptedApp) {
-      // User was accepted earlier, but host removed their email from post.accepted_emails!
+    if (acceptedApp && Array.isArray(post.accepted_emails) && post.accepted_emails.length > 0) {
+      // Host removed applicant's email from post.accepted_emails
       return { ...acceptedApp, status: 'removed' };
     }
   }
@@ -767,13 +773,13 @@ function getUserApp(post, applications, userEmail, userId) {
     setApplications(updatedApps);
     localStorage.setItem('sscbs_squad_apps', JSON.stringify(updatedApps));
 
-    const initialOpen = parseInt(post.initial_open_spots, 10) || parseInt(post.spots_left, 10) || 1;
+    const initialOpen = parseInt(post.initial_open_spots, 10) || (currentAcceptedEmails.length + (parseInt(post.spots_left, 10) || 0)) || 1;
     const newOpenSpots = Math.max(0, initialOpen - newAcceptedEmails.length);
     const isNowOpen = newOpenSpots > 0;
 
     const updatedPosts = posts.map((p) =>
       String(p.id) === String(post.id)
-        ? { ...p, accepted_emails: newAcceptedEmails, spots_left: newOpenSpots, is_open: isNowOpen }
+        ? { ...p, accepted_emails: newAcceptedEmails, initial_open_spots: initialOpen, spots_left: newOpenSpots, is_open: isNowOpen }
         : p
     );
     setPosts(updatedPosts);
@@ -783,7 +789,7 @@ function getUserApp(post, applications, userEmail, userId) {
       if (hasValidCredentials) {
         await supabase
           .from('squad_posts')
-          .update({ accepted_emails: newAcceptedEmails, spots_left: newOpenSpots, is_open: isNowOpen })
+          .update({ accepted_emails: newAcceptedEmails, initial_open_spots: initialOpen, spots_left: newOpenSpots, is_open: isNowOpen })
           .eq('id', post.id);
 
         const isRealId = app.id && !String(app.id).startsWith('app-');
@@ -853,13 +859,13 @@ function getUserApp(post, applications, userEmail, userId) {
     setApplications(updatedApps);
     localStorage.setItem('sscbs_squad_apps', JSON.stringify(updatedApps));
 
-    const initialOpen = parseInt(post.initial_open_spots, 10) || parseInt(post.spots_left, 10) || 1;
+    const initialOpen = parseInt(post.initial_open_spots, 10) || (currentAcceptedEmails.length + (parseInt(post.spots_left, 10) || 0)) || 1;
     const newOpenSpots = Math.max(0, initialOpen - newAcceptedEmails.length);
     const isNowOpen = newOpenSpots > 0;
 
     const updatedPosts = posts.map((p) =>
       String(p.id) === String(post.id)
-        ? { ...p, accepted_emails: newAcceptedEmails, spots_left: newOpenSpots, is_open: isNowOpen }
+        ? { ...p, accepted_emails: newAcceptedEmails, initial_open_spots: initialOpen, spots_left: newOpenSpots, is_open: isNowOpen }
         : p
     );
     setPosts(updatedPosts);
@@ -869,7 +875,7 @@ function getUserApp(post, applications, userEmail, userId) {
       if (hasValidCredentials) {
         await supabase
           .from('squad_posts')
-          .update({ accepted_emails: newAcceptedEmails, spots_left: newOpenSpots, is_open: isNowOpen })
+          .update({ accepted_emails: newAcceptedEmails, initial_open_spots: initialOpen, spots_left: newOpenSpots, is_open: isNowOpen })
           .eq('id', post.id);
 
         const isRealId = app.id && !String(app.id).startsWith('app-');

@@ -48,15 +48,49 @@ export default function NotificationCenter({ onNavigate }) {
   }, [isOpen]);
 
   // Handle Team Application Accept / Decline directly inside Notification card
-  const handleTeamAction = async (notifId, appId, newStatus) => {
+  const handleTeamAction = async (notifId, actionData, newStatus) => {
+    const appId = typeof actionData === 'object' ? actionData?.appId : actionData;
+    const postId = typeof actionData === 'object' ? actionData?.postId : null;
+    const applicantEmail = typeof actionData === 'object' ? actionData?.applicantEmail : null;
+
     setActionLoading(prev => ({ ...prev, [notifId]: true }));
 
     try {
-      if (hasValidCredentials) {
+      if (hasValidCredentials && appId) {
         await supabase
           .from('squad_applications')
           .update({ status: newStatus })
           .eq('id', appId);
+
+        if (newStatus === 'accepted' && postId && applicantEmail) {
+          const { data: post } = await supabase
+            .from('squad_posts')
+            .select('id, accepted_emails, initial_open_spots, spots_left')
+            .eq('id', postId)
+            .single();
+
+          if (post) {
+            const currentAccepted = Array.isArray(post.accepted_emails) ? post.accepted_emails : [];
+            const appEmailLower = applicantEmail.toLowerCase();
+            const newAcceptedEmails = currentAccepted.some(e => e?.toLowerCase() === appEmailLower)
+              ? currentAccepted
+              : [...currentAccepted, applicantEmail];
+
+            const initialOpen = parseInt(post.initial_open_spots, 10) || (currentAccepted.length + (parseInt(post.spots_left, 10) || 0)) || 1;
+            const newOpenSpots = Math.max(0, initialOpen - newAcceptedEmails.length);
+            const isNowOpen = newOpenSpots > 0;
+
+            await supabase
+              .from('squad_posts')
+              .update({
+                accepted_emails: newAcceptedEmails,
+                initial_open_spots: initialOpen,
+                spots_left: newOpenSpots,
+                is_open: isNowOpen,
+              })
+              .eq('id', postId);
+          }
+        }
       }
 
       // Mark notification as read
@@ -237,14 +271,14 @@ export default function NotificationCenter({ onNavigate }) {
                             <button
                               className="notif-btn notif-btn-accept"
                               disabled={actionLoading[notif.id]}
-                              onClick={() => handleTeamAction(notif.id, notif.actionData.appId, 'accepted')}
+                              onClick={() => handleTeamAction(notif.id, notif.actionData, 'accepted')}
                             >
                               <CheckIcon size={14} /> Accept
                             </button>
                             <button
                               className="notif-btn notif-btn-decline"
                               disabled={actionLoading[notif.id]}
-                              onClick={() => handleTeamAction(notif.id, notif.actionData.appId, 'declined')}
+                              onClick={() => handleTeamAction(notif.id, notif.actionData, 'declined')}
                             >
                               <CloseIcon size={14} /> Decline
                             </button>

@@ -317,7 +317,9 @@ CREATE TABLE IF NOT EXISTS public.squad_posts (
     skills_have TEXT[] DEFAULT '{}'::TEXT[],
     skills_looking_for TEXT[] DEFAULT '{}'::TEXT[],
     total_members INT DEFAULT 4,
+    initial_open_spots INT DEFAULT 1,
     spots_left INT DEFAULT 1,
+    accepted_emails TEXT[] DEFAULT '{}'::TEXT[],
     course TEXT DEFAULT 'BMS',
     year TEXT DEFAULT '2nd Year',
     is_open BOOLEAN DEFAULT true,
@@ -331,6 +333,8 @@ CREATE TABLE IF NOT EXISTS public.squad_posts (
 ALTER TABLE public.squad_posts ADD COLUMN IF NOT EXISTS created_by_email TEXT;
 ALTER TABLE public.squad_posts ADD COLUMN IF NOT EXISTS created_by_name TEXT;
 ALTER TABLE public.squad_posts ADD COLUMN IF NOT EXISTS total_members INT DEFAULT 4;
+ALTER TABLE public.squad_posts ADD COLUMN IF NOT EXISTS initial_open_spots INT DEFAULT 1;
+ALTER TABLE public.squad_posts ADD COLUMN IF NOT EXISTS accepted_emails TEXT[] DEFAULT '{}'::TEXT[];
 
 -- Enable RLS
 ALTER TABLE public.squad_posts ENABLE ROW LEVEL SECURITY;
