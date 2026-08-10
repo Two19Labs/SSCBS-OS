@@ -67,26 +67,45 @@ export const TimetableProvider = ({ children }) => {
   const [holidays, setHolidays] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Timetable is sourced directly from timetablesData (src/data/timetables.json)
+  // Fetch live timetable config from Supabase on mount
   useEffect(() => {
-    setLoading(false);
-
-    async function fetchHolidays() {
-      if (!hasValidCredentials) return;
+    async function fetchTimetableAndHolidays() {
+      if (!hasValidCredentials) {
+        setLoading(false);
+        return;
+      }
       try {
-        const { data, error } = await supabase
+        setLoading(true);
+        // 1. Fetch live timetable config from Supabase system_configs
+        const { data: configData, error: configError } = await supabase
+          .from('system_configs')
+          .select('value')
+          .eq('key', 'timetable')
+          .maybeSingle();
+
+        if (!configError && configData && configData.value && typeof configData.value === 'object') {
+          setTimetable(configData.value);
+          try {
+            localStorage.setItem('sscbs_os_timetable', JSON.stringify(configData.value));
+          } catch (e) {}
+        }
+
+        // 2. Fetch holidays
+        const { data: holidayData, error: holidayError } = await supabase
           .from('holidays')
           .select('id, title, date, type')
           .order('date', { ascending: true });
-        if (!error && data) {
-          setHolidays(data);
+        if (!holidayError && holidayData) {
+          setHolidays(holidayData);
         }
       } catch (err) {
-        console.error('Failed to fetch holidays:', err);
+        console.error('Failed to fetch timetable config or holidays from Supabase:', err);
+      } finally {
+        setLoading(false);
       }
     }
 
-    fetchHolidays();
+    fetchTimetableAndHolidays();
   }, []);
 
   // Update timetable function (Admin only)
@@ -153,21 +172,20 @@ export const TimetableProvider = ({ children }) => {
 
   // Helper to extract timetable dynamically
   const getTimetable = (course, semester, section) => {
-    const dataToSearch = (timetable && Object.keys(timetable).length > 0) ? timetable : timetablesData;
+    // Only fall back to static timetablesData if timetable has not been loaded at all (null)
+    const dataToSearch = timetable !== null ? timetable : timetablesData;
     if (!dataToSearch) return null;
 
     const matchedCourse = normalizeCourse(course, dataToSearch);
 
-    // Never fall back to another course: a student must see their own course's
-    // timetable or nothing at all (previously B.Sc. CS silently rendered BMS).
+    // Never fall back to another course or default data if the course has been scrapped:
     const cData = matchedCourse ? dataToSearch[matchedCourse] : null;
     if (!cData) return null;
 
     const sData = cData[semester] || cData[normalizeSemester(semester)];
     if (!sData) return null;
 
-    // Section fallback only when the semester is published as a single combined
-    // block (e.g. B.Sc. CS / Sem 7), never to mask a genuinely missing section.
+    // Section fallback only when the semester is published as a single combined block
     const sectionKeys = Object.keys(sData);
     const secData = sData[section]
       || sData[normalizeSection(section)]

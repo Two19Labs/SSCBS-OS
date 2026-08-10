@@ -1697,9 +1697,9 @@ Extract ALL timetable blocks from the attached Excel file now:`;
     reader.readAsArrayBuffer(selectedFile);
   };
 
-  // Scrap / Wipe only Management timetables (BBA FIA & BMS) from draft
+  // Scrap / Wipe only Management timetables (BBA FIA & BMS)
   const handleScrapMgmtTimetable = async () => {
-    if (!window.confirm("Are you sure you want to scrap and remove all Management timetables (BBA FIA & BMS) from your draft preview?")) {
+    if (!window.confirm("Are you sure you want to scrap and remove all Management timetables (BBA FIA & BMS) across the OS?")) {
       return;
     }
     try {
@@ -1715,14 +1715,15 @@ Extract ALL timetable blocks from the attached Excel file now:`;
       }
 
       setDraftTimetable(updatedDraft);
-      setHasUnpublishedChanges(true);
+      await updateTimetable(updatedDraft);
+      setHasUnpublishedChanges(false);
       setTextInputMgmt('');
       setTextParsedMgmt(null);
       setMgmtFile(null);
       setMgmtParsedData(null);
 
-      setSaveStatus({ type: 'success', message: 'Management timetables (BBA FIA & BMS) scrapped from draft! Click "Publish Timetable to Live OS" to apply live.' });
-      addLog("[System Admin] ✓ Scrapped Management timetables from draft preview.", "success");
+      setSaveStatus({ type: 'success', message: 'Management timetables (BBA FIA & BMS) scrapped successfully from OS and live dashboards!' });
+      addLog("[System Admin] ✓ Scrapped Management timetables from live OS.", "success");
     } catch (err) {
       setSaveStatus({ type: 'error', message: err.message || 'Failed to scrap Management timetables.' });
       addLog(`[System Admin] Error scrapping Management timetables: ${err.message}`, "error");
@@ -1731,9 +1732,9 @@ Extract ALL timetable blocks from the attached Excel file now:`;
     }
   };
 
-  // Scrap / Wipe only B.Sc. Computer Science timetables from draft
+  // Scrap / Wipe only B.Sc. Computer Science timetables
   const handleScrapCsTimetable = async () => {
-    if (!window.confirm("Are you sure you want to scrap and remove all B.Sc. Computer Science timetables from your draft preview?")) {
+    if (!window.confirm("Are you sure you want to scrap and remove all B.Sc. Computer Science timetables across the OS?")) {
       return;
     }
     try {
@@ -1748,14 +1749,15 @@ Extract ALL timetable blocks from the attached Excel file now:`;
       }
 
       setDraftTimetable(updatedDraft);
-      setHasUnpublishedChanges(true);
+      await updateTimetable(updatedDraft);
+      setHasUnpublishedChanges(false);
       setTextInputCs('');
       setTextParsedCs(null);
       setCsFile(null);
       setCsParsedData(null);
 
-      setSaveStatus({ type: 'success', message: 'B.Sc. Computer Science timetables scrapped from draft! Click "Publish Timetable to Live OS" to apply live.' });
-      addLog("[System Admin] ✓ Scrapped B.Sc. Computer Science timetables from draft preview.", "success");
+      setSaveStatus({ type: 'success', message: 'B.Sc. Computer Science timetables scrapped successfully from OS and live dashboards!' });
+      addLog("[System Admin] ✓ Scrapped B.Sc. Computer Science timetables from live OS.", "success");
     } catch (err) {
       setSaveStatus({ type: 'error', message: err.message || 'Failed to scrap B.Sc. CS timetables.' });
       addLog(`[System Admin] Error scrapping B.Sc. CS timetables: ${err.message}`, "error");
@@ -1764,9 +1766,9 @@ Extract ALL timetable blocks from the attached Excel file now:`;
     }
   };
 
-  // Scrap / Wipe all active timetables from draft
+  // Scrap / Wipe all active timetables
   const handleScrapActiveTimetables = async () => {
-    if (!window.confirm("Are you sure you want to scrap and clear all timetable data from your draft preview?")) {
+    if (!window.confirm("Are you sure you want to scrap and clear all timetable data across the entire SSCBS OS?")) {
       return;
     }
     try {
@@ -1774,7 +1776,8 @@ Extract ALL timetable blocks from the attached Excel file now:`;
       setSaveStatus({ type: '', message: '' });
 
       setDraftTimetable({});
-      setHasUnpublishedChanges(true);
+      await updateTimetable({});
+      setHasUnpublishedChanges(false);
       setTextInputMgmt('');
       setTextInputCs('');
       setTextParsedMgmt(null);
@@ -1784,8 +1787,8 @@ Extract ALL timetable blocks from the attached Excel file now:`;
       setMgmtParsedData(null);
       setCsParsedData(null);
 
-      setSaveStatus({ type: 'success', message: 'All timetable data cleared from draft! Click "Publish Timetable to Live OS" to apply to live database.' });
-      addLog("[System Admin] ✓ Successfully cleared all timetable data from draft!", "success");
+      setSaveStatus({ type: 'success', message: 'All timetable data cleared from OS and live dashboards!' });
+      addLog("[System Admin] ✓ Successfully cleared all timetable data across the OS!", "success");
     } catch (err) {
       setSaveStatus({ type: 'error', message: err.message || 'Failed to scrap timetables.' });
       addLog(`[System Admin] Error scrapping timetables: ${err.message}`, "error");
