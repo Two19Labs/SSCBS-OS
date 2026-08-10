@@ -1011,7 +1011,10 @@ Extract ALL timetable blocks from the attached Excel file now:`;
         const semMatch = headerParts[1].match(/(\d+)/);
         const sem = semMatch ? semMatch[1] : '1';
 
-        const secMatch = headerParts[2].match(/([A-D])/i);
+        const secMatch = headerParts[2].match(/Section\s*([A-D])/i) 
+          || headerParts[2].match(/Sec\s*[-:\s]?\s*([A-D])/i) 
+          || headerParts[2].match(/\b([A-D])\b/i) 
+          || headerParts[2].match(/([A-D])$/i);
         const section = secMatch ? secMatch[1].toUpperCase() : 'A';
 
         let defaultRoom = headerParts.length >= 4 ? headerParts[3].trim() : 'Room 703';
