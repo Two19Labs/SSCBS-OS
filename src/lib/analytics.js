@@ -229,10 +229,10 @@ function sendPresencePing() {
   // 1. Immediate local memory & storage update
   updateLocalAndState([]);
 
-  // 2. Track over WebSocket ONLY on view change or every 60 seconds
+  // 2. Track over WebSocket ONLY on view change or every 120 seconds
   const now = Date.now();
   if (hasValidCredentials && activePresenceChannel) {
-    if (lastTrackedView !== payload.currentView || (now - lastTrackTime) > 60000) {
+    if (lastTrackedView !== payload.currentView || (now - lastTrackTime) > 120000) {
       lastTrackedView = payload.currentView;
       lastTrackTime = now;
       try {

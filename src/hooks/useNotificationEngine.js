@@ -330,7 +330,7 @@ export function useNotificationEngine() {
           // Fetch pending applications for user's posts
           const { data: incomingApps } = await supabase
             .from('squad_applications')
-            .select('*')
+            .select('id, post_id, applicant_name, applicant_email, status, created_at')
             .in('post_id', postIds)
             .eq('status', 'pending');
 
@@ -359,7 +359,7 @@ export function useNotificationEngine() {
         // B. Fetch applications submitted by user to check for accept / decline updates
         const { data: mySubmittedApps } = await supabase
           .from('squad_applications')
-          .select('*')
+          .select('id, post_id, applicant_email, status, updated_at')
           .eq('applicant_email', userEmail)
           .in('status', ['accepted', 'declined']);
 
