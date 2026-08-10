@@ -390,6 +390,7 @@ input:checked + .notif-slider:before {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 4px;
+  padding-right: 28px;
 }
 
 .notif-card-category {
@@ -403,6 +404,8 @@ input:checked + .notif-slider:before {
 .notif-card-time {
   font-size: 11px;
   color: var(--ink-faint);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .notif-card-title {
