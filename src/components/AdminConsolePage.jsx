@@ -876,51 +876,46 @@ Each Excel file contains multiple timetable blocks. Each block has this layout:
 CRITICAL EXTRACTION RULES
 ═══════════════════════════════════════════════
 
-RULE 1 — FACULTY CODE RESOLUTION (MOST IMPORTANT):
-  Every cell in the timetable grid contains faculty codes (e.g., "MV", "SP", "Deepali", "Sanchi").
-  You MUST look up each code in that block's LEGEND TABLE to get:
-    - The FULL faculty name (e.g., "MV" → "Dr. Mona Verma")
-    - The FULL paper/subject name (e.g., "MV" → "Statistics for Business Decisions")
-  NEVER guess. ALWAYS use the legend.
+RULE 1 — FACULTY CODE & LEGEND RESOLUTION (MOST IMPORTANT):
+  - Every cell contains faculty codes (e.g., "MV", "SP", "Deepali", "Sanchi", "Garima", "Soumya", "Komal").
+  - Look up each code in the block's LEGEND TABLE to get full faculty name and paper name.
+  - CROSS-SHEET LEGEND FALLBACK: If a faculty code (e.g., Garima, Soumya, Komal) is missing from the local block legend, look it up in OTHER sheet legends in the workbook or map to full name (e.g. Dr. Garima Tripathi, Dr. Soumya Guliyan, Mr. Komal Sharma).
+  - DISAMBIGUATING MULTIPLE MATCHES: If a faculty code matches multiple rows in a legend (e.g., Soumya mapping to both Hindi B & Hindi C, or Sushmita mapping to Core & VAC), inspect the cell annotation (e.g. "(Hin B)", "(Hin C)", "(VAC)") to pick the exact matching paper.
 
 RULE 2 — COURSE NAME NORMALIZATION:
   - "BMS" → output as "BMS"
   - "BBA(FIA)" or "BBA (FIA)" → output as "BBA FIA"
   - "B.SC.(H) COMPUTER SCIENCE" → output as "Bsc Comp Sci"
 
-RULE 3 — HANDLING ANNOTATIONS IN CELLS:
-  Cells often have annotations. Parse them carefully:
+RULE 3 — HANDLING ANNOTATIONS & MULTI-ROOM SPLITS:
   - "(P)" or "(Prac)" = Practical class. Include "(Practical)" in the subject name.
   - "(Tute)" = Tutorial. Include "(Tutorial)" in the subject name.
   - "(237)" or "(Room 651)" = Room number override. Extract as "Room 237" or "Room 651".
-  - "(703/651)" = Split rooms. Output as "Room 703 / Room 651".
+  - Multi-room & Split Rooms (e.g., "(361/326)" or "MV (P) (361/326) / Priyanka (P) (715)"):
+    Output rooms separated by "/": "Room 361 / Room 326 / Room 715" (or map per group if specified).
   - "(Merged with BMS 3A)" = Merged class info. Include in subject but NOT in teacher name.
   - "(Unsupervised)" = No teacher present. If subject is known (e.g., SOFP (P)), output "[Subject] (Practical)", teacher "-". If unknown, subject becomes "Free", teacher "-".
   - "EE-1 (P) (Unsupervised)" or "C&I (P) (Unsupervised)" = Free period, teacher is "-".
   - "Lab 426" or "Lab 460" = Room override to "Lab 426" or "Lab 460".
-  - "(SEC Room)" = Use default room.
 
-RULE 4 — GROUP SPLITS (G1 / G2):
-  When a cell contains a "/" separating two group assignments:
-  Example: "SJ G1/ MV G2(337)"
-  This means:
-    - Group 1 (G1): Subject from SJ's legend entry, Teacher: full name of SJ, Room: default room
-    - Group 2 (G2): Subject from MV's legend entry, Teacher: full name of MV, Room: Room 337
-  Output format:
-    subject: "G1: [Subject1] | G2: [Subject2]"
-    teacher: "[Full Name 1] (G1) / [Full Name 2] (G2)"
-    room: "G1: Room XXX / G2: Room YYY"
-  
-  If both groups have the SAME subject, just write the subject once:
-    subject: "[Subject Name]"
-    teacher: "[Full Name 1] (G1) / [Full Name 2] (G2)"
+RULE 4 — BATCH & GROUP SPLITS (G1/G2 vs PERIOD NAMES):
+  - IMPORTANT: Daily class periods MUST be named "Period 1:" through "Period 7:".
+  - Practical batch/group labels inside cells (like "P1", "P2", "G1", "G2") represent Practical Batches (e.g. Batch P1, Batch P2, Group G1, Group G2). Do NOT confuse batch labels ("P1"/"P2") with daily Class Periods ("Period 1" - "Period 7").
+  - When a cell contains a "/" separating group assignments (e.g., "SJ G1/ MV G2(337)" or "AM G1/ RRS P2 (226)"):
+    Output format:
+      subject: "G1: [Subject1] | G2: [Subject2]"
+      teacher: "[Full Name 1] (G1) / [Full Name 2] (P2)"
+      room: "G1: Room XXX / G2: Room YYY"
+    If both groups have the SAME subject, write the subject once:
+      subject: "[Subject Name]"
+      teacher: "[Full Name 1] (G1) / [Full Name 2] (P2)"
 
 RULE 5 — ELECTIVE / LANGUAGE SPLITS:
-  Some cells list multiple language sections:
+  Some cells list multiple language/elective sections:
   Example: "Garima (Hin A) 607 / Soumya (Hin C) 644 / Komal (Hin D) 648"
   Output:
     subject: "Hindi A / Hindi C / Hindi D"
-    teacher: "Dr. Garima Tripathi / Dr. Soumya Guliyan / Mr. Komal"
+    teacher: "Dr. Garima Tripathi / Dr. Soumya Guliyan / Mr. Komal Sharma"
     room: "Room 607 / Room 644 / Room 648"
 
 RULE 6 — EMPTY CELLS = FREE PERIOD:
@@ -930,12 +925,13 @@ RULE 6 — EMPTY CELLS = FREE PERIOD:
     room: "-"
 
 RULE 7 — ROOM NUMBER FORMAT:
-  - Always prefix with "Room " (e.g., "Room 703", "Room 607")
+  - Always prefix room numbers with "Room " (e.g., "Room 703", "Room 607", "Room 326")
   - Exception: "Lab 426", "Lab 460" stay as-is
   - If no room is specified in the cell, use the DEFAULT ROOM from the block header
 
 RULE 8 — PERIOD NUMBERING:
-  Period I = P1, Period II = P2, Period III = P3, then BREAK, then Period IV = P4, Period V = P5, Period VI = P6, Period VII = P7
+  Daily Class Periods MUST be explicitly written as:
+  Period 1, Period 2, Period 3, BREAK, Period 4, Period 5, Period 6, Period 7
 
 ═══════════════════════════════════════════════
 REQUIRED OUTPUT FORMAT (STRICT TEMPLATE)
@@ -945,16 +941,16 @@ Output EVERY timetable block in this EXACT format. Do not deviate.
 
 === [COURSE] | Semester [N] | Section [X] | [Default Room] ===
 Monday:
-  P1: [Subject Name] | [Full Teacher Name] | [Room]
-  P2: [Subject Name] | [Full Teacher Name] | [Room]
-  P3: [Subject Name] | [Full Teacher Name] | [Room]
+  Period 1: [Subject Name] | [Full Teacher Name] | [Room]
+  Period 2: [Subject Name] | [Full Teacher Name] | [Room]
+  Period 3: [Subject Name] | [Full Teacher Name] | [Room]
   BREAK
-  P4: [Subject Name] | [Full Teacher Name] | [Room]
-  P5: [Subject Name] | [Full Teacher Name] | [Room]
-  P6: [Subject Name] | [Full Teacher Name] | [Room]
-  P7: [Subject Name] | [Full Teacher Name] | [Room]
+  Period 4: [Subject Name] | [Full Teacher Name] | [Room]
+  Period 5: [Subject Name] | [Full Teacher Name] | [Room]
+  Period 6: [Subject Name] | [Full Teacher Name] | [Room]
+  Period 7: [Subject Name] | [Full Teacher Name] | [Room]
 Tuesday:
-  P1: ...
+  Period 1: ...
   ...
 Wednesday:
   ...
@@ -964,7 +960,7 @@ Friday:
   ...
 
 IMPORTANT FORMATTING RULES:
-- Every day MUST have exactly 7 period lines (P1-P3, BREAK, P4-P7)
+- Every day MUST have exactly 7 period lines (Period 1-3, BREAK, Period 4-7)
 - Use "Free | - | -" for empty/free periods
 - The BREAK line has no subject/teacher/room, just the word "BREAK"
 - Separate blocks with a blank line
