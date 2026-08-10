@@ -865,7 +865,7 @@ Each Excel file contains multiple timetable blocks. Each block has this layout:
 
 3. SCHEDULE ROWS (5 rows, one per weekday):
    - Monday through Friday
-   - Each cell contains a faculty code (e.g., "MV", "SP", "RRS") that maps to a professor and subject via the LEGEND TABLE below
+   - Each cell contains a faculty code (e.g., "MV", "SP", "RRS", "OS") that maps to a professor and subject via the LEGEND TABLE below
 
 4. LEGEND TABLE (below each timetable grid):
    - Headers: S.No. | Paper Type | Paper Name | Faculty Name | Faculty Code | Faculty Load
@@ -877,30 +877,34 @@ CRITICAL EXTRACTION RULES
 ═══════════════════════════════════════════════
 
 RULE 1 — FACULTY CODE & LEGEND RESOLUTION (MOST IMPORTANT):
-  - Every cell contains faculty codes (e.g., "MV", "SP", "Deepali", "Sanchi", "Garima", "Soumya", "Komal").
+  - Every cell contains faculty codes (e.g., "MV", "SP", "Deepali", "Sanchi", "Garima", "Soumya", "Komal", "OS", "KR", "AyG").
   - Look up each code in the block's LEGEND TABLE to get full faculty name and paper name.
+  - "OS" CODE DISAMBIGUATION: In grid cells, "OS" ALWAYS stands for faculty member "Prof. Onkar Singh" (Operating Systems is the course paper title, never a teacher code).
   - CROSS-SHEET LEGEND FALLBACK: If a faculty code (e.g., Garima, Soumya, Komal) is missing from the local block legend, look it up in OTHER sheet legends in the workbook or map to full name (e.g. Dr. Garima Tripathi, Dr. Soumya Guliyan, Mr. Komal Sharma).
-  - DISAMBIGUATING MULTIPLE MATCHES: If a faculty code matches multiple rows in a legend (e.g., Soumya mapping to both Hindi B & Hindi C, or Sushmita mapping to Core & VAC), inspect the cell annotation (e.g. "(Hin B)", "(Hin C)", "(VAC)") to pick the exact matching paper.
+  - DISAMBIGUATING MULTIPLE MATCHES: If a faculty code matches multiple rows in a legend (e.g., Soumya mapping to both Hindi B & C, KR mapping to Python & Front End, or Sushmita mapping to Core & VAC), inspect in-cell tags (e.g. "(Hin B)", "(Hin C)", "(SEC Lab)", "(VAC)") to pick the exact matching paper.
 
 RULE 2 — COURSE NAME NORMALIZATION:
   - "BMS" → output as "BMS"
   - "BBA(FIA)" or "BBA (FIA)" → output as "BBA FIA"
   - "B.SC.(H) COMPUTER SCIENCE" → output as "Bsc Comp Sci"
 
-RULE 3 — HANDLING ANNOTATIONS & MULTI-ROOM SPLITS:
+RULE 3 — ANNOTATIONS, ROOM OVERRIDES & CS LAB RULES:
   - "(P)" or "(Prac)" = Practical class. Include "(Practical)" in the subject name.
   - "(Tute)" = Tutorial. Include "(Tutorial)" in the subject name.
   - "(237)" or "(Room 651)" = Room number override. Extract as "Room 237" or "Room 651".
+  - "(R)" or "(Room)" = Class takes place in the allotted block default room (Theory room).
   - Multi-room & Split Rooms (e.g., "(361/326)" or "MV (P) (361/326) / Priyanka (P) (715)"):
     Output rooms separated by "/": "Room 361 / Room 326 / Room 715" (or map per group if specified).
+  - B.SC. CS LAB DEFAULT ROOMS: For B.Sc. Computer Science practical/lab classes without an explicit room number in the cell: Group 1 (G1 / Batch P1) defaults to "Lab 426", Group 2 (G2 / Batch P2) defaults to "Lab 460". Combined/theory classes go to the block default classroom.
   - "(Merged with BMS 3A)" = Merged class info. Include in subject but NOT in teacher name.
   - "(Unsupervised)" = No teacher present. If subject is known (e.g., SOFP (P)), output "[Subject] (Practical)", teacher "-". If unknown, subject becomes "Free", teacher "-".
   - "EE-1 (P) (Unsupervised)" or "C&I (P) (Unsupervised)" = Free period, teacher is "-".
-  - "Lab 426" or "Lab 460" = Room override to "Lab 426" or "Lab 460".
 
 RULE 4 — BATCH & GROUP SPLITS (G1/G2 vs PERIOD NAMES):
   - IMPORTANT: Daily class periods MUST be named "Period 1:" through "Period 7:".
   - Practical batch/group labels inside cells (like "P1", "P2", "G1", "G2") represent Practical Batches (e.g. Batch P1, Batch P2, Group G1, Group G2). Do NOT confuse batch labels ("P1"/"P2") with daily Class Periods ("Period 1" - "Period 7").
+  - Leading Slashes (e.g. "/NR"): Output as "/ Ms. Nisha Rajput".
+  - Trailing Slashes (e.g. "ST G1/"): Output G1 assignment for Sonika Thakral (G1), and leave G2 out or set as Free.
   - When a cell contains a "/" separating group assignments (e.g., "SJ G1/ MV G2(337)" or "AM G1/ RRS P2 (226)"):
     Output format:
       subject: "G1: [Subject1] | G2: [Subject2]"
@@ -927,7 +931,7 @@ RULE 6 — EMPTY CELLS = FREE PERIOD:
 RULE 7 — ROOM NUMBER FORMAT:
   - Always prefix room numbers with "Room " (e.g., "Room 703", "Room 607", "Room 326")
   - Exception: "Lab 426", "Lab 460" stay as-is
-  - If no room is specified in the cell, use the DEFAULT ROOM from the block header
+  - If no room is specified in the cell, use the DEFAULT ROOM from the block header (or Lab 426 / Lab 460 for CS G1/G2 labs)
 
 RULE 8 — PERIOD NUMBERING:
   Daily Class Periods MUST be explicitly written as:
