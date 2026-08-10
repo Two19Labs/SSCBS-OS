@@ -7,16 +7,50 @@ import timetablesData from '../data/timetables.json';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
+const PERIOD_TIME_MAP = {
+  1: { start: '09:00', end: '10:00', startLabel: '9:00 AM' },
+  2: { start: '10:00', end: '11:00', startLabel: '10:00 AM' },
+  3: { start: '11:00', end: '12:00', startLabel: '11:00 AM' },
+  0: { start: '12:00', end: '13:00', startLabel: '12:00 PM', isBreak: true },
+  4: { start: '13:00', end: '14:00', startLabel: '1:00 PM' },
+  5: { start: '14:00', end: '15:00', startLabel: '2:00 PM' },
+  6: { start: '15:00', end: '16:00', startLabel: '3:00 PM' },
+  7: { start: '16:00', end: '17:00', startLabel: '4:00 PM' },
+};
+
 function parseTimeToMinutes(timeStr) {
   if (!timeStr || !timeStr.includes(':')) return 0;
   const [h, m] = timeStr.split(':').map(Number);
   return h * 60 + m;
 }
 
-function getISTTime() {
+function getISTDateComponents() {
   const now = new Date();
-  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-  return new Date(utc + (3600000 * 5.5));
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Kolkata',
+    weekday: 'long',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
+
+  const parts = formatter.formatToParts(now);
+  const map = {};
+  parts.forEach(p => { if (p.type !== 'literal') map[p.type] = p.value; });
+
+  const rawHour = parseInt(map.hour, 10);
+  const hours = rawHour === 24 ? 0 : rawHour;
+  const minutes = parseInt(map.minute, 10);
+
+  return {
+    dayName: map.weekday,
+    currentMinutes: hours * 60 + minutes,
+    todayDateStr: `${map.year}-${map.month}-${map.day}`,
+  };
 }
 
 export function useNotificationEngine() {
@@ -50,10 +84,7 @@ export function useNotificationEngine() {
     if (!user) return;
 
     const checkScheduleAndEvents = async () => {
-      const now = getISTTime();
-      const currentDay = DAYS[now.getDay() - 1] || 'Sunday';
-      const currentMinutes = now.getHours() * 60 + now.getMinutes();
-      const todayDateStr = now.toISOString().split('T')[0];
+      const { dayName: currentDay, currentMinutes, todayDateStr } = getISTDateComponents();
 
       // Fetch user profile settings
       const meta = user.user_metadata || {};
@@ -64,24 +95,40 @@ export function useNotificationEngine() {
       const userSchedule = getTimetable ? getTimetable(course, semester, section) : null;
       const todayClasses = userSchedule && userSchedule[currentDay] ? userSchedule[currentDay] : [];
 
-      // ── [#1] Upcoming Class Countdown (Resilient catch-up window) ──
-      todayClasses.forEach((period) => {
-        if (!period || !period.start || period.isBreak || period.subject === 'No Class' || period.subject === 'Break') return;
+      // ── [#1] Upcoming Class Countdown (5 Minutes Before Class) ──
+      todayClasses.forEach((periodItem) => {
+        if (!periodItem) return;
+        const periodNum = periodItem.period !== undefined ? periodItem.period : periodItem.id;
+        const slot = PERIOD_TIME_MAP[periodNum] || {};
 
-        const startMin = parseTimeToMinutes(period.start);
+        const start = periodItem.start || slot.start;
+        const startLabel = periodItem.startLabel || slot.startLabel || start;
+        const isBreak = periodItem.isBreak || slot.isBreak;
+        const subject = (periodItem.subject || '').trim();
+
+        // Skip breaks & empty slots
+        if (
+          !start ||
+          isBreak ||
+          ['Free', 'No Class', 'Break', '-', 'Infinity Hour', 'Infinity Hour (Break)'].includes(subject)
+        ) {
+          return;
+        }
+
+        const startMin = parseTimeToMinutes(start);
         const diffMins = startMin - currentMinutes;
 
-        // Catch-up window: Class starting in <= 20 mins OR started in last 5 mins
-        if (diffMins >= -5 && diffMins <= 20) {
-          const alertKey = `class_10m_${todayDateStr}_${period.start}_${period.subject}`;
+        // Catch-up window: Class starting in <= 5 mins OR started in last 2 mins
+        if (diffMins >= -2 && diffMins <= 5) {
+          const alertKey = `class_5m_${todayDateStr}_P${periodNum}_${start}_${subject}`;
           if (!firedAlertsRef.current.has(alertKey)) {
             markAlertFired(alertKey);
 
-            let titleText = `⏰ Class in ${diffMins} minutes`;
+            let titleText = `⏰ Class Starting in ${diffMins} mins`;
             if (diffMins <= 0) {
-              titleText = `⏰ Class Started (${period.start})`;
-            } else if (diffMins <= 3) {
-              titleText = `⏰ Class Starting NOW (${period.start})`;
+              titleText = `⏰ Class Started (${startLabel})`;
+            } else if (diffMins <= 2) {
+              titleText = `⏰ Class Starting NOW (${startLabel})`;
             }
 
             addNotification({
@@ -89,53 +136,59 @@ export function useNotificationEngine() {
               type: 'class',
               category: 'Class Schedule',
               title: titleText,
-              body: `${period.subject} ${diffMins <= 0 ? 'started' : 'starts'} at ${period.start} in Room ${period.room || 'TBA'}`,
+              body: `${subject} starts ${diffMins <= 0 ? 'now' : `soon (${startLabel})`} in Room ${periodItem.room || 'TBA'}`,
               actionType: 'view_room',
-              actionData: { room: period.room, subject: period.subject },
+              actionData: { room: periodItem.room, subject: subject },
             });
           }
         }
       });
 
-      // ── [#4] Free Slot / Study Gap Alert (Resilient catch-up window) ──
-      // Check for gaps >= 60 mins between classes
-      if (todayClasses.length >= 2) {
-        for (let i = 0; i < todayClasses.length - 1; i++) {
-          const currentPeriod = todayClasses[i];
-          const nextPeriod = todayClasses[i + 1];
+      // ── [#4] Free Slot / Study Gap Alert ──
+      const validClassPeriods = todayClasses
+        .map(item => {
+          const pNum = item.period !== undefined ? item.period : item.id;
+          const slot = PERIOD_TIME_MAP[pNum] || {};
+          return {
+            ...item,
+            start: item.start || slot.start,
+            end: item.end || slot.end,
+            isBreak: item.isBreak || slot.isBreak,
+          };
+        })
+        .filter(p => p.start && p.end && !p.isBreak && !['Free', 'No Class', 'Break', '-', 'Infinity Hour', 'Infinity Hour (Break)'].includes((p.subject || '').trim()));
 
-          if (
-            currentPeriod && currentPeriod.end &&
-            nextPeriod && nextPeriod.start &&
-            !nextPeriod.isBreak && nextPeriod.subject !== 'No Class'
-          ) {
-            const currentEndMin = parseTimeToMinutes(currentPeriod.end);
-            const nextStartMin = parseTimeToMinutes(nextPeriod.start);
-            const gapLength = nextStartMin - currentEndMin;
+      if (validClassPeriods.length >= 2) {
+        for (let i = 0; i < validClassPeriods.length - 1; i++) {
+          const currentPeriod = validClassPeriods[i];
+          const nextPeriod = validClassPeriods[i + 1];
 
-            if (gapLength >= 60) {
-              const diffMins = currentEndMin - currentMinutes;
-              if (diffMins >= -10 && diffMins <= 20) {
-                const alertKey = `gap_10m_${todayDateStr}_${currentPeriod.end}`;
-                if (!firedAlertsRef.current.has(alertKey)) {
-                  markAlertFired(alertKey);
-                  addNotification({
-                    id: alertKey,
-                    type: 'gap',
-                    category: 'Study Assistant',
-                    title: `☕ Free Gap ${diffMins <= 0 ? 'Started' : `Starting in ${diffMins} mins`}`,
-                    body: `You have a ${Math.round(gapLength / 60)}h free slot after ${currentPeriod.end}. Click to find an empty room!`,
-                    actionType: 'empty_room',
-                    actionData: { gapLength },
-                  });
-                }
+          const currentEndMin = parseTimeToMinutes(currentPeriod.end);
+          const nextStartMin = parseTimeToMinutes(nextPeriod.start);
+          const gapLength = nextStartMin - currentEndMin;
+
+          if (gapLength >= 60) {
+            const diffMins = currentEndMin - currentMinutes;
+            if (diffMins >= -5 && diffMins <= 15) {
+              const alertKey = `gap_10m_${todayDateStr}_${currentPeriod.end}`;
+              if (!firedAlertsRef.current.has(alertKey)) {
+                markAlertFired(alertKey);
+                addNotification({
+                  id: alertKey,
+                  type: 'gap',
+                  category: 'Study Assistant',
+                  title: `☕ Free Gap ${diffMins <= 0 ? 'Started' : `Starting in ${diffMins} mins`}`,
+                  body: `You have a ${Math.round(gapLength / 60)}h free slot after ${currentPeriod.end}. Click to find an empty room!`,
+                  actionType: 'empty_room',
+                  actionData: { gapLength },
+                });
               }
             }
           }
         }
       }
 
-      // ── [#15] Notice Event Starting Soon / Recently Started (Resilient catch-up window) ──
+      // ── [#15] Notice Event Reminders (15 Minutes Before Event Start) ──
       try {
         let publishedNotices = [];
 
@@ -171,20 +224,20 @@ export function useNotificationEngine() {
             const nowTime = Date.now();
             const diffMinutes = Math.round((eventTime - nowTime) / (60 * 1000));
 
-            // Broad catch-up window: Event starts in next 45 mins OR started in last 60 mins!
-            if (diffMinutes >= -60 && diffMinutes <= 45) {
+            // Catch-up window: Event starting in <= 15 mins OR started in last 5 mins
+            if (diffMinutes >= -5 && diffMinutes <= 15) {
               const alertKey = `event_15m_${notice.id}`;
               if (!firedAlertsRef.current.has(alertKey)) {
                 markAlertFired(alertKey);
 
                 let eventTitle = `🎟️ Event Starting in ${diffMinutes} mins`;
-                let eventBody = `"${notice.title}" by ${notice.society || 'College'} is starting at ${notice.venue || 'Campus'}!`;
+                let eventBody = `"${notice.title}" by ${notice.society || 'College'} starts in ${diffMinutes} minutes at ${notice.venue || 'Campus'}!`;
 
-                if (diffMinutes <= 0 && diffMinutes >= -60) {
+                if (diffMinutes <= 0 && diffMinutes >= -5) {
                   const eventTimeFormatted = new Date(notice.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                  eventTitle = `🎟️ Event Today (${eventTimeFormatted})`;
-                  eventBody = `"${notice.title}" by ${notice.society || 'College'} started at ${eventTimeFormatted} (${notice.venue || 'Campus'})`;
-                } else if (diffMinutes <= 5) {
+                  eventTitle = `🎟️ Event Starting NOW (${eventTimeFormatted})`;
+                  eventBody = `"${notice.title}" by ${notice.society || 'College'} is starting now at ${notice.venue || 'Campus'}!`;
+                } else if (diffMinutes <= 3) {
                   eventTitle = `🎟️ Event Starting NOW`;
                 }
 
