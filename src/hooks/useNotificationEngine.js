@@ -144,50 +144,6 @@ export function useNotificationEngine() {
         }
       });
 
-      // ── [#4] Free Slot / Study Gap Alert ──
-      const validClassPeriods = todayClasses
-        .map(item => {
-          const pNum = item.period !== undefined ? item.period : item.id;
-          const slot = PERIOD_TIME_MAP[pNum] || {};
-          return {
-            ...item,
-            start: item.start || slot.start,
-            end: item.end || slot.end,
-            isBreak: item.isBreak || slot.isBreak,
-          };
-        })
-        .filter(p => p.start && p.end && !p.isBreak && !['Free', 'No Class', 'Break', '-', 'Infinity Hour', 'Infinity Hour (Break)'].includes((p.subject || '').trim()));
-
-      if (validClassPeriods.length >= 2) {
-        for (let i = 0; i < validClassPeriods.length - 1; i++) {
-          const currentPeriod = validClassPeriods[i];
-          const nextPeriod = validClassPeriods[i + 1];
-
-          const currentEndMin = parseTimeToMinutes(currentPeriod.end);
-          const nextStartMin = parseTimeToMinutes(nextPeriod.start);
-          const gapLength = nextStartMin - currentEndMin;
-
-          if (gapLength >= 60) {
-            const diffMins = currentEndMin - currentMinutes;
-            if (diffMins >= -5 && diffMins <= 15) {
-              const alertKey = `gap_10m_${todayDateStr}_${currentPeriod.end}`;
-              if (!firedAlertsRef.current.has(alertKey)) {
-                markAlertFired(alertKey);
-                addNotification({
-                  id: alertKey,
-                  type: 'gap',
-                  category: 'Study Assistant',
-                  title: `☕ Free Gap ${diffMins <= 0 ? 'Started' : `Starting in ${diffMins} mins`}`,
-                  body: `You have a ${Math.round(gapLength / 60)}h free slot after ${currentPeriod.end}. Click to find an empty room!`,
-                  actionType: 'empty_room',
-                  actionData: { gapLength },
-                });
-              }
-            }
-          }
-        }
-      }
-
       // ── [#15] Notice Event Reminders (15 Minutes Before Event Start) ──
       try {
         let publishedNotices = [];

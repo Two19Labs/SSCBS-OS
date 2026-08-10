@@ -186,7 +186,7 @@ export default function NotificationCenter({ onNavigate }) {
           <div className="notif-filter-bar">
             {[
               { id: 'all', label: 'All' },
-              { id: 'class', label: 'Classes & Gaps' },
+              { id: 'class', label: 'Classes' },
               { id: 'team', label: 'Team Finder' },
               { id: 'event', label: 'Events' },
             ].map(tab => (
@@ -207,7 +207,7 @@ export default function NotificationCenter({ onNavigate }) {
                 <BellIcon size={32} className="notif-empty-icon" />
                 <p className="notif-empty-title">All caught up!</p>
                 <p className="notif-empty-desc">
-                  No notifications right now. Class countdowns, gap alerts, and team requests will appear here.
+                  No notifications right now. Class countdowns, event alerts, and team requests will appear here.
                 </p>
               </div>
             ) : (
