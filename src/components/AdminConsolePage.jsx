@@ -845,7 +845,7 @@ function AdminConsoleContent({ onBack }) {
   // ══════════════════════════════════════════════
   const TIMETABLE_AI_PROMPT = `You are a precise timetable extractor for Shaheed Sukhdev College of Business Studies (SSCBS), University of Delhi.
 
-I have attached an Excel timetable file. Read EVERY sheet and extract ALL timetable blocks. Output them in the EXACT structured text format described below. Do NOT skip any section, semester, or day.
+CRITICAL MANDATE: Output ONLY raw extracted timetable blocks using the EXACT template below. Do NOT add conversational intros, greetings ("Here is your timetable..."), explanations, or wrap-up notes. Begin immediately with the first === header block.
 
 ═══════════════════════════════════════════════
 UNDERSTANDING THE EXCEL STRUCTURE
@@ -895,8 +895,8 @@ RULE 3 — HANDLING ANNOTATIONS IN CELLS:
   - "(237)" or "(Room 651)" = Room number override. Extract as "Room 237" or "Room 651".
   - "(703/651)" = Split rooms. Output as "Room 703 / Room 651".
   - "(Merged with BMS 3A)" = Merged class info. Include in subject but NOT in teacher name.
-  - "(Unsupervised)" = No teacher present. Subject becomes "Free", teacher becomes "-".
-  - "EE-1 (P) (Unsupervised)" or "C&I (P) (Unsupervised)" or "SOFP (P) (Unsupervised)" = Free period, teacher is "-".
+  - "(Unsupervised)" = No teacher present. If subject is known (e.g., SOFP (P)), output "[Subject] (Practical)", teacher "-". If unknown, subject becomes "Free", teacher "-".
+  - "EE-1 (P) (Unsupervised)" or "C&I (P) (Unsupervised)" = Free period, teacher is "-".
   - "Lab 426" or "Lab 460" = Room override to "Lab 426" or "Lab 460".
   - "(SEC Room)" = Use default room.
 
@@ -938,7 +938,7 @@ RULE 8 — PERIOD NUMBERING:
   Period I = P1, Period II = P2, Period III = P3, then BREAK, then Period IV = P4, Period V = P5, Period VI = P6, Period VII = P7
 
 ═══════════════════════════════════════════════
-REQUIRED OUTPUT FORMAT
+REQUIRED OUTPUT FORMAT (STRICT TEMPLATE)
 ═══════════════════════════════════════════════
 
 Output EVERY timetable block in this EXACT format. Do not deviate.
@@ -966,7 +966,6 @@ Friday:
 IMPORTANT FORMATTING RULES:
 - Every day MUST have exactly 7 period lines (P1-P3, BREAK, P4-P7)
 - Use "Free | - | -" for empty/free periods
-- Use "Free | - | -" for unsupervised periods
 - The BREAK line has no subject/teacher/room, just the word "BREAK"
 - Separate blocks with a blank line
 - Use the FULL faculty name from the legend (e.g., "Dr. Mona Verma", NOT "MV")
@@ -974,20 +973,28 @@ IMPORTANT FORMATTING RULES:
 - Include "(Practical)" or "(Tutorial)" in the subject name where applicable
 - For teacher names, use the exact prefix from the legend: Dr., Mr., Ms., Prof.
 
-Now extract ALL timetable blocks from the attached Excel file.`;
+Extract ALL timetable blocks from the attached Excel file now:`;
 
   // ══════════════════════════════════════════════
-  // DETERMINISTIC TEXT PARSER (Fallback / Primary)
+  // DETERMINISTIC TEXT PARSER (Resilient Client-Side)
   // ══════════════════════════════════════════════
-  const parseStructuredText = (text) => {
+  const parseStructuredText = (rawText) => {
     const timetables = {};
-    const blocks = text.split(/^===\s*/m).filter(b => b.trim());
+    if (!rawText || typeof rawText !== 'string') return { timetables, parsedCount: 0, errorCount: 0 };
+
+    // Strip markdown code fences (e.g. ```markdown ... ```) if LLM wrapped output
+    const cleanedRawText = rawText
+      .replace(/^```[a-z]*\s*/gim, '')
+      .replace(/```$/gim, '')
+      .trim();
+
+    const blocks = cleanedRawText.split(/^===\s*/m).filter(b => b.trim());
     let parsedCount = 0;
     let errorCount = 0;
 
     for (const block of blocks) {
       try {
-        // Parse header: [COURSE] | Semester [N] | Section [X] | [Room] ===
+        // Parse header line: [COURSE] | Semester [N] | Section [X] | [Room] ===
         const headerEnd = block.indexOf('===');
         const headerLine = headerEnd > -1 ? block.substring(0, headerEnd).trim() : block.split('\n')[0].trim();
         const bodyText = headerEnd > -1 ? block.substring(headerEnd + 3).trim() : block.substring(block.indexOf('\n')).trim();
@@ -1041,18 +1048,16 @@ Now extract ALL timetable blocks from the attached Excel file.`;
 
           if (dayBlock) {
             const periodLines = dayBlock.lines.filter(l => l.trim());
-            let periodIdx = 0;
-            const periodIds = [1, 2, 3, 0, 4, 5, 6, 7];
 
             for (const pLine of periodLines) {
               const trimmed = pLine.trim();
               if (trimmed === 'BREAK' || trimmed.toLowerCase().includes('break')) {
                 dayClasses.push({ period: 0, isBreak: true, subject: 'Infinity Hour (Break)', teacher: '', room: '' });
-                periodIdx++;
                 continue;
               }
 
-              const pMatch = trimmed.match(/^P(\d):\s*(.*)/);
+              // Ultra-resilient period match: handles P1:, P 1:, Period 1:, P1 -
+              const pMatch = trimmed.match(/^(?:P|Period)\s*(\d+)[\s:-]+(.*)/i);
               if (pMatch) {
                 const pNum = parseInt(pMatch[1]);
                 const content = pMatch[2].trim();
@@ -1062,13 +1067,19 @@ Now extract ALL timetable blocks from the attached Excel file.`;
                 const teacher = parts.length > 1 ? parts[1] : '-';
                 const room = parts.length > 2 ? parts[2] : (subject === 'Free' ? '-' : defaultRoom);
 
-                dayClasses.push({ period: pNum, subject, teacher, room });
-                periodIdx++;
+                const slot = { period: pNum, subject, teacher, room };
+                
+                // Infer practical flag if subject contains practical/lab keywords
+                if (/practical|lab|prac/i.test(subject)) {
+                  slot.isPractical = true;
+                }
+
+                dayClasses.push(slot);
               }
             }
           }
 
-          // Fill missing periods
+          // Fill missing periods if incomplete
           if (dayClasses.length === 0) {
             [1, 2, 3].forEach(p => dayClasses.push({ period: p, subject: 'Free', teacher: '-', room: '-' }));
             dayClasses.push({ period: 0, isBreak: true, subject: 'Infinity Hour (Break)', teacher: '', room: '' });
@@ -1098,7 +1109,7 @@ Now extract ALL timetable blocks from the attached Excel file.`;
   };
 
   // ══════════════════════════════════════════════
-  // HUGGING FACE TEXT-TO-JSON PARSER
+  // DETERMINISTIC AI TEXT PARSER
   // ══════════════════════════════════════════════
   const parseTimetableText = async (text, category) => {
     const isCs = category === 'cs';
@@ -1114,12 +1125,10 @@ Now extract ALL timetable blocks from the attached Excel file.`;
       const { timetables, parsedCount, errorCount } = parseStructuredText(text);
 
       if (parsedCount > 0) {
-        // Filter by category
+        // Filter by category or keep all valid recognized courses
         const filtered = {};
         for (const [courseName, sems] of Object.entries(timetables)) {
-          if (isCs && courseName === 'Bsc Comp Sci') {
-            filtered[courseName] = sems;
-          } else if (!isCs && (courseName === 'BMS' || courseName === 'BBA FIA')) {
+          if (courseName === 'Bsc Comp Sci' || courseName === 'BMS' || courseName === 'BBA FIA') {
             filtered[courseName] = sems;
           }
         }
