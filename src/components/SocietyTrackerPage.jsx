@@ -374,7 +374,7 @@ export default function SocietyTrackerPage({ onBack }) {
                       title="Watch Instagram Updates"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <InstagramIcon size={16} />
+                      <InstagramIcon size={20} />
                     </a>
                     <a
                       href={society.linkedinUrl || 'https://linkedin.com'}
@@ -384,7 +384,7 @@ export default function SocietyTrackerPage({ onBack }) {
                       title="View LinkedIn Profile"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <LinkedinIcon size={16} />
+                      <LinkedinIcon size={20} />
                     </a>
                   </div>
                       </>
@@ -573,7 +573,7 @@ export default function SocietyTrackerPage({ onBack }) {
                   className="st-social-btn insta"
                   title="Instagram Updates"
                 >
-                  <InstagramIcon size={18} />
+                  <InstagramIcon size={22} />
                 </a>
                 <a
                   href={selectedSociety.linkedinUrl || 'https://linkedin.com'}
@@ -582,7 +582,7 @@ export default function SocietyTrackerPage({ onBack }) {
                   className="st-social-btn linkedin"
                   title="LinkedIn Profile"
                 >
-                  <LinkedinIcon size={18} />
+                  <LinkedinIcon size={22} />
                 </a>
               </div>
             </div>

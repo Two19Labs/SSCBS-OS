@@ -652,36 +652,31 @@
   justify-content: center;
   background: var(--surface);
   border: 1px solid var(--border);
-  color: var(--ink-dim);
   text-decoration: none;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
   flex-shrink: 0;
 }
 
 .st-social-btn.insta {
-  background: rgba(228, 64, 95, 0.08);
-  border-color: rgba(228, 64, 95, 0.25);
-  color: #e4405f;
+  background: #ffffff;
+  border-color: rgba(225, 48, 108, 0.25);
 }
 
 .st-social-btn.insta:hover {
-  background: #e4405f;
-  color: #ffffff;
-  border-color: #e4405f;
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.05);
+  border-color: #e1306c;
+  box-shadow: 0 4px 12px rgba(225, 48, 108, 0.3);
 }
 
 .st-social-btn.linkedin {
-  background: rgba(10, 102, 194, 0.08);
+  background: #ffffff;
   border-color: rgba(10, 102, 194, 0.25);
-  color: #0a66c2;
 }
 
 .st-social-btn.linkedin:hover {
-  background: #0a66c2;
-  color: #ffffff;
+  transform: translateY(-2px) scale(1.05);
   border-color: #0a66c2;
-  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(10, 102, 194, 0.3);
 }
 
 /* ── Full Society Detail Modal ── */
