@@ -1,4 +1,4 @@
-// SSCBS Society Recruitment Data Store - Official Full Names & Portfolio Page Links
+// SSCBS Society Recruitment Data Store - Official Full Names & Verified Portfolio Page Links
 
 export const CATEGORIES = [
   { id: 'all', label: 'All Domains (47)', icon: '⚡' },
@@ -407,7 +407,7 @@ export const DEMO_SOCIETIES = [
     recruitmentFormUrl: null,
     deadline: null,
     statusText: 'Recruitments will start soon, forms and info will come here soon!',
-    officialPageUrl: 'https://sscbs.du.ac.in/portfolio/gender-champion/',
+    officialPageUrl: 'https://sscbs.du.ac.in/portfolio/gender-champion-program/',
     instagramVideoUrl: 'https://instagram.com',
     linkedinUrl: 'https://linkedin.com',
     defaultBookmarked: false,
@@ -427,7 +427,7 @@ export const DEMO_SOCIETIES = [
     recruitmentFormUrl: null,
     deadline: null,
     statusText: 'Recruitments will start soon, forms and info will come here soon!',
-    officialPageUrl: 'https://sscbs.du.ac.in/portfolio/girl-up/',
+    officialPageUrl: 'https://sscbs.du.ac.in/portfolio/girl-up-ruhi/',
     instagramVideoUrl: 'https://instagram.com',
     linkedinUrl: 'https://linkedin.com',
     defaultBookmarked: false,
@@ -827,7 +827,7 @@ export const DEMO_SOCIETIES = [
     recruitmentFormUrl: null,
     deadline: null,
     statusText: 'Recruitments will start soon, forms and info will come here soon!',
-    officialPageUrl: 'https://sscbs.du.ac.in/portfolio/ima/',
+    officialPageUrl: 'https://sscbs.du.ac.in/portfolio/ima-chapter/',
     instagramVideoUrl: 'https://instagram.com',
     linkedinUrl: 'https://linkedin.com',
     defaultBookmarked: false,
@@ -847,7 +847,7 @@ export const DEMO_SOCIETIES = [
     recruitmentFormUrl: null,
     deadline: null,
     statusText: 'Recruitments will start soon, forms and info will come here soon!',
-    officialPageUrl: 'https://sscbs.du.ac.in/portfolio/apics/',
+    officialPageUrl: 'https://sscbs.du.ac.in/portfolio/apics-chapter/',
     instagramVideoUrl: 'https://instagram.com',
     linkedinUrl: 'https://linkedin.com',
     defaultBookmarked: false,
