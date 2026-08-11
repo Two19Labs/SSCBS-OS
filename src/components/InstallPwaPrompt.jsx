@@ -21,11 +21,17 @@ export default function InstallPwaPrompt() {
       return;
     }
 
-    // 2. Mobile detection (iOS / Android / mobile devices or narrow screen)
+    // 2. Mobile detection (iOS / Android / mobile devices)
     const ua = (window.navigator.userAgent || '').toLowerCase();
-    const iosDevice = /iphone|ipad|ipod/.test(ua);
-    const mobileDevice = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile/i.test(ua) || window.innerWidth <= 768;
-    
+    // iPadOS 13+ reports a desktop Safari UA; a touch-capable "Macintosh" is an iPad.
+    const iPadOS = /macintosh/.test(ua) && window.navigator.maxTouchPoints > 1;
+    const iosDevice = /iphone|ipad|ipod/.test(ua) || iPadOS;
+    const uaMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile/i.test(ua);
+    // A narrow window alone is not mobile — require a touch pointer so a resized
+    // laptop browser never matches.
+    const coarsePointer = window.matchMedia('(pointer: coarse)').matches;
+    const mobileDevice = uaMobile || iPadOS || (coarsePointer && window.innerWidth <= 768);
+
     setIsIOS(iosDevice);
     setIsMobile(mobileDevice);
 
@@ -70,8 +76,9 @@ export default function InstallPwaPrompt() {
     return null;
   }
 
-  // Show on mobile browser every time (or desktop if install prompt available)
-  if (!isMobile && !deferredPrompt) {
+  // Mobile only. Desktop Chrome also fires beforeinstallprompt, so having a
+  // deferredPrompt must not be enough to show the banner on a laptop.
+  if (!isMobile) {
     return null;
   }
 
