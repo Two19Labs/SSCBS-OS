@@ -15,6 +15,7 @@ import {
 import './SocietyTrackerPage.css';
 
 const LOCAL_STORAGE_KEY = 'sscbs_bookmarked_societies';
+const OFFICIAL_COLLEGE_SOCIETIES_URL = 'https://sscbs.du.ac.in/societies/';
 
 export default function SocietyTrackerPage({ onBack }) {
   const [activeTab, setActiveTab] = useState('all'); // 'all' | 'preferred'
@@ -202,44 +203,42 @@ export default function SocietyTrackerPage({ onBack }) {
                 className="st-card"
                 onClick={() => setSelectedSociety(society)}
               >
-                {/* Uniform Card Header Bar */}
-                <div className="st-card-top">
-                  <div className="st-card-badges">
-                    <span className="st-domain-badge">
-                      {primaryLabel.toUpperCase()}
-                    </span>
-                    {extraCount > 0 && (
-                      <span
-                        className="st-domain-badge st-more-badge"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedSociety(society);
-                        }}
-                        title="Click to view all categories & details"
-                      >
-                        +{extraCount} MORE
+                {/* Header & Title (Clean, No Description) */}
+                <div>
+                  <div className="st-card-top">
+                    <div className="st-card-badges">
+                      <span className="st-domain-badge">
+                        {primaryLabel.toUpperCase()}
                       </span>
-                    )}
+                      {extraCount > 0 && (
+                        <span
+                          className="st-domain-badge st-more-badge"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedSociety(society);
+                          }}
+                          title="Click to view all categories & details"
+                        >
+                          +{extraCount} MORE
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      className={`st-bookmark-btn ${isSaved ? 'active' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleBookmark(society.id);
+                      }}
+                      title={isSaved ? 'Remove from preferred' : 'Save to preferred'}
+                    >
+                      <BookmarkIcon filled={isSaved} size={15} />
+                    </button>
                   </div>
-                  <button
-                    className={`st-bookmark-btn ${isSaved ? 'active' : ''}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleBookmark(society.id);
-                    }}
-                    title={isSaved ? 'Remove from preferred' : 'Save to preferred'}
-                  >
-                    <BookmarkIcon filled={isSaved} size={15} />
-                  </button>
-                </div>
 
-                {/* Card Body */}
-                <div className="st-card-body">
                   <h3 className="st-society-title">{society.name}</h3>
-                  <p className="st-society-desc">{society.description}</p>
                 </div>
 
-                {/* Card Bottom */}
+                {/* Card Bottom / Action Row */}
                 <div className="st-card-bottom">
                   <div className="st-deadline-box">
                     <span className="st-deadline-lbl">
@@ -248,31 +247,39 @@ export default function SocietyTrackerPage({ onBack }) {
                     <span style={{ fontWeight: 600, fontSize: '0.8rem' }}>Recruitments Starting Soon</span>
                   </div>
 
+                  {/* Buttons Row */}
                   <div className="st-card-actions">
-                    <button
-                      className="st-details-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedSociety(society);
-                      }}
+                    <span
+                      className="st-apply-btn disabled"
+                      title="Recruitment forms will drop here soon"
                     >
-                      View Details
-                    </button>
+                      Forms Opening Soon
+                    </span>
                     <a
-                      href={society.instagramVideoUrl}
+                      href={OFFICIAL_COLLEGE_SOCIETIES_URL}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="st-social-btn"
+                      className="st-college-btn"
+                      title="Visit Official SSCBS Web Page"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      College Page <ExternalLinkIcon size={12} />
+                    </a>
+                    <a
+                      href={society.instagramVideoUrl || 'https://instagram.com'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="st-social-btn insta"
                       title="Watch Instagram Updates"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <InstagramIcon size={16} />
                     </a>
                     <a
-                      href={society.linkedinUrl}
+                      href={society.linkedinUrl || 'https://linkedin.com'}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="st-social-btn"
+                      className="st-social-btn linkedin"
                       title="View LinkedIn Profile"
                       onClick={(e) => e.stopPropagation()}
                     >
@@ -301,7 +308,7 @@ export default function SocietyTrackerPage({ onBack }) {
           </p>
           {activeTab === 'preferred' && (
             <button
-              className="st-details-btn"
+              className="st-college-btn"
               style={{ display: 'inline-flex', width: 'auto', padding: '9px 18px' }}
               onClick={() => {
                 setActiveTab('all');
@@ -395,24 +402,34 @@ export default function SocietyTrackerPage({ onBack }) {
             </div>
 
             <div className="st-modal-footer">
-              <span className="st-modal-form-disabled">
-                Forms &amp; Info Coming Soon
-              </span>
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <span className="st-modal-form-disabled">
+                  Forms Opening Soon
+                </span>
                 <a
-                  href={selectedSociety.instagramVideoUrl}
+                  href={OFFICIAL_COLLEGE_SOCIETIES_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="st-social-btn"
+                  className="st-college-btn"
+                >
+                  Visit Official SSCBS Web Page <ExternalLinkIcon size={12} />
+                </a>
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <a
+                  href={selectedSociety.instagramVideoUrl || 'https://instagram.com'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="st-social-btn insta"
                   title="Instagram Updates"
                 >
                   <InstagramIcon size={18} />
                 </a>
                 <a
-                  href={selectedSociety.linkedinUrl}
+                  href={selectedSociety.linkedinUrl || 'https://linkedin.com'}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="st-social-btn"
+                  className="st-social-btn linkedin"
                   title="LinkedIn Profile"
                 >
                   <LinkedinIcon size={18} />

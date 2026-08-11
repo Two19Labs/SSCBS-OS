@@ -285,7 +285,7 @@
   font-weight: 600;
 }
 
-/* ── Societies Grid (Uniform Equal Heights) ── */
+/* ── Societies Grid (Clean Uniform Cards without Descriptions) ── */
 .st-societies-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -387,33 +387,15 @@
   border-color: var(--accent);
 }
 
-.st-card-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  margin: 10px 0 14px;
-}
-
 .st-society-title {
-  font-size: 1.12rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: var(--ink);
-  margin: 0 0 6px 0;
+  margin: 12px 0 16px 0;
   line-height: 1.35;
   letter-spacing: -0.2px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.st-society-desc {
-  font-size: 0.83rem;
-  color: var(--ink-dim);
-  line-height: 1.45;
-  margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -447,39 +429,56 @@
   font-weight: 600;
 }
 
-/* ── Card Actions ── */
+/* ── Card Actions Row ── */
 .st-card-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
-.st-details-btn {
+.st-apply-btn.disabled {
   flex: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 9px 14px;
+  padding: 8px 10px;
   background: var(--tint);
+  border: 1px solid var(--border);
+  color: var(--ink-dim);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.st-college-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 10px;
+  background: var(--surface);
   border: 1px solid var(--border);
   color: var(--ink);
   border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.82rem;
-  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
   transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
-.st-details-btn:hover {
-  background: var(--accent);
-  color: var(--on-accent, #ffffff);
-  border-color: var(--accent);
+.st-college-btn:hover {
+  background: var(--tint);
+  border-color: var(--ink);
+  transform: translateY(-1px);
 }
 
+/* ── Coloured Social Buttons ── */
 .st-social-btn {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
@@ -492,10 +491,29 @@
   flex-shrink: 0;
 }
 
-.st-social-btn:hover {
-  border-color: var(--ink);
-  color: var(--ink);
-  background: var(--tint);
+.st-social-btn.insta {
+  background: rgba(228, 64, 95, 0.08);
+  border-color: rgba(228, 64, 95, 0.25);
+  color: #e4405f;
+}
+
+.st-social-btn.insta:hover {
+  background: #e4405f;
+  color: #ffffff;
+  border-color: #e4405f;
+  transform: translateY(-1px);
+}
+
+.st-social-btn.linkedin {
+  background: rgba(10, 102, 194, 0.08);
+  border-color: rgba(10, 102, 194, 0.25);
+  color: #0a66c2;
+}
+
+.st-social-btn.linkedin:hover {
+  background: #0a66c2;
+  color: #ffffff;
+  border-color: #0a66c2;
   transform: translateY(-1px);
 }
 
