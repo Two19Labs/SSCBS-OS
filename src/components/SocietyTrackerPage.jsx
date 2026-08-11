@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { CATEGORIES, DEMO_SOCIETIES, getDeadlineInfo } from '../data/societies';
 import {
   SearchIcon,
@@ -45,6 +45,24 @@ export default function SocietyTrackerPage({ onBack }) {
       console.error('Error saving bookmarks:', err);
     }
   }, [bookmarkedIds]);
+
+  // Live countdown timer — ticks every second
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const getCountdown = useCallback((deadlineStr) => {
+    if (!deadlineStr) return null;
+    const diff = new Date(deadlineStr) - now;
+    if (diff <= 0) return { label: 'Closed', expired: true };
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    const pad = (n) => String(n).padStart(2, '0');
+    return { label: `${pad(h)}:${pad(m)}:${pad(s)}`, expired: false, hours: h };
+  }, [now]);
 
   const toggleBookmark = (id) => {
     setBookmarkedIds((prev) =>
@@ -240,21 +258,54 @@ export default function SocietyTrackerPage({ onBack }) {
 
                 {/* Card Bottom / Action Row */}
                 <div className="st-card-bottom">
-                  <div className="st-deadline-box">
-                    <span className="st-deadline-lbl">
-                      <ClockIcon size={14} /> Status
-                    </span>
-                    <span style={{ fontWeight: 600, fontSize: '0.8rem' }}>Recruitments Starting Soon</span>
-                  </div>
+                  {(() => {
+                    const dl = getDeadlineInfo(society.deadline);
+                    const countdown = getCountdown(society.deadline);
+                    const hasForm = !!society.recruitmentFormUrl;
+                    return (
+                      <>
+                        <div className="st-deadline-box">
+                          <span className="st-deadline-lbl">
+                            <ClockIcon size={14} /> Status
+                          </span>
+                          <span style={{ fontWeight: 600, fontSize: '0.8rem' }} className={dl.status === 'urgent' ? 'st-status-urgent' : dl.isExpired ? 'st-status-expired' : ''}>
+                            {society.statusText || dl.text}
+                          </span>
+                        </div>
 
-                  {/* Buttons Row */}
-                  <div className="st-card-actions">
-                    <span
-                      className="st-apply-btn disabled"
-                      title="Recruitment forms will drop here soon"
-                    >
-                      Forms Opening Soon
-                    </span>
+                        {countdown && !countdown.expired && (
+                          <div className={`st-countdown-strip ${countdown.hours < 4 ? 'urgent' : ''}`}>
+                            <ClockIcon size={12} />
+                            <span className="st-countdown-label">Closes in</span>
+                            <span className="st-countdown-timer">{countdown.label}</span>
+                          </div>
+                        )}
+
+                        {/* Buttons Row */}
+                        <div className="st-card-actions">
+                          {hasForm && !dl.isExpired ? (
+                            <a
+                              href={society.recruitmentFormUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="st-apply-btn live"
+                              title="Open recruitment form"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              Apply Now ↗
+                            </a>
+                          ) : dl.isExpired ? (
+                            <span className="st-apply-btn disabled expired">
+                              Applications Closed
+                            </span>
+                          ) : (
+                            <span
+                              className="st-apply-btn disabled"
+                              title="Recruitment forms will drop here soon"
+                            >
+                              Forms Opening Soon
+                            </span>
+                          )}
                     <a
                       href={OFFICIAL_COLLEGE_SOCIETIES_URL}
                       target="_blank"
@@ -286,6 +337,9 @@ export default function SocietyTrackerPage({ onBack }) {
                       <LinkedinIcon size={16} />
                     </a>
                   </div>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
             );
@@ -376,15 +430,31 @@ export default function SocietyTrackerPage({ onBack }) {
 
               <div className="st-modal-section">
                 <h4 className="st-modal-sec-title">Recruitment Announcement</h4>
-                <div className="st-modal-status-box">
-                  <ClockIcon size={18} />
-                  <div>
-                    <strong>Recruitments Starting Soon</strong>
-                    <p style={{ margin: '2px 0 0 0', fontSize: '0.83rem', opacity: 0.88 }}>
-                      Official application forms, orientation details, and interview schedules will drop here soon!
-                    </p>
-                  </div>
-                </div>
+                {(() => {
+                  const dl = getDeadlineInfo(selectedSociety.deadline);
+                  const countdown = getCountdown(selectedSociety.deadline);
+                  const hasForm = !!selectedSociety.recruitmentFormUrl;
+                  return (
+                    <>
+                      <div className={`st-modal-status-box ${hasForm && !dl.isExpired ? 'live' : ''}`}>
+                        <ClockIcon size={18} />
+                        <div>
+                          <strong>{selectedSociety.statusText || dl.text}</strong>
+                          {countdown && !countdown.expired && (
+                            <div className={`st-modal-countdown ${countdown.hours < 4 ? 'urgent' : ''}`}>
+                              ⏱️ <span className="st-countdown-timer">{countdown.label}</span> remaining
+                            </div>
+                          )}
+                          {!hasForm && (
+                            <p style={{ margin: '2px 0 0 0', fontSize: '0.83rem', opacity: 0.88 }}>
+                              Official application forms, orientation details, and interview schedules will drop here soon!
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
 
               <div className="st-modal-section">
@@ -403,9 +473,26 @@ export default function SocietyTrackerPage({ onBack }) {
 
             <div className="st-modal-footer">
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <span className="st-modal-form-disabled">
-                  Forms Opening Soon
-                </span>
+                {(() => {
+                  const dl = getDeadlineInfo(selectedSociety.deadline);
+                  const hasForm = !!selectedSociety.recruitmentFormUrl;
+                  if (hasForm && !dl.isExpired) {
+                    return (
+                      <a
+                        href={selectedSociety.recruitmentFormUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="st-apply-btn live modal-apply"
+                      >
+                        Apply Now ↗
+                      </a>
+                    );
+                  }
+                  if (dl.isExpired) {
+                    return <span className="st-modal-form-disabled">Applications Closed</span>;
+                  }
+                  return <span className="st-modal-form-disabled">Forms Opening Soon</span>;
+                })()}
                 <a
                   href={OFFICIAL_COLLEGE_SOCIETIES_URL}
                   target="_blank"

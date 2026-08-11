@@ -452,6 +452,111 @@
   cursor: default;
 }
 
+.st-apply-btn.disabled.expired {
+  color: #b91c1c;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.st-apply-btn.live {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  border: 1px solid #16a34a;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.15s, box-shadow 0.15s;
+  animation: applyPulse 2s ease-in-out infinite;
+}
+
+.st-apply-btn.live:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+}
+
+.st-apply-btn.live.modal-apply {
+  flex: unset;
+  padding: 10px 20px;
+  font-size: 0.88rem;
+}
+
+@keyframes applyPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.35); }
+  50% { box-shadow: 0 0 0 6px rgba(22, 163, 74, 0); }
+}
+
+/* ── Countdown Strip ── */
+.st-countdown-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #15803d;
+}
+
+.st-countdown-strip.urgent {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+  animation: urgentBlink 1.5s ease-in-out infinite;
+}
+
+@keyframes urgentBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.st-countdown-label {
+  opacity: 0.8;
+}
+
+.st-countdown-timer {
+  font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  font-weight: 800;
+  font-size: 0.82rem;
+  letter-spacing: 0.5px;
+}
+
+/* ── Status Colors ── */
+.st-status-urgent {
+  color: #b91c1c !important;
+}
+
+.st-status-expired {
+  color: #6b7280 !important;
+  text-decoration: line-through;
+}
+
+/* ── Modal Countdown ── */
+.st-modal-countdown {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #15803d;
+}
+
+.st-modal-countdown.urgent {
+  color: #b91c1c;
+}
+
+.st-modal-status-box.live {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
 .st-college-btn {
   display: inline-flex;
   align-items: center;
