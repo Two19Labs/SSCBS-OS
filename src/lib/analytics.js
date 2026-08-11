@@ -110,11 +110,13 @@ async function fetchActivePresenceFromDB() {
     const cutoff = new Date(Date.now() - 60000).toISOString();
     const { data, error } = await supabase
       .from('active_presence')
-      .select('id, user_id, session_id, name, email, course, semester, section, current_view, view_label, device, last_ping')
+      .select('user_id, session_id, name, email, course, semester, section, current_view, view_label, device, last_ping')
       .gte('last_ping', cutoff);
 
     if (error) {
-      if (error.code === 'PGRST205' || error.message?.includes('schema cache')) {
+      // 42703 = undefined column: a schema mismatch will never fix itself, so stop
+      // re-polling instead of spamming 400s every presence tick.
+      if (error.code === 'PGRST205' || error.code === '42703' || error.message?.includes('schema cache')) {
         isPresenceTableAvailable = false;
       }
       return [];

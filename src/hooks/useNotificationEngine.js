@@ -240,14 +240,13 @@ export function useNotificationEngine() {
           try {
             const { data: post } = await supabase
               .from('squad_posts')
-              .select('id, user_id, created_by_email, user_email, competition_name, title')
+              .select('id, user_id, created_by_email, competition_name, title')
               .eq('id', app.post_id)
               .single();
 
             const isHost = post && (
               (post.created_by_email && post.created_by_email.toLowerCase() === userEmail.toLowerCase()) ||
-              (post.user_id && post.user_id === user?.id) ||
-              (post.user_email && post.user_email.toLowerCase() === userEmail.toLowerCase())
+              (post.user_id && post.user_id === user?.id)
             );
 
             if (isHost && app.applicant_email?.toLowerCase() !== userEmail.toLowerCase()) {
@@ -321,10 +320,14 @@ export function useNotificationEngine() {
     const pollTeamFinderNotifications = async () => {
       try {
         // A. Fetch squad posts created by current user
+        // Ownership resolves via created_by_email / user_id only — squad_posts has no user_email column.
+        const ownerFilters = [`created_by_email.ilike."${userEmail}"`];
+        if (user.id) ownerFilters.push(`user_id.eq."${user.id}"`);
+
         const { data: myPostsData } = await supabase
           .from('squad_posts')
-          .select('id, title, competition_name, created_by_email, user_id, user_email')
-          .or(`created_by_email.ilike."${userEmail}",user_email.ilike."${userEmail}",user_id.eq."${user.id}"`);
+          .select('id, title, competition_name, created_by_email, user_id')
+          .or(ownerFilters.join(','));
 
         const myPosts = myPostsData || [];
 
