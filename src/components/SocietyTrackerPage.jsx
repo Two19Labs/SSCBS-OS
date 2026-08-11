@@ -16,47 +16,12 @@ import './SocietyTrackerPage.css';
 
 const LOCAL_STORAGE_KEY = 'sscbs_bookmarked_societies';
 
-function DeadlineCountdown({ deadlineStr }) {
-  const [now, setNow] = useState(Date.now());
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setNow(Date.now());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  if (!deadlineStr) return <span>No Deadline</span>;
-
-  const deadlineDate = new Date(deadlineStr).getTime();
-  const diffMs = deadlineDate - now;
-
-  if (diffMs <= 0) {
-    return <span className="st-timer-expired">Closed</span>;
-  }
-
-  const totalHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const days = Math.floor(totalHours / 24);
-  const hours = totalHours % 24;
-  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-
-  if (days >= 1) {
-    return <span>{days} {days === 1 ? 'day' : 'days'} left</span>;
-  }
-
-  return (
-    <span className="st-timer-counting">
-      {String(hours).padStart(2, '0')}h {String(minutes).padStart(2, '0')}m {String(seconds).padStart(2, '0')}s left
-    </span>
-  );
-}
-
 export default function SocietyTrackerPage({ onBack }) {
   const [activeTab, setActiveTab] = useState('all'); // 'all' | 'preferred'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('urgent');
+  const [sortBy, setSortBy] = useState('name');
+  const [selectedSociety, setSelectedSociety] = useState(null);
 
   // Bookmarks state with fallback to pre-bookmarked demo items
   const [bookmarkedIds, setBookmarkedIds] = useState(() => {
@@ -91,7 +56,8 @@ export default function SocietyTrackerPage({ onBack }) {
       return false;
     }
     if (selectedCategory !== 'all') {
-      const hasCat = society.category === selectedCategory ||
+      const hasCat =
+        society.category === selectedCategory ||
         (Array.isArray(society.categories) && society.categories.includes(selectedCategory));
       if (!hasCat) return false;
     }
@@ -99,7 +65,8 @@ export default function SocietyTrackerPage({ onBack }) {
       const q = searchQuery.toLowerCase().trim();
       const matchName = society.name.toLowerCase().includes(q);
       const matchCategory = society.categoryLabel.toLowerCase().includes(q);
-      const matchSubCats = Array.isArray(society.categoryLabels) &&
+      const matchSubCats =
+        Array.isArray(society.categoryLabels) &&
         society.categoryLabels.some((lbl) => lbl.toLowerCase().includes(q));
       return matchName || matchCategory || matchSubCats;
     }
@@ -107,12 +74,6 @@ export default function SocietyTrackerPage({ onBack }) {
   });
 
   const sortedSocieties = [...filteredSocieties].sort((a, b) => {
-    const deadlineA = getDeadlineInfo(a.deadline);
-    const deadlineB = getDeadlineInfo(b.deadline);
-
-    if (sortBy === 'urgent') {
-      return deadlineA.daysLeft - deadlineB.daysLeft;
-    }
     if (sortBy === 'name') {
       return a.name.localeCompare(b.name);
     }
@@ -120,9 +81,6 @@ export default function SocietyTrackerPage({ onBack }) {
   });
 
   const totalCount = DEMO_SOCIETIES.length;
-  const activeRecruitmentCount = DEMO_SOCIETIES.filter(
-    (s) => !getDeadlineInfo(s.deadline).isExpired
-  ).length;
   const bookmarkedCount = bookmarkedIds.length;
 
   return (
@@ -211,7 +169,6 @@ export default function SocietyTrackerPage({ onBack }) {
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
           >
-            <option value="urgent">Sort by: Closing Soonest</option>
             <option value="name">Sort by: Name (A-Z)</option>
           </select>
         </div>
@@ -235,82 +192,79 @@ export default function SocietyTrackerPage({ onBack }) {
         <div className="st-societies-grid">
           {sortedSocieties.map((society) => {
             const isSaved = bookmarkedIds.includes(society.id);
-            const deadlineInfo = getDeadlineInfo(society.deadline);
+            const categoryList = society.categoryLabels || [society.categoryLabel];
+            const primaryLabel = categoryList[0];
+            const extraCount = categoryList.length - 1;
 
             return (
-              <div key={society.id} className="st-card">
-                <div>
-                  <div className="st-card-top">
-                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                      {Array.isArray(society.categoryLabels) ? (
-                        society.categoryLabels.map((lbl, idx) => (
-                          <span key={idx} className="st-domain-badge">
-                            {lbl.toUpperCase()}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="st-domain-badge">
-                          {society.categoryLabel.toUpperCase()}
-                        </span>
-                      )}
-                    </div>
-                    <button
-                      className={`st-bookmark-btn ${isSaved ? 'active' : ''}`}
-                      onClick={() => toggleBookmark(society.id)}
-                      title={isSaved ? 'Remove from preferred' : 'Save to preferred'}
-                    >
-                      <BookmarkIcon filled={isSaved} size={15} />
-                    </button>
+              <div
+                key={society.id}
+                className="st-card"
+                onClick={() => setSelectedSociety(society)}
+              >
+                {/* Uniform Card Header Bar */}
+                <div className="st-card-top">
+                  <div className="st-card-badges">
+                    <span className="st-domain-badge">
+                      {primaryLabel.toUpperCase()}
+                    </span>
+                    {extraCount > 0 && (
+                      <span
+                        className="st-domain-badge st-more-badge"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedSociety(society);
+                        }}
+                        title="Click to view all categories & details"
+                      >
+                        +{extraCount} MORE
+                      </span>
+                    )}
                   </div>
-
-                  <h3 className="st-society-title">{society.name}</h3>
-                  <p className="st-society-desc" style={{ fontSize: '0.82rem', color: 'var(--text-secondary, #94a3b8)', marginTop: '8px', lineHeight: 1.45 }}>
-                    {society.description}
-                  </p>
+                  <button
+                    className={`st-bookmark-btn ${isSaved ? 'active' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleBookmark(society.id);
+                    }}
+                    title={isSaved ? 'Remove from preferred' : 'Save to preferred'}
+                  >
+                    <BookmarkIcon filled={isSaved} size={15} />
+                  </button>
                 </div>
 
-                <div className="st-card-bottom" style={{ marginTop: '14px' }}>
-                  {/* Status Banner */}
-                  <div className="st-deadline-box normal" style={{ background: 'rgba(59, 130, 246, 0.08)', borderColor: 'rgba(59, 130, 246, 0.25)', color: '#60a5fa' }}>
+                {/* Card Body */}
+                <div className="st-card-body">
+                  <h3 className="st-society-title">{society.name}</h3>
+                  <p className="st-society-desc">{society.description}</p>
+                </div>
+
+                {/* Card Bottom */}
+                <div className="st-card-bottom">
+                  <div className="st-deadline-box">
                     <span className="st-deadline-lbl">
                       <ClockIcon size={14} /> Status
                     </span>
-                    <span style={{ fontWeight: 600, fontSize: '0.82rem' }}>Recruitments Starting Soon</span>
+                    <span style={{ fontWeight: 600, fontSize: '0.8rem' }}>Recruitments Starting Soon</span>
                   </div>
 
-                  {/* Actions */}
-                  <div className="st-card-actions" style={{ marginTop: '10px' }}>
-                    {society.recruitmentFormUrl ? (
-                      <a
-                        href={society.recruitmentFormUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="st-apply-btn"
-                      >
-                        Apply Form <ExternalLinkIcon size={14} />
-                      </a>
-                    ) : (
-                      <span
-                        className="st-apply-btn"
-                        style={{
-                          opacity: 0.7,
-                          cursor: 'default',
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          borderColor: 'rgba(255, 255, 255, 0.1)',
-                          color: '#94a3b8',
-                          justifyContent: 'center',
-                          fontSize: '0.8rem'
-                        }}
-                      >
-                        Forms &amp; Info Coming Soon
-                      </span>
-                    )}
+                  <div className="st-card-actions">
+                    <button
+                      className="st-details-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedSociety(society);
+                      }}
+                    >
+                      View Details
+                    </button>
                     <a
                       href={society.instagramVideoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="st-social-btn"
                       title="Watch Instagram Updates"
+                      onClick={(e) => e.stopPropagation()}
                     >
                       <InstagramIcon size={16} />
                     </a>
@@ -320,6 +274,7 @@ export default function SocietyTrackerPage({ onBack }) {
                       rel="noopener noreferrer"
                       className="st-social-btn"
                       title="View LinkedIn Profile"
+                      onClick={(e) => e.stopPropagation()}
                     >
                       <LinkedinIcon size={16} />
                     </a>
@@ -341,12 +296,12 @@ export default function SocietyTrackerPage({ onBack }) {
           </h3>
           <p className="st-empty-sub">
             {activeTab === 'preferred'
-              ? 'Click the bookmark icon on any society card in "All Societies" to track their deadlines here!'
+              ? 'Click the bookmark icon on any society card in "All Societies" to track them here!'
               : 'Try clearing your search query or selecting a different category filter.'}
           </p>
           {activeTab === 'preferred' && (
             <button
-              className="st-apply-btn"
+              className="st-details-btn"
               style={{ display: 'inline-flex', width: 'auto', padding: '9px 18px' }}
               onClick={() => {
                 setActiveTab('all');
@@ -360,7 +315,115 @@ export default function SocietyTrackerPage({ onBack }) {
         </div>
       )}
 
-      {/* Helper Footer for Data Dumping */}
+      {/* Full Society Detail Modal */}
+      {selectedSociety && (
+        <div
+          className="st-modal-overlay"
+          onClick={() => setSelectedSociety(null)}
+        >
+          <div
+            className="st-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="st-modal-header">
+              <div>
+                <div className="st-modal-badges">
+                  {(selectedSociety.categoryLabels || [selectedSociety.categoryLabel]).map(
+                    (lbl, idx) => (
+                      <span key={idx} className="st-domain-badge">
+                        {lbl.toUpperCase()}
+                      </span>
+                    )
+                  )}
+                </div>
+                <h2 className="st-modal-title">{selectedSociety.name}</h2>
+              </div>
+              <div className="st-modal-header-actions">
+                <button
+                  className={`st-bookmark-btn ${
+                    bookmarkedIds.includes(selectedSociety.id) ? 'active' : ''
+                  }`}
+                  onClick={() => toggleBookmark(selectedSociety.id)}
+                  title="Bookmark"
+                >
+                  <BookmarkIcon
+                    filled={bookmarkedIds.includes(selectedSociety.id)}
+                    size={16}
+                  />
+                </button>
+                <button
+                  className="st-modal-close-btn"
+                  onClick={() => setSelectedSociety(null)}
+                  title="Close"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <div className="st-modal-body">
+              <div className="st-modal-section">
+                <h4 className="st-modal-sec-title">About the Society</h4>
+                <p className="st-modal-desc">{selectedSociety.description}</p>
+              </div>
+
+              <div className="st-modal-section">
+                <h4 className="st-modal-sec-title">Recruitment Announcement</h4>
+                <div className="st-modal-status-box">
+                  <ClockIcon size={18} />
+                  <div>
+                    <strong>Recruitments Starting Soon</strong>
+                    <p style={{ margin: '2px 0 0 0', fontSize: '0.83rem', opacity: 0.88 }}>
+                      Official application forms, orientation details, and interview schedules will drop here soon!
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="st-modal-section">
+                <h4 className="st-modal-sec-title">Domains &amp; Categories</h4>
+                <div className="st-modal-tags">
+                  {(selectedSociety.categoryLabels || [selectedSociety.categoryLabel]).map(
+                    (tag, i) => (
+                      <span key={i} className="st-modal-tag-pill">
+                        🏷️ {tag}
+                      </span>
+                    )
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="st-modal-footer">
+              <span className="st-modal-form-disabled">
+                Forms &amp; Info Coming Soon
+              </span>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <a
+                  href={selectedSociety.instagramVideoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="st-social-btn"
+                  title="Instagram Updates"
+                >
+                  <InstagramIcon size={18} />
+                </a>
+                <a
+                  href={selectedSociety.linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="st-social-btn"
+                  title="LinkedIn Profile"
+                >
+                  <LinkedinIcon size={18} />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Helper Footer */}
       <div className="st-footer-banner">
         💡 <strong>Got society recruitment details to add?</strong> Simply paste the society list &amp; links here and we'll update the dataset instantly!
       </div>
