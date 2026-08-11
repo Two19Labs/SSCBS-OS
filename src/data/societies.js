@@ -576,16 +576,16 @@ export const DEMO_SOCIETIES = [
     accentColor: '#f43f5e',
   },
 
-  // --- 29. Kartavya + Connecting Dream Foundation ---
+  // --- 29. Kartavya ---
   {
-    id: 'kartavya-cdf',
-    name: 'Kartavya & Connecting Dreams Foundation (CDF) SSCBS Chapter',
-    shortName: 'Kartavya+CDF',
+    id: 'kartavya',
+    name: 'Kartavya',
+    shortName: 'Kartavya',
     category: 'ecell',
     categoryLabel: 'Startups & Social Impact',
     categories: ['ecell', 'wellness'],
     categoryLabels: ['Startups & Social Impact', 'Inclusion & Sports'],
-    description: 'Social welfare initiative empowering underprivileged communities. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Social welfare forum of SSCBS empowering underprivileged communities and driving social service initiatives. Recruitments will start soon, forms and info will come here soon!',
     recruitmentFormUrl: null,
     deadline: null,
     statusText: 'Recruitments will start soon, forms and info will come here soon!',
@@ -594,6 +594,26 @@ export const DEMO_SOCIETIES = [
     linkedinUrl: 'https://www.linkedin.com/company/kartavya-the-social-service-forum-of-sscbs',
     defaultBookmarked: false,
     accentColor: '#fbbf24',
+  },
+
+  // --- 29b. Connecting Dreams Foundation (CDF) ---
+  {
+    id: 'cdf-sscbs',
+    name: 'Connecting Dreams Foundation SSCBS Chapter (CDF)',
+    shortName: 'CDF',
+    category: 'ecell',
+    categoryLabel: 'Startups & Social Impact',
+    categories: ['ecell', 'wellness'],
+    categoryLabels: ['Startups & Social Impact', 'Inclusion & Sports'],
+    description: 'Empowering youth to achieve sustainable development goals and drive social entrepreneurship. Recruitments will start soon, forms and info will come here soon!',
+    recruitmentFormUrl: null,
+    deadline: null,
+    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
+    instagramVideoUrl: 'https://instagram.com',
+    linkedinUrl: 'https://www.linkedin.com/company/connecting-dreams-foundation-sscbs/',
+    defaultBookmarked: false,
+    accentColor: '#10b981',
   },
 
   // --- 30. NUCLEUS ---
