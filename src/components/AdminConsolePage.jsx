@@ -877,11 +877,15 @@ CRITICAL EXTRACTION RULES
 ═══════════════════════════════════════════════
 
 RULE 1 — FACULTY CODE & LEGEND RESOLUTION (MOST IMPORTANT):
-  - Every cell contains faculty codes (e.g., "MV", "SP", "Deepali", "Sanchi", "Garima", "Soumya", "Komal", "OS", "KR", "AyG").
-  - Look up each code in the block's LEGEND TABLE to get full faculty name and paper name.
+  - Every cell contains faculty codes (e.g., "MV", "SP", "Deepali", "Sanchi", "Garima", "Soumya", "Komal", "OS", "KR", "RRS", "AyG").
+  - STRICT LOCAL LEGEND PRIORITY & MULTI-SEMESTER PROFESSORS:
+    * Faculty members teach DIFFERENT papers in DIFFERENT semesters!
+    * EXAMPLE: "RRS" (Dr. Rishi Rajan Sahay) teaches "Statistics for Business Decisions" in Semester 1, but teaches "Introduction to Business Analytics" in Semester 3.
+    * ALWAYS look up faculty codes in the LOCAL block's Legend Table for that specific semester/class block first.
+    * NEVER reuse or carry over a paper name learned from one semester block to a different semester block.
   - "OS" CODE DISAMBIGUATION: In grid cells, "OS" ALWAYS stands for faculty member "Prof. Onkar Singh" (Operating Systems is the course paper title, never a teacher code).
-  - CROSS-SHEET LEGEND FALLBACK: If a faculty code (e.g., Garima, Soumya, Komal) is missing from the local block legend, look it up in OTHER sheet legends in the workbook or map to full name (e.g. Dr. Garima Tripathi, Dr. Soumya Guliyan, Mr. Komal Sharma).
-  - DISAMBIGUATING MULTIPLE MATCHES: If a faculty code matches multiple rows in a legend (e.g., Soumya mapping to both Hindi B & C, KR mapping to Python & Front End, or Sushmita mapping to Core & VAC), inspect in-cell tags (e.g. "(Hin B)", "(Hin C)", "(SEC Lab)", "(VAC)") to pick the exact matching paper.
+  - CROSS-SHEET LEGEND FALLBACK: ONLY if a faculty code is completely missing from the local block legend, look it up in OTHER sheet legends in the workbook or map to full name (e.g. Dr. Garima Tripathi, Dr. Soumya Guliyan, Mr. Komal Sharma). NEVER let a cross-sheet lookup overwrite a valid local block legend mapping.
+  - DISAMBIGUATING MULTIPLE MATCHES: If a faculty code matches multiple rows in a local legend (e.g., Soumya mapping to both Hindi B & C, KR mapping to Python & Front End, or Sushmita mapping to Core & VAC), inspect in-cell tags (e.g. "(Hin B)", "(Hin C)", "(SEC Lab)", "(VAC)") to pick the exact matching paper.
 
 RULE 2 — COURSE NAME NORMALIZATION:
   - "BMS" → output as "BMS"

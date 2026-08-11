@@ -47,7 +47,7 @@ If a period cell does NOT contain an explicit 3-digit room number, fall back to 
 Every section block in the Excel sheet contains a Legend Table at the bottom:
 - **BMS / BBA FIA**: `S. No. | Paper Type | Paper Name | Faculty Name | Faculty Code`
 - **B.Sc. Comp Sci**: `Course Type | Course Name | Course Code | Faculty Name | Faculty Code`
-Extract `Paper Name` and `Faculty Name` for every code/initial to populate full subject titles (e.g. `TA` ➔ `Fundamentals of Management`, `AM` ➔ `Organizational Behaviour` / `Data Structures`, `RRS` ➔ `Introduction to Business Analytics`).
+Extract `Paper Name` and `Faculty Name` for every code/initial to populate full subject titles (e.g. `TA` ➔ `Fundamentals of Management`, `AM` ➔ `Organizational Behaviour` / `Data Structures`, `RRS` ➔ `Statistics for Business Decisions` in Sem 1 / `Introduction to Business Analytics` in Sem 3).
 
 ### 6. Split Cells & Multi-Group Support (`/`)
 Cells containing `/` (e.g. `G1: AM (534) / G2: MV (361)` or `Garima (Hin A) 607 / Soumya (Hin C) 644 / Komal (Hin D) 648`):
