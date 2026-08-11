@@ -256,7 +256,7 @@ export default function SocietyTrackerPage({ onBack }) {
                       Forms Opening Soon
                     </span>
                     <a
-                      href={OFFICIAL_COLLEGE_SOCIETIES_URL}
+                      href={society.officialPageUrl || OFFICIAL_COLLEGE_SOCIETIES_URL}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="st-college-btn"
@@ -407,7 +407,7 @@ export default function SocietyTrackerPage({ onBack }) {
                   Forms Opening Soon
                 </span>
                 <a
-                  href={OFFICIAL_COLLEGE_SOCIETIES_URL}
+                  href={selectedSociety.officialPageUrl || OFFICIAL_COLLEGE_SOCIETIES_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="st-college-btn"
