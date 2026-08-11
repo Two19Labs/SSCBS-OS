@@ -422,8 +422,15 @@
 }
 
 .st-card.is-filled {
-  border-color: #bbf7d0;
-  background: linear-gradient(180deg, #ffffff 0%, #f9fdfa 100%);
+  opacity: 0.62;
+  filter: grayscale(0.2);
+  background: var(--tint);
+  border-color: #e5e7eb;
+}
+
+.st-card.is-filled:hover {
+  opacity: 0.95;
+  filter: none;
 }
 
 .st-society-title {
