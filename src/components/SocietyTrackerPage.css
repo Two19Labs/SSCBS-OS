@@ -671,9 +671,24 @@
   color: #ffffff !important;
 }
 
+/* ── SSCBS Logo inside social button ── */
+.st-sscbs-logo {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  border-radius: 50%;
+  filter: grayscale(1) opacity(0.5);
+  transition: filter 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .st-social-btn.sscbs:hover {
-  background: linear-gradient(135deg, #8B1A2B 0%, #B8860B 100%);
-  box-shadow: 0 4px 14px rgba(139, 26, 43, 0.45);
+  background: #fef7ed;
+  border-color: #d4a04a;
+  box-shadow: 0 4px 14px rgba(184, 134, 11, 0.3);
+}
+
+.st-social-btn.sscbs:hover .st-sscbs-logo {
+  filter: grayscale(0) opacity(1);
 }
 
 .st-social-btn.insta:hover {
