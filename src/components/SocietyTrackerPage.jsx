@@ -440,10 +440,6 @@ export default function SocietyTrackerPage({ onBack }) {
         </div>
       )}
 
-      {/* Helper Footer */}
-      <div className="st-footer-banner">
-        💡 <strong>Got society recruitment details to add?</strong> Simply paste the society list &amp; links here and we'll update the dataset instantly!
-      </div>
     </div>
   );
 }
