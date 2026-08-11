@@ -358,7 +358,7 @@ export default function SocietyTrackerPage({ onBack }) {
                           )}
                     <div className="st-social-row">
                       <a
-                        href={OFFICIAL_COLLEGE_SOCIETIES_URL}
+                        href={society.officialPageUrl || OFFICIAL_COLLEGE_SOCIETIES_URL}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="st-social-btn sscbs"
@@ -561,7 +561,7 @@ export default function SocietyTrackerPage({ onBack }) {
               </div>
               <div className="st-social-row">
                 <a
-                  href={OFFICIAL_COLLEGE_SOCIETIES_URL}
+                  href={selectedSociety.officialPageUrl || OFFICIAL_COLLEGE_SOCIETIES_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="st-social-btn sscbs"
