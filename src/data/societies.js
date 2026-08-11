@@ -3,7 +3,7 @@
 export const OFFICIAL_COLLEGE_SOCIETIES_URL = 'https://sscbs.du.ac.in/societies/';
 
 export const CATEGORIES = [
-  { id: 'all', label: 'All Domains (47)', icon: '⚡' },
+  { id: 'all', label: 'All Domains (44)', icon: '⚡' },
   { id: 'finance', label: 'Finance & Accounting', icon: '📈' },
   { id: 'consulting', label: 'Consulting & Analytics', icon: '💼' },
   { id: 'ecell', label: 'Startups & Social Impact', icon: '🚀' },
@@ -36,27 +36,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#8b5cf6',
   },
 
-  // --- 2. AIESEC ---
-  {
-    id: 'aiesec-sscbs',
-    name: 'AIESEC in SSCBS',
-    shortName: 'AIESEC',
-    category: 'economics',
-    categoryLabel: 'Economics, Law & Policy',
-    categories: ['economics', 'ecell', 'marketing'],
-    categoryLabels: ['Economics, Law & Policy', 'Startups & Social Impact', 'Marketing, PR & Corporate'],
-    description: 'Global youth leadership exchanges and outstation projects. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
-    officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
-    instagramVideoUrl: 'https://instagram.com',
-    linkedinUrl: null,
-    defaultBookmarked: false,
-    accentColor: '#0284c7',
-  },
-
-  // --- 3. Alumni Relations and Outreach Cell ---
+  // --- 2. Alumni Relations and Outreach Cell ---
   {
     id: 'alumni-cell',
     name: 'Alumni Relations and Outreach Cell (AROC), SSCBS',
@@ -76,7 +56,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#e11d48',
   },
 
-  // --- 4. Anthropos ---
+  // --- 3. Anthropos ---
   {
     id: 'anthropos-hrd',
     name: 'Anthropos – The Human Resource Development Cell of SSCBS',
@@ -96,7 +76,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#3b82f6',
   },
 
-  // --- 5. Blitz (Dance Society) ---
+  // --- 4. Blitz (Dance Society) ---
   {
     id: 'blitz-dance',
     name: 'Blitz – The Western Dance Society of SSCBS',
@@ -116,7 +96,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#06b6d4',
   },
 
-  // --- 6. CBS Model United Nations ---
+  // --- 5. CBS Model United Nations ---
   {
     id: 'cbsmun',
     name: 'CBS Model United Nations (CBSMUN)',
@@ -136,7 +116,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#0369a1',
   },
 
-  // --- 7. CII YI Chapter ---
+  // --- 6. CII YI Chapter ---
   {
     id: 'cii-yi',
     name: 'CII Yi Chapter – Confederation of Indian Industry Young Indians, SSCBS',
@@ -156,7 +136,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#fb7185',
   },
 
-  // --- 8. Collegiate Entrepreneurs Organisation (CEO, DU) ---
+  // --- 7. Collegiate Entrepreneurs Organisation (CEO, DU) ---
   {
     id: 'ceo-du',
     name: 'CEO DU – Collegiate Entrepreneurs\' Organisation, Delhi University (SSCBS Chapter)',
@@ -176,7 +156,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#d97706',
   },
 
-  // --- 9. Communique (The Promotion Cell / Prodigy) ---
+  // --- 8. Communique (The Promotion Cell / Prodigy) ---
   {
     id: 'communique-pr',
     name: 'Communiqué – The Public Relations & Promotion Cell of SSCBS',
@@ -196,7 +176,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#db2777',
   },
 
-  // --- 10. Convergence (College Seminar) ---
+  // --- 9. Convergence (College Seminar) ---
   {
     id: 'convergence-seminar',
     name: 'Convergence – The Annual Leadership Summit Committee of SSCBS',
@@ -216,7 +196,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#fda4af',
   },
 
-  // --- 11. Crescendo (College Festival) ---
+  // --- 10. Crescendo (College Festival) ---
   {
     id: 'crescendo-fest',
     name: 'Crescendo – The Annual Flagship Cultural Festival Organizing Body of SSCBS',
@@ -236,7 +216,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#a5f3fc',
   },
 
-  // --- 12. Darkroom (Photography Society) ---
+  // --- 11. Darkroom (Photography Society) ---
   {
     id: 'darkroom-photography',
     name: 'Darkroom – The Photography & Film Society of SSCBS',
@@ -256,7 +236,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#164e63',
   },
 
-  // --- 13. Debating Society ---
+  // --- 12. Debating Society ---
   {
     id: 'debating-society',
     name: 'CBS DebSoc – The Debating Society of SSCBS',
@@ -276,7 +256,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#831843',
   },
 
-  // --- 14. Dhwani (Music Society) ---
+  // --- 13. Dhwani (Music Society) ---
   {
     id: 'dhwani-music',
     name: 'Dhwani – The Music Society of SSCBS',
@@ -296,7 +276,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#0891b2',
   },
 
-  // --- 15. Ecovision (Economics Society) ---
+  // --- 14. Ecovision (Economics Society) ---
   {
     id: 'ecovision-economics',
     name: 'Ecovision – The Economics Society of SSCBS',
@@ -316,7 +296,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#0284c7',
   },
 
-  // --- 16. Enactus ---
+  // --- 15. Enactus ---
   {
     id: 'enactus-sscbs',
     name: 'Enactus SSCBS',
@@ -336,7 +316,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#f59e0b',
   },
 
-  // --- 17. FMA ---
+  // --- 16. FMA ---
   {
     id: 'fma-finance',
     name: 'FMA – Financial Management Association, SSCBS',
@@ -356,7 +336,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#047857',
   },
 
-  // --- 18. Finx (Finance Society) ---
+  // --- 17. Finx (Finance Society) ---
   {
     id: 'finx-finance',
     name: 'FinX – The Finance Society of SSCBS',
@@ -376,7 +356,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#10b981',
   },
 
-  // --- 19. Fourth Wall (Dramatics Society) ---
+  // --- 18. Fourth Wall (Dramatics Society) ---
   {
     id: 'fourth-wall-dramatics',
     name: 'Fourth Wall Productions – The Dramatics Society of SSCBS',
@@ -391,32 +371,12 @@ export const DEMO_SOCIETIES = [
     statusText: 'Recruitments will start soon, forms and info will come here soon!',
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://instagram.com',
-    linkedinUrl: null,
+    linkedinUrl: 'https://www.linkedin.com/company/4-wall-productions/',
     defaultBookmarked: false,
     accentColor: '#0e7490',
   },
 
-  // --- 20. Gender Champion Program ---
-  {
-    id: 'gender-champion',
-    name: 'Gender Champion Program, SSCBS',
-    shortName: 'Gender Champion',
-    category: 'wellness',
-    categoryLabel: 'Inclusion & Sports',
-    categories: ['wellness', 'economics'],
-    categoryLabels: ['Inclusion & Sports', 'Economics, Law & Policy'],
-    description: 'Promoting gender equity, advocacy workshops, and safety dialogues. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
-    officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
-    instagramVideoUrl: 'https://instagram.com',
-    linkedinUrl: null,
-    defaultBookmarked: false,
-    accentColor: '#a855f7',
-  },
-
-  // --- 21. GIRL UP RUHI ---
+  // --- 19. GIRL UP RUHI ---
   {
     id: 'girl-up-ruhi',
     name: 'Girl Up Ruhi SSCBS',
@@ -436,7 +396,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#c084fc',
   },
 
-  // --- 22. Grandeur ---
+  // --- 20. Grandeur ---
   {
     id: 'grandeur-consulting',
     name: 'Grandeur – The Consulting & Knowledge Cell of SSCBS',
@@ -456,7 +416,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#1d4ed8',
   },
 
-  // --- 23. IFSA Network India ---
+  // --- 21. IFSA Network India ---
   {
     id: 'ifsa-network',
     name: 'IFSA Network India (SSCBS Chapter)',
@@ -476,7 +436,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#059669',
   },
 
-  // --- 24. Illuminati (Quiz Society) ---
+  // --- 22. Illuminati (Quiz Society) ---
   {
     id: 'illuminati-quiz',
     name: 'Illuminati – The Quizzing Society of SSCBS',
@@ -496,7 +456,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#be185d',
   },
 
-  // --- 25. Kriti (Art Society) ---
+  // --- 23. Kriti (Art Society) ---
   {
     id: 'kriti-art',
     name: 'Kriti – The Fine Arts Society of SSCBS',
@@ -516,7 +476,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#67e8f9',
   },
 
-  // --- 26. Kronos (IT Society) ---
+  // --- 24. Kronos (IT Society) ---
   {
     id: 'kronos-it',
     name: 'Kronos – The IT & Tech Society of SSCBS',
@@ -536,7 +496,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#7c3aed',
   },
 
-  // --- 27. Lawrence (Law Society) ---
+  // --- 25. Lawrence (Law Society) ---
   {
     id: 'lawrence-law',
     name: 'Lawrence – The Law & Legal Studies Society of SSCBS',
@@ -556,7 +516,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#075985',
   },
 
-  // --- 28. Literary Society ---
+  // --- 26. Literary Society ---
   {
     id: 'literary-society',
     name: 'LitSoc – The Literary Society of SSCBS',
@@ -576,7 +536,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#9d174d',
   },
 
-  // --- 29. Mark-it (Marketing Society) ---
+  // --- 27. Mark-it (Marketing Society) ---
   {
     id: 'mark-it-marketing',
     name: 'Mark-It – The Marketing Society of SSCBS',
@@ -596,7 +556,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#ec4899',
   },
 
-  // --- 30. MIC (Management Interaction Cell) ---
+  // --- 28. MIC (Management Interaction Cell) ---
   {
     id: 'mic-corporate',
     name: 'MIC – Management Interaction Cell of SSCBS',
@@ -616,7 +576,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#f43f5e',
   },
 
-  // --- 31. Kartavya + Connecting Dream Foundation ---
+  // --- 29. Kartavya + Connecting Dream Foundation ---
   {
     id: 'kartavya-cdf',
     name: 'Kartavya & Connecting Dreams Foundation (CDF) SSCBS Chapter',
@@ -636,7 +596,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#fbbf24',
   },
 
-  // --- 32. NUCLEUS ---
+  // --- 30. NUCLEUS ---
   {
     id: 'nucleus-analytics',
     name: 'Nucleus – The Analytics Society of SSCBS',
@@ -656,7 +616,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#1e40af',
   },
 
-  // --- 33. Parishram (Sports Society) ---
+  // --- 31. Parishram (Sports Society) ---
   {
     id: 'parishram-sports',
     name: 'Parishram – The Sports & Athletics Society of SSCBS',
@@ -676,7 +636,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#38bdf8',
   },
 
-  // --- 34. QSA ---
+  // --- 32. QSA ---
   {
     id: 'qsa-inclusivity',
     name: 'QSA – Queer Straight Alliance SSCBS',
@@ -696,7 +656,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#e879f9',
   },
 
-  // --- 35. CBS Post ---
+  // --- 33. CBS Post ---
   {
     id: 'cbs-post',
     name: 'CBS Post – The Official Campus Student Newspaper of SSCBS',
@@ -716,7 +676,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#e11d48',
   },
 
-  // --- 36. Rotaract SSCBS ---
+  // --- 34. Rotaract SSCBS ---
   {
     id: 'rotaract-sscbs',
     name: 'Rotaract Club of SSCBS',
@@ -736,7 +696,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#f59e0b',
   },
 
-  // --- 37. Synergy (The Corporate Events Society) ---
+  // --- 35. Synergy (The Corporate Events Society) ---
   {
     id: 'synergy-corporate',
     name: 'Synergy – The Corporate Society of SSCBS',
@@ -756,7 +716,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#1d4ed8',
   },
 
-  // --- 38. Verve (Street Play Society) ---
+  // --- 36. Verve (Street Play Society) ---
   {
     id: 'verve-streetplay',
     name: 'Verve – The Street Play Society of SSCBS',
@@ -776,7 +736,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#155e75',
   },
 
-  // --- 39. Yuva (Entrepreneurship Cell) ---
+  // --- 37. Yuva (Entrepreneurship Cell) ---
   {
     id: 'yuva-ecell',
     name: 'Yuva – The Entrepreneurship Cell (E-Cell) of SSCBS',
@@ -796,7 +756,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#d97706',
   },
 
-  // --- 40. 180 Degree Consulting ---
+  // --- 38. 180 Degree Consulting ---
   {
     id: '180dc-consulting',
     name: '180 Degrees Consulting SSCBS (180DC)',
@@ -816,7 +776,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#3b82f6',
   },
 
-  // --- 41. IMA Chapter ---
+  // --- 39. IMA Chapter ---
   {
     id: 'ima-chapter',
     name: 'IMA SSCBS Student Chapter',
@@ -836,7 +796,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#065f46',
   },
 
-  // --- 42. APICS Chapter ---
+  // --- 40. APICS Chapter ---
   {
     id: 'apics-operations',
     name: 'APICS SSCBS Chapter',
@@ -856,7 +816,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#60a5fa',
   },
 
-  // --- 43. Eco Club ---
+  // --- 41. Eco Club ---
   {
     id: 'eco-club',
     name: 'Eco Club SSCBS – Environmental Conservation Cell',
@@ -876,7 +836,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#10b981',
   },
 
-  // --- 44. Sadhna + Make Sense ---
+  // --- 42. Sadhna + Make Sense ---
   {
     id: 'sadhna-makesense',
     name: 'Sadhna & MakeSense SSCBS',
@@ -896,7 +856,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#34d399',
   },
 
-  // --- 45. Bridges for Enterprise ---
+  // --- 43. Bridges for Enterprise ---
   {
     id: 'bridges-enterprise',
     name: 'Bridges for Enterprise (BfE) New Delhi Chapter at SSCBS',
@@ -916,27 +876,7 @@ export const DEMO_SOCIETIES = [
     accentColor: '#2563eb',
   },
 
-  // --- 46. Electoral Literacy Club ---
-  {
-    id: 'electoral-literacy',
-    name: 'Electoral Literacy Club (ELC) SSCBS',
-    shortName: 'ELC',
-    category: 'economics',
-    categoryLabel: 'Economics, Law & Policy',
-    categories: ['economics', 'wellness'],
-    categoryLabels: ['Economics, Law & Policy', 'Inclusion & Sports'],
-    description: 'Civic engagement, voter awareness, and democratic rights education. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
-    officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
-    instagramVideoUrl: 'https://instagram.com',
-    linkedinUrl: null,
-    defaultBookmarked: false,
-    accentColor: '#0c4a6e',
-  },
-
-  // --- 47. Financial Literacy Club ---
+  // --- 44. Financial Literacy Club ---
   {
     id: 'financial-literacy',
     name: 'Financial Literacy Cell (FLC) SSCBS',
