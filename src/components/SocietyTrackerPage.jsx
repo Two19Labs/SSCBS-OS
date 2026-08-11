@@ -10,12 +10,13 @@ import {
   ClockIcon,
   BriefcaseIcon,
   HeartIcon,
+  BackIcon,
 } from './icons';
 import './SocietyTrackerPage.css';
 
 const LOCAL_STORAGE_KEY = 'sscbs_bookmarked_societies';
 
-export default function SocietyTrackerPage() {
+export default function SocietyTrackerPage({ onBack }) {
   const [activeTab, setActiveTab] = useState('all'); // 'all' | 'preferred'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -87,85 +88,94 @@ export default function SocietyTrackerPage() {
 
   return (
     <div className="society-tracker-container">
-      {/* Teaser & Hero Banner */}
-      <div className="tracker-hero-banner">
-        <div className="hero-banner-glow" />
-        <div className="hero-tag">
-          <SparklesIcon size={14} /> RECRUITMENT SEASON 2026
+      {/* OS Standard Header Bar */}
+      <div className="st-header">
+        <div className="st-header-left">
+          {onBack && (
+            <button className="st-back-btn" onClick={onBack} aria-label="Go Back">
+              <BackIcon size={16} />
+            </button>
+          )}
+          <div>
+            <span className="st-badge">
+              <SparklesIcon size={12} /> RECRUITMENT SEASON 2026
+            </span>
+            <h1 className="st-title">Society Recruitment Tracker</h1>
+            <p className="st-subtitle">
+              Explore 50+ societies, filter by domain, save target deadlines, and access orientation videos &amp; form links.
+            </p>
+          </div>
         </div>
-        <h1 className="hero-title">Society Recruitment Tracker</h1>
-        <p className="hero-subtitle">
-          ✨ <strong>Coming soon!</strong> We're making recruitments so much easier to track for you. Explore societies below, filter by domain, save your preferred deadlines, and access orientation videos &amp; form links all in one place.
-        </p>
       </div>
 
       {/* Metrics Strip */}
-      <div className="tracker-metrics-grid">
-        <div className="metric-card">
-          <div className="metric-icon-box">🏛️</div>
+      <div className="st-metrics-grid">
+        <div className="st-metric-card">
+          <div className="st-metric-icon">🏛️</div>
           <div>
-            <div className="metric-val">{totalCount}+</div>
-            <div className="metric-lbl">Total Societies</div>
+            <div className="st-metric-val">{totalCount}+</div>
+            <div className="st-metric-lbl">Total Societies</div>
           </div>
         </div>
-        <div className="metric-card">
-          <div className="metric-icon-box">⚡</div>
+        <div className="st-metric-card">
+          <div className="st-metric-icon">⚡</div>
           <div>
-            <div className="metric-val">{activeRecruitmentCount}</div>
-            <div className="metric-lbl">Active Recruitments</div>
+            <div className="st-metric-val">{activeRecruitmentCount}</div>
+            <div className="st-metric-lbl">Active Recruitments</div>
           </div>
         </div>
-        <div className="metric-card">
-          <div className="metric-icon-box">❤️</div>
+        <div className="st-metric-card">
+          <div className="st-metric-icon">❤️</div>
           <div>
-            <div className="metric-val">{bookmarkedCount}</div>
-            <div className="metric-lbl">My Preferred</div>
+            <div className="st-metric-val">{bookmarkedCount}</div>
+            <div className="st-metric-lbl">My Preferred</div>
           </div>
         </div>
-        <div className="metric-card">
-          <div className="metric-icon-box">⏰</div>
+        <div className="st-metric-card">
+          <div className="st-metric-icon">⏰</div>
           <div>
-            <div className="metric-val">Aug 24</div>
-            <div className="metric-lbl">Earliest Deadline</div>
+            <div className="st-metric-val">Aug 24</div>
+            <div className="st-metric-lbl">Earliest Deadline</div>
           </div>
         </div>
       </div>
 
       {/* Navigation Tabs Header */}
-      <div className="tracker-tabs-header">
-        <div className="tabs-nav">
+      <div className="st-tabs-header">
+        <div className="st-tabs-nav">
           <button
-            className={`tab-btn ${activeTab === 'all' ? 'active' : ''}`}
+            className={`st-tab-btn ${activeTab === 'all' ? 'active' : ''}`}
             onClick={() => setActiveTab('all')}
           >
             <BriefcaseIcon size={16} /> All Societies
           </button>
           <button
-            className={`tab-btn ${activeTab === 'preferred' ? 'active' : ''}`}
+            className={`st-tab-btn ${activeTab === 'preferred' ? 'active' : ''}`}
             onClick={() => setActiveTab('preferred')}
           >
             <HeartIcon filled={activeTab === 'preferred'} size={16} /> My Preferred Societies
             {bookmarkedCount > 0 && (
-              <span className="tab-count-pill">{bookmarkedCount}</span>
+              <span className="st-tab-count">{bookmarkedCount}</span>
             )}
           </button>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="tracker-filter-bar">
-        <div className="filter-top-row">
-          <div className="search-input-wrapper">
-            <SearchIcon className="search-icon-pos" size={16} />
+      <div className="st-filter-bar">
+        <div className="st-filter-row">
+          <div className="st-search-wrapper">
+            <SearchIcon className="st-search-icon" size={16} />
             <input
               type="text"
+              className="st-search-input"
               placeholder="Search society name, domain, or keywords..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <select
-            className="sort-select"
+            className="st-sort-select"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
           >
@@ -175,11 +185,11 @@ export default function SocietyTrackerPage() {
         </div>
 
         {/* Category Filter Pills */}
-        <div className="category-pills-scroll">
+        <div className="st-category-pills">
           {CATEGORIES.map((cat) => (
             <button
               key={cat.id}
-              className={`category-pill ${selectedCategory === cat.id ? 'active' : ''}`}
+              className={`st-category-pill ${selectedCategory === cat.id ? 'active' : ''}`}
               onClick={() => setSelectedCategory(cat.id)}
             >
               <span>{cat.icon}</span> {cat.label}
@@ -190,41 +200,34 @@ export default function SocietyTrackerPage() {
 
       {/* Main Grid View */}
       {sortedSocieties.length > 0 ? (
-        <div className="societies-grid">
+        <div className="st-societies-grid">
           {sortedSocieties.map((society) => {
             const isSaved = bookmarkedIds.includes(society.id);
             const deadlineInfo = getDeadlineInfo(society.deadline);
 
             return (
-              <div key={society.id} className="society-card">
+              <div key={society.id} className="st-card">
                 <div>
-                  <div className="society-card-header">
-                    <span
-                      className="card-category-badge"
-                      style={{
-                        backgroundColor: `${society.accentColor}18`,
-                        color: society.accentColor,
-                        border: `1px solid ${society.accentColor}40`,
-                      }}
-                    >
+                  <div className="st-card-top">
+                    <span className="st-domain-badge">
                       {society.categoryLabel}
                     </span>
                     <button
-                      className={`bookmark-btn ${isSaved ? 'active' : ''}`}
+                      className={`st-bookmark-btn ${isSaved ? 'active' : ''}`}
                       onClick={() => toggleBookmark(society.id)}
                       title={isSaved ? 'Remove from preferred' : 'Save to preferred'}
                     >
-                      <BookmarkIcon filled={isSaved} size={16} />
+                      <BookmarkIcon filled={isSaved} size={15} />
                     </button>
                   </div>
 
-                  <h3 className="society-name">{society.name}</h3>
-                  <p className="society-description">{society.description}</p>
+                  <h3 className="st-society-title">{society.name}</h3>
+                  <p className="st-society-desc">{society.description}</p>
                 </div>
 
                 <div>
                   {/* Deadline Box */}
-                  <div className={`deadline-box ${deadlineInfo.status}`}>
+                  <div className={`st-deadline-box ${deadlineInfo.status}`}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <ClockIcon size={14} /> Deadline
                     </span>
@@ -232,12 +235,12 @@ export default function SocietyTrackerPage() {
                   </div>
 
                   {/* Actions */}
-                  <div className="card-actions-row">
+                  <div className="st-card-actions">
                     <a
                       href={society.recruitmentFormUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="apply-btn"
+                      className="st-apply-btn"
                     >
                       Apply Form <ExternalLinkIcon size={14} />
                     </a>
@@ -245,7 +248,7 @@ export default function SocietyTrackerPage() {
                       href={society.instagramVideoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="social-icon-btn instagram"
+                      className="st-social-btn"
                       title="Watch Instagram Orientation Video"
                     >
                       <InstagramIcon size={16} />
@@ -254,7 +257,7 @@ export default function SocietyTrackerPage() {
                       href={society.linkedinUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="social-icon-btn linkedin"
+                      className="st-social-btn"
                       title="View LinkedIn Page"
                     >
                       <LinkedinIcon size={16} />
@@ -266,24 +269,24 @@ export default function SocietyTrackerPage() {
           })}
         </div>
       ) : (
-        <div className="empty-bookmarks-box">
-          <div className="empty-icon-circle">
+        <div className="st-empty-box">
+          <div className="st-empty-icon">
             <BookmarkIcon size={24} />
           </div>
-          <h3 className="empty-title">
+          <h3 className="st-empty-title">
             {activeTab === 'preferred'
               ? 'No Preferred Societies Saved Yet'
               : 'No Societies Found'}
           </h3>
-          <p className="empty-sub">
+          <p className="st-empty-sub">
             {activeTab === 'preferred'
               ? 'Click the bookmark icon on any society card in "All Societies" to track their deadlines here!'
               : 'Try clearing your search query or selecting a different category filter.'}
           </p>
           {activeTab === 'preferred' && (
             <button
-              className="apply-btn"
-              style={{ display: 'inline-flex', width: 'auto', padding: '10px 20px' }}
+              className="st-apply-btn"
+              style={{ display: 'inline-flex', width: 'auto', padding: '9px 18px' }}
               onClick={() => {
                 setActiveTab('all');
                 setSelectedCategory('all');
@@ -297,10 +300,8 @@ export default function SocietyTrackerPage() {
       )}
 
       {/* Helper Footer for Data Dumping */}
-      <div className="data-dump-footer-banner">
-        <span className="dump-text">
-          💡 <strong>Got society recruitment details to add?</strong> Simply paste the society list &amp; links here and we'll update the dataset instantly!
-        </span>
+      <div className="st-footer-banner">
+        💡 <strong>Got society recruitment details to add?</strong> Simply paste the society list &amp; links here and we'll update the dataset instantly!
       </div>
     </div>
   );

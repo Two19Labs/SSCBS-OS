@@ -499,31 +499,31 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
         {/* Society Recruitment Tracker Highlight Banner */}
         <div 
           className="recruitment-home-banner" 
-
           onClick={() => onNavigate('society-tracker')}
           style={{
-            background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.18), rgba(99, 102, 241, 0.15))',
-            border: '1px solid rgba(168, 85, 247, 0.35)',
-            borderRadius: '16px',
-            padding: '18px 22px',
-            marginBottom: '24px',
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderLeft: '4px solid var(--accent)',
+            borderRadius: '12px',
+            padding: '16px 20px',
+            marginBottom: '20px',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: '16px',
-            transition: 'transform 0.2s ease, border-color 0.2s ease',
+            transition: 'border-color 0.15s ease, transform 0.15s ease',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <div style={{ fontSize: '1.6rem', background: 'rgba(168, 85, 247, 0.2)', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '12px' }}>⚡</div>
+            <div style={{ fontSize: '1.4rem', background: 'var(--tint)', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px' }}>⚡</div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <span style={{ fontWeight: 800, fontSize: '1.05rem', color: '#f8fafc' }}>Society Recruitment Tracker 2026</span>
-                <span className="micro-label success" style={{ background: '#a855f725', color: '#c084fc', border: '1px solid #c084fc40', padding: '2px 8px', borderRadius: '8px' }}>LIVE PREVIEW</span>
+                <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--ink)' }}>Society Recruitment Tracker 2026</span>
+                <span className="micro-label success">LIVE DEMO</span>
               </div>
-              <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: '4px' }}>
-                Coming soon! Explore societies, domain categories, deadlines &amp; forms.
+              <div style={{ fontSize: '0.84rem', color: 'var(--ink-dim)', marginTop: '2px' }}>
+                Explore societies, domain categories, registration forms &amp; deadline reminders.
               </div>
             </div>
           </div>
@@ -531,6 +531,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
             Explore Tracker →
           </button>
         </div>
+
 
 
         {/* Original Daily Timeline Tracker */}
