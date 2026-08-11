@@ -681,9 +681,9 @@
 }
 
 .st-social-btn.sscbs:hover {
-  background: #ffffff;
-  border-color: #701319;
-  box-shadow: 0 4px 14px rgba(112, 19, 25, 0.3);
+  background: #fef7ed;
+  border-color: #d4a04a;
+  box-shadow: 0 4px 14px rgba(184, 134, 11, 0.35);
 }
 
 .st-social-btn.sscbs:hover .st-sscbs-logo {
