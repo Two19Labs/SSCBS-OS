@@ -673,22 +673,21 @@
 
 /* ── SSCBS Logo inside social button ── */
 .st-sscbs-logo {
-  width: 22px;
-  height: 22px;
-  object-fit: cover;
-  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
   filter: grayscale(1) opacity(0.65);
   transition: filter 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s ease;
 }
 
 .st-social-btn.sscbs:hover {
-  background: linear-gradient(135deg, #701319 0%, #8b152b 100%);
-  border-color: transparent;
-  box-shadow: 0 4px 14px rgba(112, 19, 25, 0.45);
+  background: #ffffff;
+  border-color: #701319;
+  box-shadow: 0 4px 14px rgba(112, 19, 25, 0.3);
 }
 
 .st-social-btn.sscbs:hover .st-sscbs-logo {
-  filter: grayscale(0) opacity(1) brightness(1.05);
+  filter: grayscale(0) opacity(1);
 }
 
 .st-social-btn.insta:hover {
