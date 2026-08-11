@@ -295,8 +295,15 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
               activePeriod ? `till ${activePeriod.endLabel}` : null
             ].filter(Boolean).join(' · ')}
           </div>
-          <div className="live-progress">
-            <div className="live-progress-fill" style={{ width: `${progress()}%` }}></div>
+          <div className={`live-progress ${activeClass.isPractical || /\b\(P\)\b/i.test(activeClass.subject) || /\bPractical\b/i.test(activeClass.subject) ? 'is-practical' : ''}`} title={`${Math.round(progress())}% elapsed`}>
+            <div className="live-progress-ticks">
+              <span className="live-progress-tick" style={{ left: '25%' }}></span>
+              <span className="live-progress-tick" style={{ left: '50%' }}></span>
+              <span className="live-progress-tick" style={{ left: '75%' }}></span>
+            </div>
+            <div className="live-progress-fill" style={{ width: `${Math.min(100, Math.max(0, progress()))}%` }}>
+              <div className="live-progress-pin"></div>
+            </div>
           </div>
           {nextClass && nextPeriod && (
             <div className="live-next-row">
@@ -328,8 +335,15 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
           </div>
           <div className="live-subject">Break</div>
           <div className="live-meta">Catch up on work/assignments, or go and chill at Nescafe/Amul!</div>
-          <div className="live-progress">
-            <div className="live-progress-fill" style={{ width: `${progress()}%` }}></div>
+          <div className="live-progress is-break" title={`${Math.round(progress())}% elapsed`}>
+            <div className="live-progress-ticks">
+              <span className="live-progress-tick" style={{ left: '25%' }}></span>
+              <span className="live-progress-tick" style={{ left: '50%' }}></span>
+              <span className="live-progress-tick" style={{ left: '75%' }}></span>
+            </div>
+            <div className="live-progress-fill" style={{ width: `${Math.min(100, Math.max(0, progress()))}%` }}>
+              <div className="live-progress-pin"></div>
+            </div>
           </div>
           {nextClass && nextPeriod && (
             <div className="live-next-row">
@@ -361,8 +375,15 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
           </div>
           <div className="live-subject">Free block</div>
           <div className="live-meta">No lecture right now — good time for coursework.</div>
-          <div className="live-progress">
-            <div className="live-progress-fill" style={{ width: `${progress()}%` }}></div>
+          <div className="live-progress is-free" title={`${Math.round(progress())}% elapsed`}>
+            <div className="live-progress-ticks">
+              <span className="live-progress-tick" style={{ left: '25%' }}></span>
+              <span className="live-progress-tick" style={{ left: '50%' }}></span>
+              <span className="live-progress-tick" style={{ left: '75%' }}></span>
+            </div>
+            <div className="live-progress-fill" style={{ width: `${Math.min(100, Math.max(0, progress()))}%` }}>
+              <div className="live-progress-pin"></div>
+            </div>
           </div>
           {nextClass && nextPeriod && (
             <div className="live-next-row">
