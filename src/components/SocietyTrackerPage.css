@@ -360,7 +360,15 @@
   color: #ffffff;
 }
 
-.st-bookmark-btn {
+.st-action-btns {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.st-heart-btn,
+.st-check-btn {
   background: var(--tint);
   border: 1px solid var(--border);
   color: var(--ink-dim);
@@ -375,16 +383,47 @@
   flex-shrink: 0;
 }
 
-.st-bookmark-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: var(--accent-tint);
+.st-heart-btn:hover {
+  border-color: #ec4899;
+  color: #ec4899;
+  background: #fdf2f8;
 }
 
-.st-bookmark-btn.active {
-  background: var(--accent-tint);
-  color: var(--accent);
-  border-color: var(--accent);
+.st-heart-btn.active {
+  background: #fdf2f8;
+  color: #ec4899;
+  border-color: #fbcfe8;
+}
+
+.st-check-btn:hover {
+  border-color: #16a34a;
+  color: #16a34a;
+  background: #f0fdf4;
+}
+
+.st-check-btn.active {
+  background: #f0fdf4;
+  color: #16a34a;
+  border-color: #bbf7d0;
+}
+
+.st-filled-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #16a34a;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.st-card.is-filled {
+  border-color: #bbf7d0;
+  background: linear-gradient(180deg, #ffffff 0%, #f9fdfa 100%);
 }
 
 .st-society-title {

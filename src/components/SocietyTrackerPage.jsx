@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { CATEGORIES, DEMO_SOCIETIES, getDeadlineInfo } from '../data/societies';
 import {
   SearchIcon,
-  BookmarkIcon,
   InstagramIcon,
   LinkedinIcon,
   ExternalLinkIcon,
@@ -10,11 +9,13 @@ import {
   ClockIcon,
   BriefcaseIcon,
   HeartIcon,
+  CheckIcon,
   BackIcon,
 } from './icons';
 import './SocietyTrackerPage.css';
 
 const LOCAL_STORAGE_KEY = 'sscbs_bookmarked_societies';
+const FILLED_FORMS_KEY = 'sscbs_filled_form_societies';
 const OFFICIAL_COLLEGE_SOCIETIES_URL = 'https://sscbs.du.ac.in/societies/';
 
 export default function SocietyTrackerPage({ onBack }) {
@@ -24,7 +25,7 @@ export default function SocietyTrackerPage({ onBack }) {
   const [sortBy, setSortBy] = useState('name');
   const [selectedSociety, setSelectedSociety] = useState(null);
 
-  // Bookmarks state with fallback to pre-bookmarked demo items
+  // Bookmarks (Heart) state with fallback to pre-bookmarked demo items
   const [bookmarkedIds, setBookmarkedIds] = useState(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -37,6 +38,19 @@ export default function SocietyTrackerPage({ onBack }) {
     return DEMO_SOCIETIES.filter((s) => s.defaultBookmarked).map((s) => s.id);
   });
 
+  // Form Filled checkmark state with localStorage persistence
+  const [filledIds, setFilledIds] = useState(() => {
+    try {
+      const saved = localStorage.getItem(FILLED_FORMS_KEY);
+      if (saved !== null) {
+        return JSON.parse(saved);
+      }
+    } catch (err) {
+      console.error('Error reading filled form societies:', err);
+    }
+    return [];
+  });
+
   // Sync bookmarks with localStorage
   useEffect(() => {
     try {
@@ -45,6 +59,21 @@ export default function SocietyTrackerPage({ onBack }) {
       console.error('Error saving bookmarks:', err);
     }
   }, [bookmarkedIds]);
+
+  // Sync filled forms with localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(FILLED_FORMS_KEY, JSON.stringify(filledIds));
+    } catch (err) {
+      console.error('Error saving filled form societies:', err);
+    }
+  }, [filledIds]);
+
+  const toggleFormFilled = (id) => {
+    setFilledIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
 
   // Live countdown timer — ticks every second
   const [now, setNow] = useState(() => new Date());
@@ -103,6 +132,7 @@ export default function SocietyTrackerPage({ onBack }) {
 
   const totalCount = DEMO_SOCIETIES.length;
   const bookmarkedCount = bookmarkedIds.length;
+  const filledCount = filledIds.length;
 
   return (
     <div className="society-tracker-container">
@@ -136,17 +166,17 @@ export default function SocietyTrackerPage({ onBack }) {
           </div>
         </div>
         <div className="st-metric-card">
-          <div className="st-metric-icon">⚡</div>
-          <div>
-            <div className="st-metric-val">Upcoming</div>
-            <div className="st-metric-lbl">Recruitments Opening</div>
-          </div>
-        </div>
-        <div className="st-metric-card">
           <div className="st-metric-icon">❤️</div>
           <div>
             <div className="st-metric-val">{bookmarkedCount}</div>
             <div className="st-metric-lbl">My Preferred</div>
+          </div>
+        </div>
+        <div className="st-metric-card">
+          <div className="st-metric-icon">✅</div>
+          <div>
+            <div className="st-metric-val">{filledCount}</div>
+            <div className="st-metric-lbl">Forms Filled</div>
           </div>
         </div>
       </div>
@@ -213,6 +243,7 @@ export default function SocietyTrackerPage({ onBack }) {
         <div className="st-societies-grid">
           {sortedSocieties.map((society) => {
             const isSaved = bookmarkedIds.includes(society.id);
+            const isFilled = filledIds.includes(society.id);
             const categoryList = society.categoryLabels || [society.categoryLabel];
             const primaryLabel = categoryList[0];
             const extraCount = categoryList.length - 1;
@@ -220,10 +251,10 @@ export default function SocietyTrackerPage({ onBack }) {
             return (
               <div
                 key={society.id}
-                className="st-card"
+                className={`st-card ${isFilled ? 'is-filled' : ''}`}
                 onClick={() => setSelectedSociety(society)}
               >
-                {/* Header & Title (Clean, No Description) */}
+                {/* Header & Title */}
                 <div>
                   <div className="st-card-top">
                     <div className="st-card-badges">
@@ -242,17 +273,34 @@ export default function SocietyTrackerPage({ onBack }) {
                           +{extraCount} MORE
                         </span>
                       )}
+                      {isFilled && (
+                        <span className="st-filled-badge">
+                          <CheckIcon size={11} /> Filled
+                        </span>
+                      )}
                     </div>
-                    <button
-                      className={`st-bookmark-btn ${isSaved ? 'active' : ''}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleBookmark(society.id);
-                      }}
-                      title={isSaved ? 'Remove from preferred' : 'Save to preferred'}
-                    >
-                      <BookmarkIcon filled={isSaved} size={15} />
-                    </button>
+                    <div className="st-action-btns">
+                      <button
+                        className={`st-check-btn ${isFilled ? 'active' : ''}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFormFilled(society.id);
+                        }}
+                        title={isFilled ? 'Mark form as unfilled' : 'Mark form as filled'}
+                      >
+                        <CheckIcon size={14} />
+                      </button>
+                      <button
+                        className={`st-heart-btn ${isSaved ? 'active' : ''}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleBookmark(society.id);
+                        }}
+                        title={isSaved ? 'Remove from preferred' : 'Save to preferred'}
+                      >
+                        <HeartIcon filled={isSaved} size={15} />
+                      </button>
+                    </div>
                   </div>
 
                   <h3 className="st-society-title">{society.name}</h3>
@@ -350,7 +398,7 @@ export default function SocietyTrackerPage({ onBack }) {
       ) : (
         <div className="st-empty-box">
           <div className="st-empty-icon">
-            <BookmarkIcon size={24} />
+            <HeartIcon size={24} />
           </div>
           <h3 className="st-empty-title">
             {activeTab === 'preferred'
@@ -359,7 +407,7 @@ export default function SocietyTrackerPage({ onBack }) {
           </h3>
           <p className="st-empty-sub">
             {activeTab === 'preferred'
-              ? 'Click the bookmark icon on any society card in "All Societies" to track them here!'
+              ? 'Click the heart icon on any society card in "All Societies" to track them here!'
               : 'Try clearing your search query or selecting a different category filter.'}
           </p>
           {activeTab === 'preferred' && (
@@ -403,13 +451,26 @@ export default function SocietyTrackerPage({ onBack }) {
               </div>
               <div className="st-modal-header-actions">
                 <button
-                  className={`st-bookmark-btn ${
+                  className={`st-check-btn ${
+                    filledIds.includes(selectedSociety.id) ? 'active' : ''
+                  }`}
+                  onClick={() => toggleFormFilled(selectedSociety.id)}
+                  title={
+                    filledIds.includes(selectedSociety.id)
+                      ? 'Mark form as unfilled'
+                      : 'Mark form as filled'
+                  }
+                >
+                  <CheckIcon size={15} />
+                </button>
+                <button
+                  className={`st-heart-btn ${
                     bookmarkedIds.includes(selectedSociety.id) ? 'active' : ''
                   }`}
                   onClick={() => toggleBookmark(selectedSociety.id)}
                   title="Bookmark"
                 >
-                  <BookmarkIcon
+                  <HeartIcon
                     filled={bookmarkedIds.includes(selectedSociety.id)}
                     size={16}
                   />
