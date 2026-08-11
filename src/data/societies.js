@@ -1,4 +1,4 @@
-// SSCBS Society Recruitment Data Store - All 47 Official College Societies (Live Upcoming Recruitment State)
+// SSCBS Society Recruitment Data Store - Official Full Names & Multi-Category Mappings
 
 export const CATEGORIES = [
   { id: 'all', label: 'All Domains (47)', icon: '⚡' },
@@ -17,7 +17,7 @@ export const DEMO_SOCIETIES = [
   // --- 1. ACM SSCBS Chapter ---
   {
     id: 'acm-sscbs',
-    name: 'ACM SSCBS Chapter',
+    name: 'ACM SSCBS Student Chapter',
     shortName: 'ACM',
     category: 'tech',
     categoryLabel: 'Tech & IT',
@@ -36,7 +36,7 @@ export const DEMO_SOCIETIES = [
   // --- 2. AIESEC ---
   {
     id: 'aiesec-sscbs',
-    name: 'AIESEC',
+    name: 'AIESEC in SSCBS',
     shortName: 'AIESEC',
     category: 'economics',
     categoryLabel: 'Economics, Law & Policy',
@@ -55,7 +55,7 @@ export const DEMO_SOCIETIES = [
   // --- 3. Alumni Relations and Outreach Cell ---
   {
     id: 'alumni-cell',
-    name: 'Alumni Relations and Outreach Cell',
+    name: 'Alumni Relations and Outreach Cell (AROC), SSCBS',
     shortName: 'Alumni Cell',
     category: 'marketing',
     categoryLabel: 'Marketing, PR & Corporate',
@@ -74,7 +74,7 @@ export const DEMO_SOCIETIES = [
   // --- 4. Anthropos ---
   {
     id: 'anthropos-hrd',
-    name: 'Anthropos',
+    name: 'Anthropos – The Human Resource Development Cell of SSCBS',
     shortName: 'Anthropos',
     category: 'consulting',
     categoryLabel: 'Consulting & Analytics',
@@ -93,7 +93,7 @@ export const DEMO_SOCIETIES = [
   // --- 5. Blitz (Dance Society) ---
   {
     id: 'blitz-dance',
-    name: 'Blitz (Dance Society)',
+    name: 'Blitz – The Western Dance Society of SSCBS',
     shortName: 'Blitz',
     category: 'cultural',
     categoryLabel: 'Arts & Culture',
@@ -112,7 +112,7 @@ export const DEMO_SOCIETIES = [
   // --- 6. CBS Model United Nations ---
   {
     id: 'cbsmun',
-    name: 'CBS Model United Nations',
+    name: 'CBS Model United Nations (CBSMUN)',
     shortName: 'CBSMUN',
     category: 'economics',
     categoryLabel: 'Economics, Law & Policy',
@@ -131,7 +131,7 @@ export const DEMO_SOCIETIES = [
   // --- 7. CII YI Chapter ---
   {
     id: 'cii-yi',
-    name: 'CII YI Chapter',
+    name: 'CII Yi Chapter – Confederation of Indian Industry Young Indians, SSCBS',
     shortName: 'CII YI',
     category: 'marketing',
     categoryLabel: 'Marketing, PR & Corporate',
@@ -150,7 +150,7 @@ export const DEMO_SOCIETIES = [
   // --- 8. Collegiate Entrepreneurs Organisation (CEO, DU) ---
   {
     id: 'ceo-du',
-    name: 'Collegiate Entrepreneurs Organisation, Delhi University (CEO, DU)',
+    name: 'CEO DU – Collegiate Entrepreneurs\' Organisation, Delhi University (SSCBS Chapter)',
     shortName: 'CEO DU',
     category: 'ecell',
     categoryLabel: 'Startups & Social Impact',
@@ -169,7 +169,7 @@ export const DEMO_SOCIETIES = [
   // --- 9. Communique (The Promotion Cell / Prodigy) ---
   {
     id: 'communique-pr',
-    name: 'Communique (The Promotion Cell) (Prodigy)',
+    name: 'Communiqué – The Public Relations & Promotion Cell of SSCBS',
     shortName: 'Communique',
     category: 'marketing',
     categoryLabel: 'Marketing, PR & Corporate',
@@ -188,7 +188,7 @@ export const DEMO_SOCIETIES = [
   // --- 10. Convergence (College Seminar) ---
   {
     id: 'convergence-seminar',
-    name: 'Convergence (College Seminar)',
+    name: 'Convergence – The Annual Leadership Summit Committee of SSCBS',
     shortName: 'Convergence',
     category: 'marketing',
     categoryLabel: 'Marketing, PR & Corporate',
@@ -207,7 +207,7 @@ export const DEMO_SOCIETIES = [
   // --- 11. Crescendo (College Festival) ---
   {
     id: 'crescendo-fest',
-    name: 'Crescendo (College Festival)',
+    name: 'Crescendo – The Annual Flagship Cultural Festival Organizing Body of SSCBS',
     shortName: 'Crescendo',
     category: 'cultural',
     categoryLabel: 'Arts & Culture',
@@ -226,7 +226,7 @@ export const DEMO_SOCIETIES = [
   // --- 12. Darkroom (Photography Society) ---
   {
     id: 'darkroom-photography',
-    name: 'Darkroom (Photography Society)',
+    name: 'Darkroom – The Photography & Film Society of SSCBS',
     shortName: 'Darkroom',
     category: 'cultural',
     categoryLabel: 'Arts & Culture',
@@ -245,7 +245,7 @@ export const DEMO_SOCIETIES = [
   // --- 13. Debating Society ---
   {
     id: 'debating-society',
-    name: 'Debating Society',
+    name: 'CBS DebSoc – The Debating Society of SSCBS',
     shortName: 'DebSoc',
     category: 'debating',
     categoryLabel: 'Debating, Media & Lit',
@@ -264,7 +264,7 @@ export const DEMO_SOCIETIES = [
   // --- 14. Dhwani (Music Society) ---
   {
     id: 'dhwani-music',
-    name: 'Dhwani (Music Society)',
+    name: 'Dhwani – The Music Society of SSCBS',
     shortName: 'Dhwani',
     category: 'cultural',
     categoryLabel: 'Arts & Culture',
@@ -283,7 +283,7 @@ export const DEMO_SOCIETIES = [
   // --- 15. Ecovision (Economics Society) ---
   {
     id: 'ecovision-economics',
-    name: 'Ecovision (Economics Society)',
+    name: 'Ecovision – The Economics Society of SSCBS',
     shortName: 'Ecovision',
     category: 'economics',
     categoryLabel: 'Economics, Law & Policy',
@@ -302,7 +302,7 @@ export const DEMO_SOCIETIES = [
   // --- 16. Enactus ---
   {
     id: 'enactus-sscbs',
-    name: 'Enactus',
+    name: 'Enactus SSCBS',
     shortName: 'Enactus',
     category: 'ecell',
     categoryLabel: 'Startups & Social Impact',
@@ -321,7 +321,7 @@ export const DEMO_SOCIETIES = [
   // --- 17. FMA ---
   {
     id: 'fma-finance',
-    name: 'FMA',
+    name: 'FMA – Financial Management Association, SSCBS',
     shortName: 'FMA',
     category: 'finance',
     categoryLabel: 'Finance & Accounting',
@@ -340,7 +340,7 @@ export const DEMO_SOCIETIES = [
   // --- 18. Finx (Finance Society) ---
   {
     id: 'finx-finance',
-    name: 'Finx (Finance Society)',
+    name: 'FinX – The Finance Society of SSCBS',
     shortName: 'Finx',
     category: 'finance',
     categoryLabel: 'Finance & Accounting',
@@ -359,7 +359,7 @@ export const DEMO_SOCIETIES = [
   // --- 19. Fourth Wall (Dramatics Society) ---
   {
     id: 'fourth-wall-dramatics',
-    name: 'Fourth Wall (Dramatics Society)',
+    name: 'Fourth Wall Productions – The Dramatics Society of SSCBS',
     shortName: 'Fourth Wall',
     category: 'cultural',
     categoryLabel: 'Arts & Culture',
@@ -378,7 +378,7 @@ export const DEMO_SOCIETIES = [
   // --- 20. Gender Champion Program ---
   {
     id: 'gender-champion',
-    name: 'Gender Champion Program',
+    name: 'Gender Champion Program, SSCBS',
     shortName: 'Gender Champion',
     category: 'wellness',
     categoryLabel: 'Inclusion & Sports',
@@ -397,7 +397,7 @@ export const DEMO_SOCIETIES = [
   // --- 21. GIRL UP RUHI ---
   {
     id: 'girl-up-ruhi',
-    name: 'GIRL UP RUHI',
+    name: 'Girl Up Ruhi SSCBS',
     shortName: 'Girl Up',
     category: 'wellness',
     categoryLabel: 'Inclusion & Sports',
@@ -416,7 +416,7 @@ export const DEMO_SOCIETIES = [
   // --- 22. Grandeur ---
   {
     id: 'grandeur-consulting',
-    name: 'Grandeur',
+    name: 'Grandeur – The Consulting & Knowledge Cell of SSCBS',
     shortName: 'Grandeur',
     category: 'consulting',
     categoryLabel: 'Consulting & Analytics',
@@ -435,7 +435,7 @@ export const DEMO_SOCIETIES = [
   // --- 23. IFSA Network India ---
   {
     id: 'ifsa-network',
-    name: 'IFSA Network India',
+    name: 'IFSA Network India (SSCBS Chapter)',
     shortName: 'IFSA',
     category: 'finance',
     categoryLabel: 'Finance & Accounting',
@@ -454,7 +454,7 @@ export const DEMO_SOCIETIES = [
   // --- 24. Illuminati (Quiz Society) ---
   {
     id: 'illuminati-quiz',
-    name: 'Illuminati (Quiz Society)',
+    name: 'Illuminati – The Quizzing Society of SSCBS',
     shortName: 'Illuminati',
     category: 'debating',
     categoryLabel: 'Debating, Media & Lit',
@@ -473,7 +473,7 @@ export const DEMO_SOCIETIES = [
   // --- 25. Kriti (Art Society) ---
   {
     id: 'kriti-art',
-    name: 'Kriti (Art Society)',
+    name: 'Kriti – The Fine Arts Society of SSCBS',
     shortName: 'Kriti',
     category: 'cultural',
     categoryLabel: 'Arts & Culture',
@@ -492,7 +492,7 @@ export const DEMO_SOCIETIES = [
   // --- 26. Kronos (IT Society) ---
   {
     id: 'kronos-it',
-    name: 'Kronos (IT Society)',
+    name: 'Kronos – The IT & Tech Society of SSCBS',
     shortName: 'Kronos',
     category: 'tech',
     categoryLabel: 'Tech & IT',
@@ -511,7 +511,7 @@ export const DEMO_SOCIETIES = [
   // --- 27. Lawrence (Law Society) ---
   {
     id: 'lawrence-law',
-    name: 'Lawrence (Law Society)',
+    name: 'Lawrence – The Law & Legal Studies Society of SSCBS',
     shortName: 'Lawrence',
     category: 'economics',
     categoryLabel: 'Economics, Law & Policy',
@@ -530,7 +530,7 @@ export const DEMO_SOCIETIES = [
   // --- 28. Literary Society ---
   {
     id: 'literary-society',
-    name: 'Literary Society',
+    name: 'LitSoc – The Literary Society of SSCBS',
     shortName: 'LitSoc',
     category: 'debating',
     categoryLabel: 'Debating, Media & Lit',
@@ -549,7 +549,7 @@ export const DEMO_SOCIETIES = [
   // --- 29. Mark-it (Marketing Society) ---
   {
     id: 'mark-it-marketing',
-    name: 'Mark-it (Marketing Society)',
+    name: 'Mark-It – The Marketing Society of SSCBS',
     shortName: 'Mark-it',
     category: 'marketing',
     categoryLabel: 'Marketing, PR & Corporate',
@@ -568,7 +568,7 @@ export const DEMO_SOCIETIES = [
   // --- 30. MIC (Management Interaction Cell) ---
   {
     id: 'mic-corporate',
-    name: 'MIC (Management Interaction Cell)',
+    name: 'MIC – Management Interaction Cell of SSCBS',
     shortName: 'MIC',
     category: 'marketing',
     categoryLabel: 'Marketing, PR & Corporate',
@@ -587,7 +587,7 @@ export const DEMO_SOCIETIES = [
   // --- 31. Kartavya + Connecting Dream Foundation ---
   {
     id: 'kartavya-cdf',
-    name: 'Kartavya + Connecting Dream Foundation',
+    name: 'Kartavya & Connecting Dreams Foundation (CDF) SSCBS Chapter',
     shortName: 'Kartavya+CDF',
     category: 'ecell',
     categoryLabel: 'Startups & Social Impact',
@@ -606,7 +606,7 @@ export const DEMO_SOCIETIES = [
   // --- 32. NUCLEUS ---
   {
     id: 'nucleus-analytics',
-    name: 'NUCLEUS',
+    name: 'Nucleus – The Analytics Society of SSCBS',
     shortName: 'Nucleus',
     category: 'consulting',
     categoryLabel: 'Consulting & Analytics',
@@ -625,7 +625,7 @@ export const DEMO_SOCIETIES = [
   // --- 33. Parishram (Sports Society) ---
   {
     id: 'parishram-sports',
-    name: 'Parishram (Sports Society)',
+    name: 'Parishram – The Sports & Athletics Society of SSCBS',
     shortName: 'Parishram',
     category: 'wellness',
     categoryLabel: 'Inclusion & Sports',
@@ -644,7 +644,7 @@ export const DEMO_SOCIETIES = [
   // --- 34. QSA ---
   {
     id: 'qsa-inclusivity',
-    name: 'QSA',
+    name: 'QSA – Queer Straight Alliance SSCBS',
     shortName: 'QSA',
     category: 'wellness',
     categoryLabel: 'Inclusion & Sports',
@@ -663,7 +663,7 @@ export const DEMO_SOCIETIES = [
   // --- 35. CBS Post ---
   {
     id: 'cbs-post',
-    name: 'CBS Post',
+    name: 'CBS Post – The Official Campus Student Newspaper of SSCBS',
     shortName: 'CBS Post',
     category: 'debating',
     categoryLabel: 'Debating, Media & Lit',
@@ -682,7 +682,7 @@ export const DEMO_SOCIETIES = [
   // --- 36. Rotaract SSCBS ---
   {
     id: 'rotaract-sscbs',
-    name: 'Rotaract SSCBS',
+    name: 'Rotaract Club of SSCBS',
     shortName: 'Rotaract',
     category: 'ecell',
     categoryLabel: 'Startups & Social Impact',
@@ -701,7 +701,7 @@ export const DEMO_SOCIETIES = [
   // --- 37. Synergy (The Corporate Events Society) ---
   {
     id: 'synergy-corporate',
-    name: 'Synergy (The Corporate Events Society)',
+    name: 'Synergy – The Corporate Society of SSCBS',
     shortName: 'Synergy',
     category: 'consulting',
     categoryLabel: 'Consulting & Analytics',
@@ -720,7 +720,7 @@ export const DEMO_SOCIETIES = [
   // --- 38. Verve (Street Play Society) ---
   {
     id: 'verve-streetplay',
-    name: 'Verve (Street Play Society)',
+    name: 'Verve – The Street Play Society of SSCBS',
     shortName: 'Verve',
     category: 'cultural',
     categoryLabel: 'Arts & Culture',
@@ -739,7 +739,7 @@ export const DEMO_SOCIETIES = [
   // --- 39. Yuva (Entrepreneurship Cell) ---
   {
     id: 'yuva-ecell',
-    name: 'Yuva (Entrepreneurship Cell)',
+    name: 'Yuva – The Entrepreneurship Cell (E-Cell) of SSCBS',
     shortName: 'Yuva E-Cell',
     category: 'ecell',
     categoryLabel: 'Startups & Social Impact',
@@ -758,7 +758,7 @@ export const DEMO_SOCIETIES = [
   // --- 40. 180 Degree Consulting ---
   {
     id: '180dc-consulting',
-    name: '180 Degree Consulting',
+    name: '180 Degrees Consulting SSCBS (180DC)',
     shortName: '180DC',
     category: 'consulting',
     categoryLabel: 'Consulting & Analytics',
@@ -777,7 +777,7 @@ export const DEMO_SOCIETIES = [
   // --- 41. IMA Chapter ---
   {
     id: 'ima-chapter',
-    name: 'IMA Chapter',
+    name: 'IMA SSCBS Student Chapter',
     shortName: 'IMA',
     category: 'finance',
     categoryLabel: 'Finance & Accounting',
@@ -796,7 +796,7 @@ export const DEMO_SOCIETIES = [
   // --- 42. APICS Chapter ---
   {
     id: 'apics-operations',
-    name: 'APICS Chapter',
+    name: 'APICS SSCBS Chapter',
     shortName: 'APICS',
     category: 'consulting',
     categoryLabel: 'Consulting & Analytics',
@@ -815,7 +815,7 @@ export const DEMO_SOCIETIES = [
   // --- 43. Eco Club ---
   {
     id: 'eco-club',
-    name: 'Eco Club',
+    name: 'Eco Club SSCBS – Environmental Conservation Cell',
     shortName: 'Eco Club',
     category: 'ecell',
     categoryLabel: 'Startups & Social Impact',
@@ -834,7 +834,7 @@ export const DEMO_SOCIETIES = [
   // --- 44. Sadhna + Make Sense ---
   {
     id: 'sadhna-makesense',
-    name: 'Sadhna + Make Sense',
+    name: 'Sadhna & MakeSense SSCBS',
     shortName: 'Sadhna',
     category: 'ecell',
     categoryLabel: 'Startups & Social Impact',
@@ -853,7 +853,7 @@ export const DEMO_SOCIETIES = [
   // --- 45. Bridges for Enterprise ---
   {
     id: 'bridges-enterprise',
-    name: 'Bridges for Enterprise',
+    name: 'Bridges for Enterprise (BfE) New Delhi Chapter at SSCBS',
     shortName: 'BfE',
     category: 'consulting',
     categoryLabel: 'Consulting & Analytics',
@@ -872,7 +872,7 @@ export const DEMO_SOCIETIES = [
   // --- 46. Electoral Literacy Club ---
   {
     id: 'electoral-literacy',
-    name: 'Electoral Literacy Club',
+    name: 'Electoral Literacy Club (ELC) SSCBS',
     shortName: 'ELC',
     category: 'economics',
     categoryLabel: 'Economics, Law & Policy',
@@ -891,7 +891,7 @@ export const DEMO_SOCIETIES = [
   // --- 47. Financial Literacy Club ---
   {
     id: 'financial-literacy',
-    name: 'Financial Literacy Club',
+    name: 'Financial Literacy Cell (FLC) SSCBS',
     shortName: 'FLC',
     category: 'finance',
     categoryLabel: 'Finance & Accounting',
