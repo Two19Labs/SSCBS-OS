@@ -365,7 +365,7 @@ export default function SocietyTrackerPage({ onBack }) {
                         title="Visit Official SSCBS Page"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <img src="/sscbs_logo.png" alt="SSCBS" className="st-sscbs-logo" />
+                        <img src="/sscbs_college_logo.png" alt="SSCBS" className="st-sscbs-logo" />
                       </a>
                       <a
                         href={society.instagramVideoUrl || 'https://instagram.com'}
@@ -567,7 +567,7 @@ export default function SocietyTrackerPage({ onBack }) {
                   className="st-social-btn sscbs"
                   title="Visit Official SSCBS Page"
                 >
-                  <img src="/sscbs_logo.png" alt="SSCBS" className="st-sscbs-logo" />
+                  <img src="/sscbs_college_logo.png" alt="SSCBS" className="st-sscbs-logo" />
                 </a>
                 <a
                   href={selectedSociety.instagramVideoUrl || 'https://instagram.com'}
