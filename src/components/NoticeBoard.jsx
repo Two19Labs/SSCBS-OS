@@ -92,7 +92,13 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
       const orderA = a.display_order ?? 0;
       const orderB = b.display_order ?? 0;
       if (orderA !== orderB) return orderA - orderB;
-      return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+
+      const timeA = a.event_date ? new Date(a.event_date).getTime() : (a.active_from ? new Date(a.active_from).getTime() : Infinity);
+      const timeB = b.event_date ? new Date(b.event_date).getTime() : (b.active_from ? new Date(b.active_from).getTime() : Infinity);
+
+      if (timeA !== timeB) return timeA - timeB;
+
+      return new Date(a.created_at || 0) - new Date(b.created_at || 0);
     });
   };
 
@@ -193,7 +199,8 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
         .from('notices')
         .select('id, title, category, society, venue, content, link_url, event_date, active_from, active_to, created_at, created_by_email, created_by_name, display_order, status')
         .order('display_order', { ascending: true })
-        .order('created_at', { ascending: false });
+        .order('event_date', { ascending: true, nullsFirst: false })
+        .order('created_at', { ascending: true });
 
       if (error) {
         console.error('Error loading notices from Supabase:', error);

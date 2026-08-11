@@ -81,8 +81,8 @@ CREATE POLICY "Enable read access for admin_whitelist"
 CREATE INDEX IF NOT EXISTS idx_analytics_events_created_feature 
     ON public.analytics_events(created_at, feature_id);
 
-CREATE INDEX IF NOT EXISTS idx_notices_display_created 
-    ON public.notices(display_order, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_notices_display_event_created 
+    ON public.notices(display_order, event_date ASC, created_at ASC);
 
 -- 6. Create Server-Side Postgres RPC function for aggregated analytics (Reduces egress by >99%)
 CREATE OR REPLACE FUNCTION public.get_analytics_summary(start_date TIMESTAMP WITH TIME ZONE)
