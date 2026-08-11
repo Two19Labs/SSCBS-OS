@@ -73,15 +73,22 @@ export function NotificationProvider({ children }) {
 
     async function fetchCloudNotifications() {
       try {
+        const cacheKey = `sscbs_notif_cloud_${user.email}`;
+        const cachedTime = sessionStorage.getItem(`${cacheKey}_time`);
+        if (cachedTime && (Date.now() - Number(cachedTime)) < 60000) {
+          return;
+        }
+
         const { data, error } = await supabase
           .from('user_notifications')
           .select('id, user_email, type, category, title, body, action_type, action_data, read, created_at')
           .eq('user_email', user.email)
           .order('created_at', { ascending: false })
-          .limit(40);
+          .limit(15);
 
         if (!error && data && data.length > 0) {
           setNotifications(data);
+          sessionStorage.setItem(`${cacheKey}_time`, String(Date.now()));
         }
       } catch (err) {
         // Fallback gracefully to localStorage

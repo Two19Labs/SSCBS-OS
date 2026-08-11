@@ -279,10 +279,10 @@ function attachPresenceListenersIfNeeded() {
 
 function initGlobalPresenceTracker() {
   if (!presenceHeartbeatTimer) {
-    // Lightweight local ping timer every 60 seconds for tab freshness & maximum bandwidth efficiency
+    // Lightweight local ping timer every 120 seconds for tab freshness & maximum bandwidth efficiency
     presenceHeartbeatTimer = setInterval(() => {
       sendPresencePing();
-    }, 60000);
+    }, 120000);
   }
 
   // Resume presence ping immediately when student switches back to active tab
@@ -323,8 +323,8 @@ export async function touchUserActivity(user) {
 
   const now = Date.now();
   const lastTouch = lastTouchTimeMap.get(user.id) || 0;
-  // Throttle to at most once per 60 seconds per user session
-  if (now - lastTouch < 60000) return;
+  // Throttle to at most once per 5 minutes (300,000 ms) per user session
+  if (now - lastTouch < 300000) return;
   lastTouchTimeMap.set(user.id, now);
 
   try {

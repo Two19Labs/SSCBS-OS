@@ -76,18 +76,45 @@ export const TimetableProvider = ({ children }) => {
       }
       try {
         setLoading(true);
-        // 1. Fetch live timetable config from Supabase system_configs
-        const { data: configData, error: configError } = await supabase
+        // 1. Fetch live timetable config metadata from Supabase system_configs (ultra-lightweight ~50B query)
+        const { data: metaData, error: metaError } = await supabase
           .from('system_configs')
-          .select('value')
+          .select('updated_at')
           .eq('key', 'timetable')
           .maybeSingle();
 
-        if (!configError && configData && configData.value && typeof configData.value === 'object') {
-          setTimetable(configData.value);
+        const serverUpdatedAt = metaData?.updated_at || null;
+        const cachedUpdatedAt = localStorage.getItem('sscbs_os_timetable_last_updated');
+        const cachedRaw = localStorage.getItem('sscbs_os_timetable');
+
+        let cacheHit = false;
+        if (!metaError && serverUpdatedAt && cachedUpdatedAt === serverUpdatedAt && cachedRaw) {
           try {
-            localStorage.setItem('sscbs_os_timetable', JSON.stringify(configData.value));
+            const parsed = JSON.parse(cachedRaw);
+            if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+              setTimetable(parsed);
+              cacheHit = true;
+            }
           } catch (e) {}
+        }
+
+        // Only download full timetable JSON (~200KB+) if server timestamp changed or cache missing
+        if (!cacheHit) {
+          const { data: configData, error: configError } = await supabase
+            .from('system_configs')
+            .select('value, updated_at')
+            .eq('key', 'timetable')
+            .maybeSingle();
+
+          if (!configError && configData && configData.value && typeof configData.value === 'object') {
+            setTimetable(configData.value);
+            try {
+              localStorage.setItem('sscbs_os_timetable', JSON.stringify(configData.value));
+              if (configData.updated_at) {
+                localStorage.setItem('sscbs_os_timetable_last_updated', configData.updated_at);
+              }
+            } catch (e) {}
+          }
         }
 
         // 2. Fetch holidays
@@ -110,9 +137,11 @@ export const TimetableProvider = ({ children }) => {
 
   // Update timetable function (Admin only)
   const updateTimetable = async (newTimetable) => {
+    const nowIso = new Date().toISOString();
     setTimetable(newTimetable);
     try {
       localStorage.setItem('sscbs_os_timetable', JSON.stringify(newTimetable));
+      localStorage.setItem('sscbs_os_timetable_last_updated', nowIso);
     } catch (e) {}
 
     if (!hasValidCredentials) {
@@ -125,7 +154,7 @@ export const TimetableProvider = ({ children }) => {
       .upsert({
         key: 'timetable',
         value: newTimetable,
-        updated_at: new Date().toISOString(),
+        updated_at: nowIso,
       });
 
     if (error) {

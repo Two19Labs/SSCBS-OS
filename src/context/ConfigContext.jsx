@@ -35,9 +35,27 @@ export const ConfigProvider = ({ children }) => {
         return;
       }
       try {
+        const { data: metaData, error: metaError } = await supabase
+          .from('system_configs')
+          .select('updated_at')
+          .eq('key', 'feature_flags')
+          .maybeSingle();
+
+        const serverUpdatedAt = metaData?.updated_at || null;
+        const cachedUpdatedAt = localStorage.getItem('sscbs_os_feature_flags_updated_at');
+        const cachedFlags = localStorage.getItem('sscbs_os_feature_flags');
+
+        if (!metaError && serverUpdatedAt && cachedUpdatedAt === serverUpdatedAt && cachedFlags) {
+          try {
+            setFeatureFlags({ ...DEFAULT_FEATURE_FLAGS, ...JSON.parse(cachedFlags) });
+            setLoading(false);
+            return;
+          } catch (e) {}
+        }
+
         const { data, error } = await supabase
           .from('system_configs')
-          .select('value')
+          .select('value, updated_at')
           .eq('key', 'feature_flags')
           .maybeSingle();
 
@@ -46,7 +64,12 @@ export const ConfigProvider = ({ children }) => {
         } else if (data && data.value) {
           const newFlags = { ...DEFAULT_FEATURE_FLAGS, ...data.value };
           setFeatureFlags(newFlags);
-          try { localStorage.setItem('sscbs_os_feature_flags', JSON.stringify(newFlags)); } catch (e) {}
+          try {
+            localStorage.setItem('sscbs_os_feature_flags', JSON.stringify(newFlags));
+            if (data.updated_at) {
+              localStorage.setItem('sscbs_os_feature_flags_updated_at', data.updated_at);
+            }
+          } catch (e) {}
         }
       } catch (err) {
         console.error('Failed to connect to Supabase for config:', err);

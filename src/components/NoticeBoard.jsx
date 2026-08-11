@@ -172,7 +172,8 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
       if (!force) {
         const cached = sessionStorage.getItem('sscbs_cached_notices');
         const cachedTime = sessionStorage.getItem('sscbs_cached_notices_time');
-        if (cached && cachedTime && (Date.now() - Number(cachedTime)) < 30000) {
+        // 5-minute cache TTL (Realtime channel invalidates & forces refresh on new notices)
+        if (cached && cachedTime && (Date.now() - Number(cachedTime)) < 300000) {
           try {
             setNotices(JSON.parse(cached));
             setLoading(false);
