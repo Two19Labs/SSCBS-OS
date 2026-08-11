@@ -44,6 +44,7 @@ const GpaCalculatorModal = lazy(() => import('./components/GpaCalculatorModal'))
 const ContactPage = lazy(() => import('./components/ContactPage'));
 const TeamFinderPage = lazy(() => import('./components/TeamFinderPage'));
 const EmptyRoomFinderPage = lazy(() => import('./components/EmptyRoomFinderPage').then(m => ({ default: m.EmptyRoomFinderPage })));
+const SocietyTrackerPage = lazy(() => import('./components/SocietyTrackerPage'));
 
 
 const PageLoader = () => (
@@ -56,8 +57,9 @@ const PageLoader = () => (
   </div>
 );
 
-const TOOL_VIEWS = ['find-prof', 'waiver', 'admin', 'team-finder', 'empty-room', 'faculty-db'];
-const VALID_VIEWS = ['home', 'find-prof', 'waiver', 'tools', 'buzz', 'profile', 'admin', 'contact', 'team-finder', 'empty-room', 'faculty-db'];
+const TOOL_VIEWS = ['find-prof', 'waiver', 'admin', 'team-finder', 'empty-room', 'faculty-db', 'society-tracker'];
+const VALID_VIEWS = ['home', 'find-prof', 'waiver', 'tools', 'buzz', 'profile', 'admin', 'contact', 'team-finder', 'empty-room', 'faculty-db', 'society-tracker'];
+
 
 const getInitialView = () => {
   if (typeof window !== 'undefined') {
@@ -201,6 +203,7 @@ function App() {
       title: 'Main Navigation',
       items: [
         { id: 'home', label: 'Home', Icon: HomeIcon },
+        { id: 'society-tracker', label: 'Recruitment Tracker', Icon: UsersIcon },
         { id: 'buzz', label: 'Campus Buzz', Icon: MegaphoneIcon, locked: !featureFlags['buzz'] && !isAdmin },
       ],
     },
@@ -234,6 +237,7 @@ function App() {
 
   const pageTitle = {
     tools: 'Tools',
+    'society-tracker': 'Society Recruitment Tracker',
     'find-prof': 'Find My Professor',
     'faculty-db': 'Faculty Directory',
     'team-finder': 'Team Finder & Compete Hub',
@@ -246,6 +250,12 @@ function App() {
 
   const renderView = () => {
     switch (view) {
+      case 'society-tracker':
+        return (
+          <Suspense fallback={<PageLoader />}>
+            <SocietyTrackerPage onBack={goBack} />
+          </Suspense>
+        );
       case 'find-prof':
         return (
           <Suspense fallback={<PageLoader />}>
@@ -294,13 +304,14 @@ function App() {
         return (
           <div className="tools-hub">
             {[
-              { id: 'society-tracker', micro: 'SOON', microClass: 'dim', title: 'Society Recruitment Tracker', desc: 'Keep track of info & form deadlines for societies', Icon: UsersIcon, locked: true },
+              { id: 'society-tracker', micro: 'LIVE', microClass: 'success', title: 'Society Recruitment Tracker', desc: 'Keep track of info & form deadlines for societies', Icon: UsersIcon, locked: false },
               ...(hasTeamFinderAccess ? [{ id: 'team-finder', micro: 'NEW', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post case comp openings', Icon: TrophyIcon, locked: false }] : []),
               { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
               { id: 'waiver', micro: 'SOON', microClass: 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
               { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
               { id: 'confessions-matchmaker', micro: 'SOON', microClass: 'dim', title: 'Campus Confessions & Matchmaker', desc: "We're still thinking on this, DM to let us know you'd like this :)", Icon: HeartIcon, locked: true },
               { id: 'find-prof', micro: 'SEARCH', microClass: 'success', title: 'Find My Professor', desc: "Who's teaching where, right now", Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
+
               { id: 'empty-room', micro: 'LIVE', microClass: 'success', title: 'Empty Room Finder', desc: 'Spot vacant classrooms in real-time or well in advance', Icon: DoorIcon, locked: false },
             ].map(({ id, title, desc, Icon, locked }) => (
               <button

@@ -459,7 +459,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
   const hasFacultyDbAccess = canAccessFacultyDatabase(user?.email);
 
   const tools = [
-    { id: 'society-tracker', micro: 'SOON', microClass: 'dim', title: 'Society Recruitment Tracker', desc: 'Keep track of info & form deadlines for societies', Icon: UsersIcon, locked: true },
+    { id: 'society-tracker', micro: 'LIVE', microClass: 'success', title: 'Society Recruitment Tracker', desc: 'Keep track of info & form deadlines for societies', Icon: UsersIcon, locked: false },
     ...(hasTeamFinderAccess ? [{ id: 'team-finder', micro: 'NEW', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post comp openings', Icon: TrophyIcon, locked: false }] : []),
     { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
     { id: 'waiver', micro: 'SOON', microClass: 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
@@ -470,6 +470,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
   ];
 
   return (
+
     <div className="home-dashboard">
       <div className="home-main-col">
         {/* Greeting & Header */}
@@ -494,6 +495,43 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
 
         {/* Live Class Card */}
         {renderLiveCard()}
+
+        {/* Society Recruitment Tracker Highlight Banner */}
+        <div 
+          className="recruitment-home-banner" 
+
+          onClick={() => onNavigate('society-tracker')}
+          style={{
+            background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.18), rgba(99, 102, 241, 0.15))',
+            border: '1px solid rgba(168, 85, 247, 0.35)',
+            borderRadius: '16px',
+            padding: '18px 22px',
+            marginBottom: '24px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '16px',
+            transition: 'transform 0.2s ease, border-color 0.2s ease',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div style={{ fontSize: '1.6rem', background: 'rgba(168, 85, 247, 0.2)', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '12px' }}>⚡</div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span style={{ fontWeight: 800, fontSize: '1.05rem', color: '#f8fafc' }}>Society Recruitment Tracker 2026</span>
+                <span className="micro-label success" style={{ background: '#a855f725', color: '#c084fc', border: '1px solid #c084fc40', padding: '2px 8px', borderRadius: '8px' }}>LIVE PREVIEW</span>
+              </div>
+              <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: '4px' }}>
+                Coming soon! Explore societies, domain categories, deadlines &amp; forms.
+              </div>
+            </div>
+          </div>
+          <button className="home-tt-btn primary" style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+            Explore Tracker →
+          </button>
+        </div>
+
 
         {/* Original Daily Timeline Tracker */}
         {hasProfile && timetable && showTimeline && !isWeekend && !todayHoliday && (
