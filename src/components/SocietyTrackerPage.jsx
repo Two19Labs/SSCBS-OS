@@ -166,13 +166,6 @@ export default function SocietyTrackerPage({ onBack }) {
             <div className="st-metric-lbl">My Preferred</div>
           </div>
         </div>
-        <div className="st-metric-card">
-          <div className="st-metric-icon">⏰</div>
-          <div>
-            <div className="st-metric-val">Aug 24</div>
-            <div className="st-metric-lbl">Earliest Deadline</div>
-          </div>
-        </div>
       </div>
 
       {/* Navigation Tabs Header */}
