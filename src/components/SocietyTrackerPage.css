@@ -410,8 +410,8 @@
 /* ── Deadline / Status Box ── */
 .st-deadline-box {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 4px;
   padding: 8px 12px;
   border-radius: 8px;
   font-size: 0.8rem;
@@ -507,6 +507,18 @@
   color: #15803d;
 }
 
+.st-countdown-strip.green {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #15803d;
+}
+
+.st-countdown-strip.warning {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
 .st-countdown-strip.urgent {
   background: #fef2f2;
   border-color: #fecaca;
@@ -546,6 +558,10 @@
   font-size: 0.85rem;
   font-weight: 600;
   color: #15803d;
+}
+
+.st-modal-countdown.warning {
+  color: #92400e;
 }
 
 .st-modal-countdown.urgent {

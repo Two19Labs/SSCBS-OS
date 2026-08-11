@@ -56,12 +56,14 @@ export default function SocietyTrackerPage({ onBack }) {
   const getCountdown = useCallback((deadlineStr) => {
     if (!deadlineStr) return null;
     const diff = new Date(deadlineStr) - now;
-    if (diff <= 0) return { label: 'Closed', expired: true };
+    if (diff <= 0) return { label: 'Closed', expired: true, tier: 'expired' };
     const h = Math.floor(diff / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
     const pad = (n) => String(n).padStart(2, '0');
-    return { label: `${pad(h)}:${pad(m)}:${pad(s)}`, expired: false, hours: h };
+    // Tier: green > 48h, warning ≤ 48h, urgent ≤ 12h
+    const tier = h < 12 ? 'urgent' : h < 48 ? 'warning' : 'green';
+    return { label: `${pad(h)}:${pad(m)}:${pad(s)}`, expired: false, hours: h, tier };
   }, [now]);
 
   const toggleBookmark = (id) => {
@@ -274,7 +276,7 @@ export default function SocietyTrackerPage({ onBack }) {
                         </div>
 
                         {countdown && !countdown.expired && (
-                          <div className={`st-countdown-strip ${countdown.hours < 4 ? 'urgent' : ''}`}>
+                          <div className={`st-countdown-strip ${countdown.tier}`}>
                             <ClockIcon size={12} />
                             <span className="st-countdown-label">Closes in</span>
                             <span className="st-countdown-timer">{countdown.label}</span>
@@ -441,7 +443,7 @@ export default function SocietyTrackerPage({ onBack }) {
                         <div>
                           <strong>{selectedSociety.statusText || dl.text}</strong>
                           {countdown && !countdown.expired && (
-                            <div className={`st-modal-countdown ${countdown.hours < 4 ? 'urgent' : ''}`}>
+                            <div className={`st-modal-countdown ${countdown.tier}`}>
                               ⏱️ <span className="st-countdown-timer">{countdown.label}</span> remaining
                             </div>
                           )}
