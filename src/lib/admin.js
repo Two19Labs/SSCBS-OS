@@ -39,7 +39,13 @@ export function canAccessFacultyDatabase(email) {
   return true; // Faculty Directory is live for all SSCBS users!
 }
 
+export function canAccessSocietyTracker(email) {
+  if (!email || typeof email !== 'string') return false;
+  return email.toLowerCase().trim() === 'aditya.25015@sscbs.du.ac.in';
+}
+
 const TIMEWARP_KEY = 'sscbs-timewarp-enabled';
+
 
 export function isTimeWarpEnabled() {
   return localStorage.getItem(TIMEWARP_KEY) === 'true';

@@ -7,7 +7,7 @@ import HomeDashboard from './components/HomeDashboard';
 import ProfilePage from './components/ProfilePage';
 import ProfileModal from './components/ProfileModal';
 import NoticeBoard from './components/NoticeBoard';
-import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFacultyDatabase } from './lib/admin';
+import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFacultyDatabase, canAccessSocietyTracker } from './lib/admin';
 import {
   HomeIcon,
   CalendarIcon,
@@ -175,6 +175,7 @@ function App() {
   const hasTeamFinderAccess = featureFlags['team-finder'] || canAccessTeamFinder(user.email);
   const hasEmptyRoomAccess = featureFlags['empty-room'] || canAccessEmptyRoom(user.email);
   const hasFacultyDbAccess = canAccessFacultyDatabase(user.email);
+  const hasSocietyTrackerAccess = canAccessSocietyTracker(user.email);
 
   const openTool = (id) => {
     setIsMobileSidebarOpen(false);
@@ -203,7 +204,7 @@ function App() {
       title: 'Main Navigation',
       items: [
         { id: 'home', label: 'Home', Icon: HomeIcon },
-        { id: 'society-tracker', label: 'Recruitment Tracker', Icon: UsersIcon },
+        ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', label: 'Recruitment Tracker', Icon: UsersIcon }] : []),
         { id: 'buzz', label: 'Campus Buzz', Icon: MegaphoneIcon, locked: !featureFlags['buzz'] && !isAdmin },
       ],
     },
@@ -251,11 +252,12 @@ function App() {
   const renderView = () => {
     switch (view) {
       case 'society-tracker':
-        return (
+        return hasSocietyTrackerAccess ? (
           <Suspense fallback={<PageLoader />}>
             <SocietyTrackerPage onBack={goBack} />
           </Suspense>
-        );
+        ) : <HomeDashboard onNavigate={openTool} onOpenProfile={() => setView('profile')} />;
+
       case 'find-prof':
         return (
           <Suspense fallback={<PageLoader />}>
@@ -304,8 +306,9 @@ function App() {
         return (
           <div className="tools-hub">
             {[
-              { id: 'society-tracker', micro: 'LIVE', microClass: 'success', title: 'Society Recruitment Tracker', desc: 'Keep track of info & form deadlines for societies', Icon: UsersIcon, locked: false },
+              ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', micro: 'LIVE', microClass: 'success', title: 'Society Recruitment Tracker', desc: 'Keep track of info & form deadlines for societies', Icon: UsersIcon, locked: false }] : []),
               ...(hasTeamFinderAccess ? [{ id: 'team-finder', micro: 'NEW', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post case comp openings', Icon: TrophyIcon, locked: false }] : []),
+
               { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
               { id: 'waiver', micro: 'SOON', microClass: 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
               { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },

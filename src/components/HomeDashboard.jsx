@@ -6,7 +6,8 @@ import { PERIODS, DAYS } from '../data/timetables';
 import NoticeBoard from './NoticeBoard';
 import NotificationCenter from './NotificationCenter';
 import { SearchIcon, PercentIcon, CalculatorIcon, FileIcon, TrophyIcon, DoorIcon, HeartIcon, UsersIcon, UserIcon } from './icons';
-import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFacultyDatabase, isTimeWarpEnabled } from '../lib/admin';
+import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFacultyDatabase, canAccessSocietyTracker, isTimeWarpEnabled } from '../lib/admin';
+
 
 import './HomeDashboard.css';
 
@@ -457,9 +458,10 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
   const hasTeamFinderAccess = featureFlags['team-finder'] || canAccessTeamFinder(user?.email);
   const hasEmptyRoomAccess = featureFlags['empty-room'] || canAccessEmptyRoom(user?.email);
   const hasFacultyDbAccess = canAccessFacultyDatabase(user?.email);
+  const hasSocietyTrackerAccess = canAccessSocietyTracker(user?.email);
 
   const tools = [
-    { id: 'society-tracker', micro: 'LIVE', microClass: 'success', title: 'Society Recruitment Tracker', desc: 'Keep track of info & form deadlines for societies', Icon: UsersIcon, locked: false },
+    ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', micro: 'LIVE', microClass: 'success', title: 'Society Recruitment Tracker', desc: 'Keep track of info & form deadlines for societies', Icon: UsersIcon, locked: false }] : []),
     ...(hasTeamFinderAccess ? [{ id: 'team-finder', micro: 'NEW', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post comp openings', Icon: TrophyIcon, locked: false }] : []),
     { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
     { id: 'waiver', micro: 'SOON', microClass: 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
@@ -497,40 +499,43 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
         {renderLiveCard()}
 
         {/* Society Recruitment Tracker Highlight Banner */}
-        <div 
-          className="recruitment-home-banner" 
-          onClick={() => onNavigate('society-tracker')}
-          style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border)',
-            borderLeft: '4px solid var(--accent)',
-            borderRadius: '12px',
-            padding: '16px 20px',
-            marginBottom: '20px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '16px',
-            transition: 'border-color 0.15s ease, transform 0.15s ease',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <div style={{ fontSize: '1.4rem', background: 'var(--tint)', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px' }}>⚡</div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--ink)' }}>Society Recruitment Tracker 2026</span>
-                <span className="micro-label success">LIVE DEMO</span>
-              </div>
-              <div style={{ fontSize: '0.84rem', color: 'var(--ink-dim)', marginTop: '2px' }}>
-                Explore societies, domain categories, registration forms &amp; deadline reminders.
+        {hasSocietyTrackerAccess && (
+          <div 
+            className="recruitment-home-banner" 
+            onClick={() => onNavigate('society-tracker')}
+            style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderLeft: '4px solid var(--accent)',
+              borderRadius: '12px',
+              padding: '16px 20px',
+              marginBottom: '20px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '16px',
+              transition: 'border-color 0.15s ease, transform 0.15s ease',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <div style={{ fontSize: '1.4rem', background: 'var(--tint)', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px' }}>⚡</div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--ink)' }}>Society Recruitment Tracker 2026</span>
+                  <span className="micro-label success">LIVE DEMO</span>
+                </div>
+                <div style={{ fontSize: '0.84rem', color: 'var(--ink-dim)', marginTop: '2px' }}>
+                  Explore societies, domain categories, registration forms &amp; deadline reminders.
+                </div>
               </div>
             </div>
+            <button className="home-tt-btn primary" style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+              Explore Tracker →
+            </button>
           </div>
-          <button className="home-tt-btn primary" style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
-            Explore Tracker →
-          </button>
-        </div>
+        )}
+
 
 
 
