@@ -641,6 +641,13 @@
   border-color: var(--ink);
   transform: translateY(-1px);
 }
+/* ── Social Icons Row ── */
+.st-social-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
 
 /* ── Coloured Social Buttons ── */
 .st-social-btn {
@@ -662,6 +669,11 @@
   transform: translateY(-2px) scale(1.08);
   border-color: transparent;
   color: #ffffff !important;
+}
+
+.st-social-btn.sscbs:hover {
+  background: linear-gradient(135deg, #8B1A2B 0%, #B8860B 100%);
+  box-shadow: 0 4px 14px rgba(139, 26, 43, 0.45);
 }
 
 .st-social-btn.insta:hover {

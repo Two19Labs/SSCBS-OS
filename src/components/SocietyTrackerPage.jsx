@@ -11,6 +11,7 @@ import {
   HeartIcon,
   CheckIcon,
   BackIcon,
+  GraduationCapIcon,
 } from './icons';
 import './SocietyTrackerPage.css';
 
@@ -356,36 +357,38 @@ export default function SocietyTrackerPage({ onBack }) {
                               Forms Opening Soon
                             </span>
                           )}
-                    <a
-                      href={OFFICIAL_COLLEGE_SOCIETIES_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="st-college-btn"
-                      title="Visit Official SSCBS Web Page"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      College Page <ExternalLinkIcon size={12} />
-                    </a>
-                    <a
-                      href={society.instagramVideoUrl || 'https://instagram.com'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="st-social-btn insta"
-                      title="Watch Instagram Updates"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <InstagramIcon size={20} />
-                    </a>
-                    <a
-                      href={society.linkedinUrl || 'https://linkedin.com'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="st-social-btn linkedin"
-                      title="View LinkedIn Profile"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <LinkedinIcon size={20} />
-                    </a>
+                    <div className="st-social-row">
+                      <a
+                        href={OFFICIAL_COLLEGE_SOCIETIES_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="st-social-btn sscbs"
+                        title="Visit Official SSCBS Page"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <GraduationCapIcon size={18} />
+                      </a>
+                      <a
+                        href={society.instagramVideoUrl || 'https://instagram.com'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="st-social-btn insta"
+                        title="Instagram Updates"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <InstagramIcon size={18} />
+                      </a>
+                      <a
+                        href={society.linkedinUrl || 'https://linkedin.com'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="st-social-btn linkedin"
+                        title="LinkedIn Profile"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <LinkedinIcon size={18} />
+                      </a>
+                    </div>
                   </div>
                       </>
                     );
@@ -556,16 +559,17 @@ export default function SocietyTrackerPage({ onBack }) {
                   }
                   return <span className="st-modal-form-disabled">Forms Opening Soon</span>;
                 })()}
+              </div>
+              <div className="st-social-row">
                 <a
                   href={OFFICIAL_COLLEGE_SOCIETIES_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="st-college-btn"
+                  className="st-social-btn sscbs"
+                  title="Visit Official SSCBS Page"
                 >
-                  Visit Official SSCBS Web Page <ExternalLinkIcon size={12} />
+                  <GraduationCapIcon size={20} />
                 </a>
-              </div>
-              <div style={{ display: 'flex', gap: '8px' }}>
                 <a
                   href={selectedSociety.instagramVideoUrl || 'https://instagram.com'}
                   target="_blank"
@@ -573,7 +577,7 @@ export default function SocietyTrackerPage({ onBack }) {
                   className="st-social-btn insta"
                   title="Instagram Updates"
                 >
-                  <InstagramIcon size={22} />
+                  <InstagramIcon size={20} />
                 </a>
                 <a
                   href={selectedSociety.linkedinUrl || 'https://linkedin.com'}
@@ -582,7 +586,7 @@ export default function SocietyTrackerPage({ onBack }) {
                   className="st-social-btn linkedin"
                   title="LinkedIn Profile"
                 >
-                  <LinkedinIcon size={22} />
+                  <LinkedinIcon size={20} />
                 </a>
               </div>
             </div>
