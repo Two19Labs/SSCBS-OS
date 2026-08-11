@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { CATEGORIES, DEMO_SOCIETIES, getDeadlineInfo } from '../data/societies';
 import {
   SearchIcon,
@@ -15,13 +14,8 @@ import {
 import './SocietyTrackerPage.css';
 
 const LOCAL_STORAGE_KEY = 'sscbs_bookmarked_societies';
-const ADITYA_EMAIL = 'aditya.25015@sscbs.du.ac.in';
 
 export default function SocietyTrackerPage() {
-  const { user } = useAuth();
-  const userEmail = user?.email?.toLowerCase() || '';
-  const isAditya = userEmail === ADITYA_EMAIL;
-
   const [activeTab, setActiveTab] = useState('all'); // 'all' | 'preferred'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -55,52 +49,6 @@ export default function SocietyTrackerPage() {
     );
   };
 
-  // 🔒 If user is NOT Aditya, show Coming Soon lock view
-  if (!isAditya) {
-    return (
-      <div className="society-tracker-container">
-        <div className="tracker-hero-banner" style={{ textAlign: 'center', padding: '48px 32px' }}>
-          <div className="hero-banner-glow" />
-          <div className="hero-tag" style={{ margin: '0 auto 16px' }}>
-            <SparklesIcon size={14} /> RECRUITMENT SEASON 2026
-          </div>
-          <h1 className="hero-title" style={{ fontSize: '2.4rem', marginBottom: '14px' }}>
-            Society Recruitment Tracker — Coming Soon! ⚡
-          </h1>
-          <p className="hero-subtitle" style={{ margin: '0 auto 28px', maxWidth: '640px' }}>
-            We're building this to make tracking society recruitments so much easier for you. Stay tuned — 50+ society registration forms, Instagram orientation videos, domain categories (Consulting, Finance, E-Cells &amp; more), and deadline reminders will be live here very soon!
-          </p>
-
-          {/* Feature Highlights Grid */}
-          <div className="tracker-metrics-grid" style={{ marginTop: '36px', textAlign: 'left' }}>
-            <div className="metric-card">
-              <div className="metric-icon-box">🏛️</div>
-              <div>
-                <div className="metric-val">50+ Societies</div>
-                <div className="metric-lbl">Consulting, Finance, Tech, E-Cell &amp; Cultural</div>
-              </div>
-            </div>
-            <div className="metric-card">
-              <div className="metric-icon-box">❤️</div>
-              <div>
-                <div className="metric-val">Track Deadlines</div>
-                <div className="metric-lbl">Bookmark &amp; never miss form deadlines</div>
-              </div>
-            </div>
-            <div className="metric-card">
-              <div className="metric-icon-box">📹</div>
-              <div>
-                <div className="metric-val">Direct Links</div>
-                <div className="metric-lbl">Forms, Instagram Videos &amp; LinkedIn</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // 🔓 For Aditya: Show full working demo view
   const filteredSocieties = DEMO_SOCIETIES.filter((society) => {
     if (activeTab === 'preferred' && !bookmarkedIds.includes(society.id)) {
       return false;
@@ -139,15 +87,15 @@ export default function SocietyTrackerPage() {
 
   return (
     <div className="society-tracker-container">
-      {/* Teaser & Admin Preview Banner */}
+      {/* Teaser & Hero Banner */}
       <div className="tracker-hero-banner">
         <div className="hero-banner-glow" />
         <div className="hero-tag">
-          <SparklesIcon size={14} /> ADMIN DEMO PREVIEW (ADITYA)
+          <SparklesIcon size={14} /> RECRUITMENT SEASON 2026
         </div>
         <h1 className="hero-title">Society Recruitment Tracker</h1>
         <p className="hero-subtitle">
-          ✨ <strong>Previewing Demo Cards:</strong> This demo view is currently visible to you (<code>aditya.25015@sscbs.du.ac.in</code>). Other users see the coming soon screen until data launch!
+          ✨ <strong>Coming soon!</strong> We're making recruitments so much easier to track for you. Explore societies below, filter by domain, save your preferred deadlines, and access orientation videos &amp; form links all in one place.
         </p>
       </div>
 
@@ -351,7 +299,7 @@ export default function SocietyTrackerPage() {
       {/* Helper Footer for Data Dumping */}
       <div className="data-dump-footer-banner">
         <span className="dump-text">
-          💡 <strong>Ready to load the real data?</strong> Simply dump the 50+ society details in chat and we'll publish them for everyone!
+          💡 <strong>Got society recruitment details to add?</strong> Simply paste the society list &amp; links here and we'll update the dataset instantly!
         </span>
       </div>
     </div>
