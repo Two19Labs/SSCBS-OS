@@ -16,6 +16,42 @@ import './SocietyTrackerPage.css';
 
 const LOCAL_STORAGE_KEY = 'sscbs_bookmarked_societies';
 
+function DeadlineCountdown({ deadlineStr }) {
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  if (!deadlineStr) return <span>No Deadline</span>;
+
+  const deadlineDate = new Date(deadlineStr).getTime();
+  const diffMs = deadlineDate - now;
+
+  if (diffMs <= 0) {
+    return <span className="st-timer-expired">Closed</span>;
+  }
+
+  const totalHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const days = Math.floor(totalHours / 24);
+  const hours = totalHours % 24;
+  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+  if (days >= 1) {
+    return <span>{days} {days === 1 ? 'day' : 'days'} left</span>;
+  }
+
+  return (
+    <span className="st-timer-counting">
+      {String(hours).padStart(2, '0')}h {String(minutes).padStart(2, '0')}m {String(seconds).padStart(2, '0')}s left
+    </span>
+  );
+}
+
 export default function SocietyTrackerPage({ onBack }) {
   const [activeTab, setActiveTab] = useState('all'); // 'all' | 'preferred'
   const [searchQuery, setSearchQuery] = useState('');
@@ -61,8 +97,7 @@ export default function SocietyTrackerPage({ onBack }) {
       const q = searchQuery.toLowerCase().trim();
       const matchName = society.name.toLowerCase().includes(q);
       const matchCategory = society.categoryLabel.toLowerCase().includes(q);
-      const matchDesc = society.description.toLowerCase().includes(q);
-      return matchName || matchCategory || matchDesc;
+      return matchName || matchCategory;
     }
     return true;
   });
@@ -169,7 +204,7 @@ export default function SocietyTrackerPage({ onBack }) {
             <input
               type="text"
               className="st-search-input"
-              placeholder="Search society name, domain, or keywords..."
+              placeholder="Search society name or domain..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -210,7 +245,7 @@ export default function SocietyTrackerPage({ onBack }) {
                 <div>
                   <div className="st-card-top">
                     <span className="st-domain-badge">
-                      {society.categoryLabel}
+                      {society.categoryLabel.toUpperCase()}
                     </span>
                     <button
                       className={`st-bookmark-btn ${isSaved ? 'active' : ''}`}
@@ -222,16 +257,15 @@ export default function SocietyTrackerPage({ onBack }) {
                   </div>
 
                   <h3 className="st-society-title">{society.name}</h3>
-                  <p className="st-society-desc">{society.description}</p>
                 </div>
 
-                <div>
+                <div className="st-card-bottom">
                   {/* Deadline Box */}
                   <div className={`st-deadline-box ${deadlineInfo.status}`}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span className="st-deadline-lbl">
                       <ClockIcon size={14} /> Deadline
                     </span>
-                    <span>{deadlineInfo.text}</span>
+                    <DeadlineCountdown deadlineStr={society.deadline} />
                   </div>
 
                   {/* Actions */}
@@ -249,7 +283,7 @@ export default function SocietyTrackerPage({ onBack }) {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="st-social-btn"
-                      title="Watch Instagram Orientation Video"
+                      title="Watch Instagram Video"
                     >
                       <InstagramIcon size={16} />
                     </a>
@@ -258,7 +292,7 @@ export default function SocietyTrackerPage({ onBack }) {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="st-social-btn"
-                      title="View LinkedIn Page"
+                      title="View LinkedIn Profile"
                     >
                       <LinkedinIcon size={16} />
                     </a>

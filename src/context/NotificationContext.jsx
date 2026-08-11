@@ -87,7 +87,27 @@ export function NotificationProvider({ children }) {
           .limit(15);
 
         if (!error && data && data.length > 0) {
-          setNotifications(data);
+          const formatted = data.map(n => ({
+            ...n,
+            actionType: n.action_type || n.actionType || null,
+            actionData: n.action_data || n.actionData || null,
+          }));
+
+          setNotifications(prev => {
+            const map = new Map();
+            // Add cloud notifications first
+            formatted.forEach(n => map.set(n.id, n));
+            // Merge existing local notifications if not in cloud data
+            prev.forEach(n => {
+              if (!map.has(n.id)) {
+                map.set(n.id, n);
+              }
+            });
+            const merged = Array.from(map.values());
+            merged.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+            return merged.slice(0, 50);
+          });
+
           sessionStorage.setItem(`${cacheKey}_time`, String(Date.now()));
         }
       } catch (err) {

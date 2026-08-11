@@ -710,6 +710,10 @@
   }
 }
 
+.page-heading-desktop {
+  display: none;
+}
+
 /* ═══ Laptop / desktop ≥ 900px — sidebar UI ═══ */
 @media (min-width: 900px) {
   .app-sidebar {
@@ -737,9 +741,12 @@
   }
 
   .page-heading-desktop {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
     max-width: var(--content-max);
-    margin: 0 auto 18px;
+    margin: 0 auto 20px;
   }
 
   .page-heading-desktop h1 {

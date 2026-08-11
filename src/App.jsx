@@ -468,9 +468,10 @@ function App() {
 
         {/* ── Main content ── */}
         <main className="app-main">
-          {pageTitle && (
-            <div className="page-heading-desktop" style={{ marginBottom: '20px' }}>
-              <h1 style={{ margin: 0 }}>{pageTitle}</h1>
+          {view !== 'home' && (
+            <div className="page-heading-desktop">
+              <h1 style={{ margin: 0 }}>{pageTitle || 'SSCBS OS'}</h1>
+              <NotificationCenter onNavigate={openTool} />
             </div>
           )}
           {renderView()}

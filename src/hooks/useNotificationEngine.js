@@ -63,8 +63,8 @@ export function useNotificationEngine() {
   // Load fired alerts history from localStorage to avoid duplicates across page reloads
   useEffect(() => {
     try {
-      const todayStr = new Date().toISOString().split('T')[0];
-      const saved = localStorage.getItem(`sscbs_fired_alerts_${todayStr}`);
+      const { todayDateStr } = getISTDateComponents();
+      const saved = localStorage.getItem(`sscbs_fired_alerts_${todayDateStr}`);
       if (saved) {
         firedAlertsRef.current = new Set(JSON.parse(saved));
       }
@@ -74,8 +74,8 @@ export function useNotificationEngine() {
   const markAlertFired = (alertKey) => {
     firedAlertsRef.current.add(alertKey);
     try {
-      const todayStr = new Date().toISOString().split('T')[0];
-      localStorage.setItem(`sscbs_fired_alerts_${todayStr}`, JSON.stringify(Array.from(firedAlertsRef.current)));
+      const { todayDateStr } = getISTDateComponents();
+      localStorage.setItem(`sscbs_fired_alerts_${todayDateStr}`, JSON.stringify(Array.from(firedAlertsRef.current)));
     } catch (e) {}
   };
 
@@ -324,7 +324,7 @@ export function useNotificationEngine() {
         const { data: myPostsData } = await supabase
           .from('squad_posts')
           .select('id, title, competition_name, created_by_email, user_id, user_email')
-          .or(`created_by_email.ilike.${userEmail},user_email.ilike.${userEmail},user_id.eq.${user.id}`);
+          .or(`created_by_email.ilike."${userEmail}",user_email.ilike."${userEmail}",user_id.eq."${user.id}"`);
 
         const myPosts = myPostsData || [];
 

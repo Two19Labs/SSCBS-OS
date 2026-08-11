@@ -358,6 +358,8 @@ input:checked + .notif-slider:before {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  background: var(--tint);
+  color: var(--ink);
 }
 
 .icon-class {
@@ -378,6 +380,11 @@ input:checked + .notif-slider:before {
 .icon-event {
   background: var(--accent-tint);
   color: var(--maroon);
+}
+
+.icon-info, .icon-general {
+  background: var(--tint);
+  color: var(--ink);
 }
 
 .notif-card-content {

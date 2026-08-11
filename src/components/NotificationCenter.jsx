@@ -108,14 +108,18 @@ export default function NotificationCenter({ onNavigate }) {
 
     if (!onNavigate) return;
 
-    if (notif.actionType === 'view_room' || notif.type === 'class') {
-      onNavigate('timetable');
-    } else if (notif.actionType === 'empty_room' || notif.type === 'gap') {
+    const actionType = notif.actionType || notif.action_type;
+
+    if (actionType === 'view_room' || notif.type === 'class') {
+      onNavigate('home');
+    } else if (actionType === 'empty_room' || notif.type === 'gap') {
       onNavigate('empty-room');
-    } else if (notif.actionType === 'read_notice' || notif.type === 'event') {
+    } else if (actionType === 'read_notice' || notif.type === 'event') {
       onNavigate('buzz');
-    } else if (notif.actionType === 'team_view' || notif.type?.startsWith('team_')) {
+    } else if (actionType === 'team_view' || notif.type?.startsWith('team_')) {
       onNavigate('team-finder');
+    } else {
+      onNavigate('home');
     }
   };
 
@@ -245,83 +249,100 @@ export default function NotificationCenter({ onNavigate }) {
                 </p>
               </div>
             ) : (
-              filteredNotifications.map(notif => (
-                <div
-                  key={notif.id}
-                  className={`notif-card-item ${notif.read ? 'read' : 'unread'} notif-type-${notif.type}`}
-                >
-                  <div className="notif-card-main">
-                    <span className={`notif-type-icon icon-${notif.type}`}>
-                      {getCategoryIcon(notif.type)}
-                    </span>
+              filteredNotifications.map(notif => {
+                const actionData = notif.actionData || notif.action_data;
+                return (
+                  <div
+                    key={notif.id}
+                    className={`notif-card-item ${notif.read ? 'read' : 'unread'} notif-type-${notif.type}`}
+                    onClick={() => handleActionClick(notif)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <div className="notif-card-main">
+                      <span className={`notif-type-icon icon-${notif.type}`}>
+                        {getCategoryIcon(notif.type)}
+                      </span>
 
-                    <div className="notif-card-content">
-                      <div className="notif-card-top flex-between">
-                        <span className="notif-card-category">{notif.category || 'Alert'}</span>
-                        <span className="notif-card-time">{formatTimeAgo(notif.created_at)}</span>
-                      </div>
+                      <div className="notif-card-content">
+                        <div className="notif-card-top flex-between">
+                          <span className="notif-card-category">{notif.category || 'Alert'}</span>
+                          <span className="notif-card-time">{formatTimeAgo(notif.created_at)}</span>
+                        </div>
 
-                      <h4 className="notif-card-title">{notif.title}</h4>
-                      <p className="notif-card-body">{notif.body}</p>
+                        <h4 className="notif-card-title">{notif.title}</h4>
+                        <p className="notif-card-body">{notif.body}</p>
 
-                      {/* Action buttons */}
-                      <div className="notif-card-actions">
-                        {notif.type === 'team_req' && notif.actionData?.appId ? (
-                          <div className="notif-team-actions">
+                        {/* Action buttons */}
+                        <div className="notif-card-actions">
+                          {notif.type === 'team_req' && actionData?.appId ? (
+                            <div className="notif-team-actions">
+                              <button
+                                className="notif-btn notif-btn-accept"
+                                disabled={actionLoading[notif.id]}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleTeamAction(notif.id, actionData, 'accepted');
+                                }}
+                              >
+                                <CheckIcon size={14} /> Accept
+                              </button>
+                              <button
+                                className="notif-btn notif-btn-decline"
+                                disabled={actionLoading[notif.id]}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleTeamAction(notif.id, actionData, 'declined');
+                                }}
+                              >
+                                <CloseIcon size={14} /> Decline
+                              </button>
+                            </div>
+                          ) : (
                             <button
-                              className="notif-btn notif-btn-accept"
-                              disabled={actionLoading[notif.id]}
-                              onClick={() => handleTeamAction(notif.id, notif.actionData, 'accepted')}
+                              className="notif-btn notif-btn-action"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleActionClick(notif);
+                              }}
                             >
-                              <CheckIcon size={14} /> Accept
+                              {notif.type === 'class' && 'Find Room'}
+                              {notif.type === 'gap' && 'Find Empty Room'}
+                              {notif.type === 'event' && 'Read Notice'}
+                              {notif.type?.startsWith('team_') && 'Open Team Finder'}
+                              {!['class', 'gap', 'event'].includes(notif.type) && !notif.type?.startsWith('team_') && 'View Details'}
                             </button>
-                            <button
-                              className="notif-btn notif-btn-decline"
-                              disabled={actionLoading[notif.id]}
-                              onClick={() => handleTeamAction(notif.id, notif.actionData, 'declined')}
-                            >
-                              <CloseIcon size={14} /> Decline
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            className="notif-btn notif-btn-action"
-                            onClick={() => handleActionClick(notif)}
-                          >
-                            {notif.type === 'class' && 'Find Room'}
-                            {notif.type === 'gap' && 'Find Empty Room'}
-                            {notif.type === 'event' && 'Read Notice'}
-                            {notif.type?.startsWith('team_') && 'Open Team Finder'}
-                            {!['class', 'gap', 'event'].includes(notif.type) && !notif.type?.startsWith('team_') && 'View Details'}
-                          </button>
-                        )}
+                          )}
 
-                        {!notif.read && (
-                          <button
-                            className="notif-btn-read-toggle"
-                            onClick={() => markAsRead(notif.id)}
-                            title="Mark as read"
-                          >
-                            Mark Read
-                          </button>
-                        )}
+                          {!notif.read && (
+                            <button
+                              className="notif-btn-read-toggle"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                markAsRead(notif.id);
+                              }}
+                              title="Mark as read"
+                            >
+                              Mark Read
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <button
-                    className="notif-card-dismiss"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteNotification(notif.id);
-                    }}
-                    title="Remove notification"
-                    aria-label="Remove notification"
-                  >
-                    <CloseIcon size={12} />
-                  </button>
-                </div>
-              ))
+                    <button
+                      className="notif-card-dismiss"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteNotification(notif.id);
+                      }}
+                      title="Remove notification"
+                      aria-label="Remove notification"
+                    >
+                      <CloseIcon size={12} />
+                    </button>
+                  </div>
+                );
+              })
             )}
           </div>
         </div>
