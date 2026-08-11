@@ -90,14 +90,18 @@ export default function SocietyTrackerPage({ onBack }) {
     if (activeTab === 'preferred' && !bookmarkedIds.includes(society.id)) {
       return false;
     }
-    if (selectedCategory !== 'all' && society.category !== selectedCategory) {
-      return false;
+    if (selectedCategory !== 'all') {
+      const hasCat = society.category === selectedCategory ||
+        (Array.isArray(society.categories) && society.categories.includes(selectedCategory));
+      if (!hasCat) return false;
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
       const matchName = society.name.toLowerCase().includes(q);
       const matchCategory = society.categoryLabel.toLowerCase().includes(q);
-      return matchName || matchCategory;
+      const matchSubCats = Array.isArray(society.categoryLabels) &&
+        society.categoryLabels.some((lbl) => lbl.toLowerCase().includes(q));
+      return matchName || matchCategory || matchSubCats;
     }
     return true;
   });
@@ -137,7 +141,7 @@ export default function SocietyTrackerPage({ onBack }) {
             </span>
             <h1 className="st-title">Society Recruitment Tracker</h1>
             <p className="st-subtitle">
-              Explore 50+ societies, filter by domain, save target deadlines, and access orientation videos &amp; form links.
+              Recruitments will start soon, forms and info will come here soon! Filter all 47 official SSCBS societies by domain.
             </p>
           </div>
         </div>
@@ -148,15 +152,15 @@ export default function SocietyTrackerPage({ onBack }) {
         <div className="st-metric-card">
           <div className="st-metric-icon">🏛️</div>
           <div>
-            <div className="st-metric-val">{totalCount}+</div>
-            <div className="st-metric-lbl">Total Societies</div>
+            <div className="st-metric-val">{totalCount}</div>
+            <div className="st-metric-lbl">Official Societies</div>
           </div>
         </div>
         <div className="st-metric-card">
           <div className="st-metric-icon">⚡</div>
           <div>
-            <div className="st-metric-val">{activeRecruitmentCount}</div>
-            <div className="st-metric-lbl">Active Recruitments</div>
+            <div className="st-metric-val">Upcoming</div>
+            <div className="st-metric-lbl">Recruitments Opening</div>
           </div>
         </div>
         <div className="st-metric-card">
@@ -237,9 +241,19 @@ export default function SocietyTrackerPage({ onBack }) {
               <div key={society.id} className="st-card">
                 <div>
                   <div className="st-card-top">
-                    <span className="st-domain-badge">
-                      {society.categoryLabel.toUpperCase()}
-                    </span>
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                      {Array.isArray(society.categoryLabels) ? (
+                        society.categoryLabels.map((lbl, idx) => (
+                          <span key={idx} className="st-domain-badge">
+                            {lbl.toUpperCase()}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="st-domain-badge">
+                          {society.categoryLabel.toUpperCase()}
+                        </span>
+                      )}
+                    </div>
                     <button
                       className={`st-bookmark-btn ${isSaved ? 'active' : ''}`}
                       onClick={() => toggleBookmark(society.id)}
@@ -250,33 +264,53 @@ export default function SocietyTrackerPage({ onBack }) {
                   </div>
 
                   <h3 className="st-society-title">{society.name}</h3>
+                  <p className="st-society-desc" style={{ fontSize: '0.82rem', color: 'var(--text-secondary, #94a3b8)', marginTop: '8px', lineHeight: 1.45 }}>
+                    {society.description}
+                  </p>
                 </div>
 
-                <div className="st-card-bottom">
-                  {/* Deadline Box */}
-                  <div className={`st-deadline-box ${deadlineInfo.status}`}>
+                <div className="st-card-bottom" style={{ marginTop: '14px' }}>
+                  {/* Status Banner */}
+                  <div className="st-deadline-box normal" style={{ background: 'rgba(59, 130, 246, 0.08)', borderColor: 'rgba(59, 130, 246, 0.25)', color: '#60a5fa' }}>
                     <span className="st-deadline-lbl">
-                      <ClockIcon size={14} /> Deadline
+                      <ClockIcon size={14} /> Status
                     </span>
-                    <DeadlineCountdown deadlineStr={society.deadline} />
+                    <span style={{ fontWeight: 600, fontSize: '0.82rem' }}>Recruitments Starting Soon</span>
                   </div>
 
                   {/* Actions */}
-                  <div className="st-card-actions">
-                    <a
-                      href={society.recruitmentFormUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="st-apply-btn"
-                    >
-                      Apply Form <ExternalLinkIcon size={14} />
-                    </a>
+                  <div className="st-card-actions" style={{ marginTop: '10px' }}>
+                    {society.recruitmentFormUrl ? (
+                      <a
+                        href={society.recruitmentFormUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="st-apply-btn"
+                      >
+                        Apply Form <ExternalLinkIcon size={14} />
+                      </a>
+                    ) : (
+                      <span
+                        className="st-apply-btn"
+                        style={{
+                          opacity: 0.7,
+                          cursor: 'default',
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          borderColor: 'rgba(255, 255, 255, 0.1)',
+                          color: '#94a3b8',
+                          justifyContent: 'center',
+                          fontSize: '0.8rem'
+                        }}
+                      >
+                        Forms &amp; Info Coming Soon
+                      </span>
+                    )}
                     <a
                       href={society.instagramVideoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="st-social-btn"
-                      title="Watch Instagram Video"
+                      title="Watch Instagram Updates"
                     >
                       <InstagramIcon size={16} />
                     </a>
