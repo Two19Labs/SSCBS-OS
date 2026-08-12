@@ -430,15 +430,6 @@ export default function SocietyTrackerPage({ onBack }) {
                   </div>
 
                   <h3 className="st-society-title">{society.name}</h3>
-
-                  {Array.isArray(society.pocs) && society.pocs.length > 0 && (
-                    <div className="st-poc-pill-bar">
-                      <span className="st-poc-pill-icon">📞</span>
-                      <span className="st-poc-pill-names">
-                        {society.pocs.map((p) => p.name).join(' • ')}
-                      </span>
-                    </div>
-                  )}
                 </div>
 
                 {/* Card Bottom / Action Row */}
@@ -492,57 +483,61 @@ export default function SocietyTrackerPage({ onBack }) {
                             </span>
                           )}
 
-                          {Array.isArray(society.pocs) && society.pocs.length > 0 && (() => {
-                            const primaryPoc = society.pocs[0];
-                            const cleanPhone = primaryPoc.phone.replace(/[^0-9]/g, '').slice(-10);
-                            const textMsg = encodeURIComponent(`Hi! I'm an SSCBS student inquiring about recruitment for ${society.shortName || society.name}.`);
-                            return (
+                          <div className="st-social-row">
+                            <a
+                              href={society.officialPageUrl || OFFICIAL_COLLEGE_SOCIETIES_URL}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="st-social-btn sscbs"
+                              title="Visit Official SSCBS Page"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <img src="/sscbs_college_logo.png" alt="SSCBS" className="st-sscbs-logo" />
+                            </a>
+                            <a
+                              href={society.instagramVideoUrl || 'https://instagram.com'}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={`st-social-btn ${society.id === 'literary-society' ? 'linktree' : 'insta'}`}
+                              title={society.id === 'literary-society' ? 'Linktree' : 'Instagram Updates'}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {society.id === 'literary-society' ? <LinktreeIcon size={18} /> : <InstagramIcon size={18} />}
+                            </a>
+                            <a
+                              href={society.linkedinUrl || 'https://linkedin.com'}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="st-social-btn linkedin"
+                              title="LinkedIn Profile"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <LinkedinIcon size={18} />
+                            </a>
+                          </div>
+                        </div>
+
+                        {/* Dedicated Card-Bottom Expanded POR Contact Bar */}
+                        {Array.isArray(society.pocs) && society.pocs.length > 0 && (() => {
+                          const primaryPoc = society.pocs[0];
+                          const cleanPhone = primaryPoc.phone.replace(/[^0-9]/g, '').slice(-10);
+                          const textMsg = encodeURIComponent(`Hi! I'm an SSCBS student inquiring about recruitment for ${society.shortName || society.name}.`);
+                          return (
+                            <div className="st-card-por-footer">
                               <a
                                 href={`https://wa.me/91${cleanPhone}?text=${textMsg}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="st-por-btn"
-                                title={`WhatsApp Contact POR (${primaryPoc.name})`}
+                                className="st-card-por-link"
+                                title={`Contact POR (${primaryPoc.name}) on WhatsApp`}
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                <WhatsAppIcon size={14} />
-                                <span>Contact POR</span>
+                                <WhatsAppIcon size={15} />
+                                <span>Contact POR ({primaryPoc.name})</span>
                               </a>
-                            );
-                          })()}
-                    <div className="st-social-row">
-                      <a
-                        href={society.officialPageUrl || OFFICIAL_COLLEGE_SOCIETIES_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="st-social-btn sscbs"
-                        title="Visit Official SSCBS Page"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <img src="/sscbs_college_logo.png" alt="SSCBS" className="st-sscbs-logo" />
-                      </a>
-                      <a
-                        href={society.instagramVideoUrl || 'https://instagram.com'}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`st-social-btn ${society.id === 'literary-society' ? 'linktree' : 'insta'}`}
-                        title={society.id === 'literary-society' ? 'Linktree' : 'Instagram Updates'}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {society.id === 'literary-society' ? <LinktreeIcon size={18} /> : <InstagramIcon size={18} />}
-                      </a>
-                      <a
-                        href={society.linkedinUrl || 'https://linkedin.com'}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="st-social-btn linkedin"
-                        title="LinkedIn Profile"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <LinkedinIcon size={18} />
-                      </a>
-                    </div>
-                  </div>
+                            </div>
+                          );
+                        })()}
                       </>
                     );
                   })()}

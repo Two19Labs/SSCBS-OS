@@ -1487,30 +1487,39 @@
   box-shadow: 0 2px 8px rgba(37, 211, 102, 0.25);
 }
 
-/* Card-level Contact POR Button */
-.st-por-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-decoration: none;
-  background: rgba(37, 211, 102, 0.12);
-  color: #128c7e;
-  border: 1px solid rgba(37, 211, 102, 0.3);
-  transition: all 0.15s ease;
-  white-space: nowrap;
-  flex-shrink: 0;
+/* Expanded Card Bottom POR Contact Footer */
+.st-card-por-footer {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+  width: 100%;
 }
 
-.st-por-btn:hover {
+.st-card-por-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(37, 211, 102, 0.1);
+  color: #128c7e;
+  border: 1px solid rgba(37, 211, 102, 0.28);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.18s ease;
+  box-sizing: border-box;
+}
+
+.st-card-por-link:hover {
   background: #25d366;
   color: #ffffff;
   border-color: #25d366;
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(37, 211, 102, 0.25);
+  box-shadow: 0 3px 12px rgba(37, 211, 102, 0.25);
 }
+
 
 
