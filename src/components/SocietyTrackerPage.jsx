@@ -21,6 +21,16 @@ const LOCAL_STORAGE_KEY = 'sscbs_bookmarked_societies';
 const FILLED_FORMS_KEY = 'sscbs_filled_form_societies';
 const OFFICIAL_COLLEGE_SOCIETIES_URL = 'https://sscbs.du.ac.in/societies/';
 
+// Fisher-Yates shuffle algorithm helper
+function shuffleArray(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 export default function SocietyTrackerPage({ onBack }) {
   const { user } = useAuth();
   const userKeySuffix = user?.email ? `_${user.email.toLowerCase()}` : '';
@@ -30,7 +40,9 @@ export default function SocietyTrackerPage({ onBack }) {
   const [activeTab, setActiveTab] = useState('all'); // 'all' | 'preferred'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('name');
+  // Randomized shuffled order generated once per load/refresh
+  const [shuffledIds, setShuffledIds] = useState(() => shuffleArray(DEMO_SOCIETIES.map((s) => s.id)));
+  const [sortBy, setSortBy] = useState('shuffled');
   const [selectedSociety, setSelectedSociety] = useState(null);
 
   // Bookmarks (Heart) state with user-scoped key and fallback
@@ -196,7 +208,26 @@ export default function SocietyTrackerPage({ onBack }) {
     return true;
   });
 
+  const shuffledIndexMap = React.useMemo(() => {
+    const map = new Map();
+    shuffledIds.forEach((id, index) => map.set(id, index));
+    return map;
+  }, [shuffledIds]);
+
   const sortedSocieties = [...filteredSocieties].sort((a, b) => {
+    // In "My Preferred Societies" tab, keep preferred societies untouched in clean A-Z order (unless Z-A is explicitly chosen)
+    if (activeTab === 'preferred') {
+      if (sortBy === 'name-desc') {
+        return b.name.localeCompare(a.name);
+      }
+      return a.name.localeCompare(b.name);
+    }
+
+    if (sortBy === 'shuffled') {
+      const idxA = shuffledIndexMap.get(a.id) ?? 0;
+      const idxB = shuffledIndexMap.get(b.id) ?? 0;
+      return idxA - idxB;
+    }
     if (sortBy === 'name' || sortBy === 'name-asc') {
       return a.name.localeCompare(b.name);
     }
@@ -296,8 +327,16 @@ export default function SocietyTrackerPage({ onBack }) {
           <select
             className="st-sort-select"
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === 'shuffled' && sortBy === 'shuffled') {
+                // Re-trigger a fresh shuffle if user re-selects shuffled option
+                setShuffledIds(shuffleArray(DEMO_SOCIETIES.map((s) => s.id)));
+              }
+              setSortBy(val);
+            }}
           >
+            <option value="shuffled">Sort by: Shuffled (Default)</option>
             <option value="name">Sort by: Name (A-Z)</option>
             <option value="name-desc">Sort by: Name (Z-A)</option>
           </select>
