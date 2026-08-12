@@ -4,6 +4,7 @@ import { isAdminEmail } from './admin';
 
 export const FEATURE_NAMES = {
   home: 'Home Dashboard',
+  'society-tracker': 'Society Recruitment Tracker',
   timetable: 'Timetable',
   'find-prof': 'Find My Professor',
   'team-finder': 'Team Finder & Compete Hub',
@@ -474,7 +475,7 @@ export async function logFeatureClick(featureId, user) {
  * Supports hourly breakdown for daysCount = 1 (Last 24 Hours) as well as daily breakdown for 7, 30, 90 days.
  */
 export async function fetchAnalyticsData(daysCount = 7) {
-  const emptyFeatureSet = () => ({ home: 0, timetable: 0, 'find-prof': 0, 'team-finder': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 });
+  const emptyFeatureSet = () => ({ home: 0, 'society-tracker': 0, timetable: 0, 'find-prof': 0, 'team-finder': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, total: 0 });
 
   if (daysCount === 1) {
     // ----------------------------------------------------
@@ -650,6 +651,7 @@ export async function fetchAnalyticsData(daysCount = 7) {
 
     const buildSeries = () => ({
       home: slots.map((s, idx) => slotMapVisits[idx].home),
+      'society-tracker': slots.map((s, idx) => slotMapVisits[idx]['society-tracker']),
       timetable: slots.map((s, idx) => slotMapVisits[idx].timetable),
       'find-prof': slots.map((s, idx) => slotMapVisits[idx]['find-prof']),
       'team-finder': slots.map((s, idx) => slotMapVisits[idx]['team-finder']),
@@ -816,6 +818,7 @@ export async function fetchAnalyticsData(daysCount = 7) {
 
   const buildSeries = (dMap) => ({
     home: dateList.map(d => dMap[d.dateStr].home),
+    'society-tracker': dateList.map(d => dMap[d.dateStr]['society-tracker']),
     timetable: dateList.map(d => dMap[d.dateStr].timetable),
     'find-prof': dateList.map(d => dMap[d.dateStr]['find-prof']),
     'team-finder': dateList.map(d => dMap[d.dateStr]['team-finder']),

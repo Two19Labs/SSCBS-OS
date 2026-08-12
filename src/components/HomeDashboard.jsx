@@ -523,7 +523,6 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                   <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--ink)' }}>Society Recruitment Tracker 2026</span>
-                  <span className="micro-label success">LIVE DEMO</span>
                 </div>
                 <div style={{ fontSize: '0.84rem', color: 'var(--ink-dim)', marginTop: '2px' }}>
                   Explore societies, domain categories, registration forms &amp; deadline reminders.

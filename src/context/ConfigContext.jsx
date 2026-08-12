@@ -3,6 +3,7 @@ import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 
 const DEFAULT_FEATURE_FLAGS = {
   'timetable': true,
+  'society-tracker': true,
   'find-prof': true,
   'team-finder': true,
   'waiver': false,

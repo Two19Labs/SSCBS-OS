@@ -585,13 +585,14 @@ function AdminConsoleContent({ onBack }) {
     visits: { totals: {}, series: {} },
     clicks: { totals: {}, series: {} },
     combined: { totals: {}, series: {} },
-    series: { total: [], home: [], timetable: [], 'find-prof': [], 'team-finder': [], waiver: [], gpa: [], buzz: [], profile: [], admin: [] },
-    totals: { home: 0, timetable: 0, 'find-prof': 0, 'team-finder': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, grandTotal: 0 },
+    series: { total: [], home: [], 'society-tracker': [], timetable: [], 'find-prof': [], 'team-finder': [], waiver: [], gpa: [], buzz: [], profile: [], admin: [] },
+    totals: { home: 0, 'society-tracker': 0, timetable: 0, 'find-prof': 0, 'team-finder': 0, waiver: 0, gpa: 0, buzz: 0, profile: 0, admin: 0, grandTotal: 0 },
     topFeatureName: 'Timetable',
     topFeatureCount: 0
   });
   const [enabledSeries, setEnabledSeries] = useState({
     home: true,
+    'society-tracker': true,
     timetable: true,
     'find-prof': true,
     'team-finder': true,
@@ -2891,8 +2892,11 @@ Extract ALL timetable blocks from the attached Excel file now:`;
                           const featKey = usr.currentView || 'home';
                           const featStyleMap = {
                             home: { bg: 'rgba(59, 130, 246, 0.12)', color: '#3b82f6', border: 'rgba(59, 130, 246, 0.3)' },
+                            'society-tracker': { bg: 'rgba(168, 85, 247, 0.12)', color: '#a855f7', border: 'rgba(168, 85, 247, 0.3)' },
                             timetable: { bg: 'rgba(139, 92, 246, 0.12)', color: '#8b5cf6', border: 'rgba(139, 92, 246, 0.3)' },
                             'find-prof': { bg: 'rgba(16, 185, 129, 0.12)', color: '#10b981', border: 'rgba(16, 185, 129, 0.3)' },
+                            'team-finder': { bg: 'rgba(245, 158, 11, 0.12)', color: '#f59e0b', border: 'rgba(245, 158, 11, 0.3)' },
+                            'empty-room': { bg: 'rgba(14, 165, 233, 0.12)', color: '#0ea5e9', border: 'rgba(14, 165, 233, 0.3)' },
                             waiver: { bg: 'rgba(6, 182, 212, 0.12)', color: '#06b6d4', border: 'rgba(6, 182, 212, 0.3)' },
                             gpa: { bg: 'rgba(245, 158, 11, 0.12)', color: '#f59e0b', border: 'rgba(245, 158, 11, 0.3)' },
                             buzz: { bg: 'rgba(236, 72, 153, 0.12)', color: '#ec4899', border: 'rgba(236, 72, 153, 0.3)' },
@@ -3330,6 +3334,7 @@ Extract ALL timetable blocks from the attached Excel file now:`;
             
             <div className="admin-form" style={{ maxWidth: '600px' }}>
               {[
+                { id: 'society-tracker', label: 'Society Recruitment Tracker', desc: 'Real-time recruitment tracker and deadlines for SSCBS societies' },
                 { id: 'timetable', label: 'Timetable & Class Schedules', desc: 'Display timetable on home page and navigation' },
                 { id: 'find-prof', label: 'Find My Professor', desc: 'Allow students to search for professor locations' },
                 { id: 'team-finder', label: 'Team Finder & Competition Hub', desc: 'Allow students to post and find competition team openings' },
