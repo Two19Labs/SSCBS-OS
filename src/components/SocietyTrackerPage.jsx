@@ -228,7 +228,7 @@ export default function SocietyTrackerPage({ onBack }) {
             <ol className="st-pointers">
               <li>Crescendo recruits later in the year, the form will be out on Campus Buzz</li>
               <li>Sadhana &amp; Makes Sense are merging as one</li>
-              <li>All forms will be updated here, along with deadlines and reminders for you to fill your preferred ones, our promise!</li>
+              <li>All forms will be updated here, along with deadlines and reminders for you to fill your preferred ones.</li>
             </ol>
           </div>
         </div>
