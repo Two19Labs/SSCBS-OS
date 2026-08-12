@@ -3123,3 +3123,217 @@ input:checked + .admin-slider:before {
   }
 }
 
+/* ── Society Recruitment Tracker Analytics Styles ── */
+.societies-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.admin-subtab-btn {
+  background: var(--surface);
+  color: var(--ink-dim);
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-subtab-btn:hover {
+  background: var(--tint);
+  color: var(--ink);
+}
+
+.admin-subtab-btn.active {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+
+.society-chip-heart {
+  background: rgba(236, 72, 153, 0.12);
+  color: #ec4899;
+  border: 1px solid rgba(236, 72, 153, 0.3);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.society-chip-heart:hover {
+  transform: translateY(-1px);
+  background: rgba(236, 72, 153, 0.2);
+}
+
+.society-chip-filled {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.society-chip-filled:hover {
+  transform: translateY(-1px);
+  background: rgba(16, 185, 129, 0.2);
+}
+
+/* Modal Overlay Styling */
+.society-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.society-modal-content {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 18px;
+  max-width: 580px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  animation: slideUp 0.2s ease-out;
+}
+
+.society-modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: var(--tint);
+}
+
+.society-modal-close {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: var(--ink-dim);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: color 0.2s;
+}
+
+.society-modal-close:hover {
+  color: var(--ink);
+}
+
+.society-modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.society-modal-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.modal-stat-box {
+  background: var(--tint);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.modal-stat-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.modal-stat-val {
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.modal-stat-lbl {
+  font-size: 0.72rem;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+.modal-section-divider {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.modal-section-divider h4 {
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.modal-user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.modal-user-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: var(--tint);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.modal-user-item.green-border {
+  border-color: rgba(16, 185, 129, 0.25);
+  background: rgba(16, 185, 129, 0.04);
+}
+
+.online-avatar-badge.green {
+  background: #10b981;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(15px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+

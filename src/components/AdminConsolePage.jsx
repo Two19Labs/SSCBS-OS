@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import * as XLSX from 'xlsx';
 import { useTimetable } from '../context/TimetableContext';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useConfig } from '../context/ConfigContext';
 import { isAdminEmail } from '../lib/admin';
 import { subscribeToPresence, fetchAnalyticsData, FEATURE_NAMES } from '../lib/analytics';
+import { DEMO_SOCIETIES, CATEGORIES } from '../data/societies';
 import DateTimePicker from './DateTimePicker';
 import './AdminConsolePage.css';
 
@@ -385,7 +386,7 @@ function AdminConsoleContent({ onBack }) {
     if (activeTab === 'notices') {
       fetchAdminNotices();
       fetchDrafterRequestsAndRoster();
-    } else if (activeTab === 'analytics') {
+    } else if (activeTab === 'analytics' || activeTab === 'societies') {
       fetchDemographicsData();
     }
   }, [activeTab]);
@@ -576,6 +577,126 @@ function AdminConsoleContent({ onBack }) {
   const [filterCourse, setFilterCourse] = useState('All');
   const [filterSem, setFilterSem] = useState('All');
 
+  // Society Recruitment Tracker Analytics States
+  const [societiesSubTab, setSocietiesSubTab] = useState('leaderboard'); // 'leaderboard' | 'roster'
+  const [societySearch, setSocietySearch] = useState('');
+  const [societyCategoryFilter, setSocietyCategoryFilter] = useState('all');
+  const [societySortBy, setSocietySortBy] = useState('hearts'); // 'hearts' | 'filled' | 'conversion' | 'name'
+  const [studentSocietySearch, setStudentSocietySearch] = useState('');
+  const [studentSocietyCourseFilter, setStudentSocietyCourseFilter] = useState('All');
+  const [studentSocietyActivityFilter, setStudentSocietyActivityFilter] = useState('All'); // 'All' | 'HasHearted' | 'HasFilled'
+  const [selectedSocietyModal, setSelectedSocietyModal] = useState(null);
+
+  // Computed metrics for Society Recruitment Analytics
+  const societyMetrics = useMemo(() => {
+    const heartMap = {};
+    const filledMap = {};
+    const userHeartDetails = {};
+    const userFilledDetails = {};
+
+    let totalHeartsCount = 0;
+    let totalFilledCount = 0;
+    const engagedUsersSet = new Set();
+
+    (analyticsUsers || []).forEach((u) => {
+      const bookmarks = Array.isArray(u.societyBookmarks) ? u.societyBookmarks : [];
+      const filled = Array.isArray(u.societyFilledForms) ? u.societyFilledForms : [];
+
+      if (bookmarks.length > 0 || filled.length > 0) {
+        engagedUsersSet.add(u.email || u.id);
+      }
+
+      bookmarks.forEach((sId) => {
+        heartMap[sId] = (heartMap[sId] || 0) + 1;
+        totalHeartsCount++;
+        if (!userHeartDetails[sId]) userHeartDetails[sId] = [];
+        userHeartDetails[sId].push(u);
+      });
+
+      filled.forEach((sId) => {
+        filledMap[sId] = (filledMap[sId] || 0) + 1;
+        totalFilledCount++;
+        if (!userFilledDetails[sId]) userFilledDetails[sId] = [];
+        userFilledDetails[sId].push(u);
+      });
+    });
+
+    const societyStats = DEMO_SOCIETIES.map((soc) => {
+      const hearts = heartMap[soc.id] || 0;
+      const filled = filledMap[soc.id] || 0;
+      const conversionRate = hearts > 0 ? Math.round((filled / hearts) * 100) : (filled > 0 ? 100 : 0);
+      return {
+        ...soc,
+        hearts,
+        filled,
+        conversionRate,
+        heartUsers: userHeartDetails[soc.id] || [],
+        filledUsers: userFilledDetails[soc.id] || [],
+      };
+    });
+
+    const maxHearts = Math.max(...societyStats.map((s) => s.hearts), 1);
+    const maxFilled = Math.max(...societyStats.map((s) => s.filled), 1);
+
+    const sortedByEngagement = [...societyStats].sort((a, b) => (b.hearts + b.filled) - (a.hearts + a.filled));
+    const topSociety = sortedByEngagement.length > 0 && (sortedByEngagement[0].hearts > 0 || sortedByEngagement[0].filled > 0)
+      ? sortedByEngagement[0]
+      : null;
+
+    return {
+      heartMap,
+      filledMap,
+      totalHeartsCount,
+      totalFilledCount,
+      engagedStudentsCount: engagedUsersSet.size,
+      societyStats,
+      maxHearts,
+      maxFilled,
+      topSociety,
+    };
+  }, [analyticsUsers]);
+
+  const filteredSocietyStats = useMemo(() => {
+    return societyMetrics.societyStats
+      .filter((soc) => {
+        const matchesSearch =
+          !societySearch ||
+          soc.name.toLowerCase().includes(societySearch.toLowerCase()) ||
+          (soc.shortName && soc.shortName.toLowerCase().includes(societySearch.toLowerCase())) ||
+          (soc.categoryLabel && soc.categoryLabel.toLowerCase().includes(societySearch.toLowerCase()));
+
+        const matchesCat = societyCategoryFilter === 'all' || soc.category === societyCategoryFilter;
+
+        return matchesSearch && matchesCat;
+      })
+      .sort((a, b) => {
+        if (societySortBy === 'hearts') return b.hearts - a.hearts || b.filled - a.filled;
+        if (societySortBy === 'filled') return b.filled - a.filled || b.hearts - a.hearts;
+        if (societySortBy === 'conversion') return b.conversionRate - a.conversionRate || b.hearts - a.hearts;
+        if (societySortBy === 'name') return a.name.localeCompare(b.name);
+        return 0;
+      });
+  }, [societyMetrics, societySearch, societyCategoryFilter, societySortBy]);
+
+  const filteredStudentSocietyRoster = useMemo(() => {
+    return (analyticsUsers || []).filter((u) => {
+      const nameMatch = u.name && u.name.toLowerCase().includes(studentSocietySearch.toLowerCase());
+      const emailMatch = u.email && u.email.toLowerCase().includes(studentSocietySearch.toLowerCase());
+      const matchesSearch = !studentSocietySearch || nameMatch || emailMatch;
+
+      const matchesCourse = studentSocietyCourseFilter === 'All' || u.course === studentSocietyCourseFilter;
+
+      const hasBookmarks = u.societyBookmarks && u.societyBookmarks.length > 0;
+      const hasFilled = u.societyFilledForms && u.societyFilledForms.length > 0;
+
+      let matchesActivity = true;
+      if (studentSocietyActivityFilter === 'HasHearted') matchesActivity = hasBookmarks;
+      if (studentSocietyActivityFilter === 'HasFilled') matchesActivity = hasFilled;
+
+      return matchesSearch && matchesCourse && matchesActivity;
+    });
+  }, [analyticsUsers, studentSocietySearch, studentSocietyCourseFilter, studentSocietyActivityFilter]);
+
   // Real-Time Online Presence & Time-Series Graph States
   const [onlinePresence, setOnlinePresence] = useState([]);
   const [analyticsTimeRange, setAnalyticsTimeRange] = useState(7); // 7, 30, 90
@@ -644,21 +765,21 @@ function AdminConsoleContent({ onBack }) {
       // Mock demographic data sorted by last activity timestamp descending
       const now = Date.now();
       const mockUsers = [
-        { id: 'm1', name: 'Aditya Singhani', email: 'aditya.25015@sscbs.du.ac.in', course: 'BMS', semester: '2', section: 'A', lastActiveMs: now - 60000 * 1, lastActive: 'Online' },
-        { id: 'm4', name: 'Riya Gupta', email: 'riya.25078@sscbs.du.ac.in', course: 'BBA FIA', semester: '4', section: 'B', lastActiveMs: now - 60000 * 2, lastActive: 'Online' },
-        { id: 'm6', name: 'Divya Sen', email: 'divya.25102@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '4', section: 'A', lastActiveMs: now - 60000 * 3, lastActive: '3 mins ago' },
-        { id: 'm2', name: 'Manthan Kabra', email: 'manthan.25042@sscbs.du.ac.in', course: 'BMS', semester: '2', section: 'B', lastActiveMs: now - 60000 * 5, lastActive: '5 mins ago' },
-        { id: 'm16', name: 'Tushar Mehta', email: 'tushar.25244@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '8', section: 'A', lastActiveMs: now - 60000 * 6, lastActive: '6 mins ago' },
-        { id: 'm9', name: 'Ishaan Malhotra', email: 'ishaan.25145@sscbs.du.ac.in', course: 'BMS', semester: '4', section: 'D', lastActiveMs: now - 60000 * 12, lastActive: '12 mins ago' },
-        { id: 'm14', name: 'Pranav Shah', email: 'pranav.25201@sscbs.du.ac.in', course: 'BMS', semester: '4', section: 'A', lastActiveMs: now - 60000 * 60, lastActive: '1 hour ago' },
-        { id: 'm3', name: 'Kunal Sharma', email: 'kunal.25055@sscbs.du.ac.in', course: 'BBA FIA', semester: '2', section: 'A', lastActiveMs: now - 60000 * 120, lastActive: '2 hours ago' },
-        { id: 'm18', name: 'Yash Vardhan', email: 'yash.25266@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '6', section: 'A', lastActiveMs: now - 60000 * 240, lastActive: '4 hours ago' },
-        { id: 'm5', name: 'Arjun Verma', email: 'arjun.25091@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '6', section: 'A', lastActiveMs: now - 60000 * 1440, lastActive: '1 day ago' },
-        { id: 'm12', name: 'Mehak Preet', email: 'mehak.25189@sscbs.du.ac.in', course: 'BMS', semester: '8', section: 'C', lastActiveMs: now - 60000 * 4320, lastActive: '3 days ago' },
-        { id: 'm7', name: 'Siddharth Jain', email: 'sid.25114@sscbs.du.ac.in', course: 'BMS', semester: '6', section: 'A', lastActiveMs: now - 60000 * 10000, lastActive: 'Offline' },
-        { id: 'm10', name: 'Ananya Roy', email: 'ananya.25156@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '2', section: 'A', lastActiveMs: now - 60000 * 12000, lastActive: 'Offline' },
-        { id: 'm13', name: 'Neil Dsouza', email: 'neil.25199@sscbs.du.ac.in', course: 'BBA FIA', semester: '2', section: 'A', lastActiveMs: now - 60000 * 15000, lastActive: 'Offline' },
-        { id: 'm17', name: 'Vanshika Goel', email: 'vansh.25255@sscbs.du.ac.in', course: 'BMS', semester: '6', section: 'C', lastActiveMs: now - 60000 * 20000, lastActive: 'Offline' }
+        { id: 'm1', name: 'Aditya Singhani', email: 'aditya.25015@sscbs.du.ac.in', course: 'BMS', semester: '2', section: 'A', lastActiveMs: now - 60000 * 1, lastActive: 'Online', societyBookmarks: ['acm-sscbs', 'rotaract', 'kronos', 'bms-council'], societyFilledForms: ['acm-sscbs', 'rotaract'] },
+        { id: 'm4', name: 'Riya Gupta', email: 'riya.25078@sscbs.du.ac.in', course: 'BBA FIA', semester: '4', section: 'B', lastActiveMs: now - 60000 * 2, lastActive: 'Online', societyBookmarks: ['kronos', 'finx', 'synergy'], societyFilledForms: ['kronos'] },
+        { id: 'm6', name: 'Divya Sen', email: 'divya.25102@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '4', section: 'A', lastActiveMs: now - 60000 * 3, lastActive: '3 mins ago', societyBookmarks: ['acm-sscbs', 'kronos'], societyFilledForms: ['acm-sscbs'] },
+        { id: 'm2', name: 'Manthan Kabra', email: 'manthan.25042@sscbs.du.ac.in', course: 'BMS', semester: '2', section: 'B', lastActiveMs: now - 60000 * 5, lastActive: '5 mins ago', societyBookmarks: ['bms-council', 'rotaract', 'ecell'], societyFilledForms: ['bms-council'] },
+        { id: 'm16', name: 'Tushar Mehta', email: 'tushar.25244@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '8', section: 'A', lastActiveMs: now - 60000 * 6, lastActive: '6 mins ago', societyBookmarks: ['acm-sscbs'], societyFilledForms: [] },
+        { id: 'm9', name: 'Ishaan Malhotra', email: 'ishaan.25145@sscbs.du.ac.in', course: 'BMS', semester: '4', section: 'D', lastActiveMs: now - 60000 * 12, lastActive: '12 mins ago', societyBookmarks: ['rotaract', 'synergy'], societyFilledForms: ['rotaract'] },
+        { id: 'm14', name: 'Pranav Shah', email: 'pranav.25201@sscbs.du.ac.in', course: 'BMS', semester: '4', section: 'A', lastActiveMs: now - 60000 * 60, lastActive: '1 hour ago', societyBookmarks: ['kronos'], societyFilledForms: ['kronos'] },
+        { id: 'm3', name: 'Kunal Sharma', email: 'kunal.25055@sscbs.du.ac.in', course: 'BBA FIA', semester: '2', section: 'A', lastActiveMs: now - 60000 * 120, lastActive: '2 hours ago', societyBookmarks: ['finx', 'ecell'], societyFilledForms: [] },
+        { id: 'm18', name: 'Yash Vardhan', email: 'yash.25266@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '6', section: 'A', lastActiveMs: now - 60000 * 240, lastActive: '4 hours ago', societyBookmarks: ['acm-sscbs', 'kronos'], societyFilledForms: ['acm-sscbs'] },
+        { id: 'm5', name: 'Arjun Verma', email: 'arjun.25091@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '6', section: 'A', lastActiveMs: now - 60000 * 1440, lastActive: '1 day ago', societyBookmarks: ['acm-sscbs'], societyFilledForms: [] },
+        { id: 'm12', name: 'Mehak Preet', email: 'mehak.25189@sscbs.du.ac.in', course: 'BMS', semester: '8', section: 'C', lastActiveMs: now - 60000 * 4320, lastActive: '3 days ago', societyBookmarks: ['rotaract'], societyFilledForms: ['rotaract'] },
+        { id: 'm7', name: 'Siddharth Jain', email: 'sid.25114@sscbs.du.ac.in', course: 'BMS', semester: '6', section: 'A', lastActiveMs: now - 60000 * 10000, lastActive: 'Offline', societyBookmarks: ['synergy'], societyFilledForms: [] },
+        { id: 'm10', name: 'Ananya Roy', email: 'ananya.25156@sscbs.du.ac.in', course: 'Bsc Comp Sci', semester: '2', section: 'A', lastActiveMs: now - 60000 * 12000, lastActive: 'Offline', societyBookmarks: ['kronos'], societyFilledForms: [] },
+        { id: 'm13', name: 'Neil Dsouza', email: 'neil.25199@sscbs.du.ac.in', course: 'BBA FIA', semester: '2', section: 'A', lastActiveMs: now - 60000 * 15000, lastActive: 'Offline', societyBookmarks: ['finx'], societyFilledForms: ['finx'] },
+        { id: 'm17', name: 'Vanshika Goel', email: 'vansh.25255@sscbs.du.ac.in', course: 'BMS', semester: '6', section: 'C', lastActiveMs: now - 60000 * 20000, lastActive: 'Offline', societyBookmarks: ['ecell'], societyFilledForms: [] }
       ];
       mockUsers.sort((a, b) => b.lastActiveMs - a.lastActiveMs);
       setAnalyticsUsers(mockUsers);
@@ -753,7 +874,9 @@ function AdminConsoleContent({ onBack }) {
             semester: profile.semester ? String(profile.semester) : 'Unset',
             section: profile.section || 'Unset',
             lastActive,
-            lastActiveMs
+            lastActiveMs,
+            societyBookmarks: Array.isArray(profile.society_bookmarks) ? profile.society_bookmarks : [],
+            societyFilledForms: Array.isArray(profile.society_filled_forms) ? profile.society_filled_forms : [],
           };
         });
 
@@ -2026,6 +2149,14 @@ Extract ALL timetable blocks from the attached Excel file now:`;
             <span className="tab-label">Demographics</span>
           </button>
           <button 
+            className={`admin-tab-btn ${activeTab === 'societies' ? 'active' : ''}`}
+            onClick={() => setActiveTab('societies')}
+          >
+            <span className="tab-icon">❤️</span>
+            <span className="tab-label">Societies</span>
+            <span className="tab-label-full"> Tracker Analytics</span>
+          </button>
+          <button 
             className={`admin-tab-btn ${activeTab === 'holidays' ? 'active' : ''}`}
             onClick={() => setActiveTab('holidays')}
           >
@@ -2837,6 +2968,46 @@ Extract ALL timetable blocks from the attached Excel file now:`;
         ) : activeTab === 'analytics' ? (
           /* Student Demographics Analytics Tab */
           <div className="tab-pane analytics-pane">
+            {/* Promo Banner for Society Recruitment Analytics */}
+            <div
+              className="society-analytics-promo-banner"
+              onClick={() => setActiveTab('societies')}
+              style={{
+                cursor: 'pointer',
+                background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.12), rgba(168, 85, 247, 0.12))',
+                border: '1px solid rgba(236, 72, 153, 0.35)',
+                borderRadius: '14px',
+                padding: '16px 20px',
+                marginBottom: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justify: 'space-between',
+                boxShadow: '0 4px 14px rgba(236, 72, 153, 0.08)'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <span style={{ fontSize: '28px' }}>❤️</span>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--ink)' }}>
+                    Society Recruitment Tracker Analytics
+                  </h4>
+                  <p style={{ margin: '3px 0 0', fontSize: '0.84rem', color: 'var(--ink-dim)' }}>
+                    Real-time tracking of societies students are favoriting (❤️ {societyMetrics.totalHeartsCount}) and marking forms filled (✅ {societyMetrics.totalFilledCount}).
+                  </p>
+                </div>
+              </div>
+              <button
+                className="btn-access-denied-back"
+                style={{ whiteSpace: 'nowrap', padding: '8px 16px', fontSize: '0.85rem' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveTab('societies');
+                }}
+              >
+                View Society Analytics →
+              </button>
+            </div>
+
             <div className="analytics-stats-grid">
               <div className="stat-card-admin highlight-online">
                 <div className="card-icon">🟢</div>
@@ -3226,6 +3397,332 @@ Extract ALL timetable blocks from the attached Excel file now:`;
               })()}
             </div>
           </div>
+        ) : activeTab === 'societies' ? (
+          /* Society Recruitment Tracker Analytics Tab */
+          <div className="tab-pane societies-pane">
+            
+            {/* Metric Summary Cards */}
+            <div className="analytics-stats-grid">
+              <div className="stat-card-admin highlight-pink" style={{ background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.12), rgba(219, 39, 119, 0.05))', border: '1px solid rgba(236, 72, 153, 0.3)' }}>
+                <div className="card-icon">❤️</div>
+                <h4>Total Favorited Hearts</h4>
+                <p className="stat-number" style={{ color: '#ec4899' }}>{societyMetrics.totalHeartsCount}</p>
+                <p className="stat-subtitle">Across all students & societies</p>
+              </div>
+
+              <div className="stat-card-admin highlight-green" style={{ background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(5, 150, 105, 0.05))', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+                <div className="card-icon">✅</div>
+                <h4>Forms Filled (Applied)</h4>
+                <p className="stat-number" style={{ color: '#10b981' }}>{societyMetrics.totalFilledCount}</p>
+                <p className="stat-subtitle">Students marked recruitment forms filled</p>
+              </div>
+
+              <div className="stat-card-admin highlight-purple" style={{ background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(147, 51, 234, 0.05))', border: '1px solid rgba(168, 85, 247, 0.3)' }}>
+                <div className="card-icon">🎯</div>
+                <h4>Active Applicants</h4>
+                <p className="stat-number" style={{ color: '#a855f7' }}>{societyMetrics.engagedStudentsCount}</p>
+                <p className="stat-subtitle">Students with ≥1 heart or checkmark</p>
+              </div>
+
+              <div className="stat-card-admin highlight-blue" style={{ background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(37, 99, 235, 0.05))', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
+                <div className="card-icon">🔥</div>
+                <h4>Top Trending Society</h4>
+                <p className="stat-number" style={{ fontSize: '1.25rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#3b82f6' }}>
+                  {societyMetrics.topSociety ? (societyMetrics.topSociety.shortName || societyMetrics.topSociety.name) : 'No Activity'}
+                </p>
+                <p className="stat-subtitle">
+                  {societyMetrics.topSociety ? `${societyMetrics.topSociety.hearts} ❤️ • ${societyMetrics.topSociety.filled} ✅` : 'Awaiting student activity'}
+                </p>
+              </div>
+            </div>
+
+            {/* Sub-navigation Sub-Tabs */}
+            <div className="registry-card-admin" style={{ marginBottom: '20px', padding: '16px 20px' }}>
+              <div className="flex-between flex-wrap gap-3">
+                <div className="admin-subtabs" style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    className={`admin-subtab-btn ${societiesSubTab === 'leaderboard' ? 'active' : ''}`}
+                    onClick={() => setSocietiesSubTab('leaderboard')}
+                  >
+                    🏆 Society Popularity Leaderboard ({DEMO_SOCIETIES.length})
+                  </button>
+                  <button
+                    className={`admin-subtab-btn ${societiesSubTab === 'roster' ? 'active' : ''}`}
+                    onClick={() => setSocietiesSubTab('roster')}
+                  >
+                    👤 Student-by-Student Roster ({analyticsUsers.length})
+                  </button>
+                </div>
+
+                {societiesSubTab === 'leaderboard' ? (
+                  <div className="registry-filters-selects" style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <input
+                      type="text"
+                      placeholder="Search society name..."
+                      value={societySearch}
+                      onChange={(e) => setSocietySearch(e.target.value)}
+                      className="search-input-admin"
+                      style={{ maxWidth: '200px' }}
+                    />
+                    <select
+                      value={societyCategoryFilter}
+                      onChange={(e) => setSocietyCategoryFilter(e.target.value)}
+                      className="admin-select"
+                      style={{ minWidth: '150px' }}
+                    >
+                      <option value="all">All Domains</option>
+                      {CATEGORIES.filter(c => c.id !== 'all').map(cat => (
+                        <option key={cat.id} value={cat.id}>{cat.label}</option>
+                      ))}
+                    </select>
+                    <select
+                      value={societySortBy}
+                      onChange={(e) => setSocietySortBy(e.target.value)}
+                      className="admin-select"
+                      style={{ minWidth: '140px' }}
+                    >
+                      <option value="hearts">Sort by Hearts ❤️</option>
+                      <option value="filled">Sort by Forms Filled ✅</option>
+                      <option value="conversion">Sort by Conversion %</option>
+                      <option value="name">Sort Alphabetically</option>
+                    </select>
+                  </div>
+                ) : (
+                  <div className="registry-filters-selects" style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <input
+                      type="text"
+                      placeholder="Search student or email..."
+                      value={studentSocietySearch}
+                      onChange={(e) => setStudentSocietySearch(e.target.value)}
+                      className="search-input-admin"
+                      style={{ maxWidth: '200px' }}
+                    />
+                    <select
+                      value={studentSocietyCourseFilter}
+                      onChange={(e) => setStudentSocietyCourseFilter(e.target.value)}
+                      className="admin-select"
+                    >
+                      <option value="All">All Courses</option>
+                      <option value="BMS">BMS</option>
+                      <option value="BBA FIA">BBA FIA</option>
+                      <option value="Bsc Comp Sci">BSc CS</option>
+                    </select>
+                    <select
+                      value={studentSocietyActivityFilter}
+                      onChange={(e) => setStudentSocietyActivityFilter(e.target.value)}
+                      className="admin-select"
+                    >
+                      <option value="All">All Activity</option>
+                      <option value="HasHearted">Has Hearted ❤️</option>
+                      <option value="HasFilled">Has Applied ✅</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* LEADERBOARD VIEW */}
+            {societiesSubTab === 'leaderboard' && (
+              <div className="registry-card-admin">
+                <div className="chart-header-admin">
+                  <h3>🏆 Society Recruitment Popularity Leaderboard</h3>
+                  <p className="section-desc-small">
+                    Breakdown of student preferences across all 44 SSCBS college societies. Click any society to inspect student details.
+                  </p>
+                </div>
+
+                {filteredSocietyStats.length === 0 ? (
+                  <div className="no-registry-results">
+                    <p>No societies match your search filter.</p>
+                  </div>
+                ) : (
+                  <div className="table-scroll-container-admin">
+                    <table className="registry-table-admin society-leaderboard-table">
+                      <thead>
+                        <tr>
+                          <th style={{ width: '50px', textAlign: 'center' }}>Rank</th>
+                          <th>Society Name & Category</th>
+                          <th style={{ width: '150px' }}>Hearts (Favorited)</th>
+                          <th style={{ width: '150px' }}>Forms Filled (Applied)</th>
+                          <th style={{ width: '120px' }}>Conversion Rate</th>
+                          <th style={{ width: '100px', textAlign: 'center' }}>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredSocietyStats.map((soc, idx) => {
+                          const heartPct = Math.min(100, Math.round((soc.hearts / societyMetrics.maxHearts) * 100));
+                          const filledPct = Math.min(100, Math.round((soc.filled / societyMetrics.maxFilled) * 100));
+
+                          return (
+                            <tr key={soc.id} style={{ cursor: 'pointer' }} onClick={() => setSelectedSocietyModal(soc)}>
+                              <td style={{ textAlign: 'center', fontWeight: 800, color: idx < 3 ? 'var(--accent)' : 'var(--ink-dim)' }}>
+                                {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`}
+                              </td>
+                              <td>
+                                <div>
+                                  <strong style={{ fontSize: '0.95rem', color: 'var(--ink)' }}>{soc.name}</strong>
+                                  <div style={{ display: 'flex', gap: '6px', marginTop: '3px' }}>
+                                    <span className="course-sem-chip" style={{ fontSize: '0.7rem' }}>
+                                      {soc.categoryLabel || 'Society'}
+                                    </span>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                  <span style={{ fontWeight: 800, color: '#ec4899', fontSize: '0.92rem' }}>
+                                    ❤️ {soc.hearts} {soc.hearts === 1 ? 'student' : 'students'}
+                                  </span>
+                                  <div className="bar-track-admin" style={{ height: '5px' }}>
+                                    <div className="bar-fill-admin" style={{ width: `${heartPct}%`, background: '#ec4899' }} />
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                  <span style={{ fontWeight: 800, color: '#10b981', fontSize: '0.92rem' }}>
+                                    ✅ {soc.filled} {soc.filled === 1 ? 'form' : 'forms'}
+                                  </span>
+                                  <div className="bar-track-admin" style={{ height: '5px' }}>
+                                    <div className="bar-fill-admin" style={{ width: `${filledPct}%`, background: '#10b981' }} />
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <span className="active-view-chip" style={{
+                                  backgroundColor: soc.conversionRate > 50 ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)',
+                                  color: soc.conversionRate > 50 ? '#10b981' : '#f59e0b',
+                                  borderColor: soc.conversionRate > 50 ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)',
+                                }}>
+                                  ⚡ {soc.conversionRate}%
+                                </span>
+                              </td>
+                              <td style={{ textAlign: 'center' }}>
+                                <button
+                                  className="admin-action-btn view-btn"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedSocietyModal(soc);
+                                  }}
+                                  title="View interested students"
+                                >
+                                  👁️ Details
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* STUDENT ROSTER VIEW */}
+            {societiesSubTab === 'roster' && (
+              <div className="registry-card-admin">
+                <div className="chart-header-admin">
+                  <h3>👤 Student Society Selections Roster</h3>
+                  <p className="section-desc-small">
+                    Detailed list of verified students and their exact favorited (❤️) and checkmarked (✅) societies.
+                  </p>
+                </div>
+
+                {filteredStudentSocietyRoster.length === 0 ? (
+                  <div className="no-registry-results">
+                    <p>No student records match the search filter.</p>
+                  </div>
+                ) : (
+                  <div className="table-scroll-container-admin">
+                    <table className="registry-table-admin">
+                      <thead>
+                        <tr>
+                          <th style={{ width: '50px', textAlign: 'center' }}>S.No</th>
+                          <th>Student Name & Email</th>
+                          <th>Course & Class</th>
+                          <th>❤️ Favorited Societies</th>
+                          <th>✅ Forms Marked Filled</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredStudentSocietyRoster.map((usr, idx) => {
+                          const bookmarks = Array.isArray(usr.societyBookmarks) ? usr.societyBookmarks : [];
+                          const filled = Array.isArray(usr.societyFilledForms) ? usr.societyFilledForms : [];
+
+                          return (
+                            <tr key={usr.id || usr.email}>
+                              <td style={{ textAlign: 'center', fontWeight: 700, color: 'var(--ink-dim)' }}>
+                                #{idx + 1}
+                              </td>
+                              <td>
+                                <div className="student-name-cell">
+                                  <span className="online-avatar-badge">{usr.name ? usr.name.charAt(0).toUpperCase() : 'S'}</span>
+                                  <div>
+                                    <strong className="student-name-text">{usr.name}</strong>
+                                    <span className="student-email-text">{usr.email}</span>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <span className="course-sem-chip">
+                                  {usr.course} • Sem {usr.semester} {usr.section && usr.section !== 'N/A' ? `(${usr.section})` : ''}
+                                </span>
+                              </td>
+                              <td>
+                                {bookmarks.length === 0 ? (
+                                  <span style={{ fontSize: '0.78rem', color: 'var(--ink-dim)', fontStyle: 'italic' }}>None</span>
+                                ) : (
+                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                                    {bookmarks.map((sId) => {
+                                      const found = DEMO_SOCIETIES.find(s => s.id === sId);
+                                      const label = found ? found.shortName || found.name : sId;
+                                      return (
+                                        <span
+                                          key={sId}
+                                          className="society-chip-heart"
+                                          onClick={() => found && setSelectedSocietyModal(found)}
+                                          title={found ? found.name : sId}
+                                        >
+                                          ❤️ {label}
+                                        </span>
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </td>
+                              <td>
+                                {filled.length === 0 ? (
+                                  <span style={{ fontSize: '0.78rem', color: 'var(--ink-dim)', fontStyle: 'italic' }}>None</span>
+                                ) : (
+                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                                    {filled.map((sId) => {
+                                      const found = DEMO_SOCIETIES.find(s => s.id === sId);
+                                      const label = found ? found.shortName || found.name : sId;
+                                      return (
+                                        <span
+                                          key={sId}
+                                          className="society-chip-filled"
+                                          onClick={() => found && setSelectedSocietyModal(found)}
+                                          title={found ? found.name : sId}
+                                        >
+                                          ✅ {label}
+                                        </span>
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         ) : activeTab === 'holidays' ? (
           <div className="tab-pane holidays-pane flex-row gap-4">
             <div className="pane-left notice-creator-card" style={{ flex: '1' }}>
@@ -3369,6 +3866,85 @@ Extract ALL timetable blocks from the attached Excel file now:`;
             </div>
           </div>
         ) : null}
+
+        {selectedSocietyModal && (
+          <div className="society-modal-backdrop" onClick={() => setSelectedSocietyModal(null)}>
+            <div className="society-modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="society-modal-header">
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.25rem', color: 'var(--ink)' }}>{selectedSocietyModal.name}</h3>
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                    <span className="course-sem-chip">{selectedSocietyModal.categoryLabel || 'Society'}</span>
+                    {selectedSocietyModal.shortName && (
+                      <span className="course-sem-chip" style={{ background: 'rgba(139, 92, 246, 0.1)', color: 'var(--accent)' }}>
+                        @{selectedSocietyModal.shortName}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <button className="society-modal-close" onClick={() => setSelectedSocietyModal(null)}>✕</button>
+              </div>
+
+              <div className="society-modal-body">
+                <div className="society-modal-stats-row">
+                  <div className="modal-stat-box">
+                    <span className="modal-stat-icon">❤️</span>
+                    <span className="modal-stat-val" style={{ color: '#ec4899' }}>{selectedSocietyModal.hearts}</span>
+                    <span className="modal-stat-lbl">Hearted</span>
+                  </div>
+                  <div className="modal-stat-box">
+                    <span className="modal-stat-icon">✅</span>
+                    <span className="modal-stat-val" style={{ color: '#10b981' }}>{selectedSocietyModal.filled}</span>
+                    <span className="modal-stat-lbl">Forms Filled</span>
+                  </div>
+                  <div className="modal-stat-box">
+                    <span className="modal-stat-icon">⚡</span>
+                    <span className="modal-stat-val" style={{ color: '#3b82f6' }}>{selectedSocietyModal.conversionRate}%</span>
+                    <span className="modal-stat-lbl">Conversion Rate</span>
+                  </div>
+                </div>
+
+                <div className="modal-section-divider">
+                  <h4>❤️ Students Interested ({selectedSocietyModal.heartUsers.length})</h4>
+                  {selectedSocietyModal.heartUsers.length === 0 ? (
+                    <p className="section-desc-small" style={{ fontStyle: 'italic' }}>No students have favorited this society yet.</p>
+                  ) : (
+                    <div className="modal-user-list">
+                      {selectedSocietyModal.heartUsers.map((u) => (
+                        <div key={u.id || u.email} className="modal-user-item">
+                          <span className="online-avatar-badge">{u.name ? u.name.charAt(0).toUpperCase() : 'S'}</span>
+                          <div>
+                            <strong className="student-name-text">{u.name}</strong>
+                            <span className="student-email-text">{u.email} • {u.course} Sem {u.semester}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="modal-section-divider">
+                  <h4>✅ Students Applied / Forms Filled ({selectedSocietyModal.filledUsers.length})</h4>
+                  {selectedSocietyModal.filledUsers.length === 0 ? (
+                    <p className="section-desc-small" style={{ fontStyle: 'italic' }}>No students have marked form filled for this society yet.</p>
+                  ) : (
+                    <div className="modal-user-list">
+                      {selectedSocietyModal.filledUsers.map((u) => (
+                        <div key={u.id || u.email} className="modal-user-item green-border">
+                          <span className="online-avatar-badge green">{u.name ? u.name.charAt(0).toUpperCase() : 'S'}</span>
+                          <div>
+                            <strong className="student-name-text">{u.name}</strong>
+                            <span className="student-email-text">{u.email} • {u.course} Sem {u.semester}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
