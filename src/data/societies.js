@@ -201,12 +201,12 @@ export const DEMO_SOCIETIES = [
     id: 'ceo-du',
     pocs: [
       {
-        "name": "Harsh Awasthi",
-        "phone": "9634109951"
+        "name": "Shreya Choudhary",
+        "phone": "8899552223"
       },
       {
-        "name": "Pratham Arora",
-        "phone": "9810106156"
+        "name": "Arjun Sethi",
+        "phone": "8800616929"
       }
     ],
     name: 'CEO DU – Collegiate Entrepreneurs\' Organisation, Delhi University (SSCBS Chapter)',
