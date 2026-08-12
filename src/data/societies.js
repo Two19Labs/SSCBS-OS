@@ -19,6 +19,16 @@ export const DEMO_SOCIETIES = [
   // --- 1. ACM SSCBS Chapter ---
   {
     id: 'acm-sscbs',
+    pocs: [
+      {
+        "name": "Kalpana Chauhan",
+        "phone": "9729886159"
+      },
+      {
+        "name": "Ishika Mandhar",
+        "phone": "7505346807"
+      }
+    ],
     name: 'ACM SSCBS Student Chapter',
     shortName: 'ACM',
     category: 'tech',
@@ -39,6 +49,16 @@ export const DEMO_SOCIETIES = [
   // --- 2. Alumni Relations and Outreach Cell ---
   {
     id: 'alumni-cell',
+    pocs: [
+      {
+        "name": "Krishna Pransukhka",
+        "phone": "9586061867"
+      },
+      {
+        "name": "Avani Gupta",
+        "phone": "9810660939"
+      }
+    ],
     name: 'Alumni Relations and Outreach Cell (AROC), SSCBS',
     shortName: 'Alumni Cell',
     category: 'marketing',
@@ -59,6 +79,16 @@ export const DEMO_SOCIETIES = [
   // --- 3. Anthropos ---
   {
     id: 'anthropos-hrd',
+    pocs: [
+      {
+        "name": "Lala Dhruv Raj",
+        "phone": "7011661221"
+      },
+      {
+        "name": "Abhigya Yadav",
+        "phone": "8076467727"
+      }
+    ],
     name: 'Anthropos – The Human Resource Development Cell of SSCBS',
     shortName: 'Anthropos',
     category: 'consulting',
@@ -79,6 +109,16 @@ export const DEMO_SOCIETIES = [
   // --- 4. Blitz (Dance Society) ---
   {
     id: 'blitz-dance',
+    pocs: [
+      {
+        "name": "Avantika Goel",
+        "phone": "7982226421"
+      },
+      {
+        "name": "Shreyansh Sharma",
+        "phone": "8340546557"
+      }
+    ],
     name: 'Blitz – The Western Dance Society of SSCBS',
     shortName: 'Blitz',
     category: 'cultural',
@@ -99,6 +139,16 @@ export const DEMO_SOCIETIES = [
   // --- 5. CBS Model United Nations ---
   {
     id: 'cbsmun',
+    pocs: [
+      {
+        "name": "Rithik Palthiya",
+        "phone": "9398681351"
+      },
+      {
+        "name": "Kartik Kumar",
+        "phone": "9266391356"
+      }
+    ],
     name: 'CBS Model United Nations (CBSMUN)',
     shortName: 'CBSMUN',
     category: 'economics',
@@ -119,6 +169,16 @@ export const DEMO_SOCIETIES = [
   // --- 6. CII YI Chapter ---
   {
     id: 'cii-yi',
+    pocs: [
+      {
+        "name": "Soyal Dhawle",
+        "phone": "8602383455"
+      },
+      {
+        "name": "Keerthi Dumpala",
+        "phone": "9650550141"
+      }
+    ],
     name: 'CII Yi Chapter – Confederation of Indian Industry Young Indians, SSCBS',
     shortName: 'CII YI',
     category: 'marketing',
@@ -139,6 +199,16 @@ export const DEMO_SOCIETIES = [
   // --- 7. Collegiate Entrepreneurs Organisation (CEO, DU) ---
   {
     id: 'ceo-du',
+    pocs: [
+      {
+        "name": "Harsh Awasthi",
+        "phone": "9634109951"
+      },
+      {
+        "name": "Pratham Arora",
+        "phone": "9810106156"
+      }
+    ],
     name: 'CEO DU – Collegiate Entrepreneurs\' Organisation, Delhi University (SSCBS Chapter)',
     shortName: 'CEO DU',
     category: 'ecell',
@@ -159,6 +229,16 @@ export const DEMO_SOCIETIES = [
   // --- 8. Communique (The Promotion Cell / Prodigy) ---
   {
     id: 'communique-pr',
+    pocs: [
+      {
+        "name": "Madhav Singhal",
+        "phone": "8595552700"
+      },
+      {
+        "name": "Chinar Ahuja",
+        "phone": "8800265955"
+      }
+    ],
     name: 'Communiqué – The Public Relations & Promotion Cell of SSCBS',
     shortName: 'Communique',
     category: 'marketing',
@@ -179,6 +259,16 @@ export const DEMO_SOCIETIES = [
   // --- 9. Convergence (College Seminar) ---
   {
     id: 'convergence-seminar',
+    pocs: [
+      {
+        "name": "Suditi Sharma",
+        "phone": "9560287817"
+      },
+      {
+        "name": "Harsh Raj",
+        "phone": "9661294118"
+      }
+    ],
     name: 'Convergence – The Annual Leadership Summit Committee of SSCBS',
     shortName: 'Convergence',
     category: 'marketing',
@@ -199,6 +289,16 @@ export const DEMO_SOCIETIES = [
   // --- 11. Darkroom (Photography Society) ---
   {
     id: 'darkroom-photography',
+    pocs: [
+      {
+        "name": "Gajanan Ingewad",
+        "phone": "9763907304"
+      },
+      {
+        "name": "Prikshit Maan",
+        "phone": "9518167519"
+      }
+    ],
     name: 'Darkroom – The Photography & Film Society of SSCBS',
     shortName: 'Darkroom',
     category: 'cultural',
@@ -219,6 +319,16 @@ export const DEMO_SOCIETIES = [
   // --- 12. Debating Society ---
   {
     id: 'debating-society',
+    pocs: [
+      {
+        "name": "Sneh Shukla",
+        "phone": "9560089840"
+      },
+      {
+        "name": "Aiwin CT",
+        "phone": "9037466409"
+      }
+    ],
     name: 'CBS DebSoc – The Debating Society of SSCBS',
     shortName: 'DebSoc',
     category: 'debating',
@@ -239,6 +349,16 @@ export const DEMO_SOCIETIES = [
   // --- 13. Dhwani (Music Society) ---
   {
     id: 'dhwani-music',
+    pocs: [
+      {
+        "name": "Shreya Pandey",
+        "phone": "8454843952"
+      },
+      {
+        "name": "Trisha Singh",
+        "phone": "7428240131"
+      }
+    ],
     name: 'Dhwani – The Music Society of SSCBS',
     shortName: 'Dhwani',
     category: 'cultural',
@@ -259,6 +379,16 @@ export const DEMO_SOCIETIES = [
   // --- 14. Ecovision (Economics Society) ---
   {
     id: 'ecovision-economics',
+    pocs: [
+      {
+        "name": "Kanish Garg",
+        "phone": "7206704994"
+      },
+      {
+        "name": "Dhriti Singla",
+        "phone": "9665131422"
+      }
+    ],
     name: 'Ecovision – The Economics Society of SSCBS',
     shortName: 'Ecovision',
     category: 'economics',
@@ -299,6 +429,16 @@ export const DEMO_SOCIETIES = [
   // --- 16. FMA ---
   {
     id: 'fma-finance',
+    pocs: [
+      {
+        "name": "Chirag Malhotra",
+        "phone": "9310803388"
+      },
+      {
+        "name": "Arnuv Gupta",
+        "phone": "9354959517"
+      }
+    ],
     name: 'FMA – Financial Management Association, SSCBS',
     shortName: 'FMA',
     category: 'finance',
@@ -319,6 +459,16 @@ export const DEMO_SOCIETIES = [
   // --- 17. Finx (Finance Society) ---
   {
     id: 'finx-finance',
+    pocs: [
+      {
+        "name": "Viddushi Kheraa",
+        "phone": "7290096206"
+      },
+      {
+        "name": "Norvin Chowdhary",
+        "phone": "9990048844"
+      }
+    ],
     name: 'FinX – The Finance Society of SSCBS',
     shortName: 'Finx',
     category: 'finance',
@@ -339,6 +489,16 @@ export const DEMO_SOCIETIES = [
   // --- 18. Fourth Wall (Dramatics Society) ---
   {
     id: 'fourth-wall-dramatics',
+    pocs: [
+      {
+        "name": "Sarthak Pandey",
+        "phone": "8766614877"
+      },
+      {
+        "name": "Harish Mathan",
+        "phone": "7550120316"
+      }
+    ],
     name: 'Fourth Wall Productions – The Dramatics Society of SSCBS',
     shortName: 'Fourth Wall',
     category: 'cultural',
@@ -359,6 +519,20 @@ export const DEMO_SOCIETIES = [
   // --- 19. GIRL UP RUHI ---
   {
     id: 'girl-up-ruhi',
+    pocs: [
+      {
+        "name": "Tanisha Meena",
+        "phone": "8595015661"
+      },
+      {
+        "name": "Angel Bhat",
+        "phone": "8849423816"
+      },
+      {
+        "name": "Shobhit Jaiswal",
+        "phone": "9305464459"
+      }
+    ],
     name: 'Girl Up Ruhi SSCBS',
     shortName: 'Girl Up',
     category: 'wellness',
@@ -379,6 +553,16 @@ export const DEMO_SOCIETIES = [
   // --- 20. Grandeur ---
   {
     id: 'grandeur-consulting',
+    pocs: [
+      {
+        "name": "Harshit Chandnani",
+        "phone": "9311705389"
+      },
+      {
+        "name": "Samay Bothra",
+        "phone": "9354139883"
+      }
+    ],
     name: 'Grandeur – The Consulting & Knowledge Cell of SSCBS',
     shortName: 'Grandeur',
     category: 'consulting',
@@ -399,6 +583,16 @@ export const DEMO_SOCIETIES = [
   // --- 21. IFSA Network India ---
   {
     id: 'ifsa-network',
+    pocs: [
+      {
+        "name": "Ekam Singh",
+        "phone": "9560606930"
+      },
+      {
+        "name": "Akshit Singla",
+        "phone": "8076747967"
+      }
+    ],
     name: 'IFSA Network India (SSCBS Chapter)',
     shortName: 'IFSA',
     category: 'finance',
@@ -419,6 +613,16 @@ export const DEMO_SOCIETIES = [
   // --- 22. Illuminati (Quiz Society) ---
   {
     id: 'illuminati-quiz',
+    pocs: [
+      {
+        "name": "Mohd Maaz Naim",
+        "phone": "7348656545"
+      },
+      {
+        "name": "Mohammad Ayat",
+        "phone": "9311134052"
+      }
+    ],
     name: 'Illuminati – The Quizzing Society of SSCBS',
     shortName: 'Illuminati',
     category: 'debating',
@@ -439,6 +643,16 @@ export const DEMO_SOCIETIES = [
   // --- 23. Kriti (Art Society) ---
   {
     id: 'kriti-art',
+    pocs: [
+      {
+        "name": "Titiksha Singh",
+        "phone": "9205101005"
+      },
+      {
+        "name": "Shikhar Singh",
+        "phone": "8770142304"
+      }
+    ],
     name: 'Kriti – The Fine Arts Society of SSCBS',
     shortName: 'Kriti',
     category: 'cultural',
@@ -459,6 +673,16 @@ export const DEMO_SOCIETIES = [
   // --- 24. Kronos (IT Society) ---
   {
     id: 'kronos-it',
+    pocs: [
+      {
+        "name": "Poorvanshi rawat",
+        "phone": "9557758634"
+      },
+      {
+        "name": "Dheeraj banik",
+        "phone": "9434276047"
+      }
+    ],
     name: 'Kronos – The IT & Tech Society of SSCBS',
     shortName: 'Kronos',
     category: 'tech',
@@ -479,6 +703,16 @@ export const DEMO_SOCIETIES = [
   // --- 25. Lawrence (Law Society) ---
   {
     id: 'lawrence-law',
+    pocs: [
+      {
+        "name": "Hardik Baweja",
+        "phone": "7011455707"
+      },
+      {
+        "name": "Aryan Singla",
+        "phone": "9311851579"
+      }
+    ],
     name: 'Lawrence – The Law & Legal Studies Society of SSCBS',
     shortName: 'Lawrence',
     category: 'economics',
@@ -499,6 +733,16 @@ export const DEMO_SOCIETIES = [
   // --- 26. Literary Society ---
   {
     id: 'literary-society',
+    pocs: [
+      {
+        "name": "Mayank Yadav",
+        "phone": "9302023773"
+      },
+      {
+        "name": "Girisha",
+        "phone": "9599576590"
+      }
+    ],
     name: 'LitSoc – The Literary Society of SSCBS',
     shortName: 'LitSoc',
     category: 'debating',
@@ -519,6 +763,16 @@ export const DEMO_SOCIETIES = [
   // --- 27. Mark-it (Marketing Society) ---
   {
     id: 'mark-it-marketing',
+    pocs: [
+      {
+        "name": "Kashvi Aggarwal",
+        "phone": "8800262621"
+      },
+      {
+        "name": "Arjun Chowdhary",
+        "phone": "9650282850"
+      }
+    ],
     name: 'Mark-It – The Marketing Society of SSCBS',
     shortName: 'Mark-it',
     category: 'marketing',
@@ -539,6 +793,16 @@ export const DEMO_SOCIETIES = [
   // --- 28. MIC (Management Interaction Cell) ---
   {
     id: 'mic-corporate',
+    pocs: [
+      {
+        "name": "Kashish Raj",
+        "phone": "7992425818"
+      },
+      {
+        "name": "Dhruv Bharat Choudhary",
+        "phone": "9723162825"
+      }
+    ],
     name: 'MIC – Management Interaction Cell of SSCBS',
     shortName: 'MIC',
     category: 'marketing',
@@ -559,6 +823,16 @@ export const DEMO_SOCIETIES = [
   // --- 29. Kartavya ---
   {
     id: 'kartavya',
+    pocs: [
+      {
+        "name": "Aaditya Bhatnagar",
+        "phone": "7011634171"
+      },
+      {
+        "name": "Manya Bhadani",
+        "phone": "7463899565"
+      }
+    ],
     name: 'Kartavya',
     shortName: 'Kartavya',
     category: 'ecell',
@@ -579,6 +853,16 @@ export const DEMO_SOCIETIES = [
   // --- 29b. Connecting Dreams Foundation (CDF) ---
   {
     id: 'cdf-sscbs',
+    pocs: [
+      {
+        "name": "Khushi Chamola",
+        "phone": "9891464779"
+      },
+      {
+        "name": "Aryaman Gupta",
+        "phone": "8178967422"
+      }
+    ],
     name: 'Connecting Dreams Foundation SSCBS Chapter (CDF)',
     shortName: 'CDF',
     category: 'ecell',
@@ -599,6 +883,16 @@ export const DEMO_SOCIETIES = [
   // --- 30. NUCLEUS ---
   {
     id: 'nucleus-analytics',
+    pocs: [
+      {
+        "name": "Srisham Dash",
+        "phone": "7894973106"
+      },
+      {
+        "name": "Saiyam Baheti",
+        "phone": "9408785636"
+      }
+    ],
     name: 'Nucleus – The Analytics Society of SSCBS',
     shortName: 'Nucleus',
     category: 'consulting',
@@ -619,6 +913,16 @@ export const DEMO_SOCIETIES = [
   // --- 31. Parishram (Sports Society) ---
   {
     id: 'parishram-sports',
+    pocs: [
+      {
+        "name": "Khushal Bansal",
+        "phone": "9310059110"
+      },
+      {
+        "name": "Arjit Rawat",
+        "phone": "9873198531"
+      }
+    ],
     name: 'Parishram – The Sports & Athletics Society of SSCBS',
     shortName: 'Parishram',
     category: 'wellness',
@@ -639,6 +943,16 @@ export const DEMO_SOCIETIES = [
   // --- 32. QSA ---
   {
     id: 'qsa-inclusivity',
+    pocs: [
+      {
+        "name": "Himanshu Anand",
+        "phone": "8797787234"
+      },
+      {
+        "name": "Abisha Sanwaria",
+        "phone": "9599851370"
+      }
+    ],
     name: 'QSA – Queer Straight Alliance SSCBS',
     shortName: 'QSA',
     category: 'wellness',
@@ -659,6 +973,16 @@ export const DEMO_SOCIETIES = [
   // --- 33. CBS Post ---
   {
     id: 'cbs-post',
+    pocs: [
+      {
+        "name": "Riddhima Rawat",
+        "phone": "8320133074"
+      },
+      {
+        "name": "Kanishk Kumar",
+        "phone": "9315835610"
+      }
+    ],
     name: 'CBS Post – The Official Campus Student Newspaper of SSCBS',
     shortName: 'CBS Post',
     category: 'debating',
@@ -679,6 +1003,16 @@ export const DEMO_SOCIETIES = [
   // --- 34. Rotaract SSCBS ---
   {
     id: 'rotaract-sscbs',
+    pocs: [
+      {
+        "name": "Arshita",
+        "phone": "9773817046"
+      },
+      {
+        "name": "Lorena Kundalwal",
+        "phone": "8130916949"
+      }
+    ],
     name: 'Rotaract Club of SSCBS',
     shortName: 'Rotaract',
     category: 'ecell',
@@ -699,6 +1033,16 @@ export const DEMO_SOCIETIES = [
   // --- 35. Synergy (The Corporate Events Society) ---
   {
     id: 'synergy-corporate',
+    pocs: [
+      {
+        "name": "Princy Sanghvi",
+        "phone": "8076362358"
+      },
+      {
+        "name": "Nandinee Patel",
+        "phone": "6352341010"
+      }
+    ],
     name: 'Synergy – The Corporate Society of SSCBS',
     shortName: 'Synergy',
     category: 'consulting',
@@ -719,6 +1063,16 @@ export const DEMO_SOCIETIES = [
   // --- 36. Verve (Street Play Society) ---
   {
     id: 'verve-streetplay',
+    pocs: [
+      {
+        "name": "Vanshika Kumari",
+        "phone": "7079835490"
+      },
+      {
+        "name": "Harshit Goyal",
+        "phone": "8690950081"
+      }
+    ],
     name: 'Verve – The Street Play Society of SSCBS',
     shortName: 'Verve',
     category: 'cultural',
@@ -739,6 +1093,16 @@ export const DEMO_SOCIETIES = [
   // --- 37. Yuva (Entrepreneurship Cell) ---
   {
     id: 'yuva-ecell',
+    pocs: [
+      {
+        "name": "Yohan Kaul",
+        "phone": "9370095931"
+      },
+      {
+        "name": "Aashree Jain",
+        "phone": "9205762615"
+      }
+    ],
     name: 'Yuva – The Entrepreneurship Cell (E-Cell) of SSCBS',
     shortName: 'Yuva E-Cell',
     category: 'ecell',
@@ -759,6 +1123,16 @@ export const DEMO_SOCIETIES = [
   // --- 38. 180 Degree Consulting ---
   {
     id: '180dc-consulting',
+    pocs: [
+      {
+        "name": "Siddhi Garg",
+        "phone": "9289045149"
+      },
+      {
+        "name": "Sayani Jain",
+        "phone": "9205288380"
+      }
+    ],
     name: '180 Degrees Consulting SSCBS (180DC)',
     shortName: '180DC',
     category: 'consulting',
@@ -779,6 +1153,16 @@ export const DEMO_SOCIETIES = [
   // --- 39. IMA Chapter ---
   {
     id: 'ima-chapter',
+    pocs: [
+      {
+        "name": "Nitansh Yadav",
+        "phone": "8081842682"
+      },
+      {
+        "name": "Anushka Shukla",
+        "phone": "7087776803"
+      }
+    ],
     name: 'IMA SSCBS Student Chapter',
     shortName: 'IMA',
     category: 'finance',
@@ -799,6 +1183,16 @@ export const DEMO_SOCIETIES = [
   // --- 40. APICS Chapter ---
   {
     id: 'apics-operations',
+    pocs: [
+      {
+        "name": "Manya",
+        "phone": "9540368873"
+      },
+      {
+        "name": "Samarth Behl",
+        "phone": "7814710620"
+      }
+    ],
     name: 'APICS SSCBS Chapter',
     shortName: 'APICS',
     category: 'consulting',
@@ -819,6 +1213,16 @@ export const DEMO_SOCIETIES = [
   // --- 41. Eco Club ---
   {
     id: 'eco-club',
+    pocs: [
+      {
+        "name": "Piyush Kumar Pandit",
+        "phone": "9643200704"
+      },
+      {
+        "name": "Darshna Devendra Jangle",
+        "phone": "7626994926"
+      }
+    ],
     name: 'Eco Club SSCBS – Environmental Conservation Cell',
     shortName: 'Eco Club',
     category: 'ecell',
@@ -839,6 +1243,24 @@ export const DEMO_SOCIETIES = [
   // --- 42. Sadhna + Make Sense ---
   {
     id: 'sadhna-makesense',
+    pocs: [
+      {
+        "name": "Gaurav Kumar",
+        "phone": "8920477482"
+      },
+      {
+        "name": "Hansika Singh",
+        "phone": "7409107691"
+      },
+      {
+        "name": "Adit arora",
+        "phone": "8373901813"
+      },
+      {
+        "name": "Tanisha yadav",
+        "phone": "8178417627"
+      }
+    ],
     name: 'Sadhna & MakeSense SSCBS',
     shortName: 'Sadhna',
     category: 'ecell',
@@ -859,6 +1281,16 @@ export const DEMO_SOCIETIES = [
   // --- 43. Bridges for Enterprise ---
   {
     id: 'bridges-enterprise',
+    pocs: [
+      {
+        "name": "Gaurang Garg",
+        "phone": "9634320168"
+      },
+      {
+        "name": "Diza Garg",
+        "phone": "6284460396"
+      }
+    ],
     name: 'Bridges for Enterprise (BfE) New Delhi Chapter at SSCBS',
     shortName: 'BfE',
     category: 'consulting',
@@ -879,6 +1311,16 @@ export const DEMO_SOCIETIES = [
   // --- 44. Financial Literacy Club ---
   {
     id: 'financial-literacy',
+    pocs: [
+      {
+        "name": "Bhomik Kumar Sahu",
+        "phone": "8839098183"
+      },
+      {
+        "name": "Aayushi Gupta",
+        "phone": "9211394956"
+      }
+    ],
     name: 'Financial Literacy Cell (FLC) SSCBS',
     shortName: 'FLC',
     category: 'finance',

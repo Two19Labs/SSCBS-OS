@@ -12,6 +12,7 @@ import {
   HeartIcon,
   CheckIcon,
   BackIcon,
+  WhatsAppIcon,
 } from './icons';
 import { useAuth } from '../context/AuthContext';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
@@ -203,7 +204,14 @@ export default function SocietyTrackerPage({ onBack }) {
       const matchSubCats =
         Array.isArray(society.categoryLabels) &&
         society.categoryLabels.some((lbl) => lbl.toLowerCase().includes(q));
-      return matchName || matchCategory || matchSubCats;
+      const matchPocs =
+        Array.isArray(society.pocs) &&
+        society.pocs.some(
+          (poc) =>
+            poc.name.toLowerCase().includes(q) ||
+            poc.phone.replace(/[^0-9]/g, '').includes(q.replace(/[^0-9]/g, ''))
+        );
+      return matchName || matchCategory || matchSubCats || matchPocs;
     }
     return true;
   });
@@ -422,6 +430,15 @@ export default function SocietyTrackerPage({ onBack }) {
                   </div>
 
                   <h3 className="st-society-title">{society.name}</h3>
+
+                  {Array.isArray(society.pocs) && society.pocs.length > 0 && (
+                    <div className="st-poc-pill-bar">
+                      <span className="st-poc-pill-icon">📞</span>
+                      <span className="st-poc-pill-names">
+                        {society.pocs.map((p) => p.name).join(' • ')}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Card Bottom / Action Row */}
@@ -474,6 +491,25 @@ export default function SocietyTrackerPage({ onBack }) {
                               Forms Opening Soon
                             </span>
                           )}
+
+                          {Array.isArray(society.pocs) && society.pocs.length > 0 && (() => {
+                            const primaryPoc = society.pocs[0];
+                            const cleanPhone = primaryPoc.phone.replace(/[^0-9]/g, '').slice(-10);
+                            const textMsg = encodeURIComponent(`Hi! I'm an SSCBS student inquiring about recruitment for ${society.shortName || society.name}.`);
+                            return (
+                              <a
+                                href={`https://wa.me/91${cleanPhone}?text=${textMsg}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="st-por-btn"
+                                title={`WhatsApp Contact POR (${primaryPoc.name})`}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <WhatsAppIcon size={14} />
+                                <span>Contact POR</span>
+                              </a>
+                            );
+                          })()}
                     <div className="st-social-row">
                       <a
                         href={society.officialPageUrl || OFFICIAL_COLLEGE_SOCIETIES_URL}
@@ -652,6 +688,42 @@ export default function SocietyTrackerPage({ onBack }) {
                   )}
                 </div>
               </div>
+
+              {Array.isArray(selectedSociety.pocs) && selectedSociety.pocs.length > 0 && (
+                <div className="st-modal-section">
+                  <h4 className="st-modal-sec-title">💬 Points of Responsibility (PORs) Contact</h4>
+                  <div className="st-poc-grid">
+                    {selectedSociety.pocs.map((poc, idx) => {
+                      const cleanPhone = poc.phone.replace(/[^0-9]/g, '');
+                      const formattedPhone =
+                        cleanPhone.length === 10
+                          ? `+91 ${cleanPhone.slice(0, 5)} ${cleanPhone.slice(5)}`
+                          : poc.phone;
+                      const textMsg = encodeURIComponent(`Hi! I'm an SSCBS student inquiring about recruitment for ${selectedSociety.shortName || selectedSociety.name}.`);
+                      return (
+                        <div key={idx} className="st-poc-card">
+                          <div className="st-poc-details">
+                            <span className="st-poc-name">{poc.name}</span>
+                            <span className="st-poc-phone">{formattedPhone}</span>
+                          </div>
+                          <div className="st-poc-actions">
+                            <a
+                              href={`https://wa.me/91${cleanPhone.slice(-10)}?text=${textMsg}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="st-poc-action-btn whatsapp"
+                              title={`Chat with ${poc.name} on WhatsApp`}
+                            >
+                              <WhatsAppIcon size={14} />
+                              <span>WhatsApp</span>
+                            </a>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="st-modal-footer">
