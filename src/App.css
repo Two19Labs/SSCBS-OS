@@ -821,6 +821,8 @@
   .app-main {
     padding: 36px 56px 56px;
   }
+}
+
 /* ── Recruitment Home Banner Responsive ── */
 .recruitment-home-banner {
   transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease !important;

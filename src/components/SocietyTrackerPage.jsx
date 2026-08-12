@@ -14,6 +14,7 @@ import {
   BackIcon,
 } from './icons';
 import { useAuth } from '../context/AuthContext';
+import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import './SocietyTrackerPage.css';
 
 const LOCAL_STORAGE_KEY = 'sscbs_bookmarked_societies';
@@ -60,19 +61,66 @@ export default function SocietyTrackerPage({ onBack }) {
     return [];
   });
 
-  // Reload state if user changes
-  useEffect(() => {
+  // Helper for background cloud sync across devices
+  const syncProgressToCloud = useCallback(async (newBookmarks, newFilled) => {
+    if (!user || !hasValidCredentials) return;
     try {
-      const savedB = localStorage.getItem(bookmarksKey) || localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (savedB !== null) setBookmarkedIds(JSON.parse(savedB));
-      const savedF = localStorage.getItem(filledKey) || localStorage.getItem(FILLED_FORMS_KEY);
-      if (savedF !== null) setFilledIds(JSON.parse(savedF));
-    } catch (e) {
-      // ignore parse errors
-    }
-  }, [bookmarksKey, filledKey]);
+      // 1. Save to Supabase auth user metadata (syncs across devices on login)
+      const { data, error } = await supabase.auth.updateUser({
+        data: {
+          society_bookmarks: newBookmarks,
+          society_filled_forms: newFilled,
+        },
+      });
 
-  // Sync bookmarks with localStorage (user-scoped)
+      // 2. Save to user_progress settings table for cloud backup
+      if (!error && data?.user?.id) {
+        const { data: progressData } = await supabase
+          .from('user_progress')
+          .select('settings')
+          .eq('user_id', data.user.id)
+          .maybeSingle();
+
+        const existingSettings = progressData?.settings || {};
+        const newSettings = {
+          ...existingSettings,
+          society_bookmarks: newBookmarks,
+          society_filled_forms: newFilled,
+          email: data.user.email,
+        };
+
+        await supabase
+          .from('user_progress')
+          .update({ settings: newSettings })
+          .eq('user_id', data.user.id);
+      }
+    } catch (err) {
+      console.warn('Cross-device cloud sync warning:', err);
+    }
+  }, [user]);
+
+  // Load cloud data from Supabase user_metadata on mount / user load
+  useEffect(() => {
+    if (!user) return;
+    const cloudBookmarks = user.user_metadata?.society_bookmarks;
+    const cloudFilled = user.user_metadata?.society_filled_forms;
+
+    if (Array.isArray(cloudBookmarks)) {
+      setBookmarkedIds(cloudBookmarks);
+      try {
+        localStorage.setItem(bookmarksKey, JSON.stringify(cloudBookmarks));
+      } catch (e) {}
+    }
+
+    if (Array.isArray(cloudFilled)) {
+      setFilledIds(cloudFilled);
+      try {
+        localStorage.setItem(filledKey, JSON.stringify(cloudFilled));
+      } catch (e) {}
+    }
+  }, [user, bookmarksKey, filledKey]);
+
+  // Sync bookmarks with localStorage
   useEffect(() => {
     try {
       localStorage.setItem(bookmarksKey, JSON.stringify(bookmarkedIds));
@@ -81,7 +129,7 @@ export default function SocietyTrackerPage({ onBack }) {
     }
   }, [bookmarkedIds, bookmarksKey]);
 
-  // Sync filled forms with localStorage (user-scoped)
+  // Sync filled forms with localStorage
   useEffect(() => {
     try {
       localStorage.setItem(filledKey, JSON.stringify(filledIds));
@@ -91,35 +139,19 @@ export default function SocietyTrackerPage({ onBack }) {
   }, [filledIds, filledKey]);
 
   const toggleFormFilled = (id) => {
-    setFilledIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+    setFilledIds((prev) => {
+      const next = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
+      syncProgressToCloud(bookmarkedIds, next);
+      return next;
+    });
   };
 
-  // Live countdown timer — ticks every second
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => {
-    const interval = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const getCountdown = useCallback((deadlineStr) => {
-    if (!deadlineStr) return null;
-    const diff = new Date(deadlineStr) - now;
-    if (diff <= 0) return { label: 'Closed', expired: true, tier: 'expired' };
-    const h = Math.floor(diff / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    const s = Math.floor((diff % 60000) / 1000);
-    const pad = (n) => String(n).padStart(2, '0');
-    // Tier: green > 48h, warning ≤ 48h, urgent ≤ 12h
-    const tier = h < 12 ? 'urgent' : h < 48 ? 'warning' : 'green';
-    return { label: `${pad(h)}:${pad(m)}:${pad(s)}`, expired: false, hours: h, tier };
-  }, [now]);
-
   const toggleBookmark = (id) => {
-    setBookmarkedIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+    setBookmarkedIds((prev) => {
+      const next = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
+      syncProgressToCloud(next, filledIds);
+      return next;
+    });
   };
 
   const filteredSocieties = DEMO_SOCIETIES.filter((society) => {
@@ -145,8 +177,11 @@ export default function SocietyTrackerPage({ onBack }) {
   });
 
   const sortedSocieties = [...filteredSocieties].sort((a, b) => {
-    if (sortBy === 'name') {
+    if (sortBy === 'name' || sortBy === 'name-asc') {
       return a.name.localeCompare(b.name);
+    }
+    if (sortBy === 'name-desc') {
+      return b.name.localeCompare(a.name);
     }
     return 0;
   });
@@ -242,6 +277,7 @@ export default function SocietyTrackerPage({ onBack }) {
             onChange={(e) => setSortBy(e.target.value)}
           >
             <option value="name">Sort by: Name (A-Z)</option>
+            <option value="name-desc">Sort by: Name (Z-A)</option>
           </select>
         </div>
 
