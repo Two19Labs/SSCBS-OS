@@ -695,6 +695,11 @@
   box-shadow: 0 4px 14px rgba(220, 39, 67, 0.45);
 }
 
+.st-social-btn.linktree:hover {
+  background: linear-gradient(135deg, #43e660 0%, #28a745 100%);
+  box-shadow: 0 4px 14px rgba(67, 230, 96, 0.45);
+}
+
 .st-social-btn.linkedin:hover {
   background: #0a66c2;
   box-shadow: 0 4px 14px rgba(10, 102, 194, 0.45);

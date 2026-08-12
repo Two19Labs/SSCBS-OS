@@ -3,6 +3,7 @@ import { CATEGORIES, DEMO_SOCIETIES, getDeadlineInfo } from '../data/societies';
 import {
   SearchIcon,
   InstagramIcon,
+  LinktreeIcon,
   LinkedinIcon,
   ExternalLinkIcon,
   SparklesIcon,
@@ -150,7 +151,7 @@ export default function SocietyTrackerPage({ onBack }) {
             </span>
             <h1 className="st-title">Society Recruitment Tracker</h1>
             <p className="st-subtitle">
-              Recruitments will start soon, forms and info will come here soon! Filter all 47 official SSCBS societies by domain.
+              Recruitments will start soon, forms and info will come here soon! Filter all 43 official SSCBS societies by domain.
             </p>
           </div>
         </div>
@@ -371,11 +372,11 @@ export default function SocietyTrackerPage({ onBack }) {
                         href={society.instagramVideoUrl || 'https://instagram.com'}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="st-social-btn insta"
-                        title="Instagram Updates"
+                        className={`st-social-btn ${society.id === 'literary-society' ? 'linktree' : 'insta'}`}
+                        title={society.id === 'literary-society' ? 'Linktree' : 'Instagram Updates'}
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <InstagramIcon size={18} />
+                        {society.id === 'literary-society' ? <LinktreeIcon size={18} /> : <InstagramIcon size={18} />}
                       </a>
                       <a
                         href={society.linkedinUrl || 'https://linkedin.com'}
@@ -573,10 +574,10 @@ export default function SocietyTrackerPage({ onBack }) {
                   href={selectedSociety.instagramVideoUrl || 'https://instagram.com'}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="st-social-btn insta"
-                  title="Instagram Updates"
+                  className={`st-social-btn ${selectedSociety.id === 'literary-society' ? 'linktree' : 'insta'}`}
+                  title={selectedSociety.id === 'literary-society' ? 'Linktree' : 'Instagram Updates'}
                 >
-                  <InstagramIcon size={20} />
+                  {selectedSociety.id === 'literary-society' ? <LinktreeIcon size={20} /> : <InstagramIcon size={20} />}
                 </a>
                 <a
                   href={selectedSociety.linkedinUrl || 'https://linkedin.com'}

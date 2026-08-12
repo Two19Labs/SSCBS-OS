@@ -243,6 +243,12 @@ export const InstagramIcon = ({ size = 18 }) => (
   </svg>
 );
 
+export const LinktreeIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M13.5 1.515a2.109 2.109 0 0 0-3 0L7.242 4.774l2.216 2.217 2.541-2.542 2.542 2.542 2.216-2.217zM4.774 7.242l2.217 2.216 2.542-2.541-2.542-2.542zm14.452 0l-2.217 2.216-2.542-2.541 2.542-2.542zM11 11v2.5H8.5L12 17l3.5-3.5H13V11zm1 6.5L12 22l0-4.5z" />
+  </svg>
+);
+
 export const LinkedinIcon = ({ size = 18 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
     <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.25V10.9H6.46M7.86 6.72a1.4 1.4 0 1 0 1.4 1.4 1.4 1.4 0 0 0-1.4-1.4z" />
