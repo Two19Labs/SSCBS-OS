@@ -13,6 +13,7 @@ import {
   CheckIcon,
   BackIcon,
 } from './icons';
+import { useAuth } from '../context/AuthContext';
 import './SocietyTrackerPage.css';
 
 const LOCAL_STORAGE_KEY = 'sscbs_bookmarked_societies';
@@ -20,16 +21,22 @@ const FILLED_FORMS_KEY = 'sscbs_filled_form_societies';
 const OFFICIAL_COLLEGE_SOCIETIES_URL = 'https://sscbs.du.ac.in/societies/';
 
 export default function SocietyTrackerPage({ onBack }) {
+  const { user } = useAuth();
+  const userKeySuffix = user?.email ? `_${user.email.toLowerCase()}` : '';
+  const bookmarksKey = `${LOCAL_STORAGE_KEY}${userKeySuffix}`;
+  const filledKey = `${FILLED_FORMS_KEY}${userKeySuffix}`;
+
   const [activeTab, setActiveTab] = useState('all'); // 'all' | 'preferred'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('name');
   const [selectedSociety, setSelectedSociety] = useState(null);
 
-  // Bookmarks (Heart) state with fallback to pre-bookmarked demo items
+  // Bookmarks (Heart) state with user-scoped key and fallback
   const [bookmarkedIds, setBookmarkedIds] = useState(() => {
     try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+      const userKey = user?.email ? `${LOCAL_STORAGE_KEY}_${user.email.toLowerCase()}` : LOCAL_STORAGE_KEY;
+      const saved = localStorage.getItem(userKey) || localStorage.getItem(LOCAL_STORAGE_KEY);
       if (saved !== null) {
         return JSON.parse(saved);
       }
@@ -39,10 +46,11 @@ export default function SocietyTrackerPage({ onBack }) {
     return DEMO_SOCIETIES.filter((s) => s.defaultBookmarked).map((s) => s.id);
   });
 
-  // Form Filled checkmark state with localStorage persistence
+  // Form Filled checkmark state with user-scoped key and fallback
   const [filledIds, setFilledIds] = useState(() => {
     try {
-      const saved = localStorage.getItem(FILLED_FORMS_KEY);
+      const userKey = user?.email ? `${FILLED_FORMS_KEY}_${user.email.toLowerCase()}` : FILLED_FORMS_KEY;
+      const saved = localStorage.getItem(userKey) || localStorage.getItem(FILLED_FORMS_KEY);
       if (saved !== null) {
         return JSON.parse(saved);
       }
@@ -52,23 +60,35 @@ export default function SocietyTrackerPage({ onBack }) {
     return [];
   });
 
-  // Sync bookmarks with localStorage
+  // Reload state if user changes
   useEffect(() => {
     try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(bookmarkedIds));
+      const savedB = localStorage.getItem(bookmarksKey) || localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedB !== null) setBookmarkedIds(JSON.parse(savedB));
+      const savedF = localStorage.getItem(filledKey) || localStorage.getItem(FILLED_FORMS_KEY);
+      if (savedF !== null) setFilledIds(JSON.parse(savedF));
+    } catch (e) {
+      // ignore parse errors
+    }
+  }, [bookmarksKey, filledKey]);
+
+  // Sync bookmarks with localStorage (user-scoped)
+  useEffect(() => {
+    try {
+      localStorage.setItem(bookmarksKey, JSON.stringify(bookmarkedIds));
     } catch (err) {
       console.error('Error saving bookmarks:', err);
     }
-  }, [bookmarkedIds]);
+  }, [bookmarkedIds, bookmarksKey]);
 
-  // Sync filled forms with localStorage
+  // Sync filled forms with localStorage (user-scoped)
   useEffect(() => {
     try {
-      localStorage.setItem(FILLED_FORMS_KEY, JSON.stringify(filledIds));
+      localStorage.setItem(filledKey, JSON.stringify(filledIds));
     } catch (err) {
       console.error('Error saving filled form societies:', err);
     }
-  }, [filledIds]);
+  }, [filledIds, filledKey]);
 
   const toggleFormFilled = (id) => {
     setFilledIds((prev) =>
