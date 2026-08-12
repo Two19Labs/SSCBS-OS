@@ -205,9 +205,11 @@ export default function SocietyTrackerPage({ onBack }) {
               <SparklesIcon size={12} /> RECRUITMENT SEASON 2026
             </span>
             <h1 className="st-title">Society Recruitment Tracker</h1>
-            <p className="st-subtitle">
-              Recruitments will start soon, forms and info will come here soon! Filter all 43 official SSCBS societies by domain.
-            </p>
+            <ol className="st-pointers">
+              <li>Crescendo recruits later in the year, the form will be out on Campus Buzz</li>
+              <li>Sadhana &amp; Makes Sense are merging as one</li>
+              <li>All forms will be updated here, along with deadlines and reminders for you to fill your preferred ones, our promise!</li>
+            </ol>
           </div>
         </div>
       </div>

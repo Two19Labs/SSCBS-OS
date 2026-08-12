@@ -94,6 +94,21 @@
   line-height: 1.45;
 }
 
+.st-pointers {
+  margin: 6px 0 0 0;
+  padding-left: 18px;
+  color: var(--ink-dim);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.st-pointers li {
+  padding-left: 2px;
+}
+
 /* ── Metric Cards Grid ── */
 .st-metrics-grid {
   display: grid;
