@@ -409,6 +409,12 @@ export const DEMO_SOCIETIES = [
   // --- 15. Enactus ---
   {
     id: 'enactus-sscbs',
+    pocs: [
+      {
+        name: 'Enactus POC',
+        phone: '7467840660'
+      }
+    ],
     name: 'Enactus SSCBS',
     shortName: 'Enactus',
     category: 'ecell',
