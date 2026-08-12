@@ -191,28 +191,47 @@ export default function SocietyTrackerPage({ onBack }) {
     if (activeTab === 'preferred' && !bookmarkedIds.includes(society.id)) {
       return false;
     }
-    if (selectedCategory !== 'all') {
+
+    const rawQuery = searchQuery.trim();
+    if (rawQuery) {
+      const query = rawQuery.toLowerCase();
+      const cleanQ = query.replace(/[^a-z0-9]/g, '');
+
+      const nameStr = (society.name || '').toLowerCase();
+      const shortNameStr = (society.shortName || '').toLowerCase();
+      const idStr = (society.id || '').toLowerCase();
+      const descStr = (society.description || '').toLowerCase();
+      const catLabelStr = (society.categoryLabel || '').toLowerCase();
+
+      const cleanName = nameStr.replace(/[^a-z0-9]/g, '');
+      const cleanShortName = shortNameStr.replace(/[^a-z0-9]/g, '');
+      const cleanId = idStr.replace(/[^a-z0-9]/g, '');
+
+      const matchName = nameStr.includes(query) || (cleanQ && cleanName.includes(cleanQ));
+      const matchShortName = shortNameStr.includes(query) || (cleanQ && cleanShortName.includes(cleanQ));
+      const matchId = idStr.includes(query) || (cleanQ && cleanId.includes(cleanQ));
+      const matchDesc = descStr.includes(query);
+      const matchCat = catLabelStr.includes(query);
+      const matchSubCats =
+        Array.isArray(society.categoryLabels) &&
+        society.categoryLabels.some((lbl) => lbl.toLowerCase().includes(query));
+      const matchPocs =
+        Array.isArray(society.pocs) &&
+        society.pocs.some(
+          (poc) =>
+            poc.name.toLowerCase().includes(query) ||
+            (cleanQ && poc.phone.replace(/[^0-9]/g, '').includes(cleanQ))
+        );
+
+      const isMatch = matchName || matchShortName || matchId || matchDesc || matchCat || matchSubCats || matchPocs;
+      if (!isMatch) return false;
+    } else if (selectedCategory !== 'all') {
       const hasCat =
         society.category === selectedCategory ||
         (Array.isArray(society.categories) && society.categories.includes(selectedCategory));
       if (!hasCat) return false;
     }
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      const matchName = society.name.toLowerCase().includes(q);
-      const matchCategory = society.categoryLabel.toLowerCase().includes(q);
-      const matchSubCats =
-        Array.isArray(society.categoryLabels) &&
-        society.categoryLabels.some((lbl) => lbl.toLowerCase().includes(q));
-      const matchPocs =
-        Array.isArray(society.pocs) &&
-        society.pocs.some(
-          (poc) =>
-            poc.name.toLowerCase().includes(q) ||
-            poc.phone.replace(/[^0-9]/g, '').includes(q.replace(/[^0-9]/g, ''))
-        );
-      return matchName || matchCategory || matchSubCats || matchPocs;
-    }
+
     return true;
   });
 
@@ -327,10 +346,20 @@ export default function SocietyTrackerPage({ onBack }) {
             <input
               type="text"
               className="st-search-input"
-              placeholder="Search society name or domain..."
+              placeholder="Search by name, shortname, domain, or POR..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
+            {searchQuery && (
+              <button
+                className="st-search-clear-btn"
+                onClick={() => setSearchQuery('')}
+                title="Clear search"
+                type="button"
+              >
+                ✕
+              </button>
+            )}
           </div>
           <select
             className="st-sort-select"

@@ -248,6 +248,31 @@
   pointer-events: none;
 }
 
+.st-search-clear-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--border);
+  color: var(--ink-dim);
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.st-search-clear-btn:hover {
+  background: var(--ink);
+  color: var(--surface);
+}
+
+
 .st-sort-select {
   padding: 10px 14px;
   background: var(--surface);
