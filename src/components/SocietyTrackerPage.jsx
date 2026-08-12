@@ -533,7 +533,7 @@ export default function SocietyTrackerPage({ onBack }) {
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <WhatsAppIcon size={15} />
-                                <span>Contact POR ({primaryPoc.name})</span>
+                                <span>Contact PoR</span>
                               </a>
                             </div>
                           );
