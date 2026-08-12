@@ -7,20 +7,23 @@ import { TimetableProvider } from './context/TimetableContext.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
 import { ConfigProvider } from './context/ConfigContext.jsx'
 import { NotificationProvider } from './context/NotificationContext.jsx'
+import ErrorBoundary from './components/ErrorBoundary.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ThemeProvider>
-      <AuthProvider>
-        <ConfigProvider>
-          <TimetableProvider>
-            <NotificationProvider>
-              <App />
-            </NotificationProvider>
-          </TimetableProvider>
-        </ConfigProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AuthProvider>
+          <ConfigProvider>
+            <TimetableProvider>
+              <NotificationProvider>
+                <App />
+              </NotificationProvider>
+            </TimetableProvider>
+          </ConfigProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   </StrictMode>,
 )
 

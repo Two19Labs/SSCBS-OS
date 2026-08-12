@@ -61,6 +61,26 @@ export default function SocietyTrackerPage({ onBack }) {
     return [];
   });
 
+  // Live countdown timer — ticks every second
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const getCountdown = useCallback((deadlineStr) => {
+    if (!deadlineStr) return null;
+    const diff = new Date(deadlineStr) - now;
+    if (diff <= 0) return { label: 'Closed', expired: true, tier: 'expired' };
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    const pad = (n) => String(n).padStart(2, '0');
+    // Tier: green > 48h, warning ≤ 48h, urgent ≤ 12h
+    const tier = h < 12 ? 'urgent' : h < 48 ? 'warning' : 'green';
+    return { label: `${pad(h)}:${pad(m)}:${pad(s)}`, expired: false, hours: h, tier };
+  }, [now]);
+
   // Helper for background cloud sync across devices
   const syncProgressToCloud = useCallback(async (newBookmarks, newFilled) => {
     if (!user || !hasValidCredentials) return;
