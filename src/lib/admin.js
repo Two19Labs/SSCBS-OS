@@ -41,7 +41,7 @@ export function canAccessFacultyDatabase(email) {
 
 export function canAccessSocietyTracker(email) {
   if (!email || typeof email !== 'string') return false;
-  return email.toLowerCase().trim() === 'aditya.25015@sscbs.du.ac.in';
+  return true; // Society Recruitment Tracker is live for all SSCBS students!
 }
 
 const TIMEWARP_KEY = 'sscbs-timewarp-enabled';

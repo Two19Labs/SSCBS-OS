@@ -181,6 +181,64 @@
   cursor: default;
 }
 
+.sidebar-item.featured-nav-item {
+  position: relative;
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.08) 0%, rgba(124, 58, 237, 0.08) 100%);
+  border: 1px solid rgba(225, 29, 72, 0.22);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.sidebar-item.featured-nav-item:hover:not(.active) {
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.16) 0%, rgba(124, 58, 237, 0.16) 100%);
+  border-color: rgba(225, 29, 72, 0.4);
+  transform: translateX(2px);
+}
+
+.sidebar-item.featured-nav-item.active {
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.2) 0%, rgba(124, 58, 237, 0.2) 100%);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 2px 10px rgba(225, 29, 72, 0.18);
+}
+
+.mobile-sidebar-item.featured-nav-item {
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.08) 0%, rgba(124, 58, 237, 0.08) 100%);
+  border: 1px solid rgba(225, 29, 72, 0.22);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.mobile-sidebar-item.featured-nav-item.active {
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.2) 0%, rgba(124, 58, 237, 0.2) 100%);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.sidebar-featured-badge {
+  margin-left: auto;
+  font-size: 8.5px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+  background: linear-gradient(135deg, #e11d48 0%, #9333ea 100%);
+  border-radius: 999px;
+  padding: 2px 7px;
+  box-shadow: 0 2px 6px rgba(225, 29, 72, 0.4);
+  animation: liveBadgePulse 2s infinite ease-in-out;
+}
+
+@keyframes liveBadgePulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.06);
+  }
+}
+
 .sidebar-soon {
   margin-left: auto;
   font-size: 8.5px;
@@ -763,6 +821,29 @@
   .app-main {
     padding: 36px 56px 56px;
   }
+/* ── Recruitment Home Banner Responsive ── */
+.recruitment-home-banner {
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease !important;
 }
+
+.recruitment-home-banner:hover {
+  border-color: var(--accent) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(225, 29, 72, 0.12);
+}
+
+@media (max-width: 640px) {
+  .recruitment-home-banner {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 14px 16px !important;
+    gap: 14px !important;
+  }
+  .recruitment-home-banner button {
+    width: 100% !important;
+    justify-content: center;
+  }
+}
+
 
 

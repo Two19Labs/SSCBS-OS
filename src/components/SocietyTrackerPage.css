@@ -97,7 +97,7 @@
 /* ── Metric Cards Grid ── */
 .st-metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
   gap: 12px;
 }
 
@@ -288,7 +288,7 @@
 /* ── Societies Grid (Clean Uniform Cards without Descriptions) ── */
 .st-societies-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
   gap: 16px;
   align-items: stretch;
 }

@@ -204,7 +204,7 @@ function App() {
       title: 'Main Navigation',
       items: [
         { id: 'home', label: 'Home', Icon: HomeIcon },
-        ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', label: 'Recruitment Tracker', Icon: UsersIcon }] : []),
+        ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', label: 'Recruitment Tracker', Icon: UsersIcon, featured: true }] : []),
         { id: 'buzz', label: 'Campus Buzz', Icon: MegaphoneIcon, locked: !featureFlags['buzz'] && !isAdmin },
       ],
     },
@@ -355,15 +355,16 @@ function App() {
             {navSections.map((section, idx) => (
               <div key={idx} className="sidebar-section">
                 <span className="sidebar-section-title">{section.title}</span>
-                {section.items.map(({ id, label, Icon, locked }) => (
+                {section.items.map(({ id, label, Icon, locked, featured }) => (
                   <button
                     key={id}
-                    className={`sidebar-item ${view === id ? 'active' : ''} ${locked ? 'locked' : ''}`}
+                    className={`sidebar-item ${view === id ? 'active' : ''} ${locked ? 'locked' : ''} ${featured ? 'featured-nav-item' : ''}`}
                     onClick={() => !locked && openTool(id)}
                     disabled={locked}
                   >
                     <Icon filled={view === id} />
                     <span>{label}</span>
+                    {featured && <span className="sidebar-featured-badge">LIVE</span>}
                     {locked && <span className="sidebar-soon">SOON</span>}
                   </button>
                 ))}
@@ -412,10 +413,10 @@ function App() {
             {navSections.map((section, idx) => (
               <div key={idx} className="mobile-sidebar-section">
                 <div className="mobile-section-header">{section.title}</div>
-                {section.items.map(({ id, label, Icon, locked }) => (
+                {section.items.map(({ id, label, Icon, locked, featured }) => (
                   <button
                     key={id}
-                    className={`mobile-sidebar-item ${view === id ? 'active' : ''} ${locked ? 'locked' : ''}`}
+                    className={`mobile-sidebar-item ${view === id ? 'active' : ''} ${locked ? 'locked' : ''} ${featured ? 'featured-nav-item' : ''}`}
                     onClick={() => {
                       if (!locked) {
                         setIsMobileSidebarOpen(false);
@@ -428,6 +429,7 @@ function App() {
                       <Icon filled={view === id} size={18} />
                       <span>{label}</span>
                     </div>
+                    {featured && <span className="sidebar-featured-badge">LIVE</span>}
                     {locked && <span className="sidebar-soon">SOON</span>}
                   </button>
                 ))}
