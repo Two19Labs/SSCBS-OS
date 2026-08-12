@@ -3,7 +3,7 @@
 export const OFFICIAL_COLLEGE_SOCIETIES_URL = 'https://sscbs.du.ac.in/societies/';
 
 export const CATEGORIES = [
-  { id: 'all', label: 'All Domains (43)', icon: '⚡' },
+  { id: 'all', label: 'All Domains (44)', icon: '⚡' },
   { id: 'finance', label: 'Finance & Accounting', icon: '📈' },
   { id: 'consulting', label: 'Consulting & Analytics', icon: '💼' },
   { id: 'ecell', label: 'Startups & Social Impact', icon: '🚀' },
