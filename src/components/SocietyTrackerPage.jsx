@@ -46,13 +46,21 @@ export default function SocietyTrackerPage({ onBack }) {
   const [sortBy, setSortBy] = useState('shuffled');
   const [selectedSociety, setSelectedSociety] = useState(null);
 
-  // Bookmarks (Heart) state with user-scoped key and fallback
+  // Bookmarks (Heart) state with user-scoped key
   const [bookmarkedIds, setBookmarkedIds] = useState(() => {
     try {
-      const userKey = user?.email ? `${LOCAL_STORAGE_KEY}_${user.email.toLowerCase()}` : LOCAL_STORAGE_KEY;
-      const saved = localStorage.getItem(userKey) || localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (saved !== null) {
-        return JSON.parse(saved);
+      if (user?.email) {
+        const userKey = `${LOCAL_STORAGE_KEY}_${user.email.toLowerCase()}`;
+        const saved = localStorage.getItem(userKey);
+        if (saved !== null) {
+          return JSON.parse(saved);
+        }
+        return [];
+      } else {
+        const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (saved !== null) {
+          return JSON.parse(saved);
+        }
       }
     } catch (err) {
       console.error('Error reading saved bookmarks:', err);
@@ -60,13 +68,21 @@ export default function SocietyTrackerPage({ onBack }) {
     return DEMO_SOCIETIES.filter((s) => s.defaultBookmarked).map((s) => s.id);
   });
 
-  // Form Filled checkmark state with user-scoped key and fallback
+  // Form Filled checkmark state with user-scoped key
   const [filledIds, setFilledIds] = useState(() => {
     try {
-      const userKey = user?.email ? `${FILLED_FORMS_KEY}_${user.email.toLowerCase()}` : FILLED_FORMS_KEY;
-      const saved = localStorage.getItem(userKey) || localStorage.getItem(FILLED_FORMS_KEY);
-      if (saved !== null) {
-        return JSON.parse(saved);
+      if (user?.email) {
+        const userKey = `${FILLED_FORMS_KEY}_${user.email.toLowerCase()}`;
+        const saved = localStorage.getItem(userKey);
+        if (saved !== null) {
+          return JSON.parse(saved);
+        }
+        return [];
+      } else {
+        const saved = localStorage.getItem(FILLED_FORMS_KEY);
+        if (saved !== null) {
+          return JSON.parse(saved);
+        }
       }
     } catch (err) {
       console.error('Error reading filled form societies:', err);
@@ -132,25 +148,63 @@ export default function SocietyTrackerPage({ onBack }) {
     }
   }, [user]);
 
-  // Load cloud data from Supabase user_metadata on mount / user load
+  // Load cloud data from Supabase user_metadata / user_progress on mount / user load
   useEffect(() => {
     if (!user) return;
-    const cloudBookmarks = user.user_metadata?.society_bookmarks;
-    const cloudFilled = user.user_metadata?.society_filled_forms;
+    let isMounted = true;
 
-    if (Array.isArray(cloudBookmarks)) {
-      setBookmarkedIds(cloudBookmarks);
-      try {
-        localStorage.setItem(bookmarksKey, JSON.stringify(cloudBookmarks));
-      } catch (e) {}
-    }
+    const loadCloudData = async () => {
+      let cloudBookmarks = user.user_metadata?.society_bookmarks;
+      let cloudFilled = user.user_metadata?.society_filled_forms;
 
-    if (Array.isArray(cloudFilled)) {
-      setFilledIds(cloudFilled);
-      try {
-        localStorage.setItem(filledKey, JSON.stringify(cloudFilled));
-      } catch (e) {}
-    }
+      // If user_metadata does not have society_bookmarks yet, attempt lookup in user_progress settings table
+      if ((!Array.isArray(cloudBookmarks) || !Array.isArray(cloudFilled)) && hasValidCredentials) {
+        try {
+          const { data: progressData } = await supabase
+            .from('user_progress')
+            .select('settings')
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+          if (progressData?.settings) {
+            if (!Array.isArray(cloudBookmarks) && Array.isArray(progressData.settings.society_bookmarks)) {
+              cloudBookmarks = progressData.settings.society_bookmarks;
+            }
+            if (!Array.isArray(cloudFilled) && Array.isArray(progressData.settings.society_filled_forms)) {
+              cloudFilled = progressData.settings.society_filled_forms;
+            }
+          }
+        } catch (err) {
+          console.warn('Notice loading user_progress backup:', err);
+        }
+      }
+
+      if (!isMounted) return;
+
+      if (Array.isArray(cloudBookmarks)) {
+        setBookmarkedIds(cloudBookmarks);
+        try {
+          localStorage.setItem(bookmarksKey, JSON.stringify(cloudBookmarks));
+        } catch (e) {}
+      } else {
+        setBookmarkedIds([]);
+      }
+
+      if (Array.isArray(cloudFilled)) {
+        setFilledIds(cloudFilled);
+        try {
+          localStorage.setItem(filledKey, JSON.stringify(cloudFilled));
+        } catch (e) {}
+      } else {
+        setFilledIds([]);
+      }
+    };
+
+    loadCloudData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [user, bookmarksKey, filledKey]);
 
   // Sync bookmarks with localStorage
@@ -265,8 +319,9 @@ export default function SocietyTrackerPage({ onBack }) {
   });
 
   const totalCount = DEMO_SOCIETIES.length;
-  const bookmarkedCount = bookmarkedIds.length;
-  const filledCount = filledIds.length;
+  const validSocietyIds = React.useMemo(() => new Set(DEMO_SOCIETIES.map((s) => s.id)), []);
+  const bookmarkedCount = bookmarkedIds.filter((id) => validSocietyIds.has(id)).length;
+  const filledCount = filledIds.filter((id) => validSocietyIds.has(id)).length;
 
   return (
     <div className="society-tracker-container">
