@@ -239,7 +239,7 @@ export const DEMO_SOCIETIES = [
         "phone": "8800265955"
       }
     ],
-    name: 'Communiqué – The Public Relations & Promotion Cell of SSCBS',
+    name: 'Communiqué – The Branding & Communication Cell of SSCBS',
     shortName: 'Communique',
     category: 'marketing',
     categoryLabel: 'Marketing, PR & Corporate',
