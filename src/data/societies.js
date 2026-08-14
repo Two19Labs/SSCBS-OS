@@ -531,10 +531,6 @@ export const DEMO_SOCIETIES = [
         "phone": "8595015661"
       },
       {
-        "name": "Angel Bhat",
-        "phone": "8849423816"
-      },
-      {
         "name": "Shobhit Jaiswal",
         "phone": "9305464459"
       }
