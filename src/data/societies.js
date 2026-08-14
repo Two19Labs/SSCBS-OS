@@ -905,7 +905,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Consulting & Analytics',
     categories: ['consulting'],
     categoryLabels: ['Consulting & Analytics'],
-    description: 'The Analytics Society of SSCBS, specializing in data science & Python/SQL modeling. Recruitments will start soon, forms and info will come here soon!',
+    description: 'The Analytics Society of SSCBS, focusing on data driven thinking and problem solving. Recruitments starting soon, forms and info will come here soon',
     recruitmentFormUrl: null,
     deadline: null,
     statusText: 'Recruitments will start soon, forms and info will come here soon!',
