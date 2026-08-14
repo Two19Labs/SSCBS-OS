@@ -245,7 +245,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Marketing, PR & Corporate',
     categories: ['marketing', 'consulting', 'finance'],
     categoryLabels: ['Marketing, PR & Corporate', 'Consulting & Analytics', 'Finance & Accounting'],
-    description: 'Managing institutional PR, media coverage, and Prodigy event. Recruitments will start soon, forms and info will come here soon!',
+    description: 'SSCBS’s Branding & Communication Cell, driving initiatives across Consulting, Finance, and Marketing through industry collaborations, research, and strategic communication. Recruitments will start soon, forms and info will come here soon!',
     recruitmentFormUrl: null,
     deadline: null,
     statusText: 'Recruitments will start soon, forms and info will come here soon!',
