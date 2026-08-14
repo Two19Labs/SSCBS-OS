@@ -17,11 +17,20 @@
   .home-live-card {
     order: 2;
   }
-  .home-buzz-col {
+  .daily-timeline-section {
     order: 3;
   }
-  .home-tools-section {
+  .recruitment-home-banner {
     order: 4;
+  }
+  .home-buzz-col {
+    order: 5;
+  }
+  .debugger-collapsible {
+    order: 6;
+  }
+  .home-tools-section {
+    order: 7;
   }
   .home-greeting-actions .notif-center-wrapper {
     display: none !important;

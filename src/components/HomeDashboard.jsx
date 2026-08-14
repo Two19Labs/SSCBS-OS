@@ -498,46 +498,6 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
         {/* Live Class Card */}
         {renderLiveCard()}
 
-        {/* Society Recruitment Tracker Highlight Banner */}
-        {hasSocietyTrackerAccess && (
-          <div 
-            className="recruitment-home-banner" 
-            onClick={() => onNavigate('society-tracker')}
-            style={{
-              background: 'var(--surface)',
-              border: '1px solid var(--border)',
-              borderLeft: '4px solid var(--accent)',
-              borderRadius: '12px',
-              padding: '16px 20px',
-              marginBottom: '20px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '16px',
-              transition: 'border-color 0.15s ease, transform 0.15s ease',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: '1.4rem', background: 'var(--tint)', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', flexShrink: 0 }}>⚡</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                  <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--ink)' }}>Society Recruitment Tracker 2026</span>
-                </div>
-                <div style={{ fontSize: '0.84rem', color: 'var(--ink-dim)', marginTop: '2px' }}>
-                  Explore societies, domain categories, registration forms &amp; deadline reminders.
-                </div>
-              </div>
-            </div>
-            <button className="home-tt-btn primary" style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
-              Explore Tracker →
-            </button>
-          </div>
-        )}
-
-
-
-
         {/* Original Daily Timeline Tracker */}
         {hasProfile && timetable && showTimeline && !isWeekend && !todayHoliday && (
           <div className="daily-timeline-section animate-fade-in" style={{ marginBottom: '24px' }}>
@@ -586,6 +546,43 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
                 })}
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Society Recruitment Tracker Highlight Banner */}
+        {hasSocietyTrackerAccess && (
+          <div 
+            className="recruitment-home-banner" 
+            onClick={() => onNavigate('society-tracker')}
+            style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderLeft: '4px solid var(--accent)',
+              borderRadius: '12px',
+              padding: '16px 20px',
+              marginBottom: '20px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '16px',
+              transition: 'border-color 0.15s ease, transform 0.15s ease',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: '1.4rem', background: 'var(--tint)', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', flexShrink: 0 }}>⚡</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--ink)' }}>Society Recruitment Tracker 2026</span>
+                </div>
+                <div style={{ fontSize: '0.84rem', color: 'var(--ink-dim)', marginTop: '2px' }}>
+                  Explore societies, domain categories, registration forms &amp; deadline reminders.
+                </div>
+              </div>
+            </div>
+            <button className="home-tt-btn primary" style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+              Explore Tracker →
+            </button>
           </div>
         )}
 
