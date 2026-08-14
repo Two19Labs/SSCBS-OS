@@ -341,7 +341,8 @@ export default function SocietyTrackerPage({ onBack }) {
             <ol className="st-pointers">
               <li>Crescendo recruits later in the year, the form will be out on Campus Buzz</li>
               <li>Sadhana &amp; Makes Sense are merging as one</li>
-              <li>All forms will be updated here, along with deadlines and reminders for you to fill your preferred ones.</li>
+              <li>Only initial recruitment forms and their deadlines are tracked here (no interview schedules).</li>
+              <li>Click any society card to expand it for full details, descriptions, and PoRs contact.</li>
             </ol>
           </div>
         </div>
@@ -463,6 +464,7 @@ export default function SocietyTrackerPage({ onBack }) {
                 key={society.id}
                 className={`st-card ${isFilled ? 'is-filled' : ''}`}
                 onClick={() => setSelectedSociety(society)}
+                title={`Click card to expand details for ${society.name}`}
               >
                 {/* Header & Title */}
                 <div>
@@ -488,6 +490,9 @@ export default function SocietyTrackerPage({ onBack }) {
                           <CheckIcon size={11} /> Filled
                         </span>
                       )}
+                      <span className="st-expand-pill">
+                        Details ↗
+                      </span>
                     </div>
                     <div className="st-action-btns">
                       <button
@@ -601,13 +606,13 @@ export default function SocietyTrackerPage({ onBack }) {
                           </div>
                         </div>
 
-                        {/* Dedicated Card-Bottom Expanded POR Contact Bar */}
-                        {Array.isArray(society.pocs) && society.pocs.length > 0 && (() => {
-                          const primaryPoc = society.pocs[0];
-                          const cleanPhone = primaryPoc.phone.replace(/[^0-9]/g, '').slice(-10);
-                          const textMsg = encodeURIComponent(`Hi! I'm an SSCBS student inquiring about recruitment for ${society.shortName || society.name}.`);
-                          return (
-                            <div className="st-card-por-footer">
+                        {/* Dedicated Card-Bottom 50/50 Action Footer Bar (Contact PoR + Expand Details) */}
+                        <div className="st-card-por-footer">
+                          {Array.isArray(society.pocs) && society.pocs.length > 0 && (() => {
+                            const primaryPoc = society.pocs[0];
+                            const cleanPhone = primaryPoc.phone.replace(/[^0-9]/g, '').slice(-10);
+                            const textMsg = encodeURIComponent(`Hi! I'm an SSCBS student inquiring about recruitment for ${society.shortName || society.name}.`);
+                            return (
                               <a
                                 href={`https://wa.me/91${cleanPhone}?text=${textMsg}`}
                                 target="_blank"
@@ -616,12 +621,24 @@ export default function SocietyTrackerPage({ onBack }) {
                                 title={`Contact POR (${primaryPoc.name}) on WhatsApp`}
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                <WhatsAppIcon size={15} />
+                                <WhatsAppIcon size={14} />
                                 <span>Contact PoR</span>
                               </a>
-                            </div>
-                          );
-                        })()}
+                            );
+                          })()}
+                          <button
+                            type="button"
+                            className="st-card-expand-btn"
+                            title="Expand for full details & descriptions"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedSociety(society);
+                            }}
+                          >
+                            <span>Expand Details</span>
+                            <span className="st-btn-arrow">↗</span>
+                          </button>
+                        </div>
                       </>
                     );
                   })()}
@@ -744,8 +761,8 @@ export default function SocietyTrackerPage({ onBack }) {
                             </div>
                           )}
                           {!hasForm && (
-                            <p style={{ margin: '2px 0 0 0', fontSize: '0.83rem', opacity: 0.88 }}>
-                              Official application forms, orientation details, and interview schedules will drop here soon!
+                            <p style={{ margin: '4px 0 0 0', fontSize: '0.83rem', opacity: 0.88 }}>
+                              Official initial application forms and submission deadlines will drop here as soon as recruitments open!
                             </p>
                           )}
                         </div>
