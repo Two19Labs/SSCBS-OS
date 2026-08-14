@@ -12,11 +12,25 @@ export default class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     console.error('SSCBS OS ErrorBoundary caught an error:', error, errorInfo);
+    // Auto-recover from dynamic import chunk 404s after new Vercel deployments
+    if (error && (
+      error.name === 'ChunkLoadError' ||
+      /loading.*chunk/i.test(error.message || '') ||
+      /dynamically imported module/i.test(error.message || '') ||
+      /failed to fetch/i.test(error.message || '')
+    )) {
+      const chunkRetry = window.sessionStorage.getItem('sscbs_chunk_err_reload');
+      if (!chunkRetry) {
+        window.sessionStorage.setItem('sscbs_chunk_err_reload', 'true');
+        window.location.reload();
+      }
+    }
   }
 
   handleReset = () => {
     this.setState({ hasError: false, error: null });
     if (typeof window !== 'undefined') {
+      window.sessionStorage.removeItem('sscbs_chunk_err_reload');
       window.location.hash = '';
       window.location.reload();
     }
@@ -30,7 +44,7 @@ export default class ErrorBoundary extends React.Component {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justify: 'center',
+          justifyContent: 'center',
           padding: '24px',
           textAlign: 'center',
           background: 'var(--bg-main, #f8f6f0)',

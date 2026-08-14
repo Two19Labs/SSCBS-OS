@@ -35,16 +35,34 @@ import { Analytics } from '@vercel/analytics/react';
 import NotificationCenter from './components/NotificationCenter';
 import { useNotificationEngine } from './hooks/useNotificationEngine';
 
-// Lazy-loaded heavy page & tool chunks for fast initial app shell booting
-const WaiverToolPage = lazy(() => import('./components/WaiverToolPage'));
-const FindMyProfessorPage = lazy(() => import('./components/FindMyProfessorPage'));
-const FacultyDatabasePage = lazy(() => import('./components/FacultyDatabasePage'));
-const AdminConsolePage = lazy(() => import('./components/AdminConsolePage'));
-const GpaCalculatorModal = lazy(() => import('./components/GpaCalculatorModal'));
-const ContactPage = lazy(() => import('./components/ContactPage'));
-const TeamFinderPage = lazy(() => import('./components/TeamFinderPage'));
-const EmptyRoomFinderPage = lazy(() => import('./components/EmptyRoomFinderPage').then(m => ({ default: m.EmptyRoomFinderPage })));
-const SocietyTrackerPage = lazy(() => import('./components/SocietyTrackerPage'));
+// Resilient lazy loader helper for Vercel chunk hash updates
+const lazyWithRetry = (componentImport) =>
+  lazy(async () => {
+    const pageHasBeenRetried = typeof window !== 'undefined' && window.sessionStorage.getItem('sscbs_chunk_retry');
+    try {
+      const component = await componentImport();
+      if (typeof window !== 'undefined') {
+        window.sessionStorage.removeItem('sscbs_chunk_retry');
+      }
+      return component;
+    } catch (error) {
+      if (!pageHasBeenRetried && typeof window !== 'undefined') {
+        window.sessionStorage.setItem('sscbs_chunk_retry', 'true');
+        window.location.reload();
+      }
+      throw error;
+    }
+  });
+
+const WaiverToolPage = lazyWithRetry(() => import('./components/WaiverToolPage'));
+const FindMyProfessorPage = lazyWithRetry(() => import('./components/FindMyProfessorPage'));
+const FacultyDatabasePage = lazyWithRetry(() => import('./components/FacultyDatabasePage'));
+const AdminConsolePage = lazyWithRetry(() => import('./components/AdminConsolePage'));
+const GpaCalculatorModal = lazyWithRetry(() => import('./components/GpaCalculatorModal'));
+const ContactPage = lazyWithRetry(() => import('./components/ContactPage'));
+const TeamFinderPage = lazyWithRetry(() => import('./components/TeamFinderPage'));
+const EmptyRoomFinderPage = lazyWithRetry(() => import('./components/EmptyRoomFinderPage').then(m => ({ default: m.EmptyRoomFinderPage })));
+const SocietyTrackerPage = lazyWithRetry(() => import('./components/SocietyTrackerPage'));
 
 
 const PageLoader = () => (
