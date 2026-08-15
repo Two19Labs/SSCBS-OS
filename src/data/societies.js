@@ -677,12 +677,12 @@ export const DEMO_SOCIETIES = [
     id: 'kronos-it',
     pocs: [
       {
-        "name": "Poorvanshi rawat",
+        "name": "Poorvanshi Rawat",
         "phone": "9557758634"
       },
       {
-        "name": "Dheeraj banik",
-        "phone": "9434276047"
+        "name": "Divyam Jain",
+        "phone": "9355261617"
       }
     ],
     name: 'Kronos – The IT & Tech Society of SSCBS',
