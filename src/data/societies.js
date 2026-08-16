@@ -3,7 +3,7 @@
 export const OFFICIAL_COLLEGE_SOCIETIES_URL = 'https://sscbs.du.ac.in/societies/';
 
 export const CATEGORIES = [
-  { id: 'all', label: 'All Domains (44)', icon: '⚡' },
+  { id: 'all', label: 'All Domains (45)', icon: '⚡' },
   { id: 'finance', label: 'Finance & Accounting', icon: '📈' },
   { id: 'consulting', label: 'Consulting & Analytics', icon: '💼' },
   { id: 'ecell', label: 'Startups & Social Impact', icon: '🚀' },
@@ -1338,6 +1338,32 @@ export const DEMO_SOCIETIES = [
     linkedinUrl: 'https://www.linkedin.com/company/flcs-scbs',
     defaultBookmarked: false,
     accentColor: '#34d399',
+  },
+
+  // --- 45. Skill Development Cell ---
+  {
+    id: 'sdc-sscbs',
+    pocs: [
+      {
+        "name": "TBA",
+        "phone": "TBA"
+      }
+    ],
+    name: 'Skill Development Cell (SDC), SSCBS',
+    shortName: 'SDC',
+    category: 'consulting',
+    categoryLabel: 'Consulting & Analytics',
+    categories: ['consulting', 'marketing'],
+    categoryLabels: ['Consulting & Analytics', 'Marketing, PR & Corporate'],
+    description: 'Dedicated cell for practical skill-building, corporate readiness, and organizer of flagship events like Market-Niti (bilingual marketing & case study competition). Recruitments will start soon, forms and info will come here soon!',
+    recruitmentFormUrl: null,
+    deadline: null,
+    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
+    instagramVideoUrl: 'https://www.instagram.com/sdc.sscbs?igsh=b3lscjB1cnRoNHA3',
+    linkedinUrl: 'https://www.linkedin.com/company/skill-development-cell-sscbs/',
+    defaultBookmarked: false,
+    accentColor: '#10b981',
   },
 ];
 

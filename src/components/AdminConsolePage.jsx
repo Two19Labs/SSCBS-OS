@@ -3528,7 +3528,7 @@ Extract ALL timetable blocks from the attached Excel file now:`;
                 <div className="chart-header-admin">
                   <h3>🏆 Society Recruitment Popularity Leaderboard</h3>
                   <p className="section-desc-small">
-                    Breakdown of student preferences across all 44 SSCBS college societies. Click any society to inspect student details.
+                    Breakdown of student preferences across all 45 SSCBS college societies. Click any society to inspect student details.
                   </p>
                 </div>
 
