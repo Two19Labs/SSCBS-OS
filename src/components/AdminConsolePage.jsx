@@ -1043,6 +1043,7 @@ RULE 2 — COURSE NAME NORMALIZATION:
 
 RULE 3 — ANNOTATIONS, ROOM OVERRIDES & CS LAB RULES:
   - "(P)" or "(Prac)" = Practical class. Include "(Practical)" in the subject name.
+  - CRITICAL: Subject titles containing the word "Practice" (e.g. "Environmental Science: Theory into Practice - 1") are THEORY lectures. Do NOT mark as "(Practical)" or practical unless "(P)" or "(Prac)" is explicitly annotated after the faculty code in the cell!
   - "(Tute)" = Tutorial. Include "(Tutorial)" in the subject name.
   - "(237)" or "(Room 651)" = Room number override. Extract as "Room 237" or "Room 651".
   - "(R)" or "(Room)" = Class takes place in the allotted block default room (Theory room).
@@ -1264,8 +1265,8 @@ Extract ALL timetable blocks from the attached Excel file now:`;
 
                 const slot = { period: pNum, subject, teacher, room };
                 
-                // Infer practical flag if subject contains practical/lab keywords
-                if (/practical|lab|prac/i.test(subject)) {
+                // Infer practical flag if subject contains practical/lab keywords (excluding 'practice')
+                if (/\b(practical|lab)\b/i.test(subject) || (/\bprac\b/i.test(subject) && !/\bpractice\b/i.test(subject))) {
                   slot.isPractical = true;
                 }
 

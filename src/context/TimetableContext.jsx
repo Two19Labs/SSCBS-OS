@@ -12,7 +12,7 @@ const TimetableContext = createContext({
   deleteHoliday: async () => {},
 });
 
-const CURRENT_TIMETABLE_VERSION = '2026-08-07-wef-v17';
+const CURRENT_TIMETABLE_VERSION = '2026-08-16-wef-v18';
 
 // Course keys as stored in timetables.json, mapped from the variants that show
 // up in profiles and uploads. Returns null when the course is unknown.
