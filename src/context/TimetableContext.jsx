@@ -12,7 +12,63 @@ const TimetableContext = createContext({
   deleteHoliday: async () => {},
 });
 
-const CURRENT_TIMETABLE_VERSION = '2026-08-16-wef-v18';
+const CURRENT_TIMETABLE_VERSION = '2026-08-16-wef-v20';
+
+export const sanitizeTimetableData = (data) => {
+  if (!data || typeof data !== 'object') return data;
+  try {
+    const sanitized = JSON.parse(JSON.stringify(data));
+    Object.keys(sanitized).forEach(courseKey => {
+      const courseData = sanitized[courseKey];
+      if (courseData && typeof courseData === 'object') {
+        Object.keys(courseData).forEach(semKey => {
+          const semData = courseData[semKey];
+          if (semData && typeof semData === 'object') {
+            Object.keys(semData).forEach(secKey => {
+              const secData = semData[secKey];
+              if (secData && typeof secData === 'object') {
+                Object.keys(secData).forEach(dayKey => {
+                  const daySlots = secData[dayKey];
+                  if (Array.isArray(daySlots)) {
+                    secData[dayKey] = daySlots.map(slot => {
+                      if (!slot || typeof slot !== 'object') return slot;
+                      
+                      const sub = (slot.subject || '').toLowerCase();
+                      if (sub.includes('environmental science') || sub.includes('theory into practice')) {
+                        const hasExplicitPrac = /\b\(P\)\b|\b\(Prac\)\b|\b\(Practical\)\b/i.test(slot.subject || '') ||
+                                                /\b\(P\)\b|\b\(Prac\)\b|\b\(Practical\)\b/i.test(slot.teacher || '') ||
+                                                /\b\(P\)\b|\b\(Prac\)\b|\b\(Practical\)\b/i.test(slot.room || '');
+                        
+                        const isBbaFia1BMondayP3 = (
+                          courseKey.toUpperCase().includes('FIA') &&
+                          String(semKey) === '1' &&
+                          secKey.toUpperCase() === 'B' &&
+                          dayKey.toLowerCase() === 'monday' &&
+                          slot.period === 3
+                        );
+
+                        if (isBbaFia1BMondayP3 || !hasExplicitPrac) {
+                          const newSlot = { ...slot };
+                          delete newSlot.isPractical;
+                          return newSlot;
+                        }
+                      }
+                      return slot;
+                    });
+                  }
+                });
+              }
+            });
+          }
+        });
+      }
+    });
+    return sanitized;
+  } catch (e) {
+    console.warn('Error sanitizing timetable:', e);
+    return data;
+  }
+};
 
 // Course keys as stored in timetables.json, mapped from the variants that show
 // up in profiles and uploads. Returns null when the course is unknown.
@@ -50,19 +106,19 @@ export const TimetableProvider = ({ children }) => {
       if (cachedVer !== CURRENT_TIMETABLE_VERSION) {
         localStorage.removeItem('sscbs_os_timetable');
         localStorage.setItem('sscbs_os_timetable_version', CURRENT_TIMETABLE_VERSION);
-        return timetablesData;
+        return sanitizeTimetableData(timetablesData);
       }
       const cached = localStorage.getItem('sscbs_os_timetable');
       if (cached) {
         const parsed = JSON.parse(cached);
         if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
-          return parsed;
+          return sanitizeTimetableData(parsed);
         }
       }
     } catch (e) {
       console.warn('Could not read cached timetable from localStorage:', e);
     }
-    return timetablesData;
+    return sanitizeTimetableData(timetablesData);
   });
   const [holidays, setHolidays] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -92,7 +148,7 @@ export const TimetableProvider = ({ children }) => {
           try {
             const parsed = JSON.parse(cachedRaw);
             if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
-              setTimetable(parsed);
+              setTimetable(sanitizeTimetableData(parsed));
               cacheHit = true;
             }
           } catch (e) {}
@@ -107,9 +163,10 @@ export const TimetableProvider = ({ children }) => {
             .maybeSingle();
 
           if (!configError && configData && configData.value && typeof configData.value === 'object') {
-            setTimetable(configData.value);
+            const sanitized = sanitizeTimetableData(configData.value);
+            setTimetable(sanitized);
             try {
-              localStorage.setItem('sscbs_os_timetable', JSON.stringify(configData.value));
+              localStorage.setItem('sscbs_os_timetable', JSON.stringify(sanitized));
               if (configData.updated_at) {
                 localStorage.setItem('sscbs_os_timetable_last_updated', configData.updated_at);
               }
@@ -202,7 +259,8 @@ export const TimetableProvider = ({ children }) => {
   // Helper to extract timetable dynamically
   const getTimetable = (course, semester, section) => {
     // Only fall back to static timetablesData if timetable has not been loaded at all (null)
-    const dataToSearch = timetable !== null ? timetable : timetablesData;
+    const rawData = timetable !== null ? timetable : timetablesData;
+    const dataToSearch = sanitizeTimetableData(rawData);
     if (!dataToSearch) return null;
 
     const matchedCourse = normalizeCourse(course, dataToSearch);
