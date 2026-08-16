@@ -342,7 +342,6 @@ export default function SocietyTrackerPage({ onBack }) {
               <li>Crescendo recruits later in the year, the form will be out on Campus Buzz</li>
               <li>Sadhana &amp; Makes Sense are merging as one</li>
               <li>Only initial recruitment forms and their deadlines are tracked here (no interview schedules).</li>
-              <li>Click any society card to expand it for full details, descriptions, and PoRs contact.</li>
             </ol>
           </div>
         </div>
