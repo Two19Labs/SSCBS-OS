@@ -1345,8 +1345,12 @@ export const DEMO_SOCIETIES = [
     id: 'sdc-sscbs',
     pocs: [
       {
-        "name": "TBA",
-        "phone": "TBA"
+        "name": "Piyush Kumar (President)",
+        "phone": "9643200704"
+      },
+      {
+        "name": "Vaibhav Kumar (Vice President)",
+        "phone": "9341029114"
       }
     ],
     name: 'Skill Development Cell (SDC), SSCBS',
