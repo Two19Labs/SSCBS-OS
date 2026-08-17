@@ -942,30 +942,36 @@
 .cell-card-subject {
   font-weight: 800;
   color: var(--text-main);
-  font-size: 0.75rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 140px;
+  font-size: 0.775rem;
+  line-height: 1.25;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .cell-card-meta-row {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  font-size: 0.65rem;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 0.675rem;
   color: var(--text-dim);
 }
 
 .cell-card-classes {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 90px;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .cell-card-room {
   font-weight: 750;
   color: var(--accent-green);
+  background: rgba(13, 138, 95, 0.08);
+  border: 1px solid rgba(13, 138, 95, 0.2);
+  padding: 1px 5px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-size: 0.625rem;
 }
 
 .live-bubble {

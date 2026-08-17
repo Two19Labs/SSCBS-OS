@@ -12,12 +12,12 @@ const sanitizeFileName = (name) => {
 };
 
 /**
- * High-contrast CSS overrides injected into cloned capture documents.
- * Ensures pristine contrast, dark slate cards, crisp white text, and rich emerald badges
- * regardless of current browser theme or variable inheritance.
+ * High-Contrast Pristine Export Theme Overrides.
+ * Ensures crisp white card titles, zero text truncation ("Practical" instead of "Practi"),
+ * non-overlapping emerald room tags, and dark slate backgrounds across all PNG and PDF exports.
  */
 const EXPORT_HIGH_CONTRAST_CSS = `
-  /* High-Contrast Export Theme Overrides */
+  /* High-Contrast Pristine Export Theme Overrides */
   body, .sscbs-export-root, .page-view-content-wrapper, .spacious-timeline-wrapper, .spacious-weekly-grid-container, .weekly-modal-body {
     background-color: #0f172a !important;
     color: #f8fafc !important;
@@ -42,82 +42,136 @@ const EXPORT_HIGH_CONTRAST_CSS = `
     border-left: 2px solid #334155 !important;
   }
 
-  /* Occupied Class Cards (Timeline & Grid) */
-  .timeline-class-card-spacious, .cell-card-spacious, .grid-cell-card, .timeline-class-card {
-    background-color: #1e293b !important;
-    border: 1px solid #334155 !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-    color: #ffffff !important;
-  }
-  .timeline-class-card-spacious h5, .class-card-top h5, .cell-card-subject, .timeline-subject {
-    color: #ffffff !important;
-    font-weight: 800 !important;
-    font-size: 0.9rem !important;
-  }
-  .class-card-subtitle, .cell-card-classes, .timeline-card-meta, .cell-card-meta-row {
-    color: #cbd5e1 !important;
-  }
-  .class-card-room-badge, .cell-card-room, .room-tag {
-    color: #34d399 !important;
-    background-color: rgba(52, 211, 153, 0.15) !important;
-    border: 1px solid rgba(52, 211, 153, 0.3) !important;
-    font-weight: 700 !important;
-  }
-
-  /* Free Period Cards */
-  .timeline-free-card-spacious, .timeline-free-card, .cell-free-box {
-    background-color: rgba(30, 41, 59, 0.6) !important;
-    border: 1.5px dashed #334155 !important;
-    color: #94a3b8 !important;
-  }
-  .timeline-free-card-spacious h5, .timeline-free-card h5, .free-text {
-    color: #94a3b8 !important;
-  }
-  .timeline-free-card-spacious p, .timeline-free-card p {
-    color: #64748b !important;
-  }
-
-  /* Infinity Hour / Break Cards */
-  .timeline-break-card-spacious, .timeline-break-card, .break-box {
-    background-color: rgba(245, 158, 11, 0.12) !important;
-    border: 1px solid rgba(245, 158, 11, 0.3) !important;
-    color: #fef3c7 !important;
-  }
-  .timeline-break-card-spacious h5, .timeline-break-card h5 {
-    color: #fbbf24 !important;
-  }
-  .timeline-break-card-spacious p, .timeline-break-card p {
-    color: #fde68a !important;
-  }
-
   /* Weekly Timetable Table Grid */
   .spacious-weekly-grid-container, .table-responsive {
     background-color: #0f172a !important;
     border: 1px solid #334155 !important;
     border-radius: 12px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
   }
+
+  .spacious-weekly-grid, .weekly-timetable-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
   .spacious-weekly-grid th, .weekly-timetable-table th {
     background-color: #1e293b !important;
     border-bottom: 2px solid #334155 !important;
     border-right: 1px solid #334155 !important;
-    color: #cbd5e1 !important;
+    color: #f8fafc !important;
+    padding: 12px 8px !important;
   }
+  
   .weekly-th-period, .th-period-label {
     color: #818cf8 !important;
     font-weight: 800 !important;
+    font-size: 0.725rem !important;
+    letter-spacing: 0.5px !important;
   }
+
   .weekly-th-time, .th-time-label {
     color: #94a3b8 !important;
+    font-size: 0.65rem !important;
   }
+
   .spacious-weekly-grid td, .weekly-timetable-table td {
     border-bottom: 1px solid #334155 !important;
     border-right: 1px solid #334155 !important;
     color: #f8fafc !important;
+    padding: 10px 8px !important;
+    height: auto !important;
+    vertical-align: middle !important;
+    white-space: normal !important;
   }
+
   .sticky-day-col, .day-name-cell {
     background-color: #1e293b !important;
     color: #818cf8 !important;
     font-weight: 800 !important;
+    font-size: 0.75rem !important;
+    text-transform: uppercase !important;
+    border-right: 2px solid #334155 !important;
+  }
+
+  /* Occupied Grid Cell Cards */
+  .weekly-grid-cell-spacious.occupied, .weekly-class-cell {
+    background-color: rgba(30, 41, 59, 0.4) !important;
+  }
+
+  .cell-card-spacious, .grid-cell-card, .timeline-class-card-spacious, .timeline-class-card {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+    border-radius: 8px !important;
+    padding: 8px 10px !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+  }
+
+  .cell-card-subject, .timeline-subject, .class-card-top h5 {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 0.775rem !important;
+    line-height: 1.3 !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    max-width: none !important;
+    text-overflow: clip !important;
+    overflow: visible !important;
+  }
+
+  .cell-card-meta-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 6px !important;
+    margin-top: 2px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .cell-card-classes, .class-card-subtitle, .timeline-card-meta {
+    color: #cbd5e1 !important;
+    font-size: 0.675rem !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    max-width: none !important;
+    text-overflow: clip !important;
+    overflow: visible !important;
+  }
+
+  .cell-card-room, .class-card-room-badge, .room-tag {
+    color: #34d399 !important;
+    background-color: rgba(52, 211, 153, 0.15) !important;
+    border: 1px solid rgba(52, 211, 153, 0.3) !important;
+    font-weight: 750 !important;
+    font-size: 0.625rem !important;
+    padding: 1px 6px !important;
+    border-radius: 4px !important;
+    white-space: nowrap !important;
+  }
+
+  /* Free & Break Cells */
+  .cell-empty-dash {
+    color: #475569 !important;
+    font-weight: 700 !important;
+  }
+
+  .weekly-grid-cell-spacious.free {
+    background-color: #0f172a !important;
+  }
+
+  .timeline-free-card-spacious, .timeline-free-card, .cell-free-box {
+    background-color: rgba(30, 41, 59, 0.6) !important;
+    border: 1.5px dashed #334155 !important;
+    color: #94a3b8 !important;
+  }
+
+  .timeline-break-card-spacious, .timeline-break-card, .break-box {
+    background-color: rgba(245, 158, 11, 0.12) !important;
+    border: 1px solid rgba(245, 158, 11, 0.3) !important;
+    color: #fef3c7 !important;
   }
 
   /* Room Finder Grid Cards */
@@ -161,7 +215,7 @@ export const captureScheduleCanvas = async (element, theme = 'dark') => {
   if (innerTable && innerTable.scrollWidth > scrollW) {
     scrollW = innerTable.scrollWidth;
   }
-  const captureWidth = Math.max(scrollW, 1240);
+  const captureWidth = Math.max(scrollW, 1400);
 
   // Perform canvas capture with html2canvas (height auto-trimmed to exact element height)
   const canvas = await html2canvas(element, {
@@ -225,8 +279,7 @@ export const captureScheduleCanvas = async (element, theme = 'dark') => {
 };
 
 /**
- * Exports a schedule or timetable element as a high-resolution unclipped PNG image,
- * auto-cropped to the exact height of the schedule.
+ * Exports a schedule or timetable element as a high-resolution unclipped PNG image.
  */
 export const exportScheduleAsImage = async ({
   element,
@@ -254,8 +307,7 @@ export const exportScheduleAsImage = async ({
 };
 
 /**
- * Exports a schedule or timetable element as a clean, landscape-fitted A4 PDF document,
- * perfectly proportioned to the schedule bounds.
+ * Exports a schedule or timetable element as a clean, landscape-fitted A4 PDF document.
  */
 export const exportScheduleAsPDF = async ({
   element,
