@@ -12,7 +12,9 @@ const sanitizeFileName = (name) => {
 };
 
 /**
- * Captures a DOM element cleanly using html2canvas with full scroll expansion & CSS variable inheritance.
+ * Captures a DOM element with 100% full un-clipped scroll width & height.
+ * Forces horizontal expansion of all timetable columns (Periods I-VII & Saturday)
+ * and strips sticky positioning overlays so no content gets cropped.
  * 
  * @param {HTMLElement} element - Target DOM node to capture.
  * @param {string} [theme] - 'dark' or 'light'.
@@ -29,40 +31,64 @@ export const captureScheduleCanvas = async (element, theme = 'dark') => {
     ? computedStyle.backgroundColor
     : (theme === 'light' ? '#ffffff' : '#0b0f19');
 
-  // Perform canvas capture with html2canvas inside native DOM context
+  // Find all internal scroll containers and calculate full unclipped scroll dimensions
+  const scrollContainers = element.querySelectorAll('.spacious-weekly-grid-container, .weekly-timetable-table, .table-responsive, .spacious-weekly-grid, table, .room-grid');
+  let maxScrollWidth = element.scrollWidth;
+  let maxScrollHeight = element.scrollHeight;
+
+  scrollContainers.forEach(sc => {
+    if (sc.scrollWidth > maxScrollWidth) maxScrollWidth = sc.scrollWidth;
+    if (sc.scrollHeight > maxScrollHeight) maxScrollHeight = sc.scrollHeight;
+  });
+
+  // Ensure full width capture so all 7 period columns fit comfortably without truncation (min 1450px)
+  const captureWidth = Math.max(maxScrollWidth, 1450);
+  const captureHeight = Math.max(maxScrollHeight + 40, 750);
+
+  // Perform canvas capture using html2canvas with explicit full width/height bounds
   const canvas = await html2canvas(element, {
-    scale: 2, // 2x DPI for ultra-crisp text
+    scale: 2, // 2x DPI for high-resolution text sharpness
     useCORS: true,
     allowTaint: true,
     backgroundColor: bgColor,
     logging: false,
-    windowWidth: Math.max(element.scrollWidth, 1280),
+    width: captureWidth,
+    height: captureHeight,
+    windowWidth: captureWidth + 200,
+    windowHeight: captureHeight + 200,
     onclone: (clonedDoc, clonedElement) => {
-      // Force element to expand fully in cloned virtual document so no horizontal scrollbars cut off content
-      clonedElement.style.overflow = 'visible';
-      clonedElement.style.maxHeight = 'none';
-      clonedElement.style.height = 'auto';
-      clonedElement.style.width = '100%';
+      // Force top cloned wrapper to expand to full capture dimensions
+      clonedElement.style.width = captureWidth + 'px';
       clonedElement.style.maxWidth = 'none';
+      clonedElement.style.overflow = 'visible';
+      clonedElement.style.height = 'auto';
 
-      // Expand all nested scroll containers (tables, grid wrappers, timeline lists)
-      const scrollables = clonedElement.querySelectorAll('.table-responsive, .spacious-weekly-grid-container, .weekly-list-timeline, .weekly-list-view');
-      scrollables.forEach(s => {
-        s.style.overflow = 'visible';
-        s.style.maxHeight = 'none';
-        s.style.height = 'auto';
-        s.style.width = '100%';
+      // Unclip all overflow wrappers in cloned document
+      const allChildren = clonedElement.querySelectorAll('*');
+      allChildren.forEach(node => {
+        const s = window.getComputedStyle(node);
+        if (s.overflowX === 'auto' || s.overflowX === 'scroll' || s.overflowY === 'auto' || s.overflowY === 'scroll' || s.overflow === 'hidden') {
+          node.style.overflow = 'visible';
+          node.style.overflowX = 'visible';
+          node.style.overflowY = 'visible';
+          node.style.maxHeight = 'none';
+        }
+
+        // Expand tables to full capture width
+        if (node.tagName === 'TABLE' || node.classList.contains('spacious-weekly-grid') || node.classList.contains('weekly-timetable-table')) {
+          node.style.width = '100%';
+          node.style.minWidth = (captureWidth - 40) + 'px';
+          node.style.tableLayout = 'fixed';
+        }
+
+        // Reset sticky positioning so sticky headers/day columns don't freeze or overlap when expanded
+        if (node.classList.contains('sticky-day-col') || node.classList.contains('corner-sticky') || node.classList.contains('sticky-corner-cell') || node.classList.contains('day-name-cell')) {
+          node.style.position = 'static';
+          node.style.boxShadow = 'none';
+        }
       });
 
-      // Expand table grids to full unclipped width
-      const tables = clonedElement.querySelectorAll('table, .spacious-weekly-grid, .weekly-timetable-table');
-      tables.forEach(t => {
-        t.style.width = '100%';
-        t.style.minWidth = '1150px';
-        t.style.tableLayout = 'fixed';
-      });
-
-      // Hide debuggers or non-exportable buttons if present inside clone
+      // Remove non-exportable buttons or timewarp debugger panels inside clone
       const nonExportables = clonedElement.querySelectorAll('.prof-page-debugger, .btn-toggle-debugger-page');
       nonExportables.forEach(el => el.remove());
     }
@@ -72,7 +98,7 @@ export const captureScheduleCanvas = async (element, theme = 'dark') => {
 };
 
 /**
- * Exports a schedule or timetable element as a high-resolution PNG image.
+ * Exports a schedule or timetable element as a high-resolution unclipped PNG image.
  */
 export const exportScheduleAsImage = async ({
   element,
@@ -100,7 +126,7 @@ export const exportScheduleAsImage = async ({
 };
 
 /**
- * Exports a schedule or timetable element as a crisp, formatted PDF document.
+ * Exports a schedule or timetable element as a clean, landscape-fitted A4 PDF document.
  */
 export const exportScheduleAsPDF = async ({
   element,
@@ -112,18 +138,33 @@ export const exportScheduleAsPDF = async ({
     const canvas = await captureScheduleCanvas(element, theme);
     const imgData = canvas.toDataURL('image/png', 1.0);
 
-    const imgWidth = canvas.width;
-    const imgHeight = canvas.height;
-
-    // Determine orientation based on aspect ratio
-    const isLandscape = imgWidth >= imgHeight;
+    // Standard A4 landscape dimensions in mm (297mm x 210mm)
     const pdf = new jsPDF({
-      orientation: isLandscape ? 'landscape' : 'portrait',
-      unit: 'px',
-      format: [imgWidth, imgHeight]
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4'
     });
 
-    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+    const pageWidth = pdf.internal.pageSize.getWidth(); // 297 mm
+    const pageHeight = pdf.internal.pageSize.getHeight(); // 210 mm
+    const margin = 8; // 8mm margins
+
+    const maxPdfWidth = pageWidth - (margin * 2);
+    const maxPdfHeight = pageHeight - (margin * 2);
+
+    const imgRatio = canvas.width / canvas.height;
+    let renderWidth = maxPdfWidth;
+    let renderHeight = maxPdfWidth / imgRatio;
+
+    if (renderHeight > maxPdfHeight) {
+      renderHeight = maxPdfHeight;
+      renderWidth = maxPdfHeight * imgRatio;
+    }
+
+    const xOffset = (pageWidth - renderWidth) / 2;
+    const yOffset = (pageHeight - renderHeight) / 2;
+
+    pdf.addImage(imgData, 'PNG', xOffset, yOffset, renderWidth, renderHeight);
 
     const cleanName = sanitizeFileName(fileName || `${title}_SSCBS_Schedule`);
     pdf.save(`${cleanName}.pdf`);
