@@ -12,274 +12,116 @@ const sanitizeFileName = (name) => {
 };
 
 /**
- * High-Contrast Pristine Export Theme Overrides.
- * Covers both Find My Professor and Student Home Dashboard timetables.
- * Ensures crisp white card titles, zero text truncation, rose/emerald badges,
- * and high contrast dark slate backgrounds across all PNG and PDF exports.
+ * Clean non-destructive CSS rules that unclip scroll wrappers and reset sticky positioning
+ * while preserving 100% of the active page's computed colors, backgrounds, text styles, and theme.
  */
-const EXPORT_HIGH_CONTRAST_CSS = `
-  /* High-Contrast Pristine Export Theme Overrides */
-  body, .sscbs-export-root, .page-view-content-wrapper, .spacious-timeline-wrapper, .spacious-weekly-grid-container, .weekly-modal-body {
-    background-color: #0f172a !important;
-    color: #f8fafc !important;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+const EXPORT_PRESERVE_THEME_CSS = `
+  /* Unclip table scroll containers */
+  .spacious-weekly-grid-container, .table-responsive, .page-view-content-wrapper, .spacious-timeline-wrapper, .weekly-modal-body {
+    overflow: visible !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    max-width: none !important;
+    max-height: none !important;
+    height: auto !important;
   }
 
-  /* Timeline View Left Labels */
-  .timeline-row-time {
-    color: #cbd5e1 !important;
-  }
-  .timeline-row-time .period-label {
-    color: #818cf8 !important;
-    font-weight: 800 !important;
-    font-size: 0.725rem !important;
-  }
-  .timeline-row-time .time-range-label {
-    color: #f8fafc !important;
-    font-weight: 700 !important;
-    font-size: 0.8rem !important;
-  }
-  .spacious-timeline-row {
-    border-left: 2px solid #334155 !important;
-  }
-
-  /* Weekly Timetable Table Grid */
-  .spacious-weekly-grid-container, .table-responsive {
-    background-color: #0f172a !important;
-    border: 1px solid #334155 !important;
-    border-radius: 12px !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
-  }
-
+  /* Force table full width and unclipped layout */
   .spacious-weekly-grid, .weekly-timetable-table {
     width: 100% !important;
     border-collapse: collapse !important;
+    table-layout: fixed !important;
   }
 
-  .spacious-weekly-grid th, .weekly-timetable-table th {
-    background-color: #1e293b !important;
-    border-bottom: 2px solid #334155 !important;
-    border-right: 1px solid #334155 !important;
-    color: #f8fafc !important;
-    padding: 12px 8px !important;
-  }
-  
-  .weekly-th-period, .th-period-label {
-    color: #818cf8 !important;
-    font-weight: 800 !important;
-    font-size: 0.725rem !important;
-    letter-spacing: 0.5px !important;
-  }
-
-  .weekly-th-time, .th-time-label {
-    color: #94a3b8 !important;
-    font-size: 0.65rem !important;
-  }
-
+  .spacious-weekly-grid th, .weekly-timetable-table th,
   .spacious-weekly-grid td, .weekly-timetable-table td {
-    border-bottom: 1px solid #334155 !important;
-    border-right: 1px solid #334155 !important;
-    color: #f8fafc !important;
-    padding: 10px 8px !important;
     height: auto !important;
-    vertical-align: middle !important;
-    white-space: normal !important;
   }
 
-  .sticky-day-col, .day-name-cell {
-    background-color: #1e293b !important;
-    color: #818cf8 !important;
-    font-weight: 800 !important;
-    font-size: 0.75rem !important;
-    text-transform: uppercase !important;
-    border-right: 2px solid #334155 !important;
+  /* Reset sticky positioning during capture so sticky headers don't freeze or overlap */
+  .sticky-corner-cell, .day-name-cell, .sticky-day-col, .corner-sticky {
+    position: static !important;
+    box-shadow: none !important;
   }
 
-  .today-row .day-name-cell, .today-row-highlight .sticky-day-col {
-    color: #f87171 !important;
-  }
-
-  .today-badge {
-    background-color: #ef4444 !important;
-    color: #ffffff !important;
-    font-weight: 800 !important;
-    font-size: 0.55rem !important;
-    padding: 1px 5px !important;
-    border-radius: 3px !important;
-    margin-top: 2px !important;
-    display: inline-block !important;
-  }
-
-  /* Occupied Grid Cell Cards (Find My Prof & Home Dashboard) */
-  .weekly-grid-cell-spacious.occupied, .weekly-class-cell {
-    background-color: rgba(30, 41, 59, 0.4) !important;
-  }
-
-  .cell-card-spacious, .grid-cell-card, .timeline-class-card-spacious, .timeline-class-card {
-    background-color: #1e293b !important;
-    border: 1px solid #334155 !important;
-    border-radius: 8px !important;
-    padding: 8px 10px !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 4px !important;
-  }
-
-  /* Subject Titles */
+  /* Typography Normalization: Clean word wrapping without letter-by-letter vertical breaking */
   .cell-card-subject, .cell-subject, .timeline-subject, .class-card-top h5 {
-    color: #ffffff !important;
-    font-weight: 800 !important;
-    font-size: 0.775rem !important;
-    line-height: 1.3 !important;
     white-space: normal !important;
     word-break: normal !important;
     overflow-wrap: break-word !important;
-    max-width: none !important;
-    text-overflow: clip !important;
-    overflow: visible !important;
-    margin-bottom: 2px !important;
   }
 
-  .cell-details-row {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 3px !important;
-    margin-top: 4px !important;
-  }
-
-  /* Teacher Labels */
-  .cell-card-classes, .class-card-subtitle, .timeline-card-meta, .cell-teacher {
-    color: #cbd5e1 !important;
-    font-size: 0.675rem !important;
-    font-weight: 500 !important;
+  .cell-card-classes, .class-card-subtitle, .timeline-card-meta, .cell-teacher, .cell-room, .cell-card-room, .class-card-room-badge, .room-tag {
     white-space: nowrap !important;
     word-break: normal !important;
-    max-width: none !important;
-    text-overflow: clip !important;
-    overflow: visible !important;
-  }
-
-  .cell-teacher svg {
-    stroke: #818cf8 !important;
-  }
-
-  /* Room Badges */
-  .cell-card-room, .class-card-room-badge, .room-tag {
-    color: #34d399 !important;
-    background-color: rgba(52, 211, 153, 0.15) !important;
-    border: 1px solid rgba(52, 211, 153, 0.3) !important;
-    font-weight: 750 !important;
-    font-size: 0.625rem !important;
-    padding: 1px 6px !important;
-    border-radius: 4px !important;
-    white-space: nowrap !important;
-  }
-
-  .cell-room {
-    color: #f87171 !important;
-    font-size: 0.65rem !important;
-    font-weight: 700 !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 4px !important;
-  }
-
-  .cell-room svg {
-    stroke: #f87171 !important;
-  }
-
-  .grid-practical-badge {
-    background-color: #6366f1 !important;
-    color: #ffffff !important;
-    font-weight: 800 !important;
-    font-size: 0.6rem !important;
-    padding: 1px 5px !important;
-    border-radius: 3px !important;
-  }
-
-  .grid-unsupervised-badge {
-    background-color: #f59e0b !important;
-    color: #ffffff !important;
-    font-weight: 800 !important;
-    font-size: 0.6rem !important;
-    padding: 1px 5px !important;
-    border-radius: 3px !important;
-  }
-
-  /* Free & Break Cells */
-  .cell-empty-dash {
-    color: #475569 !important;
-    font-weight: 700 !important;
-  }
-
-  .weekly-grid-cell-spacious.free, .weekly-class-cell.free {
-    background-color: #0f172a !important;
-  }
-
-  .timeline-free-card-spacious, .timeline-free-card, .cell-free-box {
-    background-color: rgba(30, 41, 59, 0.6) !important;
-    border: 1.5px dashed #334155 !important;
-    color: #94a3b8 !important;
-  }
-
-  .free-text {
-    color: #94a3b8 !important;
-    font-size: 0.725rem !important;
-    font-weight: 600 !important;
-  }
-
-  .timeline-break-card-spacious, .timeline-break-card, .break-box, .break-grid-cell {
-    background-color: rgba(245, 158, 11, 0.12) !important;
-    border: 1px solid rgba(245, 158, 11, 0.3) !important;
-    color: #fef3c7 !important;
   }
 `;
 
 /**
+ * Gets the computed background color of an element or its nearest non-transparent ancestor.
+ */
+const getEffectiveBackgroundColor = (el) => {
+  let curr = el;
+  while (curr && curr !== document.documentElement) {
+    const bg = window.getComputedStyle(curr).backgroundColor;
+    if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') {
+      return bg;
+    }
+    curr = curr.parentElement;
+  }
+  return '#ffffff'; // Fallback
+};
+
+/**
  * Captures a DOM element with 100% full un-clipped scroll width,
- * dynamically auto-trimming canvas height so there is ZERO extra empty space.
+ * preserving exact computed theme colors from the live DOM screen.
  * 
  * @param {HTMLElement} element - Target DOM node to capture.
- * @param {string} [theme] - 'dark' or 'light'.
  * @returns {Promise<HTMLCanvasElement>} Rendered canvas element.
  */
-export const captureScheduleCanvas = async (element, theme = 'dark') => {
+export const captureScheduleCanvas = async (element) => {
   if (!element) {
     throw new Error('Target element for schedule capture was not found.');
   }
 
-  // Find inner table or main content grid to determine true unclipped scroll width
-  const innerTable = element.querySelector('table, .spacious-weekly-grid, .weekly-timetable-table, .spacious-timeline-list, .room-grid');
-  
+  // Find inner table or grid to calculate true unclipped scroll width
+  const innerTable = element.querySelector('table, .spacious-weekly-grid, .weekly-timetable-table, .spacious-timeline-list');
   let scrollW = element.scrollWidth;
   if (innerTable && innerTable.scrollWidth > scrollW) {
     scrollW = innerTable.scrollWidth;
   }
-  const captureWidth = Math.max(scrollW, 1400);
+  const captureWidth = Math.max(scrollW, 1350);
 
-  // Perform canvas capture with html2canvas (height auto-trimmed to exact element height)
+  // Measure active element computed background color (preserves exact light/dark mode theme!)
+  const computedBg = getEffectiveBackgroundColor(element);
+
   const canvas = await html2canvas(element, {
     scale: 2, // 2x DPI for ultra-sharp text
     useCORS: true,
     allowTaint: true,
-    backgroundColor: '#0f172a',
+    backgroundColor: computedBg,
     logging: false,
-    width: captureWidth, // Explicit full width so all 7 period columns render
+    width: captureWidth,
     windowWidth: captureWidth + 100,
     onclone: (clonedDoc, clonedElement) => {
-      // Inject high-contrast export stylesheet
+      // Inject non-destructive layout unclipping stylesheet
       const styleEl = clonedDoc.createElement('style');
-      styleEl.textContent = EXPORT_HIGH_CONTRAST_CSS;
+      styleEl.textContent = EXPORT_PRESERVE_THEME_CSS;
       clonedDoc.head.appendChild(styleEl);
 
       // Force top cloned wrapper to expand to full capture width while hugging exact content height
+      clonedElement.style.position = 'relative';
+      clonedElement.style.left = '0';
+      clonedElement.style.top = '0';
+      clonedElement.style.visibility = 'visible';
+      clonedElement.style.opacity = '1';
+      clonedElement.style.display = 'block';
       clonedElement.style.width = captureWidth + 'px';
       clonedElement.style.maxWidth = 'none';
       clonedElement.style.overflow = 'visible';
       clonedElement.style.height = 'auto';
       clonedElement.style.minHeight = '0';
-      clonedElement.style.backgroundColor = '#0f172a';
+      clonedElement.style.backgroundColor = computedBg;
       clonedElement.style.padding = '16px';
       clonedElement.style.margin = '0';
       clonedElement.style.boxSizing = 'border-box';
@@ -325,11 +167,10 @@ export const captureScheduleCanvas = async (element, theme = 'dark') => {
 export const exportScheduleAsImage = async ({
   element,
   title = 'Schedule',
-  fileName,
-  theme = 'dark'
+  fileName
 }) => {
   try {
-    const canvas = await captureScheduleCanvas(element, theme);
+    const canvas = await captureScheduleCanvas(element);
     const dataUrl = canvas.toDataURL('image/png', 1.0);
 
     const cleanName = sanitizeFileName(fileName || `${title}_SSCBS_Schedule`);
@@ -353,11 +194,10 @@ export const exportScheduleAsImage = async ({
 export const exportScheduleAsPDF = async ({
   element,
   title = 'Schedule',
-  fileName,
-  theme = 'dark'
+  fileName
 }) => {
   try {
-    const canvas = await captureScheduleCanvas(element, theme);
+    const canvas = await captureScheduleCanvas(element);
     const imgData = canvas.toDataURL('image/png', 1.0);
 
     // Standard A4 landscape dimensions in mm (297mm x 210mm)

@@ -301,8 +301,7 @@ export default function FindMyProfessorPage({ onBack }) {
       await exportScheduleAsImage({
         element: scheduleExportRef.current,
         title: selectedProf,
-        fileName: `SSCBS_Prof_${selectedProf}_Schedule`,
-        theme: 'dark'
+        fileName: `SSCBS_Prof_${selectedProf}_Schedule`
       });
       setExportMessage('PNG Downloaded! 🎉');
       setTimeout(() => setExportMessage(null), 3500);
@@ -323,8 +322,7 @@ export default function FindMyProfessorPage({ onBack }) {
       await exportScheduleAsPDF({
         element: scheduleExportRef.current,
         title: selectedProf,
-        fileName: `SSCBS_Prof_${selectedProf}_Schedule`,
-        theme: 'dark'
+        fileName: `SSCBS_Prof_${selectedProf}_Schedule`
       });
       setExportMessage('PDF Downloaded! 📄');
       setTimeout(() => setExportMessage(null), 3500);
