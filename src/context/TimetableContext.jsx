@@ -12,7 +12,7 @@ const TimetableContext = createContext({
   deleteHoliday: async () => {},
 });
 
-const CURRENT_TIMETABLE_VERSION = '2026-08-17-bms-3b-sem-hall-v21';
+const CURRENT_TIMETABLE_VERSION = '2026-08-17-bms-3b-sem-hall-v22';
 
 export const sanitizeTimetableData = (data) => {
   if (!data || typeof data !== 'object') return data;
@@ -51,6 +51,15 @@ export const sanitizeTimetableData = (data) => {
                           const newSlot = { ...slot };
                           delete newSlot.isPractical;
                           return newSlot;
+                        }
+                      }
+                      if (
+                        courseKey.toUpperCase() === 'BMS' &&
+                        String(semKey) === '3' &&
+                        secKey.toUpperCase() === 'B'
+                      ) {
+                        if (slot.room && slot.room.includes('Room 603')) {
+                          slot = { ...slot, room: slot.room.replace(/Room 603/g, '7th Floor Sem. Hall') };
                         }
                       }
                       return slot;
