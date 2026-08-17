@@ -177,6 +177,94 @@ const parseTimeToMinutes = (timeStr) => {
   return hours * 60 + minutes;
 };
 
+// Disambiguate multi-group / multi-teacher classes for a specific professor
+const disambiguateClassForTeacher = (c, profName) => {
+  const normSelected = normalizeName(profName);
+  if (!c || !c.teacher) return null;
+
+  // Split teacher field by '/' or ',' or 'and'
+  const rawTeacherSegments = c.teacher.split(/\/|\band\b|,/gi).map(s => s.trim()).filter(Boolean);
+  
+  // Find segment corresponding to this professor
+  let matchingSegment = rawTeacherSegments.find(segment => {
+    const cleanSeg = cleanDisplayName(segment);
+    return normalizeName(cleanSeg) === normSelected;
+  });
+
+  if (!matchingSegment) return null;
+
+  // Extract group tag if present in the teacher segment, e.g., (G1), (G2), (P1), (P2), G1, G2, etc.
+  const groupMatch = matchingSegment.match(/\b([GP][1-9])\b/i) || matchingSegment.match(/\((?:Group\s*)?([GP][1-9])\)/i);
+  const groupTag = groupMatch ? groupMatch[1].toUpperCase() : null;
+
+  let finalSubject = c.subject || '';
+  let rawRoomStr = (c.room || '').trim();
+  let finalRoom = ROOM_DISPLAY_MAP[rawRoomStr] || rawRoomStr || '-';
+
+  if (groupTag) {
+    // 1. Disambiguate Subject
+    if (c.subject) {
+      const subParts = c.subject.split(/\s*(?:\||\/)\s*/);
+      const matchingSub = subParts.find(part => {
+        const pUpper = part.toUpperCase();
+        return pUpper.includes(`${groupTag}:`) || 
+               pUpper.includes(`${groupTag} -`) || 
+               pUpper.includes(`(${groupTag})`) || 
+               pUpper.startsWith(`${groupTag} `) ||
+               pUpper.endsWith(` (${groupTag})`);
+      });
+
+      if (matchingSub) {
+        let cleanSub = matchingSub.replace(new RegExp(`^${groupTag}\\s*[:\\-]\\s*`, 'i'), '').trim();
+        finalSubject = cleanSub.toLowerCase().includes(`(${groupTag.toLowerCase()})`) ? cleanSub : `${cleanSub} (${groupTag})`;
+      } else {
+        if (!finalSubject.toUpperCase().includes(`(${groupTag})`)) {
+          finalSubject = `${finalSubject} (${groupTag})`;
+        }
+      }
+    }
+
+    // 2. Disambiguate Room
+    if (c.room) {
+      const roomParts = c.room.split(/\s*(?:\||\/)\s*/);
+      const matchingRoomPart = roomParts.find(part => {
+        const rUpper = part.toUpperCase();
+        return rUpper.includes(`${groupTag}:`) || 
+               rUpper.includes(`${groupTag} -`) || 
+               rUpper.includes(`(${groupTag})`) || 
+               rUpper.includes(`ROOM ${groupTag}`);
+      });
+
+      if (matchingRoomPart) {
+        let cleanR = matchingRoomPart.replace(new RegExp(`(?:Room\\s*)?${groupTag}\\s*[:\\-]\\s*`, 'i'), '').trim();
+        if (/^\d{3}$/.test(cleanR)) {
+          cleanR = `Room ${cleanR}`;
+        }
+        finalRoom = ROOM_DISPLAY_MAP[cleanR.trim()] || cleanR;
+      } else if (roomParts.length > 1) {
+        const groupIndex = parseInt(groupTag.substring(1)) - 1;
+        if (groupIndex >= 0 && groupIndex < roomParts.length) {
+          let cleanR = roomParts[groupIndex].trim();
+          if (/^\d{3}$/.test(cleanR)) {
+            cleanR = `Room ${cleanR}`;
+          }
+          finalRoom = ROOM_DISPLAY_MAP[cleanR] || cleanR;
+        }
+      }
+    }
+  }
+
+  if (typeof finalRoom === 'string') {
+    finalRoom = finalRoom.replace(/^Room\s+Room\s+/i, 'Room ');
+  }
+
+  return {
+    subject: finalSubject,
+    room: finalRoom && finalRoom !== '-' ? finalRoom : 'TBA',
+    group: groupTag
+  };
+};
+
 export default function FindMyProfessorPage({ onBack }) {
   const { timetable: timetablesData, holidays } = useTimetable();
   const { user } = useAuth();
@@ -284,7 +372,6 @@ export default function FindMyProfessorPage({ onBack }) {
   // Extract selected professor schedule
   const getProfessorSchedule = (profName) => {
     if (!profName || !timetablesData || typeof timetablesData !== 'object') return [];
-    const normSelected = normalizeName(profName);
     const schedules = [];
 
     for (const course in timetablesData) {
@@ -306,17 +393,17 @@ export default function FindMyProfessorPage({ onBack }) {
 
             classes.forEach(c => {
               if (!c || !c.teacher) return;
-              const teachers = splitTeachers(c.teacher);
-              const isTeaching = teachers.some(t => normalizeName(cleanDisplayName(t)) === normSelected);
-              if (isTeaching) {
+              const disambiguated = disambiguateClassForTeacher(c, profName);
+              if (disambiguated) {
                 schedules.push({
                   course,
                   semester: sem,
                   section: sec,
                   day,
                   period: c.period,
-                  subject: c.subject,
-                  room: ROOM_DISPLAY_MAP[(c.room || '').trim()] || c.room,
+                  subject: disambiguated.subject,
+                  room: disambiguated.room,
+                  group: disambiguated.group,
                   isBreak: c.isBreak
                 });
               }

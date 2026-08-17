@@ -1334,20 +1334,20 @@
             "period": 1,
             "subject": "Creativity and Innovation",
             "teacher": "Dr. Krishnaveni Achary",
-            "room": "Room 603"
+            "room": "7th Floor Sem. Hall"
           },
           {
             "period": 2,
             "subject": "Creativity and Innovation",
             "teacher": "Dr. Krishnaveni Achary",
-            "room": "Room 603",
+            "room": "7th Floor Sem. Hall",
             "isPractical": true
           },
           {
             "period": 3,
             "subject": "Organizational Behaviour",
             "teacher": "Dr. Anuja Mathur",
-            "room": "Room 603"
+            "room": "7th Floor Sem. Hall"
           },
           {
             "period": 0,
@@ -1360,19 +1360,19 @@
             "period": 4,
             "subject": "Macroeconomics",
             "teacher": "Dr. Sushmita",
-            "room": "Room 603"
+            "room": "7th Floor Sem. Hall"
           },
           {
             "period": 5,
             "subject": "G2: Organizational Behaviour | P1: Introduction to Business Analytics",
             "teacher": "Dr. Anuja Mathur (G2) / Dr. Rishi Rajan Sahay (P1)",
-            "room": "G2: Room 603 / P1: Room 226"
+            "room": "G2: 7th Floor Sem. Hall / P1: Room 226"
           },
           {
             "period": 6,
             "subject": "G1: Organizational Behaviour | P2: Introduction to Business Analytics",
             "teacher": "Dr. Anuja Mathur (G1) / Dr. Rishi Rajan Sahay (P2)",
-            "room": "G1: Room 603 / P2: Room 226"
+            "room": "G1: 7th Floor Sem. Hall / P2: Room 226"
           },
           {
             "period": 7,
@@ -1386,19 +1386,19 @@
             "period": 1,
             "subject": "Creativity and Innovation",
             "teacher": "Dr. Krishnaveni Achary",
-            "room": "Room 603"
+            "room": "7th Floor Sem. Hall"
           },
           {
             "period": 2,
             "subject": "Introduction to Business Analytics",
             "teacher": "Dr. Rishi Rajan Sahay",
-            "room": "Room 603"
+            "room": "7th Floor Sem. Hall"
           },
           {
             "period": 3,
             "subject": "Macroeconomics",
             "teacher": "Dr. Sushmita",
-            "room": "Room 603"
+            "room": "7th Floor Sem. Hall"
           },
           {
             "period": 0,
@@ -1411,19 +1411,19 @@
             "period": 4,
             "subject": "Introduction to Business Analytics",
             "teacher": "Dr. Rishi Rajan Sahay",
-            "room": "Room 603"
+            "room": "7th Floor Sem. Hall"
           },
           {
             "period": 5,
             "subject": "Hindi B",
             "teacher": "Dr. Soumya Guliyan",
-            "room": "Room 603"
+            "room": "7th Floor Sem. Hall"
           },
           {
             "period": 6,
             "subject": "Hindi B",
             "teacher": "Dr. Soumya Guliyan",
-            "room": "Room 603"
+            "room": "7th Floor Sem. Hall"
           },
           {
             "period": 7,
@@ -1437,21 +1437,21 @@
             "period": 1,
             "subject": "Business Intelligence and Data Visualization",
             "teacher": "Ms. Sanchi Kalra",
-            "room": "Room 603",
+            "room": "7th Floor Sem. Hall",
             "isPractical": true
           },
           {
             "period": 2,
             "subject": "Business Intelligence and Data Visualization",
             "teacher": "Ms. Sanchi Kalra",
-            "room": "Room 603",
+            "room": "7th Floor Sem. Hall",
             "isPractical": true
           },
           {
             "period": 3,
             "subject": "Introduction to Business Analytics",
             "teacher": "Dr. Rishi Rajan Sahay",
-            "room": "Room 603"
+            "room": "7th Floor Sem. Hall"
           },
           {
             "period": 0,
@@ -1464,14 +1464,14 @@
             "period": 4,
             "subject": "Creativity and Innovation",
             "teacher": "Dr. Krishnaveni Achary",
-            "room": "Room 603",
+            "room": "7th Floor Sem. Hall",
             "isPractical": true
           },
           {
             "period": 5,
             "subject": "Creativity and Innovation",
             "teacher": "Dr. Krishnaveni Achary",
-            "room": "Room 603",
+            "room": "7th Floor Sem. Hall",
             "isPractical": true
           },
           {
@@ -1492,21 +1492,21 @@
             "period": 1,
             "subject": "The Art of Being Happy",
             "teacher": "Ms. Kishori Ravi Shankar",
-            "room": "Room 603",
+            "room": "7th Floor Sem. Hall",
             "isPractical": true
           },
           {
             "period": 2,
             "subject": "The Art of Being Happy",
             "teacher": "Ms. Kishori Ravi Shankar",
-            "room": "Room 603",
+            "room": "7th Floor Sem. Hall",
             "isPractical": true
           },
           {
             "period": 3,
             "subject": "Introduction to Business Analytics",
             "teacher": "Dr. Rishi Rajan Sahay",
-            "room": "Room 603"
+            "room": "7th Floor Sem. Hall"
           },
           {
             "period": 0,
@@ -1519,19 +1519,19 @@
             "period": 4,
             "subject": "Organizational Behaviour",
             "teacher": "Dr. Anuja Mathur",
-            "room": "Room 603"
+            "room": "7th Floor Sem. Hall"
           },
           {
             "period": 5,
             "subject": "Macroeconomics",
             "teacher": "Dr. Sushmita",
-            "room": "Room 603"
+            "room": "7th Floor Sem. Hall"
           },
           {
             "period": 6,
             "subject": "C&I",
             "teacher": "Unsupervised",
-            "room": "Room 603",
+            "room": "7th Floor Sem. Hall",
             "isUnsupervised": true
           },
           {
@@ -1546,21 +1546,21 @@
             "period": 1,
             "subject": "Business Intelligence and Data Visualization",
             "teacher": "Ms. Sanchi Kalra",
-            "room": "Room 603",
+            "room": "7th Floor Sem. Hall",
             "isPractical": true
           },
           {
             "period": 2,
             "subject": "Business Intelligence and Data Visualization",
             "teacher": "Ms. Sanchi Kalra",
-            "room": "Room 603",
+            "room": "7th Floor Sem. Hall",
             "isPractical": true
           },
           {
             "period": 3,
             "subject": "The Art of Being Happy",
             "teacher": "Ms. Kishori Ravi Shankar",
-            "room": "Room 603"
+            "room": "7th Floor Sem. Hall"
           },
           {
             "period": 0,
@@ -1573,13 +1573,13 @@
             "period": 4,
             "subject": "Organizational Behaviour",
             "teacher": "Dr. Anuja Mathur",
-            "room": "Room 603"
+            "room": "7th Floor Sem. Hall"
           },
           {
             "period": 5,
             "subject": "Macroeconomics",
             "teacher": "Dr. Sushmita (G2) / Ms. Shalini Prakash (G1)",
-            "room": "G2: Room 603 / G1: Room 236"
+            "room": "G2: 7th Floor Sem. Hall / G1: Room 236"
           },
           {
             "period": 6,
