@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTimetable } from '../context/TimetableContext';
 import { useAuth } from '../context/AuthContext';
 import { PERIODS, DAYS } from '../data/timetables';
 import { getRoomStatuses, extractAllRoomsFromTimetable, getRoomDailyTimeline, getOrdinalSuffix } from '../utils/roomFinder';
-import { DoorIcon, SearchIcon, BackIcon, RefreshIcon, CalendarIcon, ImageIcon, FileIcon } from './icons';
-import { exportScheduleAsImage, exportScheduleAsPDF } from '../utils/exportUtils';
+import { DoorIcon, SearchIcon, BackIcon, RefreshIcon, CalendarIcon } from './icons';
 import './EmptyRoomFinderPage.css';
 
 export function EmptyRoomFinderPage({ onBack }) {
@@ -25,11 +24,6 @@ export function EmptyRoomFinderPage({ onBack }) {
 
   // Selected room modal for complete daily timeline
   const [selectedRoomForTimeline, setSelectedRoomForTimeline] = useState(null);
-
-  // Schedule Export State
-  const roomExportRef = useRef(null);
-  const [isExporting, setIsExporting] = useState(false);
-  const [exportMessage, setExportMessage] = useState(null);
 
   // Live IST Time state - updates every second
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -160,50 +154,6 @@ export function EmptyRoomFinderPage({ onBack }) {
     if (!timetable) return [];
     return getRoomStatuses(timetable, activeDay, activePeriodId);
   }, [timetable, activeDay, activePeriodId]);
-
-  const handleExportRoomMatrix = async () => {
-    if (!roomExportRef.current) return;
-    setIsExporting(true);
-    setExportMessage(null);
-    try {
-      await exportScheduleAsImage({
-        element: roomExportRef.current,
-        title: `Room Directory — ${activeDay}`,
-        fileName: `SSCBS_Room_Directory_${activeDay}_Period_${activePeriod.id}`,
-        theme: 'dark'
-      });
-      setExportMessage('PNG Downloaded! 🎉');
-      setTimeout(() => setExportMessage(null), 3500);
-    } catch (err) {
-      console.error('Export error:', err);
-      setExportMessage('Export failed.');
-      setTimeout(() => setExportMessage(null), 3500);
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
-  const handleExportRoomPDF = async () => {
-    if (!roomExportRef.current) return;
-    setIsExporting(true);
-    setExportMessage(null);
-    try {
-      await exportScheduleAsPDF({
-        element: roomExportRef.current,
-        title: `Room Directory — ${activeDay}`,
-        fileName: `SSCBS_Room_Directory_${activeDay}_Period_${activePeriod.id}`,
-        theme: 'dark'
-      });
-      setExportMessage('PDF Downloaded! 📄');
-      setTimeout(() => setExportMessage(null), 3500);
-    } catch (err) {
-      console.error('Export PDF error:', err);
-      setExportMessage('Export failed.');
-      setTimeout(() => setExportMessage(null), 3500);
-    } finally {
-      setIsExporting(false);
-    }
-  };
 
   // Filter rooms
   const filteredRooms = useMemo(() => {
@@ -356,7 +306,7 @@ export function EmptyRoomFinderPage({ onBack }) {
           )}
         </div>
 
-        <div className="banner-right" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="banner-right">
           {mode === 'live' && activeHoliday ? (
             <span className="stat-pill holiday">🟡 Holiday / Fest</span>
           ) : mode === 'live' && isCollegeClosedNow ? (
@@ -367,28 +317,6 @@ export function EmptyRoomFinderPage({ onBack }) {
               <span className="stat-pill occupied">🔴 {occupiedCount} Occupied</span>
             </>
           )}
-
-          {exportMessage && <span className="export-toast-notice" style={{ fontSize: '0.75rem' }}>{exportMessage}</span>}
-          <button
-            className="btn-export-schedule-img"
-            onClick={handleExportRoomMatrix}
-            disabled={isExporting}
-            title="Export room availability matrix as PNG image"
-            style={{ padding: '4px 10px', fontSize: '0.8rem' }}
-          >
-            <ImageIcon size={14} />
-            <span>{isExporting ? 'Exporting...' : 'Export PNG'}</span>
-          </button>
-          <button
-            className="btn-export-schedule-img"
-            onClick={handleExportRoomPDF}
-            disabled={isExporting}
-            title="Export room availability matrix as PDF document"
-            style={{ padding: '4px 10px', fontSize: '0.8rem', background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(249, 115, 22, 0.15))', borderColor: 'rgba(239, 68, 68, 0.3)', color: '#f87171' }}
-          >
-            <FileIcon size={14} />
-            <span>{isExporting ? 'Exporting...' : 'Export PDF'}</span>
-          </button>
         </div>
       </div>
 
@@ -459,7 +387,7 @@ export function EmptyRoomFinderPage({ onBack }) {
       </div>
 
       {/* Room Grid */}
-      <div className="room-grid" ref={roomExportRef}>
+      <div className="room-grid">
         {filteredRooms.length > 0 ? (
           filteredRooms.map(item => {
             // Determine card status badge & text for Live mode (Holiday / Closed / Normal)
