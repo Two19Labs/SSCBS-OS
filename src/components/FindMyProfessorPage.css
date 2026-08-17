@@ -945,7 +945,8 @@
   font-size: 0.775rem;
   line-height: 1.25;
   white-space: normal;
-  word-break: break-word;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 .cell-card-meta-row {
@@ -959,8 +960,8 @@
 }
 
 .cell-card-classes {
-  white-space: normal;
-  word-break: break-word;
+  white-space: nowrap;
+  word-break: normal;
 }
 
 .cell-card-room {

@@ -13,8 +13,8 @@ const sanitizeFileName = (name) => {
 
 /**
  * High-Contrast Pristine Export Theme Overrides.
- * Ensures crisp white card titles, zero text truncation ("Practical" instead of "Practi"),
- * non-overlapping emerald room tags, and dark slate backgrounds across all PNG and PDF exports.
+ * Ensures crisp white card titles, zero text truncation, non-overlapping emerald room tags,
+ * and clean single-line class labels across all PNG and PDF exports.
  */
 const EXPORT_HIGH_CONTRAST_CSS = `
   /* High-Contrast Pristine Export Theme Overrides */
@@ -116,7 +116,8 @@ const EXPORT_HIGH_CONTRAST_CSS = `
     font-size: 0.775rem !important;
     line-height: 1.3 !important;
     white-space: normal !important;
-    word-break: break-word !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
     max-width: none !important;
     text-overflow: clip !important;
     overflow: visible !important;
@@ -134,8 +135,8 @@ const EXPORT_HIGH_CONTRAST_CSS = `
   .cell-card-classes, .class-card-subtitle, .timeline-card-meta {
     color: #cbd5e1 !important;
     font-size: 0.675rem !important;
-    white-space: normal !important;
-    word-break: break-word !important;
+    white-space: nowrap !important;
+    word-break: normal !important;
     max-width: none !important;
     text-overflow: clip !important;
     overflow: visible !important;
