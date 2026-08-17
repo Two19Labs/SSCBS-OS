@@ -7,7 +7,7 @@ import NoticeBoard from './NoticeBoard';
 import NotificationCenter from './NotificationCenter';
 import { SearchIcon, PercentIcon, CalculatorIcon, FileIcon, TrophyIcon, DoorIcon, HeartIcon, UsersIcon, UserIcon, ImageIcon } from './icons';
 import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFacultyDatabase, canAccessSocietyTracker, isTimeWarpEnabled } from '../lib/admin';
-import { exportScheduleAsImage } from '../utils/exportUtils';
+import { exportScheduleAsImage, exportScheduleAsPDF } from '../utils/exportUtils';
 
 
 import './HomeDashboard.css';
@@ -77,15 +77,35 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
       await exportScheduleAsImage({
         element: scheduleExportRef.current,
         title: `${course || 'Student'} Sem ${semester || ''} Sec ${section || ''}`,
-        subtitle: `Weekly Class Timetable • Shaheed Sukhdev College of Business Studies`,
         fileName: `SSCBS_${course || 'Student'}_Sem${semester || ''}_Sec${section || ''}_Timetable`,
-        badgeText: 'Class Timetable',
         theme: 'dark'
       });
-      setExportMessage('Exported as Image! 🎉');
+      setExportMessage('PNG Downloaded! 🎉');
       setTimeout(() => setExportMessage(null), 3500);
     } catch (err) {
       console.error('Export error:', err);
+      setExportMessage('Export failed.');
+      setTimeout(() => setExportMessage(null), 3500);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportStudentPDF = async () => {
+    if (!scheduleExportRef.current) return;
+    setIsExporting(true);
+    setExportMessage(null);
+    try {
+      await exportScheduleAsPDF({
+        element: scheduleExportRef.current,
+        title: `${course || 'Student'} Sem ${semester || ''} Sec ${section || ''}`,
+        fileName: `SSCBS_${course || 'Student'}_Sem${semester || ''}_Sec${section || ''}_Timetable`,
+        theme: 'dark'
+      });
+      setExportMessage('PDF Downloaded! 📄');
+      setTimeout(() => setExportMessage(null), 3500);
+    } catch (err) {
+      console.error('Export PDF error:', err);
       setExportMessage('Export failed.');
       setTimeout(() => setExportMessage(null), 3500);
     } finally {
@@ -735,11 +755,21 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
                   className="btn-export-schedule-img"
                   onClick={handleExportStudentSchedule}
                   disabled={isExporting}
-                  title="Export un-clipped schedule as PNG image"
+                  title="Export schedule as PNG image"
                   style={{ padding: '4px 10px', fontSize: '0.8rem' }}
                 >
                   <ImageIcon size={14} />
-                  <span>{isExporting ? 'Exporting...' : 'Export Image'}</span>
+                  <span>{isExporting ? 'Exporting...' : 'Export PNG'}</span>
+                </button>
+                <button
+                  className="btn-export-schedule-img"
+                  onClick={handleExportStudentPDF}
+                  disabled={isExporting}
+                  title="Export schedule as PDF document"
+                  style={{ padding: '4px 10px', fontSize: '0.8rem', background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(249, 115, 22, 0.15))', borderColor: 'rgba(239, 68, 68, 0.3)', color: '#f87171' }}
+                >
+                  <FileIcon size={14} />
+                  <span>{isExporting ? 'Exporting...' : 'Export PDF'}</span>
                 </button>
               </div>
               <button className="close-btn" onClick={() => setShowWeeklyModal(false)}>×</button>

@@ -3,8 +3,8 @@ import { useTimetable } from '../context/TimetableContext';
 import { useAuth } from '../context/AuthContext';
 import { PERIODS, DAYS } from '../data/timetables';
 import { isAdminEmail, isTimeWarpEnabled } from '../lib/admin';
-import { exportScheduleAsImage } from '../utils/exportUtils';
-import { ImageIcon } from './icons';
+import { exportScheduleAsImage, exportScheduleAsPDF } from '../utils/exportUtils';
+import { ImageIcon, FileIcon } from './icons';
 import './FindMyProfessorPage.css';
 
 const ROOM_DISPLAY_MAP = {
@@ -301,15 +301,35 @@ export default function FindMyProfessorPage({ onBack }) {
       await exportScheduleAsImage({
         element: scheduleExportRef.current,
         title: selectedProf,
-        subtitle: `Faculty Timetable (${viewMode === 'weekly' ? 'Full Weekly Schedule Grid' : 'Daily Timeline'})`,
         fileName: `SSCBS_Prof_${selectedProf}_Schedule`,
-        badgeText: 'Faculty Schedule',
         theme: 'dark'
       });
-      setExportMessage('Exported as Image! 🎉');
+      setExportMessage('PNG Downloaded! 🎉');
       setTimeout(() => setExportMessage(null), 3500);
     } catch (err) {
       console.error('Export schedule error:', err);
+      setExportMessage('Export failed. Try again.');
+      setTimeout(() => setExportMessage(null), 3500);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportPDF = async () => {
+    if (!scheduleExportRef.current || !selectedProf) return;
+    setIsExporting(true);
+    setExportMessage(null);
+    try {
+      await exportScheduleAsPDF({
+        element: scheduleExportRef.current,
+        title: selectedProf,
+        fileName: `SSCBS_Prof_${selectedProf}_Schedule`,
+        theme: 'dark'
+      });
+      setExportMessage('PDF Downloaded! 📄');
+      setTimeout(() => setExportMessage(null), 3500);
+    } catch (err) {
+      console.error('Export PDF error:', err);
       setExportMessage('Export failed. Try again.');
       setTimeout(() => setExportMessage(null), 3500);
     } finally {
@@ -814,16 +834,26 @@ export default function FindMyProfessorPage({ onBack }) {
                   </button>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   {exportMessage && <span className="export-toast-notice">{exportMessage}</span>}
                   <button 
                     className="btn-export-schedule-img"
                     onClick={handleExportImage}
                     disabled={isExporting}
-                    title="Export un-clipped schedule as high resolution PNG image"
+                    title="Export schedule as PNG image"
                   >
-                    <ImageIcon size={16} />
-                    <span>{isExporting ? 'Generating Image...' : 'Export Image'}</span>
+                    <ImageIcon size={15} />
+                    <span>{isExporting ? 'Exporting...' : 'Export PNG'}</span>
+                  </button>
+                  <button 
+                    className="btn-export-schedule-img"
+                    onClick={handleExportPDF}
+                    disabled={isExporting}
+                    title="Export schedule as PDF document"
+                    style={{ background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(249, 115, 22, 0.15))', borderColor: 'rgba(239, 68, 68, 0.3)', color: '#f87171' }}
+                  >
+                    <FileIcon size={15} />
+                    <span>{isExporting ? 'Exporting...' : 'Export PDF'}</span>
                   </button>
                 </div>
               </div>

@@ -3,8 +3,8 @@ import { useTimetable } from '../context/TimetableContext';
 import { useAuth } from '../context/AuthContext';
 import { PERIODS, DAYS } from '../data/timetables';
 import { getRoomStatuses, extractAllRoomsFromTimetable, getRoomDailyTimeline, getOrdinalSuffix } from '../utils/roomFinder';
-import { DoorIcon, SearchIcon, BackIcon, RefreshIcon, CalendarIcon, ImageIcon } from './icons';
-import { exportScheduleAsImage } from '../utils/exportUtils';
+import { DoorIcon, SearchIcon, BackIcon, RefreshIcon, CalendarIcon, ImageIcon, FileIcon } from './icons';
+import { exportScheduleAsImage, exportScheduleAsPDF } from '../utils/exportUtils';
 import './EmptyRoomFinderPage.css';
 
 export function EmptyRoomFinderPage({ onBack }) {
@@ -166,19 +166,38 @@ export function EmptyRoomFinderPage({ onBack }) {
     setIsExporting(true);
     setExportMessage(null);
     try {
-      const vacantCountNum = roomStatuses.filter(r => r.isVacant).length;
       await exportScheduleAsImage({
         element: roomExportRef.current,
         title: `Room Directory — ${activeDay}`,
-        subtitle: `Period: ${activePeriod.label} (${activePeriod.startLabel} - ${activePeriod.endLabel}) • Shaheed Sukhdev College of Business Studies`,
         fileName: `SSCBS_Room_Directory_${activeDay}_Period_${activePeriod.id}`,
-        badgeText: `${vacantCountNum} Vacant Rooms`,
         theme: 'dark'
       });
-      setExportMessage('Exported as Image! 🎉');
+      setExportMessage('PNG Downloaded! 🎉');
       setTimeout(() => setExportMessage(null), 3500);
     } catch (err) {
       console.error('Export error:', err);
+      setExportMessage('Export failed.');
+      setTimeout(() => setExportMessage(null), 3500);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportRoomPDF = async () => {
+    if (!roomExportRef.current) return;
+    setIsExporting(true);
+    setExportMessage(null);
+    try {
+      await exportScheduleAsPDF({
+        element: roomExportRef.current,
+        title: `Room Directory — ${activeDay}`,
+        fileName: `SSCBS_Room_Directory_${activeDay}_Period_${activePeriod.id}`,
+        theme: 'dark'
+      });
+      setExportMessage('PDF Downloaded! 📄');
+      setTimeout(() => setExportMessage(null), 3500);
+    } catch (err) {
+      console.error('Export PDF error:', err);
       setExportMessage('Export failed.');
       setTimeout(() => setExportMessage(null), 3500);
     } finally {
@@ -358,7 +377,17 @@ export function EmptyRoomFinderPage({ onBack }) {
             style={{ padding: '4px 10px', fontSize: '0.8rem' }}
           >
             <ImageIcon size={14} />
-            <span>{isExporting ? 'Exporting...' : 'Export Image'}</span>
+            <span>{isExporting ? 'Exporting...' : 'Export PNG'}</span>
+          </button>
+          <button
+            className="btn-export-schedule-img"
+            onClick={handleExportRoomPDF}
+            disabled={isExporting}
+            title="Export room availability matrix as PDF document"
+            style={{ padding: '4px 10px', fontSize: '0.8rem', background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(249, 115, 22, 0.15))', borderColor: 'rgba(239, 68, 68, 0.3)', color: '#f87171' }}
+          >
+            <FileIcon size={14} />
+            <span>{isExporting ? 'Exporting...' : 'Export PDF'}</span>
           </button>
         </div>
       </div>
