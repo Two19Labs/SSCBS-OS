@@ -142,8 +142,8 @@ const EXPORT_HIGH_CONTRAST_CSS = `
 `;
 
 /**
- * Captures a DOM element with 100% full un-clipped scroll width & height,
- * applying high-contrast dark theme styles for crystal clear PNG and PDF outputs.
+ * Captures a DOM element with 100% full un-clipped scroll width,
+ * dynamically auto-trimming canvas height so there is ZERO extra empty space.
  * 
  * @param {HTMLElement} element - Target DOM node to capture.
  * @param {string} [theme] - 'dark' or 'light'.
@@ -154,44 +154,39 @@ export const captureScheduleCanvas = async (element, theme = 'dark') => {
     throw new Error('Target element for schedule capture was not found.');
   }
 
-  // Find all internal scroll containers and calculate full unclipped scroll dimensions
-  const scrollContainers = element.querySelectorAll('.spacious-weekly-grid-container, .weekly-timetable-table, .table-responsive, .spacious-weekly-grid, table, .room-grid, .spacious-timeline-wrapper');
-  let maxScrollWidth = element.scrollWidth;
-  let maxScrollHeight = element.scrollHeight;
+  // Find inner table or main content grid to determine true unclipped scroll width
+  const innerTable = element.querySelector('table, .spacious-weekly-grid, .weekly-timetable-table, .spacious-timeline-list, .room-grid');
+  
+  let scrollW = element.scrollWidth;
+  if (innerTable && innerTable.scrollWidth > scrollW) {
+    scrollW = innerTable.scrollWidth;
+  }
+  const captureWidth = Math.max(scrollW, 1240);
 
-  scrollContainers.forEach(sc => {
-    if (sc.scrollWidth > maxScrollWidth) maxScrollWidth = sc.scrollWidth;
-    if (sc.scrollHeight > maxScrollHeight) maxScrollHeight = sc.scrollHeight;
-  });
-
-  // Ensure full width capture so all 7 period columns fit comfortably without truncation (min 1450px)
-  const captureWidth = Math.max(maxScrollWidth, 1450);
-  const captureHeight = Math.max(maxScrollHeight + 40, 750);
-
-  // Perform canvas capture using html2canvas with explicit full width/height bounds
+  // Perform canvas capture with html2canvas (height auto-trimmed to exact element height)
   const canvas = await html2canvas(element, {
-    scale: 2, // 2x DPI for high-resolution text sharpness
+    scale: 2, // 2x DPI for ultra-sharp text
     useCORS: true,
     allowTaint: true,
     backgroundColor: '#0f172a',
     logging: false,
-    width: captureWidth,
-    height: captureHeight,
-    windowWidth: captureWidth + 200,
-    windowHeight: captureHeight + 200,
+    width: captureWidth, // Explicit full width so all 7 period columns render
+    windowWidth: captureWidth + 100,
     onclone: (clonedDoc, clonedElement) => {
-      // Inject high-contrast export stylesheet into cloned doc
+      // Inject high-contrast export stylesheet
       const styleEl = clonedDoc.createElement('style');
       styleEl.textContent = EXPORT_HIGH_CONTRAST_CSS;
       clonedDoc.head.appendChild(styleEl);
 
-      // Force top cloned wrapper to expand to full capture dimensions
+      // Force top cloned wrapper to expand to full capture width while hugging exact content height
       clonedElement.style.width = captureWidth + 'px';
       clonedElement.style.maxWidth = 'none';
       clonedElement.style.overflow = 'visible';
       clonedElement.style.height = 'auto';
+      clonedElement.style.minHeight = '0';
       clonedElement.style.backgroundColor = '#0f172a';
-      clonedElement.style.padding = '24px';
+      clonedElement.style.padding = '16px';
+      clonedElement.style.margin = '0';
       clonedElement.style.boxSizing = 'border-box';
 
       // Unclip all overflow wrappers in cloned document
@@ -203,12 +198,13 @@ export const captureScheduleCanvas = async (element, theme = 'dark') => {
           node.style.overflowX = 'visible';
           node.style.overflowY = 'visible';
           node.style.maxHeight = 'none';
+          node.style.height = 'auto';
         }
 
         // Expand tables to full capture width
         if (node.tagName === 'TABLE' || node.classList.contains('spacious-weekly-grid') || node.classList.contains('weekly-timetable-table')) {
           node.style.width = '100%';
-          node.style.minWidth = (captureWidth - 80) + 'px';
+          node.style.minWidth = (captureWidth - 32) + 'px';
           node.style.tableLayout = 'fixed';
         }
 
@@ -229,7 +225,8 @@ export const captureScheduleCanvas = async (element, theme = 'dark') => {
 };
 
 /**
- * Exports a schedule or timetable element as a high-resolution unclipped PNG image.
+ * Exports a schedule or timetable element as a high-resolution unclipped PNG image,
+ * auto-cropped to the exact height of the schedule.
  */
 export const exportScheduleAsImage = async ({
   element,
@@ -257,7 +254,8 @@ export const exportScheduleAsImage = async ({
 };
 
 /**
- * Exports a schedule or timetable element as a clean, landscape-fitted A4 PDF document.
+ * Exports a schedule or timetable element as a clean, landscape-fitted A4 PDF document,
+ * perfectly proportioned to the schedule bounds.
  */
 export const exportScheduleAsPDF = async ({
   element,
