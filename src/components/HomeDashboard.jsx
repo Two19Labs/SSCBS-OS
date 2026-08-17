@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useConfig } from '../context/ConfigContext';
 import { useTimetable } from '../context/TimetableContext';
 import { PERIODS, DAYS } from '../data/timetables';
 import NoticeBoard from './NoticeBoard';
 import NotificationCenter from './NotificationCenter';
-import { SearchIcon, PercentIcon, CalculatorIcon, FileIcon, TrophyIcon, DoorIcon, HeartIcon, UsersIcon, UserIcon } from './icons';
+import { SearchIcon, PercentIcon, CalculatorIcon, FileIcon, TrophyIcon, DoorIcon, HeartIcon, UsersIcon, UserIcon, ImageIcon } from './icons';
 import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFacultyDatabase, canAccessSocietyTracker, isTimeWarpEnabled } from '../lib/admin';
+import { exportScheduleAsImage } from '../utils/exportUtils';
 
 
 import './HomeDashboard.css';
@@ -57,11 +58,40 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
   const [activeWeeklyTab, setActiveWeeklyTab] = useState('Monday');
   const [showDebugger, setShowDebugger] = useState(false);
 
+  // Schedule Export State
+  const scheduleExportRef = useRef(null);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportMessage, setExportMessage] = useState(null);
+
   // Profile setup
   const course = user?.user_metadata?.course;
   const semester = user?.user_metadata?.semester;
   const section = user?.user_metadata?.section;
   const hasProfile = Boolean(course && semester && section);
+
+  const handleExportStudentSchedule = async () => {
+    if (!scheduleExportRef.current) return;
+    setIsExporting(true);
+    setExportMessage(null);
+    try {
+      await exportScheduleAsImage({
+        element: scheduleExportRef.current,
+        title: `${course || 'Student'} Sem ${semester || ''} Sec ${section || ''}`,
+        subtitle: `Weekly Class Timetable • Shaheed Sukhdev College of Business Studies`,
+        fileName: `SSCBS_${course || 'Student'}_Sem${semester || ''}_Sec${section || ''}_Timetable`,
+        badgeText: 'Class Timetable',
+        theme: 'dark'
+      });
+      setExportMessage('Exported as Image! 🎉');
+      setTimeout(() => setExportMessage(null), 3500);
+    } catch (err) {
+      console.error('Export error:', err);
+      setExportMessage('Export failed.');
+      setTimeout(() => setExportMessage(null), 3500);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   // Ticking Clock
   useEffect(() => {
@@ -670,7 +700,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
                 <h3>Full Weekly Timetable</h3>
                 <p>{course} Sem {semester} Section {section}</p>
               </div>
-              <div className="weekly-layout-toggle-group">
+              <div className="weekly-layout-toggle-group" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <button 
                   className={`btn-layout-toggle ${weeklyLayoutMode === 'grid' ? 'active' : ''}`}
                   onClick={() => setWeeklyLayoutMode('grid')}
@@ -699,11 +729,23 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
                   </svg>
                   <span>List</span>
                 </button>
+
+                {exportMessage && <span className="export-toast-notice" style={{ fontSize: '0.75rem' }}>{exportMessage}</span>}
+                <button
+                  className="btn-export-schedule-img"
+                  onClick={handleExportStudentSchedule}
+                  disabled={isExporting}
+                  title="Export un-clipped schedule as PNG image"
+                  style={{ padding: '4px 10px', fontSize: '0.8rem' }}
+                >
+                  <ImageIcon size={14} />
+                  <span>{isExporting ? 'Exporting...' : 'Export Image'}</span>
+                </button>
               </div>
               <button className="close-btn" onClick={() => setShowWeeklyModal(false)}>×</button>
             </header>
             
-            <div className="weekly-modal-body">
+            <div className="weekly-modal-body" ref={scheduleExportRef}>
               {weeklyLayoutMode === 'list' ? (
                 <div className="weekly-list-view">
                   {/* Day tabs selector */}

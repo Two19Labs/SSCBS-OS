@@ -603,9 +603,55 @@
 /* Tabs switcher details */
 .page-view-tabs {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   border-bottom: 1.5px solid var(--border-color);
-  gap: 20px;
+  gap: 16px;
   margin-top: 8px;
+}
+
+.view-tabs-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.btn-export-schedule-img {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15));
+  border: 1px solid rgba(129, 140, 248, 0.3);
+  color: var(--accent-gold, #818cf8);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 650;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-export-schedule-img:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.3));
+  border-color: rgba(129, 140, 248, 0.6);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.btn-export-schedule-img:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.export-toast-notice {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #10b981;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  animation: fadeIn 0.3s ease;
 }
 
 .view-tab-btn {

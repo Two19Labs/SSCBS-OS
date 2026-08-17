@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTimetable } from '../context/TimetableContext';
 import { useAuth } from '../context/AuthContext';
 import { PERIODS, DAYS } from '../data/timetables';
 import { isAdminEmail, isTimeWarpEnabled } from '../lib/admin';
+import { exportScheduleAsImage } from '../utils/exportUtils';
+import { ImageIcon } from './icons';
 import './FindMyProfessorPage.css';
 
 const ROOM_DISPLAY_MAP = {
@@ -285,6 +287,35 @@ export default function FindMyProfessorPage({ onBack }) {
 
   // Mobile navigation mode: 'list' (show faculty sidebar) or 'details' (show professor details panel)
   const [mobileActiveTab, setMobileActiveTab] = useState('list');
+
+  // Schedule Export Refs & States
+  const scheduleExportRef = useRef(null);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportMessage, setExportMessage] = useState(null);
+
+  const handleExportImage = async () => {
+    if (!scheduleExportRef.current || !selectedProf) return;
+    setIsExporting(true);
+    setExportMessage(null);
+    try {
+      await exportScheduleAsImage({
+        element: scheduleExportRef.current,
+        title: selectedProf,
+        subtitle: `Faculty Timetable (${viewMode === 'weekly' ? 'Full Weekly Schedule Grid' : 'Daily Timeline'})`,
+        fileName: `SSCBS_Prof_${selectedProf}_Schedule`,
+        badgeText: 'Faculty Schedule',
+        theme: 'dark'
+      });
+      setExportMessage('Exported as Image! 🎉');
+      setTimeout(() => setExportMessage(null), 3500);
+    } catch (err) {
+      console.error('Export schedule error:', err);
+      setExportMessage('Export failed. Try again.');
+      setTimeout(() => setExportMessage(null), 3500);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   // Helper: Get exact date/time in Indian Standard Time (IST = UTC+5.5)
   function getISTTime() {
@@ -768,22 +799,37 @@ export default function FindMyProfessorPage({ onBack }) {
 
               {/* Navigation View Tabs */}
               <div className="page-view-tabs">
-                <button 
-                  className={`view-tab-btn ${viewMode === 'today' ? 'active' : ''}`}
-                  onClick={() => setViewMode('today')}
-                >
-                  Today's Timeline
-                </button>
-                <button 
-                  className={`view-tab-btn ${viewMode === 'weekly' ? 'active' : ''}`}
-                  onClick={() => setViewMode('weekly')}
-                >
-                  Full Weekly Schedule Grid
-                </button>
+                <div className="view-tabs-left">
+                  <button 
+                    className={`view-tab-btn ${viewMode === 'today' ? 'active' : ''}`}
+                    onClick={() => setViewMode('today')}
+                  >
+                    Today's Timeline
+                  </button>
+                  <button 
+                    className={`view-tab-btn ${viewMode === 'weekly' ? 'active' : ''}`}
+                    onClick={() => setViewMode('weekly')}
+                  >
+                    Full Weekly Schedule Grid
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  {exportMessage && <span className="export-toast-notice">{exportMessage}</span>}
+                  <button 
+                    className="btn-export-schedule-img"
+                    onClick={handleExportImage}
+                    disabled={isExporting}
+                    title="Export un-clipped schedule as high resolution PNG image"
+                  >
+                    <ImageIcon size={16} />
+                    <span>{isExporting ? 'Generating Image...' : 'Export Image'}</span>
+                  </button>
+                </div>
               </div>
 
               {/* Render Schedule views */}
-              <div className="page-view-content-wrapper">
+              <div className="page-view-content-wrapper" ref={scheduleExportRef}>
                 
                 {viewMode === 'today' ? (
                   <div className="spacious-timeline-wrapper">
