@@ -13,8 +13,9 @@ const sanitizeFileName = (name) => {
 
 /**
  * High-Contrast Pristine Export Theme Overrides.
- * Ensures crisp white card titles, zero text truncation, non-overlapping emerald room tags,
- * and clean single-line class labels across all PNG and PDF exports.
+ * Covers both Find My Professor and Student Home Dashboard timetables.
+ * Ensures crisp white card titles, zero text truncation, rose/emerald badges,
+ * and high contrast dark slate backgrounds across all PNG and PDF exports.
  */
 const EXPORT_HIGH_CONTRAST_CSS = `
   /* High-Contrast Pristine Export Theme Overrides */
@@ -94,7 +95,22 @@ const EXPORT_HIGH_CONTRAST_CSS = `
     border-right: 2px solid #334155 !important;
   }
 
-  /* Occupied Grid Cell Cards */
+  .today-row .day-name-cell, .today-row-highlight .sticky-day-col {
+    color: #f87171 !important;
+  }
+
+  .today-badge {
+    background-color: #ef4444 !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 0.55rem !important;
+    padding: 1px 5px !important;
+    border-radius: 3px !important;
+    margin-top: 2px !important;
+    display: inline-block !important;
+  }
+
+  /* Occupied Grid Cell Cards (Find My Prof & Home Dashboard) */
   .weekly-grid-cell-spacious.occupied, .weekly-class-cell {
     background-color: rgba(30, 41, 59, 0.4) !important;
   }
@@ -110,7 +126,8 @@ const EXPORT_HIGH_CONTRAST_CSS = `
     gap: 4px !important;
   }
 
-  .cell-card-subject, .timeline-subject, .class-card-top h5 {
+  /* Subject Titles */
+  .cell-card-subject, .cell-subject, .timeline-subject, .class-card-top h5 {
     color: #ffffff !important;
     font-weight: 800 !important;
     font-size: 0.775rem !important;
@@ -121,20 +138,21 @@ const EXPORT_HIGH_CONTRAST_CSS = `
     max-width: none !important;
     text-overflow: clip !important;
     overflow: visible !important;
+    margin-bottom: 2px !important;
   }
 
-  .cell-card-meta-row {
+  .cell-details-row {
     display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 6px !important;
-    margin-top: 2px !important;
-    flex-wrap: wrap !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+    margin-top: 4px !important;
   }
 
-  .cell-card-classes, .class-card-subtitle, .timeline-card-meta {
+  /* Teacher Labels */
+  .cell-card-classes, .class-card-subtitle, .timeline-card-meta, .cell-teacher {
     color: #cbd5e1 !important;
     font-size: 0.675rem !important;
+    font-weight: 500 !important;
     white-space: nowrap !important;
     word-break: normal !important;
     max-width: none !important;
@@ -142,6 +160,11 @@ const EXPORT_HIGH_CONTRAST_CSS = `
     overflow: visible !important;
   }
 
+  .cell-teacher svg {
+    stroke: #818cf8 !important;
+  }
+
+  /* Room Badges */
   .cell-card-room, .class-card-room-badge, .room-tag {
     color: #34d399 !important;
     background-color: rgba(52, 211, 153, 0.15) !important;
@@ -153,13 +176,44 @@ const EXPORT_HIGH_CONTRAST_CSS = `
     white-space: nowrap !important;
   }
 
+  .cell-room {
+    color: #f87171 !important;
+    font-size: 0.65rem !important;
+    font-weight: 700 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+
+  .cell-room svg {
+    stroke: #f87171 !important;
+  }
+
+  .grid-practical-badge {
+    background-color: #6366f1 !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 0.6rem !important;
+    padding: 1px 5px !important;
+    border-radius: 3px !important;
+  }
+
+  .grid-unsupervised-badge {
+    background-color: #f59e0b !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 0.6rem !important;
+    padding: 1px 5px !important;
+    border-radius: 3px !important;
+  }
+
   /* Free & Break Cells */
   .cell-empty-dash {
     color: #475569 !important;
     font-weight: 700 !important;
   }
 
-  .weekly-grid-cell-spacious.free {
+  .weekly-grid-cell-spacious.free, .weekly-class-cell.free {
     background-color: #0f172a !important;
   }
 
@@ -169,30 +223,16 @@ const EXPORT_HIGH_CONTRAST_CSS = `
     color: #94a3b8 !important;
   }
 
-  .timeline-break-card-spacious, .timeline-break-card, .break-box {
+  .free-text {
+    color: #94a3b8 !important;
+    font-size: 0.725rem !important;
+    font-weight: 600 !important;
+  }
+
+  .timeline-break-card-spacious, .timeline-break-card, .break-box, .break-grid-cell {
     background-color: rgba(245, 158, 11, 0.12) !important;
     border: 1px solid rgba(245, 158, 11, 0.3) !important;
     color: #fef3c7 !important;
-  }
-
-  /* Room Finder Grid Cards */
-  .room-card {
-    background-color: #1e293b !important;
-    border: 1px solid #334155 !important;
-  }
-  .room-card.vacant {
-    background-color: rgba(16, 185, 129, 0.1) !important;
-    border: 1px solid rgba(16, 185, 129, 0.3) !important;
-  }
-  .room-card.occupied {
-    background-color: rgba(239, 68, 68, 0.1) !important;
-    border: 1px solid rgba(239, 68, 68, 0.3) !important;
-  }
-  .room-name {
-    color: #ffffff !important;
-  }
-  .room-floor-tag {
-    color: #94a3b8 !important;
   }
 `;
 
