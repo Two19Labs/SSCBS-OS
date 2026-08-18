@@ -306,7 +306,7 @@ export default function NotificationCenter({ onNavigate }) {
                               }}
                             >
                               {notif.type === 'class' && 'Find Room'}
-                              {notif.type === 'gap' && 'Find Empty Room'}
+                              {notif.type === 'gap' && 'Open Classroom Radar'}
                               {notif.type === 'event' && 'Read Notice'}
                               {notif.type?.startsWith('team_') && 'Open Team Finder'}
                               {!['class', 'gap', 'event'].includes(notif.type) && !notif.type?.startsWith('team_') && 'View Details'}

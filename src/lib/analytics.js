@@ -8,7 +8,7 @@ export const FEATURE_NAMES = {
   timetable: 'Timetable',
   'find-prof': 'Find My Professor',
   'team-finder': 'Team Finder & Compete Hub',
-  'empty-room': 'Empty Room Finder',
+  'empty-room': 'Classroom Radar',
   waiver: 'Waiver Tool',
   gpa: 'GPA Calculator',
   buzz: 'Campus Buzz',

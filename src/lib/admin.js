@@ -27,7 +27,7 @@ export const EMPTY_ROOM_TESTERS = [
 
 export function canAccessEmptyRoom(email) {
   if (!email || typeof email !== 'string') return false;
-  return true; // Empty Room Finder is now live for all SSCBS students!
+  return true; // Classroom Radar is now live for all SSCBS students!
 }
 
 export const FACULTY_DB_TESTERS = [

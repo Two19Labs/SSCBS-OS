@@ -230,7 +230,7 @@ function App() {
       title: 'Academic & Tools',
       items: [
         { id: 'find-prof', label: 'Find My Professor', Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
-        { id: 'empty-room', label: 'Empty Room Finder', Icon: DoorIcon },
+        { id: 'empty-room', label: 'Classroom Radar', Icon: DoorIcon },
         ...(hasTeamFinderAccess ? [{ id: 'team-finder', label: 'Team Finder', Icon: TrophyIcon }] : []),
         { id: 'waiver', label: 'Waiver Tool', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
         { id: 'gpa', label: 'GPA Calculator', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
@@ -260,7 +260,7 @@ function App() {
     'find-prof': 'Find My Professor',
     'faculty-db': 'Faculty Directory',
     'team-finder': 'Team Finder & Compete Hub',
-    'empty-room': 'Empty Room Finder',
+    'empty-room': 'Classroom Radar',
     admin: 'Admin Console',
     buzz: 'Campus Buzz',
     profile: 'Profile',
@@ -333,7 +333,7 @@ function App() {
               { id: 'confessions-matchmaker', micro: 'SOON', microClass: 'dim', title: 'Campus Confessions & Matchmaker', desc: "We're still thinking on this, DM to let us know you'd like this :)", Icon: HeartIcon, locked: true },
               { id: 'find-prof', micro: 'SEARCH', microClass: 'success', title: 'Find My Professor', desc: "Who's teaching where, right now", Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
 
-              { id: 'empty-room', micro: 'LIVE', microClass: 'success', title: 'Empty Room Finder', desc: 'Spot vacant classrooms in real-time or well in advance', Icon: DoorIcon, locked: false },
+              { id: 'empty-room', micro: 'LIVE', microClass: 'success', title: 'Classroom Radar', desc: 'Live room occupancy, daily schedules & vacant room finder', Icon: DoorIcon, locked: false },
             ].map(({ id, title, desc, Icon, locked }) => (
               <button
                 key={id}

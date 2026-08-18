@@ -205,9 +205,9 @@ export function EmptyRoomFinderPage({ onBack }) {
         <div className="empty-room-title-section">
           <div className="empty-room-title-row">
             <span className="empty-room-header-icon"><DoorIcon size={22} /></span>
-            <h2>Empty Room Finder</h2>
+            <h2>Classroom Radar</h2>
           </div>
-          <p className="empty-room-subtitle">Spot vacant classrooms & labs powered by official college timetables</p>
+          <p className="empty-room-subtitle">Live room occupancy, daily schedules & vacant room finder</p>
         </div>
       </div>
 
