@@ -1,5 +1,4 @@
 import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
 
 /**
  * Sanitizes filenames for safe browser download.
@@ -184,56 +183,6 @@ export const exportScheduleAsImage = async ({
     return true;
   } catch (err) {
     console.error('Failed to export schedule image:', err);
-    throw err;
-  }
-};
-
-/**
- * Exports a schedule or timetable element as a clean, landscape-fitted A4 PDF document.
- */
-export const exportScheduleAsPDF = async ({
-  element,
-  title = 'Schedule',
-  fileName
-}) => {
-  try {
-    const canvas = await captureScheduleCanvas(element);
-    const imgData = canvas.toDataURL('image/png', 1.0);
-
-    // Standard A4 landscape dimensions in mm (297mm x 210mm)
-    const pdf = new jsPDF({
-      orientation: 'landscape',
-      unit: 'mm',
-      format: 'a4'
-    });
-
-    const pageWidth = pdf.internal.pageSize.getWidth(); // 297 mm
-    const pageHeight = pdf.internal.pageSize.getHeight(); // 210 mm
-    const margin = 8; // 8mm margins
-
-    const maxPdfWidth = pageWidth - (margin * 2);
-    const maxPdfHeight = pageHeight - (margin * 2);
-
-    const imgRatio = canvas.width / canvas.height;
-    let renderWidth = maxPdfWidth;
-    let renderHeight = maxPdfWidth / imgRatio;
-
-    if (renderHeight > maxPdfHeight) {
-      renderHeight = maxPdfHeight;
-      renderWidth = maxPdfHeight * imgRatio;
-    }
-
-    const xOffset = (pageWidth - renderWidth) / 2;
-    const yOffset = (pageHeight - renderHeight) / 2;
-
-    pdf.addImage(imgData, 'PNG', xOffset, yOffset, renderWidth, renderHeight);
-
-    const cleanName = sanitizeFileName(fileName || `${title}_SSCBS_Schedule`);
-    pdf.save(`${cleanName}.pdf`);
-
-    return true;
-  } catch (err) {
-    console.error('Failed to export schedule PDF:', err);
     throw err;
   }
 };

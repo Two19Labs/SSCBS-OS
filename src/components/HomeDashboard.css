@@ -769,6 +769,35 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
+.btn-export-schedule-img {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  margin-left: 4px;
+}
+
+.btn-export-schedule-img:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.btn-export-schedule-img:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
 .weekly-modal-header .close-btn {
   background: none;
   border: none;

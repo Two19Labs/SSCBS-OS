@@ -3,8 +3,8 @@ import { useTimetable } from '../context/TimetableContext';
 import { useAuth } from '../context/AuthContext';
 import { PERIODS, DAYS } from '../data/timetables';
 import { isAdminEmail, isTimeWarpEnabled } from '../lib/admin';
-import { exportScheduleAsImage, exportScheduleAsPDF } from '../utils/exportUtils';
-import { ImageIcon, FileIcon } from './icons';
+import { exportScheduleAsImage } from '../utils/exportUtils';
+import { ImageIcon } from './icons';
 import './FindMyProfessorPage.css';
 
 const ROOM_DISPLAY_MAP = {
@@ -307,27 +307,6 @@ export default function FindMyProfessorPage({ onBack }) {
       setTimeout(() => setExportMessage(null), 3500);
     } catch (err) {
       console.error('Export schedule error:', err);
-      setExportMessage('Export failed. Try again.');
-      setTimeout(() => setExportMessage(null), 3500);
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
-  const handleExportPDF = async () => {
-    if (!scheduleExportRef.current || !selectedProf) return;
-    setIsExporting(true);
-    setExportMessage(null);
-    try {
-      await exportScheduleAsPDF({
-        element: scheduleExportRef.current,
-        title: selectedProf,
-        fileName: `SSCBS_Prof_${selectedProf}_Schedule`
-      });
-      setExportMessage('PDF Downloaded! 📄');
-      setTimeout(() => setExportMessage(null), 3500);
-    } catch (err) {
-      console.error('Export PDF error:', err);
       setExportMessage('Export failed. Try again.');
       setTimeout(() => setExportMessage(null), 3500);
     } finally {
@@ -842,16 +821,6 @@ export default function FindMyProfessorPage({ onBack }) {
                   >
                     <ImageIcon size={15} />
                     <span>{isExporting ? 'Exporting...' : 'Export PNG'}</span>
-                  </button>
-                  <button 
-                    className="btn-export-schedule-img"
-                    onClick={handleExportPDF}
-                    disabled={isExporting}
-                    title="Export schedule as PDF document"
-                    style={{ background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(249, 115, 22, 0.15))', borderColor: 'rgba(239, 68, 68, 0.3)', color: '#f87171' }}
-                  >
-                    <FileIcon size={15} />
-                    <span>{isExporting ? 'Exporting...' : 'Export PDF'}</span>
                   </button>
                 </div>
               </div>
