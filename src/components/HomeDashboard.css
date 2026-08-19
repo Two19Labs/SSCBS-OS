@@ -14,23 +14,26 @@
   .home-greeting-row {
     order: 1;
   }
-  .home-live-card {
+  .sem-countdown-banner {
     order: 2;
   }
-  .daily-timeline-section {
+  .home-live-card {
     order: 3;
   }
-  .recruitment-home-banner {
+  .daily-timeline-section {
     order: 4;
   }
-  .home-buzz-col {
+  .recruitment-home-banner {
     order: 5;
   }
-  .debugger-collapsible {
+  .home-buzz-col {
     order: 6;
   }
-  .home-tools-section {
+  .debugger-collapsible {
     order: 7;
+  }
+  .home-tools-section {
+    order: 8;
   }
   .home-greeting-actions .notif-center-wrapper {
     display: none !important;
@@ -1520,5 +1523,190 @@
   .debugger-controls-row {
     flex-direction: column;
     gap: 10px;
+  }
+}
+
+/* ── Semester Countdown Banner ── */
+.sem-countdown-banner {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent, #700000);
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.sem-countdown-banner:hover {
+  border-color: var(--border-hover, var(--border));
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.sem-countdown-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.sem-countdown-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 240px;
+}
+
+.sem-countdown-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.sem-badge-icon {
+  font-size: 12px;
+}
+
+.sem-countdown-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.sem-countdown-title .highlight-stat {
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.sem-countdown-title .highlight-stat.accent {
+  color: var(--accent, #700000);
+}
+
+.sem-countdown-sub {
+  font-size: 12.5px;
+  color: var(--ink-dim);
+  line-height: 1.4;
+}
+
+.sem-countdown-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.sem-breakdown-btn {
+  background: var(--surface-hover, rgba(0, 0, 0, 0.04));
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.sem-breakdown-btn:hover {
+  background: var(--border);
+  transform: translateY(-1px);
+}
+
+.sem-setup-btn {
+  background: var(--accent, #700000);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.sem-setup-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* Breakdown drawer */
+.sem-breakdown-drawer {
+  border-top: 1px dashed var(--border);
+  padding-top: 12px;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sem-breakdown-header {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+}
+
+.sem-breakdown-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sem-subject-chip {
+  background: var(--surface-hover, rgba(0, 0, 0, 0.03));
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.sem-subject-name {
+  font-weight: 600;
+  color: var(--ink);
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sem-subject-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: var(--accent, #700000);
+}
+
+@media (max-width: 600px) {
+  .sem-countdown-banner {
+    padding: 14px 16px;
+  }
+  .sem-countdown-title {
+    font-size: 15.5px;
+  }
+  .sem-countdown-actions {
+    width: 100%;
+    justify-content: flex-end;
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useConfig } from '../context/ConfigContext';
 import { useTimetable } from '../context/TimetableContext';
@@ -57,6 +57,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
   const [weeklyLayoutMode, setWeeklyLayoutMode] = useState('grid');
   const [activeWeeklyTab, setActiveWeeklyTab] = useState('Monday');
   const [showDebugger, setShowDebugger] = useState(false);
+  const [showSubjectBreakdown, setShowSubjectBreakdown] = useState(false);
 
   // Schedule Export State
   const scheduleExportRef = useRef(null);
@@ -222,6 +223,162 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
       setActiveWeeklyTab(DAYS.includes(currentDayName) ? currentDayName : 'Monday');
     }
   }, [showWeeklyModal]);
+
+  // Calculate Semester Countdown (Days & Classes remaining till Nov 30)
+  const semStats = useMemo(() => {
+    const now = new Date(time);
+    let year = now.getFullYear();
+    let semEndDate = new Date(year, 10, 30, 23, 59, 59, 999);
+
+    if (now > semEndDate) {
+      year += 1;
+      semEndDate = new Date(year, 10, 30, 23, 59, 59, 999);
+    }
+
+    const msDiff = semEndDate.getTime() - now.getTime();
+    const daysLeft = Math.max(0, Math.ceil(msDiff / (1000 * 60 * 60 * 24)));
+
+    if (!hasProfile || !timetable) {
+      return {
+        daysLeft,
+        classesLeft: null,
+        teachingDaysLeft: null,
+        subjectBreakdown: {},
+        targetDateStr: 'Nov 30',
+      };
+    }
+
+    let totalClasses = 0;
+    let teachingDaysCount = 0;
+    const subjectBreakdown = {};
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    const tempDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endDateOnly = new Date(semEndDate.getFullYear(), semEndDate.getMonth(), semEndDate.getDate());
+
+    while (tempDate <= endDateOnly) {
+      const dayOfWeek = tempDate.getDay();
+      const dateStr = tempDate.getFullYear() + '-' + String(tempDate.getMonth() + 1).padStart(2, '0') + '-' + String(tempDate.getDate()).padStart(2, '0');
+      
+      const isWknd = dayOfWeek === 0 || dayOfWeek === 6;
+      const isHldy = holidays?.some(h => h.date === dateStr);
+
+      if (!isWknd && !isHldy) {
+        teachingDaysCount++;
+        const dayName = DAYS[dayOfWeek - 1];
+        const daySchedule = timetable[dayName] || [];
+        const isToday = tempDate.toDateString() === now.toDateString();
+
+        for (const cls of daySchedule) {
+          if (cls && !cls.isBreak && cls.subject && cls.subject !== 'Free') {
+            if (isToday) {
+              const periodInfo = PERIODS.find(p => p.id === cls.period);
+              if (periodInfo) {
+                const endMin = parseTimeToMinutes(periodInfo.end);
+                if (currentMinutes < endMin) {
+                  totalClasses++;
+                  const subjName = cls.subject.trim();
+                  subjectBreakdown[subjName] = (subjectBreakdown[subjName] || 0) + 1;
+                }
+              } else {
+                totalClasses++;
+                const subjName = cls.subject.trim();
+                subjectBreakdown[subjName] = (subjectBreakdown[subjName] || 0) + 1;
+              }
+            } else {
+              totalClasses++;
+              const subjName = cls.subject.trim();
+              subjectBreakdown[subjName] = (subjectBreakdown[subjName] || 0) + 1;
+            }
+          }
+        }
+      }
+
+      tempDate.setDate(tempDate.getDate() + 1);
+    }
+
+    return {
+      daysLeft,
+      classesLeft: totalClasses,
+      teachingDaysLeft: teachingDaysCount,
+      subjectBreakdown,
+      targetDateStr: 'Nov 30',
+    };
+  }, [time, hasProfile, timetable, holidays, course, semester, section]);
+
+  const renderSemesterCountdownBanner = () => {
+    const { daysLeft, classesLeft, teachingDaysLeft, subjectBreakdown, targetDateStr } = semStats;
+
+    return (
+      <div className="sem-countdown-banner">
+        <div className="sem-countdown-content">
+          <div className="sem-countdown-left">
+            <div className="sem-countdown-badge">
+              <span className="sem-badge-icon">⏳</span>
+              <span>SEMESTER COUNTDOWN</span>
+            </div>
+            <div className="sem-countdown-title">
+              {classesLeft !== null ? (
+                <>
+                  <span className="highlight-stat">{daysLeft} days</span> and{' '}
+                  <span className="highlight-stat accent">{classesLeft} classes</span> left till semester end
+                </>
+              ) : (
+                <>
+                  <span className="highlight-stat">{daysLeft} days</span> left till semester end ({targetDateStr})
+                </>
+              )}
+            </div>
+            <div className="sem-countdown-sub">
+              {classesLeft !== null ? (
+                <>
+                  Target: <strong>Nov 30</strong> · <strong>{teachingDaysLeft} teaching days</strong> remaining for {course} Sem {semester} ({section})
+                </>
+              ) : (
+                <>
+                  Target: <strong>Nov 30</strong> · Set up your profile to see your personalized remaining class count
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="sem-countdown-actions">
+            {classesLeft !== null && Object.keys(subjectBreakdown).length > 0 && (
+              <button
+                className="sem-breakdown-btn"
+                onClick={() => setShowSubjectBreakdown(!showSubjectBreakdown)}
+              >
+                {showSubjectBreakdown ? 'Hide Breakdown ▲' : 'Class Breakdown ▼'}
+              </button>
+            )}
+            {!hasProfile && (
+              <button className="sem-setup-btn" onClick={onOpenProfile}>
+                Set up profile →
+              </button>
+            )}
+          </div>
+        </div>
+
+        {showSubjectBreakdown && classesLeft !== null && Object.keys(subjectBreakdown).length > 0 && (
+          <div className="sem-breakdown-drawer animate-fade-in">
+            <div className="sem-breakdown-header">
+              <span>Remaining Classes by Subject (till Nov 30)</span>
+            </div>
+            <div className="sem-breakdown-grid">
+              {Object.entries(subjectBreakdown)
+                .sort((a, b) => b[1] - a[1])
+                .map(([subject, count]) => (
+                  <div key={subject} className="sem-subject-chip">
+                    <span className="sem-subject-name" title={subject}>{subject}</span>
+                    <span className="sem-subject-count">{count} {count === 1 ? 'class' : 'classes'}</span>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const renderLiveCard = () => {
     if (!hasProfile) {
@@ -523,6 +680,9 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
             </div>
           </div>
         </div>
+
+        {/* Semester Countdown Banner */}
+        {renderSemesterCountdownBanner()}
 
         {/* Live Class Card */}
         {renderLiveCard()}
