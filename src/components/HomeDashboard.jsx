@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useConfig } from '../context/ConfigContext';
 import { useTimetable } from '../context/TimetableContext';
@@ -222,39 +222,6 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
       setActiveWeeklyTab(DAYS.includes(currentDayName) ? currentDayName : 'Monday');
     }
   }, [showWeeklyModal]);
-
-  // Calculate Semester Countdown (Days remaining till semester end)
-  const daysLeft = useMemo(() => {
-    const now = new Date(time);
-    let year = now.getFullYear();
-    let semEndDate = new Date(year, 10, 30, 23, 59, 59, 999);
-
-    if (now > semEndDate) {
-      year += 1;
-      semEndDate = new Date(year, 10, 30, 23, 59, 59, 999);
-    }
-
-    const msDiff = semEndDate.getTime() - now.getTime();
-    return Math.max(0, Math.ceil(msDiff / (1000 * 60 * 60 * 24)));
-  }, [time]);
-
-  const renderSemesterCountdownBanner = () => {
-    return (
-      <div className="sem-countdown-banner">
-        <div className="sem-countdown-content">
-          <div className="sem-countdown-left">
-            <div className="sem-countdown-badge">
-              <span className="sem-badge-icon">⏳</span>
-              <span>SEMESTER COUNTDOWN</span>
-            </div>
-            <div className="sem-countdown-title">
-              <span className="highlight-stat accent">{daysLeft} days</span> left till semester end
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   const renderLiveCard = () => {
     if (!hasProfile) {
@@ -556,9 +523,6 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
             </div>
           </div>
         </div>
-
-        {/* Semester Countdown Banner */}
-        {renderSemesterCountdownBanner()}
 
         {/* Live Class Card */}
         {renderLiveCard()}
