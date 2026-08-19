@@ -338,11 +338,6 @@ export default function SocietyTrackerPage({ onBack }) {
               <SparklesIcon size={12} /> RECRUITMENT SEASON 2026
             </span>
             <h1 className="st-title">Society Recruitment Tracker</h1>
-            <ol className="st-pointers">
-              <li>Crescendo recruits later in the year, the form will be out on Campus Buzz</li>
-              <li>Sadhana &amp; Makes Sense are merging as one</li>
-              <li>Only initial recruitment forms and their deadlines are tracked here (no interview schedules).</li>
-            </ol>
           </div>
         </div>
       </div>
