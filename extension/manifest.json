@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "SSCBS OS - EduERP Realtime Attendance Sync",
+  "version": "1.0.0",
+  "description": "Real-time automatic attendance sync from EduERP (pgtechnos.com) to SSCBS OS Waiver Tool.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://pgtechnos.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "SSCBS OS Auto-Sync"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://pgtechnos.com/EduERP/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ]
+    }
+  ]
+}

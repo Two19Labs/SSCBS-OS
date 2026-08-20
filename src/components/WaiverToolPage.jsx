@@ -220,6 +220,30 @@ function WaiverToolPage({ onBack }) {
     }
   }, [storageKey]);
 
+  // Listen for real-time extension auto-sync events
+  useEffect(() => {
+    const handleExtensionSync = (e) => {
+      if (e.key === 'sscbs_eduerp_live_sync' && e.newValue) {
+        try {
+          const payload = JSON.parse(e.newValue);
+          if (payload && payload.htmlText) {
+            parseHtmlSpreadsheet(payload.htmlText);
+            setFileMeta({
+              name: 'EduERP Realtime Extension Auto-Sync',
+              size: payload.htmlText.length,
+              uploadedAt: new Date().toISOString()
+            });
+          }
+        } catch (err) {
+          console.warn("Failed to parse extension live sync payload:", err);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleExtensionSync);
+    return () => window.removeEventListener('storage', handleExtensionSync);
+  }, []);
+
   // Persist state changes automatically
   useEffect(() => {
     if (!parsedData) return;

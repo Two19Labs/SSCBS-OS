@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 280px;
+      margin: 0;
+      padding: 16px;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .header h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+    .status-badge {
+      background: #dcfce7;
+      color: #15803d;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 12px;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+    .btn-sync {
+      width: 100%;
+      background: #6366f1;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-sync:hover {
+      background: #4f46e5;
+    }
+    .footer-note {
+      font-size: 0.72rem;
+      color: #64748b;
+      margin-top: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <span>⚡</span>
+    <h3>SSCBS OS Realtime Sync</h3>
+  </div>
+  <div className="status-badge" id="popup-status">Connected to EduERP</div>
+  <button class="btn-sync" id="popup-sync-btn">⚡ Sync Attendance Now</button>
+  <div class="footer-note">Automatic realtime sync with SSCBS OS Waiver Tool</div>
+  <script src="popup.js"></script>
+</body>
+</html>
