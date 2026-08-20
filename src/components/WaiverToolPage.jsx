@@ -200,6 +200,43 @@ function WaiverToolPage({ onBack }) {
     }
   };
 
+  // Helper to extract attendance tokens flexible regex matching (P/A, Th/tu/PR/Prac)
+  const parseAttendanceTokens = (text) => {
+    if (!text) return [];
+    const tokens = [];
+    const pattern = /(P|A)\s*\(\s*(Th|tu|PR|Prac)\s*\)/gi;
+    let match;
+    while ((match = pattern.exec(text)) !== null) {
+      const status = match[1].toUpperCase();
+      const rawType = match[2].toLowerCase();
+      let type = 'PR';
+      if (rawType === 'th') type = 'Th';
+      else if (rawType === 'tu') type = 'tu';
+
+      tokens.push({
+        type,
+        attended: status === 'P'
+      });
+    }
+    return tokens;
+  };
+
+  // Helper to extract report date from header string or filename
+  const extractReportDate = (text, fileName) => {
+    let year = 2026;
+    let monthIndex = null;
+
+    const textMatch = text && text.match(/REPORT ON\s+([\d]{4})-([\d]{2})-([\d]{2})/i);
+    const fileMatch = fileName && fileName.match(/([\d]{4})-([\d]{2})-([\d]{2})/);
+    const match = textMatch || fileMatch;
+
+    if (match) {
+      year = parseInt(match[1], 10);
+      monthIndex = parseInt(match[2], 10) - 1; // 0 = Jan
+    }
+    return { year, monthIndex };
+  };
+
   // Main parser runner
   const processAttendance = () => {
     if (!file) {
@@ -227,25 +264,16 @@ function WaiverToolPage({ onBack }) {
         let isHtml = false;
         let encoding = 'utf-8';
 
-        // 1. Detect UTF-16LE BOM (0xFF, 0xFE)
+        // Detect BOM or check content for HTML tags
         if (arr[0] === 0xFF && arr[1] === 0xFE) {
           encoding = 'utf-16le';
-          const sample = new TextDecoder('utf-16le').decode(arr.subarray(0, Math.min(arr.length, 1000)));
-          if (sample.toLowerCase().includes('<table')) {
-            isHtml = true;
-          }
         } else if (arr[0] === 0xFE && arr[1] === 0xFF) {
           encoding = 'utf-16be';
-          const sample = new TextDecoder('utf-16be').decode(arr.subarray(0, Math.min(arr.length, 1000)));
-          if (sample.toLowerCase().includes('<table')) {
-            isHtml = true;
-          }
-        } else {
-          // Check standard UTF-8 / ASCII
-          const sample = new TextDecoder('utf-8').decode(arr.subarray(0, Math.min(arr.length, 1000)));
-          if (sample.toLowerCase().includes('<table')) {
-            isHtml = true;
-          }
+        }
+
+        const sample = new TextDecoder(encoding).decode(arr.subarray(0, Math.min(arr.length, 4000)));
+        if (sample.toLowerCase().includes('<table') || sample.toLowerCase().includes('report on')) {
+          isHtml = true;
         }
 
         if (isHtml) {
@@ -269,130 +297,142 @@ function WaiverToolPage({ onBack }) {
     reader.readAsArrayBuffer(file);
   };
 
-  // Helper to extract nested cell text
-  const extractNestedClasses = (cellHtml) => {
-    const list = [];
-    const cellTdRegex = /<td[^>]*>([\s\S]*?)<\/td>/gi;
-    let match;
-    while ((match = cellTdRegex.exec(cellHtml)) !== null) {
-      const val = match[1].replace(/<[^>]*>/g, '').trim();
-      if (val) list.push(val);
-    }
-    return list;
-  };
-
   // Custom HTML table parser for malformed ERP exports
   const parseHtmlSpreadsheet = (htmlText) => {
-    const cleanHtml = htmlText.replace(/<!--[\s\S]*?-->/g, '');
-
-    const outerRows = [];
-    let idx = 0;
-    let tableNesting = 0;
-    let insideTr = false;
-    let currentTrContent = "";
-
-    while (idx < cleanHtml.length) {
-      const next6 = cleanHtml.substring(idx, idx + 6).toLowerCase();
-      const next8 = cleanHtml.substring(idx, idx + 8).toLowerCase();
-      const next3 = cleanHtml.substring(idx, idx + 3).toLowerCase();
-      const next5 = cleanHtml.substring(idx, idx + 5).toLowerCase();
-
-      if (next6 === "<table") {
-        tableNesting++;
-        if (insideTr) currentTrContent += "<table";
-        idx += 6;
-        continue;
-      }
-      if (next8 === "</table>") {
-        tableNesting--;
-        if (insideTr) currentTrContent += "</table>";
-        idx += 8;
-        continue;
-      }
-      if (next3 === "<tr" && tableNesting === 1) {
-        insideTr = true;
-        currentTrContent = "<tr";
-        idx += 3;
-        continue;
-      }
-      if (next5 === "</tr>" && tableNesting === 1 && insideTr) {
-        insideTr = false;
-        currentTrContent += "</tr>";
-        outerRows.push(currentTrContent);
-        idx += 5;
-        continue;
-      }
-      if (insideTr) {
-        currentTrContent += cleanHtml[idx];
-      }
-      idx++;
+    const { year: detectedYear, monthIndex: detectedMonth } = extractReportDate(htmlText, file ? file.name : '');
+    const activeMonth = detectedMonth !== null ? detectedMonth : startingMonth;
+    if (detectedMonth !== null && detectedMonth !== startingMonth) {
+      setStartingMonth(detectedMonth);
     }
 
-    if (outerRows.length < 2) {
+    const cleanHtml = htmlText.replace(/<!--[\s\S]*?-->/g, '');
+
+    let outerRowHtmls = [];
+
+    // Attempt browser DOMParser first if available
+    if (typeof window !== 'undefined' && window.DOMParser) {
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(cleanHtml, 'text/html');
+        const mainTable = doc.querySelector('table');
+        if (mainTable) {
+          const rows = Array.from(mainTable.rows);
+          if (rows.length >= 2) {
+            outerRowHtmls = rows.map(r => r.outerHTML);
+          }
+        }
+      } catch (domErr) {
+        console.warn("DOMParser fallback used due to error:", domErr);
+      }
+    }
+
+    // Fallback string-based table level parser
+    if (outerRowHtmls.length < 2) {
+      const firstTableIdx = cleanHtml.toLowerCase().indexOf('<table');
+      const tableContent = firstTableIdx !== -1 ? cleanHtml.substring(firstTableIdx) : cleanHtml;
+
+      let idx = 0;
+      let tableLevel = 0;
+      let insideOuterTr = false;
+      let currentTr = "";
+
+      while (idx < tableContent.length) {
+        const sub = tableContent.substring(idx).toLowerCase();
+        if (sub.startsWith('<table')) {
+          tableLevel++;
+          if (insideOuterTr) currentTr += tableContent.substr(idx, 6);
+          idx += 6;
+          continue;
+        }
+        if (sub.startsWith('</table>')) {
+          tableLevel--;
+          if (insideOuterTr) currentTr += tableContent.substr(idx, 8);
+          idx += 8;
+          continue;
+        }
+        if (tableLevel === 1 && sub.startsWith('<tr')) {
+          insideOuterTr = true;
+          currentTr = "<tr";
+          idx += 3;
+          continue;
+        }
+        if (tableLevel === 1 && insideOuterTr && sub.startsWith('</tr>')) {
+          insideOuterTr = false;
+          currentTr += "</tr>";
+          outerRowHtmls.push(currentTr);
+          idx += 5;
+          continue;
+        }
+        if (insideOuterTr) {
+          currentTr += tableContent[idx];
+        }
+        idx++;
+      }
+    }
+
+    if (outerRowHtmls.length < 2) {
       throw new Error("No outer table rows found in attendance file.");
     }
 
-    const parseCells = (rowHtml) => {
+    const extractOuterCells = (rowHtml) => {
       const cells = [];
       let cIdx = 0;
-      let cellNesting = 0;
+      let tLevel = 0;
       let insideCell = false;
       let cellTag = "";
-      let currentCellContent = "";
+      let cellContent = "";
 
       while (cIdx < rowHtml.length) {
-        const next6 = rowHtml.substring(cIdx, cIdx + 6).toLowerCase();
-        const next8 = rowHtml.substring(cIdx, cIdx + 8).toLowerCase();
-        const next3 = rowHtml.substring(cIdx, cIdx + 3).toLowerCase();
-        const next5 = rowHtml.substring(cIdx, cIdx + 5).toLowerCase();
+        const sub = rowHtml.substring(cIdx).toLowerCase();
 
-        if (next6 === "<table") {
-          cellNesting++;
-          currentCellContent += "<table";
+        if (sub.startsWith('<table')) {
+          tLevel++;
+          if (insideCell) cellContent += rowHtml.substr(cIdx, 6);
           cIdx += 6;
           continue;
         }
-        if (next8 === "</table>") {
-          cellNesting--;
-          currentCellContent += "</table>";
+        if (sub.startsWith('</table>')) {
+          tLevel--;
+          if (insideCell) cellContent += rowHtml.substr(cIdx, 8);
           cIdx += 8;
           continue;
         }
-        if (cellNesting === 0 && !insideCell && (next3 === "<td" || next3 === "<th")) {
+        if (tLevel === 0 && !insideCell && (sub.startsWith('<td') || sub.startsWith('<th'))) {
           insideCell = true;
-          cellTag = rowHtml.substring(cIdx + 1, cIdx + 3).toLowerCase();
-          currentCellContent = "";
-          while (rowHtml[cIdx] !== ">" && cIdx < rowHtml.length) {
-            cIdx++;
-          }
-          cIdx++;
+          cellTag = sub.startsWith('<td') ? 'td' : 'th';
+          cellContent = "";
+          const tagEnd = rowHtml.indexOf('>', cIdx);
+          cIdx = tagEnd !== -1 ? tagEnd + 1 : cIdx + 3;
           continue;
         }
-        if (cellNesting === 0 && insideCell && next5 === `</${cellTag}>`) {
+        if (tLevel === 0 && insideCell && sub.startsWith(`</${cellTag}>`)) {
           insideCell = false;
-          cells.push(currentCellContent.trim().replace(/\s+/g, ' '));
-          cIdx += 5;
+          cells.push(cellContent.trim());
+          cIdx += cellTag.length + 3;
           continue;
         }
         if (insideCell) {
-          currentCellContent += rowHtml[cIdx];
+          cellContent += rowHtml[cIdx];
         }
         cIdx++;
       }
       return cells;
     };
 
-    const headerCells = parseCells(outerRows[0]).map(h => h.replace(/<[^>]*>/g, '').trim());
+    const headerCellsRaw = extractOuterCells(outerRowHtmls[0]);
+    const headerCells = headerCellsRaw.map(h => h.replace(/<[^>]*>/g, '').trim());
 
     if (headerCells.length < 5) {
       throw new Error("Invalid header structure.");
     }
 
-    const dateColsCount = headerCells.length - 5;
-    const totalPresentIdx = headerCells.length - 2;
-    const totalAbsentIdx = headerCells.length - 1;
+    let totalPresentIdx = headerCells.findIndex(h => h.toLowerCase().includes('present'));
+    let totalAbsentIdx = headerCells.findIndex(h => h.toLowerCase().includes('absent'));
+
+    if (totalPresentIdx === -1) totalPresentIdx = headerCells.length - 2;
+    if (totalAbsentIdx === -1) totalAbsentIdx = headerCells.length - 1;
     
-    let currentMonthOffset = startingMonth;
+    let currentMonthOffset = activeMonth;
     let lastDateVal = 0;
     const parsedDates = [];
 
@@ -406,7 +446,7 @@ function WaiverToolPage({ onBack }) {
       lastDateVal = dateVal;
 
       const monthLabel = MONTHS[currentMonthOffset];
-      const dateStr = `2026-${String(currentMonthOffset + 1).padStart(2, '0')}-${String(dateVal).padStart(2, '0')}`;
+      const dateStr = `${detectedYear}-${String(currentMonthOffset + 1).padStart(2, '0')}-${String(dateVal).padStart(2, '0')}`;
 
       parsedDates.push({
         colIdx: c,
@@ -416,14 +456,14 @@ function WaiverToolPage({ onBack }) {
     }
 
     const parsedSubjects = [];
-    for (let r = 1; r < outerRows.length; r++) {
-      const cells = parseCells(outerRows[r]);
+    for (let r = 1; r < outerRowHtmls.length; r++) {
+      const cells = extractOuterCells(outerRowHtmls[r]);
       if (cells.length < headerCells.length) continue;
 
-      const subjectName = cells[1];
-      const rollNo = cells[2];
-      const reportedPresent = parseInt(cells[totalPresentIdx], 10);
-      const reportedAbsent = parseInt(cells[totalAbsentIdx], 10);
+      const subjectName = cells[1].replace(/<[^>]*>/g, '').trim();
+      const rollNo = cells[2].replace(/<[^>]*>/g, '').trim();
+      const reportedPresent = parseInt(cells[totalPresentIdx].replace(/<[^>]*>/g, ''), 10) || 0;
+      const reportedAbsent = parseInt(cells[totalAbsentIdx].replace(/<[^>]*>/g, ''), 10) || 0;
 
       const dateAttendanceMap = {};
       let baselineThAttended = 0;
@@ -435,33 +475,22 @@ function WaiverToolPage({ onBack }) {
 
       parsedDates.forEach(d => {
         const cellHtml = cells[d.colIdx] || "";
-        const classes = extractNestedClasses(cellHtml);
+        const tokens = parseAttendanceTokens(cellHtml);
 
         const dateRecord = [];
 
-        classes.forEach(c => {
-          if (c === 'P( Th)') {
-            baselineThAttended++;
+        tokens.forEach(tok => {
+          if (tok.type === 'Th') {
             baselineThHeld++;
-            dateRecord.push({ type: 'Th', attended: true });
-          } else if (c === 'A( Th)') {
-            baselineThHeld++;
-            dateRecord.push({ type: 'Th', attended: false });
-          } else if (c === 'P( tu)') {
-            baselineTuAttended++;
+            if (tok.attended) baselineThAttended++;
+          } else if (tok.type === 'tu') {
             baselineTuHeld++;
-            dateRecord.push({ type: 'tu', attended: true });
-          } else if (c === 'A( tu)') {
-            baselineTuHeld++;
-            dateRecord.push({ type: 'tu', attended: false });
-          } else if (c === 'P( PR)') {
-            baselinePrAttended++;
+            if (tok.attended) baselineTuAttended++;
+          } else if (tok.type === 'PR') {
             baselinePrHeld++;
-            dateRecord.push({ type: 'PR', attended: true });
-          } else if (c === 'A( PR)') {
-            baselinePrHeld++;
-            dateRecord.push({ type: 'PR', attended: false });
+            if (tok.attended) baselinePrAttended++;
           }
+          dateRecord.push(tok);
         });
 
         if (dateRecord.length > 0) {
@@ -499,6 +528,13 @@ function WaiverToolPage({ onBack }) {
       throw new Error("No attendance data rows found.");
     }
 
+    // Check if XLSX parsed HTML tags as raw cells (indicates HTML text disguised as .xls)
+    const rawSampleStr = rows.slice(0, 10).map(r => JSON.stringify(r)).join(' ');
+    if (rawSampleStr.toLowerCase().includes('<table') || rawSampleStr.toLowerCase().includes('<tr>')) {
+      const text = new TextDecoder('utf-8').decode(data);
+      return parseHtmlSpreadsheet(text);
+    }
+
     const headerRow = rows[0].map(c => String(c || '').trim());
     const totalPresentIdx = headerRow.findIndex(h => h.toLowerCase().includes('present'));
     const totalAbsentIdx = headerRow.findIndex(h => h.toLowerCase().includes('absent'));
@@ -507,8 +543,14 @@ function WaiverToolPage({ onBack }) {
       throw new Error("Could not locate 'Total Present' or 'Total Absent' summary columns.");
     }
 
+    const { year: detectedYear, monthIndex: detectedMonth } = extractReportDate('', file ? file.name : '');
+    const activeMonth = detectedMonth !== null ? detectedMonth : startingMonth;
+    if (detectedMonth !== null && detectedMonth !== startingMonth) {
+      setStartingMonth(detectedMonth);
+    }
+
     const parsedDates = [];
-    let currentMonthOffset = startingMonth;
+    let currentMonthOffset = activeMonth;
     let lastDateVal = 0;
 
     for (let c = 3; c < totalPresentIdx; c++) {
@@ -522,7 +564,7 @@ function WaiverToolPage({ onBack }) {
       lastDateVal = dateVal;
 
       const monthLabel = MONTHS[currentMonthOffset];
-      const dateStr = `2026-${String(currentMonthOffset + 1).padStart(2, '0')}-${String(dateVal).padStart(2, '0')}`;
+      const dateStr = `${detectedYear}-${String(currentMonthOffset + 1).padStart(2, '0')}-${String(dateVal).padStart(2, '0')}`;
 
       parsedDates.push({
         colIdx: c,
@@ -553,32 +595,21 @@ function WaiverToolPage({ onBack }) {
         const val = String(row[d.colIdx] || '').trim();
         if (!val) return;
 
-        const tokens = val.split(/[,\s+]+/).map(t => t.trim()).filter(Boolean);
+        const tokens = parseAttendanceTokens(val);
         const dateRecord = [];
 
-        tokens.forEach(token => {
-          if (token.includes('P(Th)')) {
-            baselineThAttended++;
+        tokens.forEach(tok => {
+          if (tok.type === 'Th') {
             baselineThHeld++;
-            dateRecord.push({ type: 'Th', attended: true });
-          } else if (token.includes('A(Th)')) {
-            baselineThHeld++;
-            dateRecord.push({ type: 'Th', attended: false });
-          } else if (token.includes('P(tu)')) {
-            baselineTuAttended++;
+            if (tok.attended) baselineThAttended++;
+          } else if (tok.type === 'tu') {
             baselineTuHeld++;
-            dateRecord.push({ type: 'tu', attended: true });
-          } else if (token.includes('A(tu)')) {
-            baselineTuHeld++;
-            dateRecord.push({ type: 'tu', attended: false });
-          } else if (token.includes('P(PR)') || token.includes('P(Prac)')) {
-            baselinePrAttended++;
+            if (tok.attended) baselineTuAttended++;
+          } else if (tok.type === 'PR') {
             baselinePrHeld++;
-            dateRecord.push({ type: 'PR', attended: true });
-          } else if (token.includes('A(PR)') || token.includes('A(Prac)')) {
-            baselinePrHeld++;
-            dateRecord.push({ type: 'PR', attended: false });
+            if (tok.attended) baselinePrAttended++;
           }
+          dateRecord.push(tok);
         });
 
         if (dateRecord.length > 0) {
