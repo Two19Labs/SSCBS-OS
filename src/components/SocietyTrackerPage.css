@@ -778,33 +778,72 @@
   width: 24px;
   height: 24px;
   object-fit: contain;
-  filter: grayscale(1) opacity(0.65);
+  filter: grayscale(0) opacity(1);
   transition: filter 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s ease;
 }
 
-.st-social-btn.sscbs:hover {
-  background: #fef7ed;
+/* College Page Button (SSCBS) - Lit up at all times */
+.st-social-btn.sscbs {
+  background: #fff8ee;
   border-color: #d4a04a;
-  box-shadow: 0 4px 14px rgba(184, 134, 11, 0.35);
+  box-shadow: 0 2px 8px rgba(184, 134, 11, 0.25);
 }
 
-.st-social-btn.sscbs:hover .st-sscbs-logo {
-  filter: grayscale(0) opacity(1);
+.st-social-btn.sscbs:hover {
+  background: #fef3e2;
+  border-color: #b8860b;
+  box-shadow: 0 4px 14px rgba(184, 134, 11, 0.45);
+}
+
+[data-theme='dark'] .st-social-btn.sscbs {
+  background: rgba(212, 160, 74, 0.18);
+  border-color: rgba(212, 160, 74, 0.5);
+  box-shadow: 0 2px 8px rgba(212, 160, 74, 0.2);
+}
+
+[data-theme='dark'] .st-social-btn.sscbs:hover {
+  background: rgba(212, 160, 74, 0.3);
+  border-color: #d4a04a;
+  box-shadow: 0 4px 14px rgba(212, 160, 74, 0.4);
+}
+
+/* Instagram Button - Lit up at all times */
+.st-social-btn.insta {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  border-color: transparent;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(220, 39, 67, 0.35);
 }
 
 .st-social-btn.insta:hover {
-  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-  box-shadow: 0 4px 14px rgba(220, 39, 67, 0.45);
+  box-shadow: 0 4px 14px rgba(220, 39, 67, 0.55);
+  filter: brightness(1.06);
+}
+
+/* Linktree Button - Lit up at all times */
+.st-social-btn.linktree {
+  background: linear-gradient(135deg, #43e660 0%, #28a745 100%);
+  border-color: transparent;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(67, 230, 96, 0.35);
 }
 
 .st-social-btn.linktree:hover {
-  background: linear-gradient(135deg, #43e660 0%, #28a745 100%);
-  box-shadow: 0 4px 14px rgba(67, 230, 96, 0.45);
+  box-shadow: 0 4px 14px rgba(67, 230, 96, 0.55);
+  filter: brightness(1.06);
+}
+
+/* LinkedIn Button - Lit up at all times */
+.st-social-btn.linkedin {
+  background: #0a66c2;
+  border-color: transparent;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(10, 102, 194, 0.35);
 }
 
 .st-social-btn.linkedin:hover {
-  background: #0a66c2;
-  box-shadow: 0 4px 14px rgba(10, 102, 194, 0.45);
+  background: #0854a0;
+  box-shadow: 0 4px 14px rgba(10, 102, 194, 0.55);
 }
 
 /* ── Full Society Detail Modal ── */
