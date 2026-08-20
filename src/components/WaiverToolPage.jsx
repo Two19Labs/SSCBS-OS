@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import FooterCredit from './FooterCredit';
 import { useAuth } from '../context/AuthContext';
+import { syncEduErpAttendance } from '../services/eduerpSyncService';
 import './WaiverToolPage.css';
 
 const MONTHS = [
