@@ -20,13 +20,14 @@ const guestPhotoMap = {
   'dr-rama-bansal-guest': 'https://sscbs.du.ac.in/wp-content/uploads/2024/11/rama-200x300.jpg',
   'ms-ruchi-singhal-guest': 'https://sscbs.du.ac.in/wp-content/uploads/2024/11/Ruchi-Singhal.jpg',
   'dr-saima-guest': 'https://sscbs.du.ac.in/wp-content/uploads/2024/11/IMG_20240905_194320-225x300.jpg',
-  'dr-shevata-sehgal-marwah-guest': 'https://sscbs.du.ac.in/wp-content/uploads/2024/11/Photo-239x300.jpeg',
-  'dr-shiva-kapoor-guest': 'https://sscbs.du.ac.in/wp-content/uploads/2024/11/IMG-20240903-WA0000-187x300.jpg',
-  'dr-simple-arora-guest': 'https://sscbs.du.ac.in/wp-content/uploads/2024/11/Photo-3-235x300.jpg'
+  'dr-shevata-sehgal-marwah-guest': null,
+  'dr-shiva-kapoor-guest': 'https://sscbs.du.ac.in/wp-content/uploads/2024/11/Photo-239x300.jpeg',
+  'dr-simple-arora-guest': 'https://sscbs.du.ac.in/wp-content/uploads/2024/11/IMG-20240903-WA0000-187x300.jpg',
+  'mr-vineet-kumar-guest': 'https://sscbs.du.ac.in/wp-content/uploads/2024/11/Photo-3-235x300.jpg'
 };
 
 dataset = dataset.map(prof => {
-  if (guestPhotoMap[prof.id]) {
+  if (guestPhotoMap.hasOwnProperty(prof.id)) {
     return {
       ...prof,
       photoUrl: guestPhotoMap[prof.id]
@@ -38,4 +39,4 @@ dataset = dataset.map(prof => {
 fs.writeFileSync(jsonPath, JSON.stringify(dataset, null, 2));
 
 const updatedCount = dataset.filter(p => p.designation === 'Guest Faculty' && p.photoUrl).length;
-console.log(`Successfully assigned photo headshots to ${updatedCount} Guest Faculty members!`);
+console.log(`Successfully assigned correct photo headshots to Guest Faculty members! (${updatedCount} with photos)`);
