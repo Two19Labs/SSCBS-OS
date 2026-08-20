@@ -189,6 +189,7 @@ function WaiverToolPage({ onBack }) {
   const [rememberPass, setRememberPass] = useState(true);
   const [eduErpPasteText, setEduErpPasteText] = useState('');
   const [eduErpStatusMsg, setEduErpStatusMsg] = useState(null);
+  const [isEduErpLoading, setIsEduErpLoading] = useState(false);
 
   // CDC & Placement Cell Extra Attendance (+1 Numerator & +1 Denominator)
   const [extraAttendance, setExtraAttendance] = useState({}); // { [subjectName]: number }
@@ -1512,17 +1513,38 @@ function WaiverToolPage({ onBack }) {
                     </div>
 
                     <button 
-                      className="btn-eduerp-auto-pull"
-                      onClick={() => {
+                      className={`btn-eduerp-auto-pull ${isEduErpLoading ? 'loading' : ''}`}
+                      disabled={isEduErpLoading}
+                      onClick={async () => {
                         if (!eduErpPass) {
                           setEduErpStatusMsg("Please enter your EduERP password to pull live attendance.");
                           return;
                         }
-                        window.open("https://pgtechnos.com/EduERP/", "_blank");
-                        setEduErpStatusMsg("Opened EduERP Portal! After logging in, copy your attendance report table or click [Download In Excel] and paste/drop it into SSCBS OS.");
+
+                        setIsEduErpLoading(true);
+                        setEduErpStatusMsg("⚡ Connecting to EduERP portal & pulling live attendance...");
+
+                        try {
+                          const result = await syncEduErpAttendance(eduErpEmail, eduErpPass);
+                          if (result && result.htmlText) {
+                            parseHtmlSpreadsheet(result.htmlText);
+                            setFileMeta({
+                              name: `EduERP Realtime Direct Sync (${eduErpEmail})`,
+                              size: result.htmlText.length,
+                              uploadedAt: new Date().toISOString()
+                            });
+                            setShowEduErpModal(false);
+                            setEduErpStatusMsg(null);
+                          }
+                        } catch (err) {
+                          console.warn("EduERP direct fetch notice:", err);
+                          setEduErpStatusMsg("Connection sent. If browser CORS prevents direct response reading, paste your EduERP attendance table in the box below for instant 1-second import.");
+                        } finally {
+                          setIsEduErpLoading(false);
+                        }
                       }}
                     >
-                      ⚡ Pull Realtime Attendance from EduERP ↗
+                      {isEduErpLoading ? "⚡ Connecting & Fetching..." : "⚡ Pull Realtime Attendance"}
                     </button>
                     {eduErpStatusMsg && <div className="eduerp-status-notice">{eduErpStatusMsg}</div>}
                   </div>
