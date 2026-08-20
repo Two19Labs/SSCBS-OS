@@ -177,7 +177,17 @@ function WaiverToolPage({ onBack }) {
 
   // EduERP Real-Time Sync Modal state for aditya.25015@sscbs.du.ac.in
   const [showEduErpModal, setShowEduErpModal] = useState(false);
+  const [eduErpEmail, setEduErpEmail] = useState(user?.email || 'aditya.25015@sscbs.du.ac.in');
+  const [eduErpPass, setEduErpPass] = useState(() => {
+    try {
+      return localStorage.getItem(`sscbs_eduerp_pass_${user?.id || user?.email || 'guest'}`) || '';
+    } catch (e) {
+      return '';
+    }
+  });
+  const [rememberPass, setRememberPass] = useState(true);
   const [eduErpPasteText, setEduErpPasteText] = useState('');
+  const [eduErpStatusMsg, setEduErpStatusMsg] = useState(null);
 
   // CDC & Placement Cell Extra Attendance (+1 Numerator & +1 Denominator)
   const [extraAttendance, setExtraAttendance] = useState({}); // { [subjectName]: number }
@@ -1441,42 +1451,92 @@ function WaiverToolPage({ onBack }) {
               <div className="edu-erp-sync-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                   <div className="title-area">
-                    <span className="beta-tag">⚡ BETA</span>
-                    <h3>EduERP Real-Time Sync</h3>
+                    <span className="beta-tag">⚡ REALTIME</span>
+                    <h3>EduERP 1-Click Sync</h3>
                   </div>
                   <button className="btn-close-modal" onClick={() => setShowEduErpModal(false)}>✕</button>
                 </div>
 
                 <div className="modal-body">
                   <p className="modal-desc">
-                    Connect with official SSCBS EduERP portal (<code>pgtechnos.com/EduERP/</code>) to import your latest attendance report in real-time.
+                    Connect directly with your SSCBS EduERP account (<code>pgtechnos.com/EduERP/</code>) for instant 1-click attendance fetching.
                   </p>
 
-                  <div className="erp-step-box">
-                    <div className="step-num">1</div>
-                    <div className="step-content">
-                      <strong>Open EduERP Portal Login</strong>
-                      <p>Log in with <code>aditya.25015@sscbs.du.ac.in</code> to view your student attendance report.</p>
-                      <a 
-                        href="https://pgtechnos.com/EduERP/" 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="btn-open-eduerp"
-                      >
-                        Open EduERP Portal Login ↗
-                      </a>
+                  <div className="eduerp-auto-login-card">
+                    <h4>🔒 EduERP Student Credentials</h4>
+                    <div className="eduerp-inputs">
+                      <div className="eduerp-input-field">
+                        <label>EduERP Email ID</label>
+                        <input 
+                          type="email"
+                          value={eduErpEmail}
+                          onChange={(e) => setEduErpEmail(e.target.value)}
+                          placeholder="aditya.25015@sscbs.du.ac.in"
+                        />
+                      </div>
+                      <div className="eduerp-input-field">
+                        <label>EduERP Password</label>
+                        <input 
+                          type="password"
+                          value={eduErpPass}
+                          onChange={(e) => {
+                            setEduErpPass(e.target.value);
+                            if (rememberPass) {
+                              try {
+                                localStorage.setItem(`sscbs_eduerp_pass_${user?.id || user?.email || 'guest'}`, e.target.value);
+                              } catch (err) {}
+                            }
+                          }}
+                          placeholder="Enter your EduERP password..."
+                        />
+                      </div>
                     </div>
+
+                    <div className="eduerp-checkbox-row">
+                      <label className="checkbox-lbl">
+                        <input 
+                          type="checkbox" 
+                          checked={rememberPass}
+                          onChange={(e) => {
+                            setRememberPass(e.target.checked);
+                            if (!e.target.checked) {
+                              try {
+                                localStorage.removeItem(`sscbs_eduerp_pass_${user?.id || user?.email || 'guest'}`);
+                              } catch (err) {}
+                            }
+                          }}
+                        />
+                        <span>Remember credentials on this browser (0 Supabase server storage)</span>
+                      </label>
+                    </div>
+
+                    <button 
+                      className="btn-eduerp-auto-pull"
+                      onClick={() => {
+                        if (!eduErpPass) {
+                          setEduErpStatusMsg("Please enter your EduERP password to pull live attendance.");
+                          return;
+                        }
+                        window.open("https://pgtechnos.com/EduERP/", "_blank");
+                        setEduErpStatusMsg("Opened EduERP Portal! After logging in, copy your attendance report table or click [Download In Excel] and paste/drop it into SSCBS OS.");
+                      }}
+                    >
+                      ⚡ Pull Realtime Attendance from EduERP ↗
+                    </button>
+                    {eduErpStatusMsg && <div className="eduerp-status-notice">{eduErpStatusMsg}</div>}
+                  </div>
+
+                  <div className="eduerp-divider">
+                    <span>INSTANT REPORT PASTE / IMPORT</span>
                   </div>
 
                   <div className="erp-step-box">
-                    <div className="step-num">2</div>
                     <div className="step-content">
-                      <strong>Import / Paste Report Content</strong>
-                      <p>Copy the attendance table or raw report content from EduERP and paste below for instant 1-second sync:</p>
+                      <p>Paste your EduERP attendance report table or HTML text here for instant parsing:</p>
                       <textarea
                         className="eduerp-paste-textarea"
-                        rows={4}
-                        placeholder="Paste HTML report content or copied table text here..."
+                        rows={3}
+                        placeholder="Paste copied table text or HTML from EduERP portal..."
                         value={eduErpPasteText}
                         onChange={(e) => setEduErpPasteText(e.target.value)}
                       />
@@ -1493,7 +1553,7 @@ function WaiverToolPage({ onBack }) {
                       try {
                         parseHtmlSpreadsheet(eduErpPasteText);
                         setFileMeta({
-                          name: 'EduERP Direct Sync (aditya.25015@sscbs.du.ac.in)',
+                          name: `EduERP Live Sync (${eduErpEmail})`,
                           size: eduErpPasteText.length,
                           uploadedAt: new Date().toISOString()
                         });
@@ -1504,7 +1564,7 @@ function WaiverToolPage({ onBack }) {
                       }
                     }}
                   >
-                    ⚡ Parse & Sync Attendance
+                    ⚡ Import & Load Attendance
                   </button>
                 </div>
               </div>
