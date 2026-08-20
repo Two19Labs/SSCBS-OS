@@ -167,6 +167,7 @@ function WaiverToolPage({ onBack }) {
   // Tabs inside results selector
   const [activeSelectorTab, setActiveSelectorTab] = useState('grid'); // 'grid' | 'calendar' | 'list'
   const [activeMonthKey, setActiveMonthKey] = useState(""); // e.g. "2026-01"
+  const [summaryViewMode, setSummaryViewMode] = useState('cards'); // 'cards' | 'table'
 
   // Clean error on changes
   useEffect(() => {
@@ -913,6 +914,83 @@ function WaiverToolPage({ onBack }) {
     return blocks;
   };
 
+  const renderSubjectsCards = () => {
+    if (!parsedData) return null;
+    const subjectStats = getSimulatedSubjectStats();
+
+    return (
+      <div className="subjects-cards-wrapper">
+        <div className="subjects-cards-grid">
+          {subjectStats.map((sub, sIdx) => {
+            const types = [
+              { key: 'Th', label: 'Theory', infoOnly: false, stat: sub.stats.Th },
+              { key: 'tu', label: 'Tutorial', infoOnly: false, stat: sub.stats.tu },
+              { key: 'PR', label: 'Practical', infoOnly: true, stat: sub.stats.PR }
+            ];
+
+            return (
+              <div key={sIdx} className="subject-card">
+                <div className="subject-card-header">
+                  <span className="subject-card-title">{sub.name}</span>
+                  <span className="subject-card-roll">{sub.rollNo}</span>
+                </div>
+
+                <div className="subject-card-body">
+                  {types.map(({ key, label, infoOnly, stat }) => {
+                    const hasClasses = stat.held > 0;
+                    const pct = hasClasses ? (stat.attended / stat.held) * 100 : 0;
+
+                    let pctClass = 'text-green';
+                    let barColor = '#10b981';
+                    if (pct < 75) {
+                      pctClass = 'text-red';
+                      barColor = '#ef4444';
+                    } else if (pct < 85) {
+                      pctClass = 'text-orange';
+                      barColor = '#f59e0b';
+                    }
+
+                    return (
+                      <div key={key} className="subject-row-item">
+                        <div className="row-item-top">
+                          <div className="row-item-label-group">
+                            <span className="row-type-name">{label}</span>
+                            {infoOnly && <span className="info-only-badge">info only</span>}
+                          </div>
+                          <div className="row-item-stats-group">
+                            {hasClasses ? (
+                              <>
+                                <span className="row-stat-fraction">{stat.attended}/{stat.held}</span>
+                                <span className={`row-stat-pct ${pctClass}`}>{pct.toFixed(1)}%</span>
+                              </>
+                            ) : (
+                              <span className="no-classes-lbl">no classes &mdash;</span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="row-progress-bar-track">
+                          {hasClasses ? (
+                            <div 
+                              className="row-progress-bar-fill" 
+                              style={{ width: `${Math.min(100, Math.max(0, pct))}%`, backgroundColor: barColor }}
+                            ></div>
+                          ) : (
+                            <div className="row-progress-bar-empty"></div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   const renderAttendanceGrid = () => {
     if (!parsedData) return null;
 
@@ -1287,56 +1365,74 @@ function WaiverToolPage({ onBack }) {
 
           {/* Right Main Pane: Contents */}
           <main className="workspace-main-content">
-            {/* Top Row: Attendance Summary Table */}
+            {/* Top Row: Attendance Summary / Subjects Cards */}
             <div className="results-card-glass fullwidth-summary-card">
               <div className="card-header-row">
                 <div className="title-block">
-                  <h3>Adjusted Attendance Summary</h3>
-                  <p className="subtitle">Real-time simulator of waivers impact</p>
+                  <h3>Subjects</h3>
+                  <p className="subtitle">Real-time attendance simulator across Theory, Tutorial & Practical</p>
                 </div>
-                <div className={`status-pill ${allSafe ? 'safe' : 'alert'}`}>
-                  {allSafe ? "ALL SAFE (≥85%)" : "SHORTAGE DETECTED"}
+                <div className="summary-header-right-cluster">
+                  <div className="view-mode-toggle-btns">
+                    <button 
+                      className={`toggle-view-btn ${summaryViewMode === 'cards' ? 'active' : ''}`}
+                      onClick={() => setSummaryViewMode('cards')}
+                    >
+                      Cards View
+                    </button>
+                    <button 
+                      className={`toggle-view-btn ${summaryViewMode === 'table' ? 'active' : ''}`}
+                      onClick={() => setSummaryViewMode('table')}
+                    >
+                      Table View
+                    </button>
+                  </div>
+                  <div className={`status-pill ${allSafe ? 'safe' : 'alert'}`}>
+                    {allSafe ? "ALL SAFE (≥85%)" : "SHORTAGE DETECTED"}
+                  </div>
                 </div>
               </div>
 
-              <div className="stats-comparison-table-wrapper">
-                <table className="stats-comparison-table">
-                  <thead>
-                    <tr>
-                      <th>Subject Name</th>
-                      <th>Type</th>
-                      <th className="center">Original</th>
-                      <th className="center">Simulated</th>
-                      <th className="right">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {simulatedStats.map((s, idx) => {
-                      const isShort = s.simPct < threshold;
-                      return (
-                        <tr key={idx} className={isShort ? "row-alert" : ""}>
-                          <td className="subject-name">{s.subjectName}</td>
-                          <td className="subject-type-badge">{s.type}</td>
-                          <td className="center txt-muted">
-                            {s.baselineAttended}/{s.baselineHeld} <span className="pct-small">({s.baselinePct.toFixed(1)}%)</span>
-                          </td>
-                          <td className="center bold">
-                            {s.simAttended}/{s.simHeld} <span className={isShort ? "text-red" : "text-green"}>({s.simPct.toFixed(1)}%)</span>
-                          </td>
-                          <td className="right">
-                            <span className={`status-badge-mini ${isShort ? 'badge-short' : 'badge-safe'}`}>
-                              {isShort ? 'SHORT' : 'SAFE'}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              {summaryViewMode === 'cards' ? renderSubjectsCards() : (
+                <div className="stats-comparison-table-wrapper">
+                  <table className="stats-comparison-table">
+                    <thead>
+                      <tr>
+                        <th>Subject Name</th>
+                        <th>Type</th>
+                        <th className="center">Original</th>
+                        <th className="center">Simulated</th>
+                        <th className="right">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {simulatedStats.map((s, idx) => {
+                        const isShort = s.simPct < threshold;
+                        return (
+                          <tr key={idx} className={isShort ? "row-alert" : ""}>
+                            <td className="subject-name">{s.subjectName}</td>
+                            <td className="subject-type-badge">{s.type}</td>
+                            <td className="center txt-muted">
+                              {s.baselineAttended}/{s.baselineHeld} <span className="pct-small">({s.baselinePct.toFixed(1)}%)</span>
+                            </td>
+                            <td className="center bold">
+                              {s.simAttended}/{s.simHeld} <span className={isShort ? "text-red" : "text-green"}>({s.simPct.toFixed(1)}%)</span>
+                            </td>
+                            <td className="right">
+                              <span className={`status-badge-mini ${isShort ? 'badge-short' : 'badge-safe'}`}>
+                                {isShort ? 'SHORT' : 'SAFE'}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
 
               <div className="subjects-note-container">
-                <p>📌 <strong>Theory & Tutorial Monitored Separately:</strong> Theory (`Th`) and Tutorial (`tu`) are independent requirements. Practical (`PR`) classes are completely ignored.</p>
+                <p>📌 <strong>Theory & Tutorial Monitored for Waivers:</strong> Practical (`PR`) classes are marked <strong>info only</strong> and displayed for your reference, but are not prioritized when allocating waivers.</p>
               </div>
             </div>
 
