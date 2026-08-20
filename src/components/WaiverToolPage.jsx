@@ -179,6 +179,9 @@ function WaiverToolPage({ onBack }) {
   const [showEduErpModal, setShowEduErpModal] = useState(false);
   const [eduErpPasteText, setEduErpPasteText] = useState('');
 
+  // CDC & Placement Cell Extra Attendance (+1 Numerator & +1 Denominator)
+  const [extraAttendance, setExtraAttendance] = useState({}); // { [subjectName]: number }
+
   // Restore persisted state on mount or user change
   useEffect(() => {
     try {
@@ -197,6 +200,7 @@ function WaiverToolPage({ onBack }) {
           if (saved.threshold !== undefined) setThreshold(saved.threshold);
           if (saved.fileMeta) setFileMeta(saved.fileMeta);
           if (saved.activeMonthKey) setActiveMonthKey(saved.activeMonthKey);
+          if (saved.extraAttendance) setExtraAttendance(saved.extraAttendance);
         }
       }
     } catch (err) {
@@ -217,13 +221,14 @@ function WaiverToolPage({ onBack }) {
         maxWaivers,
         threshold,
         fileMeta,
-        activeMonthKey
+        activeMonthKey,
+        extraAttendance
       };
       localStorage.setItem(storageKey, JSON.stringify(stateToSave));
     } catch (err) {
       console.warn("Failed to persist Waiver Tool state:", err);
     }
-  }, [parsedData, selectedWaivers, recommendedWaivers, solverResult, startingMonth, maxWaivers, threshold, fileMeta, activeMonthKey, storageKey]);
+  }, [parsedData, selectedWaivers, recommendedWaivers, solverResult, startingMonth, maxWaivers, threshold, fileMeta, activeMonthKey, extraAttendance, storageKey]);
 
   const handleUploadNewSheet = () => {
     setParsedData(null);
@@ -232,9 +237,18 @@ function WaiverToolPage({ onBack }) {
     setSelectedWaivers(new Set());
     setRecommendedWaivers([]);
     setSolverResult(null);
+    setExtraAttendance({});
     try {
       localStorage.removeItem(storageKey);
     } catch (e) {}
+  };
+
+  const handleExtraAttendanceChange = (subjectName, delta) => {
+    setExtraAttendance(prev => {
+      const current = prev[subjectName] || 0;
+      const next = Math.max(0, current + delta);
+      return { ...prev, [subjectName]: next };
+    });
   };
 
   // Clean error on changes
@@ -847,7 +861,11 @@ function WaiverToolPage({ onBack }) {
         }
       });
 
-      const pct = held > 0 ? (attended / held * 100) : 100;
+      const extra = extraAttendance[g.subjectName] || 0;
+      const simAttended = attended + extra;
+      const simHeld = held + extra;
+
+      const pct = simHeld > 0 ? (simAttended / simHeld * 100) : 100;
       const baselinePct = g.baselineHeld > 0 ? (g.baselineAttended / g.baselineHeld * 100) : 100;
       
       return {
@@ -856,8 +874,9 @@ function WaiverToolPage({ onBack }) {
         baselineAttended: g.baselineAttended,
         baselineHeld: g.baselineHeld,
         simPct: pct,
-        simAttended: attended,
-        simHeld: held
+        simAttended,
+        simHeld,
+        extraCount: extra
       };
     });
   };
@@ -886,17 +905,20 @@ function WaiverToolPage({ onBack }) {
         });
       });
 
+      const extra = extraAttendance[sub.name] || 0;
+
       const baselineTotalHeld = sub.baselineStats.Th.held + sub.baselineStats.tu.held + sub.baselineStats.PR.held;
       const baselineTotalAtt = sub.baselineStats.Th.attended + sub.baselineStats.tu.attended + sub.baselineStats.PR.attended;
       const baselinePct = baselineTotalHeld > 0 ? (baselineTotalAtt / baselineTotalHeld * 100) : 100;
 
-      const simTotalHeld = stats.Th.held + stats.tu.held + stats.PR.held;
-      const simTotalAtt = stats.Th.attended + stats.tu.attended + stats.PR.attended;
+      const simTotalHeld = stats.Th.held + stats.tu.held + stats.PR.held + extra;
+      const simTotalAtt = stats.Th.attended + stats.tu.attended + stats.PR.attended + extra;
       const simPct = simTotalHeld > 0 ? (simTotalAtt / simTotalHeld * 100) : 100;
 
       return {
         name: sub.name,
         rollNo: sub.rollNo,
+        extraCount: extra,
         baselinePct,
         simPct,
         stats,
@@ -1057,6 +1079,34 @@ function WaiverToolPage({ onBack }) {
                       </div>
                     );
                   })}
+
+                  <div className="card-extra-cdc-row">
+                    <div className="cdc-label-group">
+                      <span className="cdc-icon">⚡</span>
+                      <span className="cdc-title">CDC / Society Extra:</span>
+                      <span className="cdc-hint">(+1 Attended & +1 Held)</span>
+                    </div>
+                    <div className="cdc-stepper">
+                      <button 
+                        className="btn-cdc-step" 
+                        onClick={() => handleExtraAttendanceChange(sub.name, -1)}
+                        disabled={!sub.extraCount}
+                        title="Remove 1 CDC Extra Attendance"
+                      >
+                        -
+                      </button>
+                      <span className={`cdc-val ${sub.extraCount ? 'has-extra' : ''}`}>
+                        +{sub.extraCount || 0}
+                      </span>
+                      <button 
+                        className="btn-cdc-step" 
+                        onClick={() => handleExtraAttendanceChange(sub.name, 1)}
+                        title="Add 1 CDC Extra Attendance (+1 Numerator & +1 Denominator)"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             );
