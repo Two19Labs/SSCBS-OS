@@ -2030,5 +2030,290 @@
   border-radius: 4px;
 }
 
+/* EduERP Quick Sync Banner */
+.eduerp-quick-sync-banner {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.08));
+  border: 1.5px solid rgba(99, 102, 241, 0.25);
+  border-radius: 16px;
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.eduerp-quick-sync-banner .banner-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.eduerp-quick-sync-banner .zap-icon {
+  font-size: 1.4rem;
+  background: #6366f1;
+  color: #ffffff;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.eduerp-quick-sync-banner strong {
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.eduerp-quick-sync-banner p {
+  margin: 0.2rem 0 0 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.eduerp-quick-sync-banner code {
+  background: rgba(99, 102, 241, 0.1);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  color: #4338ca;
+}
+
+.btn-trigger-eduerp {
+  background: #6366f1;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 0.65rem 1.25rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+
+.btn-trigger-eduerp:hover {
+  background: #4f46e5;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+}
+
+/* Modal styling */
+.modal-backdrop-blur {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(6px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.edu-erp-sync-modal {
+  background: #ffffff;
+  border-radius: 20px;
+  max-width: 580px;
+  width: 100%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.edu-erp-sync-modal .modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.edu-erp-sync-modal .title-area {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.edu-erp-sync-modal .beta-tag {
+  background: #e0e7ff;
+  color: #4338ca;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+}
+
+.edu-erp-sync-modal h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.btn-close-modal {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0.3rem;
+  line-height: 1;
+}
+
+.btn-close-modal:hover {
+  color: #0f172a;
+}
+
+.edu-erp-sync-modal .modal-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.modal-desc {
+  font-size: 0.9rem;
+  color: #475467;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.modal-desc code {
+  background: #f1f5f9;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  color: #334155;
+}
+
+.erp-step-box {
+  display: flex;
+  gap: 1rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.erp-step-box .step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #6366f1;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.erp-step-box .step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.erp-step-box .step-content strong {
+  font-size: 0.92rem;
+  color: #0f172a;
+}
+
+.erp-step-box .step-content p {
+  margin: 0;
+  font-size: 0.84rem;
+  color: #64748b;
+}
+
+.btn-open-eduerp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+  font-weight: 600;
+  font-size: 0.82rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 6px;
+  text-decoration: none;
+  margin-top: 0.3rem;
+  width: fit-content;
+  transition: all 0.2s ease;
+}
+
+.btn-open-eduerp:hover {
+  border-color: #6366f1;
+  color: #6366f1;
+}
+
+.eduerp-paste-textarea {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-family: monospace;
+  font-size: 0.8rem;
+  outline: none;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.eduerp-paste-textarea:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #f1f5f9;
+  background: #f8fafc;
+}
+
+.btn-modal-cancel {
+  background: transparent;
+  border: 1px solid #cbd5e1;
+  color: #475467;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-modal-sync-submit {
+  background: #6366f1;
+  color: #ffffff;
+  border: none;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.55rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-modal-sync-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-modal-sync-submit:not(:disabled):hover {
+  background: #4f46e5;
+}
+
 
 

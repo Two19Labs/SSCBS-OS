@@ -175,6 +175,10 @@ function WaiverToolPage({ onBack }) {
   const [activeMonthKey, setActiveMonthKey] = useState(""); // e.g. "2026-01"
   const [summaryViewMode, setSummaryViewMode] = useState('cards'); // 'cards' | 'table'
 
+  // EduERP Real-Time Sync Modal state for aditya.25015@sscbs.du.ac.in
+  const [showEduErpModal, setShowEduErpModal] = useState(false);
+  const [eduErpPasteText, setEduErpPasteText] = useState('');
+
   // Restore persisted state on mount or user change
   useEffect(() => {
     try {
@@ -1321,6 +1325,22 @@ function WaiverToolPage({ onBack }) {
             </div>
           </div>
 
+          {/* EduERP Real-Time Sync Banner for aditya.25015@sscbs.du.ac.in */}
+          {(user?.email?.toLowerCase() === 'aditya.25015@sscbs.du.ac.in' || !user || user?.email?.toLowerCase().includes('aditya')) && (
+            <div className="eduerp-quick-sync-banner">
+              <div className="banner-left">
+                <span className="zap-icon">⚡</span>
+                <div>
+                  <strong>EduERP Real-Time Direct Sync</strong>
+                  <p>Import live attendance directly from EduERP (<code>pgtechnos.com/EduERP/</code>) for <strong>aditya.25015@sscbs.du.ac.in</strong></p>
+                </div>
+              </div>
+              <button className="btn-trigger-eduerp" onClick={() => setShowEduErpModal(true)}>
+                Sync from EduERP ↗
+              </button>
+            </div>
+          )}
+
           <div 
             className="dropzone-area"
             onDragOver={handleDragOver}
@@ -1364,6 +1384,82 @@ function WaiverToolPage({ onBack }) {
           >
             {isProcessing ? "Processing Spreadsheet..." : "Extract & Calculate Optimal Waivers"}
           </button>
+
+          {/* EduERP Real-Time Sync Modal */}
+          {showEduErpModal && (
+            <div className="modal-backdrop-blur" onClick={() => setShowEduErpModal(false)}>
+              <div className="edu-erp-sync-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                  <div className="title-area">
+                    <span className="beta-tag">⚡ BETA</span>
+                    <h3>EduERP Real-Time Sync</h3>
+                  </div>
+                  <button className="btn-close-modal" onClick={() => setShowEduErpModal(false)}>✕</button>
+                </div>
+
+                <div className="modal-body">
+                  <p className="modal-desc">
+                    Connect with official SSCBS EduERP portal (<code>pgtechnos.com/EduERP/</code>) to import your latest attendance report in real-time.
+                  </p>
+
+                  <div className="erp-step-box">
+                    <div className="step-num">1</div>
+                    <div className="step-content">
+                      <strong>Open EduERP Portal Login</strong>
+                      <p>Log in with <code>aditya.25015@sscbs.du.ac.in</code> to view your student attendance report.</p>
+                      <a 
+                        href="https://pgtechnos.com/EduERP/" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="btn-open-eduerp"
+                      >
+                        Open EduERP Portal Login ↗
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="erp-step-box">
+                    <div className="step-num">2</div>
+                    <div className="step-content">
+                      <strong>Import / Paste Report Content</strong>
+                      <p>Copy the attendance table or raw report content from EduERP and paste below for instant 1-second sync:</p>
+                      <textarea
+                        className="eduerp-paste-textarea"
+                        rows={4}
+                        placeholder="Paste HTML report content or copied table text here..."
+                        value={eduErpPasteText}
+                        onChange={(e) => setEduErpPasteText(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="modal-footer">
+                  <button className="btn-modal-cancel" onClick={() => setShowEduErpModal(false)}>Cancel</button>
+                  <button 
+                    className="btn-modal-sync-submit"
+                    disabled={!eduErpPasteText.trim()}
+                    onClick={() => {
+                      try {
+                        parseHtmlSpreadsheet(eduErpPasteText);
+                        setFileMeta({
+                          name: 'EduERP Direct Sync (aditya.25015@sscbs.du.ac.in)',
+                          size: eduErpPasteText.length,
+                          uploadedAt: new Date().toISOString()
+                        });
+                        setShowEduErpModal(false);
+                        setEduErpPasteText('');
+                      } catch (err) {
+                        setError("Failed to parse EduERP content. Please ensure you copied the attendance table from EduERP.");
+                      }
+                    }}
+                  >
+                    ⚡ Parse & Sync Attendance
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <div className="fullpage-workspace-layout">
