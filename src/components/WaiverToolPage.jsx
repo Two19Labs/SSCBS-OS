@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import FooterCredit from './FooterCredit';
+import { useAuth } from '../context/AuthContext';
 import './WaiverToolPage.css';
 
 const MONTHS = [
@@ -149,7 +150,12 @@ const executeSolver = (candidatesList, groupsList, limit, targetPct) => {
 };
 
 function WaiverToolPage({ onBack }) {
+  const { user } = useAuth();
+  const userKey = user?.id || user?.email || 'guest';
+  const storageKey = `sscbs_waiver_tool_state_${userKey}`;
+
   const [file, setFile] = useState(null);
+  const [fileMeta, setFileMeta] = useState(null);
   const [startingMonth, setStartingMonth] = useState(0); // 0 = Jan
   const [maxWaivers, setMaxWaivers] = useState(12);
   const [threshold, setThreshold] = useState(85);
@@ -168,6 +174,64 @@ function WaiverToolPage({ onBack }) {
   const [activeSelectorTab, setActiveSelectorTab] = useState('grid'); // 'grid' | 'calendar' | 'list'
   const [activeMonthKey, setActiveMonthKey] = useState(""); // e.g. "2026-01"
   const [summaryViewMode, setSummaryViewMode] = useState('cards'); // 'cards' | 'table'
+
+  // Restore persisted state on mount or user change
+  useEffect(() => {
+    try {
+      const savedStr = localStorage.getItem(storageKey);
+      if (savedStr) {
+        const saved = JSON.parse(savedStr);
+        if (saved && saved.parsedData) {
+          setParsedData(saved.parsedData);
+          if (Array.isArray(saved.selectedWaivers)) {
+            setSelectedWaivers(new Set(saved.selectedWaivers));
+          }
+          if (saved.recommendedWaivers) setRecommendedWaivers(saved.recommendedWaivers);
+          if (saved.solverResult) setSolverResult(saved.solverResult);
+          if (saved.startingMonth !== undefined) setStartingMonth(saved.startingMonth);
+          if (saved.maxWaivers !== undefined) setMaxWaivers(saved.maxWaivers);
+          if (saved.threshold !== undefined) setThreshold(saved.threshold);
+          if (saved.fileMeta) setFileMeta(saved.fileMeta);
+          if (saved.activeMonthKey) setActiveMonthKey(saved.activeMonthKey);
+        }
+      }
+    } catch (err) {
+      console.warn("Failed to restore Waiver Tool state:", err);
+    }
+  }, [storageKey]);
+
+  // Persist state changes automatically
+  useEffect(() => {
+    if (!parsedData) return;
+    try {
+      const stateToSave = {
+        parsedData,
+        selectedWaivers: Array.from(selectedWaivers),
+        recommendedWaivers,
+        solverResult,
+        startingMonth,
+        maxWaivers,
+        threshold,
+        fileMeta,
+        activeMonthKey
+      };
+      localStorage.setItem(storageKey, JSON.stringify(stateToSave));
+    } catch (err) {
+      console.warn("Failed to persist Waiver Tool state:", err);
+    }
+  }, [parsedData, selectedWaivers, recommendedWaivers, solverResult, startingMonth, maxWaivers, threshold, fileMeta, activeMonthKey, storageKey]);
+
+  const handleUploadNewSheet = () => {
+    setParsedData(null);
+    setFile(null);
+    setFileMeta(null);
+    setSelectedWaivers(new Set());
+    setRecommendedWaivers([]);
+    setSolverResult(null);
+    try {
+      localStorage.removeItem(storageKey);
+    } catch (e) {}
+  };
 
   // Clean error on changes
   useEffect(() => {
@@ -254,6 +318,13 @@ function WaiverToolPage({ onBack }) {
 
     setIsProcessing(true);
     setError(null);
+
+    setFileMeta({
+      name: file.name,
+      size: file.size,
+      lastModified: file.lastModified,
+      uploadedAt: new Date().toISOString()
+    });
 
     const reader = new FileReader();
 
@@ -1181,6 +1252,11 @@ function WaiverToolPage({ onBack }) {
         <div className="navbar-logo-area">
           <img src="/sscbs_logo.png" alt="SSCBS Crest" width="28" height="28" />
           <span className="navbar-logo-text">SSCBS <span className="logo-accent">Waiver Assistant</span></span>
+          {fileMeta?.name && (
+            <span className="active-file-pill" title={`Active uploaded sheet: ${fileMeta.name}`}>
+              📄 {fileMeta.name}
+            </span>
+          )}
         </div>
         <div className="navbar-badge-area">
           <span className="navbar-portal-badge">Interactive Simulation Mode</span>
@@ -1358,7 +1434,7 @@ function WaiverToolPage({ onBack }) {
               </div>
             </div>
 
-            <button className="btn-sidebar-upload-new" onClick={() => setParsedData(null)}>
+            <button className="btn-sidebar-upload-new" onClick={handleUploadNewSheet}>
               Upload New Sheet
             </button>
           </aside>

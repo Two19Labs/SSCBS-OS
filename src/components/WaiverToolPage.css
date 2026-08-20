@@ -65,6 +65,21 @@
   font-weight: 850;
 }
 
+.active-file-pill {
+  background: var(--bg, #f1f5f9);
+  border: 1px solid var(--border-strong, #cbd5e1);
+  color: var(--ink-dim, #475467);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 12px;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-left: 0.4rem;
+}
+
 .navbar-badge-area {
   display: flex;
   align-items: center;
