@@ -173,7 +173,6 @@ function WaiverToolPage({ onBack }) {
   // Tabs inside results selector
   const [activeSelectorTab, setActiveSelectorTab] = useState('grid'); // 'grid' | 'calendar' | 'list'
   const [activeMonthKey, setActiveMonthKey] = useState(""); // e.g. "2026-01"
-  const [summaryViewMode, setSummaryViewMode] = useState('cards'); // 'cards' | 'table'
 
   // CDC & Placement Cell Extra Attendance (+1 Numerator & +1 Denominator)
   const [extraAttendance, setExtraAttendance] = useState({}); // { [subjectName]: number }
@@ -1471,63 +1470,13 @@ function WaiverToolPage({ onBack }) {
                   <p className="subtitle">Real-time attendance simulator across Theory, Tutorial & Practical</p>
                 </div>
                 <div className="summary-header-right-cluster">
-                  <div className="view-mode-toggle-btns">
-                    <button 
-                      className={`toggle-view-btn ${summaryViewMode === 'cards' ? 'active' : ''}`}
-                      onClick={() => setSummaryViewMode('cards')}
-                    >
-                      Cards View
-                    </button>
-                    <button 
-                      className={`toggle-view-btn ${summaryViewMode === 'table' ? 'active' : ''}`}
-                      onClick={() => setSummaryViewMode('table')}
-                    >
-                      Table View
-                    </button>
-                  </div>
                   <div className={`status-pill ${allSafe ? 'safe' : 'alert'}`}>
                     {allSafe ? "ALL SAFE (≥85%)" : "SHORTAGE DETECTED"}
                   </div>
                 </div>
               </div>
 
-              {summaryViewMode === 'cards' ? renderSubjectsCards() : (
-                <div className="stats-comparison-table-wrapper">
-                  <table className="stats-comparison-table">
-                    <thead>
-                      <tr>
-                        <th>Subject Name</th>
-                        <th>Type</th>
-                        <th className="center">Original</th>
-                        <th className="center">Simulated</th>
-                        <th className="right">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {simulatedStats.map((s, idx) => {
-                        const isShort = s.simPct < threshold;
-                        return (
-                          <tr key={idx} className={isShort ? "row-alert" : ""}>
-                            <td className="subject-name">{s.subjectName}</td>
-                            <td className="subject-type-badge">{s.type}</td>
-                            <td className="center txt-muted">
-                              {s.baselineAttended}/{s.baselineHeld} <span className="pct-small">({s.baselinePct.toFixed(1)}%)</span>
-                            </td>
-                            <td className="center bold">
-                              {s.simAttended}/{s.simHeld} <span className={isShort ? "text-red" : "text-green"}>({s.simPct.toFixed(1)}%)</span>
-                            </td>
-                            <td className="right">
-                              <span className={`status-badge-mini ${isShort ? 'badge-short' : 'badge-safe'}`}>
-                                {isShort ? 'SHORT' : 'SAFE'}
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+              {renderSubjectsCards()}
 
               <div className="subjects-note-container">
                 <p>📌 <strong>Theory & Tutorial Monitored for Waivers:</strong> Practical (`PR`) classes are marked <strong>info only</strong> and displayed for your reference, but are not prioritized when allocating waivers.</p>
