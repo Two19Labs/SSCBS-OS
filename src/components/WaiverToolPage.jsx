@@ -1075,34 +1075,6 @@ function WaiverToolPage({ onBack }) {
                       </div>
                     );
                   })}
-
-                  <div className="card-extra-cdc-row">
-                    <div className="cdc-label-group">
-                      <span className="cdc-icon">⚡</span>
-                      <span className="cdc-title">CDC / Society Extra:</span>
-                      <span className="cdc-hint">(+1 Attended & +1 Held)</span>
-                    </div>
-                    <div className="cdc-stepper">
-                      <button 
-                        className="btn-cdc-step" 
-                        onClick={() => handleExtraAttendanceChange(sub.name, -1)}
-                        disabled={!sub.extraCount}
-                        title="Remove 1 CDC Extra Attendance"
-                      >
-                        -
-                      </button>
-                      <span className={`cdc-val ${sub.extraCount ? 'has-extra' : ''}`}>
-                        +{sub.extraCount || 0}
-                      </span>
-                      <button 
-                        className="btn-cdc-step" 
-                        onClick={() => handleExtraAttendanceChange(sub.name, 1)}
-                        title="Add 1 CDC Extra Attendance (+1 Numerator & +1 Denominator)"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
                 </div>
               </div>
             );
