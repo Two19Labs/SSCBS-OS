@@ -183,23 +183,33 @@ function WaiverToolPage({ onBack }) {
       const savedStr = localStorage.getItem(storageKey);
       if (savedStr) {
         const saved = JSON.parse(savedStr);
-        if (saved && saved.parsedData) {
+        if (
+          saved &&
+          saved.parsedData &&
+          Array.isArray(saved.parsedData.allDates) &&
+          Array.isArray(saved.parsedData.allSubjects) &&
+          Array.isArray(saved.parsedData.candidates) &&
+          Array.isArray(saved.parsedData.targetGroups)
+        ) {
           setParsedData(saved.parsedData);
           if (Array.isArray(saved.selectedWaivers)) {
             setSelectedWaivers(new Set(saved.selectedWaivers));
           }
-          if (saved.recommendedWaivers) setRecommendedWaivers(saved.recommendedWaivers);
+          if (Array.isArray(saved.recommendedWaivers)) setRecommendedWaivers(saved.recommendedWaivers);
           if (saved.solverResult) setSolverResult(saved.solverResult);
           if (saved.startingMonth !== undefined) setStartingMonth(saved.startingMonth);
           if (saved.maxWaivers !== undefined) setMaxWaivers(saved.maxWaivers);
           if (saved.threshold !== undefined) setThreshold(saved.threshold);
           if (saved.fileMeta) setFileMeta(saved.fileMeta);
           if (saved.activeMonthKey) setActiveMonthKey(saved.activeMonthKey);
-          if (saved.extraAttendance) setExtraAttendance(saved.extraAttendance);
+          if (saved.extraAttendance && typeof saved.extraAttendance === 'object') setExtraAttendance(saved.extraAttendance);
+        } else {
+          localStorage.removeItem(storageKey);
         }
       }
     } catch (err) {
       console.warn("Failed to restore Waiver Tool state:", err);
+      try { localStorage.removeItem(storageKey); } catch (_) {}
     }
   }, [storageKey]);
 
@@ -877,17 +887,17 @@ function WaiverToolPage({ onBack }) {
   };
 
   const getSimulatedSubjectStats = () => {
-    if (!parsedData) return [];
+    if (!parsedData || !Array.isArray(parsedData.allSubjects)) return [];
 
     return parsedData.allSubjects.map(sub => {
       const stats = {
-        Th: { attended: sub.baselineStats.Th.attended, held: sub.baselineStats.Th.held },
-        tu: { attended: sub.baselineStats.tu.attended, held: sub.baselineStats.tu.held },
-        PR: { attended: sub.baselineStats.PR.attended, held: sub.baselineStats.PR.held }
+        Th: { attended: sub?.baselineStats?.Th?.attended || 0, held: sub?.baselineStats?.Th?.held || 0 },
+        tu: { attended: sub?.baselineStats?.tu?.attended || 0, held: sub?.baselineStats?.tu?.held || 0 },
+        PR: { attended: sub?.baselineStats?.PR?.attended || 0, held: sub?.baselineStats?.PR?.held || 0 }
       };
 
       selectedWaivers.forEach(dateStr => {
-        const dayRecord = sub.dateAttendance[dateStr] || [];
+        const dayRecord = sub?.dateAttendance?.[dateStr] || [];
         dayRecord.forEach(cls => {
           if (cls.attended) {
             if (cls.type === 'Th') stats.Th.attended--;
@@ -900,10 +910,10 @@ function WaiverToolPage({ onBack }) {
         });
       });
 
-      const extra = extraAttendance[sub.name] || 0;
+      const extra = extraAttendance[sub?.name] || 0;
 
-      const baselineTotalHeld = sub.baselineStats.Th.held + sub.baselineStats.tu.held + sub.baselineStats.PR.held;
-      const baselineTotalAtt = sub.baselineStats.Th.attended + sub.baselineStats.tu.attended + sub.baselineStats.PR.attended;
+      const baselineTotalHeld = (sub?.baselineStats?.Th?.held || 0) + (sub?.baselineStats?.tu?.held || 0) + (sub?.baselineStats?.PR?.held || 0);
+      const baselineTotalAtt = (sub?.baselineStats?.Th?.attended || 0) + (sub?.baselineStats?.tu?.attended || 0) + (sub?.baselineStats?.PR?.attended || 0);
       const baselinePct = baselineTotalHeld > 0 ? (baselineTotalAtt / baselineTotalHeld * 100) : 100;
 
       const simTotalHeld = stats.Th.held + stats.tu.held + stats.PR.held + extra;
@@ -1117,15 +1127,15 @@ function WaiverToolPage({ onBack }) {
             </thead>
             <tbody>
               {subjectStats.map((sub, sIdx) => {
-                const originalSubject = parsedData.allSubjects[sIdx];
+                const originalSubject = parsedData?.allSubjects?.[sIdx];
                 return (
                   <tr key={sIdx}>
                     <td className="sticky-col subject-cell">
                       <div className="sub-name">{sub.name}</div>
                       <div className="sub-roll txt-muted">Roll: {sub.rollNo}</div>
                     </td>
-                    {parsedData.allDates.map((d) => {
-                      const dayRecord = originalSubject.dateAttendance[d.dateStr] || [];
+                    {parsedData?.allDates?.map((d) => {
+                      const dayRecord = originalSubject?.dateAttendance?.[d.dateStr] || [];
                       const isChecked = selectedWaivers.has(d.dateStr);
                       
                       return (

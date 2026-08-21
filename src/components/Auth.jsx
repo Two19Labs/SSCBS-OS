@@ -24,7 +24,7 @@ const slides = [
 ];
 
 export default function Auth({ forceMode }) {
-  const { signIn, signUp, resetPassword, updatePassword, isPasswordRecovery, setIsPasswordRecovery, directStudentAccess, isConfigured } = useAuth();
+  const { signIn, signUp, resetPassword, updatePassword, isPasswordRecovery, setIsPasswordRecovery, isConfigured } = useAuth();
   
   // mode: 'signin' | 'signup' | 'forgot' | 'update_password'
   const [mode, setMode] = useState(() => {
@@ -63,11 +63,6 @@ export default function Auth({ forceMode }) {
       localStorage.setItem('sscbs_has_visited', '1');
     } catch (e) {}
   }, []);
-
-  const handleInstantAccess = () => {
-    const targetEmail = email && email.includes('@') ? email : 'aditya.25015@sscbs.du.ac.in';
-    directStudentAccess(targetEmail);
-  };
 
   // Carousel auto-play
   useEffect(() => {
