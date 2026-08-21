@@ -1581,29 +1581,54 @@
 }
 
 /* Sticky right columns for stats */
-.attendance-spreadsheet-table .sticky-col-right {
-  position: sticky;
-  background: var(--surface);
-  z-index: 2;
-  border-left: 2px solid var(--border);
-  box-shadow: -4px 0 8px -4px rgba(0, 0, 0, 0.08);
-  min-width: 90px;
-}
-
 .attendance-spreadsheet-table .sticky-col-right.stats-cell,
 .attendance-spreadsheet-table th.stats-header {
-  right: 85px; /* width of pct-cell */
+  min-width: 130px;
   border-right: none;
 }
 
 .attendance-spreadsheet-table .sticky-col-right.pct-cell,
 .attendance-spreadsheet-table th.pct-header {
-  right: 0;
+  min-width: 85px;
 }
 
-.attendance-spreadsheet-table th.sticky-col-right {
-  background: var(--bg);
-  z-index: 3;
+/* Enable sticky right columns only on wide screens to prevent overlapping sticky columns */
+@media (min-width: 1400px) {
+  .attendance-spreadsheet-table .sticky-col-right {
+    position: sticky;
+    background: var(--surface);
+    z-index: 4;
+    border-left: 2px solid var(--border);
+    box-shadow: -4px 0 8px -4px rgba(0, 0, 0, 0.08);
+  }
+
+  .attendance-spreadsheet-table .sticky-col-right.stats-cell,
+  .attendance-spreadsheet-table th.stats-header {
+    right: 85px; /* width of pct-cell */
+    width: 130px;
+  }
+
+  .attendance-spreadsheet-table .sticky-col-right.pct-cell,
+  .attendance-spreadsheet-table th.pct-header {
+    right: 0;
+    width: 85px;
+  }
+
+  .attendance-spreadsheet-table th.sticky-col-right {
+    background: var(--bg);
+    z-index: 5;
+  }
+}
+
+@media (max-width: 1399px) {
+  .attendance-spreadsheet-table .sticky-col-right {
+    position: static;
+    box-shadow: none;
+    border-left: 1px solid var(--border);
+  }
+  .attendance-spreadsheet-table th.sticky-col-right {
+    position: static;
+  }
 }
 
 /* Date header cell clicks */
@@ -1819,7 +1844,7 @@
   box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 1350px) {
   .customizer-split-layout {
     grid-template-columns: 1fr;
   }
