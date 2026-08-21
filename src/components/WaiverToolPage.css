@@ -1327,35 +1327,191 @@
   }
 }
 
-@media (max-width: 480px) {
-  .calendar-week-headers {
-    font-size: 0.7rem;
-  }
+/* Horizontal Top Toolbar */
+.workspace-top-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.85rem 1.25rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
 
-  .calendar-days-grid {
-    gap: 0.25rem;
-  }
+.toolbar-controls-cluster {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
 
-  .calendar-day-cell {
-    padding: 0.2rem;
-    aspect-ratio: 1 / 1;
-  }
+.toolbar-input-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
 
-  .calendar-day-cell .day-number {
-    font-size: 0.75rem;
-  }
+.toolbar-input-item label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
 
-  .abs-dot-count, .pres-dot-count {
-    width: 12px;
-    height: 12px;
-    font-size: 0.55rem;
-  }
+.toolbar-input-item input {
+  width: 60px;
+  padding: 0.35rem 0.5rem;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-align: center;
+  background: var(--bg);
+  color: var(--ink);
+}
 
-  .waived-cell-indicator {
-    width: 4px;
-    height: 4px;
-    top: 2px;
-    right: 2px;
+.btn-recalculate-toolbar {
+  background: var(--bg);
+  border: 1.5px solid var(--border-strong);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-recalculate-toolbar:hover {
+  background: var(--ink);
+  color: var(--surface);
+  border-color: var(--ink);
+  transform: translateY(-1px);
+}
+
+.toolbar-metrics-cluster {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: var(--bg);
+  padding: 0.45rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.metric-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+}
+
+.metric-lbl {
+  color: var(--ink-dim);
+  font-weight: 600;
+}
+
+.metric-val {
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.status-tag {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.status-tag.safe-tag {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+
+.status-tag.alert-tag {
+  background: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
+}
+
+.toolbar-actions-cluster {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-toolbar-primary {
+  background: var(--ink);
+  color: var(--surface);
+  border: 1.5px solid var(--ink);
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-toolbar-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-toolbar-sec {
+  background: var(--bg);
+  color: var(--ink);
+  border: 1.5px solid var(--border-strong);
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-toolbar-sec:hover {
+  background: var(--border);
+}
+
+.btn-toolbar-upload {
+  background: var(--surface);
+  color: var(--ink-dim);
+  border: 1px solid var(--border);
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-toolbar-upload:hover {
+  color: var(--ink);
+  border-color: var(--border-strong);
+}
+
+/* 2-Column Main Workspace Grid: Left = Spreadsheet Grid, Right = Subjects */
+.workspace-columns-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 1.25rem;
+  align-items: start;
+  width: 100%;
+}
+
+.workspace-left-pane,
+.workspace-right-pane {
+  width: 100%;
+}
+
+@media (max-width: 1180px) {
+  .workspace-columns-grid {
+    grid-template-columns: 1fr;
   }
 }
 

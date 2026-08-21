@@ -1500,212 +1500,207 @@ function WaiverToolPage({ onBack }) {
         </div>
       ) : (
         <div className="fullpage-workspace-layout">
-          {/* Left Sidebar: Settings, solver status, and triggers */}
-          <aside className="workspace-sidebar">
-            <div className="sidebar-section-card">
-              <h4>Waiver Parameters</h4>
-              <div className="sidebar-inputs-group">
-                <div className="sidebar-input-item">
-                  <label htmlFor="sidebar-max-w">Max Waivers Allowed</label>
-                  <input 
-                    type="number" 
-                    id="sidebar-max-w"
-                    min="1" 
-                    max="30"
-                    value={maxWaivers}
-                    onChange={(e) => setMaxWaivers(Math.max(1, parseInt(e.target.value) || 1))}
-                  />
-                </div>
-                <div className="sidebar-input-item">
-                  <label htmlFor="sidebar-thresh">Target Percentage (%)</label>
-                  <input 
-                    type="number" 
-                    id="sidebar-thresh"
-                    min="50" 
-                    max="100"
-                    value={threshold}
-                    onChange={(e) => setThreshold(Math.max(50, Math.min(100, parseInt(e.target.value) || 85)))}
-                  />
-                </div>
+          {/* Top Horizontal Toolbar Controls & Status */}
+          <header className="workspace-top-toolbar">
+            <div className="toolbar-controls-cluster">
+              <div className="toolbar-input-item">
+                <label htmlFor="top-max-w">Max Waivers</label>
+                <input 
+                  type="number" 
+                  id="top-max-w"
+                  min="1" 
+                  max="30"
+                  value={maxWaivers}
+                  onChange={(e) => setMaxWaivers(Math.max(1, parseInt(e.target.value) || 1))}
+                />
               </div>
-              <button className="btn-recalculate-sidebar-glow" onClick={handleRecalculate}>
-                Recalculate Suggestion
+
+              <div className="toolbar-input-item">
+                <label htmlFor="top-thresh">Target (%)</label>
+                <input 
+                  type="number" 
+                  id="top-thresh"
+                  min="50" 
+                  max="100"
+                  value={threshold}
+                  onChange={(e) => setThreshold(Math.max(50, Math.min(100, parseInt(e.target.value) || 85)))}
+                />
+              </div>
+
+              <button className="btn-recalculate-toolbar" onClick={handleRecalculate} title="Recalculate waiver recommendations">
+                🔄 Recalculate
               </button>
             </div>
 
-            <div className="sidebar-section-card solver-status-card">
-              <h4>Solver Output</h4>
-              <div className="solver-status-rows">
-                <div className="solver-row">
-                  <span>Optimizer Status:</span>
-                  <span className={`status-label ${solverResult?.success ? "safe-text" : "alert-text"}`}>
-                    {solverResult?.success ? "OPTIMAL" : "SHORTAGE"}
-                  </span>
-                </div>
-                <div className="solver-row">
-                  <span>Selected / Max:</span>
-                  <strong>{selectedWaivers.size} / {maxWaivers}</strong>
-                </div>
-                <div className="solver-row">
-                  <span>Min Attendance:</span>
-                  <strong className={allSafe ? "safe-text" : "alert-text"}>
-                    {solverResult?.minPctAchieved ? `${solverResult.minPctAchieved.toFixed(1)}%` : "N/A"}
-                  </strong>
-                </div>
+            <div className="toolbar-metrics-cluster">
+              <div className="metric-pill">
+                <span className="metric-lbl">Status:</span>
+                <span className={`status-tag ${solverResult?.success ? "safe-tag" : "alert-tag"}`}>
+                  {solverResult?.success ? "OPTIMAL" : "SHORTAGE"}
+                </span>
+              </div>
+              <div className="metric-pill">
+                <span className="metric-lbl">Waivers Used:</span>
+                <strong className="metric-val">{selectedWaivers.size} / {maxWaivers}</strong>
+              </div>
+              <div className="metric-pill">
+                <span className="metric-lbl">Min Attendance:</span>
+                <strong className={`metric-val ${allSafe ? "safe-text" : "alert-text"}`}>
+                  {solverResult?.minPctAchieved ? `${solverResult.minPctAchieved.toFixed(1)}%` : "N/A"}
+                </strong>
               </div>
             </div>
 
-            <div className="sidebar-section-card actions-card">
-              <h4>Quick Actions</h4>
-              <div className="sidebar-action-buttons">
-                <button className="btn-sidebar-primary" onClick={resetToRecommended}>
-                  Apply Suggested
-                </button>
-                <button className="btn-sidebar-secondary" onClick={clearAllWaivers}>
-                  Clear All
-                </button>
-              </div>
+            <div className="toolbar-actions-cluster">
+              <button className="btn-toolbar-primary" onClick={resetToRecommended} title="Apply suggested optimal waivers">
+                Apply Suggested
+              </button>
+              <button className="btn-toolbar-sec" onClick={clearAllWaivers} title="Clear all active waivers">
+                Clear All
+              </button>
+              <button className="btn-toolbar-upload" onClick={handleUploadNewSheet} title="Upload a new attendance sheet">
+                📄 New Sheet
+              </button>
             </div>
+          </header>
 
-            <button className="btn-sidebar-upload-new" onClick={handleUploadNewSheet}>
-              Upload New Sheet
-            </button>
-          </aside>
-
-          {/* Right Main Pane: Contents */}
-          <main className="workspace-main-content">
-            {/* Top Row: Attendance Summary / Subjects Cards */}
-            <div className="results-card-glass fullwidth-summary-card">
-              <div className="card-header-row">
-                <div className="title-block">
-                  <h3>Subjects</h3>
-                  <p className="subtitle">Real-time attendance simulator across Theory, Tutorial & Practical</p>
-                </div>
-                <div className="summary-header-right-cluster">
-                  <div className={`status-pill ${allSafe ? 'safe' : 'alert'}`}>
-                    {allSafe ? "ALL SAFE (≥85%)" : "SHORTAGE DETECTED"}
+          {/* Main 2-Column Split: Left = Spreadsheet Grid, Right = Subjects Cards */}
+          <div className="workspace-columns-grid">
+            {/* Left Pane: Interactive Spreadsheet Grid & Views */}
+            <div className="workspace-left-pane">
+              <div className="results-card-glass customizer-card-container">
+                {/* TAB SELECTORS ROW */}
+                <div className="selector-view-tabs-row">
+                  <div className="selector-view-tabs">
+                    <button 
+                      className={`tab-btn ${activeSelectorTab === 'grid' ? 'active' : ''}`}
+                      onClick={() => setActiveSelectorTab('grid')}
+                    >
+                      📊 Spreadsheet Grid
+                    </button>
+                    <button 
+                      className={`tab-btn ${activeSelectorTab === 'calendar' ? 'active' : ''}`}
+                      onClick={() => setActiveSelectorTab('calendar')}
+                    >
+                      📅 Calendar View
+                    </button>
+                    <button 
+                      className={`tab-btn ${activeSelectorTab === 'split' ? 'active' : ''}`}
+                      onClick={() => setActiveSelectorTab('split')}
+                    >
+                      ⚡ Side-by-Side
+                    </button>
+                    <button 
+                      className={`tab-btn ${activeSelectorTab === 'list' ? 'active' : ''}`}
+                      onClick={() => setActiveSelectorTab('list')}
+                    >
+                      📋 Recommended List
+                    </button>
+                  </div>
+                  <div className="actions-cluster">
+                    <button className="btn-suggest-apply" onClick={resetToRecommended} title="Apply auto-recommended optimal waivers">Apply Recommended</button>
+                    <button className="btn-sec-small" onClick={clearAllWaivers} title="Clear all active waivers">Clear All</button>
                   </div>
                 </div>
-              </div>
 
-              {renderSubjectsCards()}
-
-              <div className="subjects-note-container">
-                <p>📌 <strong>1/3rd Waiver Policy Enforced:</strong> Waivers are capped at <strong>1/3rd (33.3%)</strong> of total baseline held classes per subject component (e.g. 12 held = max 4 waivers). Excess waivers beyond the cap are ignored by college rules and will not reduce held count further. Practical (`PR`) classes are info only.</p>
-              </div>
-            </div>
-
-            {/* Bottom Row: Tabs Detailed Customizer (Full width!) */}
-            <div className="results-card-glass detailed-tabs-card fullwidth-customizer-card">
-              
-              {/* TAB SELECTORS ROW */}
-              <div className="selector-view-tabs-row">
-                <div className="selector-view-tabs">
-                  <button 
-                    className={`tab-btn ${activeSelectorTab === 'grid' ? 'active' : ''}`}
-                    onClick={() => setActiveSelectorTab('grid')}
-                  >
-                    📊 Spreadsheet Grid
-                  </button>
-                  <button 
-                    className={`tab-btn ${activeSelectorTab === 'calendar' ? 'active' : ''}`}
-                    onClick={() => setActiveSelectorTab('calendar')}
-                  >
-                    📅 Calendar View
-                  </button>
-                  <button 
-                    className={`tab-btn ${activeSelectorTab === 'split' ? 'active' : ''}`}
-                    onClick={() => setActiveSelectorTab('split')}
-                  >
-                    ⚡ Side-by-Side
-                  </button>
-                  <button 
-                    className={`tab-btn ${activeSelectorTab === 'list' ? 'active' : ''}`}
-                    onClick={() => setActiveSelectorTab('list')}
-                  >
-                    📋 Recommended List
-                  </button>
-                </div>
-                <div className="actions-cluster">
-                  <button className="btn-suggest-apply" onClick={resetToRecommended} title="Apply auto-recommended optimal waivers">Apply Recommended</button>
-                  <button className="btn-sec-small" onClick={clearAllWaivers} title="Clear all active waivers">Clear All</button>
-                </div>
-              </div>
-
-              {/* TAB CONTENT PANELS */}
-              {activeSelectorTab === 'grid' && (
-                <div className="customizer-fullwidth-grid-pane">
-                  {renderAttendanceGrid()}
-                </div>
-              )}
-
-              {activeSelectorTab === 'calendar' && (
-                <div className="customizer-fullwidth-calendar-pane">
-                  {renderCalendarView()}
-                </div>
-              )}
-
-              {activeSelectorTab === 'split' && (
-                <div className="customizer-split-layout">
-                  <div className="customizer-grid-pane">
+                {/* TAB CONTENT PANELS */}
+                {activeSelectorTab === 'grid' && (
+                  <div className="customizer-fullwidth-grid-pane">
                     {renderAttendanceGrid()}
                   </div>
-                  <div className="customizer-calendar-pane">
+                )}
+
+                {activeSelectorTab === 'calendar' && (
+                  <div className="customizer-fullwidth-calendar-pane">
                     {renderCalendarView()}
                   </div>
-                </div>
-              )}
+                )}
 
-              {activeSelectorTab === 'list' && (
-                <div className="recommended-list-view">
-                  <div className="card-header-row pt-0">
-                    <div className="title-block">
-                      <h3>Recommended Dates</h3>
-                      <p className="subtitle">
-                        {solverResult?.success ? (
-                          <span>Optimal combination clears target using <strong>{solverResult.waiversCount}</strong> waivers.</span>
-                        ) : (
-                          <span className="text-orange">Max waivers used. Closest best solution shown.</span>
-                        )}
-                      </p>
+                {activeSelectorTab === 'split' && (
+                  <div className="customizer-split-layout">
+                    <div className="customizer-grid-pane">
+                      {renderAttendanceGrid()}
+                    </div>
+                    <div className="customizer-calendar-pane">
+                      {renderCalendarView()}
                     </div>
                   </div>
+                )}
 
-                  <div className="dates-selector-list">
-                    {parsedData.candidates
-                      .sort((a, b) => b.totalAbsences - a.totalAbsences)
-                      .map((cand, idx) => {
-                        const isChecked = selectedWaivers.has(cand.dateStr);
-                        const isRecommended = recommendedWaivers.includes(cand.dateStr);
-                        
-                        return (
-                          <div 
-                            key={idx} 
-                            className={`date-selection-item ${isChecked ? 'active' : ''} ${isRecommended ? 'recommended-border' : ''}`}
-                            onClick={() => handleCheckboxChange(cand.dateStr)}
-                          >
-                            <div className="checkbox-glow-wrapper">
-                              <input 
-                                type="checkbox" 
-                                checked={isChecked}
-                                onChange={() => {}} 
-                                id={`date-chk-${idx}`}
-                              />
-                              <label htmlFor={`date-chk-${idx}`} onClick={(e) => e.stopPropagation()}></label>
+                {activeSelectorTab === 'list' && (
+                  <div className="recommended-list-view">
+                    <div className="card-header-row pt-0">
+                      <div className="title-block">
+                        <h3>Recommended Dates</h3>
+                        <p className="subtitle">
+                          {solverResult?.success ? (
+                            <span>Optimal combination clears target using <strong>{solverResult.waiversCount}</strong> waivers.</span>
+                          ) : (
+                            <span className="text-orange">Max waivers used. Closest best solution shown.</span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="dates-selector-list">
+                      {parsedData.candidates
+                        .sort((a, b) => b.totalAbsences - a.totalAbsences)
+                        .map((cand, idx) => {
+                          const isChecked = selectedWaivers.has(cand.dateStr);
+                          const isRecommended = recommendedWaivers.includes(cand.dateStr);
+                          
+                          return (
+                            <div 
+                              key={idx} 
+                              className={`date-selection-item ${isChecked ? 'active' : ''} ${isRecommended ? 'recommended-border' : ''}`}
+                              onClick={() => handleCheckboxChange(cand.dateStr)}
+                            >
+                              <div className="checkbox-glow-wrapper">
+                                <input 
+                                  type="checkbox" 
+                                  checked={isChecked}
+                                  onChange={() => {}} 
+                                  id={`date-chk-${idx}`}
+                                />
+                                <label htmlFor={`date-chk-${idx}`} onClick={(e) => e.stopPropagation()}></label>
+                              </div>
+                              <div className="date-info">
+                                <span className="date-label">{cand.label}</span>
+                                <span className="date-sub">Absences: <strong>{cand.totalAbsences}</strong> | Presents: <strong>{cand.totalPresents}</strong></span>
+                              </div>
+                              {isRecommended && <span className="recommended-tag">Rec</span>}
                             </div>
-                            <div className="date-info">
-                              <span className="date-label">{cand.label}</span>
-                              <span className="date-sub">Absences: <strong>{cand.totalAbsences}</strong> | Presents: <strong>{cand.totalPresents}</strong></span>
-                            </div>
-                            {isRecommended && <span className="recommended-tag">Rec</span>}
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right Pane: Subjects Overview & Attendance Cards */}
+            <div className="workspace-right-pane">
+              <div className="results-card-glass subjects-summary-card">
+                <div className="card-header-row">
+                  <div className="title-block">
+                    <h3>Subjects Overview</h3>
+                    <p className="subtitle">Real-time attendance simulator across Theory, Tutorial & Practical</p>
+                  </div>
+                  <div className="summary-header-right-cluster">
+                    <div className={`status-pill ${allSafe ? 'safe' : 'alert'}`}>
+                      {allSafe ? "ALL SAFE (≥85%)" : "SHORTAGE DETECTED"}
+                    </div>
                   </div>
                 </div>
-              )}
+
+                {renderSubjectsCards()}
+
+                <div className="subjects-note-container">
+                  <p>📌 <strong>1/3rd Waiver Policy Enforced:</strong> Waivers are capped at <strong>1/3rd (33.3%)</strong> of total baseline held classes per subject component (e.g. 12 held = max 4 waivers). Excess waivers beyond the cap are ignored by college rules and will not reduce held count further. Practical (`PR`) classes are info only.</p>
+                </div>
+              </div>
             </div>
-          </main>
+          </div>
         </div>
       )}
       <FooterCredit />
