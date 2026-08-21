@@ -21,18 +21,27 @@ const executeSolver = (candidatesList, groupsList, limit, targetPct) => {
 
   const checkSolution = (selectedCandidates) => {
     const adjusted = groupsList.map((g, gIdx) => {
-      let attended = g.baselineAttended;
-      let held = g.baselineHeld;
+      let rawWaivedAttended = 0;
+      let rawWaivedHeld = 0;
       
       selectedCandidates.forEach(c => {
         const eff = c.groupEffects[gIdx];
         if (eff) {
-          attended -= eff.attended;
-          held -= eff.held;
+          rawWaivedAttended += eff.attended;
+          rawWaivedHeld += eff.held;
         }
       });
-      
-      const pct = held > 0 ? (attended / held) : 1.0;
+
+      // 1/3rd Waiver Cap Rule: Max waivable classes = Math.floor(baselineHeld / 3)
+      const maxWaivable = Math.floor(g.baselineHeld / 3);
+      const effectiveWaivedHeld = Math.min(rawWaivedHeld, maxWaivable);
+      const ratio = rawWaivedHeld > 0 ? (effectiveWaivedHeld / rawWaivedHeld) : 1;
+      const effectiveWaivedAttended = Math.round(rawWaivedAttended * ratio);
+
+      const simAttended = Math.max(0, g.baselineAttended - effectiveWaivedAttended);
+      const simHeld = Math.max(1, g.baselineHeld - effectiveWaivedHeld);
+
+      const pct = simHeld > 0 ? (simAttended / simHeld) : 1.0;
       return pct;
     });
     
@@ -851,8 +860,8 @@ function WaiverToolPage({ onBack }) {
     if (!parsedData) return [];
 
     return parsedData.targetGroups.map(g => {
-      let attended = g.baselineAttended;
-      let held = g.baselineHeld;
+      let rawWaivedAttended = 0;
+      let rawWaivedHeld = 0;
       
       selectedWaivers.forEach(dateStr => {
         const cand = parsedData.candidates.find(c => c.dateStr === dateStr);
@@ -861,14 +870,20 @@ function WaiverToolPage({ onBack }) {
         const gIdx = parsedData.targetGroups.findIndex(tg => tg.key === g.key);
         const eff = cand.groupEffects[gIdx];
         if (eff) {
-          attended -= eff.attended;
-          held -= eff.held;
+          rawWaivedAttended += eff.attended;
+          rawWaivedHeld += eff.held;
         }
       });
 
+      // 1/3rd Waiver Cap Rule: Max waivable classes = Math.floor(baselineHeld / 3)
+      const maxWaivable = Math.floor(g.baselineHeld / 3);
+      const effectiveWaivedHeld = Math.min(rawWaivedHeld, maxWaivable);
+      const ratio = rawWaivedHeld > 0 ? (effectiveWaivedHeld / rawWaivedHeld) : 1;
+      const effectiveWaivedAttended = Math.round(rawWaivedAttended * ratio);
+
       const extra = extraAttendance[g.subjectName] || 0;
-      const simAttended = attended + extra;
-      const simHeld = held + extra;
+      const simAttended = Math.max(0, g.baselineAttended - effectiveWaivedAttended) + extra;
+      const simHeld = Math.max(1, g.baselineHeld - effectiveWaivedHeld) + extra;
 
       const pct = simHeld > 0 ? (simAttended / simHeld * 100) : 100;
       const baselinePct = g.baselineHeld > 0 ? (g.baselineAttended / g.baselineHeld * 100) : 100;
@@ -881,7 +896,13 @@ function WaiverToolPage({ onBack }) {
         simPct: pct,
         simAttended,
         simHeld,
-        extraCount: extra
+        extraCount: extra,
+        maxWaivable,
+        rawWaivedHeld,
+        effectiveWaivedHeld,
+        isCapReached: rawWaivedHeld >= maxWaivable && maxWaivable > 0,
+        isCapExceeded: rawWaivedHeld > maxWaivable,
+        excessCount: Math.max(0, rawWaivedHeld - maxWaivable)
       };
     });
   };
@@ -890,24 +911,58 @@ function WaiverToolPage({ onBack }) {
     if (!parsedData || !Array.isArray(parsedData.allSubjects)) return [];
 
     return parsedData.allSubjects.map(sub => {
-      const stats = {
-        Th: { attended: sub?.baselineStats?.Th?.attended || 0, held: sub?.baselineStats?.Th?.held || 0 },
-        tu: { attended: sub?.baselineStats?.tu?.attended || 0, held: sub?.baselineStats?.tu?.held || 0 },
-        PR: { attended: sub?.baselineStats?.PR?.attended || 0, held: sub?.baselineStats?.PR?.held || 0 }
+      const rawWaived = {
+        Th: { attended: 0, held: 0 },
+        tu: { attended: 0, held: 0 },
+        PR: { attended: 0, held: 0 }
       };
 
       selectedWaivers.forEach(dateStr => {
         const dayRecord = sub?.dateAttendance?.[dateStr] || [];
         dayRecord.forEach(cls => {
           if (cls.attended) {
-            if (cls.type === 'Th') stats.Th.attended--;
-            if (cls.type === 'tu') stats.tu.attended--;
-            if (cls.type === 'PR') stats.PR.attended--;
+            if (cls.type === 'Th') rawWaived.Th.attended++;
+            if (cls.type === 'tu') rawWaived.tu.attended++;
+            if (cls.type === 'PR') rawWaived.PR.attended++;
           }
-          if (cls.type === 'Th') stats.Th.held--;
-          if (cls.type === 'tu') stats.tu.held--;
-          if (cls.type === 'PR') stats.PR.held--;
+          if (cls.type === 'Th') rawWaived.Th.held++;
+          if (cls.type === 'tu') rawWaived.tu.held++;
+          if (cls.type === 'PR') rawWaived.PR.held++;
         });
+      });
+
+      const types = ['Th', 'tu', 'PR'];
+      const stats = {};
+      const capInfo = {};
+
+      types.forEach(t => {
+        const baseHeld = sub?.baselineStats?.[t]?.held || 0;
+        const baseAtt = sub?.baselineStats?.[t]?.attended || 0;
+        const maxWaivable = Math.floor(baseHeld / 3);
+        const attemptedHeld = rawWaived[t].held;
+        const effectiveHeld = Math.min(attemptedHeld, maxWaivable);
+        const ratio = attemptedHeld > 0 ? (effectiveHeld / attemptedHeld) : 1;
+        const effectiveAttended = Math.round(rawWaived[t].attended * ratio);
+
+        const simHeld = Math.max(0, baseHeld - effectiveHeld);
+        const simAttended = Math.max(0, baseAtt - effectiveAttended);
+
+        stats[t] = {
+          attended: simAttended,
+          held: simHeld,
+          effectiveHeld,
+          attemptedHeld,
+          maxWaivable
+        };
+
+        capInfo[t] = {
+          maxWaivable,
+          attemptedHeld,
+          effectiveHeld,
+          isCapExceeded: attemptedHeld > maxWaivable,
+          isCapReached: attemptedHeld >= maxWaivable && maxWaivable > 0,
+          excess: Math.max(0, attemptedHeld - maxWaivable)
+        };
       });
 
       const extra = extraAttendance[sub?.name] || 0;
@@ -927,6 +982,7 @@ function WaiverToolPage({ onBack }) {
         baselinePct,
         simPct,
         stats,
+        capInfo,
         baselineStats: sub.baselineStats,
         simTotalAtt,
         simTotalHeld,
@@ -1039,8 +1095,10 @@ function WaiverToolPage({ onBack }) {
 
                 <div className="subject-card-body">
                   {types.map(({ key, label, infoOnly, stat }) => {
-                    const hasClasses = stat.held > 0;
-                    const pct = hasClasses ? (stat.attended / stat.held) * 100 : 0;
+                    const baseHeld = sub.baselineStats?.[key]?.held || 0;
+                    const hasClasses = baseHeld > 0;
+                    const pct = hasClasses && stat.held > 0 ? (stat.attended / stat.held) * 100 : (hasClasses ? 0 : 100);
+                    const cap = sub.capInfo?.[key] || {};
 
                     let pctClass = 'text-green';
                     let barColor = '#10b981';
@@ -1058,6 +1116,16 @@ function WaiverToolPage({ onBack }) {
                           <div className="row-item-label-group">
                             <span className="row-type-name">{label}</span>
                             {infoOnly && <span className="info-only-badge">info only</span>}
+                            {hasClasses && cap.isCapExceeded && (
+                              <span className="cap-exceeded-pill" title={`Attempted ${cap.attemptedHeld} waivers. Max waivable is ${cap.maxWaivable} (1/3rd limit of ${baseHeld} held classes). ${cap.excess} class(es) ignored.`}>
+                                ⚠️ 1/3 Cap Exceeded ({cap.excess} ignored)
+                              </span>
+                            )}
+                            {hasClasses && cap.isCapReached && !cap.isCapExceeded && (
+                              <span className="cap-reached-pill" title={`Reached maximum waivable limit of ${cap.maxWaivable} classes (1/3rd of total held).`}>
+                                🔒 1/3 Cap Reached ({cap.effectiveHeld}/{cap.maxWaivable})
+                              </span>
+                            )}
                           </div>
                           <div className="row-item-stats-group">
                             {hasClasses ? (
@@ -1523,7 +1591,7 @@ function WaiverToolPage({ onBack }) {
               {renderSubjectsCards()}
 
               <div className="subjects-note-container">
-                <p>📌 <strong>Theory & Tutorial Monitored for Waivers:</strong> Practical (`PR`) classes are marked <strong>info only</strong> and displayed for your reference, but are not prioritized when allocating waivers.</p>
+                <p>📌 <strong>1/3rd Waiver Policy Enforced:</strong> Waivers are capped at <strong>1/3rd (33.3%)</strong> of total baseline held classes per subject component (e.g. 12 held = max 4 waivers). Excess waivers beyond the cap are ignored by college rules and will not reduce held count further. Practical (`PR`) classes are info only.</p>
               </div>
             </div>
 

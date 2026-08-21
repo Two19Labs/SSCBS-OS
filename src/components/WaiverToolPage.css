@@ -2048,9 +2048,31 @@
   border: 1px solid #e2e8f0;
   color: #475467;
   font-size: 0.65rem;
-  font-weight: 600;
   padding: 0.08rem 0.35rem;
-  border-radius: 10px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.cap-exceeded-pill {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #dc2626;
+  font-size: 0.64rem;
+  padding: 0.08rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 700;
+  cursor: help;
+}
+
+.cap-reached-pill {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #d97706;
+  font-size: 0.64rem;
+  padding: 0.08rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 700;
+  cursor: help;
 }
 
 .row-item-stats-group {
