@@ -1,12 +1,18 @@
 // SSCBS OS Service Worker for OS Push Notifications
-const CACHE_NAME = 'sscbs-os-sw-v1';
+const CACHE_NAME = 'sscbs-os-sw-v2';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => caches.delete(cacheName))
+      );
+    }).then(() => self.clients.claim())
+  );
 });
 
 // Handle OS notification clicks (desktop / Android / iOS)
