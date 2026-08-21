@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import FooterCredit from './FooterCredit';
 import { useAuth } from '../context/AuthContext';
-import { syncEduErpAttendance } from '../services/eduerpSyncService';
 import './WaiverToolPage.css';
 
 const MONTHS = [
@@ -176,21 +175,6 @@ function WaiverToolPage({ onBack }) {
   const [activeMonthKey, setActiveMonthKey] = useState(""); // e.g. "2026-01"
   const [summaryViewMode, setSummaryViewMode] = useState('cards'); // 'cards' | 'table'
 
-  // EduERP Real-Time Sync Modal state for aditya.25015@sscbs.du.ac.in
-  const [showEduErpModal, setShowEduErpModal] = useState(false);
-  const [eduErpEmail, setEduErpEmail] = useState(user?.email || 'aditya.25015@sscbs.du.ac.in');
-  const [eduErpPass, setEduErpPass] = useState(() => {
-    try {
-      return localStorage.getItem(`sscbs_eduerp_pass_${user?.id || user?.email || 'guest'}`) || '';
-    } catch (e) {
-      return '';
-    }
-  });
-  const [rememberPass, setRememberPass] = useState(true);
-  const [eduErpPasteText, setEduErpPasteText] = useState('');
-  const [eduErpStatusMsg, setEduErpStatusMsg] = useState(null);
-  const [isEduErpLoading, setIsEduErpLoading] = useState(false);
-
   // CDC & Placement Cell Extra Attendance (+1 Numerator & +1 Denominator)
   const [extraAttendance, setExtraAttendance] = useState({}); // { [subjectName]: number }
 
@@ -219,30 +203,6 @@ function WaiverToolPage({ onBack }) {
       console.warn("Failed to restore Waiver Tool state:", err);
     }
   }, [storageKey]);
-
-  // Listen for real-time extension auto-sync events
-  useEffect(() => {
-    const handleExtensionSync = (e) => {
-      if (e.key === 'sscbs_eduerp_live_sync' && e.newValue) {
-        try {
-          const payload = JSON.parse(e.newValue);
-          if (payload && payload.htmlText) {
-            parseHtmlSpreadsheet(payload.htmlText);
-            setFileMeta({
-              name: 'EduERP Realtime Extension Auto-Sync',
-              size: payload.htmlText.length,
-              uploadedAt: new Date().toISOString()
-            });
-          }
-        } catch (err) {
-          console.warn("Failed to parse extension live sync payload:", err);
-        }
-      }
-    };
-
-    window.addEventListener('storage', handleExtensionSync);
-    return () => window.removeEventListener('storage', handleExtensionSync);
-  }, []);
 
   // Persist state changes automatically
   useEffect(() => {
@@ -1411,22 +1371,6 @@ function WaiverToolPage({ onBack }) {
             </div>
           </div>
 
-          {/* EduERP Real-Time Sync Banner for aditya.25015@sscbs.du.ac.in */}
-          {(user?.email?.toLowerCase() === 'aditya.25015@sscbs.du.ac.in' || !user || user?.email?.toLowerCase().includes('aditya')) && (
-            <div className="eduerp-quick-sync-banner">
-              <div className="banner-left">
-                <span className="zap-icon">⚡</span>
-                <div>
-                  <strong>EduERP Real-Time Direct Sync</strong>
-                  <p>Import live attendance directly from EduERP (<code>pgtechnos.com/EduERP/</code>) for <strong>aditya.25015@sscbs.du.ac.in</strong></p>
-                </div>
-              </div>
-              <button className="btn-trigger-eduerp" onClick={() => setShowEduErpModal(true)}>
-                Sync from EduERP ↗
-              </button>
-            </div>
-          )}
-
           <div 
             className="dropzone-area"
             onDragOver={handleDragOver}
@@ -1470,153 +1414,6 @@ function WaiverToolPage({ onBack }) {
           >
             {isProcessing ? "Processing Spreadsheet..." : "Extract & Calculate Optimal Waivers"}
           </button>
-
-          {/* EduERP Real-Time Sync Modal */}
-          {showEduErpModal && (
-            <div className="modal-backdrop-blur" onClick={() => setShowEduErpModal(false)}>
-              <div className="edu-erp-sync-modal" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-header">
-                  <div className="title-area">
-                    <span className="beta-tag">⚡ REALTIME</span>
-                    <h3>EduERP 1-Click Sync</h3>
-                  </div>
-                  <button className="btn-close-modal" onClick={() => setShowEduErpModal(false)}>✕</button>
-                </div>
-
-                <div className="modal-body">
-                  <p className="modal-desc">
-                    Connect directly with your SSCBS EduERP account (<code>pgtechnos.com/EduERP/</code>) for instant 1-click attendance fetching.
-                  </p>
-
-                  <div className="eduerp-auto-login-card">
-                    <h4>🔒 EduERP Student Credentials</h4>
-                    <div className="eduerp-inputs">
-                      <div className="eduerp-input-field">
-                        <label>EduERP Email ID</label>
-                        <input 
-                          type="email"
-                          value={eduErpEmail}
-                          onChange={(e) => setEduErpEmail(e.target.value)}
-                          placeholder="aditya.25015@sscbs.du.ac.in"
-                        />
-                      </div>
-                      <div className="eduerp-input-field">
-                        <label>EduERP Password</label>
-                        <input 
-                          type="password"
-                          value={eduErpPass}
-                          onChange={(e) => {
-                            setEduErpPass(e.target.value);
-                            if (rememberPass) {
-                              try {
-                                localStorage.setItem(`sscbs_eduerp_pass_${user?.id || user?.email || 'guest'}`, e.target.value);
-                              } catch (err) {}
-                            }
-                          }}
-                          placeholder="Enter your EduERP password..."
-                        />
-                      </div>
-                    </div>
-
-                    <div className="eduerp-checkbox-row">
-                      <label className="checkbox-lbl">
-                        <input 
-                          type="checkbox" 
-                          checked={rememberPass}
-                          onChange={(e) => {
-                            setRememberPass(e.target.checked);
-                            if (!e.target.checked) {
-                              try {
-                                localStorage.removeItem(`sscbs_eduerp_pass_${user?.id || user?.email || 'guest'}`);
-                              } catch (err) {}
-                            }
-                          }}
-                        />
-                        <span>Remember credentials on this browser (0 Supabase server storage)</span>
-                      </label>
-                    </div>
-
-                    <button 
-                      className={`btn-eduerp-auto-pull ${isEduErpLoading ? 'loading' : ''}`}
-                      disabled={isEduErpLoading}
-                      onClick={async () => {
-                        if (!eduErpPass) {
-                          setEduErpStatusMsg("Please enter your EduERP password to pull live attendance.");
-                          return;
-                        }
-
-                        setIsEduErpLoading(true);
-                        setEduErpStatusMsg("⚡ Connecting to EduERP portal & pulling live attendance...");
-
-                        try {
-                          const result = await syncEduErpAttendance(eduErpEmail, eduErpPass);
-                          if (result && result.htmlText) {
-                            parseHtmlSpreadsheet(result.htmlText);
-                            setFileMeta({
-                              name: `EduERP Realtime Direct Sync (${eduErpEmail})`,
-                              size: result.htmlText.length,
-                              uploadedAt: new Date().toISOString()
-                            });
-                            setShowEduErpModal(false);
-                            setEduErpStatusMsg(null);
-                          }
-                        } catch (err) {
-                          console.warn("EduERP direct fetch notice:", err);
-                          setEduErpStatusMsg("Connection sent. If browser CORS prevents direct response reading, paste your EduERP attendance table in the box below for instant 1-second import.");
-                        } finally {
-                          setIsEduErpLoading(false);
-                        }
-                      }}
-                    >
-                      {isEduErpLoading ? "⚡ Connecting & Fetching..." : "⚡ Pull Realtime Attendance"}
-                    </button>
-                    {eduErpStatusMsg && <div className="eduerp-status-notice">{eduErpStatusMsg}</div>}
-                  </div>
-
-                  <div className="eduerp-divider">
-                    <span>INSTANT REPORT PASTE / IMPORT</span>
-                  </div>
-
-                  <div className="erp-step-box">
-                    <div className="step-content">
-                      <p>Paste your EduERP attendance report table or HTML text here for instant parsing:</p>
-                      <textarea
-                        className="eduerp-paste-textarea"
-                        rows={3}
-                        placeholder="Paste copied table text or HTML from EduERP portal..."
-                        value={eduErpPasteText}
-                        onChange={(e) => setEduErpPasteText(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="modal-footer">
-                  <button className="btn-modal-cancel" onClick={() => setShowEduErpModal(false)}>Cancel</button>
-                  <button 
-                    className="btn-modal-sync-submit"
-                    disabled={!eduErpPasteText.trim()}
-                    onClick={() => {
-                      try {
-                        parseHtmlSpreadsheet(eduErpPasteText);
-                        setFileMeta({
-                          name: `EduERP Live Sync (${eduErpEmail})`,
-                          size: eduErpPasteText.length,
-                          uploadedAt: new Date().toISOString()
-                        });
-                        setShowEduErpModal(false);
-                        setEduErpPasteText('');
-                      } catch (err) {
-                        setError("Failed to parse EduERP content. Please ensure you copied the attendance table from EduERP.");
-                      }
-                    }}
-                  >
-                    ⚡ Import & Load Attendance
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       ) : (
         <div className="fullpage-workspace-layout">
