@@ -1682,5 +1682,68 @@
   transform: translate(2px, -2px);
 }
 
+/* ── Preference Rank Badges & Reorder Controls ── */
+.st-rank-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  background: rgba(236, 72, 153, 0.12);
+  color: #ec4899;
+  border: 1px solid rgba(236, 72, 153, 0.3);
+  letter-spacing: 0.2px;
+}
+
+.st-rank-badge.rank-top {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(236, 72, 153, 0.18) 100%);
+  color: #d97706;
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: 0 1px 4px rgba(245, 158, 11, 0.15);
+}
+
+.st-card.is-top-choice {
+  border-top: 2px solid #f59e0b;
+}
+
+.st-rank-reorder-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--tint);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1px 2px;
+}
+
+.st-reorder-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.65rem;
+  font-weight: 800;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  padding: 0;
+}
+
+.st-reorder-btn:hover:not(:disabled) {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.st-reorder-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
 
 

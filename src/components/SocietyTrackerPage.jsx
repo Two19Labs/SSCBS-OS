@@ -241,6 +241,21 @@ export default function SocietyTrackerPage({ onBack }) {
     });
   };
 
+  const moveBookmarkRank = (id, direction) => {
+    setBookmarkedIds((prev) => {
+      const idx = prev.indexOf(id);
+      if (idx === -1) return prev;
+      const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+      if (targetIdx < 0 || targetIdx >= prev.length) return prev;
+      const next = [...prev];
+      const temp = next[idx];
+      next[idx] = next[targetIdx];
+      next[targetIdx] = temp;
+      syncProgressToCloud(next, filledIds);
+      return next;
+    });
+  };
+
   const filteredSocieties = DEMO_SOCIETIES.filter((society) => {
     if (activeTab === 'preferred' && !bookmarkedIds.includes(society.id)) {
       return false;
@@ -296,11 +311,20 @@ export default function SocietyTrackerPage({ onBack }) {
   }, [shuffledIds]);
 
   const sortedSocieties = [...filteredSocieties].sort((a, b) => {
-    // In "My Preferred Societies" tab, keep preferred societies untouched in clean A-Z order (unless Z-A is explicitly chosen)
+    // In "My Preferred Societies" tab, default to preference rank order (#1 Choice first)
     if (activeTab === 'preferred') {
+      if (sortBy === 'name' || sortBy === 'name-asc') {
+        return a.name.localeCompare(b.name);
+      }
       if (sortBy === 'name-desc') {
         return b.name.localeCompare(a.name);
       }
+      // Rank order (shuffled / rank)
+      const rankA = bookmarkedIds.indexOf(a.id);
+      const rankB = bookmarkedIds.indexOf(b.id);
+      if (rankA !== -1 && rankB !== -1) return rankA - rankB;
+      if (rankA !== -1) return -1;
+      if (rankB !== -1) return 1;
       return a.name.localeCompare(b.name);
     }
 
@@ -423,9 +447,19 @@ export default function SocietyTrackerPage({ onBack }) {
               setSortBy(val);
             }}
           >
-            <option value="shuffled">Sort by: Shuffled (Default)</option>
-            <option value="name">Sort by: Name (A-Z)</option>
-            <option value="name-desc">Sort by: Name (Z-A)</option>
+            {activeTab === 'preferred' ? (
+              <>
+                <option value="rank">Sort by: Preference Rank (#1 First)</option>
+                <option value="name">Sort by: Name (A-Z)</option>
+                <option value="name-desc">Sort by: Name (Z-A)</option>
+              </>
+            ) : (
+              <>
+                <option value="shuffled">Sort by: Shuffled (Default)</option>
+                <option value="name">Sort by: Name (A-Z)</option>
+                <option value="name-desc">Sort by: Name (Z-A)</option>
+              </>
+            )}
           </select>
         </div>
 
@@ -448,6 +482,8 @@ export default function SocietyTrackerPage({ onBack }) {
         <div className="st-societies-grid">
           {sortedSocieties.map((society) => {
             const isSaved = bookmarkedIds.includes(society.id);
+            const rankIndex = bookmarkedIds.indexOf(society.id);
+            const rank = rankIndex !== -1 ? rankIndex + 1 : null;
             const isFilled = filledIds.includes(society.id);
             const categoryList = society.categoryLabels || [society.categoryLabel];
             const primaryLabel = categoryList[0];
@@ -456,7 +492,7 @@ export default function SocietyTrackerPage({ onBack }) {
             return (
               <div
                 key={society.id}
-                className={`st-card ${isFilled ? 'is-filled' : ''}`}
+                className={`st-card ${isFilled ? 'is-filled' : ''} ${rank === 1 ? 'is-top-choice' : ''}`}
                 onClick={() => setSelectedSociety(society)}
                 title={`Click card to expand details for ${society.name}`}
               >
@@ -479,6 +515,14 @@ export default function SocietyTrackerPage({ onBack }) {
                           +{extraCount} MORE
                         </span>
                       )}
+                      {isSaved && rank !== null && (
+                        <span
+                          className={`st-rank-badge ${rank === 1 ? 'rank-top' : ''}`}
+                          title={`Preference Rank #${rank}`}
+                        >
+                          ❤️ #{rank} {rank === 1 ? 'Top Choice' : 'Preference'}
+                        </span>
+                      )}
                       {isFilled && (
                         <span className="st-filled-badge">
                           <CheckIcon size={11} /> Filled
@@ -489,6 +533,26 @@ export default function SocietyTrackerPage({ onBack }) {
                       </span>
                     </div>
                     <div className="st-action-btns">
+                      {isSaved && rankIndex !== -1 && (
+                        <div className="st-rank-reorder-group" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            className="st-reorder-btn"
+                            disabled={rankIndex === 0}
+                            onClick={() => moveBookmarkRank(society.id, 'up')}
+                            title="Move up (increase preference rank)"
+                          >
+                            ▲
+                          </button>
+                          <button
+                            className="st-reorder-btn"
+                            disabled={rankIndex === bookmarkedIds.length - 1}
+                            onClick={() => moveBookmarkRank(society.id, 'down')}
+                            title="Move down (lower preference rank)"
+                          >
+                            ▼
+                          </button>
+                        </div>
+                      )}
                       <button
                         className={`st-check-btn ${isFilled ? 'active' : ''}`}
                         onClick={(e) => {
@@ -691,6 +755,13 @@ export default function SocietyTrackerPage({ onBack }) {
                         {lbl.toUpperCase()}
                       </span>
                     )
+                  )}
+                  {bookmarkedIds.includes(selectedSociety.id) && (
+                    <span
+                      className={`st-rank-badge ${bookmarkedIds.indexOf(selectedSociety.id) === 0 ? 'rank-top' : ''}`}
+                    >
+                      ❤️ #{bookmarkedIds.indexOf(selectedSociety.id) + 1} {bookmarkedIds.indexOf(selectedSociety.id) === 0 ? 'Top Choice' : 'Preference'}
+                    </span>
                   )}
                 </div>
                 <h2 className="st-modal-title">{selectedSociety.name}</h2>

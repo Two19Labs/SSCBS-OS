@@ -593,6 +593,7 @@ function AdminConsoleContent({ onBack }) {
     const filledMap = {};
     const userHeartDetails = {};
     const userFilledDetails = {};
+    const topChoiceMap = {};
 
     let totalHeartsCount = 0;
     let totalFilledCount = 0;
@@ -606,11 +607,14 @@ function AdminConsoleContent({ onBack }) {
         engagedUsersSet.add(u.email || u.id);
       }
 
-      bookmarks.forEach((sId) => {
+      bookmarks.forEach((sId, index) => {
         heartMap[sId] = (heartMap[sId] || 0) + 1;
         totalHeartsCount++;
+        if (index === 0) {
+          topChoiceMap[sId] = (topChoiceMap[sId] || 0) + 1;
+        }
         if (!userHeartDetails[sId]) userHeartDetails[sId] = [];
-        userHeartDetails[sId].push(u);
+        userHeartDetails[sId].push({ ...u, preferenceRank: index + 1 });
       });
 
       filled.forEach((sId) => {
@@ -623,11 +627,13 @@ function AdminConsoleContent({ onBack }) {
 
     const societyStats = DEMO_SOCIETIES.map((soc) => {
       const hearts = heartMap[soc.id] || 0;
+      const topChoices = topChoiceMap[soc.id] || 0;
       const filled = filledMap[soc.id] || 0;
       const conversionRate = hearts > 0 ? Math.round((filled / hearts) * 100) : (filled > 0 ? 100 : 0);
       return {
         ...soc,
         hearts,
+        topChoices,
         filled,
         conversionRate,
         heartUsers: userHeartDetails[soc.id] || [],
@@ -670,6 +676,7 @@ function AdminConsoleContent({ onBack }) {
         return matchesSearch && matchesCat;
       })
       .sort((a, b) => {
+        if (societySortBy === 'topChoice') return b.topChoices - a.topChoices || b.hearts - a.hearts;
         if (societySortBy === 'hearts') return b.hearts - a.hearts || b.filled - a.filled;
         if (societySortBy === 'filled') return b.filled - a.filled || b.hearts - a.hearts;
         if (societySortBy === 'conversion') return b.conversionRate - a.conversionRate || b.hearts - a.hearts;
@@ -3483,6 +3490,7 @@ Extract ALL timetable blocks from the attached Excel file now:`;
                       style={{ minWidth: '140px' }}
                     >
                       <option value="hearts">Sort by Hearts ❤️</option>
+                      <option value="topChoice">Sort by #1 Top Choice 👑</option>
                       <option value="filled">Sort by Forms Filled ✅</option>
                       <option value="conversion">Sort by Conversion %</option>
                       <option value="name">Sort Alphabetically</option>
@@ -3574,6 +3582,11 @@ Extract ALL timetable blocks from the attached Excel file now:`;
                                   <span style={{ fontWeight: 800, color: '#ec4899', fontSize: '0.92rem' }}>
                                     ❤️ {soc.hearts} {soc.hearts === 1 ? 'student' : 'students'}
                                   </span>
+                                  {soc.topChoices > 0 && (
+                                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#d97706' }}>
+                                      👑 {soc.topChoices} #1 Choice{soc.topChoices > 1 ? 's' : ''}
+                                    </span>
+                                  )}
                                   <div className="bar-track-admin" style={{ height: '5px' }}>
                                     <div className="bar-fill-admin" style={{ width: `${heartPct}%`, background: '#ec4899' }} />
                                   </div>
@@ -3894,6 +3907,11 @@ Extract ALL timetable blocks from the attached Excel file now:`;
                     <span className="modal-stat-lbl">Hearted</span>
                   </div>
                   <div className="modal-stat-box">
+                    <span className="modal-stat-icon">👑</span>
+                    <span className="modal-stat-val" style={{ color: '#d97706' }}>{selectedSocietyModal.topChoices || 0}</span>
+                    <span className="modal-stat-lbl">#1 Top Choice</span>
+                  </div>
+                  <div className="modal-stat-box">
                     <span className="modal-stat-icon">✅</span>
                     <span className="modal-stat-val" style={{ color: '#10b981' }}>{selectedSocietyModal.filled}</span>
                     <span className="modal-stat-lbl">Forms Filled</span>
@@ -3916,7 +3934,14 @@ Extract ALL timetable blocks from the attached Excel file now:`;
                           <span className="online-avatar-badge">{u.name ? u.name.charAt(0).toUpperCase() : 'S'}</span>
                           <div>
                             <strong className="student-name-text">{u.name}</strong>
-                            <span className="student-email-text">{u.email} • {u.course} Sem {u.semester}</span>
+                            <span className="student-email-text">
+                              {u.email} • {u.course} Sem {u.semester}
+                              {u.preferenceRank && (
+                                <span className={`course-sem-chip ${u.preferenceRank === 1 ? 'top-choice-chip' : ''}`} style={{ marginLeft: '6px' }}>
+                                  #{u.preferenceRank} Choice
+                                </span>
+                              )}
+                            </span>
                           </div>
                         </div>
                       ))}
