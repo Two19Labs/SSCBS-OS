@@ -381,14 +381,13 @@
 
 /* Full-Page Workspace Layout Structure */
 .fullpage-workspace-layout {
-  display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: 1.5rem;
-  padding: 1.5rem 2rem;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.25rem 2rem;
   box-sizing: border-box;
   width: 100%;
-  max-width: var(--content-max);
+  max-width: 1700px;
   margin-inline: auto;
 }
 
@@ -596,8 +595,7 @@
 
 @media (max-width: 1024px) {
   .fullpage-workspace-layout {
-    grid-template-columns: 1fr;
-    padding: 1.5rem 1rem;
+    padding: 1rem;
   }
 }
 
