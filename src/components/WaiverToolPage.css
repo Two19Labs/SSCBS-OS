@@ -1551,6 +1551,29 @@
   white-space: nowrap;
 }
 
+.attendance-spreadsheet-table th.month-group-header {
+  background: var(--bg);
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--border-strong);
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.header-stacked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.15;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 /* Sticky left column for subjects */
 .attendance-spreadsheet-table .sticky-col {
   position: sticky;
@@ -1583,17 +1606,19 @@
 /* Sticky right columns for stats */
 .attendance-spreadsheet-table .sticky-col-right.stats-cell,
 .attendance-spreadsheet-table th.stats-header {
-  min-width: 130px;
+  min-width: 145px;
+  width: 145px;
   border-right: none;
 }
 
 .attendance-spreadsheet-table .sticky-col-right.pct-cell,
 .attendance-spreadsheet-table th.pct-header {
-  min-width: 85px;
+  min-width: 90px;
+  width: 90px;
 }
 
-/* Enable sticky right columns only on wide screens to prevent overlapping sticky columns */
-@media (min-width: 1400px) {
+/* Enable sticky right columns to keep stats visible while scrolling */
+@media (min-width: 1000px) {
   .attendance-spreadsheet-table .sticky-col-right {
     position: sticky;
     background: var(--surface);
@@ -1604,14 +1629,14 @@
 
   .attendance-spreadsheet-table .sticky-col-right.stats-cell,
   .attendance-spreadsheet-table th.stats-header {
-    right: 85px; /* width of pct-cell */
-    width: 130px;
+    right: 90px; /* width of pct-cell */
+    width: 145px;
   }
 
   .attendance-spreadsheet-table .sticky-col-right.pct-cell,
   .attendance-spreadsheet-table th.pct-header {
     right: 0;
-    width: 85px;
+    width: 90px;
   }
 
   .attendance-spreadsheet-table th.sticky-col-right {
@@ -1620,7 +1645,7 @@
   }
 }
 
-@media (max-width: 1399px) {
+@media (max-width: 999px) {
   .attendance-spreadsheet-table .sticky-col-right {
     position: static;
     box-shadow: none;
@@ -1793,6 +1818,29 @@
     width: 100%;
     justify-content: flex-start;
   }
+}
+
+.customizer-fullwidth-grid-pane {
+  width: 100%;
+  overflow: hidden;
+}
+
+.customizer-fullwidth-calendar-pane {
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+.customizer-fullwidth-calendar-pane .calendar-simulation-view {
+  background: none;
+  border: none;
+  padding: 0;
+  box-shadow: none;
 }
 
 /* Side-by-Side Split Customizer Layout */

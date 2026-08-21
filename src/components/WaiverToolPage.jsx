@@ -1093,36 +1093,69 @@ function WaiverToolPage({ onBack }) {
     );
   };
 
+  const getMonthGroups = () => {
+    if (!parsedData || !Array.isArray(parsedData.allDates)) return [];
+    const groups = [];
+    parsedData.allDates.forEach(d => {
+      const parts = d.dateStr.split('-');
+      const year = parts[0];
+      const monthIdx = parseInt(parts[1], 10) - 1;
+      const monthName = MONTHS[monthIdx] || '';
+      const key = `${monthName} ${year}`;
+      
+      let group = groups.find(g => g.key === key);
+      if (!group) {
+        group = { key, monthName, year, dates: [] };
+        groups.push(group);
+      }
+      group.dates.push(d);
+    });
+    return groups;
+  };
+
   const renderAttendanceGrid = () => {
     if (!parsedData) return null;
 
     const subjectStats = getSimulatedSubjectStats();
+    const monthGroups = getMonthGroups();
 
     return (
       <div className="attendance-grid-container">
         <div className="grid-scroll-wrapper">
           <table className="attendance-spreadsheet-table">
             <thead>
-              <tr>
-                <th className="sticky-col subject-header">Subject Name</th>
+              <tr className="header-month-row">
+                <th rowSpan={2} className="sticky-col subject-header">Subject Name</th>
+                {monthGroups.map(g => (
+                  <th key={g.key} colSpan={g.dates.length} className="month-group-header">
+                    {g.monthName.toUpperCase()} {g.year}
+                  </th>
+                ))}
+                <th rowSpan={2} className="sticky-col-right stats-header">
+                  <div className="header-stacked">
+                    <span>Simulated</span>
+                    <span>Pres / Held</span>
+                  </div>
+                </th>
+                <th rowSpan={2} className="sticky-col-right pct-header">%</th>
+              </tr>
+              <tr className="header-days-row">
                 {parsedData.allDates.map((d) => {
                   const isChecked = selectedWaivers.has(d.dateStr);
                   const isRecommended = recommendedWaivers.includes(d.dateStr);
+                  const dayNum = parseInt(d.dateStr.split('-')[2], 10);
                   return (
                     <th 
                       key={d.dateStr} 
                       className={`date-header-cell ${isChecked ? 'waived' : ''} ${isRecommended ? 'recommended' : ''}`}
                       onClick={() => handleCheckboxChange(d.dateStr)}
-                      title="Click to toggle waiver for this date"
+                      title={`${d.dateStr}: Click to toggle waiver for this date`}
                     >
-                      <div className="header-date-label">{d.label.split(' ')[0]}</div>
-                      <div className="header-month-label">{d.label.split(' ')[1]}</div>
+                      <div className="header-date-label">{dayNum}</div>
                       {isChecked && <span className="waiver-pill-indicator">W</span>}
                     </th>
                   );
                 })}
-                <th className="sticky-col-right stats-header">Simulated Pres/Held</th>
-                <th className="sticky-col-right pct-header">%</th>
               </tr>
             </thead>
             <tbody>
@@ -1143,6 +1176,7 @@ function WaiverToolPage({ onBack }) {
                           key={d.dateStr} 
                           className={`attendance-cell ${isChecked ? 'waived-cell' : ''}`}
                           onClick={() => handleCheckboxChange(d.dateStr)}
+                          title={`${d.dateStr}: Click to toggle waiver`}
                         >
                           {dayRecord.length === 0 ? (
                             <span className="no-class">-</span>
@@ -1503,13 +1537,25 @@ function WaiverToolPage({ onBack }) {
                     className={`tab-btn ${activeSelectorTab === 'grid' ? 'active' : ''}`}
                     onClick={() => setActiveSelectorTab('grid')}
                   >
-                    Interactive Customizer
+                    📊 Spreadsheet Grid
+                  </button>
+                  <button 
+                    className={`tab-btn ${activeSelectorTab === 'calendar' ? 'active' : ''}`}
+                    onClick={() => setActiveSelectorTab('calendar')}
+                  >
+                    📅 Calendar View
+                  </button>
+                  <button 
+                    className={`tab-btn ${activeSelectorTab === 'split' ? 'active' : ''}`}
+                    onClick={() => setActiveSelectorTab('split')}
+                  >
+                    ⚡ Side-by-Side
                   </button>
                   <button 
                     className={`tab-btn ${activeSelectorTab === 'list' ? 'active' : ''}`}
                     onClick={() => setActiveSelectorTab('list')}
                   >
-                    Recommended List
+                    📋 Recommended List
                   </button>
                 </div>
                 <div className="actions-cluster">
@@ -1519,7 +1565,19 @@ function WaiverToolPage({ onBack }) {
               </div>
 
               {/* TAB CONTENT PANELS */}
-              {activeSelectorTab === 'grid' ? (
+              {activeSelectorTab === 'grid' && (
+                <div className="customizer-fullwidth-grid-pane">
+                  {renderAttendanceGrid()}
+                </div>
+              )}
+
+              {activeSelectorTab === 'calendar' && (
+                <div className="customizer-fullwidth-calendar-pane">
+                  {renderCalendarView()}
+                </div>
+              )}
+
+              {activeSelectorTab === 'split' && (
                 <div className="customizer-split-layout">
                   <div className="customizer-grid-pane">
                     {renderAttendanceGrid()}
@@ -1528,7 +1586,9 @@ function WaiverToolPage({ onBack }) {
                     {renderCalendarView()}
                   </div>
                 </div>
-              ) : (
+              )}
+
+              {activeSelectorTab === 'list' && (
                 <div className="recommended-list-view">
                   <div className="card-header-row pt-0">
                     <div className="title-block">
