@@ -1375,11 +1375,11 @@ export const DEMO_SOCIETIES = [
     id: 'ncc-sscbs',
     pocs: [
       {
-        name: 'JUO Naman Yadav',
+        name: 'Naman Yadav',
         phone: '8795325575',
       },
       {
-        name: 'JUO Mayank Yadav',
+        name: 'Mayank Yadav',
         phone: '9302023773',
       },
     ],
