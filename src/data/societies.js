@@ -3,7 +3,7 @@
 export const OFFICIAL_COLLEGE_SOCIETIES_URL = 'https://sscbs.du.ac.in/societies/';
 
 export const CATEGORIES = [
-  { id: 'all', label: 'All Domains (45)', icon: '⚡' },
+  { id: 'all', label: 'All Domains (46)', icon: '⚡' },
   { id: 'finance', label: 'Finance & Accounting', icon: '📈' },
   { id: 'consulting', label: 'Consulting & Analytics', icon: '💼' },
   { id: 'ecell', label: 'Startups & Social Impact', icon: '🚀' },
@@ -1368,6 +1368,37 @@ export const DEMO_SOCIETIES = [
     linkedinUrl: 'https://www.linkedin.com/company/skill-development-cell-sscbs/',
     defaultBookmarked: false,
     accentColor: '#10b981',
+  },
+
+  // --- 46. NCC SSCBS (National Cadet Corps) ---
+  {
+    id: 'ncc-sscbs',
+    pocs: [
+      {
+        name: 'JUO Naman Yadav',
+        phone: '8795325575',
+      },
+      {
+        name: 'JUO Mayank Yadav',
+        phone: '9302023773',
+      },
+    ],
+    name: 'NCC SSCBS – National Cadet Corps (SSCBS Chapter)',
+    shortName: 'NCC',
+    category: 'wellness',
+    categoryLabel: 'Inclusion & Sports',
+    categories: ['wellness', 'ecell', 'debating'],
+    categoryLabels: ['Inclusion & Sports', 'Startups & Social Impact', 'Debating, Media & Lit'],
+    description: 'Government organization focused on discipline, leadership, fitness, adventure, and nation-building across sports, culture, innovation, and defense. Open to all academic backgrounds (college society rules do not apply). Recruitment Day: 25th Aug, 12:00 PM at College Ground.',
+    recruitmentFormUrl: 'https://forms.gle/1wwKFBpsu4M8QpFQ9',
+    deadline: '2026-08-25T12:00:00+05:30',
+    statusText: 'Forms Live! Recruitment Day: 25th Aug, 12:00 PM @ College Ground',
+    officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
+    instagramVideoUrl: 'https://www.instagram.com/ncc_sscbs?igsi=czJwYmpheWw1MHcw',
+    linkedinUrl: null,
+    whatsappGroupUrl: 'https://chat.whatsapp.com/D166C6KICau4c8AocjYf5s?s=cl&p=a&mlu=4',
+    defaultBookmarked: false,
+    accentColor: '#15803d',
   },
 ];
 

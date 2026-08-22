@@ -651,16 +651,29 @@ export default function SocietyTrackerPage({ onBack }) {
                             >
                               {society.id === 'literary-society' ? <LinktreeIcon size={18} /> : <InstagramIcon size={18} />}
                             </a>
-                            <a
-                              href={society.linkedinUrl || 'https://linkedin.com'}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="st-social-btn linkedin"
-                              title="LinkedIn Profile"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <LinkedinIcon size={18} />
-                            </a>
+                            {society.whatsappGroupUrl && !society.linkedinUrl ? (
+                              <a
+                                href={society.whatsappGroupUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="st-social-btn whatsapp"
+                                title="Official WhatsApp Group"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <WhatsAppIcon size={18} />
+                              </a>
+                            ) : (
+                              <a
+                                href={society.linkedinUrl || 'https://linkedin.com'}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="st-social-btn linkedin"
+                                title="LinkedIn Profile"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <LinkedinIcon size={18} />
+                              </a>
+                            )}
                           </div>
                         </div>
 
@@ -929,15 +942,27 @@ export default function SocietyTrackerPage({ onBack }) {
                 >
                   {selectedSociety.id === 'literary-society' ? <LinktreeIcon size={20} /> : <InstagramIcon size={20} />}
                 </a>
-                <a
-                  href={selectedSociety.linkedinUrl || 'https://linkedin.com'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="st-social-btn linkedin"
-                  title="LinkedIn Profile"
-                >
-                  <LinkedinIcon size={20} />
-                </a>
+                {selectedSociety.whatsappGroupUrl && !selectedSociety.linkedinUrl ? (
+                  <a
+                    href={selectedSociety.whatsappGroupUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="st-social-btn whatsapp"
+                    title="Official WhatsApp Group"
+                  >
+                    <WhatsAppIcon size={20} />
+                  </a>
+                ) : (
+                  <a
+                    href={selectedSociety.linkedinUrl || 'https://linkedin.com'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="st-social-btn linkedin"
+                    title="LinkedIn Profile"
+                  >
+                    <LinkedinIcon size={20} />
+                  </a>
+                )}
               </div>
             </div>
           </div>
