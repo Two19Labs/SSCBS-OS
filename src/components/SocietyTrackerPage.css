@@ -846,6 +846,19 @@
   box-shadow: 0 4px 14px rgba(10, 102, 194, 0.55);
 }
 
+/* WhatsApp Group Button - Lit up at all times */
+.st-social-btn.whatsapp {
+  background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+  border-color: transparent;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(37, 211, 102, 0.35);
+}
+
+.st-social-btn.whatsapp:hover {
+  background: linear-gradient(135deg, #22c35e 0%, #0e786c 100%);
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.55);
+}
+
 /* ── Full Society Detail Modal ── */
 .st-modal-overlay {
   position: fixed;
