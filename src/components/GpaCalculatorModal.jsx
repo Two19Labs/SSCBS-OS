@@ -162,6 +162,30 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
     }
   };
 
+  const getSemSgpaAndCredits = (semNum) => {
+    const semStr = semNum.toString();
+    const semSubjects = (semStr === selectedSemester)
+      ? subjects
+      : (allSemsSubjects[semStr] || DEFAULT_SLOTS.map(s => ({ ...s })));
+
+    let totalCredits = 0;
+    let totalPoints = 0;
+
+    semSubjects.forEach((sub) => {
+      const credits = parseFloat(sub.credits) || 0;
+      const grade = sub.grade || 'F';
+      const gp = GRADE_POINTS[grade] !== undefined ? GRADE_POINTS[grade] : 0;
+      totalCredits += credits;
+      totalPoints += gp * credits;
+    });
+
+    const sgpa = totalCredits > 0 ? (totalPoints / totalCredits) : 0;
+    return {
+      sgpa: parseFloat(sgpa.toFixed(2)),
+      credits: totalCredits
+    };
+  };
+
   // SGPA Calculation Logic
   useEffect(() => {
     let totalCredits = 0;
@@ -181,15 +205,14 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
     setTotalSgpaPoints(totalPoints);
   }, [subjects]);
 
-  // CGPA Calculation Logic
+  // CGPA Calculation Logic - Automatically derives SGPA & credits per semester
   useEffect(() => {
     let totalCredits = 0;
     let totalPoints = 0;
 
     semestersData.forEach((sem) => {
       if (sem.enabled) {
-        const sgpa = parseFloat(sem.sgpa) || 0;
-        const credits = parseFloat(sem.credits) || 0;
+        const { sgpa, credits } = getSemSgpaAndCredits(sem.number);
         totalCredits += credits;
         totalPoints += sgpa * credits;
       }
@@ -198,7 +221,7 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
     const cgpa = totalCredits > 0 ? (totalPoints / totalCredits) : 0;
     setCgpaResult(parseFloat(cgpa.toFixed(2)));
     setTotalCgpaCredits(totalCredits);
-  }, [semestersData]);
+  }, [semestersData, subjects, allSemsSubjects, selectedSemester]);
 
   // Helper functions
   const handleSubjectChange = (id, field, value) => {
@@ -504,10 +527,15 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                       <button 
                         type="button" 
                         className="btn-primary-gpa btn-full-width"
-                        onClick={handleCopySgpaToCgpa}
-                        disabled={totalSgpaCredits === 0}
+                        onClick={() => {
+                          const semNum = parseInt(selectedSemester);
+                          setSemestersData(prev =>
+                            prev.map(s => s.number === semNum ? { ...s, enabled: true } : s)
+                          );
+                          setActiveTab('cgpa');
+                        }}
                       >
-                        Copy to CGPA Calculator
+                        Calculate Cumulative CGPA →
                       </button>
                     </div>
                   </div>
@@ -522,68 +550,45 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
               <div className="pane-main-layout">
                 {/* Inputs Area */}
                 <div className="inputs-section">
-                  <h4 className="section-title-small">Enter SGPA for Completed Semesters</h4>
+                  <h4 className="section-title-small">Select Completed Semesters</h4>
                   <p className="section-desc-small">
-                    Toggle checkboxes to include semesters in the cumulative CGPA calculation.
+                    Checkmark completed semesters to calculate your cumulative CGPA. SGPA & Credits are automatically pulled from your SGPA calculator entries.
                   </p>
 
                   <div className="cgpa-semester-grid">
-                    {semestersData.map((sem) => (
-                      <div key={sem.number} className={`cgpa-sem-card ${sem.enabled ? 'enabled' : 'disabled'}`}>
-                        <div className="sem-card-top">
-                          <label className="sem-checkbox-label">
-                            <input
-                              type="checkbox"
-                              checked={sem.enabled}
-                              onChange={(e) => handleSemesterDataChange(sem.number, 'enabled', e.target.checked)}
-                            />
-                            Semester {sem.number}
-                          </label>
-                          {sem.number === parseInt(selectedSemester) && (
-                            <button
-                              type="button"
-                              className="btn-tiny-copy"
-                              onClick={() => handleSemesterDataChange(sem.number, 'sgpa', sgpaResult.toString())}
-                              title="Copy SGPA from the SGPA calculator tab"
-                            >
-                              ⚡ Copy SGPA ({sgpaResult})
-                            </button>
-                          )}
-                        </div>
-                        
-                        <div className="sem-card-inputs">
-                          <div className="sem-input-group">
-                            <label htmlFor={`cgpa-sgpa-${sem.number}`}>SGPA:</label>
-                            <input
-                              id={`cgpa-sgpa-${sem.number}`}
-                              type="number"
-                              className="gpa-input-number sem-gpa-input"
-                              placeholder="0.00"
-                              min="0"
-                              max="10"
-                              step="0.01"
-                              value={sem.sgpa}
-                              onChange={(e) => handleSemesterDataChange(sem.number, 'sgpa', e.target.value)}
-                              disabled={!sem.enabled}
-                            />
+                    {semestersData.map((sem) => {
+                      const { sgpa, credits } = getSemSgpaAndCredits(sem.number);
+                      const isEditingInSgpa = sem.number === parseInt(selectedSemester);
+
+                      return (
+                        <div key={sem.number} className={`cgpa-sem-card ${sem.enabled ? 'enabled' : 'disabled'}`}>
+                          <div className="sem-card-top">
+                            <label className="sem-checkbox-label">
+                              <input
+                                type="checkbox"
+                                checked={sem.enabled}
+                                onChange={(e) => handleSemesterDataChange(sem.number, 'enabled', e.target.checked)}
+                              />
+                              <span>Semester {sem.number}</span>
+                            </label>
+                            {isEditingInSgpa && (
+                              <span className="active-sem-badge">Active SGPA</span>
+                            )}
                           </div>
                           
-                          <div className="sem-input-group">
-                            <label htmlFor={`cgpa-credits-${sem.number}`}>Credits:</label>
-                            <input
-                              id={`cgpa-credits-${sem.number}`}
-                              type="number"
-                              className="gpa-input-number sem-credits-input"
-                              min="1"
-                              max="40"
-                              value={sem.credits}
-                              onChange={(e) => handleSemesterDataChange(sem.number, 'credits', e.target.value)}
-                              disabled={!sem.enabled}
-                            />
+                          <div className="sem-card-stats-row">
+                            <div className="sem-stat-badge">
+                              <span className="stat-label">SGPA</span>
+                              <span className="stat-value">{sgpa.toFixed(2)}</span>
+                            </div>
+                            <div className="sem-stat-badge">
+                              <span className="stat-label">Credits</span>
+                              <span className="stat-value">{credits}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
 
