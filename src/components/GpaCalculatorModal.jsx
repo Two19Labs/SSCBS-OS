@@ -26,42 +26,141 @@ const GRADE_POINTS = {
 
 const GRADES_ORDER = ['O', 'A+', 'A', 'B+', 'B', 'C', 'D', 'F', 'Ab'];
 
+const STORAGE_KEYS = {
+  ALL_SEMS_SUBJECTS: 'sscbs_gpa_all_sems_subjects',
+  CGPA_DATA: 'sscbs_gpa_cgpa_data',
+  SELECTED_SEM: 'sscbs_gpa_selected_sem',
+  ACTIVE_TAB: 'sscbs_gpa_active_tab',
+};
+
 export default function GpaCalculatorModal({ isOpen, onClose }) {
   const { user } = useAuth();
   
   // Tabs: 'sgpa' | 'cgpa'
-  const [activeTab, setActiveTab] = useState('sgpa');
+  const [activeTab, setActiveTab] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.ACTIVE_TAB);
+      return saved === 'cgpa' ? 'cgpa' : 'sgpa';
+    } catch (e) {
+      return 'sgpa';
+    }
+  });
   
   // SGPA Tab states
-  const [selectedSemester, setSelectedSemester] = useState('1');
-  const [subjects, setSubjects] = useState(() => 
-    DEFAULT_SLOTS.map(s => ({ ...s }))
-  );
+  const [selectedSemester, setSelectedSemester] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.SELECTED_SEM);
+      if (saved && parseInt(saved) >= 1 && parseInt(saved) <= 8) {
+        return saved;
+      }
+    } catch (e) {}
+    return '1';
+  });
+
+  // Map of all semesters' subjects { '1': [...], '2': [...], ... }
+  const [allSemsSubjects, setAllSemsSubjects] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.ALL_SEMS_SUBJECTS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (typeof parsed === 'object' && parsed !== null) {
+          return parsed;
+        }
+      }
+    } catch (e) {}
+    return {};
+  });
+
+  // Currently active semester's subjects
+  const [subjects, setSubjects] = useState(() => {
+    try {
+      const savedSem = localStorage.getItem(STORAGE_KEYS.SELECTED_SEM) || '1';
+      const savedMap = localStorage.getItem(STORAGE_KEYS.ALL_SEMS_SUBJECTS);
+      if (savedMap) {
+        const parsed = JSON.parse(savedMap);
+        if (parsed && parsed[savedSem] && Array.isArray(parsed[savedSem])) {
+          return parsed[savedSem];
+        }
+      }
+    } catch (e) {}
+    return DEFAULT_SLOTS.map(s => ({ ...s }));
+  });
+
   const [sgpaResult, setSgpaResult] = useState(0);
   const [totalSgpaCredits, setTotalSgpaCredits] = useState(0);
   const [totalSgpaPoints, setTotalSgpaPoints] = useState(0);
 
   // CGPA Tab states
-  const [semestersData, setSemestersData] = useState(() => 
-    Array.from({ length: 8 }, (_, i) => ({
+  const [semestersData, setSemestersData] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.CGPA_DATA);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length === 8) {
+          return parsed;
+        }
+      }
+    } catch (e) {}
+    return Array.from({ length: 8 }, (_, i) => ({
       number: i + 1,
       sgpa: '',
       credits: 22,
-      enabled: i === 0 // default Enable Sem 1
-    }))
-  );
+      enabled: i === 0
+    }));
+  });
+
   const [cgpaResult, setCgpaResult] = useState(0);
   const [totalCgpaCredits, setTotalCgpaCredits] = useState(0);
 
-  // Auto-detect user course and semester on open to prefill
+  // Sync activeTab & selectedSemester to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.ACTIVE_TAB, activeTab);
+      localStorage.setItem(STORAGE_KEYS.SELECTED_SEM, selectedSemester);
+    } catch (e) {}
+  }, [activeTab, selectedSemester]);
+
+  // Sync active semester subjects into allSemsSubjects & localStorage
+  useEffect(() => {
+    setAllSemsSubjects(prev => {
+      const updated = { ...prev, [selectedSemester]: subjects };
+      try {
+        localStorage.setItem(STORAGE_KEYS.ALL_SEMS_SUBJECTS, JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+  }, [subjects, selectedSemester]);
+
+  // Sync CGPA semestersData to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.CGPA_DATA, JSON.stringify(semestersData));
+    } catch (e) {}
+  }, [semestersData]);
+
+  // Auto-detect user course and semester on open to prefill if no saved semester exists
   useEffect(() => {
     if (isOpen && user?.user_metadata) {
       const userSem = user.user_metadata.semester;
       if (userSem && parseInt(userSem) >= 1 && parseInt(userSem) <= 8) {
-        setSelectedSemester(userSem.toString());
+        const savedSem = localStorage.getItem(STORAGE_KEYS.SELECTED_SEM);
+        if (!savedSem) {
+          handleSemesterSelect(userSem.toString());
+        }
       }
     }
   }, [user, isOpen]);
+
+  // Handle switching selected semester
+  const handleSemesterSelect = (newSemStr) => {
+    setSelectedSemester(newSemStr);
+    const existing = allSemsSubjects[newSemStr];
+    if (existing && Array.isArray(existing) && existing.length > 0) {
+      setSubjects(existing);
+    } else {
+      setSubjects(DEFAULT_SLOTS.map(s => ({ ...s })));
+    }
+  };
 
   // SGPA Calculation Logic
   useEffect(() => {
@@ -154,8 +253,10 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
   };
 
   const handleResetSgpa = () => {
-    if (window.confirm('Are you sure you want to reset all subjects?')) {
-      setSubjects(DEFAULT_SLOTS.map(s => ({ ...s })));
+    if (window.confirm(`Are you sure you want to reset subjects for Semester ${selectedSemester}?`)) {
+      const reset = DEFAULT_SLOTS.map(s => ({ ...s }));
+      setSubjects(reset);
+      setAllSemsSubjects(prev => ({ ...prev, [selectedSemester]: reset }));
     }
   };
 
@@ -232,7 +333,7 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                     <select
                       id="modal-sem-select"
                       value={selectedSemester}
-                      onChange={(e) => setSelectedSemester(e.target.value)}
+                      onChange={(e) => handleSemesterSelect(e.target.value)}
                       className="gpa-select-field"
                     >
                       {Array.from({ length: 8 }, (_, i) => (
