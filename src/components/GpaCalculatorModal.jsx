@@ -24,6 +24,8 @@ const GRADE_POINTS = {
   'Ab': 0
 };
 
+const GRADES_ORDER = ['O', 'A+', 'A', 'B+', 'B', 'C', 'D', 'F', 'Ab'];
+
 export default function GpaCalculatorModal({ isOpen, onClose }) {
   const { user } = useAuth();
   
@@ -106,6 +108,34 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
     );
   };
 
+  const handleStepGrade = (id, direction) => {
+    setSubjects(prev =>
+      prev.map(sub => {
+        if (sub.id !== id) return sub;
+        const currIndex = GRADES_ORDER.indexOf(sub.grade);
+        if (currIndex === -1) return sub;
+        let newIndex = currIndex;
+        if (direction === 'up') {
+          newIndex = Math.max(0, currIndex - 1);
+        } else if (direction === 'down') {
+          newIndex = Math.min(GRADES_ORDER.length - 1, currIndex + 1);
+        }
+        return { ...sub, grade: GRADES_ORDER[newIndex] };
+      })
+    );
+  };
+
+  const handleStepCredits = (id, delta) => {
+    setSubjects(prev =>
+      prev.map(sub => {
+        if (sub.id !== id) return sub;
+        const current = parseInt(sub.credits) || 0;
+        const next = Math.max(1, Math.min(10, current + delta));
+        return { ...sub, credits: next };
+      })
+    );
+  };
+
   const handleAddSubject = () => {
     const newId = subjects.length > 0 ? Math.max(...subjects.map(s => s.id)) + 1 : 1;
     setSubjects(prev => [
@@ -138,7 +168,6 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
           : sem
       )
     );
-    // Switch to CGPA tab to let the user see the update
     setActiveTab('cgpa');
   };
 
@@ -155,8 +184,6 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
     if (gpa >= 4.00) return { name: 'Third Division (Pass)', class: 'third' };
     return { name: 'Fail / Essential Repeat', class: 'fail' };
   };
-
-
 
   if (!isOpen) return null;
 
@@ -229,38 +256,94 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                       </thead>
                       <tbody>
                         {subjects.map((sub) => (
-                          <tr key={sub.id}>
-                            <td data-label="Subject Name">
+                          <tr key={sub.id} className="gpa-subject-row">
+                            <td className="cell-subject-name" data-label="Subject Name">
                               <input
                                 type="text"
                                 className="gpa-input-text table-input-name"
                                 value={sub.name}
                                 onChange={(e) => handleSubjectChange(sub.id, 'name', e.target.value)}
-                                placeholder="Enter subject name..."
+                                placeholder="Subject name..."
                               />
-                            </td>
-                            <td data-label="Credits">
-                              <input
-                                type="number"
-                                className="gpa-input-number table-input-credits"
-                                value={sub.credits}
-                                min="1"
-                                max="10"
-                                onChange={(e) => handleSubjectChange(sub.id, 'credits', e.target.value)}
-                              />
-                            </td>
-                            <td data-label="Grade">
-                              <select
-                                className="gpa-select-field table-select-grade"
-                                value={sub.grade}
-                                onChange={(e) => handleSubjectChange(sub.id, 'grade', e.target.value)}
+                              <button
+                                type="button"
+                                className="gpa-delete-row-btn inline-mobile-delete"
+                                onClick={() => handleDeleteSubject(sub.id)}
+                                title="Delete Subject"
+                                aria-label="Delete Subject"
                               >
-                                {Object.keys(GRADE_POINTS).map(g => (
-                                  <option key={g} value={g}>{g} ({GRADE_POINTS[g]} GPA)</option>
-                                ))}
-                              </select>
+                                &times;
+                              </button>
                             </td>
-                            <td className="cell-action">
+
+                            <td className="cell-credits" data-label="Credits">
+                              <div className="gpa-stepper-control credits-stepper">
+                                <button
+                                  type="button"
+                                  className="stepper-btn"
+                                  onClick={() => handleStepCredits(sub.id, -1)}
+                                  disabled={parseInt(sub.credits) <= 1}
+                                  aria-label="Decrease Credits"
+                                >
+                                  −
+                                </button>
+                                <input
+                                  type="number"
+                                  className="gpa-input-number table-input-credits"
+                                  value={sub.credits}
+                                  min="1"
+                                  max="10"
+                                  onChange={(e) => handleSubjectChange(sub.id, 'credits', e.target.value)}
+                                />
+                                <button
+                                  type="button"
+                                  className="stepper-btn"
+                                  onClick={() => handleStepCredits(sub.id, 1)}
+                                  disabled={parseInt(sub.credits) >= 10}
+                                  aria-label="Increase Credits"
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </td>
+
+                            <td className="cell-grade" data-label="Grade">
+                              <div className="gpa-stepper-control grade-stepper">
+                                <button
+                                  type="button"
+                                  className="stepper-btn grade-step-btn"
+                                  onClick={() => handleStepGrade(sub.id, 'down')}
+                                  disabled={sub.grade === 'Ab' || GRADES_ORDER.indexOf(sub.grade) === GRADES_ORDER.length - 1}
+                                  title="Lower Grade"
+                                  aria-label="Lower Grade"
+                                >
+                                  ‹
+                                </button>
+                                <div className="grade-select-wrapper">
+                                  <select
+                                    className="gpa-select-field table-select-grade"
+                                    value={sub.grade}
+                                    onChange={(e) => handleSubjectChange(sub.id, 'grade', e.target.value)}
+                                  >
+                                    {Object.keys(GRADE_POINTS).map(g => (
+                                      <option key={g} value={g}>{g} ({GRADE_POINTS[g]} GPA)</option>
+                                    ))}
+                                  </select>
+                                </div>
+                                <button
+                                  type="button"
+                                  className="stepper-btn grade-step-btn"
+                                  onClick={() => handleStepGrade(sub.id, 'up')}
+                                  disabled={sub.grade === 'O' || GRADES_ORDER.indexOf(sub.grade) === 0}
+                                  title="Higher Grade"
+                                  aria-label="Higher Grade"
+                                >
+                                  ›
+                                </button>
+                              </div>
+                            </td>
+
+                            <td className="cell-action-desktop">
                               <button
                                 type="button"
                                 className="gpa-delete-row-btn"

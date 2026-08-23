@@ -243,57 +243,109 @@
   border-bottom: none;
 }
 
-.width-credits { width: 90px; }
-.width-grade { width: 170px; }
-.width-action { width: 44px; }
-
-/* Table Inputs */
-.gpa-input-text {
-  width: 100%;
+/* Stepper Controls */
+.gpa-stepper-control {
+  display: inline-flex;
+  align-items: center;
   background-color: var(--bg);
   border: 1.5px solid var(--border);
-  border-radius: 8px;
-  padding: 7px 10px;
-  font-family: inherit;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--ink);
-  outline: none;
-  transition: all 0.15s ease;
-}
-
-.gpa-input-text:focus {
-  border-color: var(--accent);
-  background-color: var(--surface);
-}
-
-.gpa-input-number {
-  background-color: var(--bg);
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  padding: 7px 8px;
-  font-family: inherit;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--ink);
-  outline: none;
-  text-align: center;
+  border-radius: 10px;
+  padding: 2px;
+  height: 38px;
   transition: border-color 0.15s ease;
 }
 
-.gpa-input-number:focus {
+.gpa-stepper-control:focus-within {
   border-color: var(--accent);
-  background-color: var(--surface);
 }
 
-.table-input-credits {
-  width: 65px;
+.credits-stepper {
+  width: 110px;
+  justify-content: space-between;
 }
 
-.table-select-grade {
+.grade-stepper {
   width: 100%;
-  padding: 7px 10px;
+  max-width: 190px;
+  justify-content: space-between;
+}
+
+.stepper-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  user-select: none;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.stepper-btn:hover:not(:disabled) {
+  background-color: var(--accent-tint);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.stepper-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: transparent;
+  border-color: transparent;
+}
+
+.grade-step-btn {
+  font-size: 1.3rem;
+}
+
+.credits-stepper .table-input-credits {
+  border: none;
+  background: transparent;
+  width: 36px;
+  padding: 0;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-align: center;
+  outline: none;
+}
+
+.grade-select-wrapper {
+  flex: 1;
+  min-width: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.grade-stepper .table-select-grade {
+  border: none;
+  background: transparent;
+  text-align: center;
+  text-align-last: center;
+  font-weight: 800;
   font-size: 0.825rem;
+  color: var(--ink);
+  cursor: pointer;
+  outline: none;
+  width: 100%;
+  padding: 0 4px;
+}
+
+.inline-mobile-delete {
+  display: none;
+}
+
+.cell-action-desktop {
+  width: 44px;
+  text-align: center;
 }
 
 /* Delete Row Button */
@@ -739,7 +791,7 @@
     font-size: 0.85rem;
   }
 
-  /* TRANSFORM TABLE INTO MOBILE CARDS */
+  /* TRANSFORM TABLE INTO COMPACT MOBILE CARDS */
   .table-responsive {
     border: none;
     background: transparent;
@@ -747,64 +799,93 @@
   }
 
   .gpa-calc-table,
-  .gpa-calc-table tbody,
-  .gpa-calc-table tr {
+  .gpa-calc-table tbody {
     display: block;
     width: 100%;
   }
 
   .gpa-calc-table thead {
-    display: none; /* Hide header on mobile */
+    display: none; /* Hide table header on mobile */
   }
 
   .gpa-calc-table tr {
     background: var(--surface);
     border: 1.5px solid var(--border);
     border-radius: 14px;
-    padding: 12px 14px;
+    padding: 12px;
     margin-bottom: 10px;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    grid-template-areas:
+      "subject subject"
+      "credits grade";
+    gap: 8px 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
   }
 
   .gpa-calc-table td {
     padding: 0;
     border: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
   }
 
-  .gpa-calc-table td[data-label]::before {
+  .cell-subject-name {
+    grid-area: subject;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .cell-subject-name::before {
+    display: none; /* No duplicate label needed for top row subject name */
+  }
+
+  .inline-mobile-delete {
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  .cell-action-desktop {
+    display: none;
+  }
+
+  .cell-credits {
+    grid-area: credits;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .cell-grade {
+    grid-area: grade;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .cell-credits[data-label]::before,
+  .cell-grade[data-label]::before {
     content: attr(data-label);
     font-weight: 800;
-    font-size: 0.75rem;
+    font-size: 0.68rem;
     color: var(--ink-dim);
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    min-width: 90px;
+  }
+
+  .credits-stepper,
+  .grade-stepper {
+    width: 100%;
+    max-width: 100%;
+    height: 36px;
   }
 
   .table-input-name {
     font-size: 0.9rem;
     font-weight: 700;
-  }
-
-  .table-input-credits {
-    width: 90px;
-  }
-
-  .table-select-grade {
-    max-width: 180px;
-  }
-
-  .cell-action {
-    position: absolute;
-    top: 10px;
-    right: 10px;
+    padding: 7px 10px;
   }
 
   .cgpa-semester-grid {
