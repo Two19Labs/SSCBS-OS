@@ -319,16 +319,9 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                                 >
                                   ‹
                                 </button>
-                                <div className="grade-select-wrapper">
-                                  <select
-                                    className="gpa-select-field table-select-grade"
-                                    value={sub.grade}
-                                    onChange={(e) => handleSubjectChange(sub.id, 'grade', e.target.value)}
-                                  >
-                                    {Object.keys(GRADE_POINTS).map(g => (
-                                      <option key={g} value={g}>{g} ({GRADE_POINTS[g]} GPA)</option>
-                                    ))}
-                                  </select>
+                                <div className="grade-display-badge">
+                                  <span className="grade-letter">{sub.grade}</span>
+                                  <span className="grade-gpa-val">({GRADE_POINTS[sub.grade]} GPA)</span>
                                 </div>
                                 <button
                                   type="button"

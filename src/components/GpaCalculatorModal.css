@@ -317,26 +317,29 @@
   outline: none;
 }
 
-.grade-select-wrapper {
+.grade-display-badge {
   flex: 1;
-  min-width: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.grade-stepper .table-select-grade {
-  border: none;
-  background: transparent;
-  text-align: center;
-  text-align-last: center;
+  gap: 4px;
+  padding: 0 4px;
   font-weight: 800;
   font-size: 0.825rem;
   color: var(--ink);
-  cursor: pointer;
-  outline: none;
-  width: 100%;
-  padding: 0 4px;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.grade-letter {
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.grade-gpa-val {
+  font-size: 0.775rem;
+  color: var(--ink-dim);
+  font-weight: 700;
 }
 
 .inline-mobile-delete {
