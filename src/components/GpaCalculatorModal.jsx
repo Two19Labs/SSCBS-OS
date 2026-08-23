@@ -164,25 +164,48 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
 
   const getSemSgpaAndCredits = (semNum) => {
     const semStr = semNum.toString();
-    const semSubjects = (semStr === selectedSemester)
-      ? subjects
-      : (allSemsSubjects[semStr] || DEFAULT_SLOTS.map(s => ({ ...s })));
+    
+    // Active editing semester in SGPA tab
+    if (semStr === selectedSemester) {
+      let totalCredits = 0;
+      let totalPoints = 0;
+      subjects.forEach((sub) => {
+        const credits = parseFloat(sub.credits) || 0;
+        const grade = sub.grade || 'F';
+        const gp = GRADE_POINTS[grade] !== undefined ? GRADE_POINTS[grade] : 0;
+        totalCredits += credits;
+        totalPoints += gp * credits;
+      });
+      const sgpa = totalCredits > 0 ? (totalPoints / totalCredits) : 0;
+      return {
+        sgpa: parseFloat(sgpa.toFixed(2)),
+        credits: totalCredits
+      };
+    }
 
-    let totalCredits = 0;
-    let totalPoints = 0;
+    // Saved semester data in allSemsSubjects
+    const semSubjects = allSemsSubjects[semStr];
+    if (semSubjects && Array.isArray(semSubjects) && semSubjects.length > 0) {
+      let totalCredits = 0;
+      let totalPoints = 0;
+      semSubjects.forEach((sub) => {
+        const credits = parseFloat(sub.credits) || 0;
+        const grade = sub.grade || 'F';
+        const gp = GRADE_POINTS[grade] !== undefined ? GRADE_POINTS[grade] : 0;
+        totalCredits += credits;
+        totalPoints += gp * credits;
+      });
+      const sgpa = totalCredits > 0 ? (totalPoints / totalCredits) : 0;
+      return {
+        sgpa: parseFloat(sgpa.toFixed(2)),
+        credits: totalCredits
+      };
+    }
 
-    semSubjects.forEach((sub) => {
-      const credits = parseFloat(sub.credits) || 0;
-      const grade = sub.grade || 'F';
-      const gp = GRADE_POINTS[grade] !== undefined ? GRADE_POINTS[grade] : 0;
-      totalCredits += credits;
-      totalPoints += gp * credits;
-    });
-
-    const sgpa = totalCredits > 0 ? (totalPoints / totalCredits) : 0;
+    // Default for unconfigured semesters: 0 SGPA, 0 Credits
     return {
-      sgpa: parseFloat(sgpa.toFixed(2)),
-      credits: totalCredits
+      sgpa: 0,
+      credits: 0
     };
   };
 
