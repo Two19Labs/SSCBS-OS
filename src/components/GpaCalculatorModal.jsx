@@ -366,15 +366,6 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                                 onChange={(e) => handleSubjectChange(sub.id, 'name', e.target.value)}
                                 placeholder="Subject name..."
                               />
-                              <button
-                                type="button"
-                                className="gpa-delete-row-btn inline-mobile-delete"
-                                onClick={() => handleDeleteSubject(sub.id)}
-                                title="Delete Subject"
-                                aria-label="Delete Subject"
-                              >
-                                &times;
-                              </button>
                             </td>
 
                             <td className="cell-credits" data-label="Credits">
@@ -437,12 +428,13 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
                               </div>
                             </td>
 
-                            <td className="cell-action-desktop">
+                            <td className="cell-action">
                               <button
                                 type="button"
                                 className="gpa-delete-row-btn"
                                 onClick={() => handleDeleteSubject(sub.id)}
                                 title="Delete Subject"
+                                aria-label="Delete Subject"
                               >
                                 &times;
                               </button>

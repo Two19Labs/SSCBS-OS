@@ -239,8 +239,27 @@
   vertical-align: middle;
 }
 
-.gpa-calc-table tr:last-child td {
-  border-bottom: none;
+/* Table Inputs */
+.gpa-input-text {
+  width: 100%;
+  background-color: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--ink);
+  outline: none;
+  height: 38px;
+  box-sizing: border-box;
+  transition: all 0.15s ease;
+}
+
+.gpa-input-text:focus {
+  border-color: var(--accent);
+  background-color: var(--surface);
+  box-shadow: 0 0 0 3px var(--accent-tint);
 }
 
 /* Stepper Controls */
@@ -818,11 +837,12 @@
     padding: 12px;
     margin-bottom: 10px;
     display: grid;
-    grid-template-columns: 1fr 1.2fr;
+    grid-template-columns: 1fr 34px;
     grid-template-areas:
-      "subject subject"
+      "subject action"
       "credits grade";
     gap: 8px 10px;
+    align-items: center;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
   }
 
@@ -833,23 +853,19 @@
 
   .cell-subject-name {
     grid-area: subject;
-    display: flex;
-    align-items: center;
-    gap: 8px;
     width: 100%;
   }
 
   .cell-subject-name::before {
-    display: none; /* No duplicate label needed for top row subject name */
-  }
-
-  .inline-mobile-delete {
-    display: flex;
-    flex-shrink: 0;
-  }
-
-  .cell-action-desktop {
     display: none;
+  }
+
+  .cell-action {
+    grid-area: action;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
   }
 
   .cell-credits {
