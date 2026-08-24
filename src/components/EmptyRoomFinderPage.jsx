@@ -2,7 +2,14 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useTimetable } from '../context/TimetableContext';
 import { useAuth } from '../context/AuthContext';
 import { PERIODS, DAYS } from '../data/timetables';
-import { getRoomStatuses, extractAllRoomsFromTimetable, getRoomDailyTimeline, getOrdinalSuffix } from '../utils/roomFinder';
+import {
+  getRoomStatuses,
+  extractAllRoomsFromTimetable,
+  getRoomDailyTimeline,
+  getOrdinalSuffix,
+  matchClassOccupancy,
+  findDailyScheduleMatchesForRoom
+} from '../utils/roomFinder';
 import { DoorIcon, SearchIcon, BackIcon, RefreshIcon, CalendarIcon } from './icons';
 import './EmptyRoomFinderPage.css';
 
@@ -155,31 +162,40 @@ export function EmptyRoomFinderPage({ onBack }) {
     return getRoomStatuses(timetable, activeDay, activePeriodId);
   }, [timetable, activeDay, activePeriodId]);
 
-  // Filter rooms
+  // Filter rooms with enhanced Course & Section search matching
   const filteredRooms = useMemo(() => {
-    return roomStatuses.filter(item => {
-      if (floorFilter !== 'ALL' && item.floor !== Number(floorFilter)) {
-        return false;
-      }
+    const q = searchQuery.trim();
 
-      if (mode === 'live' && (isCollegeClosedNow || activeHoliday)) {
-        // Bypasses vacant/occupied split during off-hours & holidays
-      } else {
-        if (statusFilter === 'VACANT' && !item.isVacant) return false;
-        if (statusFilter === 'OCCUPIED' && item.isVacant) return false;
-      }
+    return roomStatuses
+      .map(item => {
+        if (!q) return { ...item, dailyScheduleMatches: [] };
+        const matches = findDailyScheduleMatchesForRoom(timetable, activeDay, item.room, q);
+        return { ...item, dailyScheduleMatches: matches };
+      })
+      .filter(item => {
+        if (floorFilter !== 'ALL' && item.floor !== Number(floorFilter)) {
+          return false;
+        }
 
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase().trim();
-        const roomMatch = item.room.toLowerCase().includes(q);
-        const subjMatch = item.occupiedBy?.subject?.toLowerCase().includes(q);
-        const teacherMatch = item.occupiedBy?.teacher?.toLowerCase().includes(q);
-        return roomMatch || subjMatch || teacherMatch;
-      }
+        if (mode === 'live' && (isCollegeClosedNow || activeHoliday)) {
+          // Bypasses vacant/occupied split during off-hours & holidays
+        } else {
+          if (statusFilter === 'VACANT' && !item.isVacant) return false;
+          if (statusFilter === 'OCCUPIED' && item.isVacant) return false;
+        }
 
-      return true;
-    });
-  }, [roomStatuses, floorFilter, statusFilter, searchQuery, mode, isCollegeClosedNow, activeHoliday]);
+        if (q) {
+          const qLower = q.toLowerCase();
+          const roomMatch = item.room.toLowerCase().includes(qLower);
+          const currentOccupancyMatch = item.occupiedBy ? matchClassOccupancy(item.occupiedBy, q) : false;
+          const scheduleMatch = item.dailyScheduleMatches && item.dailyScheduleMatches.length > 0;
+
+          return roomMatch || currentOccupancyMatch || scheduleMatch;
+        }
+
+        return true;
+      });
+  }, [roomStatuses, floorFilter, statusFilter, searchQuery, mode, isCollegeClosedNow, activeHoliday, timetable, activeDay]);
 
 
   // Stats
@@ -207,7 +223,7 @@ export function EmptyRoomFinderPage({ onBack }) {
             <span className="empty-room-header-icon"><DoorIcon size={22} /></span>
             <h2>Classroom Radar</h2>
           </div>
-          <p className="empty-room-subtitle">Live room occupancy, daily schedules & vacant room finder</p>
+          <p className="empty-room-subtitle">Live room occupancy, course section finder & daily schedules</p>
         </div>
       </div>
 
@@ -327,13 +343,27 @@ export function EmptyRoomFinderPage({ onBack }) {
           <SearchIcon size={16} />
           <input
             type="text"
-            placeholder="Search room (e.g. 503, 703, Lab 426)..."
+            placeholder="Search room, course, section or faculty (e.g. BMS 1A, BSC 3A, 503, Lab 426)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           {searchQuery && (
             <button className="search-clear-btn" onClick={() => setSearchQuery('')}>×</button>
           )}
+        </div>
+
+        {/* Quick Section Shortcuts */}
+        <div className="section-shortcuts-row">
+          <span className="shortcuts-label">Quick Section Search:</span>
+          {['BMS 1A', 'BMS 1B', 'BBA FIA 1A', 'BSC 3A', 'BMS 3A', 'BBA FIA 3B'].map(secCode => (
+            <button
+              key={secCode}
+              className={`shortcut-chip ${searchQuery.toUpperCase() === secCode ? 'active' : ''}`}
+              onClick={() => setSearchQuery(searchQuery.toUpperCase() === secCode ? '' : secCode)}
+            >
+              {secCode}
+            </button>
+          ))}
         </div>
 
         {/* Status Pills */}
@@ -464,6 +494,26 @@ export function EmptyRoomFinderPage({ onBack }) {
                       </div>
                     </div>
                   )}
+
+                  {/* Matched Schedule Banner for Section Searches */}
+                  {searchQuery.trim() && item.dailyScheduleMatches && item.dailyScheduleMatches.length > 0 && (
+                    <div className="matched-schedule-banner">
+                      <div className="matched-schedule-title">
+                        📍 Matched Section Class Today:
+                      </div>
+                      <div className="matched-slots-list">
+                        {item.dailyScheduleMatches.map((m) => (
+                          <div key={m.periodId} className="matched-slot-item">
+                            <span className="matched-slot-time">{m.periodLabel} ({m.timeRange})</span>
+                            <span className="matched-slot-class">
+                              {m.occupiedBy.course} Sem {m.occupiedBy.sem} ({m.occupiedBy.sec}) — {m.occupiedBy.subject}
+                              {m.occupiedBy.teacher && ` • ${m.occupiedBy.teacher}`}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="room-card-footer">
@@ -477,8 +527,8 @@ export function EmptyRoomFinderPage({ onBack }) {
         ) : (
           <div className="empty-rooms-placeholder">
             <DoorIcon size={36} />
-            <h3>No rooms match your filter</h3>
-            <p>Try switching to another floor, clearing your search query, or checking a different period.</p>
+            <h3>No rooms match your search query</h3>
+            <p>Try searching another course, section (e.g. BMS 1A, BSC 3A), room number, or clearing your query.</p>
           </div>
         )}
       </div>

@@ -380,6 +380,91 @@
   align-items: center;
 }
 
+/* ── Quick Section Shortcuts ── */
+.section-shortcuts-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 2px 0;
+}
+
+.shortcuts-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.shortcut-chip {
+  background: var(--tint);
+  border: 1px solid var(--border);
+  color: var(--ink-dim);
+  font-size: 0.775rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.shortcut-chip:hover {
+  background: var(--border);
+  color: var(--ink);
+}
+
+.shortcut-chip.active {
+  background: var(--gold-tint);
+  border-color: var(--gold-text);
+  color: var(--gold-text);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Matched Section Schedule Banner on Room Cards ── */
+.matched-schedule-banner {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: var(--gold-tint);
+  border: 1px solid rgba(176, 141, 62, 0.3);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.matched-schedule-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--gold-text);
+  letter-spacing: 0.02em;
+}
+
+.matched-slots-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.matched-slot-item {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+.matched-slot-time {
+  font-weight: 700;
+  color: var(--gold-text);
+}
+
+.matched-slot-class {
+  color: var(--ink);
+}
+
 .filter-pills-row,
 .floor-pills-row {
   display: flex;

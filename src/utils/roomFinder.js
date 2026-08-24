@@ -115,14 +115,24 @@ export function getOccupiedRoomsMap(timetableData, day, periodId) {
         if (periodEntry && periodEntry.room && periodEntry.subject !== 'Free' && !periodEntry.isBreak) {
           const extractedRooms = extractRoomsFromText(periodEntry.room);
           extractedRooms.forEach(roomName => {
-            occupiedMap.set(roomName, {
+            const newItem = {
               course,
-              sem,
-              sec,
+              sem: String(sem),
+              sec: String(sec),
               subject: periodEntry.subject || 'In Class',
               teacher: periodEntry.teacher || '',
               rawRoom: periodEntry.room
-            });
+            };
+
+            if (!occupiedMap.has(roomName)) {
+              occupiedMap.set(roomName, {
+                ...newItem,
+                allOccupancies: [newItem]
+              });
+            } else {
+              const existing = occupiedMap.get(roomName);
+              existing.allOccupancies.push(newItem);
+            }
           });
         }
       }
@@ -130,6 +140,121 @@ export function getOccupiedRoomsMap(timetableData, day, periodId) {
   }
 
   return occupiedMap;
+}
+
+/**
+ * Normalizes query string and checks if an occupancy object matches the user query.
+ */
+export function matchClassOccupancy(occupancy, rawQuery) {
+  if (!occupancy || !rawQuery) return false;
+
+  const q = rawQuery.trim().toLowerCase();
+  if (!q) return false;
+
+  const items = occupancy.allOccupancies || [occupancy];
+
+  return items.some(item => {
+    const course = (item.course || '').toLowerCase();
+    const sem = String(item.sem || '').toLowerCase();
+    const sec = (item.sec || '').toLowerCase();
+    const subject = (item.subject || '').toLowerCase();
+    const teacher = (item.teacher || '').toLowerCase();
+
+    // Normalized course aliases
+    const courseAliases = [];
+    if (course.includes('bms')) {
+      courseAliases.push('bms');
+    }
+    if (course.includes('fia') || course.includes('bba')) {
+      courseAliases.push('bba', 'fia', 'bba fia', 'bbafia', 'bba(fia)');
+    }
+    if (course.includes('comp') || course.includes('cs') || course.includes('bsc') || course.includes('b.sc')) {
+      courseAliases.push('bsc', 'b.sc', 'cs', 'bsc cs', 'b.sc cs', 'computer science', 'comp sci');
+    }
+    if (course.includes('operational') || course.includes('or') || course.includes('m.sc') || course.includes('msc')) {
+      courseAliases.push('or', 'msc', 'm.sc', 'operational research');
+    }
+
+    const secVariants = [sec, `sec ${sec}`, `section ${sec}`];
+    const semVariants = [sem, `sem ${sem}`, `semester ${sem}`];
+
+    const combinedVariants = [
+      `${course} ${sem}${sec}`,
+      `${course} ${sem} ${sec}`,
+      `${course} sem ${sem} sec ${sec}`,
+      `${course} sem ${sem} (${sec})`,
+      `${course} ${sec}`,
+      `${sem}${sec}`,
+      `${sem} ${sec}`
+    ];
+
+    if (course.includes('comp') || course.includes('cs') || course.includes('bsc')) {
+      combinedVariants.push(
+        `bsc ${sem}${sec}`,
+        `bsc ${sem} ${sec}`,
+        `b.sc ${sem}${sec}`,
+        `bsc cs ${sem}${sec}`,
+        `cs ${sem}${sec}`
+      );
+    }
+    if (course.includes('fia') || course.includes('bba')) {
+      combinedVariants.push(
+        `bba fia ${sem}${sec}`,
+        `bba ${sem}${sec}`,
+        `fia ${sem}${sec}`,
+        `bba fia ${sem} ${sec}`
+      );
+    }
+
+    if (subject.includes(q) || teacher.includes(q)) return true;
+    if (combinedVariants.some(v => v.includes(q))) return true;
+    if (courseAliases.some(alias => alias === q || alias.includes(q))) return true;
+    if (secVariants.some(sv => sv === q)) return true;
+    if (semVariants.some(sm => sm === q)) return true;
+
+    const tokens = q.split(/\s+/).filter(Boolean);
+    if (tokens.length > 1) {
+      const allTokensMatch = tokens.every(tok => {
+        return (
+          subject.includes(tok) ||
+          teacher.includes(tok) ||
+          course.includes(tok) ||
+          courseAliases.some(a => a.includes(tok)) ||
+          sem === tok ||
+          sec.toLowerCase() === tok ||
+          secVariants.some(sv => sv === tok) ||
+          semVariants.some(sm => sm === tok) ||
+          combinedVariants.some(cv => cv.includes(tok))
+        );
+      });
+      if (allTokensMatch) return true;
+    }
+
+    return false;
+  });
+}
+
+/**
+ * Finds all daily timeline slots in a room matching a search query.
+ */
+export function findDailyScheduleMatchesForRoom(timetableData, day, roomName, rawQuery) {
+  if (!timetableData || !day || !roomName || !rawQuery) return [];
+  const q = rawQuery.trim().toLowerCase();
+  if (!q) return [];
+
+  const roomTimeline = getRoomDailyTimeline(timetableData, day, roomName);
+  if (!roomTimeline || !roomTimeline.timeline) return [];
+
+  const matchedSlots = [];
+  roomTimeline.timeline.forEach(slot => {
+    if (!slot.isVacant && slot.occupiedBy) {
+      if (matchClassOccupancy(slot.occupiedBy, q)) {
+        matchedSlots.push(slot);
+      }
+    }
+  });
+
+  return matchedSlots;
 }
 
 /**
