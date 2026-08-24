@@ -728,8 +728,10 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
                   </svg>
                   <span>List</span>
                 </button>
+              </div>
 
-                {exportMessage && <span className="export-toast-notice" style={{ fontSize: '0.75rem', alignSelf: 'center', marginLeft: '6px' }}>{exportMessage}</span>}
+              <div className="weekly-modal-right-actions">
+                {exportMessage && <span className="export-toast-notice">{exportMessage}</span>}
                 <button
                   className="btn-export-schedule-img"
                   onClick={handleExportStudentSchedule}
@@ -739,8 +741,8 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
                   <ImageIcon size={14} />
                   <span>{isExporting ? 'Exporting...' : 'Export PNG'}</span>
                 </button>
+                <button className="close-btn" onClick={() => setShowWeeklyModal(false)} title="Close">×</button>
               </div>
-              <button className="close-btn" onClick={() => setShowWeeklyModal(false)}>×</button>
             </header>
             
             <div className="weekly-modal-body" ref={scheduleExportRef}>

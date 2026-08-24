@@ -620,23 +620,26 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15));
-  border: 1px solid rgba(129, 140, 248, 0.3);
-  color: var(--accent-gold, #818cf8);
+  background: var(--tint);
+  border: 1px solid var(--border-strong);
+  color: var(--ink);
   padding: 6px 14px;
   border-radius: 8px;
   font-size: 0.85rem;
-  font-weight: 650;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
 }
 
+.btn-export-schedule-img svg {
+  color: var(--ink);
+}
+
 .btn-export-schedule-img:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.3));
-  border-color: rgba(129, 140, 248, 0.6);
+  background: var(--border);
+  color: var(--ink);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
 }
 
 .btn-export-schedule-img:disabled {

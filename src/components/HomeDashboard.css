@@ -741,7 +741,12 @@
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.15);
   margin-left: auto;
-  margin-right: 16px;
+}
+
+.weekly-modal-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .btn-layout-toggle {
@@ -769,13 +774,13 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.btn-export-schedule-img {
+.weekly-modal-header .btn-export-schedule-img {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.25);
-  color: #ffffff;
+  color: #ffffff !important;
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 0.75rem;
@@ -783,17 +788,21 @@
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
-  margin-left: 4px;
 }
 
-.btn-export-schedule-img:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.25);
+.weekly-modal-header .btn-export-schedule-img svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+.weekly-modal-header .btn-export-schedule-img:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.22);
   border-color: rgba(255, 255, 255, 0.4);
-  color: #ffffff;
+  color: #ffffff !important;
   transform: translateY(-1px);
 }
 
-.btn-export-schedule-img:disabled {
+.weekly-modal-header .btn-export-schedule-img:disabled {
   opacity: 0.5;
   cursor: wait;
 }
@@ -804,8 +813,11 @@
   color: rgba(255, 255, 255, 0.8);
   font-size: 1.5rem;
   cursor: pointer;
-  padding: 0;
+  padding: 0 4px;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .weekly-modal-header .close-btn:hover {
