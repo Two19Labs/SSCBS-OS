@@ -3,7 +3,7 @@
 export const OFFICIAL_COLLEGE_SOCIETIES_URL = 'https://sscbs.du.ac.in/societies/';
 
 export const CATEGORIES = [
-  { id: 'all', label: 'All Domains (46)', icon: '⚡' },
+  { id: 'all', label: 'All Domains (47)', icon: '⚡' },
   { id: 'finance', label: 'Finance & Accounting', icon: '📈' },
   { id: 'consulting', label: 'Consulting & Analytics', icon: '💼' },
   { id: 'ecell', label: 'Startups & Social Impact', icon: '🚀' },
@@ -1399,6 +1399,36 @@ export const DEMO_SOCIETIES = [
     whatsappGroupUrl: 'https://chat.whatsapp.com/D166C6KICau4c8AocjYf5s?s=cl&p=a&mlu=4',
     defaultBookmarked: false,
     accentColor: '#15803d',
+  },
+
+  // --- 47. North East Cell (NESWC) ---
+  {
+    id: 'north-east-cell',
+    pocs: [
+      {
+        name: 'Madang Sangdo',
+        phone: '8798396303',
+      },
+      {
+        name: 'Deborah',
+        phone: '9402522915',
+      },
+    ],
+    name: 'North East Cell – North East Students Welfare Committee (NESWC), SSCBS',
+    shortName: 'North East Cell',
+    category: 'wellness',
+    categoryLabel: 'Inclusion & Sports',
+    categories: ['wellness', 'cultural'],
+    categoryLabels: ['Inclusion & Sports', 'Arts & Culture'],
+    description: 'Promoting regional diversity, culture, and student welfare for the 8 North Eastern states (organizers of flagship event "818" and "Prelude to 818"). Recruitments will start soon, forms and info will come here soon!',
+    recruitmentFormUrl: null,
+    deadline: null,
+    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
+    instagramVideoUrl: 'https://www.instagram.com/neswc.sscbs/',
+    linkedinUrl: 'https://www.linkedin.com/company/north-east-cell-sscbs',
+    defaultBookmarked: false,
+    accentColor: '#f59e0b',
   },
 ];
 
