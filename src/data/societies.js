@@ -1131,10 +1131,39 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Startups & Social Impact',
     categories: ['ecell', 'consulting'],
     categoryLabels: ['Startups & Social Impact', 'Consulting & Analytics'],
-    description: 'The Entrepreneurship Cell of SSCBS promoting student incubators and E-Summit. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    description: 'The Entrepreneurship Cell of SSCBS promoting student incubators and E-Summit.',
+    scheduledForm: {
+      liveFrom: '2026-08-28T17:00:00+05:30',
+      initialDeadline: '2026-08-29T05:00:00+05:30',
+      extensionTime: '2026-08-29T04:50:00+05:30',
+      extendedDeadline: '2026-08-29T06:00:00+05:30',
+      recruitmentFormUrl: 'https://www.yuvaecell.in/join',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (!this.scheduledForm) return null;
+      const now = new Date();
+      if (now < new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      if (now >= new Date(this.scheduledForm.extensionTime)) {
+        return this.scheduledForm.extendedDeadline;
+      }
+      return this.scheduledForm.initialDeadline;
+    },
+    get statusText() {
+      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      const now = new Date();
+      if (now < new Date(this.scheduledForm.liveFrom)) {
+        return 'Recruitments start Aug 28, 5:00 PM!';
+      }
+      return null;
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbaLTSzJ1BR/?igsh=MWFyZzJveHA5NGtwbA==',
     linkedinUrl: 'https://www.linkedin.com/company/yuva-entrepreneurship-cell-cbs',
