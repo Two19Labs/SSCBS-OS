@@ -1124,10 +1124,39 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Startups & Social Impact',
     categories: ['ecell', 'wellness'],
     categoryLabels: ['Startups & Social Impact', 'Inclusion & Sports'],
-    description: 'Youth chapter of Rotary International executing community drives. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    description: 'Youth chapter of Rotary International executing community drives.',
+    scheduledForm: {
+      liveFrom: '2026-08-28T17:00:00+05:30',
+      recruitmentFormUrl: 'https://forms.gle/sBrzLXVtenLREGzf9',
+      initialDeadline: '2026-08-29T14:00:00+05:30',
+      extensionTrigger: '2026-08-29T13:55:00+05:30',
+      extendedDeadline: '2026-08-29T16:00:00+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (!this.scheduledForm) return null;
+      const now = new Date();
+      if (now < new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      if (now >= new Date(this.scheduledForm.extensionTrigger)) {
+        return this.scheduledForm.extendedDeadline;
+      }
+      return this.scheduledForm.initialDeadline;
+    },
+    get statusText() {
+      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      const now = new Date();
+      if (now < new Date(this.scheduledForm.liveFrom)) {
+        return 'Recruitments will start soon, forms and info will come here soon!';
+      }
+      return null;
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbYOcmaP5Te/?igsh=MTNicDZlcmlrcnJ0ZQ==',
     linkedinUrl: 'https://www.linkedin.com/company/rotaract-sscbs',
