@@ -865,10 +865,30 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Marketing, PR & Corporate',
     categories: ['marketing', 'consulting'],
     categoryLabels: ['Marketing, PR & Corporate', 'Consulting & Analytics'],
-    description: 'Connecting students with corporate leaders and CXO keynotes. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    description: 'Connecting students with corporate leaders and CXO keynotes.',
+    scheduledForm: {
+      liveFrom: '2026-08-28T16:59:00+05:30',
+      recruitmentFormUrl: 'https://application.micsscbs.in/',
+      deadline: '2026-08-29T17:00:00+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.deadline;
+      }
+      return null;
+    },
+    get statusText() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      return 'Recruitments will start soon, forms and info will come here soon!';
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbX7F5KzqOz/?igsh=d2NsdjVzNGd1eGFw',
     linkedinUrl: 'https://www.linkedin.com/company/management-interaction-cell-sscbs',
