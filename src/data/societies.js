@@ -1072,9 +1072,29 @@ export const DEMO_SOCIETIES = [
     categories: ['consulting', 'marketing'],
     categoryLabels: ['Consulting & Analytics', 'Marketing, PR & Corporate'],
     description: 'Bridging academia and corporate life via live corporate projects and Decennium. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    scheduledForm: {
+      liveFrom: '2026-08-28T17:00:00+05:30',
+      recruitmentFormUrl: 'https://forms.gle/TeaKDF7hq5eBRGJC6',
+      deadline: '2026-08-29T12:00:00+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.deadline;
+      }
+      return null;
+    },
+    get statusText() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      return 'Recruitments will start soon, forms and info will come here soon!';
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/Dbaw7pWBAb8/?igsh=emNjbGRnb2tybmRj',
     linkedinUrl: 'https://www.linkedin.com/company/synergy-the-corporate-society-of-sscbs',
