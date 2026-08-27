@@ -801,10 +801,44 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Marketing, PR & Corporate',
     categories: ['marketing', 'consulting'],
     categoryLabels: ['Marketing, PR & Corporate', 'Consulting & Analytics'],
-    description: 'Specializing in brand strategy, digital marketing campaigns, and MarkCon. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    description: 'Specializing in brand strategy, digital marketing campaigns, and MarkCon.',
+    scheduledForm: {
+      liveFrom: '2026-08-28T17:00:00+05:30',
+      recruitmentFormUrl: 'https://forms.gle/1wb7SoP6ZSJLhFSL9',
+      initialDeadline: '2026-08-28T20:00:00+05:30',
+      ext1Trigger: '2026-08-28T19:55:00+05:30',
+      ext1Deadline: '2026-08-29T02:00:00+05:30',
+      ext2Trigger: '2026-08-29T01:55:00+05:30',
+      ext2Deadline: '2026-08-29T09:00:00+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (!this.scheduledForm) return null;
+      const now = new Date();
+      if (now < new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      if (now >= new Date(this.scheduledForm.ext2Trigger)) {
+        return this.scheduledForm.ext2Deadline;
+      }
+      if (now >= new Date(this.scheduledForm.ext1Trigger)) {
+        return this.scheduledForm.ext1Deadline;
+      }
+      return this.scheduledForm.initialDeadline;
+    },
+    get statusText() {
+      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      const now = new Date();
+      if (now < new Date(this.scheduledForm.liveFrom)) {
+        return 'Recruitments will start soon, forms and info will come here soon!';
+      }
+      return null;
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbYPW3mMOXL/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==&igsi=MzRlODBiNWFlZA==',
     linkedinUrl: 'https://www.linkedin.com/company/markitsscbs',
