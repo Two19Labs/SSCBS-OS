@@ -1180,7 +1180,7 @@ export const DEMO_SOCIETIES = [
       if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments start Aug 28, 5:00 PM!';
+        return 'Recruitments will start soon, forms and info will come here soon!';
       }
       return null;
     },
