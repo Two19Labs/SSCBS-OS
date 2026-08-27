@@ -299,7 +299,7 @@ export const DEMO_SOCIETIES = [
         "phone": "9518167519"
       }
     ],
-    name: 'Darkroom – The Photography & Film Society of SSCBS',
+    name: 'The Darkroom – The Photography & Visual Arts Society of SSCBS',
     shortName: 'Darkroom',
     category: 'cultural',
     categoryLabel: 'Arts & Culture',
