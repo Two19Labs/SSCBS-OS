@@ -1758,5 +1758,97 @@
   cursor: not-allowed;
 }
 
+/* ── Recruitment Kickoff Announcement Banner ── */
+.st-recruitment-banner {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.st-recruitment-banner-icon {
+  font-size: 1.4rem;
+  background: var(--tint);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.st-recruitment-banner-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.st-recruitment-banner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.st-recruitment-banner-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.st-recruitment-timer-pill {
+  background: rgba(225, 29, 72, 0.1);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.78rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(225, 29, 72, 0.25);
+  font-variant-numeric: tabular-nums;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.st-recruitment-timer-pill.live {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.st-recruitment-banner-text {
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+  margin: 0 0 8px 0;
+  line-height: 1.45;
+}
+
+.st-recruitment-goodluck {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--tint);
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px dashed var(--border);
+}
+
+@media (max-width: 640px) {
+  .st-recruitment-banner {
+    flex-direction: column;
+    padding: 14px 16px;
+  }
+}
+
 
 

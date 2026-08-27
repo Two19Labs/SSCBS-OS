@@ -579,41 +579,94 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
         )}
 
         {/* Society Recruitment Tracker Highlight Banner */}
-        {hasSocietyTrackerAccess && (
-          <div 
-            className="recruitment-home-banner" 
-            onClick={() => onNavigate('society-tracker')}
-            style={{
-              background: 'var(--surface)',
-              border: '1px solid var(--border)',
-              borderLeft: '4px solid var(--accent)',
-              borderRadius: '12px',
-              padding: '16px 20px',
-              marginBottom: '20px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '16px',
-              transition: 'border-color 0.15s ease, transform 0.15s ease',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: '1.4rem', background: 'var(--tint)', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', flexShrink: 0 }}>⚡</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                  <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--ink)' }}>Society Recruitment Tracker 2026</span>
-                </div>
-                <div style={{ fontSize: '0.84rem', color: 'var(--ink-dim)', marginTop: '2px' }}>
-                  Explore societies, domain categories, registration forms &amp; deadline reminders.
+        {hasSocietyTrackerAccess && (() => {
+          const target = new Date(2026, 7, 28, 17, 0, 0); // 28th Aug 2026, 5:00 PM IST
+          const diff = target.getTime() - time.getTime();
+          const isLive = diff <= 0;
+          let countdownStr = '';
+          if (!isLive) {
+            const totalSecs = Math.floor(diff / 1000);
+            const days = Math.floor(totalSecs / 86400);
+            const hrs = Math.floor((totalSecs % 86400) / 3600);
+            const mins = Math.floor((totalSecs % 3600) / 60);
+            const secs = totalSecs % 60;
+            countdownStr = days > 0 
+              ? `${days}d ${String(hrs).padStart(2, '0')}h ${String(mins).padStart(2, '0')}m ${String(secs).padStart(2, '0')}s`
+              : `${String(hrs).padStart(2, '0')}h ${String(mins).padStart(2, '0')}m ${String(secs).padStart(2, '0')}s`;
+          }
+
+          return (
+            <div 
+              className="recruitment-home-banner" 
+              onClick={() => onNavigate('society-tracker')}
+              style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderLeft: '4px solid var(--accent)',
+                borderRadius: '12px',
+                padding: '16px 20px',
+                marginBottom: '20px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '16px',
+                transition: 'border-color 0.15s ease, transform 0.15s ease',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '1.4rem', background: 'var(--tint)', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', flexShrink: 0 }}>🚀</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                    <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--ink)' }}>Society Recruitment Tracker 2026</span>
+                    {!isLive ? (
+                      <span style={{
+                        background: 'rgba(225, 29, 72, 0.1)',
+                        color: 'var(--accent)',
+                        fontWeight: 700,
+                        fontSize: '0.78rem',
+                        padding: '3px 10px',
+                        borderRadius: '20px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        border: '1px solid rgba(225, 29, 72, 0.25)',
+                        fontVariantNumeric: 'tabular-nums'
+                      }}>
+                        ⏳ Starts 28th Aug @ 5 PM ({countdownStr})
+                      </span>
+                    ) : (
+                      <span style={{
+                        background: 'rgba(16, 185, 129, 0.12)',
+                        color: '#10b981',
+                        fontWeight: 700,
+                        fontSize: '0.78rem',
+                        padding: '3px 10px',
+                        borderRadius: '20px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        border: '1px solid rgba(16, 185, 129, 0.25)'
+                      }}>
+                        🟢 RECRUITMENTS LIVE
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ fontSize: '0.84rem', color: 'var(--ink-dim)', marginTop: '4px', lineHeight: '1.45' }}>
+                    {!isLive ? (
+                      <>Recruitments begin <strong>28th August at 5:00 PM</strong> for most societies! Best of luck to all freshers &amp; applicants! 🍀✨</>
+                    ) : (
+                      <>Recruitments are now officially live for most societies! Best of luck to freshers &amp; all applicants! 🍀✨</>
+                    )}
+                  </div>
                 </div>
               </div>
+              <button className="home-tt-btn primary" style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+                Explore Tracker →
+              </button>
             </div>
-            <button className="home-tt-btn primary" style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
-              Explore Tracker →
-            </button>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Time Warp Testing Debugger for Admins */}
         {canTimeWarp && (

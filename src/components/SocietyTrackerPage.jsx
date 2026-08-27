@@ -366,6 +366,54 @@ export default function SocietyTrackerPage({ onBack }) {
         </div>
       </div>
 
+      {/* Recruitment Kickoff & Good Luck Announcement Banner */}
+      {(() => {
+        const target = new Date(2026, 7, 28, 17, 0, 0); // 28th Aug 2026 5:00 PM IST
+        const diff = target.getTime() - now.getTime();
+        const isLive = diff <= 0;
+        let countdownStr = '';
+        if (!isLive) {
+          const totalSecs = Math.floor(diff / 1000);
+          const days = Math.floor(totalSecs / 86400);
+          const hrs = Math.floor((totalSecs % 86400) / 3600);
+          const mins = Math.floor((totalSecs % 3600) / 60);
+          const secs = totalSecs % 60;
+          countdownStr = days > 0 
+            ? `${days}d ${String(hrs).padStart(2, '0')}h ${String(mins).padStart(2, '0')}m ${String(secs).padStart(2, '0')}s`
+            : `${String(hrs).padStart(2, '0')}h ${String(mins).padStart(2, '0')}m ${String(secs).padStart(2, '0')}s`;
+        }
+
+        return (
+          <div className="st-recruitment-banner">
+            <div className="st-recruitment-banner-icon">📢</div>
+            <div className="st-recruitment-banner-body">
+              <div className="st-recruitment-banner-header">
+                <span className="st-recruitment-banner-title">
+                  {isLive ? 'Recruitments Are Officially Live!' : 'Recruitments Begin 28th August at 5:00 PM!'}
+                </span>
+                {!isLive ? (
+                  <span className="st-recruitment-timer-pill">
+                    ⏳ Countdown: {countdownStr}
+                  </span>
+                ) : (
+                  <span className="st-recruitment-timer-pill live">
+                    🟢 LIVE NOW
+                  </span>
+                )}
+              </div>
+              <p className="st-recruitment-banner-text">
+                {!isLive 
+                  ? 'Recruitments for most societies officially begin today, 28th August at 5:00 PM IST. Registration forms and domain details will drop live!'
+                  : 'Society induction forms are now live! Explore categories, check requirements, and track deadlines.'}
+              </p>
+              <div className="st-recruitment-goodluck">
+                🍀 Best of luck to all freshers &amp; applicants for society recruitments! ✨
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Metrics Strip */}
       <div className="st-metrics-grid">
         <div className="st-metric-card">
