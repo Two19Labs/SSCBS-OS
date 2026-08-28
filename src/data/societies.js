@@ -128,7 +128,7 @@ export const DEMO_SOCIETIES = [
     description: 'Western choreography and urban dance society. Recruitments will start soon, forms and info will come here soon!',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
-      recruitmentFormUrl: 'https://forms.gle/nSTCDFoBJMmUexZ6',
+      recruitmentFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSe19JX3pMhye1Xb0LAdrOYIr9GolmuIghyZYEqvlCWPwSH_3w/viewform?usp=dialog',
       initialDeadline: '2026-08-31T23:59:59+05:30',
       extensionTrigger: '2026-08-31T23:55:00+05:30',
       extendedDeadline: '2026-09-01T23:59:59+05:30',
