@@ -530,9 +530,38 @@ export const DEMO_SOCIETIES = [
     categories: ['finance', 'consulting'],
     categoryLabels: ['Finance & Accounting', 'Consulting & Analytics'],
     description: 'Financial Management Association fostering practical corporate finance modeling. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    scheduledForm: {
+      liveFrom: '2026-08-28T17:00:00+05:30',
+      recruitmentFormUrl: 'https://forms.gle/cE3C7ypU7k5x6Lgs5',
+      initialDeadline: '2026-08-29T02:00:00+05:30',
+      extensionTrigger: '2026-08-29T01:55:00+05:30',
+      extendedDeadline: '2026-08-29T09:00:00+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (!this.scheduledForm) return null;
+      const now = new Date();
+      if (now < new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      if (this.scheduledForm.extensionTrigger && now >= new Date(this.scheduledForm.extensionTrigger)) {
+        return this.scheduledForm.extendedDeadline;
+      }
+      return this.scheduledForm.initialDeadline;
+    },
+    get statusText() {
+      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      const now = new Date();
+      if (now < new Date(this.scheduledForm.liveFrom)) {
+        return 'Recruitments will start soon, forms and info will come here soon!';
+      }
+      return null;
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbYzG9mzd03/?igsh=dmMzcm5ja281Ynpx',
     linkedinUrl: 'https://www.linkedin.com/company/fma-du-sscbs',
