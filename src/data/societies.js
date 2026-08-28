@@ -976,10 +976,8 @@ export const DEMO_SOCIETIES = [
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/1wb7SoP6ZSJLhFSL9',
       initialDeadline: '2026-08-28T21:00:00+05:30',
-      ext1Trigger: '2026-08-28T20:55:00+05:30',
-      ext1Deadline: '2026-08-29T02:00:00+05:30',
-      ext2Trigger: '2026-08-29T01:55:00+05:30',
-      ext2Deadline: '2026-08-29T10:00:00+05:30',
+      extensionTrigger: '2026-08-28T20:55:00+05:30',
+      extendedDeadline: '2026-08-29T09:00:00+05:30',
     },
     get recruitmentFormUrl() {
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
@@ -993,11 +991,8 @@ export const DEMO_SOCIETIES = [
       if (now < new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      if (now >= new Date(this.scheduledForm.ext2Trigger)) {
-        return this.scheduledForm.ext2Deadline;
-      }
-      if (now >= new Date(this.scheduledForm.ext1Trigger)) {
-        return this.scheduledForm.ext1Deadline;
+      if (this.scheduledForm.extensionTrigger && now >= new Date(this.scheduledForm.extensionTrigger)) {
+        return this.scheduledForm.extendedDeadline;
       }
       return this.scheduledForm.initialDeadline;
     },
