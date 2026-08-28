@@ -216,9 +216,29 @@ export const DEMO_SOCIETIES = [
     categories: ['ecell', 'consulting'],
     categoryLabels: ['Startups & Social Impact', 'Consulting & Analytics'],
     description: 'Fostering startup founders and incubation mentorship. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    scheduledForm: {
+      liveFrom: '2026-08-28T17:00:00+05:30',
+      recruitmentFormUrl: 'https://forms.gle/6SwWBJFsrzJAXUcz9',
+      deadline: '2026-08-29T23:59:59+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.deadline;
+      }
+      return null;
+    },
+    get statusText() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      return 'Recruitments will start soon, forms and info will come here soon!';
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DNBVwNypSlm/?igsh=d2xmZ2xjOTVpd2sy',
     linkedinUrl: 'https://www.linkedin.com/company/the-collegiate-entrepreneurs-organisation-delhi-university',
@@ -1323,9 +1343,29 @@ export const DEMO_SOCIETIES = [
     categories: ['consulting', 'ecell'],
     categoryLabels: ['Consulting & Analytics', 'Startups & Social Impact'],
     description: 'Pro-bono strategy consulting for non-profits and social enterprises. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    scheduledForm: {
+      liveFrom: '2026-08-28T17:00:00+05:30',
+      recruitmentFormUrl: 'https://wkf.ms/45IkCUU',
+      deadline: '2026-08-29T03:00:00+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.deadline;
+      }
+      return null;
+    },
+    get statusText() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      return 'Recruitments will start soon, forms and info will come here soon!';
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbYbNPNo99E/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==&igsi=MzRlODBiNWFlZA==',
     linkedinUrl: 'https://www.linkedin.com/company/180dcsscbs',
