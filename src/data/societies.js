@@ -612,9 +612,41 @@ export const DEMO_SOCIETIES = [
     categories: ['consulting', 'finance', 'marketing'],
     categoryLabels: ['Consulting & Analytics', 'Finance & Accounting', 'Marketing, PR & Corporate'],
     description: 'DU’s oldest consulting cell engaged in live corporate strategy projects. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    scheduledForm: {
+      liveFrom: '2026-08-28T16:30:00+05:30',
+      recruitmentFormUrl: 'https://docs.google.com/forms/d/1ImV_zGDWcIZW_rc5SaPowByyturiFYSJXJeh9VsEjD4/viewform',
+      initialDeadline: '2026-08-29T02:00:00+05:30',
+      extensionTrigger: '2026-08-29T01:55:00+05:30',
+      extendedDeadline: '2026-08-29T10:00:00+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (!this.scheduledForm) return null;
+      const now = new Date();
+      if (now < new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      if (now >= new Date(this.scheduledForm.extensionTrigger)) {
+        return this.scheduledForm.extendedDeadline;
+      }
+      return this.scheduledForm.initialDeadline;
+    },
+    get statusText() {
+      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      const now = new Date();
+      if (now < new Date(this.scheduledForm.liveFrom)) {
+        return 'Recruitments will start soon, forms and info will come here soon!';
+      }
+      if (now >= new Date(this.scheduledForm.extensionTrigger)) {
+        return '⏰ DEADLINE EXTENDED TO AUG 29 10:00 AM!';
+      }
+      return null;
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbX2Xcisn90/?igsh=MXJieDUxMmx1a3E0Mw==',
     linkedinUrl: 'https://www.linkedin.com/company/grandeursscbs',
