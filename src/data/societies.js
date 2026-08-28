@@ -438,7 +438,7 @@ export const DEMO_SOCIETIES = [
     pocs: [
       {
         "name": "Sneh Shukla",
-        "phone": "9560089840"
+        "phone": "8800431880"
       },
       {
         "name": "Aiwin CT",
