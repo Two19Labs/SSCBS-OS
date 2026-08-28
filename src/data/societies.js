@@ -2025,9 +2025,29 @@ export const DEMO_SOCIETIES = [
     categories: ['consulting', 'marketing'],
     categoryLabels: ['Consulting & Analytics', 'Marketing, PR & Corporate'],
     description: 'Dedicated cell for practical skill-building, corporate readiness, and organizer of flagship events like Market-Niti (bilingual marketing & case study competition). Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    scheduledForm: {
+      liveFrom: '2026-08-29T12:00:00+05:30',
+      recruitmentFormUrl: 'https://forms.gle/k6NYkZoHjmgomCqy7',
+      deadline: '2026-08-31T12:00:00+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.deadline;
+      }
+      return null;
+    },
+    get statusText() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      return 'Recruitments will start soon, forms and info will come here soon!';
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/sdc.sscbs?igsh=b3lscjB1cnRoNHA3',
     linkedinUrl: 'https://www.linkedin.com/company/skill-development-cell-sscbs/',
