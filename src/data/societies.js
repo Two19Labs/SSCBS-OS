@@ -1675,9 +1675,29 @@ export const DEMO_SOCIETIES = [
     categories: ['wellness', 'ecell', 'debating'],
     categoryLabels: ['Inclusion & Sports', 'Startups & Social Impact', 'Debating, Media & Lit'],
     description: 'Government organization focused on discipline, leadership, fitness, adventure, and nation-building across sports, culture, innovation, and defense. Open to all academic backgrounds (college society rules do not apply). Recruitment Day: 7th Sep, 12:00 PM at College Ground.',
-    recruitmentFormUrl: 'https://forms.gle/1wwKFBpsu4M8QpFQ9',
-    deadline: '2026-09-07T12:00:00+05:30',
-    statusText: 'Forms Live! Recruitment Day: 7th Sep, 12:00 PM @ College Ground',
+    scheduledForm: {
+      liveFrom: '2026-08-28T17:00:00+05:30',
+      recruitmentFormUrl: 'https://forms.gle/1wwKFBpsu4M8QpFQ9',
+      deadline: '2026-09-07T12:00:00+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.deadline;
+      }
+      return null;
+    },
+    get statusText() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return 'Forms Live! Recruitment Day: 7th Sep, 12:00 PM @ College Ground';
+      }
+      return 'Recruitments will start soon, forms and info will come here soon!';
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/ncc_sscbs?igsi=czJwYmpheWw1MHcw',
     linkedinUrl: null,
