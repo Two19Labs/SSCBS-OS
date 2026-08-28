@@ -613,7 +613,7 @@ export const DEMO_SOCIETIES = [
     categoryLabels: ['Consulting & Analytics', 'Finance & Accounting', 'Marketing, PR & Corporate'],
     description: 'DU’s oldest consulting cell engaged in live corporate strategy projects. Recruitments will start soon, forms and info will come here soon!',
     scheduledForm: {
-      liveFrom: '2026-08-28T16:30:00+05:30',
+      liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://docs.google.com/forms/d/1ImV_zGDWcIZW_rc5SaPowByyturiFYSJXJeh9VsEjD4/viewform',
       initialDeadline: '2026-08-29T02:00:00+05:30',
       extensionTrigger: '2026-08-29T01:55:00+05:30',
