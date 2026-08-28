@@ -1683,9 +1683,29 @@ export const DEMO_SOCIETIES = [
     categories: ['consulting', 'ecell', 'finance'],
     categoryLabels: ['Consulting & Analytics', 'Startups & Social Impact', 'Finance & Accounting'],
     description: 'Global non-profit impact consulting chapter offering strategy advisory. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    scheduledForm: {
+      liveFrom: '2026-08-28T17:00:00+05:30',
+      recruitmentFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSfgcZFpWnHVgdvLVFXZ5vQaTvKjP0mb4bvasXDDmkMuSGymzA/viewform',
+      deadline: '2026-08-29T10:00:00+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.deadline;
+      }
+      return null;
+    },
+    get statusText() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      return 'Recruitments will start soon, forms and info will come here soon!';
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbYp8ESBdkp/?igsh=MW10cHJ1bzY5djhlaA==',
     linkedinUrl: 'https://www.linkedin.com/company/bridges-for-enterprise-new-delhi',
