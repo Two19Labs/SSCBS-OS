@@ -1676,7 +1676,7 @@ export const DEMO_SOCIETIES = [
       liveFrom: '2026-08-28T17:00:00+05:30',
       initialDeadline: '2026-08-29T05:00:00+05:30',
       extensionTime: '2026-08-29T04:50:00+05:30',
-      extendedDeadline: '2026-08-29T06:00:00+05:30',
+      extendedDeadline: '2026-08-29T08:00:00+05:30',
       recruitmentFormUrl: 'https://www.yuvaecell.in/join',
     },
     get recruitmentFormUrl() {
@@ -1701,6 +1701,9 @@ export const DEMO_SOCIETIES = [
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
         return 'Recruitments will start soon, forms and info will come here soon!';
+      }
+      if (now >= new Date(this.scheduledForm.extensionTime)) {
+        return '⏰ DEADLINE EXTENDED TO AUG 29 8:00 AM!';
       }
       return null;
     },
