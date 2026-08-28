@@ -364,9 +364,38 @@ export const DEMO_SOCIETIES = [
     categories: ['cultural', 'debating'],
     categoryLabels: ['Arts & Culture', 'Debating, Media & Lit'],
     description: 'Visual arts, photojournalism, filmmaking, and video editing. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    scheduledForm: {
+      liveFrom: '2026-08-28T20:00:00+05:30',
+      recruitmentFormUrl: 'https://tally.so/r/RGyR0v',
+      initialDeadline: '2026-08-29T23:59:59+05:30',
+      extensionTrigger: '2026-08-29T23:55:00+05:30',
+      extendedDeadline: '2026-08-30T23:59:59+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (!this.scheduledForm) return null;
+      const now = new Date();
+      if (now < new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      if (this.scheduledForm.extensionTrigger && now >= new Date(this.scheduledForm.extensionTrigger)) {
+        return this.scheduledForm.extendedDeadline;
+      }
+      return this.scheduledForm.initialDeadline;
+    },
+    get statusText() {
+      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      const now = new Date();
+      if (now < new Date(this.scheduledForm.liveFrom)) {
+        return 'Recruitments will start soon, forms and info will come here soon!';
+      }
+      return null;
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbaG3aMpQB9/?igsh=MWkwMDhsbGNiNnp3cA==',
     linkedinUrl: 'https://www.linkedin.com/company/the-darkroom-cbs',
