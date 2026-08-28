@@ -1756,7 +1756,7 @@ export const DEMO_SOCIETIES = [
     description: 'Supply Chain & Operations Management society organizing operational case challenges. Recruitments will start soon, forms and info will come here soon!',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
-      recruitmentFormUrl: 'https://forms.gle/ABd5RPKV4qsFuLWt7',
+      recruitmentFormUrl: 'https://forms.gle/A4JGd45B9tVegbAs8',
       initialDeadline: '2026-08-29T02:00:00+05:30',
       extensionTrigger: '2026-08-29T01:55:00+05:30',
       extendedDeadline: '2026-08-29T09:00:00+05:30',
