@@ -1308,7 +1308,7 @@ export const DEMO_SOCIETIES = [
     description: 'The Analytics Society of SSCBS, focusing on data driven thinking and problem solving. Recruitments starting soon, forms and info will come here soon',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
-      recruitmentFormUrl: 'https://tally.so/r/Y5IPZd',
+      recruitmentFormUrl: 'https://tally.so/r/Y5lPZd',
       deadline: '2026-08-29T12:00:00+05:30',
     },
     get recruitmentFormUrl() {
