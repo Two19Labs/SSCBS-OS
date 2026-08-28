@@ -126,9 +126,38 @@ export const DEMO_SOCIETIES = [
     categories: ['cultural'],
     categoryLabels: ['Arts & Culture'],
     description: 'Western choreography and urban dance society. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    scheduledForm: {
+      liveFrom: '2026-08-28T17:00:00+05:30',
+      recruitmentFormUrl: 'https://forms.gle/nSTCDFoBJMmUexZ6',
+      initialDeadline: '2026-08-31T23:59:59+05:30',
+      extensionTrigger: '2026-08-31T23:55:00+05:30',
+      extendedDeadline: '2026-09-01T23:59:59+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (!this.scheduledForm) return null;
+      const now = new Date();
+      if (now < new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      if (this.scheduledForm.extensionTrigger && now >= new Date(this.scheduledForm.extensionTrigger)) {
+        return this.scheduledForm.extendedDeadline;
+      }
+      return this.scheduledForm.initialDeadline;
+    },
+    get statusText() {
+      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      const now = new Date();
+      if (now < new Date(this.scheduledForm.liveFrom)) {
+        return 'Recruitments will start soon, forms and info will come here soon!';
+      }
+      return null;
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbVhG6pyQph/?igsh=MWlweThkazFheHkzZA==&igsi=MWlweThkazFheHkzZA==',
     linkedinUrl: 'https://www.linkedin.com/company/blitz-the-western-dance-society-of-sscbs',
