@@ -890,7 +890,7 @@ export const DEMO_SOCIETIES = [
     description: 'Global financial services network focusing on capital markets & M&A. Recruitments will start soon, forms and info will come here soon!',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
-      recruitmentFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSewEr_zajO6RYpqhd8ZqyIvrYiFWH3t-egJBkY3MAYf8W-8Mw/viewform?usp=sharing&ouid=113357977931873999202',
+      recruitmentFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSewEr_zajO6RYpqhd8ZqyIvrYiFWH3t-egJBkY3MAYf8W-8Mw/viewform?usp=header',
       deadline: '2026-08-29T10:00:00+05:30',
     },
     get recruitmentFormUrl() {
