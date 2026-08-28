@@ -265,10 +265,29 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Marketing, PR & Corporate',
     categories: ['marketing', 'consulting', 'finance'],
     categoryLabels: ['Marketing, PR & Corporate', 'Consulting & Analytics', 'Finance & Accounting'],
-    description: 'SSCBS’s Branding & Communication Cell, driving initiatives across Consulting, Finance, and Marketing through industry collaborations, research, and strategic communication. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    scheduledForm: {
+      liveFrom: '2026-08-28T17:00:00+05:30',
+      recruitmentFormUrl: 'https://tally.so/r/RGybvJ',
+      deadline: '2026-08-29T12:00:00+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.deadline;
+      }
+      return null;
+    },
+    get statusText() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      return 'Recruitments will start soon, forms and info will come here soon!';
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbYBdyZS6Vb/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
     linkedinUrl: 'https://www.linkedin.com/company/communique-the-public-relations-cell-of-sscbs',
