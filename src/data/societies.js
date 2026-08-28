@@ -2155,9 +2155,38 @@ export const DEMO_SOCIETIES = [
     categories: ['wellness', 'cultural'],
     categoryLabels: ['Inclusion & Sports', 'Arts & Culture'],
     description: 'Promoting regional diversity, culture, and student welfare for the 8 North Eastern states (organizers of flagship event "818" and "Prelude to 818"). Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    scheduledForm: {
+      liveFrom: '2026-08-30T12:00:00+05:30',
+      recruitmentFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSdpzIyIWgp9z5ZaKFZcpIQ16I3Dt_qsUUXy4jI59OGX0et5Tw/viewform?usp=send_form',
+      initialDeadline: '2026-09-05T23:59:59+05:30',
+      extensionTrigger: '2026-09-05T23:55:00+05:30',
+      extendedDeadline: '2026-09-07T23:59:59+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (!this.scheduledForm) return null;
+      const now = new Date();
+      if (now < new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      if (this.scheduledForm.extensionTrigger && now >= new Date(this.scheduledForm.extensionTrigger)) {
+        return this.scheduledForm.extendedDeadline;
+      }
+      return this.scheduledForm.initialDeadline;
+    },
+    get statusText() {
+      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      const now = new Date();
+      if (now < new Date(this.scheduledForm.liveFrom)) {
+        return 'Recruitments will start soon, forms and info will come here soon!';
+      }
+      return null;
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/neswc.sscbs/',
     linkedinUrl: 'https://www.linkedin.com/company/north-east-cell-sscbs',
