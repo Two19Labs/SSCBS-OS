@@ -1,7 +1,7 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useAuth } from './context/AuthContext';
 import { useConfig } from './context/ConfigContext';
-import { logFeatureView, logFeatureClick, subscribeToPresence, FEATURE_NAMES } from './lib/analytics';
+import { initPostHog, logFeatureView, logFeatureClick, subscribeToPresence, FEATURE_NAMES } from './lib/analytics';
 import Auth from './components/Auth';
 import HomeDashboard from './components/HomeDashboard';
 import ProfilePage from './components/ProfilePage';
@@ -31,7 +31,6 @@ import {
 import './App.css';
 import InstallPwaPrompt from './components/InstallPwaPrompt';
 import FooterCredit from './components/FooterCredit';
-import { Analytics } from '@vercel/analytics/react';
 import NotificationCenter from './components/NotificationCenter';
 import { useNotificationEngine } from './hooks/useNotificationEngine';
 
@@ -97,6 +96,11 @@ function App() {
   const { user, loading, isPasswordRecovery } = useAuth();
   const { featureFlags } = useConfig();
   useNotificationEngine();
+
+  useEffect(() => {
+    initPostHog();
+  }, []);
+
   const [view, setViewState] = useState(getInitialView);
   const [returnView, setReturnView] = useState('home');
   const [isGpaOpen, setIsGpaOpen] = useState(false);
@@ -504,27 +508,6 @@ function App() {
         {isGpaOpen && <GpaCalculatorModal isOpen={isGpaOpen} onClose={() => setIsGpaOpen(false)} />}
       </Suspense>
       <InstallPwaPrompt />
-      <Analytics beforeSend={(event) => {
-        try {
-          if (event && event.url) {
-            const urlObj = new URL(event.url);
-            let rawRoute = urlObj.hash ? urlObj.hash.replace(/^#\/?/, '').trim() : '';
-            if (!rawRoute && typeof window !== 'undefined' && window.location.hash) {
-              rawRoute = window.location.hash.replace(/^#\/?/, '').trim();
-            }
-            if (rawRoute) {
-              const route = (rawRoute === 'home') ? '' : rawRoute;
-              urlObj.pathname = route ? `/${route}` : '/';
-              urlObj.hash = '';
-              event.url = urlObj.toString();
-              return event;
-            }
-          }
-        } catch (e) {
-          // Ignore URL parse errors
-        }
-        return event;
-      }} />
     </>
   );
 }

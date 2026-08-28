@@ -2014,7 +2014,7 @@ export const DEMO_SOCIETIES = [
     description: 'Spreading financial awareness, personal budgeting, and community literacy. Recruitments will start soon, forms and info will come here soon!',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
-      recruitmentFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSegL-Gx1r_dSles7qT-oY0JKLL_nWcKo2i33bYCi5_o5IYxZQ/viewform?usp=header',
+      recruitmentFormUrl: 'https://forms.gle/zwUowFUpEoFtPw578',
       initialDeadline: '2026-08-29T18:00:00+05:30',
       extensionTrigger: '2026-08-29T17:55:00+05:30',
       extendedDeadline: '2026-08-29T23:59:59+05:30',

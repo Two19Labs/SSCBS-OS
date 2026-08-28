@@ -1,6 +1,46 @@
 import { supabase, hasValidCredentials } from './supabaseClient';
-import { track } from '@vercel/analytics';
+import posthog from 'posthog-js';
 import { isAdminEmail } from './admin';
+
+const POSTHOG_KEY = import.meta.env.VITE_POSTHOG_KEY;
+const POSTHOG_HOST = import.meta.env.VITE_POSTHOG_HOST || 'https://us.i.posthog.com';
+
+let isPostHogInitialized = false;
+
+export function initPostHog() {
+  if (typeof window === 'undefined' || isPostHogInitialized) return;
+  if (POSTHOG_KEY && POSTHOG_KEY !== 'phc_your_posthog_project_api_key' && POSTHOG_KEY.trim() !== '') {
+    try {
+      posthog.init(POSTHOG_KEY.trim(), {
+        api_host: POSTHOG_HOST.trim(),
+        autocapture: true,
+        capture_pageview: false, // Custom page view tracking for SPA hash routes
+      });
+      isPostHogInitialized = true;
+    } catch (e) {
+      console.warn('PostHog init notice:', e);
+    }
+  }
+}
+
+export function identifyPostHogUser(user) {
+  if (!user || !user.id || typeof window === 'undefined') return;
+  try {
+    initPostHog();
+    if (isPostHogInitialized && posthog.__loaded) {
+      posthog.identify(user.id, {
+        email: user.email,
+        name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Student',
+        course: user.user_metadata?.course || 'Unset',
+        semester: user.user_metadata?.semester ? String(user.user_metadata.semester) : 'Unset',
+        section: user.user_metadata?.section || 'Unset'
+      });
+    }
+  } catch (e) {
+    // Non-blocking
+  }
+}
+
 
 export const FEATURE_NAMES = {
   home: 'Home Dashboard',
@@ -322,9 +362,13 @@ function initGlobalPresenceTracker() {
 let lastTouchTimeMap = new Map();
 
 export async function touchUserActivity(user) {
-  if (!user || !user.id || !hasValidCredentials) return;
+  if (!user || !user.id) return;
+  identifyPostHogUser(user);
+
+  if (!hasValidCredentials) return;
 
   const now = Date.now();
+
   const lastTouch = lastTouchTimeMap.get(user.id) || 0;
   // Throttle to at most once per 5 minutes (300,000 ms) per user session
   if (now - lastTouch < 300000) return;
@@ -446,19 +490,28 @@ export async function logFeatureView(featureId, user) {
     }
   }
 
-  // 2. Send real-time pageview and custom event to Vercel Web Analytics for ALL pages
+  // 2. Send real-time pageview and custom event to PostHog Analytics
   try {
+    initPostHog();
     const routePath = (featureId === 'home' || !featureId) ? '/' : `/${featureId}`;
-    if (typeof window !== 'undefined' && typeof window.va === 'function') {
-      window.va('pageview', { route: routePath, path: routePath });
+    if (user) {
+      identifyPostHogUser(user);
     }
-    track('page_view', {
-      feature_id: featureId,
-      feature_name: FEATURE_NAMES[featureId] || featureId,
-      path: routePath
-    });
+    if (isPostHogInitialized && posthog.__loaded) {
+      posthog.capture('$pageview', {
+        $current_url: window.location.origin + (routePath === '/' ? '' : `/#${featureId}`),
+        feature_id: featureId,
+        feature_name: FEATURE_NAMES[featureId] || featureId,
+        path: routePath
+      });
+      posthog.capture('feature_view', {
+        feature_id: featureId,
+        feature_name: FEATURE_NAMES[featureId] || featureId,
+        path: routePath
+      });
+    }
   } catch (e) {
-    // Non-blocking for Vercel analytics
+    // Non-blocking for PostHog analytics
   }
 }
 
