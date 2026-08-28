@@ -1563,9 +1563,30 @@ export const DEMO_SOCIETIES = [
     categories: ['finance', 'consulting'],
     categoryLabels: ['Finance & Accounting', 'Consulting & Analytics'],
     description: 'Institute of Management Accountants chapter focusing on management accounting. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    scheduledForm: {
+      liveFrom: '2026-08-28T17:00:00+05:30',
+      recruitmentFormUrl: 'https://bit.ly/ima-recruitment-form',
+      initialDeadline: '2026-08-29T15:00:00+05:30',
+      extendedDeadline: '2026-08-29T17:00:00+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.extendedDeadline || this.scheduledForm.initialDeadline;
+      }
+      return null;
+    },
+    get statusText() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      return 'Recruitments will start soon, forms and info will come here soon!';
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbYQ2s1vIVq/?igsh=YWlzNmIxbWpkbTh3',
     linkedinUrl: 'https://www.linkedin.com/company/ima-sscbs-chapter',
