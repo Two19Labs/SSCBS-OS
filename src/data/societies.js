@@ -1607,7 +1607,7 @@ export const DEMO_SOCIETIES = [
       recruitmentFormUrl: 'https://forms.gle/sBrzLXVtenLREGzf9',
       initialDeadline: '2026-08-29T14:00:00+05:30',
       extensionTrigger: '2026-08-29T13:55:00+05:30',
-      extendedDeadline: '2026-08-29T16:00:00+05:30',
+      extendedDeadline: '2026-08-29T18:00:00+05:30',
     },
     get recruitmentFormUrl() {
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
