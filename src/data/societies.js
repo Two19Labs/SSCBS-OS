@@ -2146,7 +2146,7 @@ export const DEMO_SOCIETIES = [
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/zwUowFUpEoFtPw578',
       initialDeadline: '2026-08-29T18:00:00+05:30',
-      extensionTrigger: '2026-08-29T17:30:00+05:30',
+      extensionTrigger: '2026-08-29T18:00:00+05:30',
       extendedDeadline: '2026-08-29T20:00:00+05:30',
     },
     get recruitmentFormUrl() {
