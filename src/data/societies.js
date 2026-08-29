@@ -630,8 +630,12 @@ export const DEMO_SOCIETIES = [
     id: 'enactus-sscbs',
     pocs: [
       {
-        name: 'Enactus POC',
-        phone: '7467840660'
+        "name": "Pari Aggarwal",
+        "phone": "9350422869"
+      },
+      {
+        "name": "Disha Singh",
+        "phone": "9667415603"
       }
     ],
     name: 'Enactus SSCBS',
@@ -641,9 +645,29 @@ export const DEMO_SOCIETIES = [
     categories: ['ecell', 'consulting', 'finance'],
     categoryLabels: ['Startups & Social Impact', 'Consulting & Analytics', 'Finance & Accounting'],
     description: 'World Cup winning social entrepreneurship society launching sustainable business ventures. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    scheduledForm: {
+      liveFrom: '2026-08-29T12:00:00+05:30',
+      recruitmentFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSfCFtas21mXIx1c-awOtC_o4Ju3__ZfuwbJkV2MIwrLQ1GOdw/viewform?usp=header',
+      deadline: '2026-08-29T23:59:59+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.deadline;
+      }
+      return null;
+    },
+    get statusText() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      return 'Recruitments will start soon, forms and info will come here soon!';
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbaPwlIzUG6/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==&igsi=MzRlODBiNWFlZA==',
     linkedinUrl: 'https://www.linkedin.com/company/enactus-sscbs',
