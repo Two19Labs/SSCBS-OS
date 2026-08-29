@@ -1387,7 +1387,7 @@ export const DEMO_SOCIETIES = [
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://tally.so/r/Y5lPZd',
-      deadline: '2026-08-29T12:00:00+05:30',
+      deadline: '2026-08-29T16:00:00+05:30',
     },
     get recruitmentFormUrl() {
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
