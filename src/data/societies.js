@@ -269,7 +269,9 @@ export const DEMO_SOCIETIES = [
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/uAez4N2X6DhySucy8',
-      deadline: '2026-08-29T23:59:59+05:30',
+      initialDeadline: '2026-08-29T23:59:59+05:30',
+      extensionTrigger: '2026-08-29T23:55:00+05:30',
+      extendedDeadline: '2026-08-30T09:00:00+05:30',
     },
     get recruitmentFormUrl() {
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
@@ -278,10 +280,15 @@ export const DEMO_SOCIETIES = [
       return null;
     },
     get deadline() {
-      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
-        return this.scheduledForm.deadline;
+      if (!this.scheduledForm) return null;
+      const now = new Date();
+      if (now < new Date(this.scheduledForm.liveFrom)) {
+        return null;
       }
-      return null;
+      if (this.scheduledForm.extensionTrigger && now >= new Date(this.scheduledForm.extensionTrigger)) {
+        return this.scheduledForm.extendedDeadline;
+      }
+      return this.scheduledForm.initialDeadline;
     },
     get statusText() {
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
@@ -1049,7 +1056,9 @@ export const DEMO_SOCIETIES = [
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSfcjAJAPUOrQ6yJ836gnr0ECMeCCuwLz-PFV6yZLr745q7LsQ/viewform?usp=publish-editor',
-      deadline: '2026-08-29T23:59:59+05:30',
+      initialDeadline: '2026-08-29T23:59:59+05:30',
+      extensionTrigger: '2026-08-29T23:55:00+05:30',
+      extendedDeadline: '2026-08-30T23:59:59+05:30',
     },
     get recruitmentFormUrl() {
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
@@ -1058,10 +1067,15 @@ export const DEMO_SOCIETIES = [
       return null;
     },
     get deadline() {
-      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
-        return this.scheduledForm.deadline;
+      if (!this.scheduledForm) return null;
+      const now = new Date();
+      if (now < new Date(this.scheduledForm.liveFrom)) {
+        return null;
       }
-      return null;
+      if (this.scheduledForm.extensionTrigger && now >= new Date(this.scheduledForm.extensionTrigger)) {
+        return this.scheduledForm.extendedDeadline;
+      }
+      return this.scheduledForm.initialDeadline;
     },
     get statusText() {
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
