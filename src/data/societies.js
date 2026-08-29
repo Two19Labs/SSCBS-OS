@@ -2146,8 +2146,8 @@ export const DEMO_SOCIETIES = [
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/zwUowFUpEoFtPw578',
       initialDeadline: '2026-08-29T18:00:00+05:30',
-      extensionTrigger: '2026-08-29T17:55:00+05:30',
-      extendedDeadline: '2026-08-29T23:59:59+05:30',
+      extensionTrigger: '2026-08-29T17:30:00+05:30',
+      extendedDeadline: '2026-08-29T20:00:00+05:30',
     },
     get recruitmentFormUrl() {
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
@@ -2173,7 +2173,7 @@ export const DEMO_SOCIETIES = [
         return 'Recruitments will start soon, forms and info will come here soon!';
       }
       if (now >= new Date(this.scheduledForm.extensionTrigger)) {
-        return '⏰ DEADLINE EXTENDED TO AUG 29 EOD!';
+        return '⏰ DEADLINE EXTENDED TO AUG 29 8:00 PM!';
       }
       return null;
     },
