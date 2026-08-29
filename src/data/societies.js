@@ -36,9 +36,29 @@ export const DEMO_SOCIETIES = [
     categories: ['tech', 'consulting'],
     categoryLabels: ['Tech & IT', 'Consulting & Analytics'],
     description: 'Official student chapter of Association for Computing Machinery. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    scheduledForm: {
+      liveFrom: '2026-08-29T14:30:00+05:30',
+      recruitmentFormUrl: 'https://forms.gle/kxFVEUMWwi8vJGfL8',
+      deadline: '2026-08-31T23:59:59+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.deadline;
+      }
+      return null;
+    },
+    get statusText() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      return 'Recruitments will start soon, forms and info will come here soon!';
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbZ5twHyO9E/?igsh=MTF4MXdwM3o4bDJwbw==&igsi=MTF4MXdwM3o4bDJwbw==',
     linkedinUrl: 'https://www.linkedin.com/company/acm-sscbs',
