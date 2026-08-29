@@ -1146,9 +1146,29 @@ export const DEMO_SOCIETIES = [
     categories: ['economics', 'debating'],
     categoryLabels: ['Economics, Law & Policy', 'Debating, Media & Lit'],
     description: 'Legal awareness, corporate law discussions, and moot court competitions. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    scheduledForm: {
+      liveFrom: '2026-08-29T21:00:00+05:30',
+      recruitmentFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLScHSDNmE5GNjN5NhXw4Iq3yG1rZNHuhQABfmBBFKl5nsROSXA/viewform',
+      deadline: '2026-09-02T23:59:59+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.deadline;
+      }
+      return null;
+    },
+    get statusText() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      return 'Recruitments will start soon, forms and info will come here soon!';
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/lawrence.sscbs/',
     linkedinUrl: 'https://www.linkedin.com/school/lawrence-sscbs/',
