@@ -1523,9 +1523,38 @@ export const DEMO_SOCIETIES = [
     categories: ['debating', 'marketing'],
     categoryLabels: ['Debating, Media & Lit', 'Marketing, PR & Corporate'],
     description: 'Official student journalism portal and campus newspaper. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    scheduledForm: {
+      liveFrom: '2026-08-29T14:00:00+05:30',
+      recruitmentFormUrl: 'https://forms.gle/SAWDcHGJAUS967L26',
+      initialDeadline: '2026-08-30T17:00:00+05:30',
+      extensionTrigger: '2026-08-30T16:55:00+05:30',
+      extendedDeadline: '2026-08-30T23:59:59+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (!this.scheduledForm) return null;
+      const now = new Date();
+      if (now < new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      if (this.scheduledForm.extensionTrigger && now >= new Date(this.scheduledForm.extensionTrigger)) {
+        return this.scheduledForm.extendedDeadline;
+      }
+      return this.scheduledForm.initialDeadline;
+    },
+    get statusText() {
+      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      const now = new Date();
+      if (now < new Date(this.scheduledForm.liveFrom)) {
+        return 'Recruitments will start soon, forms and info will come here soon!';
+      }
+      return null;
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbYLstvSEDR/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==&igsi=MzRlODBiNWFlZA==',
     linkedinUrl: 'https://www.linkedin.com/company/the-cbs-post',
