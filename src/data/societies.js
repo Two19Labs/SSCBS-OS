@@ -489,10 +489,30 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Marketing, PR & Corporate',
     categories: ['marketing', 'consulting'],
     categoryLabels: ['Marketing, PR & Corporate', 'Consulting & Analytics'],
-    description: 'Organizing committee for SSCBS flagship national leadership seminars. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    description: 'Organizing committee for SSCBS flagship national leadership seminars.',
+    scheduledForm: {
+      liveFrom: '2026-08-30T21:00:00+05:30',
+      recruitmentFormUrl: 'https://forms.gle/qizcM46Drwocim7m9',
+      deadline: '2026-08-31T23:59:59+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.deadline;
+      }
+      return null;
+    },
+    get statusText() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      return 'Recruitments will start soon, forms and info will come here soon!';
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbVWQ7nTBQs/?igsh=MWE1d2wxaTc2bGk4Zg==',
     linkedinUrl: 'https://www.linkedin.com/company/convergencesscbs',
