@@ -130,12 +130,12 @@ export const DEMO_SOCIETIES = [
     id: 'anthropos-hrd',
     pocs: [
       {
-        "name": "Lala Dhruv Raj",
-        "phone": "7011661221"
-      },
-      {
         "name": "Abhigya Yadav",
         "phone": "8076467727"
+      },
+      {
+        "name": "Lala Dhruv Raj",
+        "phone": "7011661221"
       }
     ],
     name: 'Anthropos – The Human Resource Development Cell of SSCBS',
