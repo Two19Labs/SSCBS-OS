@@ -1122,10 +1122,30 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Debating, Media & Lit',
     categories: ['debating', 'cultural'],
     categoryLabels: ['Debating, Media & Lit', 'Arts & Culture'],
-    description: 'The quizzing society of SSCBS hosting general, business & pop culture trivia. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    description: 'The quizzing society of SSCBS hosting general, business & pop culture trivia.',
+    scheduledForm: {
+      liveFrom: '2026-08-30T17:00:00+05:30',
+      recruitmentFormUrl: 'https://tally.so/r/WO7OKL',
+      deadline: '2026-09-01T06:00:00+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.deadline;
+      }
+      return null;
+    },
+    get statusText() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      return 'Recruitments will start soon, forms and info will come here soon!';
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/illuminati.sscbs/',
     linkedinUrl: 'https://www.linkedin.com/company/illuminati-cbs',
