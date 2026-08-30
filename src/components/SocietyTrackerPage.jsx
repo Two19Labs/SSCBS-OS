@@ -260,6 +260,11 @@ export default function SocietyTrackerPage({ onBack }) {
     if (activeTab === 'preferred' && !bookmarkedIds.includes(society.id)) {
       return false;
     }
+    if (activeTab === 'open') {
+      const now = new Date();
+      const isOpen = society.recruitmentFormUrl && (!society.deadline || now <= new Date(society.deadline));
+      if (!isOpen) return false;
+    }
 
     const rawQuery = searchQuery.trim();
     if (rawQuery) {
@@ -346,6 +351,10 @@ export default function SocietyTrackerPage({ onBack }) {
   const validSocietyIds = React.useMemo(() => new Set(DEMO_SOCIETIES.map((s) => s.id)), []);
   const bookmarkedCount = bookmarkedIds.filter((id) => validSocietyIds.has(id)).length;
   const filledCount = filledIds.filter((id) => validSocietyIds.has(id)).length;
+  const openFormsCount = React.useMemo(() => {
+    const nowTime = new Date();
+    return DEMO_SOCIETIES.filter((s) => s.recruitmentFormUrl && (!s.deadline || nowTime <= new Date(s.deadline))).length;
+  }, []);
 
   return (
     <div className="society-tracker-container">
@@ -424,6 +433,13 @@ export default function SocietyTrackerPage({ onBack }) {
           </div>
         </div>
         <div className="st-metric-card">
+          <div className="st-metric-icon">⚡</div>
+          <div>
+            <div className="st-metric-val">{openFormsCount}</div>
+            <div className="st-metric-lbl">Open Forms</div>
+          </div>
+        </div>
+        <div className="st-metric-card">
           <div className="st-metric-icon">❤️</div>
           <div>
             <div className="st-metric-val">{bookmarkedCount}</div>
@@ -447,6 +463,15 @@ export default function SocietyTrackerPage({ onBack }) {
             onClick={() => setActiveTab('all')}
           >
             <BriefcaseIcon size={16} /> All Societies
+          </button>
+          <button
+            className={`st-tab-btn ${activeTab === 'open' ? 'active' : ''}`}
+            onClick={() => setActiveTab('open')}
+          >
+            ⚡ Open Forms Only
+            {openFormsCount > 0 && (
+              <span className="st-tab-count">{openFormsCount}</span>
+            )}
           </button>
           <button
             className={`st-tab-btn ${activeTab === 'preferred' ? 'active' : ''}`}
