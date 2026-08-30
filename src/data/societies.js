@@ -951,7 +951,7 @@ export const DEMO_SOCIETIES = [
       recruitmentFormUrl: 'https://bit.ly/GirlUpRuhi_Recruitment2026-27',
       initialDeadline: '2026-08-29T15:00:00+05:30',
       extensionTrigger: '2026-08-29T14:55:00+05:30',
-      extendedDeadline: '2026-08-30T10:00:00+05:30',
+      extendedDeadline: '2026-08-30T14:00:00+05:30',
     },
     get recruitmentFormUrl() {
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
@@ -977,7 +977,7 @@ export const DEMO_SOCIETIES = [
         return 'Recruitments will start soon, forms and info will come here soon!';
       }
       if (now >= new Date(this.scheduledForm.extensionTrigger)) {
-        return '⏰ DEADLINE EXTENDED TO AUG 30 10:00 AM!';
+        return '⏰ DEADLINE EXTENDED TO AUG 30 2:00 PM!';
       }
       return null;
     },
