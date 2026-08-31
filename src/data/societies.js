@@ -520,6 +520,36 @@ export const DEMO_SOCIETIES = [
     accentColor: '#fda4af',
   },
 
+  // --- 10. Crescendo (Annual Cultural Fest Body) ---
+  {
+    id: 'crescendo-cultural',
+    pocs: [
+      {
+        "name": "Anushka Singh",
+        "phone": "8796768601"
+      },
+      {
+        "name": "Kumar Pratham",
+        "phone": "7250840770"
+      }
+    ],
+    name: 'Crescendo – The Annual Flagship Cultural Festival Organizing Body of SSCBS',
+    shortName: 'Crescendo',
+    category: 'cultural',
+    categoryLabel: 'Arts & Culture',
+    categories: ['cultural', 'marketing'],
+    categoryLabels: ['Arts & Culture', 'Marketing, PR & Corporate'],
+    description: 'Organizing body for SSCBS flagship annual cultural festival. Crescendo recruits in Semester 2.',
+    recruitmentFormUrl: null,
+    deadline: null,
+    statusText: 'Crescendo recruits in Semester 2',
+    officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
+    instagramVideoUrl: 'https://www.instagram.com/crescendo_sscbs/',
+    linkedinUrl: 'https://www.linkedin.com/company/crescendo-sscbs',
+    defaultBookmarked: false,
+    accentColor: '#ec4899',
+  },
+
   // --- 11. Darkroom (Photography Society) ---
   {
     id: 'darkroom-photography',
