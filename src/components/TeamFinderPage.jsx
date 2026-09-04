@@ -68,6 +68,15 @@ function formatStudentName(rawName, email) {
   return 'Student Lead';
 }
 
+function isUserPost(post, user) {
+  if (!post || !user) return false;
+  const userEmailLower = user.email ? user.email.toLowerCase().trim() : '';
+  const postEmailLower = (post.created_by_email || post.user_email || '').toLowerCase().trim();
+  const isEmailMatch = Boolean(userEmailLower && postEmailLower && userEmailLower === postEmailLower);
+  const isUserIdMatch = Boolean(user.id && post.user_id && user.id === post.user_id);
+  return isEmailMatch || isUserIdMatch;
+}
+
 export default function TeamFinderPage({ onBack }) {
   const { user } = useAuth();
   const { featureFlags } = useConfig();
@@ -79,6 +88,7 @@ export default function TeamFinderPage({ onBack }) {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('my'); // 'my' (My Listings), 'other' (Other Listings)
+  const [hasUserToggledTab, setHasUserToggledTab] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshToast, setRefreshToast] = useState('');
 
@@ -189,15 +199,15 @@ export default function TeamFinderPage({ onBack }) {
         ]);
 
         if (!postsRes.error && postsRes.data) {
-          const expiredPosts = postsRes.data.filter((p) => p.created_at && now - new Date(p.created_at).getTime() > POST_EXPIRATION_MS);
-          const activePostsData = postsRes.data.filter((p) => !p.created_at || now - new Date(p.created_at).getTime() <= POST_EXPIRATION_MS);
-
-          // Auto-delete expired posts older than 168 hours (7 days) from Supabase
-          if (expiredPosts.length > 0) {
-            const expiredIds = expiredPosts.map((p) => p.id);
-            supabase.from('squad_posts').delete().in('id', expiredIds).catch(() => {});
-            supabase.from('squad_applications').delete().in('post_id', expiredIds).catch(() => {});
-          }
+          // Visually filter active posts (<= 7 days old or missing timestamp).
+          // DO NOT execute client-side destructive DELETE queries to Supabase!
+          const activePostsData = postsRes.data.filter((p) => {
+            if (!p.created_at) return true;
+            const createdAtMs = new Date(p.created_at).getTime();
+            if (isNaN(createdAtMs)) return true;
+            const ageMs = now - createdAtMs;
+            return ageMs <= POST_EXPIRATION_MS;
+          });
 
           const enrichedPosts = activePostsData.map((p) => {
             const authorEmail = p.created_by_email || p.user_email || '';
@@ -275,6 +285,17 @@ export default function TeamFinderPage({ onBack }) {
       };
     }
   }, []);
+
+  // Smart default tab: if user has 0 posts of their own, auto-switch to "Other Listings"
+  useEffect(() => {
+    if (!loading && !hasUserToggledTab && posts.length > 0) {
+      const userHasPosts = posts.some((p) => isUserPost(p, user));
+      const peerHasPosts = posts.some((p) => !isUserPost(p, user));
+      if (!userHasPosts && peerHasPosts) {
+        setActiveTab('other');
+      }
+    }
+  }, [posts, loading, user, hasUserToggledTab]);
 
   const handleOpenCreateModal = () => {
     setEditingPost(null);
@@ -535,6 +556,14 @@ export default function TeamFinderPage({ onBack }) {
     const updated = [postPayload, ...posts.filter((p) => p.id !== postPayload.id)];
     setPosts(updated);
     localStorage.setItem('sscbs_squad_posts', JSON.stringify(updated));
+    try {
+      sessionStorage.removeItem('sscbs_cached_team_posts');
+      sessionStorage.removeItem('sscbs_cached_team_time');
+    } catch (e) {}
+
+    // Switch to 'my' tab so the author sees their new post immediately
+    setHasUserToggledTab(true);
+    setActiveTab('my');
 
     setSubmitting(false);
     setIsCreateModalOpen(false);
@@ -554,6 +583,10 @@ export default function TeamFinderPage({ onBack }) {
     const updated = posts.filter((p) => p.id !== id);
     setPosts(updated);
     localStorage.setItem('sscbs_squad_posts', JSON.stringify(updated));
+    try {
+      sessionStorage.removeItem('sscbs_cached_team_posts');
+      sessionStorage.removeItem('sscbs_cached_team_time');
+    } catch (e) {}
   };
 
   const handleToggleStatus = async (id, currentOpenState) => {
@@ -927,17 +960,17 @@ function getUserApp(post, applications, userEmail, userId) {
   };
 
   // My Applications sent by current user
-  const mySentApplications = applications.filter(
-    (a) => a.applicant_email === user?.email || a.applicant_id === user?.id
-  );
+  const userEmailLower = user?.email ? user.email.toLowerCase().trim() : '';
+  const mySentApplications = applications.filter((a) => {
+    const appEmailLower = a.applicant_email ? a.applicant_email.toLowerCase().trim() : '';
+    const isEmail = Boolean(userEmailLower && appEmailLower && userEmailLower === appEmailLower);
+    const isId = Boolean(user?.id && a.applicant_id && user.id === a.applicant_id);
+    return isEmail || isId;
+  });
 
-  // Counts
-  const myPosts = posts.filter(
-    (p) => p.created_by_email === user?.email || p.user_id === user?.id
-  );
-  const otherPosts = posts.filter(
-    (p) => p.created_by_email !== user?.email && p.user_id !== user?.id
-  );
+  // Counts (Case-Insensitive)
+  const myPosts = posts.filter((p) => isUserPost(p, user));
+  const otherPosts = posts.filter((p) => !isUserPost(p, user));
   const myPostsCount = myPosts.length;
   const otherPostsCount = otherPosts.length;
 
@@ -949,7 +982,7 @@ function getUserApp(post, applications, userEmail, userId) {
 
   // Filtering
   const filteredPosts = posts.filter((post) => {
-    const isMyPost = post.created_by_email === user?.email || post.user_id === user?.id;
+    const isMyPost = isUserPost(post, user);
 
     if (activeTab === 'my' && !isMyPost) return false;
     if (activeTab === 'other' && isMyPost) return false;
@@ -1050,7 +1083,10 @@ function getUserApp(post, applications, userEmail, userId) {
         <div className="tf-tab-switcher">
           <button
             className={`tf-tab-btn ${activeTab === 'my' ? 'active' : ''}`}
-            onClick={() => setActiveTab('my')}
+            onClick={() => {
+              setHasUserToggledTab(true);
+              setActiveTab('my');
+            }}
           >
             <span>📌 My Listings</span>
             <span className="tf-tab-count">{myPostsCount}</span>
@@ -1062,7 +1098,10 @@ function getUserApp(post, applications, userEmail, userId) {
           </button>
           <button
             className={`tf-tab-btn ${activeTab === 'other' ? 'active' : ''}`}
-            onClick={() => setActiveTab('other')}
+            onClick={() => {
+              setHasUserToggledTab(true);
+              setActiveTab('other');
+            }}
           >
             <span>🌐 Other Listings</span>
             <span className="tf-tab-count">{otherPostsCount}</span>
@@ -1106,9 +1145,22 @@ function getUserApp(post, applications, userEmail, userId) {
             <>
               <h3>You haven't posted any team openings yet</h3>
               <p>Post a team opening to find complementary teammates for upcoming competitions!</p>
-              <button className="btn-tf-primary" onClick={handleOpenCreateModal} style={{ marginTop: '1rem' }}>
-                <UsersIcon size={16} /> Post Team Opening
-              </button>
+              <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <button className="btn-tf-primary" onClick={handleOpenCreateModal}>
+                  <UsersIcon size={16} /> Post Team Opening
+                </button>
+                {otherPostsCount > 0 && (
+                  <button
+                    className="btn-tf-secondary"
+                    onClick={() => {
+                      setHasUserToggledTab(true);
+                      setActiveTab('other');
+                    }}
+                  >
+                    Browse {otherPostsCount} Other Team Opening{otherPostsCount === 1 ? '' : 's'}
+                  </button>
+                )}
+              </div>
             </>
           ) : (
             <>
@@ -1123,7 +1175,7 @@ function getUserApp(post, applications, userEmail, userId) {
       ) : (
         <div className="tf-posts-grid">
           {filteredPosts.map((post) => {
-            const isHost = post.created_by_email === user?.email || post.user_id === user?.id;
+            const isHost = isUserPost(post, user);
             const postApps = applications.filter((a) => a.post_id === post.id);
             const pendingAppsCount = postApps.filter((a) => a.status === 'pending').length;
             

@@ -91,7 +91,7 @@ export const DEMO_SOCIETIES = [
       recruitmentFormUrl: 'https://bit.ly/4hXzE0j',
       initialDeadline: '2026-08-30T23:59:59+05:30',
       extensionTrigger: '2026-08-30T23:55:00+05:30',
-      extendedDeadline: '2026-08-31T16:00:00+05:30',
+      extendedDeadline: '2026-08-31T15:00:00+05:30',
     },
     get recruitmentFormUrl() {
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
@@ -1228,7 +1228,7 @@ export const DEMO_SOCIETIES = [
       recruitmentFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSfcjAJAPUOrQ6yJ836gnr0ECMeCCuwLz-PFV6yZLr745q7LsQ/viewform?usp=publish-editor',
       initialDeadline: '2026-08-29T23:59:59+05:30',
       extensionTrigger: '2026-08-29T23:55:00+05:30',
-      extendedDeadline: '2026-08-30T23:59:59+05:30',
+      extendedDeadline: '2026-09-02T17:00:00+05:30',
     },
     get recruitmentFormUrl() {
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
@@ -1249,6 +1249,10 @@ export const DEMO_SOCIETIES = [
     },
     get statusText() {
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        const now = new Date();
+        if (this.scheduledForm.extensionTrigger && now >= new Date(this.scheduledForm.extensionTrigger)) {
+          return '⏰ DEADLINE EXTENDED TO SEP 2, 5:00 PM!';
+        }
         return null;
       }
       return 'Recruitments will start soon, forms and info will come here soon!';
@@ -2303,10 +2307,30 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Startups & Social Impact',
     categories: ['ecell', 'wellness'],
     categoryLabels: ['Startups & Social Impact', 'Inclusion & Sports'],
-    description: 'Wellness, yoga, and mental health initiatives for student well-being. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    description: 'Wellness, yoga, and mental health initiatives for student well-being (Creativity, Mental Health, Community & Events).',
+    scheduledForm: {
+      liveFrom: '2026-09-04T00:00:00+05:30',
+      recruitmentFormUrl: 'https://forms.gle/sfq56R6zwSxW5Tmn6',
+      deadline: '2026-09-05T17:00:00+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.deadline;
+      }
+      return null;
+    },
+    get statusText() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      return 'Recruitments will start soon, forms and info will come here soon!';
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/sadhana.cbs/',
     linkedinUrl: 'https://www.linkedin.com/company/sadhana-the-yoga-society-of-sscbs',
