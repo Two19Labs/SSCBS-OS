@@ -1383,10 +1383,30 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Debating, Media & Lit',
     categories: ['debating', 'cultural'],
     categoryLabels: ['Debating, Media & Lit', 'Arts & Culture'],
-    description: 'Promoting creative writing, poetry slams, and literary publications. Recruitments will start soon, forms and info will come here soon!',
-    recruitmentFormUrl: null,
-    deadline: null,
-    statusText: 'Recruitments will start soon, forms and info will come here soon!',
+    description: 'Promoting creative writing, poetry slams, and literary publications.',
+    scheduledForm: {
+      liveFrom: '2026-09-05T00:00:00+05:30',
+      recruitmentFormUrl: 'https://forms.gle/se98PHc7iNWxxthy8',
+      deadline: '2026-09-09T17:00:00+05:30',
+    },
+    get recruitmentFormUrl() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.recruitmentFormUrl;
+      }
+      return null;
+    },
+    get deadline() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return this.scheduledForm.deadline;
+      }
+      return null;
+    },
+    get statusText() {
+      if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
+        return null;
+      }
+      return 'Recruitments will start soon, forms and info will come here soon!';
+    },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://linktr.ee/litsocsscbs?utm_source=chatgpt.com',
     linkedinUrl: 'https://www.linkedin.com/company/litsocsscbs',
