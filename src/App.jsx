@@ -226,7 +226,7 @@ function App() {
       title: 'Main Navigation',
       items: [
         { id: 'home', label: 'Home', Icon: HomeIcon },
-        ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', label: 'Recruitment Tracker', Icon: UsersIcon, featured: true }] : []),
+        ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', label: 'Societies Database', Icon: UsersIcon, featured: true }] : []),
         { id: 'buzz', label: 'Campus Buzz', Icon: MegaphoneIcon, locked: !featureFlags['buzz'] && !isAdmin },
       ],
     },
@@ -260,7 +260,7 @@ function App() {
 
   const pageTitle = {
     tools: 'Tools',
-    'society-tracker': 'Society Recruitment Tracker',
+    'society-tracker': 'Societies Database',
     'find-prof': 'Find My Professor',
     'faculty-db': 'Faculty Directory',
     'team-finder': 'Team Finder & Compete Hub',
@@ -328,7 +328,7 @@ function App() {
         return (
           <div className="tools-hub">
             {[
-              ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', micro: 'LIVE', microClass: 'success', title: 'Society Recruitment Tracker', desc: 'Keep track of info & form deadlines for societies', Icon: UsersIcon, locked: false }] : []),
+              ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', micro: 'DATABASE', microClass: 'success', title: 'Societies Database', desc: 'Directory of 47+ societies, domains & PoR contacts', Icon: UsersIcon, locked: false }] : []),
               ...(hasTeamFinderAccess ? [{ id: 'team-finder', micro: 'NEW', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post case comp openings', Icon: TrophyIcon, locked: false }] : []),
 
               { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },

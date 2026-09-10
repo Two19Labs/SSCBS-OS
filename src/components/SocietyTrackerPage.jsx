@@ -1,16 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { CATEGORIES, DEMO_SOCIETIES, getDeadlineInfo } from '../data/societies';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { CATEGORIES, DEMO_SOCIETIES, OFFICIAL_COLLEGE_SOCIETIES_URL } from '../data/societies';
 import {
   SearchIcon,
   InstagramIcon,
   LinktreeIcon,
   LinkedinIcon,
-  ExternalLinkIcon,
   SparklesIcon,
-  ClockIcon,
   BriefcaseIcon,
   HeartIcon,
-  CheckIcon,
   BackIcon,
   WhatsAppIcon,
 } from './icons';
@@ -19,8 +16,6 @@ import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import './SocietyTrackerPage.css';
 
 const LOCAL_STORAGE_KEY = 'sscbs_bookmarked_societies';
-const FILLED_FORMS_KEY = 'sscbs_filled_form_societies';
-const OFFICIAL_COLLEGE_SOCIETIES_URL = 'https://sscbs.du.ac.in/societies/';
 
 // Fisher-Yates shuffle algorithm helper
 function shuffleArray(array) {
@@ -36,7 +31,6 @@ export default function SocietyTrackerPage({ onBack }) {
   const { user } = useAuth();
   const userKeySuffix = user?.email ? `_${user.email.toLowerCase()}` : '';
   const bookmarksKey = `${LOCAL_STORAGE_KEY}${userKeySuffix}`;
-  const filledKey = `${FILLED_FORMS_KEY}${userKeySuffix}`;
 
   const [activeTab, setActiveTab] = useState('all'); // 'all' | 'preferred'
   const [searchQuery, setSearchQuery] = useState('');
@@ -46,7 +40,7 @@ export default function SocietyTrackerPage({ onBack }) {
   const [sortBy, setSortBy] = useState('shuffled');
   const [selectedSociety, setSelectedSociety] = useState(null);
 
-  // Bookmarks (Heart) state with user-scoped key
+  // Bookmarks (Heart / Star) state with user-scoped key
   const [bookmarkedIds, setBookmarkedIds] = useState(() => {
     try {
       if (user?.email) {
@@ -68,57 +62,14 @@ export default function SocietyTrackerPage({ onBack }) {
     return DEMO_SOCIETIES.filter((s) => s.defaultBookmarked).map((s) => s.id);
   });
 
-  // Form Filled checkmark state with user-scoped key
-  const [filledIds, setFilledIds] = useState(() => {
-    try {
-      if (user?.email) {
-        const userKey = `${FILLED_FORMS_KEY}_${user.email.toLowerCase()}`;
-        const saved = localStorage.getItem(userKey);
-        if (saved !== null) {
-          return JSON.parse(saved);
-        }
-        return [];
-      } else {
-        const saved = localStorage.getItem(FILLED_FORMS_KEY);
-        if (saved !== null) {
-          return JSON.parse(saved);
-        }
-      }
-    } catch (err) {
-      console.error('Error reading filled form societies:', err);
-    }
-    return [];
-  });
-
-  // Live countdown timer — ticks every second
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => {
-    const interval = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const getCountdown = useCallback((deadlineStr) => {
-    if (!deadlineStr) return null;
-    const diff = new Date(deadlineStr) - now;
-    if (diff <= 0) return { label: 'Closed', expired: true, tier: 'expired' };
-    const h = Math.floor(diff / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    const s = Math.floor((diff % 60000) / 1000);
-    const pad = (n) => String(n).padStart(2, '0');
-    // Tier: green > 48h, warning ≤ 48h, urgent ≤ 12h
-    const tier = h < 12 ? 'urgent' : h < 48 ? 'warning' : 'green';
-    return { label: `${pad(h)}:${pad(m)}:${pad(s)}`, expired: false, hours: h, tier };
-  }, [now]);
-
   // Helper for background cloud sync across devices
-  const syncProgressToCloud = useCallback(async (newBookmarks, newFilled) => {
+  const syncProgressToCloud = useCallback(async (newBookmarks) => {
     if (!user || !hasValidCredentials) return;
     try {
       // 1. Save to Supabase auth user metadata (syncs across devices on login)
       const { data, error } = await supabase.auth.updateUser({
         data: {
           society_bookmarks: newBookmarks,
-          society_filled_forms: newFilled,
         },
       });
 
@@ -134,7 +85,6 @@ export default function SocietyTrackerPage({ onBack }) {
         const newSettings = {
           ...existingSettings,
           society_bookmarks: newBookmarks,
-          society_filled_forms: newFilled,
           email: data.user.email,
         };
 
@@ -155,10 +105,9 @@ export default function SocietyTrackerPage({ onBack }) {
 
     const loadCloudData = async () => {
       let cloudBookmarks = user.user_metadata?.society_bookmarks;
-      let cloudFilled = user.user_metadata?.society_filled_forms;
 
       // If user_metadata does not have society_bookmarks yet, attempt lookup in user_progress settings table
-      if ((!Array.isArray(cloudBookmarks) || !Array.isArray(cloudFilled)) && hasValidCredentials) {
+      if (!Array.isArray(cloudBookmarks) && hasValidCredentials) {
         try {
           const { data: progressData } = await supabase
             .from('user_progress')
@@ -166,13 +115,8 @@ export default function SocietyTrackerPage({ onBack }) {
             .eq('user_id', user.id)
             .maybeSingle();
 
-          if (progressData?.settings) {
-            if (!Array.isArray(cloudBookmarks) && Array.isArray(progressData.settings.society_bookmarks)) {
-              cloudBookmarks = progressData.settings.society_bookmarks;
-            }
-            if (!Array.isArray(cloudFilled) && Array.isArray(progressData.settings.society_filled_forms)) {
-              cloudFilled = progressData.settings.society_filled_forms;
-            }
+          if (progressData?.settings && Array.isArray(progressData.settings.society_bookmarks)) {
+            cloudBookmarks = progressData.settings.society_bookmarks;
           }
         } catch (err) {
           console.warn('Notice loading user_progress backup:', err);
@@ -189,15 +133,6 @@ export default function SocietyTrackerPage({ onBack }) {
       } else {
         setBookmarkedIds([]);
       }
-
-      if (Array.isArray(cloudFilled)) {
-        setFilledIds(cloudFilled);
-        try {
-          localStorage.setItem(filledKey, JSON.stringify(cloudFilled));
-        } catch (e) {}
-      } else {
-        setFilledIds([]);
-      }
     };
 
     loadCloudData();
@@ -205,7 +140,7 @@ export default function SocietyTrackerPage({ onBack }) {
     return () => {
       isMounted = false;
     };
-  }, [user, bookmarksKey, filledKey]);
+  }, [user, bookmarksKey]);
 
   // Sync bookmarks with localStorage
   useEffect(() => {
@@ -216,27 +151,10 @@ export default function SocietyTrackerPage({ onBack }) {
     }
   }, [bookmarkedIds, bookmarksKey]);
 
-  // Sync filled forms with localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem(filledKey, JSON.stringify(filledIds));
-    } catch (err) {
-      console.error('Error saving filled form societies:', err);
-    }
-  }, [filledIds, filledKey]);
-
-  const toggleFormFilled = (id) => {
-    setFilledIds((prev) => {
-      const next = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
-      syncProgressToCloud(bookmarkedIds, next);
-      return next;
-    });
-  };
-
   const toggleBookmark = (id) => {
     setBookmarkedIds((prev) => {
       const next = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
-      syncProgressToCloud(next, filledIds);
+      syncProgressToCloud(next);
       return next;
     });
   };
@@ -251,7 +169,7 @@ export default function SocietyTrackerPage({ onBack }) {
       const temp = next[idx];
       next[idx] = next[targetIdx];
       next[targetIdx] = temp;
-      syncProgressToCloud(next, filledIds);
+      syncProgressToCloud(next);
       return next;
     });
   };
@@ -259,11 +177,6 @@ export default function SocietyTrackerPage({ onBack }) {
   const filteredSocieties = DEMO_SOCIETIES.filter((society) => {
     if (activeTab === 'preferred' && !bookmarkedIds.includes(society.id)) {
       return false;
-    }
-    if (activeTab === 'open') {
-      const now = new Date();
-      const isOpen = society.recruitmentFormUrl && (!society.deadline || now <= new Date(society.deadline));
-      if (!isOpen) return false;
     }
 
     const rawQuery = searchQuery.trim();
@@ -309,14 +222,14 @@ export default function SocietyTrackerPage({ onBack }) {
     return true;
   });
 
-  const shuffledIndexMap = React.useMemo(() => {
+  const shuffledIndexMap = useMemo(() => {
     const map = new Map();
     shuffledIds.forEach((id, index) => map.set(id, index));
     return map;
   }, [shuffledIds]);
 
   const sortedSocieties = [...filteredSocieties].sort((a, b) => {
-    // In "My Preferred Societies" tab, default to preference rank order (#1 Choice first)
+    // In "Starred" tab, default to preference rank order
     if (activeTab === 'preferred') {
       if (sortBy === 'name' || sortBy === 'name-asc') {
         return a.name.localeCompare(b.name);
@@ -348,13 +261,13 @@ export default function SocietyTrackerPage({ onBack }) {
   });
 
   const totalCount = DEMO_SOCIETIES.length;
-  const validSocietyIds = React.useMemo(() => new Set(DEMO_SOCIETIES.map((s) => s.id)), []);
+  const validSocietyIds = useMemo(() => new Set(DEMO_SOCIETIES.map((s) => s.id)), []);
   const bookmarkedCount = bookmarkedIds.filter((id) => validSocietyIds.has(id)).length;
-  const filledCount = filledIds.filter((id) => validSocietyIds.has(id)).length;
-  const openFormsCount = React.useMemo(() => {
-    const nowTime = new Date();
-    return DEMO_SOCIETIES.filter((s) => s.recruitmentFormUrl && (!s.deadline || nowTime <= new Date(s.deadline))).length;
-  }, []);
+  const totalDomainsCount = CATEGORIES.length - 1;
+  const totalPocsCount = useMemo(
+    () => DEMO_SOCIETIES.reduce((acc, s) => acc + (Array.isArray(s.pocs) ? s.pocs.length : 0), 0),
+    []
+  );
 
   return (
     <div className="society-tracker-container">
@@ -368,60 +281,27 @@ export default function SocietyTrackerPage({ onBack }) {
           )}
           <div>
             <span className="st-badge">
-              <SparklesIcon size={12} /> RECRUITMENT SEASON 2026
+              <SparklesIcon size={12} /> OFFICIAL CAMPUS DIRECTORY
             </span>
-            <h1 className="st-title">Society Recruitment Tracker</h1>
+            <h1 className="st-title">Central Societies Database</h1>
+            <p className="st-subtitle">
+              Comprehensive directory of all {totalCount} official societies, cells, and student initiatives at SSCBS.
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Recruitment Kickoff & Good Luck Announcement Banner */}
-      {(() => {
-        const target = new Date(2026, 7, 28, 17, 0, 0); // 28th Aug 2026 5:00 PM IST
-        const diff = target.getTime() - now.getTime();
-        const isLive = diff <= 0;
-        let countdownStr = '';
-        if (!isLive) {
-          const totalSecs = Math.floor(diff / 1000);
-          const days = Math.floor(totalSecs / 86400);
-          const hrs = Math.floor((totalSecs % 86400) / 3600);
-          const mins = Math.floor((totalSecs % 3600) / 60);
-          const secs = totalSecs % 60;
-          countdownStr = days > 0 
-            ? `${days}d ${String(hrs).padStart(2, '0')}h ${String(mins).padStart(2, '0')}m ${String(secs).padStart(2, '0')}s`
-            : `${String(hrs).padStart(2, '0')}h ${String(mins).padStart(2, '0')}m ${String(secs).padStart(2, '0')}s`;
-        }
-
-        return (
-          <div className="st-recruitment-banner">
-            <div className="st-recruitment-banner-icon">📢</div>
-            <div className="st-recruitment-banner-body">
-              <div className="st-recruitment-banner-header">
-                <span className="st-recruitment-banner-title">
-                  {isLive ? 'Recruitments Are Officially Live!' : 'Recruitments Begin 28th August at 5:00 PM!'}
-                </span>
-                {!isLive ? (
-                  <span className="st-recruitment-timer-pill">
-                    ⏳ Countdown: {countdownStr}
-                  </span>
-                ) : (
-                  <span className="st-recruitment-timer-pill live">
-                    🟢 LIVE NOW
-                  </span>
-                )}
-              </div>
-              <p className="st-recruitment-banner-text">
-                {!isLive 
-                  ? 'Recruitments for most societies officially begin today, 28th August at 5:00 PM IST. Registration forms and domain details will drop live!'
-                  : 'Society induction forms are now live! Explore categories, check requirements, and track deadlines.'}
-              </p>
-              <div className="st-recruitment-goodluck">
-                🍀 Best of luck to all freshers &amp; applicants for society recruitments! ✨
-              </div>
-            </div>
-          </div>
-        );
-      })()}
+      {/* Directory Welcome Banner */}
+      <div className="st-directory-hero">
+        <div className="st-hero-icon">🏛️</div>
+        <div className="st-hero-content">
+          <div className="st-hero-title">SSCBS Central Societies Database</div>
+          <p className="st-hero-desc">
+            Explore SSCBS's ecosystem of student-run societies and cells across {totalDomainsCount} distinct domains.
+            Browse full society dossiers, connect directly with student Points of Responsibility (PoRs) on WhatsApp, and follow official portals.
+          </p>
+        </div>
+      </div>
 
       {/* Metrics Strip */}
       <div className="st-metrics-grid">
@@ -433,24 +313,24 @@ export default function SocietyTrackerPage({ onBack }) {
           </div>
         </div>
         <div className="st-metric-card">
-          <div className="st-metric-icon">⚡</div>
+          <div className="st-metric-icon">🏷️</div>
           <div>
-            <div className="st-metric-val">{openFormsCount}</div>
-            <div className="st-metric-lbl">Open Forms</div>
+            <div className="st-metric-val">{totalDomainsCount}</div>
+            <div className="st-metric-lbl">Active Domains</div>
           </div>
         </div>
         <div className="st-metric-card">
-          <div className="st-metric-icon">❤️</div>
+          <div className="st-metric-icon">💬</div>
+          <div>
+            <div className="st-metric-val">{totalPocsCount}+</div>
+            <div className="st-metric-lbl">Student PoRs</div>
+          </div>
+        </div>
+        <div className="st-metric-card">
+          <div className="st-metric-icon">⭐</div>
           <div>
             <div className="st-metric-val">{bookmarkedCount}</div>
-            <div className="st-metric-lbl">My Preferred</div>
-          </div>
-        </div>
-        <div className="st-metric-card">
-          <div className="st-metric-icon">✅</div>
-          <div>
-            <div className="st-metric-val">{filledCount}</div>
-            <div className="st-metric-lbl">Forms Filled</div>
+            <div className="st-metric-lbl">Starred Societies</div>
           </div>
         </div>
       </div>
@@ -463,21 +343,13 @@ export default function SocietyTrackerPage({ onBack }) {
             onClick={() => setActiveTab('all')}
           >
             <BriefcaseIcon size={16} /> All Societies
-          </button>
-          <button
-            className={`st-tab-btn ${activeTab === 'open' ? 'active' : ''}`}
-            onClick={() => setActiveTab('open')}
-          >
-            ⚡ Open Forms Only
-            {openFormsCount > 0 && (
-              <span className="st-tab-count">{openFormsCount}</span>
-            )}
+            <span className="st-tab-count">{totalCount}</span>
           </button>
           <button
             className={`st-tab-btn ${activeTab === 'preferred' ? 'active' : ''}`}
             onClick={() => setActiveTab('preferred')}
           >
-            <HeartIcon filled={activeTab === 'preferred'} size={16} /> My Preferred Societies
+            <HeartIcon filled={activeTab === 'preferred'} size={16} /> Starred Societies
             {bookmarkedCount > 0 && (
               <span className="st-tab-count">{bookmarkedCount}</span>
             )}
@@ -493,7 +365,7 @@ export default function SocietyTrackerPage({ onBack }) {
             <input
               type="text"
               className="st-search-input"
-              placeholder="Search by name, shortname, domain, or POR..."
+              placeholder="Search by name, acronym (e.g. ACM, FinX), domain, or PoR..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -522,7 +394,7 @@ export default function SocietyTrackerPage({ onBack }) {
           >
             {activeTab === 'preferred' ? (
               <>
-                <option value="rank">Sort by: Preference Rank (#1 First)</option>
+                <option value="rank">Sort by: Saved Rank Order</option>
                 <option value="name">Sort by: Name (A-Z)</option>
                 <option value="name-desc">Sort by: Name (Z-A)</option>
               </>
@@ -557,7 +429,6 @@ export default function SocietyTrackerPage({ onBack }) {
             const isSaved = bookmarkedIds.includes(society.id);
             const rankIndex = bookmarkedIds.indexOf(society.id);
             const rank = rankIndex !== -1 ? rankIndex + 1 : null;
-            const isFilled = filledIds.includes(society.id);
             const categoryList = society.categoryLabels || [society.categoryLabel];
             const primaryLabel = categoryList[0];
             const extraCount = categoryList.length - 1;
@@ -565,9 +436,9 @@ export default function SocietyTrackerPage({ onBack }) {
             return (
               <div
                 key={society.id}
-                className={`st-card ${isFilled ? 'is-filled' : ''} ${rank === 1 ? 'is-top-choice' : ''}`}
+                className={`st-card ${rank === 1 ? 'is-top-choice' : ''}`}
                 onClick={() => setSelectedSociety(society)}
-                title={`Click card to expand details for ${society.name}`}
+                title={`Click card to view dossier for ${society.name}`}
               >
                 {/* Header & Title */}
                 <div>
@@ -591,28 +462,20 @@ export default function SocietyTrackerPage({ onBack }) {
                       {isSaved && rank !== null && (
                         <span
                           className={`st-rank-badge ${rank === 1 ? 'rank-top' : ''}`}
-                          title={`Preference Rank #${rank}`}
+                          title={`Starred #${rank}`}
                         >
-                          ❤️ #{rank} {rank === 1 ? 'Top Choice' : 'Preference'}
+                          ⭐ #{rank} {rank === 1 ? 'Top Pick' : 'Starred'}
                         </span>
                       )}
-                      {isFilled && (
-                        <span className="st-filled-badge">
-                          <CheckIcon size={11} /> Filled
-                        </span>
-                      )}
-                      <span className="st-expand-pill">
-                        Details ↗
-                      </span>
                     </div>
                     <div className="st-action-btns">
-                      {isSaved && rankIndex !== -1 && (
+                      {isSaved && rankIndex !== -1 && activeTab === 'preferred' && (
                         <div className="st-rank-reorder-group" onClick={(e) => e.stopPropagation()}>
                           <button
                             className="st-reorder-btn"
                             disabled={rankIndex === 0}
                             onClick={() => moveBookmarkRank(society.id, 'up')}
-                            title="Move up (increase preference rank)"
+                            title="Move up"
                           >
                             ▲
                           </button>
@@ -620,29 +483,19 @@ export default function SocietyTrackerPage({ onBack }) {
                             className="st-reorder-btn"
                             disabled={rankIndex === bookmarkedIds.length - 1}
                             onClick={() => moveBookmarkRank(society.id, 'down')}
-                            title="Move down (lower preference rank)"
+                            title="Move down"
                           >
                             ▼
                           </button>
                         </div>
                       )}
                       <button
-                        className={`st-check-btn ${isFilled ? 'active' : ''}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleFormFilled(society.id);
-                        }}
-                        title={isFilled ? 'Mark form as unfilled' : 'Mark form as filled'}
-                      >
-                        <CheckIcon size={14} />
-                      </button>
-                      <button
                         className={`st-heart-btn ${isSaved ? 'active' : ''}`}
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleBookmark(society.id);
                         }}
-                        title={isSaved ? 'Remove from preferred' : 'Save to preferred'}
+                        title={isSaved ? 'Remove from starred' : 'Add to starred societies'}
                       >
                         <HeartIcon filled={isSaved} size={15} />
                       </button>
@@ -650,142 +503,97 @@ export default function SocietyTrackerPage({ onBack }) {
                   </div>
 
                   <h3 className="st-society-title">{society.name}</h3>
+                  {society.description && (
+                    <p className="st-card-desc">{society.description}</p>
+                  )}
                 </div>
 
                 {/* Card Bottom / Action Row */}
                 <div className="st-card-bottom">
-                  {(() => {
-                    const dl = getDeadlineInfo(society.deadline);
-                    const countdown = getCountdown(society.deadline);
-                    const hasForm = !!society.recruitmentFormUrl;
-                    return (
-                      <>
-                        <div className="st-deadline-box">
-                          <span className="st-deadline-lbl">
-                            <ClockIcon size={14} /> Status
-                          </span>
-                          <span style={{ fontWeight: 600, fontSize: '0.8rem' }} className={dl.status === 'urgent' ? 'st-status-urgent' : dl.isExpired ? 'st-status-expired' : ''}>
-                            {society.statusText || dl.text}
-                          </span>
-                        </div>
+                  <div className="st-card-social-strip">
+                    <span className="st-social-strip-label">Official Handles</span>
+                    <div className="st-social-row">
+                      <a
+                        href={society.officialPageUrl || OFFICIAL_COLLEGE_SOCIETIES_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="st-social-btn sscbs"
+                        title="Visit Official SSCBS Page"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <img src="/sscbs_college_logo.png" alt="SSCBS" className="st-sscbs-logo" />
+                      </a>
+                      <a
+                        href={society.instagramVideoUrl || 'https://instagram.com'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`st-social-btn ${society.id === 'literary-society' ? 'linktree' : 'insta'}`}
+                        title={society.id === 'literary-society' ? 'Linktree' : 'Instagram Updates'}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {society.id === 'literary-society' ? <LinktreeIcon size={18} /> : <InstagramIcon size={18} />}
+                      </a>
+                      {society.whatsappGroupUrl && !society.linkedinUrl ? (
+                        <a
+                          href={society.whatsappGroupUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="st-social-btn whatsapp"
+                          title="Official WhatsApp Group"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <WhatsAppIcon size={18} />
+                        </a>
+                      ) : (
+                        <a
+                          href={society.linkedinUrl || 'https://linkedin.com'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="st-social-btn linkedin"
+                          title="LinkedIn Profile"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <LinkedinIcon size={18} />
+                        </a>
+                      )}
+                    </div>
+                  </div>
 
-                        {countdown && !countdown.expired && (
-                          <div className={`st-countdown-strip ${countdown.tier}`}>
-                            <ClockIcon size={12} />
-                            <span className="st-countdown-label">Closes in</span>
-                            <span className="st-countdown-timer">{countdown.label}</span>
-                          </div>
-                        )}
-
-                        {/* Buttons Row */}
-                        <div className="st-card-actions">
-                          {hasForm && !dl.isExpired ? (
-                            <a
-                              href={society.recruitmentFormUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="st-apply-btn live"
-                              title="Open recruitment form"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              Apply Now ↗
-                            </a>
-                          ) : dl.isExpired ? (
-                            <span className="st-apply-btn disabled expired">
-                              Applications Closed
-                            </span>
-                          ) : (
-                            <span
-                              className="st-apply-btn disabled"
-                              title="Recruitment forms will drop here soon"
-                            >
-                              Forms Opening Soon
-                            </span>
-                          )}
-
-                          <div className="st-social-row">
-                            <a
-                              href={society.officialPageUrl || OFFICIAL_COLLEGE_SOCIETIES_URL}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="st-social-btn sscbs"
-                              title="Visit Official SSCBS Page"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <img src="/sscbs_college_logo.png" alt="SSCBS" className="st-sscbs-logo" />
-                            </a>
-                            <a
-                              href={society.instagramVideoUrl || 'https://instagram.com'}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={`st-social-btn ${society.id === 'literary-society' ? 'linktree' : 'insta'}`}
-                              title={society.id === 'literary-society' ? 'Linktree' : 'Instagram Updates'}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              {society.id === 'literary-society' ? <LinktreeIcon size={18} /> : <InstagramIcon size={18} />}
-                            </a>
-                            {society.whatsappGroupUrl && !society.linkedinUrl ? (
-                              <a
-                                href={society.whatsappGroupUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="st-social-btn whatsapp"
-                                title="Official WhatsApp Group"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <WhatsAppIcon size={18} />
-                              </a>
-                            ) : (
-                              <a
-                                href={society.linkedinUrl || 'https://linkedin.com'}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="st-social-btn linkedin"
-                                title="LinkedIn Profile"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <LinkedinIcon size={18} />
-                              </a>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Dedicated Card-Bottom 50/50 Action Footer Bar (Contact PoR + Expand Details) */}
-                        <div className="st-card-por-footer">
-                          {Array.isArray(society.pocs) && society.pocs.length > 0 && (() => {
-                            const primaryPoc = society.pocs[0];
-                            const cleanPhone = primaryPoc.phone.replace(/[^0-9]/g, '').slice(-10);
-                            const textMsg = encodeURIComponent(`Hi! I'm an SSCBS student inquiring about recruitment for ${society.shortName || society.name}.`);
-                            return (
-                              <a
-                                href={`https://wa.me/91${cleanPhone}?text=${textMsg}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="st-card-por-link"
-                                title={`Contact POR (${primaryPoc.name}) on WhatsApp`}
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <WhatsAppIcon size={14} />
-                                <span>Contact PoR</span>
-                              </a>
-                            );
-                          })()}
-                          <button
-                            type="button"
-                            className="st-card-expand-btn"
-                            title="Expand for full details & descriptions"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedSociety(society);
-                            }}
-                          >
-                            <span>Expand Details</span>
-                            <span className="st-btn-arrow">↗</span>
-                          </button>
-                        </div>
-                      </>
-                    );
-                  })()}
+                  {/* Dedicated Card-Bottom 50/50 Action Footer Bar (Contact PoR + View Dossier) */}
+                  <div className="st-card-por-footer">
+                    {Array.isArray(society.pocs) && society.pocs.length > 0 && (() => {
+                      const primaryPoc = society.pocs[0];
+                      const cleanPhone = primaryPoc.phone.replace(/[^0-9]/g, '').slice(-10);
+                      const textMsg = encodeURIComponent(
+                        `Hi ${primaryPoc.name}! I'm an SSCBS student reaching out regarding ${society.shortName || society.name}.`
+                      );
+                      return (
+                        <a
+                          href={`https://wa.me/91${cleanPhone}?text=${textMsg}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="st-card-por-link"
+                          title={`Contact PoR (${primaryPoc.name}) on WhatsApp`}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <WhatsAppIcon size={14} />
+                          <span>Contact PoR</span>
+                        </a>
+                      );
+                    })()}
+                    <button
+                      type="button"
+                      className="st-card-expand-btn"
+                      title="Expand for full dossier, contacts & domains"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedSociety(society);
+                      }}
+                    >
+                      <span>View Dossier</span>
+                      <span className="st-btn-arrow">↗</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -798,18 +606,18 @@ export default function SocietyTrackerPage({ onBack }) {
           </div>
           <h3 className="st-empty-title">
             {activeTab === 'preferred'
-              ? 'No Preferred Societies Saved Yet'
+              ? 'No Starred Societies Saved Yet'
               : 'No Societies Found'}
           </h3>
           <p className="st-empty-sub">
             {activeTab === 'preferred'
-              ? 'Click the heart icon on any society card in "All Societies" to track them here!'
-              : 'Try clearing your search query or selecting a different category filter.'}
+              ? 'Click the heart or star icon on any society card in "All Societies" to save them to your favorites roster!'
+              : 'Try clearing your search query or selecting a different domain filter.'}
           </p>
           {activeTab === 'preferred' && (
             <button
               className="st-college-btn"
-              style={{ display: 'inline-flex', width: 'auto', padding: '9px 18px' }}
+              style={{ display: 'inline-flex', width: 'auto', padding: '9px 18px', marginTop: '12px' }}
               onClick={() => {
                 setActiveTab('all');
                 setSelectedCategory('all');
@@ -822,7 +630,7 @@ export default function SocietyTrackerPage({ onBack }) {
         </div>
       )}
 
-      {/* Full Society Detail Modal */}
+      {/* Full Society Detail Modal / Dossier */}
       {selectedSociety && (
         <div
           className="st-modal-overlay"
@@ -846,7 +654,7 @@ export default function SocietyTrackerPage({ onBack }) {
                     <span
                       className={`st-rank-badge ${bookmarkedIds.indexOf(selectedSociety.id) === 0 ? 'rank-top' : ''}`}
                     >
-                      ❤️ #{bookmarkedIds.indexOf(selectedSociety.id) + 1} {bookmarkedIds.indexOf(selectedSociety.id) === 0 ? 'Top Choice' : 'Preference'}
+                      ⭐ #{bookmarkedIds.indexOf(selectedSociety.id) + 1} Starred Pick
                     </span>
                   )}
                 </div>
@@ -854,24 +662,11 @@ export default function SocietyTrackerPage({ onBack }) {
               </div>
               <div className="st-modal-header-actions">
                 <button
-                  className={`st-check-btn ${
-                    filledIds.includes(selectedSociety.id) ? 'active' : ''
-                  }`}
-                  onClick={() => toggleFormFilled(selectedSociety.id)}
-                  title={
-                    filledIds.includes(selectedSociety.id)
-                      ? 'Mark form as unfilled'
-                      : 'Mark form as filled'
-                  }
-                >
-                  <CheckIcon size={15} />
-                </button>
-                <button
                   className={`st-heart-btn ${
                     bookmarkedIds.includes(selectedSociety.id) ? 'active' : ''
                   }`}
                   onClick={() => toggleBookmark(selectedSociety.id)}
-                  title="Bookmark"
+                  title={bookmarkedIds.includes(selectedSociety.id) ? 'Remove from starred' : 'Add to starred'}
                 >
                   <HeartIcon
                     filled={bookmarkedIds.includes(selectedSociety.id)}
@@ -890,41 +685,12 @@ export default function SocietyTrackerPage({ onBack }) {
 
             <div className="st-modal-body">
               <div className="st-modal-section">
-                <h4 className="st-modal-sec-title">About the Society</h4>
+                <h4 className="st-modal-sec-title">About the Society &amp; Mission</h4>
                 <p className="st-modal-desc">{selectedSociety.description}</p>
               </div>
 
               <div className="st-modal-section">
-                <h4 className="st-modal-sec-title">Recruitment Announcement</h4>
-                {(() => {
-                  const dl = getDeadlineInfo(selectedSociety.deadline);
-                  const countdown = getCountdown(selectedSociety.deadline);
-                  const hasForm = !!selectedSociety.recruitmentFormUrl;
-                  return (
-                    <>
-                      <div className={`st-modal-status-box ${hasForm && !dl.isExpired ? 'live' : ''}`}>
-                        <ClockIcon size={18} />
-                        <div>
-                          <strong>{selectedSociety.statusText || dl.text}</strong>
-                          {countdown && !countdown.expired && (
-                            <div className={`st-modal-countdown ${countdown.tier}`}>
-                              ⏱️ <span className="st-countdown-timer">{countdown.label}</span> remaining
-                            </div>
-                          )}
-                          {!hasForm && (
-                            <p style={{ margin: '4px 0 0 0', fontSize: '0.83rem', opacity: 0.88 }}>
-                              Official initial application forms and submission deadlines will drop here as soon as recruitments open!
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </>
-                  );
-                })()}
-              </div>
-
-              <div className="st-modal-section">
-                <h4 className="st-modal-sec-title">Domains &amp; Categories</h4>
+                <h4 className="st-modal-sec-title">Domains &amp; Specializations</h4>
                 <div className="st-modal-tags">
                   {(selectedSociety.categoryLabels || [selectedSociety.categoryLabel]).map(
                     (tag, i) => (
@@ -938,7 +704,7 @@ export default function SocietyTrackerPage({ onBack }) {
 
               {Array.isArray(selectedSociety.pocs) && selectedSociety.pocs.length > 0 && (
                 <div className="st-modal-section">
-                  <h4 className="st-modal-sec-title">💬 Points of Responsibility (PORs) Contact</h4>
+                  <h4 className="st-modal-sec-title">💬 Student Leadership &amp; PoR Contacts</h4>
                   <div className="st-poc-grid">
                     {selectedSociety.pocs.map((poc, idx) => {
                       const cleanPhone = poc.phone.replace(/[^0-9]/g, '');
@@ -946,7 +712,9 @@ export default function SocietyTrackerPage({ onBack }) {
                         cleanPhone.length === 10
                           ? `+91 ${cleanPhone.slice(0, 5)} ${cleanPhone.slice(5)}`
                           : poc.phone;
-                      const textMsg = encodeURIComponent(`Hi! I'm an SSCBS student inquiring about recruitment for ${selectedSociety.shortName || selectedSociety.name}.`);
+                      const textMsg = encodeURIComponent(
+                        `Hi ${poc.name}! I'm an SSCBS student reaching out regarding ${selectedSociety.shortName || selectedSociety.name}.`
+                      );
                       return (
                         <div key={idx} className="st-poc-card">
                           <div className="st-poc-details">
@@ -971,29 +739,45 @@ export default function SocietyTrackerPage({ onBack }) {
                   </div>
                 </div>
               )}
+
+              <div className="st-modal-section">
+                <h4 className="st-modal-sec-title">🗓️ Annual Induction &amp; Recruitment Cycle</h4>
+                <div className="st-induction-info-box">
+                  <span className="st-induction-icon">📢</span>
+                  <div>
+                    <strong style={{ display: 'block', marginBottom: '3px', color: 'var(--ink)' }}>
+                      Annual Recruitment Window
+                    </strong>
+                    <p style={{ margin: 0, fontSize: '0.84rem', lineHeight: '1.45', color: 'var(--ink-dim)' }}>
+                      Official society inductions at SSCBS are conducted annually at the beginning of the odd semester (typically in August/September) for freshers and prospective applicants.
+                      Applications for the 2026–27 session have completed. Follow their official social handles and reach out to the PoRs above for updates on campus events, workshops, and future recruitment cycles!
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="st-modal-footer">
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                {(() => {
-                  const dl = getDeadlineInfo(selectedSociety.deadline);
-                  const hasForm = !!selectedSociety.recruitmentFormUrl;
-                  if (hasForm && !dl.isExpired) {
-                    return (
-                      <a
-                        href={selectedSociety.recruitmentFormUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="st-apply-btn live modal-apply"
-                      >
-                        Apply Now ↗
-                      </a>
-                    );
-                  }
-                  if (dl.isExpired) {
-                    return <span className="st-modal-form-disabled">Applications Closed</span>;
-                  }
-                  return <span className="st-modal-form-disabled">Forms Opening Soon</span>;
+                {Array.isArray(selectedSociety.pocs) && selectedSociety.pocs.length > 0 && (() => {
+                  const primaryPoc = selectedSociety.pocs[0];
+                  const cleanPhone = primaryPoc.phone.replace(/[^0-9]/g, '').slice(-10);
+                  const textMsg = encodeURIComponent(
+                    `Hi ${primaryPoc.name}! I'm an SSCBS student reaching out regarding ${selectedSociety.shortName || selectedSociety.name}.`
+                  );
+                  return (
+                    <a
+                      href={`https://wa.me/91${cleanPhone}?text=${textMsg}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="st-card-por-link"
+                      style={{ padding: '8px 14px', height: '36px' }}
+                      title={`Message ${primaryPoc.name} on WhatsApp`}
+                    >
+                      <WhatsAppIcon size={15} />
+                      <span>WhatsApp PoR ({primaryPoc.name})</span>
+                    </a>
+                  );
                 })()}
               </div>
               <div className="st-social-row">

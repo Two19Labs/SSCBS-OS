@@ -1,9 +1,9 @@
-// SSCBS Society Recruitment Data Store - Official Full Names & Direct LinkedIn Page Links
+// SSCBS Central Societies Database - Official Full Names, Descriptions, Domains, PoRs & Direct Links
 
 export const OFFICIAL_COLLEGE_SOCIETIES_URL = 'https://sscbs.du.ac.in/societies/';
 
 export const CATEGORIES = [
-  { id: 'all', label: 'All Domains (47)', icon: '⚡' },
+  { id: 'all', label: 'All Domains (47)', icon: '🏛️' },
   { id: 'finance', label: 'Finance & Accounting', icon: '📈' },
   { id: 'consulting', label: 'Consulting & Analytics', icon: '💼' },
   { id: 'ecell', label: 'Startups & Social Impact', icon: '🚀' },
