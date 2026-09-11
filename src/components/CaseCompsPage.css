@@ -639,6 +639,26 @@
   border: 1px solid rgba(59, 130, 246, 0.25);
 }
 
+.cc-tag.purple {
+  background: rgba(168, 85, 247, 0.1);
+  color: #9333ea;
+  border: 1px solid rgba(168, 85, 247, 0.25);
+}
+
+[data-theme='dark'] .cc-tag.purple {
+  color: #c084fc;
+}
+
+.cc-tag.blue {
+  background: rgba(14, 165, 233, 0.1);
+  color: #0284c7;
+  border: 1px solid rgba(14, 165, 233, 0.25);
+}
+
+[data-theme='dark'] .cc-tag.blue {
+  color: #38bdf8;
+}
+
 /* Highlights Box */
 .cc-details-box {
   background: var(--bg);

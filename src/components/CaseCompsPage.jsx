@@ -15,73 +15,13 @@ import {
 } from './icons';
 import './CaseCompsPage.css';
 
-// Resilient fallback opportunities in case Unstop API is temporarily unavailable
-const FALLBACK_COMPETITIONS = [
-  {
-    id: 'fb-1',
-    title: 'Tata Imagination Challenge 2026',
-    orgName: 'Tata Group & IIM Bangalore',
-    orgLogo: 'https://d8it4huxumps7.cloudfront.net/images/partners/partners75/5d08e336c6a1e_Indian_Institute_of_Management_Rohtak_logo.jpg',
-    unstopUrl: 'https://unstop.com/competitions',
-    deadline: '2026-09-25T23:59:00+05:30',
-    remainDaysText: '14 days left',
-    daysRemainingNum: 14,
-    urgency: 'normal',
-    minTeam: 1,
-    maxTeam: 3,
-    teamSizeDisplay: '1 - 3 Members',
-    prizes: '₹2,00,000 Cash Pool & PPIs',
-    isFree: true,
-    isFlagship: true,
-    isFirstYearFriendly: true,
-    registeredCount: 3420,
-  },
-  {
-    id: 'fb-2',
-    title: 'Moneyball: The Strategy & Valuation Challenge',
-    orgName: 'BITS Pilani · Interface 2026',
-    orgLogo: 'https://d8it4huxumps7.cloudfront.net/images/partners/partners75/677e49accecfc_bits-management.png',
-    unstopUrl: 'https://unstop.com/competitions',
-    deadline: '2026-09-21T23:59:00+05:30',
-    remainDaysText: '10 days left',
-    daysRemainingNum: 10,
-    urgency: 'normal',
-    minTeam: 1,
-    maxTeam: 4,
-    teamSizeDisplay: '1 - 4 Members',
-    prizes: '₹16,000 Cash Pool',
-    isFree: true,
-    isFlagship: true,
-    isFirstYearFriendly: true,
-    registeredCount: 1280,
-  },
-  {
-    id: 'fb-3',
-    title: 'The Product Graveyard & Resurrections',
-    orgName: 'Indian Institute of Management (IIM), Rohtak',
-    orgLogo: 'https://d8it4huxumps7.cloudfront.net/images/partners/partners75/5d08e336c6a1e_Indian_Institute_of_Management_Rohtak_logo.jpg',
-    unstopUrl: 'https://unstop.com/competitions',
-    deadline: '2026-09-12T23:59:00+05:30',
-    remainDaysText: '1 days left',
-    daysRemainingNum: 1,
-    urgency: 'high',
-    minTeam: 1,
-    maxTeam: 2,
-    teamSizeDisplay: '1 - 2 Members',
-    prizes: 'Certificates & National Recognition',
-    isFree: true,
-    isFlagship: true,
-    isFirstYearFriendly: true,
-    registeredCount: 890,
-  },
-];
-
 export default function CaseCompsPage({ onBack, onNavigate }) {
   const [competitions, setCompetitions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [fetchError, setFetchError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'first-year' | 'flagship' | 'closing-soon'
+  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'iim' | 'du' | 'iit' | 'flagship' | 'closing-soon'
   const [teamFilter, setTeamFilter] = useState('all'); // 'all' | 'solo' | 'team'
   const [copiedId, setCopiedId] = useState(null);
   const [isPlaybookExpanded, setIsPlaybookExpanded] = useState(false);
@@ -90,20 +30,22 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
   const fetchOpportunities = useCallback(async (showRefreshing = false) => {
     if (showRefreshing) setIsRefreshing(true);
     else setLoading(true);
+    setFetchError(null);
 
     try {
       const res = await fetch('/api/competitions');
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to reach Unstop`);
       const data = await res.json();
-      if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+      if (data.success && Array.isArray(data.data)) {
         setCompetitions(data.data);
         setLastUpdated(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
       } else {
-        setCompetitions(FALLBACK_COMPETITIONS);
+        throw new Error(data.error || 'Empty response received from Unstop');
       }
     } catch (err) {
-      console.warn('Failed to fetch live Unstop competitions, using fallback list:', err);
-      setCompetitions(FALLBACK_COMPETITIONS);
+      console.error('Error fetching live Unstop competitions:', err);
+      setFetchError(err.message || 'Unable to load real-time competitions from Unstop.');
+      setCompetitions([]);
     } finally {
       setLoading(false);
       setIsRefreshing(false);
@@ -131,13 +73,15 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
     }
   };
 
-  // Metrics computation
+  // Metrics computation from 100% real Unstop competitions
   const metrics = useMemo(() => {
     const total = competitions.length;
-    const firstYear = competitions.filter((c) => c.isFirstYearFriendly).length;
+    const du = competitions.filter((c) => c.isDU).length;
+    const iim = competitions.filter((c) => c.isIIMorMBA).length;
+    const iit = competitions.filter((c) => c.isIITorTech).length;
     const flagship = competitions.filter((c) => c.isFlagship).length;
     const closingSoon = competitions.filter((c) => c.daysRemainingNum <= 3).length;
-    return { total, firstYear, flagship, closingSoon };
+    return { total, du, iim, iit, flagship, closingSoon };
   }, [competitions]);
 
   // Filtering
@@ -153,7 +97,9 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
       }
 
       // Category filter
-      if (activeFilter === 'first-year' && !comp.isFirstYearFriendly) return false;
+      if (activeFilter === 'du' && !comp.isDU) return false;
+      if (activeFilter === 'iim' && !comp.isIIMorMBA) return false;
+      if (activeFilter === 'iit' && !comp.isIITorTech) return false;
       if (activeFilter === 'flagship' && !comp.isFlagship) return false;
       if (activeFilter === 'closing-soon' && comp.daysRemainingNum > 3) return false;
 
@@ -178,11 +124,11 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
           <div>
             <div className="cc-badge">
               <SparklesIcon size={13} />
-              <span>LIVE ALERTS · FIRST YEAR FOCUS</span>
+              <span>LIVE UNSTOP FEED · 100% REAL OPPORTUNITIES</span>
             </div>
             <h1 className="cc-title">Case Competitions Alerts</h1>
             <p className="cc-subtitle">
-              Live opportunities pulled automatically from Unstop, pre-filtered for undergraduate & first-year CBSites.
+              Live case competitions & corporate challenges synced directly from Unstop across Delhi University, IIMs, IITs, top B-Schools and national enterprises.
             </p>
           </div>
         </div>
@@ -216,28 +162,28 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
         </div>
 
         <div
-          className={`cc-metric-card ${activeFilter === 'first-year' ? 'active' : ''}`}
-          onClick={() => setActiveFilter('first-year')}
-        >
-          <div className="cc-metric-icon success">
-            <GraduationCapIcon size={18} />
-          </div>
-          <div className="cc-metric-info">
-            <span className="cc-metric-value">{metrics.firstYear}</span>
-            <span className="cc-metric-label">First-Year Friendly</span>
-          </div>
-        </div>
-
-        <div
-          className={`cc-metric-card ${activeFilter === 'flagship' ? 'active' : ''}`}
-          onClick={() => setActiveFilter('flagship')}
+          className={`cc-metric-card ${activeFilter === 'iim' ? 'active' : ''}`}
+          onClick={() => setActiveFilter('iim')}
         >
           <div className="cc-metric-icon gold">
             <FlameIcon size={18} />
           </div>
           <div className="cc-metric-info">
-            <span className="cc-metric-value">{metrics.flagship}</span>
-            <span className="cc-metric-label">Tier-1 & Flagships</span>
+            <span className="cc-metric-value">{metrics.iim}</span>
+            <span className="cc-metric-label">IIMs & Top MBA</span>
+          </div>
+        </div>
+
+        <div
+          className={`cc-metric-card ${activeFilter === 'du' ? 'active' : ''}`}
+          onClick={() => setActiveFilter('du')}
+        >
+          <div className="cc-metric-icon success">
+            <GraduationCapIcon size={18} />
+          </div>
+          <div className="cc-metric-info">
+            <span className="cc-metric-value">{metrics.du}</span>
+            <span className="cc-metric-label">DU Colleges</span>
           </div>
         </div>
 
@@ -262,7 +208,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
           <input
             type="text"
             className="cc-search-input"
-            placeholder="Search by name, IIM, BITS, SRCC, or prizes..."
+            placeholder="Search by name, IIM, IIT, LSR, Stephen's, BITS, prizes..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -279,25 +225,37 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
               className={`cc-tab-btn ${activeFilter === 'all' ? 'active' : ''}`}
               onClick={() => setActiveFilter('all')}
             >
-              All Comps
+              All Comps ({metrics.total})
             </button>
             <button
-              className={`cc-tab-btn ${activeFilter === 'first-year' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('first-year')}
+              className={`cc-tab-btn ${activeFilter === 'iim' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('iim')}
             >
-              🎓 First-Year Picks
+              🏛️ IIMs & MBA ({metrics.iim})
+            </button>
+            <button
+              className={`cc-tab-btn ${activeFilter === 'du' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('du')}
+            >
+              🎓 DU Circuits ({metrics.du})
+            </button>
+            <button
+              className={`cc-tab-btn ${activeFilter === 'iit' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('iit')}
+            >
+              ⚙️ IITs & Tech ({metrics.iit})
             </button>
             <button
               className={`cc-tab-btn ${activeFilter === 'flagship' ? 'active' : ''}`}
               onClick={() => setActiveFilter('flagship')}
             >
-              ⭐ Tier-1 Flagship
+              ⭐ Tier-1 Flagships ({metrics.flagship})
             </button>
             <button
               className={`cc-tab-btn ${activeFilter === 'closing-soon' ? 'active' : ''}`}
               onClick={() => setActiveFilter('closing-soon')}
             >
-              ⏳ Closing Soon
+              ⏳ Closing Soon ({metrics.closingSoon})
             </button>
           </div>
 
@@ -329,8 +287,8 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
         <div className="cc-status-left">
           <span className="cc-pulse-dot"></span>
           <span>
-            Showing <strong>{filteredCompetitions.length}</strong> active case competitions
-            {lastUpdated && <span className="cc-last-sync"> · Last synced at {lastUpdated}</span>}
+            Showing <strong>{filteredCompetitions.length}</strong> live active competitions from Unstop
+            {lastUpdated && <span className="cc-last-sync"> · Synced at {lastUpdated}</span>}
           </span>
         </div>
         <button
@@ -359,8 +317,8 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
           <div className="cc-playbook-grid">
             <div className="cc-playbook-step">
               <span className="cc-step-number">01</span>
-              <h4>Pick the Right Comp</h4>
-              <p>Look for the <strong>🎓 First-Year Pick</strong> badge. These typically have simple preliminary quiz or 3-slider executive summary rounds with zero prerequisite barriers.</p>
+              <h4>Start with Preliminary Decks</h4>
+              <p>Target competitions with 3-slider executive summaries or open quiz rounds. They require zero prerequisite pedigree and focus on structured logic.</p>
             </div>
             <div className="cc-playbook-step">
               <span className="cc-step-number">02</span>
@@ -385,17 +343,28 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
       {loading ? (
         <div className="cc-loading-state">
           <div className="cc-spinner"></div>
-          <p className="cc-loading-title">Connecting to Unstop catalog...</p>
-          <p className="cc-loading-subtitle">Filtering active undergraduate case competitions for you</p>
+          <p className="cc-loading-title">Fetching live competitions from Unstop...</p>
+          <p className="cc-loading-subtitle">Pulling direct listings across DU, IIMs, IITs & corporate circuits</p>
+        </div>
+      ) : fetchError ? (
+        <div className="cc-empty-state error">
+          <div className="cc-empty-icon">
+            <TrophyIcon size={36} />
+          </div>
+          <h3 className="cc-empty-title">Could not load live competitions</h3>
+          <p className="cc-empty-desc">{fetchError}</p>
+          <button className="cc-empty-btn" onClick={() => fetchOpportunities(false)}>
+            Retry Connection to Unstop
+          </button>
         </div>
       ) : filteredCompetitions.length === 0 ? (
         <div className="cc-empty-state">
           <div className="cc-empty-icon">
             <TrophyIcon size={36} />
           </div>
-          <h3 className="cc-empty-title">No competitions found</h3>
+          <h3 className="cc-empty-title">No competitions match your filter</h3>
           <p className="cc-empty-desc">
-            Try adjusting your search query or switching tabs to see more opportunities.
+            Try searching a different keyword or resetting your filter tabs.
           </p>
           <button
             className="cc-empty-btn"
@@ -445,16 +414,26 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
                 {comp.title}
               </h2>
 
-              {/* Tag Badges */}
+              {/* Badges Row */}
               <div className="cc-badges-row">
-                {comp.isFlagship && (
-                  <span className="cc-tag gold">
-                    <FlameIcon size={11} filled /> Tier-1 Flagship
+                {comp.isDU && (
+                  <span className="cc-tag purple">
+                    🎓 DU Circuit
                   </span>
                 )}
-                {comp.isFirstYearFriendly && (
-                  <span className="cc-tag green">
-                    <GraduationCapIcon size={11} /> First-Year Pick
+                {comp.isIIMorMBA && (
+                  <span className="cc-tag gold">
+                    🏛️ IIM / MBA
+                  </span>
+                )}
+                {comp.isIITorTech && (
+                  <span className="cc-tag blue">
+                    ⚙️ IIT / Tech
+                  </span>
+                )}
+                {comp.isFlagship && !comp.isIIMorMBA && !comp.isDU && (
+                  <span className="cc-tag gold">
+                    <FlameIcon size={11} filled /> Tier-1 Flagship
                   </span>
                 )}
                 <span className="cc-tag neutral">
@@ -505,7 +484,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
                   type="button"
                   className={`cc-share-btn ${copiedId === comp.id ? 'copied' : ''}`}
                   onClick={(e) => handleShare(comp, e)}
-                  title="Share with friends"
+                  title="Share competition with friends"
                 >
                   {copiedId === comp.id ? <CheckIcon size={14} /> : <CopyIcon size={14} />}
                 </button>
