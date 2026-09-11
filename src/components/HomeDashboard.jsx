@@ -621,7 +621,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
                   </span>
                 </div>
                 <div style={{ fontSize: '0.84rem', color: 'var(--ink-dim)', marginTop: '4px', lineHeight: '1.45' }}>
-                  Live case competitions, flagship challenges &amp; hackathons pulled directly from Unstop, pre-filtered for undergraduate CBSites across all circuits.
+                  It's competitions season! Find opportunities relevant to CBS folks right here, synced with and pulled from Unstop, all filterable! :)
                 </div>
               </div>
             </div>

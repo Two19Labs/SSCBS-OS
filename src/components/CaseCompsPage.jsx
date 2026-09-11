@@ -442,7 +442,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
             </div>
             <h1 className="cc-title">Case Competitions Alerts</h1>
             <p className="cc-subtitle">
-              Live case competitions & corporate challenges synced directly from Unstop across Delhi University, IIMs, IITs, top B-Schools and national enterprises.
+              It's competitions season! Find opportunities relevant to CBS folks right here, synced with and pulled from Unstop, all filterable! :)
             </p>
           </div>
         </div>
