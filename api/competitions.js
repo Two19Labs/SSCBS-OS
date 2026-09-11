@@ -12,10 +12,12 @@ const FLAGSHIP_KEYWORDS = [
 ];
 
 const DU_KEYWORDS = [
-  'delhi university', 'university of delhi', 'sscbs', 'srcc', 'stephen',
-  'hindu', 'hansraj', 'lsr', 'lady shri ram', 'sggscc', 'ramjas', 'kirori mal',
-  'drc', 'daulat ram', 'gargi', 'venkateswara', 'sgtb khalsa', 'keshav mahavidyalaya',
-  'deen dayal upadhyaya', 'ddu'
+  'delhi university', 'university of delhi', '(du)', 'sscbs', 'shaheed sukhdev',
+  'srcc', 'shri ram college', 'stephen', 'hindu', 'hansraj', 'lsr', 'lady shri ram',
+  'sggscc', 'ramjas', 'kirori mal', 'kmc', 'drc', 'daulat ram', 'gargi', 'venkateswara',
+  'venky', 'sgtb khalsa', 'khalsa', 'keshav mahavidyalaya', 'deen dayal upadhyaya', 'ddu',
+  'miranda', 'jesus and mary', 'jmc', 'atma ram', 'arsd', 'sbsc', 'shaheed bhagat singh',
+  'motilal nehru', 'indraprastha college', 'ipcw', 'maharaja agrasen', 'ramanujan'
 ];
 
 const IIM_MBA_KEYWORDS = [
@@ -40,8 +42,16 @@ export async function fetchCompetitionsFromUnstop() {
     'opportunity=competitions&searchTerm=case study&per_page=50',
     'opportunity=competitions&searchTerm=consulting&per_page=50',
     'opportunity=competitions&searchTerm=strategy&per_page=50',
+    'opportunity=competitions&searchTerm=delhi university&per_page=50',
+    'opportunity=competitions&searchTerm=du&per_page=50',
+    'opportunity=competitions&searchTerm=srcc&per_page=50',
+    'opportunity=competitions&searchTerm=sscbs&per_page=50',
+    'opportunity=competitions&searchTerm=lsr&per_page=50',
+    'opportunity=competitions&searchTerm=stephen&per_page=50',
+    'opportunity=competitions&searchTerm=sggscc&per_page=50',
     'opportunity=competitions&searchTerm=iim&per_page=50',
     'opportunity=competitions&searchTerm=iit&per_page=50',
+    'opportunity=competitions&searchTerm=b-plan&per_page=50',
     'opportunity=competitions&searchTerm=challenge&per_page=50'
   ];
 
