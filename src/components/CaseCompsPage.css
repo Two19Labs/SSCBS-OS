@@ -477,159 +477,180 @@
   gap: 18px;
 }
 
-/* ── Modern Bento Card ── */
+/* ── Clean Pro Opportunity Card ── */
 .cc-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.18s ease;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.2s ease;
 }
 
 .cc-card:hover {
-  transform: translateY(-3px);
-  border-color: var(--ink-dim);
-  box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px -6px rgba(0, 0, 0, 0.09);
 }
 
 [data-theme='dark'] .cc-card:hover {
-  box-shadow: 0 10px 28px -4px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 14px 34px -6px rgba(0, 0, 0, 0.5);
 }
 
-/* ── Top Circuit Accent Line ── */
-.cc-card-accent-bar {
-  height: 3.5px;
-  width: 100%;
+/* Subtle Circuit Hover Accents */
+.cc-card-du:hover {
+  border-color: rgba(147, 51, 234, 0.5);
 }
 
-.cc-accent-du {
-  background: linear-gradient(90deg, #9333ea, #c084fc);
+.cc-card-iim:hover {
+  border-color: rgba(217, 119, 6, 0.5);
 }
 
-.cc-accent-iim {
-  background: linear-gradient(90deg, #d97706, #f59e0b);
+.cc-card-iit:hover {
+  border-color: rgba(2, 132, 199, 0.5);
 }
 
-.cc-accent-iit {
-  background: linear-gradient(90deg, #0284c7, #38bdf8);
+.cc-card-flagship:hover {
+  border-color: rgba(176, 141, 62, 0.55);
 }
 
-.cc-accent-flagship {
-  background: linear-gradient(90deg, #b08d3e, #eab308);
-}
-
-.cc-accent-general {
-  background: linear-gradient(90deg, var(--accent, #71222c), #9333ea);
+.cc-card-general:hover {
+  border-color: var(--ink-dim);
 }
 
 /* ── Card Inner Container ── */
 .cc-card-inner {
-  padding: 16px 18px 16px;
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
   flex: 1;
 }
 
-/* ── Row 1: Header Pills & Urgency Chip ── */
-.cc-card-header-pills {
+/* ── Top Bar: Host Identity + Circuit + Urgency ── */
+.cc-card-top-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
 }
 
-.cc-pill-group-left {
+.cc-host-identity {
   display: flex;
   align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
 }
 
-.cc-circuit-pill {
+.cc-host-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  object-fit: contain;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+  padding: 2px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.cc-host-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  font-size: 0.95rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cc-host-avatar.du {
+  background: rgba(147, 51, 234, 0.1);
+  color: #9333ea;
+  border-color: rgba(147, 51, 234, 0.25);
+}
+
+.cc-host-avatar.iim {
+  background: rgba(217, 119, 6, 0.1);
+  color: #d97706;
+  border-color: rgba(217, 119, 6, 0.25);
+}
+
+.cc-host-avatar.iit {
+  background: rgba(2, 132, 199, 0.1);
+  color: #0284c7;
+  border-color: rgba(2, 132, 199, 0.25);
+}
+
+.cc-host-avatar.flagship {
+  background: rgba(176, 141, 62, 0.12);
+  color: #b08d3e;
+  border-color: rgba(176, 141, 62, 0.28);
+}
+
+.cc-host-avatar.general {
+  background: var(--bg);
+  color: var(--ink);
+}
+
+[data-theme='dark'] .cc-host-avatar.du { color: #c084fc; }
+[data-theme='dark'] .cc-host-avatar.iim { color: #fbbf24; }
+[data-theme='dark'] .cc-host-avatar.iit { color: #38bdf8; }
+
+.cc-host-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+
+.cc-host-name {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cc-circuit-tag {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.7rem;
+  gap: 3px;
+  font-size: 0.68rem;
   font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 6px;
+  border-radius: 4px;
+  width: fit-content;
   letter-spacing: 0.2px;
 }
 
-.cc-circuit-pill.du {
-  background: rgba(168, 85, 247, 0.12);
-  color: #9333ea;
-  border: 1px solid rgba(168, 85, 247, 0.25);
-}
+.cc-circuit-tag.du { color: #9333ea; }
+.cc-circuit-tag.iim { color: #d97706; }
+.cc-circuit-tag.iit { color: #0284c7; }
+.cc-circuit-tag.flagship { color: #b08d3e; }
+.cc-circuit-tag.general { color: var(--ink-dim); }
 
-[data-theme='dark'] .cc-circuit-pill.du {
-  color: #c084fc;
-}
-
-.cc-circuit-pill.iim {
-  background: rgba(245, 158, 11, 0.12);
-  color: #d97706;
-  border: 1px solid rgba(245, 158, 11, 0.28);
-}
-
-[data-theme='dark'] .cc-circuit-pill.iim {
-  color: #fbbf24;
-}
-
-.cc-circuit-pill.iit {
-  background: rgba(14, 165, 233, 0.1);
-  color: #0284c7;
-  border: 1px solid rgba(14, 165, 233, 0.25);
-}
-
-[data-theme='dark'] .cc-circuit-pill.iit {
-  color: #38bdf8;
-}
-
-.cc-circuit-pill.flagship {
-  background: rgba(176, 141, 62, 0.12);
-  color: #b08d3e;
-  border: 1px solid rgba(176, 141, 62, 0.28);
-}
-
-.cc-circuit-pill.general {
-  background: var(--bg);
-  color: var(--ink-dim);
-  border: 1px solid var(--border);
-}
+[data-theme='dark'] .cc-circuit-tag.du { color: #c084fc; }
+[data-theme='dark'] .cc-circuit-tag.iim { color: #fbbf24; }
+[data-theme='dark'] .cc-circuit-tag.iit { color: #38bdf8; }
 
 .cc-circuit-icon {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   line-height: 1;
 }
 
-.cc-entry-pill {
-  font-size: 0.68rem;
-  font-weight: 700;
-  padding: 3px 7px;
-  border-radius: 6px;
-}
-
-.cc-entry-pill.free {
-  background: rgba(16, 185, 129, 0.1);
-  color: #059669;
-  border: 1px solid rgba(16, 185, 129, 0.25);
-}
-
-[data-theme='dark'] .cc-entry-pill.free {
-  color: #34d399;
-}
-
-.cc-entry-pill.paid {
-  background: var(--bg);
-  color: var(--ink-dim);
-  border: 1px solid var(--border);
+.cc-top-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 /* Urgency Chip */
@@ -678,53 +699,10 @@
   border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
-/* ── Row 2: Host / Organizer ── */
-.cc-host-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-
-.cc-host-logo {
-  width: 22px;
-  height: 22px;
-  border-radius: 5px;
-  object-fit: contain;
-  background: #ffffff;
-  border: 1px solid var(--border);
-  flex-shrink: 0;
-  padding: 1px;
-}
-
-.cc-host-avatar {
-  width: 22px;
-  height: 22px;
-  border-radius: 5px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--ink);
-  font-size: 0.72rem;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.cc-host-name {
-  font-size: 0.76rem;
-  font-weight: 600;
-  color: var(--ink-dim);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* ── Row 3: Competition Title ── */
+/* ── Competition Title ── */
 .cc-card-title {
-  margin: 0;
-  font-size: 1.02rem;
+  margin: 2px 0 0 0;
+  font-size: 1.05rem;
   font-weight: 800;
   color: var(--ink);
   line-height: 1.35;
@@ -736,78 +714,124 @@
   min-height: 2.75rem;
 }
 
-/* ── Row 4: Bento Specs Grid (3 Balanced Columns) ── */
-.cc-specs-grid {
-  display: grid;
-  grid-template-columns: 1.25fr 1fr 1fr;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  padding: 8px 10px;
-  gap: 8px;
-}
-
-.cc-spec-cell {
+/* ── Standout Prize & Entry Bar ── */
+.cc-prize-bar {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-}
-
-.cc-spec-cell:not(:last-child) {
-  border-right: 1px solid var(--border);
-  padding-right: 8px;
-}
-
-.cc-spec-label {
-  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.62rem;
-  font-weight: 700;
-  color: var(--ink-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  white-space: nowrap;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.22);
 }
 
-.cc-spec-label svg {
-  opacity: 0.7;
+[data-theme='dark'] .cc-prize-bar {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.28);
 }
 
-.cc-spec-val {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--ink);
+.cc-prize-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  flex: 1;
+}
+
+.cc-prize-trophy {
+  color: #d97706;
+  flex-shrink: 0;
+}
+
+.cc-prize-text {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #b45309;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.cc-spec-val.prize {
-  color: #d97706;
-}
-
-[data-theme='dark'] .cc-spec-val.prize {
+[data-theme='dark'] .cc-prize-text {
   color: #fbbf24;
 }
 
-/* ── Row 5: Micro Social Proof / Status ── */
-.cc-card-meta-row {
+.cc-entry-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 5px;
+  letter-spacing: 0.2px;
+  flex-shrink: 0;
+}
+
+.cc-entry-tag.free {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+[data-theme='dark'] .cc-entry-tag.free {
+  color: #34d399;
+}
+
+.cc-entry-tag.paid {
+  background: var(--bg);
+  color: var(--ink-dim);
+  border: 1px solid var(--border);
+}
+
+/* ── Clean Metadata Row: Format & Deadline ── */
+.cc-specs-row {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
   gap: 8px;
+  font-size: 0.76rem;
+  color: var(--ink-dim);
+  font-weight: 600;
   min-height: 20px;
 }
 
-.cc-meta-reg {
-  font-size: 0.72rem;
-  color: var(--ink-dim);
+.cc-spec-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   white-space: nowrap;
 }
 
-.cc-meta-reg strong {
+.cc-spec-item svg {
+  opacity: 0.75;
+}
+
+.cc-spec-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* ── Social Proof Footer Metric ── */
+.cc-card-footer-metric {
+  display: flex;
+  align-items: center;
+  font-size: 0.74rem;
+  color: var(--ink-dim);
+  min-height: 18px;
+}
+
+.cc-reg-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cc-reg-icon {
+  color: #f97316;
+}
+
+.cc-reg-count strong {
   color: var(--ink);
   font-weight: 700;
 }

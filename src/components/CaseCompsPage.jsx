@@ -508,100 +508,87 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
 
             return (
               <article key={comp.id} className={`cc-card cc-card-${circuit.type}`}>
-                {/* Top circuit accent line */}
-                <div className={`cc-card-accent-bar cc-accent-${circuit.type}`} />
-
                 <div className="cc-card-inner">
-                  {/* Row 1: Header pills (Circuit + Entry + Urgency) */}
-                  <div className="cc-card-header-pills">
-                    <div className="cc-pill-group-left">
-                      <span className={`cc-circuit-pill ${circuit.type}`}>
-                        <span className="cc-circuit-icon">{circuit.icon}</span>
-                        <span>{circuit.label}</span>
-                      </span>
-                      {comp.isFree ? (
-                        <span className="cc-entry-pill free">Free Entry</span>
+                  {/* Top Bar: Host Profile + Circuit Tag + Urgency */}
+                  <div className="cc-card-top-bar">
+                    <div className="cc-host-identity">
+                      {comp.orgLogo ? (
+                        <img
+                          src={comp.orgLogo}
+                          alt=""
+                          className="cc-host-logo"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
                       ) : (
-                        <span className="cc-entry-pill paid">Paid</span>
+                        <div className={`cc-host-avatar ${circuit.type}`}>
+                          {(comp.orgName ? comp.orgName.charAt(0) : 'A').toUpperCase()}
+                        </div>
                       )}
-                    </div>
-
-                    <div className={`cc-urgency-chip ${comp.urgency}`}>
-                      <span className="cc-status-dot" />
-                      <span>{comp.remainDaysText}</span>
-                    </div>
-                  </div>
-
-                  {/* Row 2: Host / Organizer */}
-                  <div className="cc-host-row">
-                    {comp.orgLogo ? (
-                      <img
-                        src={comp.orgLogo}
-                        alt=""
-                        className="cc-host-logo"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <div className={`cc-host-avatar ${circuit.type}`}>
-                        {(comp.orgName ? comp.orgName.charAt(0) : 'A').toUpperCase()}
+                      <div className="cc-host-meta">
+                        <span className="cc-host-name" title={comp.orgName || 'Academic Host'}>
+                          {comp.orgName || 'Academic Host'}
+                        </span>
+                        <span className={`cc-circuit-tag ${circuit.type}`}>
+                          <span className="cc-circuit-icon">{circuit.icon}</span>
+                          <span>{circuit.label}</span>
+                        </span>
                       </div>
-                    )}
-                    <span className="cc-host-name" title={comp.orgName || 'Academic Host'}>
-                      {comp.orgName || 'Academic Host'}
-                    </span>
+                    </div>
+
+                    <div className="cc-top-status">
+                      <span className={`cc-urgency-chip ${comp.urgency}`}>
+                        <span className="cc-status-dot" />
+                        <span>{comp.remainDaysText}</span>
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Row 3: Competition Title */}
+                  {/* Competition Title */}
                   <h2 className="cc-card-title" title={comp.title || 'Case Competition'}>
                     {comp.title || 'Case Competition'}
                   </h2>
 
-                  {/* Row 4: 3-Column Bento Specs Grid */}
-                  <div className="cc-specs-grid">
-                    <div className="cc-spec-cell">
-                      <span className="cc-spec-label">
-                        <TrophyIcon size={11} /> PRIZE POOL
-                      </span>
-                      <span className="cc-spec-val prize" title={comp.prizes || 'Recognition'}>
-                        {comp.prizes || 'Recognition'}
+                  {/* Featured Prize & Entry Bar */}
+                  <div className="cc-prize-bar">
+                    <div className="cc-prize-left">
+                      <TrophyIcon size={14} className="cc-prize-trophy" />
+                      <span className="cc-prize-text" title={comp.prizes || 'Certificates & Recognition'}>
+                        {comp.prizes || 'Certificates & Recognition'}
                       </span>
                     </div>
-
-                    <div className="cc-spec-cell">
-                      <span className="cc-spec-label">
-                        <UsersIcon size={11} /> FORMAT
-                      </span>
-                      <span className="cc-spec-val" title={comp.teamSizeDisplay || 'Solo / Team'}>
-                        {comp.teamSizeDisplay || 'Solo / Team'}
-                      </span>
-                    </div>
-
-                    <div className="cc-spec-cell">
-                      <span className="cc-spec-label">
-                        <CalendarIcon size={11} /> DEADLINE
-                      </span>
-                      <span className="cc-spec-val" title={deadlineText}>
-                        {deadlineText}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Row 5: Micro Social Proof & Status */}
-                  <div className="cc-card-meta-row">
-                    <span className="cc-meta-reg">
-                      {Number(comp.registeredCount || 0) > 0 ? (
-                        <>
-                          <strong>{Number(comp.registeredCount).toLocaleString()}</strong> applied
-                        </>
-                      ) : (
-                        <span className="cc-meta-fresh">⚡ Recently Listed</span>
-                      )}
+                    <span className={`cc-entry-tag ${comp.isFree ? 'free' : 'paid'}`}>
+                      {comp.isFree ? 'Free Entry' : 'Paid'}
                     </span>
                   </div>
 
-                  {/* Row 6: Action Buttons */}
+                  {/* Metadata: Format & Deadline */}
+                  <div className="cc-specs-row">
+                    <div className="cc-spec-item" title={comp.teamSizeDisplay || 'Solo / Team'}>
+                      <UsersIcon size={13} />
+                      <span>{comp.teamSizeDisplay || 'Solo / Team'}</span>
+                    </div>
+                    <div className="cc-spec-dot" />
+                    <div className="cc-spec-item" title={deadlineText}>
+                      <CalendarIcon size={13} />
+                      <span>Ends {deadlineText}</span>
+                    </div>
+                  </div>
+
+                  {/* Social Proof Footer Metric */}
+                  <div className="cc-card-footer-metric">
+                    {Number(comp.registeredCount || 0) > 0 ? (
+                      <span className="cc-reg-count">
+                        <FlameIcon size={12} className="cc-reg-icon" />
+                        <strong>{Number(comp.registeredCount).toLocaleString()}</strong> students applied
+                      </span>
+                    ) : (
+                      <span className="cc-meta-fresh">⚡ Recently Listed</span>
+                    )}
+                  </div>
+
+                  {/* Action Buttons */}
                   <div className="cc-card-actions">
                     <a
                       href={comp.unstopUrl}
