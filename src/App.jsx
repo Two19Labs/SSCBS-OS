@@ -7,6 +7,7 @@ import HomeDashboard from './components/HomeDashboard';
 import ProfilePage from './components/ProfilePage';
 import ProfileModal from './components/ProfileModal';
 import NoticeBoard from './components/NoticeBoard';
+import ErrorBoundary from './components/ErrorBoundary';
 import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFacultyDatabase, canAccessSocietyTracker, canAccessCaseComps } from './lib/admin';
 import {
   HomeIcon,
@@ -293,7 +294,9 @@ function App() {
       case 'case-comps':
         return hasCaseCompsAccess ? (
           <Suspense fallback={<PageLoader />}>
-            <CaseCompsPage onBack={goBack} onNavigate={openTool} />
+            <ErrorBoundary>
+              <CaseCompsPage onBack={goBack} onNavigate={openTool} />
+            </ErrorBoundary>
           </Suspense>
         ) : <HomeDashboard onNavigate={openTool} onOpenProfile={() => setView('profile')} />;
 

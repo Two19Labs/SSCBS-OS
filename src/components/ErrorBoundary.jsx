@@ -31,6 +31,20 @@ export default class ErrorBoundary extends React.Component {
     this.setState({ hasError: false, error: null });
     if (typeof window !== 'undefined') {
       window.sessionStorage.removeItem('sscbs_chunk_err_reload');
+      window.sessionStorage.removeItem('sscbs_chunk_retry');
+      window.location.hash = '';
+      window.location.reload();
+    }
+  };
+
+  handleHardReset = () => {
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.clear();
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => {
+          regs.forEach(r => r.unregister());
+        });
+      }
       window.location.hash = '';
       window.location.reload();
     }
@@ -40,7 +54,7 @@ export default class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div style={{
-          minHeight: '100vh',
+          minHeight: '80vh',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -53,25 +67,62 @@ export default class ErrorBoundary extends React.Component {
         }}>
           <div style={{ fontSize: '3rem', marginBottom: '16px' }}>⚠️</div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '8px' }}>Something went wrong</h2>
-          <p style={{ color: 'var(--ink-dim, #78716c)', maxWidth: '420px', fontSize: '0.95rem', marginBottom: '24px' }}>
-            An unexpected error occurred while rendering this page. You can reload or return to the main dashboard.
+          <p style={{ color: 'var(--ink-dim, #78716c)', maxWidth: '440px', fontSize: '0.92rem', marginBottom: '16px' }}>
+            An unexpected error occurred while rendering this view. You can reload or return to the main dashboard.
           </p>
-          <button
-            onClick={this.handleReset}
-            style={{
-              padding: '10px 20px',
-              borderRadius: '10px',
-              border: 'none',
-              background: 'var(--primary-color, #1e3a8a)',
-              color: '#ffffff',
-              fontWeight: 600,
-              fontSize: '0.95rem',
-              cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-            }}
-          >
-            Reload &amp; Return Home
-          </button>
+
+          {this.state.error && (
+            <div style={{
+              background: 'rgba(0, 0, 0, 0.05)',
+              border: '1px solid rgba(0,0,0,0.1)',
+              borderRadius: '8px',
+              padding: '10px 14px',
+              maxWidth: '520px',
+              width: '100%',
+              marginBottom: '20px',
+              textAlign: 'left',
+              fontSize: '0.78rem',
+              color: '#dc2626',
+              fontFamily: 'monospace',
+              overflowX: 'auto'
+            }}>
+              <strong>Details:</strong> {this.state.error?.message || String(this.state.error)}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <button
+              onClick={this.handleReset}
+              style={{
+                padding: '10px 20px',
+                borderRadius: '8px',
+                border: 'none',
+                background: 'var(--primary-color, #1e3a8a)',
+                color: '#ffffff',
+                fontWeight: 600,
+                fontSize: '0.9rem',
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+              }}
+            >
+              Reload &amp; Return Home
+            </button>
+            <button
+              onClick={this.handleHardReset}
+              style={{
+                padding: '10px 18px',
+                borderRadius: '8px',
+                border: '1px solid rgba(0,0,0,0.15)',
+                background: 'transparent',
+                color: 'var(--ink, #1c1917)',
+                fontWeight: 600,
+                fontSize: '0.9rem',
+                cursor: 'pointer'
+              }}
+            >
+              Hard Refresh &amp; Clear Cache
+            </button>
+          </div>
         </div>
       );
     }
