@@ -45,6 +45,7 @@ export function identifyPostHogUser(user) {
 export const FEATURE_NAMES = {
   home: 'Home Dashboard',
   'society-tracker': 'Societies Database',
+  'case-comps': 'Case Competitions Alerts',
   timetable: 'Timetable',
   'find-prof': 'Find My Professor',
   'team-finder': 'Team Finder & Compete Hub',

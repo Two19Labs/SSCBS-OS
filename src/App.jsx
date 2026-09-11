@@ -7,7 +7,7 @@ import HomeDashboard from './components/HomeDashboard';
 import ProfilePage from './components/ProfilePage';
 import ProfileModal from './components/ProfileModal';
 import NoticeBoard from './components/NoticeBoard';
-import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFacultyDatabase, canAccessSocietyTracker } from './lib/admin';
+import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFacultyDatabase, canAccessSocietyTracker, canAccessCaseComps } from './lib/admin';
 import {
   HomeIcon,
   CalendarIcon,
@@ -25,6 +25,7 @@ import {
   DoorIcon,
   HeartIcon,
   UsersIcon,
+  FlameIcon,
   MenuIcon,
   CloseIcon,
 } from './components/icons';
@@ -62,6 +63,7 @@ const ContactPage = lazyWithRetry(() => import('./components/ContactPage'));
 const TeamFinderPage = lazyWithRetry(() => import('./components/TeamFinderPage'));
 const EmptyRoomFinderPage = lazyWithRetry(() => import('./components/EmptyRoomFinderPage').then(m => ({ default: m.EmptyRoomFinderPage })));
 const SocietyTrackerPage = lazyWithRetry(() => import('./components/SocietyTrackerPage'));
+const CaseCompsPage = lazyWithRetry(() => import('./components/CaseCompsPage'));
 
 
 const PageLoader = () => (
@@ -74,8 +76,8 @@ const PageLoader = () => (
   </div>
 );
 
-const TOOL_VIEWS = ['find-prof', 'waiver', 'admin', 'team-finder', 'empty-room', 'faculty-db', 'society-tracker'];
-const VALID_VIEWS = ['home', 'find-prof', 'waiver', 'tools', 'buzz', 'profile', 'admin', 'contact', 'team-finder', 'empty-room', 'faculty-db', 'society-tracker'];
+const TOOL_VIEWS = ['find-prof', 'waiver', 'admin', 'team-finder', 'empty-room', 'faculty-db', 'society-tracker', 'case-comps'];
+const VALID_VIEWS = ['home', 'find-prof', 'waiver', 'tools', 'buzz', 'profile', 'admin', 'contact', 'team-finder', 'empty-room', 'faculty-db', 'society-tracker', 'case-comps'];
 
 
 const getInitialView = () => {
@@ -198,6 +200,7 @@ function App() {
   const hasEmptyRoomAccess = featureFlags['empty-room'] || canAccessEmptyRoom(user.email);
   const hasFacultyDbAccess = canAccessFacultyDatabase(user.email);
   const hasSocietyTrackerAccess = canAccessSocietyTracker(user.email);
+  const hasCaseCompsAccess = canAccessCaseComps(user.email);
 
   const openTool = (id) => {
     setIsMobileSidebarOpen(false);
@@ -227,6 +230,7 @@ function App() {
       items: [
         { id: 'home', label: 'Home', Icon: HomeIcon },
         ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', label: 'Societies Database', Icon: UsersIcon, featured: true }] : []),
+        ...(hasCaseCompsAccess ? [{ id: 'case-comps', label: 'Case Competitions Alerts', Icon: FlameIcon, featured: true }] : []),
         { id: 'buzz', label: 'Campus Buzz', Icon: MegaphoneIcon, locked: !featureFlags['buzz'] && !isAdmin },
       ],
     },
@@ -261,6 +265,7 @@ function App() {
   const pageTitle = {
     tools: 'Tools',
     'society-tracker': 'Societies Database',
+    'case-comps': 'Case Competitions Alerts',
     'find-prof': 'Find My Professor',
     'faculty-db': 'Faculty Directory',
     'team-finder': 'Team Finder & Compete Hub',
@@ -277,6 +282,13 @@ function App() {
         return hasSocietyTrackerAccess ? (
           <Suspense fallback={<PageLoader />}>
             <SocietyTrackerPage onBack={goBack} />
+          </Suspense>
+        ) : <HomeDashboard onNavigate={openTool} onOpenProfile={() => setView('profile')} />;
+
+      case 'case-comps':
+        return hasCaseCompsAccess ? (
+          <Suspense fallback={<PageLoader />}>
+            <CaseCompsPage onBack={goBack} onNavigate={openTool} />
           </Suspense>
         ) : <HomeDashboard onNavigate={openTool} onOpenProfile={() => setView('profile')} />;
 
@@ -329,6 +341,7 @@ function App() {
           <div className="tools-hub">
             {[
               ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', micro: 'DATABASE', microClass: 'success', title: 'Societies Database', desc: 'Directory of 47+ societies, domains & PoR contacts', Icon: UsersIcon, locked: false }] : []),
+              ...(hasCaseCompsAccess ? [{ id: 'case-comps', micro: 'ALERTS', microClass: 'success', title: 'Case Competitions Alerts', desc: 'Live opportunities from Unstop for CBSites & first-years', Icon: FlameIcon, locked: false }] : []),
               ...(hasTeamFinderAccess ? [{ id: 'team-finder', micro: 'NEW', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post case comp openings', Icon: TrophyIcon, locked: false }] : []),
 
               { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },

@@ -5,8 +5,8 @@ import { useTimetable } from '../context/TimetableContext';
 import { PERIODS, DAYS } from '../data/timetables';
 import NoticeBoard from './NoticeBoard';
 import NotificationCenter from './NotificationCenter';
-import { SearchIcon, PercentIcon, CalculatorIcon, FileIcon, TrophyIcon, DoorIcon, HeartIcon, UsersIcon, UserIcon, ImageIcon } from './icons';
-import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFacultyDatabase, canAccessSocietyTracker, isTimeWarpEnabled } from '../lib/admin';
+import { SearchIcon, PercentIcon, CalculatorIcon, FileIcon, TrophyIcon, DoorIcon, HeartIcon, UsersIcon, UserIcon, ImageIcon, FlameIcon } from './icons';
+import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFacultyDatabase, canAccessSocietyTracker, canAccessCaseComps, isTimeWarpEnabled } from '../lib/admin';
 import { exportScheduleAsImage } from '../utils/exportUtils';
 
 
@@ -488,9 +488,11 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
   const hasEmptyRoomAccess = featureFlags['empty-room'] || canAccessEmptyRoom(user?.email);
   const hasFacultyDbAccess = canAccessFacultyDatabase(user?.email);
   const hasSocietyTrackerAccess = canAccessSocietyTracker(user?.email);
+  const hasCaseCompsAccess = canAccessCaseComps(user?.email);
 
   const tools = [
     ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', micro: 'DATABASE', microClass: 'success', title: 'Societies Database', desc: 'Directory of 47+ societies, domains & PoR contacts', Icon: UsersIcon, locked: false }] : []),
+    ...(hasCaseCompsAccess ? [{ id: 'case-comps', micro: 'ALERTS', microClass: 'success', title: 'Case Competitions Alerts', desc: 'Live opportunities from Unstop for CBSites & first-years', Icon: FlameIcon, locked: false }] : []),
     ...(hasTeamFinderAccess ? [{ id: 'team-finder', micro: 'NEW', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post comp openings', Icon: TrophyIcon, locked: false }] : []),
     { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
     { id: 'waiver', micro: 'SOON', microClass: 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },

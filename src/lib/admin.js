@@ -44,6 +44,16 @@ export function canAccessSocietyTracker(email) {
   return true; // Society Recruitment Tracker is live for all SSCBS students!
 }
 
+export const CASE_COMP_TESTERS = [
+  'aditya.25015@sscbs.du.ac.in',
+];
+
+export function canAccessCaseComps(email) {
+  if (!email || typeof email !== 'string') return false;
+  const normalized = email.toLowerCase().trim();
+  return CASE_COMP_TESTERS.some((tester) => tester.toLowerCase() === normalized);
+}
+
 const TIMEWARP_KEY = 'sscbs-timewarp-enabled';
 
 

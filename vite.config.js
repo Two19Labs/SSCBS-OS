@@ -14,9 +14,29 @@ const previewHeaders = Object.fromEntries(
   (vercelConfig.headers?.[0]?.headers ?? []).map(({ key, value }) => [key, value])
 )
 
+function devApiPlugin() {
+  return {
+    name: 'dev-api-competitions',
+    configureServer(server) {
+      server.middlewares.use('/api/competitions', async (req, res) => {
+        try {
+          const { fetchCompetitionsFromUnstop } = await import('./api/competitions.js');
+          const data = await fetchCompetitionsFromUnstop();
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ success: true, count: data.length, data }));
+        } catch (err) {
+          res.statusCode = 500;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ success: false, error: err.message }));
+        }
+      });
+    },
+  };
+}
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), devApiPlugin()],
   // NOTE: applied to `preview` only, never `server`. The dev server relies on
   // inline scripts and eval for HMR, which this CSP deliberately forbids.
   preview: {
