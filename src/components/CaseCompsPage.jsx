@@ -588,17 +588,11 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
                     </div>
                   </div>
 
-                  {/* Row 5: Micro Social Proof & Recommendation Tag */}
+                  {/* Row 5: Micro Social Proof & Status */}
                   <div className="cc-card-meta-row">
-                    {comp.isFirstYearFriendly ? (
-                      <span className="cc-meta-tag fyp">
-                        <SparklesIcon size={11} /> 1st Year Friendly
-                      </span>
-                    ) : (
-                      <span className="cc-meta-tag open">
-                        Verified Listing
-                      </span>
-                    )}
+                    <span className="cc-meta-tag open">
+                      Verified Listing
+                    </span>
 
                     <span className="cc-meta-reg">
                       {Number(comp.registeredCount || 0) > 0 ? (

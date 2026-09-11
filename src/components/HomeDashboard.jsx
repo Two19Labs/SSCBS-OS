@@ -492,7 +492,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
 
   const tools = [
     ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', micro: 'DATABASE', microClass: 'success', title: 'Societies Database', desc: 'Directory of 47+ societies, domains & PoR contacts', Icon: UsersIcon, locked: false }] : []),
-    ...(hasCaseCompsAccess ? [{ id: 'case-comps', micro: 'ALERTS', microClass: 'success', title: 'Case Competitions Alerts', desc: 'Live opportunities from Unstop for CBSites & first-years', Icon: FlameIcon, locked: false }] : []),
+    ...(hasCaseCompsAccess ? [{ id: 'case-comps', micro: 'ALERTS', microClass: 'success', title: 'Case Competitions Alerts', desc: 'Live opportunities from Unstop for SSCBS students across all circuits', Icon: FlameIcon, locked: false }] : []),
     ...(hasTeamFinderAccess ? [{ id: 'team-finder', micro: 'NEW', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post comp openings', Icon: TrophyIcon, locked: false }] : []),
     { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
     { id: 'waiver', micro: 'SOON', microClass: 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
@@ -617,11 +617,11 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
                     gap: '5px',
                     border: '1px solid rgba(234, 179, 8, 0.25)'
                   }}>
-                    LIVE FROM UNSTOP &middot; 1ST YEAR FOCUS
+                    LIVE FROM UNSTOP &middot; 100% REAL OPPORTUNITIES
                   </span>
                 </div>
                 <div style={{ fontSize: '0.84rem', color: 'var(--ink-dim)', marginTop: '4px', lineHeight: '1.45' }}>
-                  Live case competitions, flagship challenges &amp; hackathons pulled directly from Unstop, pre-filtered for undergraduate &amp; first-year CBSites.
+                  Live case competitions, flagship challenges &amp; hackathons pulled directly from Unstop, pre-filtered for undergraduate CBSites across all circuits.
                 </div>
               </div>
             </div>
