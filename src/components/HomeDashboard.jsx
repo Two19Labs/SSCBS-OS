@@ -580,11 +580,11 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
           </div>
         )}
 
-        {/* SSCBS Central Societies Database Highlight Banner */}
-        {hasSocietyTrackerAccess && (
+        {/* Case Competitions Alerts Highlight Banner (Live for Aditya / Testers) */}
+        {hasCaseCompsAccess && (
           <div 
             className="recruitment-home-banner" 
-            onClick={() => onNavigate('society-tracker')}
+            onClick={() => onNavigate('case-comps')}
             style={{
               background: 'var(--surface)',
               border: '1px solid var(--border)',
@@ -601,13 +601,13 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: '1.4rem', background: 'var(--tint)', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', flexShrink: 0 }}>🏛️</div>
+              <div style={{ fontSize: '1.4rem', background: 'var(--tint)', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', flexShrink: 0 }}>🏆</div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                  <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--ink)' }}>SSCBS Central Societies Database</span>
+                  <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--ink)' }}>Case Competitions Alerts</span>
                   <span style={{
-                    background: 'rgba(16, 185, 129, 0.12)',
-                    color: '#10b981',
+                    background: 'rgba(234, 179, 8, 0.12)',
+                    color: '#ca8a04',
                     fontWeight: 700,
                     fontSize: '0.78rem',
                     padding: '3px 10px',
@@ -615,18 +615,18 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '5px',
-                    border: '1px solid rgba(16, 185, 129, 0.25)'
+                    border: '1px solid rgba(234, 179, 8, 0.25)'
                   }}>
-                    47 SOCIETIES &middot; 9 DOMAINS
+                    LIVE FROM UNSTOP &middot; 1ST YEAR FOCUS
                   </span>
                 </div>
                 <div style={{ fontSize: '0.84rem', color: 'var(--ink-dim)', marginTop: '4px', lineHeight: '1.45' }}>
-                  Explore official dossiers across finance, consulting, tech, cultural, and sports. Find student PoR contacts, WhatsApp connects &amp; social handles.
+                  Live case competitions, flagship challenges &amp; hackathons pulled directly from Unstop, pre-filtered for undergraduate &amp; first-year CBSites.
                 </div>
               </div>
             </div>
             <button className="home-tt-btn primary" style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
-              Explore Database →
+              Explore Case Comps →
             </button>
           </div>
         )}
