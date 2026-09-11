@@ -250,7 +250,7 @@ function getCountdownDetails(deadlineStr, fallbackRemainText, nowMs) {
 function getCardCircuit(comp) {
   if (comp.isDU) return { type: 'du', label: 'DU Circuit', icon: '🎓' };
   if (isIIMorIITComp(comp)) return { type: 'iim-iit', label: 'IIMs & IITs', icon: '🏛️' };
-  if (isOtherMbaOrCorporateComp(comp)) return { type: 'other-mba-corp', label: 'Other MBA & Corporate', icon: '🏢' };
+  if (isOtherMbaOrCorporateComp(comp)) return { type: 'other-mba-corp', label: 'Other Colleges & Corporates', icon: '🏢' };
   return { type: 'general', label: 'National Circuit', icon: '💼' };
 }
 
@@ -503,7 +503,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
           </div>
           <div className="cc-metric-info">
             <span className="cc-metric-value">{metrics.otherMbaCorp}</span>
-            <span className="cc-metric-label">Other MBA & Corporate</span>
+            <span className="cc-metric-label">Other Colleges & Corporates</span>
           </div>
         </div>
       </div>
@@ -550,7 +550,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
             className={`cc-tab-btn ${activeFilter === 'other-mba-corp' ? 'active' : ''}`}
             onClick={() => setActiveFilter('other-mba-corp')}
           >
-            🏢 Other MBA & Corporate ({metrics.otherMbaCorp})
+            🏢 Other Colleges & Corporates ({metrics.otherMbaCorp})
           </button>
         </div>
 
