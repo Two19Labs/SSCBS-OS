@@ -56,13 +56,6 @@ const FlameIcon = ({ size = 18 }) => (
   </svg>
 );
 
-const SparklesIcon = ({ size = 18 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z" />
-    <path d="M19 15l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z" />
-  </svg>
-);
-
 const ClockIcon = ({ size = 18 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="10" />
@@ -258,7 +251,6 @@ function getCardCircuit(comp) {
   if (comp.isDU) return { type: 'du', label: 'DU Circuit', icon: '🎓' };
   if (isIIMorIITComp(comp)) return { type: 'iim-iit', label: 'IIMs & IITs', icon: '🏛️' };
   if (isOtherMbaOrCorporateComp(comp)) return { type: 'other-mba-corp', label: 'Other MBA & Corporate', icon: '🏢' };
-  if (comp.isFlagship) return { type: 'flagship', label: 'Tier-1 Flagship', icon: '⭐' };
   return { type: 'general', label: 'National Circuit', icon: '💼' };
 }
 
@@ -355,8 +347,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
     const du = competitions.filter((c) => c.isDU).length;
     const iimIit = competitions.filter((c) => isIIMorIITComp(c)).length;
     const otherMbaCorp = competitions.filter((c) => isOtherMbaOrCorporateComp(c)).length;
-    const flagship = competitions.filter((c) => c.isFlagship).length;
-    return { total, du, iimIit, otherMbaCorp, flagship };
+    return { total, du, iimIit, otherMbaCorp };
   }, [competitions]);
 
   const hasActiveFilters = searchQuery.trim() !== '' || activeFilter !== 'all' || teamFilter !== 'all' || feeFilter !== 'all' || sortBy !== 'closing-soonest';
@@ -385,7 +376,6 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
       if (activeFilter === 'du' && !comp.isDU) return false;
       if (activeFilter === 'iim-iit' && !isIIMorIITComp(comp)) return false;
       if (activeFilter === 'other-mba-corp' && !isOtherMbaOrCorporateComp(comp)) return false;
-      if (activeFilter === 'flagship' && !comp.isFlagship) return false;
 
       // Team filter
       if (teamFilter === 'solo' && comp.maxTeam > 1) return false;
@@ -516,19 +506,6 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
             <span className="cc-metric-label">Other MBA & Corporate</span>
           </div>
         </div>
-
-        <div
-          className={`cc-metric-card ${activeFilter === 'flagship' ? 'active' : ''}`}
-          onClick={() => setActiveFilter('flagship')}
-        >
-          <div className="cc-metric-icon purple">
-            <SparklesIcon size={18} />
-          </div>
-          <div className="cc-metric-info">
-            <span className="cc-metric-value">{metrics.flagship}</span>
-            <span className="cc-metric-label">Flagships</span>
-          </div>
-        </div>
       </div>
 
       {/* ── Filter Bar & Search ── */}
@@ -574,12 +551,6 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
             onClick={() => setActiveFilter('other-mba-corp')}
           >
             🏢 Other MBA & Corporate ({metrics.otherMbaCorp})
-          </button>
-          <button
-            className={`cc-tab-btn ${activeFilter === 'flagship' ? 'active' : ''}`}
-            onClick={() => setActiveFilter('flagship')}
-          >
-            ⭐ Tier-1 Flagships ({metrics.flagship})
           </button>
         </div>
 
