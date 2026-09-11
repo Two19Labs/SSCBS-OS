@@ -796,25 +796,9 @@
 .cc-card-meta-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 8px;
   min-height: 20px;
-}
-
-.cc-meta-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.68rem;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 5px;
-}
-
-.cc-meta-tag.open {
-  background: var(--bg);
-  color: var(--ink-dim);
-  border: 1px solid var(--border);
 }
 
 .cc-meta-reg {
@@ -859,14 +843,28 @@
 
 .cc-btn-apply {
   flex: 1.15;
-  background: var(--ink);
-  color: var(--surface);
-  border: 1px solid var(--ink);
+  background: #1c4980;
+  color: #ffffff;
+  border: 1px solid #1c4980;
 }
 
 .cc-btn-apply:hover {
-  opacity: 0.92;
+  background: #143760;
+  border-color: #143760;
+  color: #ffffff;
   transform: translateY(-1px);
+}
+
+[data-theme='dark'] .cc-btn-apply {
+  background: #1c4980;
+  color: #ffffff;
+  border-color: #2762a8;
+}
+
+[data-theme='dark'] .cc-btn-apply:hover {
+  background: #2762a8;
+  border-color: #2762a8;
+  color: #ffffff;
 }
 
 .cc-btn-team {

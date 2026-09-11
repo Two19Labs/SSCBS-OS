@@ -451,7 +451,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
             <div className="cc-playbook-step">
               <span className="cc-step-number">03</span>
               <h4>Use the Team Finder</h4>
-              <p>Don't have a team yet? Use the <strong>Find CBS Teammates</strong> button below any competition to link up with fellow batchmates and seniors on SSCBS OS.</p>
+              <p>Don't have a team yet? Use the <strong>Find Teammates</strong> button below any competition to link up with fellow batchmates and seniors on SSCBS OS.</p>
             </div>
             <div className="cc-playbook-step">
               <span className="cc-step-number">04</span>
@@ -590,10 +590,6 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
 
                   {/* Row 5: Micro Social Proof & Status */}
                   <div className="cc-card-meta-row">
-                    <span className="cc-meta-tag open">
-                      Verified Listing
-                    </span>
-
                     <span className="cc-meta-reg">
                       {Number(comp.registeredCount || 0) > 0 ? (
                         <>
@@ -621,10 +617,10 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
                       type="button"
                       className="cc-action-btn cc-btn-team"
                       onClick={(e) => handleFindTeammates(comp, e)}
-                      title="Find CBS batchmates on Team Finder"
+                      title="Find batchmates on Team Finder"
                     >
                       <UsersIcon size={13} />
-                      <span>CBS Teammates</span>
+                      <span>Find Teammates</span>
                     </button>
 
                     <button
