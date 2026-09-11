@@ -77,7 +77,7 @@ function isUserPost(post, user) {
   return isEmailMatch || isUserIdMatch;
 }
 
-export default function TeamFinderPage({ onBack }) {
+export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill }) {
   const { user } = useAuth();
   const { featureFlags } = useConfig();
   const isAdmin = isAdminEmail(user?.email);
@@ -296,6 +296,39 @@ export default function TeamFinderPage({ onBack }) {
       }
     }
   }, [posts, loading, user, hasUserToggledTab]);
+
+  // Auto-open and prefill when navigated from Case Competitions Alerts
+  useEffect(() => {
+    let prefill = initialPrefill;
+    if (!prefill && typeof window !== 'undefined') {
+      try {
+        const stored = sessionStorage.getItem('sscbs_team_finder_prefill');
+        if (stored) {
+          prefill = JSON.parse(stored);
+          sessionStorage.removeItem('sscbs_team_finder_prefill');
+        }
+      } catch (e) {
+        console.warn('Could not read team finder prefill', e);
+      }
+    }
+
+    if (prefill) {
+      setEditingPost(null);
+      setFormData((prev) => ({
+        ...prev,
+        competition_name: prefill.competition_name || '',
+        organizer: prefill.organizer || '',
+        competition_link: prefill.competition_link || '',
+        title: prefill.title || `Looking for teammates for ${prefill.competition_name}`,
+        description: prefill.description || `Building a squad for ${prefill.competition_name}. Aiming for podium!`,
+        total_members: String(prefill.total_members || 4),
+        spots_left: String(prefill.spots_left || 1),
+      }));
+      setFormError('');
+      setIsCreateModalOpen(true);
+      if (typeof onClearPrefill === 'function') onClearPrefill();
+    }
+  }, [initialPrefill, onClearPrefill]);
 
   const handleOpenCreateModal = () => {
     setEditingPost(null);

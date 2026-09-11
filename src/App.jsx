@@ -202,12 +202,17 @@ function App() {
   const hasSocietyTrackerAccess = canAccessSocietyTracker(user.email);
   const hasCaseCompsAccess = canAccessCaseComps(user.email);
 
-  const openTool = (id) => {
+  const [teamFinderPrefill, setTeamFinderPrefill] = useState(null);
+
+  const openTool = (id, extra = null) => {
     setIsMobileSidebarOpen(false);
     logFeatureView(id, user);
     if (id === 'gpa') {
       setIsGpaOpen(true);
       return;
+    }
+    if (id === 'team-finder' && extra) {
+      setTeamFinderPrefill(extra);
     }
     setReturnView(TOOL_VIEWS.includes(view) ? 'home' : view);
     setView(id);
@@ -307,7 +312,11 @@ function App() {
       case 'team-finder':
         return (
           <Suspense fallback={<PageLoader />}>
-            <TeamFinderPage onBack={goBack} />
+            <TeamFinderPage 
+              onBack={goBack} 
+              initialPrefill={teamFinderPrefill}
+              onClearPrefill={() => setTeamFinderPrefill(null)}
+            />
           </Suspense>
         );
       case 'empty-room':
