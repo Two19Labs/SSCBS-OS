@@ -492,7 +492,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
 
   const tools = [
     ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', micro: 'DATABASE', microClass: 'success', title: 'Societies Database', desc: 'Directory of 47+ societies, domains & PoR contacts', Icon: UsersIcon, locked: false }] : []),
-    ...(hasCaseCompsAccess ? [{ id: 'case-comps', micro: 'ALERTS', microClass: 'success', title: 'Case Competitions Alerts', desc: 'Live opportunities from Unstop for SSCBS students across all circuits', Icon: FlameIcon, locked: false }] : []),
+    ...(hasCaseCompsAccess ? [{ id: 'case-comps', micro: 'LIVE', microClass: 'success', title: 'Case Competitions', desc: 'Live opportunities from Unstop for SSCBS students across all circuits', Icon: FlameIcon, locked: false }] : []),
     ...(hasTeamFinderAccess ? [{ id: 'team-finder', micro: 'NEW', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post comp openings', Icon: TrophyIcon, locked: false }] : []),
     { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
     { id: 'waiver', micro: 'SOON', microClass: 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
@@ -604,7 +604,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
               <div style={{ fontSize: '1.4rem', background: 'var(--tint)', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', flexShrink: 0 }}>🏆</div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                  <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--ink)' }}>Case Competitions Alerts</span>
+                  <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--ink)' }}>Case Competitions</span>
                   <span style={{
                     background: 'rgba(234, 179, 8, 0.12)',
                     color: '#ca8a04',

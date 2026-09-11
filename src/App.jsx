@@ -234,7 +234,7 @@ function App() {
       title: 'Main Navigation',
       items: [
         { id: 'home', label: 'Home', Icon: HomeIcon },
-        ...(hasCaseCompsAccess ? [{ id: 'case-comps', label: 'Case Competitions Alerts', Icon: FlameIcon }] : []),
+        ...(hasCaseCompsAccess ? [{ id: 'case-comps', label: 'Case Competitions', Icon: FlameIcon, featured: true }] : []),
         { id: 'buzz', label: 'Campus Buzz', Icon: MegaphoneIcon, locked: !featureFlags['buzz'] && !isAdmin },
       ],
     },
@@ -270,7 +270,7 @@ function App() {
   const pageTitle = {
     tools: 'Tools',
     'society-tracker': 'Societies Database',
-    'case-comps': 'Case Competitions Alerts',
+    'case-comps': 'Case Competitions',
     'find-prof': 'Find My Professor',
     'faculty-db': 'Faculty Directory',
     'team-finder': 'Team Finder & Compete Hub',
