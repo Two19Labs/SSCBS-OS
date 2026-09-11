@@ -108,6 +108,7 @@ function App() {
   const [returnView, setReturnView] = useState('home');
   const [isGpaOpen, setIsGpaOpen] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [teamFinderPrefill, setTeamFinderPrefill] = useState(null);
 
   const setView = (newView) => {
     if (VALID_VIEWS.includes(newView)) {
@@ -202,8 +203,6 @@ function App() {
   const hasFacultyDbAccess = canAccessFacultyDatabase(user.email);
   const hasSocietyTrackerAccess = canAccessSocietyTracker(user.email);
   const hasCaseCompsAccess = canAccessCaseComps(user.email);
-
-  const [teamFinderPrefill, setTeamFinderPrefill] = useState(null);
 
   const openTool = (id, extra = null) => {
     setIsMobileSidebarOpen(false);
