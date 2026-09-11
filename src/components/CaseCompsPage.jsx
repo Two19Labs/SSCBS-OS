@@ -79,12 +79,6 @@ const CalendarIcon = ({ size = 18 }) => (
   </svg>
 );
 
-const GraduationCapIcon = ({ size = 18 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 10 12 5 2 10l10 5 10-5v6" />
-    <path d="M6 12v5c0 1.657 2.686 3 6 3s6-1.343 6-3v-5" />
-  </svg>
-);
 
 const CheckIcon = ({ size = 18 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -128,7 +122,6 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
   const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'iim' | 'du' | 'iit' | 'flagship' | 'closing-soon'
   const [teamFilter, setTeamFilter] = useState('all'); // 'all' | 'solo' | 'team'
   const [copiedId, setCopiedId] = useState(null);
-  const [isPlaybookExpanded, setIsPlaybookExpanded] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
 
   const fetchOpportunities = useCallback(async (showRefreshing = false) => {
@@ -414,53 +407,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
             {lastUpdated && <span className="cc-last-sync"> · Synced at {lastUpdated}</span>}
           </span>
         </div>
-        <button
-          className="cc-playbook-toggle"
-          onClick={() => setIsPlaybookExpanded(!isPlaybookExpanded)}
-        >
-          <span>{isPlaybookExpanded ? 'Hide' : 'Show'} 1st Year Case Guide</span>
-          <span className="cc-toggle-arrow">{isPlaybookExpanded ? '▲' : '▼'}</span>
-        </button>
       </div>
-
-      {/* ── Expandable First-Year Case Playbook ── */}
-      {isPlaybookExpanded && (
-        <div className="cc-playbook-card">
-          <div className="cc-playbook-header">
-            <div className="cc-playbook-icon">
-              <GraduationCapIcon size={20} />
-            </div>
-            <div>
-              <h3 className="cc-playbook-title">The SSCBS 1st Year Case Comp Playbook</h3>
-              <p className="cc-playbook-desc">
-                How to participate, build a team, and make national podiums in your very first semester:
-              </p>
-            </div>
-          </div>
-          <div className="cc-playbook-grid">
-            <div className="cc-playbook-step">
-              <span className="cc-step-number">01</span>
-              <h4>Start with Preliminary Decks</h4>
-              <p>Target competitions with 3-slider executive summaries or open quiz rounds. They require zero prerequisite pedigree and focus on structured logic.</p>
-            </div>
-            <div className="cc-playbook-step">
-              <span className="cc-step-number">02</span>
-              <h4>Form a Balanced Squad</h4>
-              <p>The classic CBS winning formula: <strong>1 Secondary Researcher</strong> + <strong>1 Financial/Quant Analyst</strong> + <strong>1 Deck Designer & Presenter</strong>.</p>
-            </div>
-            <div className="cc-playbook-step">
-              <span className="cc-step-number">03</span>
-              <h4>Use the Team Finder</h4>
-              <p>Don't have a team yet? Use the <strong>Find Teammates</strong> button below any competition to link up with fellow batchmates and seniors on SSCBS OS.</p>
-            </div>
-            <div className="cc-playbook-step">
-              <span className="cc-step-number">04</span>
-              <h4>Focus on Structure over Jargon</h4>
-              <p>Judges value clear problem framing, MECE segmentation, and actionable financial feasibility far more than fancy business buzzwords.</p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── Competitions Grid ── */}
       {loading ? (
