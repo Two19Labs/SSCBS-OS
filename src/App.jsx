@@ -229,7 +229,6 @@ function App() {
       title: 'Main Navigation',
       items: [
         { id: 'home', label: 'Home', Icon: HomeIcon },
-        ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', label: 'Societies Database', Icon: UsersIcon }] : []),
         ...(hasCaseCompsAccess ? [{ id: 'case-comps', label: 'Case Competitions Alerts', Icon: FlameIcon }] : []),
         { id: 'buzz', label: 'Campus Buzz', Icon: MegaphoneIcon, locked: !featureFlags['buzz'] && !isAdmin },
       ],
@@ -248,6 +247,7 @@ function App() {
     {
       title: 'Miscellaneous & Support',
       items: [
+        ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', label: 'Societies Database', Icon: UsersIcon }] : []),
         ...(hasFacultyDbAccess ? [{ id: 'faculty-db', label: 'Faculty Directory', Icon: UserIcon }] : []),
         { id: 'contact', label: 'Contact Us', Icon: MessageIcon, locked: !featureFlags['contact'] && !isAdmin },
       ],
