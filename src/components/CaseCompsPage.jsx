@@ -436,7 +436,10 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
             </button>
           )}
           <div>
-            <h1 className="cc-title">Case Competitions</h1>
+            <div className="cc-title-row">
+              <h1 className="cc-title">Case Competitions</h1>
+              <span className="cc-unstop-tag">UNSTOP ONLY</span>
+            </div>
             <p className="cc-subtitle">
               It's competitions season! Find opportunities relevant to CBS folks right here, synced with and pulled from Unstop, all filterable! :)
             </p>
@@ -455,6 +458,14 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
           </button>
         </div>
       </header>
+
+      {/* ── Very Visible Notice: Unstop Exclusivity ── */}
+      <div className="cc-unstop-notice-banner">
+        <span className="cc-unstop-notice-tag">UNSTOP ONLY</span>
+        <span className="cc-unstop-notice-text">
+          <strong>Notice:</strong> This directory indexes opportunities synced exclusively from <strong>Unstop</strong>. Other case competitions hosted outside Unstop (e.g. independent college websites, Google Forms, direct corporate portals) are not shown here.
+        </span>
+      </div>
 
       {/* ── Filter Bar & Search ── */}
       <div className="cc-filter-section">
