@@ -436,10 +436,6 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
             </button>
           )}
           <div>
-            <div className="cc-badge">
-              <SparklesIcon size={13} />
-              <span>LIVE UNSTOP FEED · 100% REAL OPPORTUNITIES</span>
-            </div>
             <h1 className="cc-title">Case Competitions</h1>
             <p className="cc-subtitle">
               It's competitions season! Find opportunities relevant to CBS folks right here, synced with and pulled from Unstop, all filterable! :)
