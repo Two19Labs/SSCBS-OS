@@ -79,6 +79,21 @@ const CalendarIcon = ({ size = 18 }) => (
   </svg>
 );
 
+const GraduationCapIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 10 12 5 2 10l10 5 10-5v6" />
+    <path d="M6 12v5c0 1.657 2.686 3 6 3s6-1.343 6-3v-5" />
+  </svg>
+);
+
+const ArrowUpDownIcon = ({ size = 14, className = '' }) => (
+  <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
+    <path d="m21 16-4 4-4-4" />
+    <path d="M17 20V4" />
+    <path d="m3 8 4-4 4 4" />
+    <path d="M7 4v16" />
+  </svg>
+);
 
 const CheckIcon = ({ size = 18 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -93,6 +108,13 @@ const CopyIcon = ({ size = 18 }) => (
   </svg>
 );
 import './CaseCompsPage.css';
+
+function parsePrizeAmount(prizesStr) {
+  if (!prizesStr) return 0;
+  const cleaned = prizesStr.replace(/,/g, '');
+  const match = cleaned.match(/\d+/);
+  return match ? parseInt(match[0], 10) : 0;
+}
 
 function formatDeadlineDisplay(deadlineStr, remainDaysText) {
   if (!deadlineStr) return remainDaysText || 'Ongoing';
@@ -119,8 +141,10 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [fetchError, setFetchError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'iim' | 'du' | 'iit' | 'flagship' | 'closing-soon'
+  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'du' | 'iim' | 'iit' | 'flagship'
   const [teamFilter, setTeamFilter] = useState('all'); // 'all' | 'solo' | 'team'
+  const [feeFilter, setFeeFilter] = useState('all'); // 'all' | 'free' | 'paid'
+  const [sortBy, setSortBy] = useState('closing-soonest'); // 'closing-soonest' | 'closing-latest' | 'title-asc' | 'title-desc' | 'prize-highest' | 'popular'
   const [copiedId, setCopiedId] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
 
@@ -196,13 +220,22 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
     const iim = competitions.filter((c) => c.isIIMorMBA).length;
     const iit = competitions.filter((c) => c.isIITorTech).length;
     const flagship = competitions.filter((c) => c.isFlagship).length;
-    const closingSoon = competitions.filter((c) => c.daysRemainingNum <= 3).length;
-    return { total, du, iim, iit, flagship, closingSoon };
+    return { total, du, iim, iit, flagship };
   }, [competitions]);
 
-  // Filtering
+  const hasActiveFilters = searchQuery.trim() !== '' || activeFilter !== 'all' || teamFilter !== 'all' || feeFilter !== 'all' || sortBy !== 'closing-soonest';
+
+  const handleResetFilters = () => {
+    setSearchQuery('');
+    setActiveFilter('all');
+    setTeamFilter('all');
+    setFeeFilter('all');
+    setSortBy('closing-soonest');
+  };
+
+  // Filtering & Sorting
   const filteredCompetitions = useMemo(() => {
-    return competitions.filter((comp) => {
+    const result = competitions.filter((comp) => {
       // Search match
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -212,20 +245,52 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
         if (!matchesTitle && !matchesOrg && !matchesPrize) return false;
       }
 
-      // Category filter
+      // Circuit filter (closing-soon category removed)
       if (activeFilter === 'du' && !comp.isDU) return false;
       if (activeFilter === 'iim' && !comp.isIIMorMBA) return false;
       if (activeFilter === 'iit' && !comp.isIITorTech) return false;
       if (activeFilter === 'flagship' && !comp.isFlagship) return false;
-      if (activeFilter === 'closing-soon' && comp.daysRemainingNum > 3) return false;
 
       // Team filter
       if (teamFilter === 'solo' && comp.maxTeam > 1) return false;
       if (teamFilter === 'team' && comp.maxTeam <= 1) return false;
 
+      // Fee filter
+      if (feeFilter === 'free' && !comp.isFree) return false;
+      if (feeFilter === 'paid' && comp.isFree) return false;
+
       return true;
     });
-  }, [competitions, searchQuery, activeFilter, teamFilter]);
+
+    // Sort order
+    result.sort((a, b) => {
+      switch (sortBy) {
+        case 'title-asc':
+          return (a.title || '').localeCompare(b.title || '', undefined, { sensitivity: 'base' });
+        case 'title-desc':
+          return (b.title || '').localeCompare(a.title || '', undefined, { sensitivity: 'base' });
+        case 'closing-soonest':
+          if (a.daysRemainingNum !== b.daysRemainingNum) {
+            return a.daysRemainingNum - b.daysRemainingNum;
+          }
+          return (b.registeredCount || 0) - (a.registeredCount || 0);
+        case 'closing-latest':
+          return b.daysRemainingNum - a.daysRemainingNum;
+        case 'prize-highest': {
+          const prizeA = parsePrizeAmount(a.prizes);
+          const prizeB = parsePrizeAmount(b.prizes);
+          if (prizeA !== prizeB) return prizeB - prizeA;
+          return (b.registeredCount || 0) - (a.registeredCount || 0);
+        }
+        case 'popular':
+          return (b.registeredCount || 0) - (a.registeredCount || 0);
+        default:
+          return 0;
+      }
+    });
+
+    return result;
+  }, [competitions, searchQuery, activeFilter, teamFilter, feeFilter, sortBy]);
 
   return (
     <div className="case-comps-container">
@@ -273,20 +338,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
           </div>
           <div className="cc-metric-info">
             <span className="cc-metric-value">{metrics.total}</span>
-            <span className="cc-metric-label">Live Opportunities</span>
-          </div>
-        </div>
-
-        <div
-          className={`cc-metric-card ${activeFilter === 'iim' ? 'active' : ''}`}
-          onClick={() => setActiveFilter('iim')}
-        >
-          <div className="cc-metric-icon gold">
-            <FlameIcon size={18} />
-          </div>
-          <div className="cc-metric-info">
-            <span className="cc-metric-value">{metrics.iim}</span>
-            <span className="cc-metric-label">IIMs & Top MBA</span>
+            <span className="cc-metric-label">Live Comps</span>
           </div>
         </div>
 
@@ -304,15 +356,41 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
         </div>
 
         <div
-          className={`cc-metric-card ${activeFilter === 'closing-soon' ? 'active' : ''}`}
-          onClick={() => setActiveFilter('closing-soon')}
+          className={`cc-metric-card ${activeFilter === 'iim' ? 'active' : ''}`}
+          onClick={() => setActiveFilter('iim')}
         >
-          <div className="cc-metric-icon urgent">
+          <div className="cc-metric-icon gold">
+            <FlameIcon size={18} />
+          </div>
+          <div className="cc-metric-info">
+            <span className="cc-metric-value">{metrics.iim}</span>
+            <span className="cc-metric-label">IIMs & MBA</span>
+          </div>
+        </div>
+
+        <div
+          className={`cc-metric-card ${activeFilter === 'iit' ? 'active' : ''}`}
+          onClick={() => setActiveFilter('iit')}
+        >
+          <div className="cc-metric-icon cyan">
             <ClockIcon size={18} />
           </div>
           <div className="cc-metric-info">
-            <span className="cc-metric-value">{metrics.closingSoon}</span>
-            <span className="cc-metric-label">Closing in 72h</span>
+            <span className="cc-metric-value">{metrics.iit}</span>
+            <span className="cc-metric-label">IITs & Tech</span>
+          </div>
+        </div>
+
+        <div
+          className={`cc-metric-card ${activeFilter === 'flagship' ? 'active' : ''}`}
+          onClick={() => setActiveFilter('flagship')}
+        >
+          <div className="cc-metric-icon purple">
+            <SparklesIcon size={18} />
+          </div>
+          <div className="cc-metric-info">
+            <span className="cc-metric-value">{metrics.flagship}</span>
+            <span className="cc-metric-label">Flagships</span>
           </div>
         </div>
       </div>
@@ -335,65 +413,118 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
           )}
         </div>
 
-        <div className="cc-pill-filters">
-          <div className="cc-tabs">
-            <button
-              className={`cc-tab-btn ${activeFilter === 'all' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('all')}
-            >
-              All Comps ({metrics.total})
-            </button>
-            <button
-              className={`cc-tab-btn ${activeFilter === 'iim' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('iim')}
-            >
-              🏛️ IIMs & MBA ({metrics.iim})
-            </button>
-            <button
-              className={`cc-tab-btn ${activeFilter === 'du' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('du')}
-            >
-              🎓 DU Circuits ({metrics.du})
-            </button>
-            <button
-              className={`cc-tab-btn ${activeFilter === 'iit' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('iit')}
-            >
-              ⚙️ IITs & Tech ({metrics.iit})
-            </button>
-            <button
-              className={`cc-tab-btn ${activeFilter === 'flagship' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('flagship')}
-            >
-              ⭐ Tier-1 Flagships ({metrics.flagship})
-            </button>
-            <button
-              className={`cc-tab-btn ${activeFilter === 'closing-soon' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('closing-soon')}
-            >
-              ⏳ Closing Soon ({metrics.closingSoon})
-            </button>
+        {/* Primary Circuit Tabs */}
+        <div className="cc-tabs">
+          <button
+            className={`cc-tab-btn ${activeFilter === 'all' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('all')}
+          >
+            All Circuits ({metrics.total})
+          </button>
+          <button
+            className={`cc-tab-btn ${activeFilter === 'du' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('du')}
+          >
+            🎓 DU Circuits ({metrics.du})
+          </button>
+          <button
+            className={`cc-tab-btn ${activeFilter === 'iim' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('iim')}
+          >
+            🏛️ IIMs & MBA ({metrics.iim})
+          </button>
+          <button
+            className={`cc-tab-btn ${activeFilter === 'iit' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('iit')}
+          >
+            ⚙️ IITs & Tech ({metrics.iit})
+          </button>
+          <button
+            className={`cc-tab-btn ${activeFilter === 'flagship' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('flagship')}
+          >
+            ⭐ Tier-1 Flagships ({metrics.flagship})
+          </button>
+        </div>
+
+        {/* Secondary Filter & Sort Toolbar */}
+        <div className="cc-controls-bar">
+          <div className="cc-controls-left">
+            {/* Format Filter */}
+            <div className="cc-filter-pill-group">
+              <button
+                className={`cc-filter-pill-btn ${teamFilter === 'all' ? 'active' : ''}`}
+                onClick={() => setTeamFilter('all')}
+              >
+                All Formats
+              </button>
+              <button
+                className={`cc-filter-pill-btn ${teamFilter === 'solo' ? 'active' : ''}`}
+                onClick={() => setTeamFilter('solo')}
+              >
+                Solo
+              </button>
+              <button
+                className={`cc-filter-pill-btn ${teamFilter === 'team' ? 'active' : ''}`}
+                onClick={() => setTeamFilter('team')}
+              >
+                Teams (2+)
+              </button>
+            </div>
+
+            {/* Fee Filter */}
+            <div className="cc-filter-pill-group">
+              <button
+                className={`cc-filter-pill-btn ${feeFilter === 'all' ? 'active' : ''}`}
+                onClick={() => setFeeFilter('all')}
+              >
+                All Fees
+              </button>
+              <button
+                className={`cc-filter-pill-btn ${feeFilter === 'free' ? 'active' : ''}`}
+                onClick={() => setFeeFilter('free')}
+              >
+                Free Entry
+              </button>
+              <button
+                className={`cc-filter-pill-btn ${feeFilter === 'paid' ? 'active' : ''}`}
+                onClick={() => setFeeFilter('paid')}
+              >
+                Paid
+              </button>
+            </div>
           </div>
 
-          <div className="cc-team-pills">
-            <button
-              className={`cc-team-pill ${teamFilter === 'all' ? 'active' : ''}`}
-              onClick={() => setTeamFilter('all')}
-            >
-              All Formats
-            </button>
-            <button
-              className={`cc-team-pill ${teamFilter === 'solo' ? 'active' : ''}`}
-              onClick={() => setTeamFilter('solo')}
-            >
-              Solo
-            </button>
-            <button
-              className={`cc-team-pill ${teamFilter === 'team' ? 'active' : ''}`}
-              onClick={() => setTeamFilter('team')}
-            >
-              Teams (2+)
-            </button>
+          <div className="cc-controls-right">
+            {/* Sort Selector */}
+            <div className="cc-sort-box">
+              <ArrowUpDownIcon size={14} />
+              <label htmlFor="cc-sort-select" className="cc-sort-label">Sort:</label>
+              <select
+                id="cc-sort-select"
+                className="cc-sort-select"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <option value="closing-soonest">⏳ Closing Soonest</option>
+                <option value="closing-latest">📅 Closing Latest</option>
+                <option value="title-asc">🔤 Title: A → Z</option>
+                <option value="title-desc">🔤 Title: Z → A</option>
+                <option value="prize-highest">🏆 Highest Prize Pool</option>
+                <option value="popular">🔥 Most Applied (Popular)</option>
+              </select>
+            </div>
+
+            {hasActiveFilters && (
+              <button
+                type="button"
+                className="cc-reset-btn"
+                onClick={handleResetFilters}
+                title="Reset search, filters and sorting"
+              >
+                Reset Filters
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -434,15 +565,11 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
           </div>
           <h3 className="cc-empty-title">No competitions match your filter</h3>
           <p className="cc-empty-desc">
-            Try searching a different keyword or resetting your filter tabs.
+            Try searching a different keyword or resetting your filter criteria.
           </p>
           <button
             className="cc-empty-btn"
-            onClick={() => {
-              setSearchQuery('');
-              setActiveFilter('all');
-              setTeamFilter('all');
-            }}
+            onClick={handleResetFilters}
           >
             Clear All Filters
           </button>
