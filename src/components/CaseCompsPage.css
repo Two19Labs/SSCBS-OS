@@ -834,13 +834,13 @@
   gap: 8px;
   padding: 8px 12px;
   border-radius: 10px;
-  background: rgba(245, 158, 11, 0.08);
-  border: 1px solid rgba(245, 158, 11, 0.22);
+  background: rgba(16, 185, 129, 0.09);
+  border: 1px solid rgba(16, 185, 129, 0.24);
 }
 
 [data-theme='dark'] .cc-prize-bar {
-  background: rgba(245, 158, 11, 0.12);
-  border-color: rgba(245, 158, 11, 0.28);
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(52, 211, 153, 0.28);
 }
 
 .cc-prize-left {
@@ -852,21 +852,25 @@
 }
 
 .cc-prize-trophy {
-  color: #d97706;
+  color: #059669;
   flex-shrink: 0;
 }
 
 .cc-prize-text {
   font-size: 0.82rem;
   font-weight: 800;
-  color: #b45309;
+  color: #047857;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+[data-theme='dark'] .cc-prize-trophy {
+  color: #34d399;
+}
+
 [data-theme='dark'] .cc-prize-text {
-  color: #fbbf24;
+  color: #6ee7b7;
 }
 
 .cc-entry-tag {
@@ -879,13 +883,15 @@
 }
 
 .cc-entry-tag.free {
-  background: rgba(16, 185, 129, 0.12);
+  background: var(--surface);
   color: #059669;
-  border: 1px solid rgba(16, 185, 129, 0.25);
+  border: 1px solid rgba(16, 185, 129, 0.32);
 }
 
 [data-theme='dark'] .cc-entry-tag.free {
+  background: rgba(6, 78, 59, 0.45);
   color: #34d399;
+  border-color: rgba(52, 211, 153, 0.35);
 }
 
 .cc-entry-tag.paid {
