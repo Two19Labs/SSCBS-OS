@@ -116,14 +116,93 @@ function parsePrizeAmount(prizesStr) {
   return match ? parseInt(match[0], 10) : 0;
 }
 
-function formatDeadlineDisplay(deadlineStr, remainDaysText) {
-  if (!deadlineStr) return remainDaysText || 'Ongoing';
+function getCountdownDetails(deadlineStr, fallbackRemainText, nowMs) {
+  if (!deadlineStr) {
+    return {
+      text: fallbackRemainText || 'Ongoing',
+      exactDateStr: 'Ongoing',
+      urgencyClass: 'green',
+      hoursLeft: 9999,
+      daysLeft: 999,
+    };
+  }
+
   try {
-    const d = new Date(deadlineStr);
-    if (isNaN(d.getTime())) return remainDaysText || 'Ongoing';
-    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    const deadlineDate = new Date(deadlineStr);
+    const deadlineMs = deadlineDate.getTime();
+    if (isNaN(deadlineMs)) {
+      return {
+        text: fallbackRemainText || 'Ongoing',
+        exactDateStr: 'Ongoing',
+        urgencyClass: 'green',
+        hoursLeft: 9999,
+        daysLeft: 999,
+      };
+    }
+
+    const diffMs = deadlineMs - nowMs;
+    const exactDateStr = deadlineDate.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    if (diffMs <= 0) {
+      return {
+        text: 'Ending Soon',
+        exactDateStr,
+        urgencyClass: 'red',
+        hoursLeft: 0,
+        daysLeft: 0,
+      };
+    }
+
+    const totalMinutes = Math.floor(diffMs / (1000 * 60));
+    const totalHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const days = Math.floor(totalHours / 24);
+    const hours = totalHours % 24;
+    const minutes = totalMinutes % 60;
+
+    let text = '';
+    if (days > 6) {
+      text = `${days}d left`;
+    } else if (days >= 1) {
+      text = `${days}d ${hours}h left`;
+    } else if (totalHours >= 1) {
+      text = `${totalHours}h ${minutes}m left`;
+    } else {
+      text = `${minutes}m left`;
+    }
+
+    // Color thresholds:
+    // Red: approaching (<= 48 hours / 2 days)
+    // Yellow: medium time (3 to 6 days / <= 144 hours)
+    // Green: lots of time (7+ days)
+    let urgencyClass = 'green';
+    if (totalHours <= 48) {
+      urgencyClass = 'red';
+    } else if (totalHours <= 144) {
+      urgencyClass = 'yellow';
+    } else {
+      urgencyClass = 'green';
+    }
+
+    return {
+      text,
+      exactDateStr,
+      urgencyClass,
+      hoursLeft: totalHours,
+      daysLeft: days,
+    };
   } catch {
-    return remainDaysText || 'Ongoing';
+    return {
+      text: fallbackRemainText || 'Ongoing',
+      exactDateStr: 'Ongoing',
+      urgencyClass: 'green',
+      hoursLeft: 9999,
+      daysLeft: 999,
+    };
   }
 }
 
@@ -147,6 +226,15 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
   const [sortBy, setSortBy] = useState('closing-soonest'); // 'closing-soonest' | 'closing-latest' | 'title-asc' | 'title-desc' | 'prize-highest' | 'popular'
   const [copiedId, setCopiedId] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [nowMs, setNowMs] = useState(() => Date.now());
+
+  useEffect(() => {
+    // Tick every 30 seconds for live countdown accuracy
+    const timer = setInterval(() => {
+      setNowMs(Date.now());
+    }, 30000);
+    return () => clearInterval(timer);
+  }, []);
 
   const fetchOpportunities = useCallback(async (showRefreshing = false) => {
     if (showRefreshing) setIsRefreshing(true);
@@ -578,12 +666,12 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
         <div className="cc-grid">
           {filteredCompetitions.map((comp) => {
             const circuit = getCardCircuit(comp);
-            const deadlineText = formatDeadlineDisplay(comp.deadline, comp.remainDaysText);
+            const countdown = getCountdownDetails(comp.deadline, comp.remainDaysText, nowMs);
 
             return (
               <article key={comp.id} className={`cc-card cc-card-${circuit.type}`}>
                 <div className="cc-card-inner">
-                  {/* Top Bar: Host Profile + Circuit Tag + Urgency */}
+                  {/* Top Bar: Host Profile + Circuit Tag + Exact Countdown Timer */}
                   <div className="cc-card-top-bar">
                     <div className="cc-host-identity">
                       {comp.orgLogo ? (
@@ -612,9 +700,13 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
                     </div>
 
                     <div className="cc-top-status">
-                      <span className={`cc-urgency-chip ${comp.urgency}`}>
+                      <span
+                        className={`cc-countdown-chip ${countdown.urgencyClass}`}
+                        title={`Exact Deadline: ${countdown.exactDateStr}`}
+                      >
                         <span className="cc-status-dot" />
-                        <span>{comp.remainDaysText}</span>
+                        <ClockIcon size={12} className="cc-timer-icon" />
+                        <span>{countdown.text}</span>
                       </span>
                     </div>
                   </div>
@@ -637,16 +729,16 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
                     </span>
                   </div>
 
-                  {/* Metadata: Format & Deadline */}
+                  {/* Metadata: Format & Exact Deadline */}
                   <div className="cc-specs-row">
                     <div className="cc-spec-item" title={comp.teamSizeDisplay || 'Solo / Team'}>
                       <UsersIcon size={13} />
                       <span>{comp.teamSizeDisplay || 'Solo / Team'}</span>
                     </div>
                     <div className="cc-spec-dot" />
-                    <div className="cc-spec-item" title={deadlineText}>
+                    <div className="cc-spec-item" title={`Exact Deadline: ${countdown.exactDateStr}`}>
                       <CalendarIcon size={13} />
-                      <span>Ends {deadlineText}</span>
+                      <span>Ends {countdown.exactDateStr}</span>
                     </div>
                   </div>
 

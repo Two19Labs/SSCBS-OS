@@ -646,8 +646,8 @@
   flex-shrink: 0;
 }
 
-/* Urgency Chip */
-.cc-urgency-chip {
+/* ── Exact Deadline Countdown Chip (Red / Yellow / Green) ── */
+.cc-countdown-chip {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -656,40 +656,81 @@
   font-size: 0.7rem;
   font-weight: 700;
   flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.1px;
+  transition: all 0.2s ease;
 }
 
 .cc-status-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
+  flex-shrink: 0;
   background: currentColor;
 }
 
-.cc-urgency-chip.high {
-  background: rgba(239, 68, 68, 0.1);
+.cc-timer-icon {
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+/* Red: Approaching / Urgency (<= 48h) */
+.cc-countdown-chip.red {
+  background: rgba(239, 68, 68, 0.12);
   color: #dc2626;
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  border: 1px solid rgba(239, 68, 68, 0.32);
 }
 
-.cc-urgency-chip.high .cc-status-dot {
-  animation: pulseDot 1.4s ease-in-out infinite;
+[data-theme='dark'] .cc-countdown-chip.red {
+  background: rgba(239, 68, 68, 0.22);
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.42);
 }
 
-@keyframes pulseDot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.75); }
+.cc-countdown-chip.red .cc-status-dot {
+  background: #ef4444;
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  animation: countdownPulseRed 1.4s ease-in-out infinite;
 }
 
-.cc-urgency-chip.medium {
-  background: rgba(245, 158, 11, 0.1);
-  color: #d97706;
-  border: 1px solid rgba(245, 158, 11, 0.25);
+@keyframes countdownPulseRed {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 4px rgba(239, 68, 68, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
-.cc-urgency-chip.normal {
+/* Yellow: Medium Time Remaining (3 to 6 days) */
+.cc-countdown-chip.yellow {
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.32);
+}
+
+[data-theme='dark'] .cc-countdown-chip.yellow {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+.cc-countdown-chip.yellow .cc-status-dot {
+  background: #f59e0b;
+}
+
+/* Green: Plenty of Time Remaining (> 6 days) */
+.cc-countdown-chip.green {
   background: rgba(16, 185, 129, 0.1);
-  color: #059669;
-  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #047857;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+[data-theme='dark'] .cc-countdown-chip.green {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.4);
+}
+
+.cc-countdown-chip.green .cc-status-dot {
+  background: #10b981;
 }
 
 /* ── Competition Title ── */
