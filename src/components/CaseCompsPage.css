@@ -570,13 +570,15 @@
   border-color: rgba(147, 51, 234, 0.25);
 }
 
-.cc-host-avatar.iim {
+.cc-host-avatar.iim,
+.cc-host-avatar.iim-iit {
   background: rgba(217, 119, 6, 0.1);
   color: #d97706;
   border-color: rgba(217, 119, 6, 0.25);
 }
 
-.cc-host-avatar.iit {
+.cc-host-avatar.iit,
+.cc-host-avatar.other-mba-corp {
   background: rgba(2, 132, 199, 0.1);
   color: #0284c7;
   border-color: rgba(2, 132, 199, 0.25);
@@ -594,8 +596,10 @@
 }
 
 [data-theme='dark'] .cc-host-avatar.du { color: #c084fc; }
-[data-theme='dark'] .cc-host-avatar.iim { color: #fbbf24; }
-[data-theme='dark'] .cc-host-avatar.iit { color: #38bdf8; }
+[data-theme='dark'] .cc-host-avatar.iim,
+[data-theme='dark'] .cc-host-avatar.iim-iit { color: #fbbf24; }
+[data-theme='dark'] .cc-host-avatar.iit,
+[data-theme='dark'] .cc-host-avatar.other-mba-corp { color: #38bdf8; }
 
 .cc-host-meta {
   display: flex;
@@ -625,14 +629,18 @@
 }
 
 .cc-circuit-tag.du { color: #9333ea; }
-.cc-circuit-tag.iim { color: #d97706; }
-.cc-circuit-tag.iit { color: #0284c7; }
+.cc-circuit-tag.iim,
+.cc-circuit-tag.iim-iit { color: #d97706; }
+.cc-circuit-tag.iit,
+.cc-circuit-tag.other-mba-corp { color: #0284c7; }
 .cc-circuit-tag.flagship { color: #b08d3e; }
 .cc-circuit-tag.general { color: var(--ink-dim); }
 
 [data-theme='dark'] .cc-circuit-tag.du { color: #c084fc; }
-[data-theme='dark'] .cc-circuit-tag.iim { color: #fbbf24; }
-[data-theme='dark'] .cc-circuit-tag.iit { color: #38bdf8; }
+[data-theme='dark'] .cc-circuit-tag.iim,
+[data-theme='dark'] .cc-circuit-tag.iim-iit { color: #fbbf24; }
+[data-theme='dark'] .cc-circuit-tag.iit,
+[data-theme='dark'] .cc-circuit-tag.other-mba-corp { color: #38bdf8; }
 
 .cc-circuit-icon {
   font-size: 0.72rem;

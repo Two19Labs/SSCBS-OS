@@ -107,7 +107,55 @@ const CopyIcon = ({ size = 18 }) => (
     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
   </svg>
 );
+
+const BriefcaseIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+  </svg>
+);
 import './CaseCompsPage.css';
+
+const IIM_IIT_KEYWORDS = [
+  'iim', 'iit', 'indian institute of management', 'indian institute of technology',
+  'doms', 'dms', 'sjmsom', 'vgsom'
+];
+
+const OTHER_MBA_CORP_KEYWORDS = [
+  'isb', 'xlri', 'mdi', 'fms', 'spjimr', 'sp jain', 'sibm', 'symbiosis', 'scmhrd',
+  'nmims', 'iift', 'great lakes', 'glim', 'tapmi', 'imt', 'gim', 'somaiya',
+  'fore', 'lbsim', 'bits', 'mica', 'irma', 'tiss', 'jbims',
+  "l'oreal", 'loreal', 'brandstorm', 'tata', 'hul', 'unilever', 'itc', 'marico',
+  'mondelez', 'reckitt', 'nestle', 'p&g', 'pepsico', 'coca-cola', 'aditya birla',
+  'reliance', 'jio', 'mahindra', 'mckinsey', 'bain', 'bcg', 'kearney', 'ey',
+  'deloitte', 'pwc', 'kpmg', 'amazon', 'flipkart', 'google', 'microsoft',
+  'tvs', 'optum', 'accenture', 'hsbc', 'citi', 'jpmorgan', 'morgan stanley',
+  'goldman sachs', 'amex', 'hdfc', 'icici', 'axis bank', 'kotak', 'bajaj',
+  'hero', 'airtel', 'asian paints', 'corporate'
+];
+
+function isMatch(text, kw) {
+  if (kw.length <= 4 && /^[a-z0-9]+$/i.test(kw)) {
+    const regex = new RegExp(`\\b${kw}\\b`, 'i');
+    return regex.test(text);
+  }
+  return text.includes(kw);
+}
+
+function isIIMorIITComp(comp) {
+  if (typeof comp.isIIMorIIT === 'boolean') return comp.isIIMorIIT;
+  if (comp.isIIM || comp.isIIT) return true;
+  const combined = `${comp.orgName || ''} ${comp.title || ''}`.toLowerCase();
+  return IIM_IIT_KEYWORDS.some(kw => isMatch(combined, kw));
+}
+
+function isOtherMbaOrCorporateComp(comp) {
+  if (typeof comp.isOtherMbaOrCorporate === 'boolean') return comp.isOtherMbaOrCorporate;
+  if (comp.isCorporate || comp.isOtherMba) return true;
+  if (comp.isDU || isIIMorIITComp(comp)) return false;
+  const combined = `${comp.orgName || ''} ${comp.title || ''}`.toLowerCase();
+  return OTHER_MBA_CORP_KEYWORDS.some(kw => isMatch(combined, kw));
+}
 
 function parsePrizeAmount(prizesStr) {
   if (!prizesStr) return 0;
@@ -208,8 +256,8 @@ function getCountdownDetails(deadlineStr, fallbackRemainText, nowMs) {
 
 function getCardCircuit(comp) {
   if (comp.isDU) return { type: 'du', label: 'DU Circuit', icon: '🎓' };
-  if (comp.isIIMorMBA) return { type: 'iim', label: 'IIM / MBA', icon: '🏛️' };
-  if (comp.isIITorTech) return { type: 'iit', label: 'IIT / Tech', icon: '⚙️' };
+  if (isIIMorIITComp(comp)) return { type: 'iim-iit', label: 'IIMs & IITs', icon: '🏛️' };
+  if (isOtherMbaOrCorporateComp(comp)) return { type: 'other-mba-corp', label: 'Other MBA & Corporate', icon: '🏢' };
   if (comp.isFlagship) return { type: 'flagship', label: 'Tier-1 Flagship', icon: '⭐' };
   return { type: 'general', label: 'National Circuit', icon: '💼' };
 }
@@ -305,10 +353,10 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
   const metrics = useMemo(() => {
     const total = competitions.length;
     const du = competitions.filter((c) => c.isDU).length;
-    const iim = competitions.filter((c) => c.isIIMorMBA).length;
-    const iit = competitions.filter((c) => c.isIITorTech).length;
+    const iimIit = competitions.filter((c) => isIIMorIITComp(c)).length;
+    const otherMbaCorp = competitions.filter((c) => isOtherMbaOrCorporateComp(c)).length;
     const flagship = competitions.filter((c) => c.isFlagship).length;
-    return { total, du, iim, iit, flagship };
+    return { total, du, iimIit, otherMbaCorp, flagship };
   }, [competitions]);
 
   const hasActiveFilters = searchQuery.trim() !== '' || activeFilter !== 'all' || teamFilter !== 'all' || feeFilter !== 'all' || sortBy !== 'closing-soonest';
@@ -333,10 +381,10 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
         if (!matchesTitle && !matchesOrg && !matchesPrize) return false;
       }
 
-      // Circuit filter (closing-soon category removed)
+      // Circuit filter
       if (activeFilter === 'du' && !comp.isDU) return false;
-      if (activeFilter === 'iim' && !comp.isIIMorMBA) return false;
-      if (activeFilter === 'iit' && !comp.isIITorTech) return false;
+      if (activeFilter === 'iim-iit' && !isIIMorIITComp(comp)) return false;
+      if (activeFilter === 'other-mba-corp' && !isOtherMbaOrCorporateComp(comp)) return false;
       if (activeFilter === 'flagship' && !comp.isFlagship) return false;
 
       // Team filter
@@ -444,28 +492,28 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
         </div>
 
         <div
-          className={`cc-metric-card ${activeFilter === 'iim' ? 'active' : ''}`}
-          onClick={() => setActiveFilter('iim')}
+          className={`cc-metric-card ${activeFilter === 'iim-iit' ? 'active' : ''}`}
+          onClick={() => setActiveFilter('iim-iit')}
         >
           <div className="cc-metric-icon gold">
             <FlameIcon size={18} />
           </div>
           <div className="cc-metric-info">
-            <span className="cc-metric-value">{metrics.iim}</span>
-            <span className="cc-metric-label">IIMs & MBA</span>
+            <span className="cc-metric-value">{metrics.iimIit}</span>
+            <span className="cc-metric-label">IIMs & IITs</span>
           </div>
         </div>
 
         <div
-          className={`cc-metric-card ${activeFilter === 'iit' ? 'active' : ''}`}
-          onClick={() => setActiveFilter('iit')}
+          className={`cc-metric-card ${activeFilter === 'other-mba-corp' ? 'active' : ''}`}
+          onClick={() => setActiveFilter('other-mba-corp')}
         >
           <div className="cc-metric-icon cyan">
-            <ClockIcon size={18} />
+            <BriefcaseIcon size={18} />
           </div>
           <div className="cc-metric-info">
-            <span className="cc-metric-value">{metrics.iit}</span>
-            <span className="cc-metric-label">IITs & Tech</span>
+            <span className="cc-metric-value">{metrics.otherMbaCorp}</span>
+            <span className="cc-metric-label">Other MBA & Corporate</span>
           </div>
         </div>
 
@@ -490,7 +538,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
           <input
             type="text"
             className="cc-search-input"
-            placeholder="Search by name, IIM, IIT, LSR, Stephen's, BITS, prizes..."
+            placeholder="Search by name, IIM, IIT, XLRI, ISB, L'Oréal, prizes..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -516,16 +564,16 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
             🎓 DU Circuits ({metrics.du})
           </button>
           <button
-            className={`cc-tab-btn ${activeFilter === 'iim' ? 'active' : ''}`}
-            onClick={() => setActiveFilter('iim')}
+            className={`cc-tab-btn ${activeFilter === 'iim-iit' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('iim-iit')}
           >
-            🏛️ IIMs & MBA ({metrics.iim})
+            🏛️ IIMs & IITs ({metrics.iimIit})
           </button>
           <button
-            className={`cc-tab-btn ${activeFilter === 'iit' ? 'active' : ''}`}
-            onClick={() => setActiveFilter('iit')}
+            className={`cc-tab-btn ${activeFilter === 'other-mba-corp' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('other-mba-corp')}
           >
-            ⚙️ IITs & Tech ({metrics.iit})
+            🏢 Other MBA & Corporate ({metrics.otherMbaCorp})
           </button>
           <button
             className={`cc-tab-btn ${activeFilter === 'flagship' ? 'active' : ''}`}

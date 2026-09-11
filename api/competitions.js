@@ -20,20 +20,54 @@ const DU_KEYWORDS = [
   'motilal nehru', 'indraprastha college', 'ipcw', 'maharaja agrasen', 'ramanujan'
 ];
 
-const IIM_MBA_KEYWORDS = [
-  'iim', 'indian institute of management', 'xlri', 'fms', 'faculty of management',
-  'sibm', 'symbiosis', 'spjimr', 'sp jain', 'mdi', 'gurgaon', 'great lakes', 'glim',
-  'nmims', 'iift', 'iim rohtak', 'iim bangalore', 'iim ahmedabad', 'iim calcutta',
-  'iim lucknow', 'iim kozhikode', 'iim indore', 'iim shillong', 'iim ranchi',
+const IIM_KEYWORDS = [
+  'iim', 'indian institute of management', 'iim ahmedabad', 'iim bangalore', 'iim calcutta',
+  'iim lucknow', 'iim kozhikode', 'iim indore', 'iim shillong', 'iim ranchi', 'iim rohtak',
   'iim trichy', 'iim kashipur', 'iim udaipur', 'iim bodh gaya', 'iim jammu', 'iim sambalpur',
-  'iim sirmaur', 'iim visakhapatnam', 'iim amritsar', 'iim nagpur', 'iim raipur',
-  'iit delhi dms', 'doms', 'sjmsom', 'vgsom'
+  'iim sirmaur', 'iim visakhapatnam', 'iim amritsar', 'iim nagpur', 'iim raipur'
 ];
 
-const IIT_TECH_KEYWORDS = [
-  'iit', 'indian institute of technology', 'bits', 'birla institute', 'nsut',
-  'dtu', 'delhi technological', 'nit', 'national institute of technology', 'iiit'
+const IIT_KEYWORDS = [
+  'iit', 'indian institute of technology', 'iit bombay', 'iit delhi', 'iit madras',
+  'iit kanpur', 'iit kharagpur', 'iit roorkee', 'iit guwahati', 'iit bhu', 'iit hyderabad',
+  'iit dhanbad', 'iit indore', 'iit mandi', 'iit varanasi', 'iit gandhinagar', 'iit patna',
+  'iit jodhpur', 'iit ropar', 'iit tirupati', 'iit palakkad', 'iit dharwad', 'iit bhilai',
+  'iit goa', 'doms', 'dms', 'sjmsom', 'vgsom'
 ];
+
+const OTHER_MBA_KEYWORDS = [
+  'isb', 'indian school of business', 'xlri', 'xavier school of management', 'xavier labour',
+  'xavier', 'mdi', 'management development institute', 'mdi gurgaon', 'mdi murshidabad',
+  'fms', 'faculty of management studies', 'spjimr', 'sp jain', 's.p. jain', 'sibm', 'symbiosis',
+  'scmhrd', 'siom', 'nmims', 'narsee monjee', 'iift', 'indian institute of foreign trade',
+  'great lakes', 'glim', 'tapmi', 't. a. pai', 'imt', 'imt ghaziabad', 'gim', 'goa institute of management',
+  'k j somaiya', 'somaiya', 'simsr', 'fore', 'fore school', 'lbsim', 'lal bahadur shastri',
+  'bits', 'bits pilani', 'mica', 'mudra institute', 'irma', 'institute of rural management',
+  'tiss', 'tata institute of social sciences', 'jbims', 'jamnalal bajaj'
+];
+
+const CORPORATE_KEYWORDS = [
+  "l'oreal", 'loreal', 'brandstorm', 'tata', 'tata steel', 'tata motors', 'tata crucible',
+  'tata imagination', 'tcs', 'hul', 'hindustan unilever', 'lime', 'unilever', 'itc',
+  'interrobang', 'marico', 'over the wall', 'mondelez', 'reckitt', 'nestle', 'p&g',
+  'procter & gamble', 'pepsico', 'coca-cola', 'coke', 'aditya birla', 'stratfresh', 'abg',
+  'reliance', 'jio', 'reliance retail', 'mahindra', 'war room', 'mckinsey', 'bain', 'bcg',
+  'boston consulting', 'kearney', 'oliver wyman', 'strategy&', 'ey', 'ernst & young', 'deloitte',
+  'pwc', 'kpmg', 'grant thornton', 'bdo', 'amazon', 'flipkart', 'google', 'microsoft', 'apple',
+  'meta', 'uber', 'swiggy', 'zomato', 'tvs', 'tvs credit', 'optum', 'stratethon', 'accenture',
+  'standard chartered', 'hsbc', 'citi', 'citigroup', 'jpmorgan', 'jp morgan', 'morgan stanley',
+  'goldman sachs', 'american express', 'amex', 'hdfc', 'icici', 'axis bank', 'kotak', 'bajaj',
+  'bajaj finserv', 'hero', 'hero motocorp', 'airtel', 'vodafone', 'asian paints', 'berger paints',
+  'wipro', 'infosys', 'cognizant', 'capgemini', 'hcl', 'corporate', 'enterprise', 'industry'
+];
+
+function matchesKeyword(text, keyword) {
+  if (keyword.length <= 4 && /^[a-z0-9]+$/i.test(keyword)) {
+    const regex = new RegExp(`\\b${keyword}\\b`, 'i');
+    return regex.test(text);
+  }
+  return text.includes(keyword);
+}
 
 export async function fetchCompetitionsFromUnstop() {
   const queryEndpoints = [
@@ -51,6 +85,11 @@ export async function fetchCompetitionsFromUnstop() {
     'opportunity=competitions&searchTerm=sggscc&per_page=50',
     'opportunity=competitions&searchTerm=iim&per_page=50',
     'opportunity=competitions&searchTerm=iit&per_page=50',
+    'opportunity=competitions&searchTerm=xlri&per_page=50',
+    'opportunity=competitions&searchTerm=isb&per_page=50',
+    'opportunity=competitions&searchTerm=mdi&per_page=50',
+    'opportunity=competitions&searchTerm=corporate&per_page=50',
+    'opportunity=competitions&searchTerm=loreal&per_page=50',
     'opportunity=competitions&searchTerm=b-plan&per_page=50',
     'opportunity=competitions&searchTerm=challenge&per_page=50'
   ];
@@ -105,10 +144,14 @@ export async function fetchCompetitionsFromUnstop() {
     const combined = `${lowerOrg} ${lowerTitle}`;
 
     // Tag categorization
-    const isDU = DU_KEYWORDS.some(kw => combined.includes(kw));
-    const isIIMorMBA = IIM_MBA_KEYWORDS.some(kw => combined.includes(kw));
-    const isIITorTech = IIT_TECH_KEYWORDS.some(kw => combined.includes(kw));
-    const isFlagship = FLAGSHIP_KEYWORDS.some(kw => combined.includes(kw));
+    const isDU = DU_KEYWORDS.some(kw => matchesKeyword(combined, kw));
+    const isIIM = IIM_KEYWORDS.some(kw => matchesKeyword(combined, kw));
+    const isIIT = IIT_KEYWORDS.some(kw => matchesKeyword(combined, kw));
+    const isIIMorIIT = isIIM || isIIT;
+    const isOtherMba = OTHER_MBA_KEYWORDS.some(kw => matchesKeyword(combined, kw));
+    const isCorporate = CORPORATE_KEYWORDS.some(kw => matchesKeyword(combined, kw));
+    const isOtherMbaOrCorporate = (isOtherMba || isCorporate) && !isDU && !isIIMorIIT;
+    const isFlagship = FLAGSHIP_KEYWORDS.some(kw => matchesKeyword(combined, kw));
 
     const minTeam = item.regnRequirements?.min_team_size || 1;
     const maxTeam = item.regnRequirements?.max_team_size || 4;
@@ -156,8 +199,14 @@ export async function fetchCompetitionsFromUnstop() {
       isFree,
       isFlagship,
       isDU,
-      isIIMorMBA,
-      isIITorTech,
+      isIIM,
+      isIIT,
+      isIIMorIIT,
+      isOtherMba,
+      isCorporate,
+      isOtherMbaOrCorporate,
+      isIIMorMBA: isIIM || isOtherMba,
+      isIITorTech: isIIT,
       isFirstYearFriendly,
       registeredCount: item.registerCount || 0,
       viewsCount: item.viewsCount || 0,
