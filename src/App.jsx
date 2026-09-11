@@ -229,8 +229,8 @@ function App() {
       title: 'Main Navigation',
       items: [
         { id: 'home', label: 'Home', Icon: HomeIcon },
-        ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', label: 'Societies Database', Icon: UsersIcon, featured: true }] : []),
-        ...(hasCaseCompsAccess ? [{ id: 'case-comps', label: 'Case Competitions Alerts', Icon: FlameIcon, featured: true }] : []),
+        ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', label: 'Societies Database', Icon: UsersIcon }] : []),
+        ...(hasCaseCompsAccess ? [{ id: 'case-comps', label: 'Case Competitions Alerts', Icon: FlameIcon }] : []),
         { id: 'buzz', label: 'Campus Buzz', Icon: MegaphoneIcon, locked: !featureFlags['buzz'] && !isAdmin },
       ],
     },
