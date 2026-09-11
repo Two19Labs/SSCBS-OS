@@ -12,8 +12,28 @@ import {
   CheckIcon,
   CopyIcon,
   GraduationCapIcon,
+  CalendarIcon,
 } from './icons';
 import './CaseCompsPage.css';
+
+function formatDeadlineDisplay(deadlineStr, remainDaysText) {
+  if (!deadlineStr) return remainDaysText || 'Ongoing';
+  try {
+    const d = new Date(deadlineStr);
+    if (isNaN(d.getTime())) return remainDaysText || 'Ongoing';
+    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+  } catch {
+    return remainDaysText || 'Ongoing';
+  }
+}
+
+function getCardCircuit(comp) {
+  if (comp.isDU) return { type: 'du', label: 'DU Circuit', icon: '🎓' };
+  if (comp.isIIMorMBA) return { type: 'iim', label: 'IIM / MBA', icon: '🏛️' };
+  if (comp.isIITorTech) return { type: 'iit', label: 'IIT / Tech', icon: '⚙️' };
+  if (comp.isFlagship) return { type: 'flagship', label: 'Tier-1 Flagship', icon: '⭐' };
+  return { type: 'general', label: 'National Circuit', icon: '💼' };
+}
 
 export default function CaseCompsPage({ onBack, onNavigate }) {
   const [competitions, setCompetitions] = useState([]);
@@ -398,118 +418,150 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
         </div>
       ) : (
         <div className="cc-grid">
-          {filteredCompetitions.map((comp) => (
-            <article key={comp.id} className="cc-card">
-              {/* Card Header: Organizer */}
-              <div className="cc-card-top">
-                <div className="cc-org-wrapper">
-                  {comp.orgLogo ? (
-                    <img
-                      src={comp.orgLogo}
-                      alt=""
-                      className="cc-org-logo"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    <div className="cc-org-placeholder">
-                      {comp.orgName.charAt(0).toUpperCase()}
+          {filteredCompetitions.map((comp) => {
+            const circuit = getCardCircuit(comp);
+            const deadlineText = formatDeadlineDisplay(comp.deadline, comp.remainDaysText);
+
+            return (
+              <article key={comp.id} className={`cc-card cc-card-${circuit.type}`}>
+                {/* Top circuit accent line */}
+                <div className={`cc-card-accent-bar cc-accent-${circuit.type}`} />
+
+                <div className="cc-card-inner">
+                  {/* Row 1: Header pills (Circuit + Entry + Urgency) */}
+                  <div className="cc-card-header-pills">
+                    <div className="cc-pill-group-left">
+                      <span className={`cc-circuit-pill ${circuit.type}`}>
+                        <span className="cc-circuit-icon">{circuit.icon}</span>
+                        <span>{circuit.label}</span>
+                      </span>
+                      {comp.isFree ? (
+                        <span className="cc-entry-pill free">Free Entry</span>
+                      ) : (
+                        <span className="cc-entry-pill paid">Paid</span>
+                      )}
                     </div>
-                  )}
-                  <span className="cc-org-name" title={comp.orgName}>
-                    {comp.orgName}
-                  </span>
-                </div>
 
-                <div className={`cc-urgency-badge ${comp.urgency}`}>
-                  <ClockIcon size={12} />
-                  <span>{comp.remainDaysText}</span>
-                </div>
-              </div>
-
-              {/* Title */}
-              <h2 className="cc-card-title" title={comp.title}>
-                {comp.title}
-              </h2>
-
-              {/* Badges Row */}
-              <div className="cc-badges-row">
-                {comp.isDU && (
-                  <span className="cc-tag purple">
-                    🎓 DU Circuit
-                  </span>
-                )}
-                {comp.isIIMorMBA && (
-                  <span className="cc-tag gold">
-                    🏛️ IIM / MBA
-                  </span>
-                )}
-                {comp.isIITorTech && (
-                  <span className="cc-tag blue">
-                    ⚙️ IIT / Tech
-                  </span>
-                )}
-                {comp.isFlagship && !comp.isIIMorMBA && !comp.isDU && (
-                  <span className="cc-tag gold">
-                    <FlameIcon size={11} filled /> Tier-1 Flagship
-                  </span>
-                )}
-                <span className="cc-tag neutral">
-                  <UsersIcon size={11} /> {comp.teamSizeDisplay}
-                </span>
-                {comp.isFree && (
-                  <span className="cc-tag free">Free Entry</span>
-                )}
-              </div>
-
-              {/* Highlights Box */}
-              <div className="cc-details-box">
-                <div className="cc-detail-item">
-                  <span className="cc-detail-label">Prize Pool</span>
-                  <span className="cc-detail-value prize">{comp.prizes}</span>
-                </div>
-                {comp.registeredCount > 0 && (
-                  <div className="cc-detail-item">
-                    <span className="cc-detail-label">Registrations</span>
-                    <span className="cc-detail-value">{comp.registeredCount.toLocaleString()}</span>
+                    <div className={`cc-urgency-chip ${comp.urgency}`}>
+                      <span className="cc-status-dot" />
+                      <span>{comp.remainDaysText}</span>
+                    </div>
                   </div>
-                )}
-              </div>
 
-              {/* Card Actions */}
-              <div className="cc-card-actions">
-                <a
-                  href={comp.unstopUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="cc-btn primary"
-                >
-                  <span>Apply on Unstop</span>
-                  <ExternalLinkIcon size={13} />
-                </a>
+                  {/* Row 2: Host / Organizer */}
+                  <div className="cc-host-row">
+                    {comp.orgLogo ? (
+                      <img
+                        src={comp.orgLogo}
+                        alt=""
+                        className="cc-host-logo"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className={`cc-host-avatar ${circuit.type}`}>
+                        {comp.orgName.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <span className="cc-host-name" title={comp.orgName}>
+                      {comp.orgName}
+                    </span>
+                  </div>
 
-                <button
-                  type="button"
-                  className="cc-btn secondary"
-                  onClick={(e) => handleFindTeammates(comp, e)}
-                  title="Find CBS teammates on Team Finder"
-                >
-                  <UsersIcon size={14} />
-                  <span>Find Teammates</span>
-                </button>
+                  {/* Row 3: Competition Title */}
+                  <h2 className="cc-card-title" title={comp.title}>
+                    {comp.title}
+                  </h2>
 
-                <button
-                  type="button"
-                  className={`cc-share-btn ${copiedId === comp.id ? 'copied' : ''}`}
-                  onClick={(e) => handleShare(comp, e)}
-                  title="Share competition with friends"
-                >
-                  {copiedId === comp.id ? <CheckIcon size={14} /> : <CopyIcon size={14} />}
-                </button>
-              </div>
-            </article>
-          ))}
+                  {/* Row 4: 3-Column Bento Specs Grid */}
+                  <div className="cc-specs-grid">
+                    <div className="cc-spec-cell">
+                      <span className="cc-spec-label">
+                        <TrophyIcon size={11} /> PRIZE POOL
+                      </span>
+                      <span className="cc-spec-val prize" title={comp.prizes}>
+                        {comp.prizes}
+                      </span>
+                    </div>
+
+                    <div className="cc-spec-cell">
+                      <span className="cc-spec-label">
+                        <UsersIcon size={11} /> FORMAT
+                      </span>
+                      <span className="cc-spec-val" title={comp.teamSizeDisplay}>
+                        {comp.teamSizeDisplay}
+                      </span>
+                    </div>
+
+                    <div className="cc-spec-cell">
+                      <span className="cc-spec-label">
+                        <CalendarIcon size={11} /> DEADLINE
+                      </span>
+                      <span className="cc-spec-val" title={deadlineText}>
+                        {deadlineText}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Row 5: Micro Social Proof & Recommendation Tag */}
+                  <div className="cc-card-meta-row">
+                    {comp.isFirstYearFriendly ? (
+                      <span className="cc-meta-tag fyp">
+                        <SparklesIcon size={11} /> 1st Year Friendly
+                      </span>
+                    ) : (
+                      <span className="cc-meta-tag open">
+                        Verified Listing
+                      </span>
+                    )}
+
+                    <span className="cc-meta-reg">
+                      {comp.registeredCount > 0 ? (
+                        <>
+                          <strong>{comp.registeredCount.toLocaleString()}</strong> applied
+                        </>
+                      ) : (
+                        <span className="cc-meta-fresh">⚡ Recently Listed</span>
+                      )}
+                    </span>
+                  </div>
+
+                  {/* Row 6: Action Buttons */}
+                  <div className="cc-card-actions">
+                    <a
+                      href={comp.unstopUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="cc-action-btn cc-btn-apply"
+                    >
+                      <span>Apply on Unstop</span>
+                      <ExternalLinkIcon size={12} />
+                    </a>
+
+                    <button
+                      type="button"
+                      className="cc-action-btn cc-btn-team"
+                      onClick={(e) => handleFindTeammates(comp, e)}
+                      title="Find CBS batchmates on Team Finder"
+                    >
+                      <UsersIcon size={13} />
+                      <span>CBS Teammates</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className={`cc-share-icon-btn ${copiedId === comp.id ? 'copied' : ''}`}
+                      onClick={(e) => handleShare(comp, e)}
+                      title={copiedId === comp.id ? 'Copied link!' : 'Copy competition link'}
+                    >
+                      {copiedId === comp.id ? <CheckIcon size={13} /> : <CopyIcon size={13} />}
+                    </button>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
         </div>
       )}
     </div>
