@@ -715,6 +715,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
           {filteredCompetitions.map((comp) => {
             const circuit = getCardCircuit(comp);
             const countdown = getCountdownDetails(comp.deadline, comp.remainDaysText, nowMs);
+            const isSolo = comp.maxTeam === 1 || (comp.teamSizeDisplay && comp.teamSizeDisplay.toLowerCase().startsWith('solo'));
 
             return (
               <article key={comp.id} className={`cc-card cc-card-${circuit.type}`}>
@@ -814,15 +815,17 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
                       <ExternalLinkIcon size={12} />
                     </a>
 
-                    <button
-                      type="button"
-                      className="cc-action-btn cc-btn-team"
-                      onClick={(e) => handleFindTeammates(comp, e)}
-                      title="Find batchmates on Team Finder"
-                    >
-                      <UsersIcon size={13} />
-                      <span>Find Teammates</span>
-                    </button>
+                    {!isSolo && (
+                      <button
+                        type="button"
+                        className="cc-action-btn cc-btn-team"
+                        onClick={(e) => handleFindTeammates(comp, e)}
+                        title="Find batchmates on Team Finder"
+                      >
+                        <UsersIcon size={13} />
+                        <span>Find Teammates</span>
+                      </button>
+                    )}
 
                     <button
                       type="button"
