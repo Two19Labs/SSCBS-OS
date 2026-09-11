@@ -460,61 +460,6 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
         </div>
       </header>
 
-      {/* ── Metrics Stat Bar ── */}
-      <div className="cc-metrics-grid">
-        <div
-          className={`cc-metric-card ${activeFilter === 'all' ? 'active' : ''}`}
-          onClick={() => setActiveFilter('all')}
-        >
-          <div className="cc-metric-icon info">
-            <TrophyIcon size={18} />
-          </div>
-          <div className="cc-metric-info">
-            <span className="cc-metric-value">{metrics.total}</span>
-            <span className="cc-metric-label">Live Comps</span>
-          </div>
-        </div>
-
-        <div
-          className={`cc-metric-card ${activeFilter === 'du' ? 'active' : ''}`}
-          onClick={() => setActiveFilter('du')}
-        >
-          <div className="cc-metric-icon success">
-            <GraduationCapIcon size={18} />
-          </div>
-          <div className="cc-metric-info">
-            <span className="cc-metric-value">{metrics.du}</span>
-            <span className="cc-metric-label">DU Colleges</span>
-          </div>
-        </div>
-
-        <div
-          className={`cc-metric-card ${activeFilter === 'iim-iit' ? 'active' : ''}`}
-          onClick={() => setActiveFilter('iim-iit')}
-        >
-          <div className="cc-metric-icon gold">
-            <FlameIcon size={18} />
-          </div>
-          <div className="cc-metric-info">
-            <span className="cc-metric-value">{metrics.iimIit}</span>
-            <span className="cc-metric-label">IIMs & IITs</span>
-          </div>
-        </div>
-
-        <div
-          className={`cc-metric-card ${activeFilter === 'other-mba-corp' ? 'active' : ''}`}
-          onClick={() => setActiveFilter('other-mba-corp')}
-        >
-          <div className="cc-metric-icon cyan">
-            <BriefcaseIcon size={18} />
-          </div>
-          <div className="cc-metric-info">
-            <span className="cc-metric-value">{metrics.otherMbaCorp}</span>
-            <span className="cc-metric-label">Other Colleges & Corporates</span>
-          </div>
-        </div>
-      </div>
-
       {/* ── Filter Bar & Search ── */}
       <div className="cc-filter-section">
         <div className="cc-search-wrapper">
