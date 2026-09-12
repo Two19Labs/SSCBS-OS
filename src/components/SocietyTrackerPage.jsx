@@ -5,7 +5,6 @@ import {
   InstagramIcon,
   LinktreeIcon,
   LinkedinIcon,
-  SparklesIcon,
   BriefcaseIcon,
   HeartIcon,
   BackIcon,
@@ -280,9 +279,6 @@ export default function SocietyTrackerPage({ onBack }) {
             </button>
           )}
           <div>
-            <span className="st-badge">
-              <SparklesIcon size={12} /> OFFICIAL CAMPUS DIRECTORY
-            </span>
             <h1 className="st-title">Central Societies Database</h1>
             <p className="st-subtitle">
               Comprehensive directory of all {totalCount} official societies, cells, and student initiatives at SSCBS.
