@@ -704,7 +704,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
                       {Number(comp.registeredCount || 0) > 0 ? (
                         <span className="cc-reg-count">
                           <FlameIcon size={12} className="cc-reg-icon" />
-                          <strong>{Number(comp.registeredCount).toLocaleString()}</strong> students applied
+                          <strong>{Number(comp.registeredCount).toLocaleString()}</strong> registrations
                         </span>
                       ) : (
                         <span className="cc-meta-fresh">⚡ Recently Listed</span>
