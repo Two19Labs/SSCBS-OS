@@ -112,28 +112,42 @@ function isUndergradEligible(item) {
 
 export async function fetchCompetitionsFromUnstop() {
   const queryEndpoints = [
+    // Category & Core Theme Keywords
     'opportunity=competitions&subType=case-competitions&per_page=50',
     'opportunity=competitions&searchTerm=case competitions&per_page=50',
-    'opportunity=competitions&searchTerm=case&per_page=50',
     'opportunity=competitions&searchTerm=case study&per_page=50',
+    'opportunity=competitions&searchTerm=case&per_page=50',
     'opportunity=competitions&searchTerm=consulting&per_page=50',
     'opportunity=competitions&searchTerm=strategy&per_page=50',
+    'opportunity=competitions&searchTerm=b-plan&per_page=50',
+    'opportunity=competitions&searchTerm=challenge&per_page=50',
+
+    // Delhi University Circuit (Top Colleges)
     'opportunity=competitions&searchTerm=delhi university&per_page=50',
     'opportunity=competitions&searchTerm=du&per_page=50',
-    'opportunity=competitions&searchTerm=srcc&per_page=50',
     'opportunity=competitions&searchTerm=sscbs&per_page=50',
+    'opportunity=competitions&searchTerm=srcc&per_page=50',
+    'opportunity=competitions&searchTerm=hindu&per_page=50',
+    'opportunity=competitions&searchTerm=miranda&per_page=50',
+    'opportunity=competitions&searchTerm=hansraj&per_page=50',
+    'opportunity=competitions&searchTerm=kirori mal&per_page=50',
+    'opportunity=competitions&searchTerm=ramjas&per_page=50',
     'opportunity=competitions&searchTerm=lsr&per_page=50',
     'opportunity=competitions&searchTerm=stephen&per_page=50',
     'opportunity=competitions&searchTerm=sggscc&per_page=50',
+    'opportunity=competitions&searchTerm=venky&per_page=50',
+    'opportunity=competitions&searchTerm=gargi&per_page=50',
+
+    // Premier National B-Schools & Tech
     'opportunity=competitions&searchTerm=iim&per_page=50',
     'opportunity=competitions&searchTerm=iit&per_page=50',
     'opportunity=competitions&searchTerm=xlri&per_page=50',
     'opportunity=competitions&searchTerm=isb&per_page=50',
     'opportunity=competitions&searchTerm=mdi&per_page=50',
+
+    // Corporate Challenges
     'opportunity=competitions&searchTerm=corporate&per_page=50',
-    'opportunity=competitions&searchTerm=loreal&per_page=50',
-    'opportunity=competitions&searchTerm=b-plan&per_page=50',
-    'opportunity=competitions&searchTerm=challenge&per_page=50'
+    'opportunity=competitions&searchTerm=loreal&per_page=50'
   ];
 
   const headers = {
@@ -141,17 +155,23 @@ export async function fetchCompetitionsFromUnstop() {
     'Accept': 'application/json, text/plain, */*',
   };
 
-  const fetchPromises = queryEndpoints.map(q =>
-    fetch(`https://unstop.com/api/public/opportunity/search-result?${q}`, { headers })
-      .then(res => (res.ok ? res.json() : null))
-      .then(json => (json?.data?.data || []))
-      .catch(err => {
-        console.warn(`Error querying Unstop for [${q}]:`, err.message);
-        return [];
-      })
-  );
+  const fetchChunk = (chunk) =>
+    Promise.all(
+      chunk.map(q =>
+        fetch(`https://unstop.com/api/public/opportunity/search-result?${q}`, { headers })
+          .then(res => (res.ok ? res.json() : null))
+          .then(json => (json?.data?.data || []))
+          .catch(err => {
+            console.warn(`Error querying Unstop for [${q}]:`, err.message);
+            return [];
+          })
+      )
+    );
 
-  const batches = await Promise.all(fetchPromises);
+  const chunk1 = queryEndpoints.slice(0, 15);
+  const chunk2 = queryEndpoints.slice(15);
+  const [res1, res2] = await Promise.all([fetchChunk(chunk1), fetchChunk(chunk2)]);
+  const batches = [...res1, ...res2];
   const now = Date.now();
 
   const map = new Map();
