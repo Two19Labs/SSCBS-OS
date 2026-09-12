@@ -202,12 +202,12 @@ export async function fetchCompetitionsFromUnstop() {
     const isFree = !item.isPaid;
     const isFirstYearFriendly = isFree && (maxTeam >= 1 && maxTeam <= 5);
 
-    // Extract prizes
+    // Extract prizes: calculate true cumulative cash pool across all positions
     let prizeDisplay = 'Certificates & Recognition';
     if (Array.isArray(item.prizes) && item.prizes.length > 0) {
-      const maxCash = item.prizes.reduce((max, p) => (p.cash && p.cash > max ? p.cash : max), 0);
-      if (maxCash > 0) {
-        prizeDisplay = `₹${maxCash.toLocaleString('en-IN')} Cash Pool`;
+      const totalCash = item.prizes.reduce((sum, p) => sum + (Number(p.cash) || 0), 0);
+      if (totalCash > 0) {
+        prizeDisplay = `₹${totalCash.toLocaleString('en-IN')} Cash Pool`;
       } else if (item.prizes.some(p => p.rank)) {
         prizeDisplay = item.prizes.map(p => p.rank).filter(Boolean).slice(0, 2).join(' · ');
       }
