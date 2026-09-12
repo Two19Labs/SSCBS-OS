@@ -113,6 +113,7 @@ function isUndergradEligible(item) {
 export async function fetchCompetitionsFromUnstop() {
   const queryEndpoints = [
     'opportunity=competitions&subType=case-competitions&per_page=50',
+    'opportunity=competitions&searchTerm=case competitions&per_page=50',
     'opportunity=competitions&searchTerm=case&per_page=50',
     'opportunity=competitions&searchTerm=case study&per_page=50',
     'opportunity=competitions&searchTerm=consulting&per_page=50',
