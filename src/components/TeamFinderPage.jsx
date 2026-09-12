@@ -1132,6 +1132,7 @@ function getUserApp(post, applications, userEmail, userId) {
             <RefreshIcon size={14} className={isRefreshing ? 'spin-icon' : ''} />
             <span>{isRefreshing ? 'Refreshing…' : 'Refresh Listings'}</span>
           </button>
+          {refreshToast && <span className="refresh-toast-msg">{refreshToast}</span>}
 
           <button className="btn-tf-primary" onClick={handleOpenCreateModal}>
             <UsersIcon size={16} />
@@ -1139,20 +1140,6 @@ function getUserApp(post, applications, userEmail, userId) {
           </button>
         </div>
       </header>
-
-      {/* ── Teaming Guidelines & Auto-Cleanup Banner ── */}
-      <div className="tf-cleanup-notice">
-        <div className="cleanup-notice-icon">🧹</div>
-        <div className="cleanup-notice-text">
-          <strong>Teaming Guidelines:</strong> Please delete your listing once your squad is sorted! To keep the feed fresh and prevent piling up, listings auto-delete after <strong>168 hours (7 days)</strong>.
-        </div>
-      </div>
-
-      {/* ── Refresh Tip Banner ── */}
-      <div className="tf-refresh-tip">
-        <span>💡 Been on this page for a while? Click <strong>Refresh Listings</strong> above to see recent moves by peers!</span>
-        {refreshToast && <span className="refresh-toast-msg">{refreshToast}</span>}
-      </div>
 
       {/* ── Tab Switcher & Search Bar ── */}
       <div className="tf-controls-bar">
