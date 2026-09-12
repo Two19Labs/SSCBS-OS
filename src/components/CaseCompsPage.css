@@ -917,10 +917,12 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  row-gap: 4px;
   font-size: 0.76rem;
   color: var(--ink-dim);
   font-weight: 600;
   min-height: 20px;
+  flex-wrap: wrap;
 }
 
 .cc-spec-item {
@@ -948,9 +950,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  row-gap: 4px;
   font-size: 0.74rem;
   color: var(--ink-dim);
   min-height: 22px;
+  flex-wrap: wrap;
 }
 
 .cc-footer-metric-left {
@@ -1148,47 +1152,246 @@
   border-color: var(--ink);
 }
 
-/* ── Responsive Mobile Styles ── */
-@media (max-width: 860px) {
-  .cc-metrics-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+/* ── Multi-Device Responsive System (Mobile, Tablet, Laptop, Desktop) ── */
 
-  .cc-playbook-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
+/* 1. Large Tablet & Laptop (641px - 1080px) */
+@media (min-width: 641px) and (max-width: 1080px) {
   .cc-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 16px;
+  }
+
+  .cc-controls-bar {
+    gap: 10px;
   }
 }
 
-@media (max-width: 540px) {
+/* 2. Desktop & Ultra-wide (> 1080px) */
+@media (min-width: 1081px) {
+  .cc-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 18px;
+  }
+}
+
+/* 3. Phablet & Tablet Transition (<= 768px) */
+@media (max-width: 768px) {
+  .case-comps-container {
+    padding: 0 0 32px;
+    gap: 16px;
+  }
+
+  .cc-controls-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .cc-controls-left {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .cc-controls-right {
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .cc-sort-box {
+    flex: 1;
+    min-width: 180px;
+  }
+
+  .cc-sort-select {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* 4. Mobile Devices (<= 640px) */
+@media (max-width: 640px) {
+  .cc-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px;
+  }
+
   .cc-header {
     flex-direction: column;
     align-items: stretch;
+    gap: 12px;
+    padding-bottom: 12px;
+  }
+
+  .cc-header-left {
+    align-items: center;
+    gap: 10px;
+  }
+
+  .cc-title {
+    font-size: 1.25rem;
+  }
+
+  .cc-subtitle {
+    font-size: 0.8rem;
   }
 
   .cc-header-actions {
+    width: 100%;
+    display: flex;
     justify-content: flex-end;
   }
 
-  .cc-pill-filters {
-    flex-direction: column;
-    align-items: stretch;
+  .cc-refresh-btn {
+    padding: 6px 12px;
+    font-size: 0.78rem;
   }
 
+  .cc-unstop-notice-banner {
+    padding: 6px 10px;
+    font-size: 0.74rem;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .cc-unstop-notice-tag {
+    margin-top: 1px;
+  }
+
+  .cc-search-input {
+    font-size: 16px; /* Prevents auto-zoom in iOS Safari */
+    padding: 9px 36px 9px 36px;
+  }
+
+  /* Smooth horizontal scroll with hidden scrollbar for tabs */
   .cc-tabs {
     overflow-x: auto;
     flex-wrap: nowrap;
-    padding-bottom: 4px;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    margin: 0 -4px;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .cc-tabs::-webkit-scrollbar {
+    display: none;
   }
 
   .cc-tab-btn {
     white-space: nowrap;
+    flex-shrink: 0;
+    padding: 6px 11px;
+    font-size: 0.78rem;
   }
 
-  .cc-playbook-grid {
-    grid-template-columns: 1fr;
+  .cc-card-inner {
+    padding: 16px 16px;
+    gap: 11px;
+  }
+
+  .cc-card-title {
+    font-size: 0.98rem;
+    min-height: 2.65rem;
+    height: 2.65rem;
+  }
+
+  .cc-prize-bar {
+    padding: 6px 10px;
+  }
+
+  .cc-prize-text {
+    font-size: 0.8rem;
+  }
+
+  .cc-action-btn {
+    height: 36px;
+    font-size: 0.76rem;
+  }
+}
+
+/* 5. Extra Small Mobile Phones (<= 400px, e.g. iPhone SE, Fold closed) */
+@media (max-width: 400px) {
+  .case-comps-container {
+    gap: 12px;
+    padding: 0 0 24px;
+  }
+
+  .cc-card-inner {
+    padding: 14px 13px;
+    gap: 10px;
+  }
+
+  .cc-host-logo,
+  .cc-host-avatar {
+    width: 42px;
+    height: 42px;
+  }
+
+  .cc-host-name {
+    font-size: 0.8rem;
+  }
+
+  .cc-card-title {
+    font-size: 0.92rem;
+    line-height: 1.3;
+    min-height: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .cc-filter-pill-group {
+    flex: 1 1 100%;
+    justify-content: space-between;
+  }
+
+  .cc-filter-pill-btn {
+    flex: 1;
+    text-align: center;
+    padding: 4px 6px;
+    font-size: 0.7rem;
+  }
+
+  .cc-specs-row {
+    font-size: 0.72rem;
+    gap: 6px;
+  }
+
+  .cc-card-footer-metric {
+    font-size: 0.7rem;
+    gap: 6px;
+  }
+
+  .cc-card-actions {
+    gap: 6px;
+  }
+
+  .cc-action-btn {
+    font-size: 0.72rem;
+    padding: 0 6px;
+    gap: 4px;
+  }
+
+  .cc-share-icon-btn {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+/* 6. Ultra-Narrow Devices (<= 340px) */
+@media (max-width: 340px) {
+  .cc-card-actions {
+    flex-wrap: wrap;
+  }
+
+  .cc-btn-apply {
+    flex: 1 1 100%;
+  }
+
+  .cc-btn-team {
+    flex: 1 1 auto;
   }
 }
