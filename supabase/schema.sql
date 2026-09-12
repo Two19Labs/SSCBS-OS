@@ -377,7 +377,7 @@ CREATE TABLE IF NOT EXISTS public.squad_applications (
     applicant_year TEXT DEFAULT '2nd Year',
     pitch_note TEXT NOT NULL,
     highlighted_skills TEXT[] DEFAULT '{}'::TEXT[],
-    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'declined')),
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'declined', 'removed')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );

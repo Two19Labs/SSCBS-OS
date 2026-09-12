@@ -117,7 +117,9 @@ export default function NotificationCenter({ onNavigate }) {
     } else if (actionType === 'read_notice' || notif.type === 'event') {
       onNavigate('buzz');
     } else if (actionType === 'team_view' || notif.type?.startsWith('team_')) {
-      onNavigate('team-finder');
+      const postId = notif.actionData?.postId || notif.action_data?.postId;
+      const isReviewMode = notif.type === 'team_req';
+      onNavigate('team-finder', postId ? { openPostId: postId, reviewMode: isReviewMode } : null);
     } else {
       onNavigate('home');
     }

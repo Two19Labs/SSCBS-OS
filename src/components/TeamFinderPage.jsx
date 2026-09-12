@@ -42,13 +42,21 @@ const PRESET_ORGANIZERS = [
   'L\'Oréal',
 ];
 
-function formatWhatsAppUrl(phone, textMessage = '') {
-  if (!phone) return '#';
-  let digits = String(phone).replace(/\D/g, '');
-  if (digits.length === 10) {
-    digits = '91' + digits;
+function sanitizeIndianPhone(raw) {
+  if (!raw) return '';
+  let digits = String(raw).replace(/\D/g, '');
+  if (digits.length === 12 && digits.startsWith('91')) {
+    digits = digits.slice(2);
+  } else if (digits.length === 11 && digits.startsWith('0')) {
+    digits = digits.slice(1);
   }
-  return `https://wa.me/${digits}${textMessage ? `?text=${encodeURIComponent(textMessage)}` : ''}`;
+  return digits.slice(0, 10);
+}
+
+function formatWhatsAppUrl(phone, textMessage = '') {
+  const cleanPhone = sanitizeIndianPhone(phone);
+  if (!cleanPhone || cleanPhone.length !== 10) return '#';
+  return `https://wa.me/91${cleanPhone}${textMessage ? `?text=${encodeURIComponent(textMessage)}` : ''}`;
 }
 
 function formatStudentName(rawName, email) {
@@ -151,6 +159,14 @@ export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill 
 
   const POST_EXPIRATION_MS = 168 * 60 * 60 * 1000; // 168 hours (7 days / 1 week)
 
+  const invalidateSessionCache = () => {
+    try {
+      sessionStorage.removeItem('sscbs_cached_team_posts');
+      sessionStorage.removeItem('sscbs_cached_team_apps');
+      sessionStorage.removeItem('sscbs_cached_team_time');
+    } catch (e) {}
+  };
+
   // Fetch real posts & applications from Supabase
   const fetchPostsAndApps = async (force = false) => {
     const now = Date.now();
@@ -185,10 +201,13 @@ export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill 
     setLoading(true);
     try {
       if (hasValidCredentials) {
+        const sevenDaysAgo = new Date(now - POST_EXPIRATION_MS).toISOString();
+
         const [postsRes, appsRes] = await Promise.all([
           supabase
             .from('squad_posts')
             .select('id, user_id, competition_name, organizer, competition_link, phone_number, title, description, skills_have, skills_looking_for, total_members, initial_open_spots, spots_left, accepted_emails, course, year, is_open, created_by_email, created_by_name, created_at, updated_at')
+            .gte('created_at', sevenDaysAgo)
             .order('created_at', { ascending: false })
             .limit(50),
           supabase
@@ -264,6 +283,11 @@ export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill 
   useEffect(() => {
     fetchPostsAndApps();
 
+    // 30s background poll for seamless updates
+    const pollInterval = setInterval(() => {
+      fetchPostsAndApps(true);
+    }, 30000);
+
     if (hasValidCredentials) {
       const channelPosts = supabase
         .channel('public:squad_posts')
@@ -280,10 +304,13 @@ export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill 
         .subscribe();
 
       return () => {
+        clearInterval(pollInterval);
         supabase.removeChannel(channelPosts);
         supabase.removeChannel(channelApps);
       };
     }
+
+    return () => clearInterval(pollInterval);
   }, []);
 
   // Smart default tab: if user has 0 posts of their own, auto-switch to "Other Listings"
@@ -312,7 +339,7 @@ export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill 
       }
     }
 
-    if (prefill) {
+    if (prefill && prefill.competition_name && !prefill.openPostId) {
       setEditingPost(null);
       setFormData((prev) => ({
         ...prev,
@@ -329,6 +356,24 @@ export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill 
       if (typeof onClearPrefill === 'function') onClearPrefill();
     }
   }, [initialPrefill, onClearPrefill]);
+
+  // Auto-open review modal or view details when deep-linked from notifications
+  useEffect(() => {
+    if (!initialPrefill?.openPostId || posts.length === 0) return;
+
+    const targetPost = posts.find((p) => String(p.id) === String(initialPrefill.openPostId));
+    if (targetPost) {
+      const isHost = isUserPost(targetPost, user);
+      if (initialPrefill.reviewMode || isHost) {
+        setHasUserToggledTab(true);
+        setActiveTab('my');
+        setSelectedPostForReview(targetPost);
+      } else {
+        setSelectedPostForView(targetPost);
+      }
+      if (typeof onClearPrefill === 'function') onClearPrefill();
+    }
+  }, [initialPrefill, posts, user, onClearPrefill]);
 
   const handleOpenCreateModal = () => {
     setEditingPost(null);
@@ -455,7 +500,7 @@ export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill 
       setFormError('Please write a brief description for your opening.');
       return;
     }
-    const cleanPostPhone = (formData.phone_number || '').replace(/\D/g, '');
+    const cleanPostPhone = sanitizeIndianPhone(formData.phone_number);
     if (!cleanPostPhone || cleanPostPhone.length !== 10) {
       setFormError('Please enter a valid compulsory 10-digit WhatsApp phone number (e.g. 9876543210).');
       return;
@@ -478,17 +523,20 @@ export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill 
 
     if (editingPost) {
       // ── EDIT EXISTING POST ──
+      const currentAccepted = Array.isArray(editingPost.accepted_emails) ? editingPost.accepted_emails : [];
+      const initialOpen = openSpots + currentAccepted.length;
+
       const updatePayload = {
         competition_name: formData.competition_name.trim(),
         organizer: formData.organizer.trim() || 'Corporate / Society',
         competition_link: formattedLink,
-        phone_number: formData.phone_number.trim(),
+        phone_number: cleanPostPhone,
         title: descText,
         description: descText,
         skills_have: formData.skills_have,
         skills_looking_for: formData.skills_looking_for,
         total_members: totalMem,
-        initial_open_spots: openSpots,
+        initial_open_spots: initialOpen,
         spots_left: openSpots,
         course: userCourse,
         year: userSem,
@@ -506,6 +554,7 @@ export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill 
       const updated = posts.map((p) => (p.id === editingPost.id ? { ...p, ...updatePayload } : p));
       setPosts(updated);
       localStorage.setItem('sscbs_squad_posts', JSON.stringify(updated));
+      invalidateSessionCache();
 
       setSubmitting(false);
       setIsCreateModalOpen(false);
@@ -521,7 +570,7 @@ export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill 
       competition_name: formData.competition_name.trim(),
       organizer: formData.organizer.trim() || 'Corporate / Society',
       competition_link: formattedLink,
-      phone_number: formData.phone_number.trim(),
+      phone_number: cleanPostPhone,
       title: descText,
       description: descText,
       skills_have: formData.skills_have,
@@ -589,10 +638,7 @@ export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill 
     const updated = [postPayload, ...posts.filter((p) => p.id !== postPayload.id)];
     setPosts(updated);
     localStorage.setItem('sscbs_squad_posts', JSON.stringify(updated));
-    try {
-      sessionStorage.removeItem('sscbs_cached_team_posts');
-      sessionStorage.removeItem('sscbs_cached_team_time');
-    } catch (e) {}
+    invalidateSessionCache();
 
     // Switch to 'my' tab so the author sees their new post immediately
     setHasUserToggledTab(true);
@@ -616,10 +662,7 @@ export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill 
     const updated = posts.filter((p) => p.id !== id);
     setPosts(updated);
     localStorage.setItem('sscbs_squad_posts', JSON.stringify(updated));
-    try {
-      sessionStorage.removeItem('sscbs_cached_team_posts');
-      sessionStorage.removeItem('sscbs_cached_team_time');
-    } catch (e) {}
+    invalidateSessionCache();
   };
 
   const handleToggleStatus = async (id, currentOpenState) => {
@@ -628,6 +671,7 @@ export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill 
     );
     setPosts(updated);
     localStorage.setItem('sscbs_squad_posts', JSON.stringify(updated));
+    invalidateSessionCache();
 
     try {
       if (hasValidCredentials) {
@@ -659,7 +703,7 @@ export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill 
       setApplyError('Please write a short pitch note.');
       return;
     }
-    const cleanApplyPhone = (applyForm.applicant_phone || '').replace(/\D/g, '');
+    const cleanApplyPhone = sanitizeIndianPhone(applyForm.applicant_phone);
     if (!cleanApplyPhone || cleanApplyPhone.length !== 10) {
       setApplyError('Please enter a valid compulsory 10-digit WhatsApp phone number (e.g. 9876543210).');
       return;
@@ -674,7 +718,7 @@ export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill 
       applicant_id: user?.id,
       applicant_name: user?.user_metadata?.full_name || user?.email.split('@')[0],
       applicant_email: user?.email,
-      applicant_phone: applyForm.applicant_phone.trim(),
+      applicant_phone: cleanApplyPhone,
       applicant_course: user?.user_metadata?.course || 'BMS',
       applicant_year: user?.user_metadata?.semester ? `Sem ${user.user_metadata.semester}` : '2nd Year',
       pitch_note: applyForm.pitch_note.trim(),
@@ -753,6 +797,7 @@ export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill 
     ];
     setApplications(updatedApps);
     localStorage.setItem('sscbs_squad_apps', JSON.stringify(updatedApps));
+    invalidateSessionCache();
 
     setApplySubmitting(false);
     setApplySuccess('🎉 Join request submitted! The team lead will review your application.');
@@ -824,6 +869,12 @@ function getUserApp(post, applications, userEmail, userId) {
     const post = posts.find((p) => String(p.id) === String(app.post_id));
     if (!post) return;
 
+    const currentOpen = getPostOpenSpots(post, applications);
+    if (currentOpen <= 0) {
+      alert('All open spots in this squad are already filled! Remove an accepted member or edit your listing to accept more.');
+      return;
+    }
+
     const appEmailLower = (app.applicant_email || '').toLowerCase();
     const currentAcceptedEmails = Array.isArray(post.accepted_emails) ? post.accepted_emails : [];
 
@@ -850,6 +901,7 @@ function getUserApp(post, applications, userEmail, userId) {
     );
     setPosts(updatedPosts);
     localStorage.setItem('sscbs_squad_posts', JSON.stringify(updatedPosts));
+    invalidateSessionCache();
 
     try {
       if (hasValidCredentials) {
@@ -884,6 +936,7 @@ function getUserApp(post, applications, userEmail, userId) {
     );
     setApplications(updatedApps);
     localStorage.setItem('sscbs_squad_apps', JSON.stringify(updatedApps));
+    invalidateSessionCache();
 
     try {
       if (hasValidCredentials) {
@@ -936,6 +989,7 @@ function getUserApp(post, applications, userEmail, userId) {
     );
     setPosts(updatedPosts);
     localStorage.setItem('sscbs_squad_posts', JSON.stringify(updatedPosts));
+    invalidateSessionCache();
 
     try {
       if (hasValidCredentials) {
@@ -1026,6 +1080,7 @@ function getUserApp(post, applications, userEmail, userId) {
         (post.competition_name || '').toLowerCase().includes(q) ||
         (post.organizer || '').toLowerCase().includes(q) ||
         (post.title || '').toLowerCase().includes(q) ||
+        (post.description || '').toLowerCase().includes(q) ||
         (post.skills_looking_for || []).some((s) => s.toLowerCase().includes(q)) ||
         (post.skills_have || []).some((s) => s.toLowerCase().includes(q));
 
@@ -1526,10 +1581,10 @@ function getUserApp(post, applications, userEmail, userId) {
                   <input
                     type="tel"
                     required
-                    maxLength={10}
+                    maxLength={16}
                     placeholder="10-digit number (e.g. 9876543210)"
                     value={formData.phone_number}
-                    onChange={(e) => setFormData({ ...formData, phone_number: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                    onChange={(e) => setFormData({ ...formData, phone_number: sanitizeIndianPhone(e.target.value) })}
                   />
                 </div>
               </div>
@@ -1742,10 +1797,10 @@ function getUserApp(post, applications, userEmail, userId) {
                 <input
                   type="tel"
                   required
-                  maxLength={10}
+                  maxLength={16}
                   placeholder="10-digit phone (e.g. 9876543210)"
                   value={applyForm.applicant_phone}
-                  onChange={(e) => setApplyForm({ ...applyForm, applicant_phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                  onChange={(e) => setApplyForm({ ...applyForm, applicant_phone: sanitizeIndianPhone(e.target.value) })}
                 />
               </div>
 
@@ -1802,9 +1857,15 @@ function getUserApp(post, applications, userEmail, userId) {
             <div className="tf-modal-header">
               <div>
                 <h3>Review Team Applicants</h3>
-                <p className="tf-modal-subtitle">
-                  {selectedPostForReview.competition_name} • {getPostOpenSpots(selectedPostForReview, applications)} open spot(s)
-                </p>
+                {(() => {
+                  const activeReviewPost = posts.find((p) => String(p.id) === String(selectedPostForReview.id)) || selectedPostForReview;
+                  const openSpotsRemaining = getPostOpenSpots(activeReviewPost, applications);
+                  return (
+                    <p className="tf-modal-subtitle">
+                      {activeReviewPost.competition_name} • {openSpotsRemaining} open spot(s)
+                    </p>
+                  );
+                })()}
               </div>
               <button type="button" className="tf-close-btn" onClick={() => setSelectedPostForReview(null)} aria-label="Close">
                 ×
@@ -1814,6 +1875,8 @@ function getUserApp(post, applications, userEmail, userId) {
             <div className="review-apps-body">
               {(() => {
                 const postApps = applications.filter((a) => a.post_id === selectedPostForReview.id);
+                const activeReviewPost = posts.find((p) => String(p.id) === String(selectedPostForReview.id)) || selectedPostForReview;
+                const openSpotsRemaining = getPostOpenSpots(activeReviewPost, applications);
 
                 if (postApps.length === 0) {
                   return (
@@ -1826,6 +1889,23 @@ function getUserApp(post, applications, userEmail, userId) {
 
                 return (
                   <div className="apps-review-list">
+                    {openSpotsRemaining <= 0 && (
+                      <div style={{
+                        margin: '0 0 16px 0',
+                        padding: '10px 14px',
+                        background: 'rgba(239, 68, 68, 0.08)',
+                        border: '1px solid rgba(239, 68, 68, 0.25)',
+                        borderRadius: '8px',
+                        fontSize: '0.85rem',
+                        color: 'var(--danger, #ef4444)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}>
+                        <span>⚠️</span>
+                        <span><strong>All open spots are filled!</strong> To accept additional applicants, remove an accepted member below or edit your post to increase total team size.</span>
+                      </div>
+                    )}
                     {postApps.map((app) => (
                       <div key={app.id} className={`app-review-card ${app.status}`}>
                         <div className="app-card-header">
@@ -1876,8 +1956,11 @@ function getUserApp(post, applications, userEmail, userId) {
                               <button
                                 className="btn-accept-app"
                                 onClick={() => handleAcceptApplicant(app)}
+                                disabled={openSpotsRemaining <= 0}
+                                title={openSpotsRemaining <= 0 ? "Squad is full. Remove a member or expand team size." : "Accept applicant"}
+                                style={openSpotsRemaining <= 0 ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
                               >
-                                ✓ Accept & Fill Spot
+                                {openSpotsRemaining <= 0 ? 'Squad Full' : '✓ Accept & Fill Spot'}
                               </button>
                               <button
                                 className="btn-card-subtle danger"

@@ -18,7 +18,30 @@ UPDATE public.squad_posts
 SET initial_open_spots = COALESCE(spots_left, 1)
 WHERE initial_open_spots IS NULL;
 
--- 4. Verify columns created properly
+-- 4. Update squad_applications status check constraint to include 'removed'
+ALTER TABLE public.squad_applications 
+DROP CONSTRAINT IF EXISTS squad_applications_status_check;
+
+ALTER TABLE public.squad_applications 
+ADD CONSTRAINT squad_applications_status_check 
+CHECK (status IN ('pending', 'accepted', 'declined', 'removed'));
+
+-- 5. Enable Realtime Replication for Team Finder tables
+DO $$
+BEGIN
+    BEGIN
+        ALTER PUBLICATION supabase_realtime ADD TABLE public.squad_posts;
+    EXCEPTION
+        WHEN duplicate_object THEN NULL;
+    END;
+    BEGIN
+        ALTER PUBLICATION supabase_realtime ADD TABLE public.squad_applications;
+    EXCEPTION
+        WHEN duplicate_object THEN NULL;
+    END;
+END $$;
+
+-- 6. Verify columns and constraint created properly
 SELECT column_name, data_type, column_default
 FROM information_schema.columns
 WHERE table_schema = 'public' AND table_name = 'squad_posts'
