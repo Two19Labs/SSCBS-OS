@@ -1536,7 +1536,7 @@
 }
 
 .home-case-comps-tag {
-  background: #2563eb;
+  background: #1c4980;
   color: #ffffff !important;
   font-weight: 700;
   font-size: 0.75rem;
@@ -1545,11 +1545,12 @@
   display: inline-flex;
   align-items: center;
   letter-spacing: 0.2px;
-  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 1px 3px rgba(28, 73, 128, 0.3);
 }
 
 [data-theme='dark'] .home-case-comps-tag {
-  background: #2563eb !important;
+  background: #1c4980 !important;
   color: #ffffff !important;
-  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 1px 4px rgba(28, 73, 128, 0.4);
 }

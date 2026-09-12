@@ -608,7 +608,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
                   <span
                     className="home-case-comps-tag"
                     style={{
-                      background: '#2563eb',
+                      background: '#1c4980',
                       color: '#ffffff',
                       fontWeight: 700,
                       fontSize: '0.75rem',
@@ -617,7 +617,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
                       display: 'inline-flex',
                       alignItems: 'center',
                       letterSpacing: '0.2px',
-                      boxShadow: '0 1px 3px rgba(37, 99, 235, 0.3)',
+                      boxShadow: '0 1px 3px rgba(28, 73, 128, 0.3)',
                     }}
                   >
                     Live from Unstop
