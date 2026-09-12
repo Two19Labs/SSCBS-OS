@@ -393,6 +393,9 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
       if (feeFilter === 'free' && !comp.isFree) return false;
       if (feeFilter === 'paid' && comp.isFree) return false;
 
+      // Undergraduate eligibility check
+      if (comp.isUndergradEligible === false) return false;
+
       return true;
     });
 
@@ -460,11 +463,11 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
         </div>
       </header>
 
-      {/* ── Very Visible Notice: Unstop Exclusivity ── */}
+      {/* ── Very Visible Notice: Unstop Exclusivity & Undergrad Filter ── */}
       <div className="cc-unstop-notice-banner">
         <span className="cc-unstop-notice-tag">UNSTOP ONLY</span>
         <span className="cc-unstop-notice-text">
-          <strong>Notice:</strong> Synced exclusively from <strong>Unstop</strong>. Competitions hosted outside Unstop are not listed here.
+          <strong>Notice:</strong> Curated for <strong>Undergraduate eligibility</strong>, synced directly from <strong>Unstop</strong>. External opportunities are not shown.
         </span>
       </div>
 

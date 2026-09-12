@@ -69,6 +69,47 @@ function matchesKeyword(text, keyword) {
   return text.includes(keyword);
 }
 
+// Strict eligibility check: Only allow competitions that undergraduates can participate in
+function isUndergradEligible(item) {
+  if (!item) return false;
+
+  const filterNames = (item.filters || []).map(f => (f.name || '').toLowerCase().trim());
+  const hasAll = filterNames.length === 0 || filterNames.includes('all');
+  const hasUG = filterNames.some(f => f.includes('undergraduate'));
+  const hasPG = filterNames.some(f => f.includes('postgraduate'));
+  const isSchoolOnly = filterNames.length > 0 && filterNames.every(f => f.includes('school'));
+  
+  const title = (item.title || '').toLowerCase();
+  const mbaOnlyTitle = /\b(mba\s+only|pgdm\s+only|postgraduate\s+only|only\s+for\s+mba|mba\s+students\s+only|only\s+mba)\b/i.test(title);
+
+  // Strictly exclude if MBA/Postgraduate only, school-only, or MBA-only in title
+  if ((hasPG && !hasUG && !hasAll) || mbaOnlyTitle || isSchoolOnly) {
+    return false;
+  }
+
+  // Check structured registration eligibility payload from Unstop
+  let regnEligibility = item.regnRequirements?.eligibility;
+  if (typeof regnEligibility === 'string') {
+    try {
+      regnEligibility = JSON.parse(regnEligibility);
+    } catch (e) {}
+  }
+
+  if (regnEligibility && typeof regnEligibility === 'object') {
+    const bSchools = Array.isArray(regnEligibility.bSchools) ? regnEligibility.bSchools : [];
+    const arts = Array.isArray(regnEligibility.arts) ? regnEligibility.arts : [];
+    const engineering = Array.isArray(regnEligibility.engineering) ? regnEligibility.engineering : [];
+    const others = Array.isArray(regnEligibility.others) ? regnEligibility.others : [];
+
+    // If strictly restricted to B-schools with no undergrad/arts/tech access
+    if (bSchools.length > 0 && arts.length === 0 && engineering.length === 0 && (others.length === 0 || (others.length === 1 && others[0] === 'all' && hasPG && !hasUG))) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 export async function fetchCompetitionsFromUnstop() {
   const queryEndpoints = [
     'opportunity=competitions&subType=case-competitions&per_page=50',
@@ -130,6 +171,9 @@ export async function fetchCompetitionsFromUnstop() {
         const deadlineTime = new Date(item.regnRequirements.end_regn_dt).getTime();
         if (deadlineTime < now) continue;
       }
+
+      // Strictly exclude non-undergraduate (MBA/PG only, school only) competitions
+      if (!isUndergradEligible(item)) continue;
 
       map.set(item.id, item);
     }
@@ -210,6 +254,7 @@ export async function fetchCompetitionsFromUnstop() {
       isFirstYearFriendly,
       registeredCount: item.registerCount || 0,
       viewsCount: item.viewsCount || 0,
+      isUndergradEligible: true,
     };
   });
 
