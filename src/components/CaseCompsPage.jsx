@@ -464,7 +464,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
       <div className="cc-unstop-notice-banner">
         <span className="cc-unstop-notice-tag">UNSTOP ONLY</span>
         <span className="cc-unstop-notice-text">
-          <strong>Notice:</strong> This directory indexes opportunities synced exclusively from <strong>Unstop</strong>. Other case competitions hosted outside Unstop (e.g. independent college websites, Google Forms, direct corporate portals) are not shown here.
+          <strong>Notice:</strong> Synced exclusively from <strong>Unstop</strong>. Competitions hosted outside Unstop are not listed here.
         </span>
       </div>
 
@@ -671,10 +671,6 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
                       <div className="cc-host-meta">
                         <span className="cc-host-name" title={comp.orgName || 'Academic Host'}>
                           {comp.orgName || 'Academic Host'}
-                        </span>
-                        <span className={`cc-circuit-tag ${circuit.type}`}>
-                          <span className="cc-circuit-icon">{circuit.icon}</span>
-                          <span>{circuit.label}</span>
                         </span>
                       </div>
                     </div>

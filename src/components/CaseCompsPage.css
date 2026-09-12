@@ -120,32 +120,38 @@
   line-height: 1.45;
 }
 
-/* ── Very Visible Notice: Unstop Exclusivity ── */
+/* ── Slim Notice: Unstop Exclusivity ── */
 .cc-unstop-notice-banner {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  align-items: center;
+  gap: 8px;
   background: rgba(28, 73, 128, 0.05);
   border: 1px solid rgba(28, 73, 128, 0.18);
-  border-left: 3.5px solid #1c4980;
-  border-radius: 8px;
-  padding: 9px 13px;
-  font-size: 0.81rem;
-  line-height: 1.45;
+  border-left: 3px solid #1c4980;
+  border-radius: 6px;
+  padding: 5px 11px;
+  font-size: 0.77rem;
+  line-height: 1.35;
   color: var(--ink-dim);
 }
 
 .cc-unstop-notice-tag {
   background: #1c4980;
   color: #ffffff;
-  font-size: 0.64rem;
+  font-size: 0.62rem;
   font-weight: 800;
-  letter-spacing: 0.5px;
-  padding: 2px 6px;
+  letter-spacing: 0.4px;
+  padding: 1.5px 6px;
   border-radius: 4px;
   white-space: nowrap;
   flex-shrink: 0;
-  margin-top: 1px;
+  line-height: 1.2;
+}
+
+.cc-unstop-notice-text {
+  font-size: 0.77rem;
+  line-height: 1.35;
+  color: var(--ink-dim);
 }
 
 .cc-unstop-notice-text strong {
@@ -593,40 +599,40 @@
   flex: 1;
 }
 
-/* ── Top Bar: Host Identity + Circuit + Urgency ── */
+/* ── Top Bar: Host Identity + Urgency ── */
 .cc-card-top-bar {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
 }
 
 .cc-host-identity {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   min-width: 0;
   flex: 1;
 }
 
 .cc-host-logo {
-  width: 38px;
-  height: 38px;
-  border-radius: 9px;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
   object-fit: contain;
   background: #ffffff;
   border: 1px solid var(--border);
   flex-shrink: 0;
-  padding: 2px;
+  padding: 3px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .cc-host-avatar {
-  width: 38px;
-  height: 38px;
-  border-radius: 9px;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
   border: 1px solid var(--border);
-  font-size: 0.95rem;
+  font-size: 1.15rem;
   font-weight: 800;
   display: flex;
   align-items: center;
@@ -675,16 +681,16 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  gap: 2px;
+  flex: 1;
+  justify-content: center;
 }
 
 .cc-host-name {
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 0.84rem;
+  font-weight: 650;
   color: var(--ink-dim);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.35;
+  word-break: break-word;
 }
 
 .cc-circuit-tag {
@@ -722,6 +728,7 @@
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
+  margin-top: 3px;
 }
 
 /* ── Exact Deadline Countdown Chip (Red / Yellow / Green) ── */
