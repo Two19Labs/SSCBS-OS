@@ -1554,3 +1554,17 @@
   border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 1px 4px rgba(28, 73, 128, 0.4);
 }
+
+.home-case-comps-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .home-case-comps-actions {
+    width: 100%;
+  }
+}
+

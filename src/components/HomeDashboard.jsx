@@ -628,9 +628,31 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
                 </div>
               </div>
             </div>
-            <button className="home-tt-btn primary" style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
-              Explore Case Comps →
-            </button>
+            <div className="home-case-comps-actions">
+              <button 
+                className="home-tt-btn primary" 
+                style={{ whiteSpace: 'nowrap', justifyContent: 'center' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onNavigate('case-comps');
+                }}
+              >
+                Explore Case Comps →
+              </button>
+              {hasTeamFinderAccess && (
+                <button 
+                  className="home-tt-btn" 
+                  style={{ whiteSpace: 'nowrap', justifyContent: 'center' }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onNavigate('team-finder');
+                  }}
+                  title="Find teammates on Team Finder"
+                >
+                  Find teammates →
+                </button>
+              )}
+            </div>
           </div>
         )}
 
