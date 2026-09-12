@@ -4,37 +4,40 @@ import './FooterCredit.css';
 export default function FooterCredit({ className = '' }) {
   return (
     <footer className={`global-footer-credit ${className}`}>
-      <span>
-        Made with <span className="heart-icon">♥</span> by{' '}
-        <a
-          href="https://www.linkedin.com/in/aditya-singhani-69294a27a/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="developer-name linkedin-link"
-        >
-          Aditya Singhani
-        </a>{' '}
-        &amp;{' '}
-        <a
-          href="https://www.linkedin.com/in/manthan-kabra/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="developer-name linkedin-link"
-        >
-          Manthan Kabra
-        </a>
-      </span>
-      <span className="house-credit">
-        From the House of{' '}
-        <a
-          href="https://two19labs.in/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="developer-name linkedin-link"
-        >
-          Two19 Labs
-        </a>
-      </span>
+      <div className="credit-main">
+        <span>
+          Made with <span className="heart-icon">♥</span> by{' '}
+          <a
+            href="https://www.linkedin.com/in/aditya-singhani-69294a27a/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="developer-name linkedin-link"
+          >
+            Aditya Singhani
+          </a>{' '}
+          &amp;{' '}
+          <a
+            href="https://www.linkedin.com/in/manthan-kabra/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="developer-name linkedin-link"
+          >
+            Manthan Kabra
+          </a>
+        </span>
+        <span className="credit-separator"> · </span>
+        <span className="house-credit">
+          From the House of{' '}
+          <a
+            href="https://two19labs.in/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="developer-name linkedin-link"
+          >
+            Two19 Labs
+          </a>
+        </span>
+      </div>
     </footer>
   );
 }

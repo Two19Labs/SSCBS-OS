@@ -645,7 +645,6 @@
   font-weight: 700;
 }
 
-/* Credits Footer in Auth Panel */
 .auth-credit-footer {
   margin-top: 32px;
   text-align: center;
@@ -657,6 +656,19 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
+}
+
+.auth-credit-footer .auth-credit-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  row-gap: 2px;
+}
+
+.auth-credit-footer .auth-credit-sep {
+  opacity: 0.6;
 }
 
 .auth-credit-footer .heart-icon {
