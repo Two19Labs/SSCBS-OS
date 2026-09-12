@@ -605,7 +605,21 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                   <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--ink)' }}>Case Competitions</span>
-                  <span className="home-case-comps-pill">
+                  <span
+                    className="home-case-comps-tag"
+                    style={{
+                      background: '#2563eb',
+                      color: '#ffffff',
+                      fontWeight: 700,
+                      fontSize: '0.75rem',
+                      padding: '3px 10px',
+                      borderRadius: '20px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      letterSpacing: '0.2px',
+                      boxShadow: '0 1px 3px rgba(37, 99, 235, 0.3)',
+                    }}
+                  >
                     Live from Unstop
                   </span>
                 </div>
