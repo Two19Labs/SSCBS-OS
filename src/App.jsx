@@ -352,7 +352,7 @@ function App() {
           <div className="tools-hub">
             {[
               ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', micro: 'DATABASE', microClass: 'success', title: 'Societies Database', desc: 'Directory of 47+ societies, domains & PoR contacts', Icon: UsersIcon, locked: false }] : []),
-              ...(hasCaseCompsAccess ? [{ id: 'case-comps', micro: 'ALERTS', microClass: 'success', title: 'Case Competitions Alerts', desc: 'Live opportunities from Unstop for CBSites & first-years', Icon: FlameIcon, locked: false }] : []),
+              ...(hasCaseCompsAccess ? [{ id: 'case-comps', micro: 'LIVE', microClass: 'success', title: 'Case Competitions', desc: 'Live opportunities from Unstop for SSCBS students across all circuits', Icon: FlameIcon, locked: false }] : []),
               ...(hasTeamFinderAccess ? [{ id: 'team-finder', micro: 'NEW', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post case comp openings', Icon: TrophyIcon, locked: false }] : []),
 
               { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },

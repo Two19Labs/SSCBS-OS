@@ -605,19 +605,8 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                   <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--ink)' }}>Case Competitions</span>
-                  <span style={{
-                    background: 'rgba(234, 179, 8, 0.12)',
-                    color: '#ca8a04',
-                    fontWeight: 700,
-                    fontSize: '0.78rem',
-                    padding: '3px 10px',
-                    borderRadius: '20px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '5px',
-                    border: '1px solid rgba(234, 179, 8, 0.25)'
-                  }}>
-                    LIVE FROM UNSTOP &middot; 100% REAL OPPORTUNITIES
+                  <span className="home-case-comps-pill">
+                    Live from Unstop
                   </span>
                 </div>
                 <div style={{ fontSize: '0.84rem', color: 'var(--ink-dim)', marginTop: '4px', lineHeight: '1.45' }}>
