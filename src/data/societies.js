@@ -35,7 +35,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Tech & IT',
     categories: ['tech', 'consulting'],
     categoryLabels: ['Tech & IT', 'Consulting & Analytics'],
-    description: 'Official student chapter of Association for Computing Machinery. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Official student chapter of Association for Computing Machinery.',
     scheduledForm: {
       liveFrom: '2026-08-29T14:30:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/kxFVEUMWwi8vJGfL8',
@@ -57,7 +57,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbZ5twHyO9E/?igsh=MTF4MXdwM3o4bDJwbw==&igsi=MTF4MXdwM3o4bDJwbw==',
@@ -111,10 +111,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       return null;
     },
@@ -144,7 +144,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Consulting & Analytics',
     categories: ['consulting', 'marketing'],
     categoryLabels: ['Consulting & Analytics', 'Marketing, PR & Corporate'],
-    description: 'Human Resource Development cell (PoorvAbhyas mock interviews). Recruitments will start soon, forms and info will come here soon!',
+    description: 'Human Resource Development cell (PoorvAbhyas mock interviews).',
     scheduledForm: {
       liveFrom: '2026-08-30T00:00:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/g5F1UPmS7bJEi1q59',
@@ -170,10 +170,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       if (this.scheduledForm.extensionTrigger && now >= new Date(this.scheduledForm.extensionTrigger)) {
         return '⏰ DEADLINE EXTENDED TO AUG 30 EOD!';
@@ -206,7 +206,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Arts & Culture',
     categories: ['cultural'],
     categoryLabels: ['Arts & Culture'],
-    description: 'Western choreography and urban dance society. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Western choreography and urban dance society.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSe19JX3pMhye1Xb0LAdrOYIr9GolmuIghyZYEqvlCWPwSH_3w/viewform?usp=dialog',
@@ -232,10 +232,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       return null;
     },
@@ -265,7 +265,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Economics, Law & Policy',
     categories: ['economics', 'debating'],
     categoryLabels: ['Economics, Law & Policy', 'Debating, Media & Lit'],
-    description: 'Simulating global diplomacy, international security, and MUN fests. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Simulating global diplomacy, international security, and MUN fests.',
     scheduledForm: {
       liveFrom: '2026-08-29T09:00:00+05:30',
       recruitmentFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLScwylYJXv5W0a5uyklOwK8Lvt5fu49Wk1EQSYcFANfbcV15_w/viewform?usp=sharing&ouid=106905105408675242929',
@@ -291,10 +291,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       if (now >= new Date(this.scheduledForm.extensionTrigger)) {
         return '⏰ DEADLINE EXTENDED TO AUG 31 EOD!';
@@ -355,7 +355,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbVjFiFIuNL/?utm_source=ig_web_copy_link',
@@ -383,7 +383,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Startups & Social Impact',
     categories: ['ecell', 'consulting'],
     categoryLabels: ['Startups & Social Impact', 'Consulting & Analytics'],
-    description: 'Fostering startup founders and incubation mentorship. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Fostering startup founders and incubation mentorship.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/6SwWBJFsrzjAXUcz9',
@@ -412,7 +412,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DNBVwNypSlm/?igsh=d2xmZ2xjOTVpd2sy',
@@ -461,7 +461,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbYBdyZS6Vb/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
@@ -511,7 +511,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbVWQ7nTBQs/?igsh=MWE1d2wxaTc2bGk4Zg==',
@@ -539,10 +539,10 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Arts & Culture',
     categories: ['cultural', 'marketing'],
     categoryLabels: ['Arts & Culture', 'Marketing, PR & Corporate'],
-    description: 'Organizing body for SSCBS flagship annual cultural festival. Crescendo recruits in Semester 2.',
+    description: 'Organizing body for SSCBS flagship annual cultural festival.',
     recruitmentFormUrl: null,
     deadline: null,
-    statusText: 'Crescendo recruits in Semester 2',
+    statusText: '',
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/crescendo_sscbs/',
     linkedinUrl: 'https://www.linkedin.com/company/crescendo-sscbs',
@@ -569,7 +569,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Arts & Culture',
     categories: ['cultural', 'debating'],
     categoryLabels: ['Arts & Culture', 'Debating, Media & Lit'],
-    description: 'Visual arts, photojournalism, filmmaking, and video editing. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Visual arts, photojournalism, filmmaking, and video editing.',
     scheduledForm: {
       liveFrom: '2026-08-28T20:00:00+05:30',
       recruitmentFormUrl: 'https://tally.so/r/RGyR0v',
@@ -595,10 +595,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       return null;
     },
@@ -628,7 +628,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Debating, Media & Lit',
     categories: ['debating', 'economics'],
     categoryLabels: ['Debating, Media & Lit', 'Economics, Law & Policy'],
-    description: 'Parliamentary debating and oratorical competitions. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Parliamentary debating and oratorical competitions.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/5q4LDUYQBafCeeoE6',
@@ -654,10 +654,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       return null;
     },
@@ -687,7 +687,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Arts & Culture',
     categories: ['cultural'],
     categoryLabels: ['Arts & Culture'],
-    description: 'Vocalists, instrumentalists, and college band performances. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Vocalists, instrumentalists, and college band performances.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/vJwtXjsfvTCwWXpv9',
@@ -711,7 +711,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return '⏰ DEADLINE EXTENDED TO AUG 30 EOD!';
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbV_shCBMco/?utm_source=ig_web_copy_link',
@@ -739,7 +739,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Economics, Law & Policy',
     categories: ['economics', 'consulting'],
     categoryLabels: ['Economics, Law & Policy', 'Consulting & Analytics'],
-    description: 'Macroeconomic research, policy debates, and EcoSummit. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Macroeconomic research, policy debates, and EcoSummit.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://bit.ly/Ecovision_Recruitments_2026-27',
@@ -761,7 +761,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbWBRpFykcl/?utm_source=ig_web_copy_link',
@@ -789,7 +789,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Startups & Social Impact',
     categories: ['ecell', 'consulting', 'finance'],
     categoryLabels: ['Startups & Social Impact', 'Consulting & Analytics', 'Finance & Accounting'],
-    description: 'World Cup winning social entrepreneurship society launching sustainable business ventures. Recruitments will start soon, forms and info will come here soon!',
+    description: 'World Cup winning social entrepreneurship society launching sustainable business ventures.',
     scheduledForm: {
       liveFrom: '2026-08-29T12:00:00+05:30',
       recruitmentFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSfCFtas21mXIx1c-awOtC_o4Ju3__ZfuwbJkV2MIwrLQ1GOdw/viewform?usp=header',
@@ -811,7 +811,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbaPwlIzUG6/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==&igsi=MzRlODBiNWFlZA==',
@@ -839,7 +839,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Finance & Accounting',
     categories: ['finance', 'consulting'],
     categoryLabels: ['Finance & Accounting', 'Consulting & Analytics'],
-    description: 'Financial Management Association fostering practical corporate finance modeling. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Financial Management Association fostering practical corporate finance modeling.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/cE3C7ypU7k5x6Lgs5',
@@ -865,10 +865,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       return null;
     },
@@ -898,7 +898,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Finance & Accounting',
     categories: ['finance', 'consulting'],
     categoryLabels: ['Finance & Accounting', 'Consulting & Analytics'],
-    description: 'Premier finance society running student investment funds and FinWiz. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Premier finance society running student investment funds and FinWiz.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/2xjVngeJpyEFDpEG9',
@@ -920,7 +920,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbYWiMCh784/?igsh=MXJyd2VjamVrMWJxOA==',
@@ -948,7 +948,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Arts & Culture',
     categories: ['cultural', 'debating'],
     categoryLabels: ['Arts & Culture', 'Debating, Media & Lit'],
-    description: 'Stage play and dramatics society crafting theatrical productions. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Stage play and dramatics society crafting theatrical productions.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/7FFRqNhAidduHtUG8',
@@ -970,7 +970,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/p/DbYF1FCT50J/',
@@ -1024,10 +1024,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       if (now >= new Date(this.scheduledForm.extensionTrigger)) {
         return '⏰ DEADLINE EXTENDED TO AUG 30 2:00 PM!';
@@ -1060,7 +1060,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Consulting & Analytics',
     categories: ['consulting', 'finance', 'marketing'],
     categoryLabels: ['Consulting & Analytics', 'Finance & Accounting', 'Marketing, PR & Corporate'],
-    description: 'DU’s oldest consulting cell engaged in live corporate strategy projects. Recruitments will start soon, forms and info will come here soon!',
+    description: 'DU’s oldest consulting cell engaged in live corporate strategy projects.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://docs.google.com/forms/d/1ImV_zGDWcIZW_rc5SaPowByyturiFYSJXJeh9VsEjD4/viewform',
@@ -1086,10 +1086,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       if (now >= new Date(this.scheduledForm.extensionTrigger)) {
         return '⏰ DEADLINE EXTENDED TO AUG 29 10:00 AM!';
@@ -1122,7 +1122,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Finance & Accounting',
     categories: ['finance', 'consulting'],
     categoryLabels: ['Finance & Accounting', 'Consulting & Analytics'],
-    description: 'Global financial services network focusing on capital markets & M&A. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Global financial services network focusing on capital markets & M&A.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSewEr_zajO6RYpqhd8ZqyIvrYiFWH3t-egJBkY3MAYf8W-8Mw/viewform?usp=header',
@@ -1144,7 +1144,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbYosjNy7Lo/?igsh=ZGQzcnpxaXoweDd0',
@@ -1194,7 +1194,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/illuminati.sscbs/',
@@ -1222,7 +1222,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Arts & Culture',
     categories: ['cultural'],
     categoryLabels: ['Arts & Culture'],
-    description: 'Fine arts, sketching, painting, and visual decor for campus events. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Fine arts, sketching, painting, and visual decor for campus events.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSfcjAJAPUOrQ6yJ836gnr0ECMeCCuwLz-PFV6yZLr745q7LsQ/viewform?usp=publish-editor',
@@ -1255,7 +1255,7 @@ export const DEMO_SOCIETIES = [
         }
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbdBeyAzIuh/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==&igsi=MzRlODBiNWFlZA==',
@@ -1283,7 +1283,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Tech & IT',
     categories: ['tech', 'cultural'],
     categoryLabels: ['Tech & IT', 'Arts & Culture'],
-    description: 'Specializing in Web/App Development, UI/UX design, and tech buildouts. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Specializing in Web/App Development, UI/UX design, and tech buildouts.',
     scheduledForm: {
       liveFrom: '2026-08-28T20:00:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/tcBTBXsN4rytd2bZ6',
@@ -1305,7 +1305,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbYeHxnscdn/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==&igsi=MzRlODBiNWFlZA==',
@@ -1333,7 +1333,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Economics, Law & Policy',
     categories: ['economics', 'debating'],
     categoryLabels: ['Economics, Law & Policy', 'Debating, Media & Lit'],
-    description: 'Legal awareness, corporate law discussions, and moot court competitions. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Legal awareness, corporate law discussions, and moot court competitions.',
     scheduledForm: {
       liveFrom: '2026-08-29T21:00:00+05:30',
       recruitmentFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLScHSDNmE5GNjN5NhXw4Iq3yG1rZNHuhQABfmBBFKl5nsROSXA/viewform',
@@ -1355,7 +1355,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/lawrence.sscbs/',
@@ -1405,7 +1405,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://linktr.ee/litsocsscbs?utm_source=chatgpt.com',
@@ -1459,10 +1459,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       return null;
     },
@@ -1514,7 +1514,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbX7F5KzqOz/?igsh=d2NsdjVzNGd1eGFw',
@@ -1568,10 +1568,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       return null;
     },
@@ -1601,7 +1601,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Startups & Social Impact',
     categories: ['ecell', 'wellness'],
     categoryLabels: ['Startups & Social Impact', 'Inclusion & Sports'],
-    description: 'Empowering youth to achieve sustainable development goals and drive social entrepreneurship. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Empowering youth to achieve sustainable development goals and drive social entrepreneurship.',
     scheduledForm: {
       liveFrom: '2026-08-29T19:00:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/htM6JBwBvxjV6E1U7',
@@ -1627,10 +1627,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       return null;
     },
@@ -1660,7 +1660,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Consulting & Analytics',
     categories: ['consulting'],
     categoryLabels: ['Consulting & Analytics'],
-    description: 'The Analytics Society of SSCBS, focusing on data driven thinking and problem solving. Recruitments starting soon, forms and info will come here soon',
+    description: 'The Analytics Society of SSCBS, focusing on data driven thinking and problem solving.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://tally.so/r/Y5lPZd',
@@ -1682,7 +1682,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/p/DbX3S7QvBZY/',
@@ -1710,7 +1710,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Inclusion & Sports',
     categories: ['wellness'],
     categoryLabels: ['Inclusion & Sports'],
-    description: 'Sports society organizing inter-college athletic tournaments & fitness sessions. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Sports society organizing inter-college athletic tournaments & fitness sessions.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/DjJ9QhKPKQ3zBEPf6',
@@ -1736,10 +1736,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       return null;
     },
@@ -1791,7 +1791,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/qsa.sscbs/',
@@ -1819,7 +1819,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Debating, Media & Lit',
     categories: ['debating', 'marketing'],
     categoryLabels: ['Debating, Media & Lit', 'Marketing, PR & Corporate'],
-    description: 'Official student journalism portal and campus newspaper. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Official student journalism portal and campus newspaper.',
     scheduledForm: {
       liveFrom: '2026-08-29T14:00:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/SAWDcHGJAUS967L26',
@@ -1845,10 +1845,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       return null;
     },
@@ -1904,10 +1904,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       return null;
     },
@@ -1937,7 +1937,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Consulting & Analytics',
     categories: ['consulting', 'marketing'],
     categoryLabels: ['Consulting & Analytics', 'Marketing, PR & Corporate'],
-    description: 'Bridging academia and corporate life via live corporate projects and Decennium. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Bridging academia and corporate life via live corporate projects and Decennium.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/TeaKDF7hq5eBRGJC6',
@@ -1963,10 +1963,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       return null;
     },
@@ -1996,7 +1996,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Arts & Culture',
     categories: ['cultural', 'ecell'],
     categoryLabels: ['Arts & Culture', 'Startups & Social Impact'],
-    description: 'Nukkad Natak street play team driving social awareness. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Nukkad Natak street play team driving social awareness.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSdPqoql3CVKzbNcncdyKSwx-d0DHZitgQHaXEDvYJkA_Np_Ew/viewform',
@@ -2022,10 +2022,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       return null;
     },
@@ -2081,10 +2081,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       if (now >= new Date(this.scheduledForm.extensionTime)) {
         return '⏰ DEADLINE EXTENDED TO AUG 29 8:00 AM!';
@@ -2117,7 +2117,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Consulting & Analytics',
     categories: ['consulting', 'ecell'],
     categoryLabels: ['Consulting & Analytics', 'Startups & Social Impact'],
-    description: 'Pro-bono strategy consulting for non-profits and social enterprises. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Pro-bono strategy consulting for non-profits and social enterprises.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://wkf.ms/45IkCUU',
@@ -2139,7 +2139,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbYbNPNo99E/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==&igsi=MzRlODBiNWFlZA==',
@@ -2167,7 +2167,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Finance & Accounting',
     categories: ['finance', 'consulting'],
     categoryLabels: ['Finance & Accounting', 'Consulting & Analytics'],
-    description: 'Institute of Management Accountants chapter focusing on management accounting. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Institute of Management Accountants chapter focusing on management accounting.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://bit.ly/ima-recruitment-form',
@@ -2190,7 +2190,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbYQ2s1vIVq/?igsh=YWlzNmIxbWpkbTh3',
@@ -2218,7 +2218,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Consulting & Analytics',
     categories: ['consulting', 'marketing'],
     categoryLabels: ['Consulting & Analytics', 'Marketing, PR & Corporate'],
-    description: 'Supply Chain & Operations Management society organizing operational case challenges. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Supply Chain & Operations Management society organizing operational case challenges.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/A4JGd45B9tVegbAs8',
@@ -2244,10 +2244,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       if (now >= new Date(this.scheduledForm.extensionTrigger)) {
         return '⏰ DEADLINE EXTENDED TO AUG 29 9:00 AM!';
@@ -2306,10 +2306,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       return null;
     },
@@ -2369,7 +2369,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/sadhana.cbs/',
@@ -2397,7 +2397,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Consulting & Analytics',
     categories: ['consulting', 'ecell', 'finance'],
     categoryLabels: ['Consulting & Analytics', 'Startups & Social Impact', 'Finance & Accounting'],
-    description: 'Global non-profit impact consulting chapter offering strategy advisory. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Global non-profit impact consulting chapter offering strategy advisory.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSfgcZFpWnHVgdvLVFXZ5vQaTvKjP0mb4bvasXDDmkMuSGymzA/viewform',
@@ -2419,7 +2419,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/reel/DbYp8ESBdkp/?igsh=MW10cHJ1bzY5djhlaA==',
@@ -2447,7 +2447,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Finance & Accounting',
     categories: ['finance', 'ecell'],
     categoryLabels: ['Finance & Accounting', 'Startups & Social Impact'],
-    description: 'Spreading financial awareness, personal budgeting, and community literacy. Recruitments will start soon, forms and info will come here soon!',
+    description: 'Spreading financial awareness, personal budgeting, and community literacy.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/zwUowFUpEoFtPw578',
@@ -2473,10 +2473,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       if (now >= new Date(this.scheduledForm.extensionTrigger)) {
         return '⏰ DEADLINE EXTENDED TO AUG 29 8:00 PM!';
@@ -2509,7 +2509,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Consulting & Analytics',
     categories: ['consulting', 'marketing'],
     categoryLabels: ['Consulting & Analytics', 'Marketing, PR & Corporate'],
-    description: 'Dedicated cell for practical skill-building, corporate readiness, and organizer of flagship events like Market-Niti (bilingual marketing & case study competition). Recruitments will start soon, forms and info will come here soon!',
+    description: 'Dedicated cell for practical skill-building, corporate readiness, and organizer of flagship events like Market-Niti (bilingual marketing & case study competition).',
     scheduledForm: {
       liveFrom: '2026-08-29T12:00:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/k6NYkZoHjmgomCqy7',
@@ -2531,7 +2531,7 @@ export const DEMO_SOCIETIES = [
       if (this.scheduledForm && new Date() >= new Date(this.scheduledForm.liveFrom)) {
         return null;
       }
-      return 'Recruitments will start soon, forms and info will come here soon!';
+      return '';
     },
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/sdc.sscbs?igsh=b3lscjB1cnRoNHA3',
@@ -2559,10 +2559,10 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Inclusion & Sports',
     categories: ['wellness', 'ecell', 'debating'],
     categoryLabels: ['Inclusion & Sports', 'Startups & Social Impact', 'Debating, Media & Lit'],
-    description: 'Government organization focused on discipline, leadership, fitness, adventure, and nation-building across sports, culture, innovation, and defense. Open to all academic backgrounds (college society rules do not apply). Recruitment Day: 7th Sep, 12:00 PM at College Ground.',
+    description: 'Government organization focused on discipline, leadership, fitness, adventure, and nation-building across sports, culture, innovation, and defense. Open to all academic backgrounds (college society rules do not apply).',
     recruitmentFormUrl: 'https://forms.gle/1wwKFBpsu4M8QpFQ9',
     deadline: '2026-09-07T12:00:00+05:30',
-    statusText: 'Forms Live! Recruitment Day: 7th Sep, 12:00 PM @ College Ground',
+    statusText: null,
     officialPageUrl: OFFICIAL_COLLEGE_SOCIETIES_URL,
     instagramVideoUrl: 'https://www.instagram.com/ncc_sscbs?igsi=czJwYmpheWw1MHcw',
     linkedinUrl: null,
@@ -2590,7 +2590,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Inclusion & Sports',
     categories: ['wellness', 'cultural'],
     categoryLabels: ['Inclusion & Sports', 'Arts & Culture'],
-    description: 'Promoting regional diversity, culture, and student welfare for the 8 North Eastern states (organizers of flagship event "818" and "Prelude to 818"). Recruitments will start soon, forms and info will come here soon!',
+    description: 'Promoting regional diversity, culture, and student welfare for the 8 North Eastern states (organizers of flagship event "818" and "Prelude to 818").',
     scheduledForm: {
       liveFrom: '2026-08-30T12:00:00+05:30',
       recruitmentFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSdpzIyIWgp9z5ZaKFZcpIQ16I3Dt_qsUUXy4jI59OGX0et5Tw/viewform?usp=send_form',
@@ -2616,10 +2616,10 @@ export const DEMO_SOCIETIES = [
       return this.scheduledForm.initialDeadline;
     },
     get statusText() {
-      if (!this.scheduledForm) return 'Recruitments will start soon, forms and info will come here soon!';
+      if (!this.scheduledForm) return '';
       const now = new Date();
       if (now < new Date(this.scheduledForm.liveFrom)) {
-        return 'Recruitments will start soon, forms and info will come here soon!';
+        return '';
       }
       return null;
     },
@@ -2638,10 +2638,10 @@ export function getDeadlineInfo(deadlineStr) {
   if (!deadlineStr) {
     return {
       status: 'normal',
-      text: 'Recruitments start soon!',
+      text: 'Closed',
       isExpired: false,
       daysLeft: 99,
-      isSoon: true,
+      isSoon: false,
     };
   }
 
