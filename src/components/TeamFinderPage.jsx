@@ -834,24 +834,7 @@ function getUserApp(post, applications, userEmail, userId) {
 
   if (matches.length === 0) return null;
 
-  const acceptedEmails = Array.isArray(post.accepted_emails) ? post.accepted_emails : [];
-  const isAcceptedInPost = acceptedEmails.some(
-    (e) => e && emailLower && e.toLowerCase() === emailLower
-  );
-
-  // CRITICAL: If user's email is NOT in post.accepted_emails, they are NOT accepted into the squad!
-  if (!isAcceptedInPost) {
-    const removedApp = matches.find((m) => m.status === 'removed');
-    if (removedApp) return removedApp;
-
-    const acceptedApp = matches.find((m) => m.status === 'accepted');
-    if (acceptedApp && Array.isArray(post.accepted_emails) && post.accepted_emails.length > 0) {
-      // Host removed applicant's email from post.accepted_emails
-      return { ...acceptedApp, status: 'removed' };
-    }
-  }
-
-  // Otherwise, sort by creation timestamp / ID descending to get latest status
+  // Sort by creation timestamp / ID descending so latest status takes precedence
   matches.sort((a, b) => {
     const timeA = new Date(a.created_at || 0).getTime() || (typeof a.id === 'number' ? a.id : 0);
     const timeB = new Date(b.created_at || 0).getTime() || (typeof b.id === 'number' ? b.id : 0);
@@ -859,9 +842,18 @@ function getUserApp(post, applications, userEmail, userId) {
   });
 
   const latest = { ...matches[0] };
+  const acceptedEmails = Array.isArray(post.accepted_emails) ? post.accepted_emails : [];
+  const isAcceptedInPost = acceptedEmails.some(
+    (e) => e && emailLower && e.toLowerCase() === emailLower
+  );
+
   if (isAcceptedInPost) {
     latest.status = 'accepted';
+  } else if (latest.status === 'accepted') {
+    // Host removed applicant's email from post.accepted_emails
+    latest.status = 'removed';
   }
+
   return latest;
 }
 
