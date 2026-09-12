@@ -1068,10 +1068,6 @@ function getUserApp(post, applications, userEmail, userId) {
             </button>
           )}
           <div>
-            <div className="tf-badge">
-              <ShieldIcon size={12} />
-              <span>LIVE • SSCBS OS</span>
-            </div>
             <h1 className="tf-title">Team Finder & Competition Hub</h1>
             <p className="tf-subtitle">
               Connect with peers, match complementary skills, and form competition teams.
