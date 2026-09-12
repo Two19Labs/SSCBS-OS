@@ -320,7 +320,7 @@ export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill 
         organizer: prefill.organizer || '',
         competition_link: prefill.competition_link || '',
         title: prefill.title || `Looking for teammates for ${prefill.competition_name}`,
-        description: prefill.description || `Building a squad for ${prefill.competition_name}. Aiming for podium!`,
+        description: prefill.description || `Building a squad for ${prefill.competition_name || 'Case Competition'}${prefill.organizer ? ` (${prefill.organizer})` : ''}`,
         total_members: String(prefill.total_members || 4),
         spots_left: String(prefill.spots_left || 1),
       }));

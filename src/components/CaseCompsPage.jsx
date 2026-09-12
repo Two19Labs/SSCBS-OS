@@ -323,14 +323,15 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
   };
 
   const handleFindTeammates = (comp, e) => {
-    e.stopPropagation();
+    if (e?.stopPropagation) e.stopPropagation();
     const teamSize = Math.max(2, Math.min(5, comp.maxTeam || 4));
+    const orgSuffix = comp.orgName ? ` (${comp.orgName})` : '';
     const prefill = {
       competition_name: comp.title || '',
       organizer: comp.orgName || '',
       competition_link: comp.unstopUrl || '',
       title: `Team for ${comp.title || 'Case Competition'}`,
-      description: `Building a squad for ${comp.title} (${comp.orgName}). Aiming for a winning pitch deck and national podium! Looking for peers with strong research, deck design, or quant skills.`,
+      description: `Building a squad for ${comp.title || 'Case Competition'}${orgSuffix}`,
       total_members: teamSize,
       spots_left: Math.max(1, teamSize - 1),
     };
