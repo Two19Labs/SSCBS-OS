@@ -596,16 +596,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
         </div>
       </div>
 
-      {/* ── Notice / Status Banner ── */}
-      <div className="cc-status-bar">
-        <div className="cc-status-left">
-          <span className="cc-pulse-dot"></span>
-          <span>
-            Showing <strong>{filteredCompetitions.length}</strong> live active competitions from Unstop
-            {lastUpdated && <span className="cc-last-sync"> · Synced at {lastUpdated}</span>}
-          </span>
-        </div>
-      </div>
+
 
       {/* ── Competitions Grid ── */}
       {loading ? (
