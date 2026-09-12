@@ -642,7 +642,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
             return (
               <article key={comp.id} className={`cc-card cc-card-${circuit.type}`}>
                 <div className="cc-card-inner">
-                  {/* Top Bar: Host Profile + Circuit Tag + Exact Countdown Timer */}
+                  {/* Top Bar: Host Profile (Equalized Full Width) */}
                   <div className="cc-card-top-bar">
                     <div className="cc-host-identity">
                       {comp.orgLogo ? (
@@ -664,17 +664,6 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
                           {comp.orgName || 'Academic Host'}
                         </span>
                       </div>
-                    </div>
-
-                    <div className="cc-top-status">
-                      <span
-                        className={`cc-countdown-chip ${countdown.urgencyClass}`}
-                        title={`Exact Deadline: ${countdown.exactDateStr}`}
-                      >
-                        <span className="cc-status-dot" />
-                        <ClockIcon size={12} className="cc-timer-icon" />
-                        <span>{countdown.text}</span>
-                      </span>
                     </div>
                   </div>
 
@@ -709,16 +698,27 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
                     </div>
                   </div>
 
-                  {/* Social Proof Footer Metric */}
+                  {/* Social Proof + Deadline Status */}
                   <div className="cc-card-footer-metric">
-                    {Number(comp.registeredCount || 0) > 0 ? (
-                      <span className="cc-reg-count">
-                        <FlameIcon size={12} className="cc-reg-icon" />
-                        <strong>{Number(comp.registeredCount).toLocaleString()}</strong> students applied
-                      </span>
-                    ) : (
-                      <span className="cc-meta-fresh">⚡ Recently Listed</span>
-                    )}
+                    <div className="cc-footer-metric-left">
+                      {Number(comp.registeredCount || 0) > 0 ? (
+                        <span className="cc-reg-count">
+                          <FlameIcon size={12} className="cc-reg-icon" />
+                          <strong>{Number(comp.registeredCount).toLocaleString()}</strong> students applied
+                        </span>
+                      ) : (
+                        <span className="cc-meta-fresh">⚡ Recently Listed</span>
+                      )}
+                    </div>
+
+                    <span
+                      className={`cc-countdown-chip ${countdown.urgencyClass}`}
+                      title={`Exact Deadline: ${countdown.exactDateStr}`}
+                    >
+                      <span className="cc-status-dot" />
+                      <ClockIcon size={12} className="cc-timer-icon" />
+                      <span>{countdown.text}</span>
+                    </span>
                   </div>
 
                   {/* Action Buttons */}
