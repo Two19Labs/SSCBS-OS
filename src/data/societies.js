@@ -333,6 +333,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Marketing, PR & Corporate',
     categories: ['marketing', 'ecell'],
     categoryLabels: ['Marketing, PR & Corporate', 'Startups & Social Impact'],
+    description: 'Youth leadership and nation-building wing of Confederation of Indian Industry.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://forms.gle/uAez4N2X6DhySucy8',
@@ -448,6 +449,7 @@ export const DEMO_SOCIETIES = [
     categoryLabel: 'Marketing, PR & Corporate',
     categories: ['marketing', 'consulting', 'finance'],
     categoryLabels: ['Marketing, PR & Corporate', 'Consulting & Analytics', 'Finance & Accounting'],
+    description: 'Official branding and media communication cell handling public relations and Prodigy.',
     scheduledForm: {
       liveFrom: '2026-08-28T17:00:00+05:30',
       recruitmentFormUrl: 'https://tally.so/r/RGybvJ',

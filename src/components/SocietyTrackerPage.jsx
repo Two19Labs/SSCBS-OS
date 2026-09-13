@@ -489,7 +489,7 @@ export default function SocietyTrackerPage({ onBack, onNavigate }) {
                 title={`Click card to view dossier for ${society.name}`}
               >
                 {/* Header & Title */}
-                <div>
+                <div className="st-card-main">
                   <div className="st-card-top">
                     <div className="st-card-badges">
                       <span className="st-domain-badge">
@@ -551,9 +551,7 @@ export default function SocietyTrackerPage({ onBack, onNavigate }) {
                   </div>
 
                   <h3 className="st-society-title">{society.name}</h3>
-                  {society.description && (
-                    <p className="st-card-desc">{society.description}</p>
-                  )}
+                  <p className="st-card-desc">{society.description || '\u00A0'}</p>
 
                   {/* Compact Single-Line TIC Strip */}
                   {(() => {
