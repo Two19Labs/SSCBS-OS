@@ -2540,7 +2540,7 @@ export const DEMO_SOCIETIES = [
   // --- 45. Skill Development Cell ---
   {
     id: 'sdc-sscbs',
-    tics: [],
+    tics: ["Dr. Neeraj Kumar Sehrawat", "Mr. Deepak Tiwari"],
     pocs: [
       {
         "name": "Piyush Kumar (President)",
