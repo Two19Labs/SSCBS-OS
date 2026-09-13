@@ -26,7 +26,52 @@ function shuffleArray(array) {
   return arr;
 }
 
-export default function SocietyTrackerPage({ onBack }) {
+// Map clean teacher names to faculty_directory.json IDs for seamless navigation
+const FACULTY_NAME_TO_ID = {
+  'anamika gupta': 'dr-anamika-gupta-ph-d',
+  'shikha gupta': 'dr-shikha-gupta-ph-d',
+  'anuja mathur': 'dr-anuja-mathur-ph-d',
+  'tushar marwaha': 'tushar-marwaha-mba',
+  'rashid shamim': 'md-rashid-shamim-mba',
+  'md rashid shamim': 'md-rashid-shamim-mba',
+  'mohd. rashid shamim': 'md-rashid-shamim-mba',
+  'raj kumar': 'raj-kumar-ma',
+  'satish kumar goel': 'dr-satish-kumar-goel-ph-d',
+  'neeraj sehrawat': 'neeraj-sehrawat-ph-d',
+  'neeraj kumar sehrawat': 'neeraj-sehrawat-ph-d',
+  'neeraj k sehrawat': 'neeraj-sehrawat-ph-d',
+  'amit kumar': 'amit-kumar-m-com',
+  'ramesh kumar': 'ramesh-kumar-ph-d',
+  'ramesh barpa': 'ramesh-kumar-ph-d',
+  'ramesh kumar barpa': 'ramesh-kumar-ph-d',
+  'amrina kausar': 'dr-amrina-kausar-ph-d',
+  'mona verma': 'dr-mona-verma-ph-d',
+  'madhu totla': 'ca-madhu-totla-maheshwari',
+  'shalini prakash': 'shalini-prakash-m-phil',
+  'kavita rastogi': 'kavita-rastogi-msc',
+  'rishi rajan sahay': 'dr-rishi-rajan-sahay-ph-d',
+  'paridhi': 'paridhi-mba',
+  'kumar bijoy': 'kumar-bijoy-ma-eco-ph-d-cfa',
+  'tarannum ahmad': 'dr-tarannum-ahmad-ph-d',
+  'sonika thakral': 'dr-sonika-thakral-ph-d',
+  'sushmita': 'dr-sushmita-ph-d',
+  'onkar singh': 'onkar-singh-m-phil-m-sc',
+  'saumya jain': 'saumya-jain-m-com',
+  'nidhi kesari': 'dr-nidhi-kesari-ph-d',
+  'poonam verma': 'poonam-verma',
+};
+
+export function getFacultyIdForName(rawName) {
+  if (!rawName || typeof rawName !== 'string') return null;
+  const clean = rawName
+    .toLowerCase()
+    .replace(/^(dr\.|prof\.|mr\.|ms\.|md\.|mohd\.)\s+/i, '')
+    .replace(/\(convenor\)/i, '')
+    .trim();
+  return FACULTY_NAME_TO_ID[clean] || null;
+}
+
+export default function SocietyTrackerPage({ onBack, onNavigate }) {
   const { user } = useAuth();
   const userKeySuffix = user?.email ? `_${user.email.toLowerCase()}` : '';
   const bookmarksKey = `${LOCAL_STORAGE_KEY}${userKeySuffix}`;
@@ -208,8 +253,15 @@ export default function SocietyTrackerPage({ onBack }) {
             poc.name.toLowerCase().includes(query) ||
             (cleanQ && poc.phone.replace(/[^0-9]/g, '').includes(cleanQ))
         );
+      const matchTics =
+        Array.isArray(society.tics) &&
+        society.tics.some((tic) => {
+          const tLower = tic.toLowerCase();
+          const cleanT = tLower.replace(/[^a-z0-9]/g, '');
+          return tLower.includes(query) || (cleanQ && cleanT.includes(cleanQ));
+        });
 
-      const isMatch = matchName || matchShortName || matchId || matchDesc || matchCat || matchSubCats || matchPocs;
+      const isMatch = matchName || matchShortName || matchId || matchDesc || matchCat || matchSubCats || matchPocs || matchTics;
       if (!isMatch) return false;
     } else if (selectedCategory !== 'all') {
       const hasCat =
@@ -361,7 +413,7 @@ export default function SocietyTrackerPage({ onBack }) {
             <input
               type="text"
               className="st-search-input"
-              placeholder="Search by name, acronym (e.g. ACM, FinX), domain, or PoR..."
+              placeholder="Search by name, acronym (e.g. ACM, FinX), domain, TIC, or PoR..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -502,6 +554,23 @@ export default function SocietyTrackerPage({ onBack }) {
                   {society.description && (
                     <p className="st-card-desc">{society.description}</p>
                   )}
+
+                  {/* Compact Single-Line TIC Strip */}
+                  {(() => {
+                    const hasTics = Array.isArray(society.tics) && society.tics.length > 0;
+                    const tooltipText = hasTics
+                      ? `Teacher(s)-in-Charge: ${society.tics.join(', ')} (Click card for full profiles)`
+                      : 'Teacher-in-Charge details to be updated';
+                    return (
+                      <div className="st-card-tic-row" title={tooltipText}>
+                        <span className="st-card-tic-icon" aria-hidden="true">🧑‍🏫</span>
+                        <span className="st-card-tic-label">TIC:</span>
+                        <span className={`st-card-tic-names ${!hasTics ? 'is-unspecified' : ''}`}>
+                          {hasTics ? society.tics.join(', ') : 'To be updated'}
+                        </span>
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* Card Bottom / Action Row */}
@@ -696,6 +765,68 @@ export default function SocietyTrackerPage({ onBack }) {
                     )
                   )}
                 </div>
+              </div>
+
+              {/* Teacher(s)-in-Charge & Faculty Advisors Section */}
+              <div className="st-modal-section">
+                <h4 className="st-modal-sec-title">🧑‍🏫 Teacher(s)-in-Charge &amp; Faculty Advisors</h4>
+                {Array.isArray(selectedSociety.tics) && selectedSociety.tics.length > 0 ? (
+                  <div className="st-tic-grid">
+                    {selectedSociety.tics.map((ticStr, idx) => {
+                      const isConvenor = ticStr.includes('(Convenor)');
+                      const cleanName = ticStr.replace(/\(Convenor\)/i, '').trim();
+                      const facultyId = getFacultyIdForName(cleanName);
+                      const isPlacementOfficer = cleanName.toLowerCase().includes('deepak tiwari');
+
+                      return (
+                        <div key={idx} className={`st-tic-card ${isConvenor ? 'is-convenor' : ''}`}>
+                          <div className="st-tic-card-left">
+                            <span className="st-tic-avatar">🎓</span>
+                            <div className="st-tic-info">
+                              <span className="st-tic-name">{cleanName}</span>
+                              <span className="st-tic-role">
+                                {isPlacementOfficer
+                                  ? 'Placement Officer / Advisor'
+                                  : isConvenor
+                                  ? 'Convenor'
+                                  : 'Faculty Advisor / TIC'}
+                              </span>
+                            </div>
+                          </div>
+                          {facultyId && onNavigate ? (
+                            <button
+                              type="button"
+                              className="st-tic-details-btn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedSociety(null);
+                                onNavigate('faculty-db', { profId: facultyId });
+                              }}
+                              title={`View room, contacts & portfolio for ${cleanName} in Faculty Directory`}
+                            >
+                              <span>View Details</span>
+                              <span className="st-btn-arrow">→</span>
+                            </button>
+                          ) : (
+                            isPlacementOfficer && (
+                              <span className="st-tic-note-badge">CDC Head</span>
+                            )
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="st-tic-empty-notice">
+                    <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>ℹ️</span>
+                    <div>
+                      <strong style={{ color: 'var(--ink)' }}>Official TIC To Be Updated</strong>
+                      <p style={{ margin: '2px 0 0 0', fontSize: '0.82rem', color: 'var(--ink-dim)' }}>
+                        Teacher-in-Charge details have not yet been officially updated in current college records for this initiative. Please check with society PoRs above for details.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {Array.isArray(selectedSociety.pocs) && selectedSociety.pocs.length > 0 && (

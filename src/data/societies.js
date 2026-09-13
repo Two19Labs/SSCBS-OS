@@ -19,6 +19,7 @@ export const DEMO_SOCIETIES = [
   // --- 1. ACM SSCBS Chapter ---
   {
     id: 'acm-sscbs',
+    tics: ["Prof. Anamika Gupta (Convenor)","Prof. Shikha Gupta"],
     pocs: [
       {
         "name": "Kalpana Chauhan",
@@ -69,6 +70,7 @@ export const DEMO_SOCIETIES = [
   // --- 2. Alumni Relations and Outreach Cell ---
   {
     id: 'alumni-cell',
+    tics: ["Dr. Anuja Mathur","Mr. Tushar Marwaha"],
     pocs: [
       {
         "name": "Krishna Pransukhka",
@@ -128,6 +130,7 @@ export const DEMO_SOCIETIES = [
   // --- 3. Anthropos ---
   {
     id: 'anthropos-hrd',
+    tics: ["Md Rashid Shamim","Mr. Raj Kumar"],
     pocs: [
       {
         "name": "Abhigya Yadav",
@@ -190,6 +193,7 @@ export const DEMO_SOCIETIES = [
   // --- 4. Blitz (Dance Society) ---
   {
     id: 'blitz-dance',
+    tics: ["Dr. Satish Kumar Goel","Dr. Raj Kumar"],
     pocs: [
       {
         "name": "Avantika Goel",
@@ -249,6 +253,7 @@ export const DEMO_SOCIETIES = [
   // --- 5. CBS Model United Nations ---
   {
     id: 'cbsmun',
+    tics: ["Dr. Satish Kumar Goel","Dr. Raj Kumar"],
     pocs: [
       {
         "name": "Rithik Palthiya",
@@ -311,6 +316,7 @@ export const DEMO_SOCIETIES = [
   // --- 6. CII YI Chapter ---
   {
     id: 'cii-yi',
+    tics: ["Mr. Tushar Marwaha"],
     pocs: [
       {
         "name": "Soyal Dhawle",
@@ -367,6 +373,7 @@ export const DEMO_SOCIETIES = [
   // --- 7. Collegiate Entrepreneurs Organisation (CEO, DU) ---
   {
     id: 'ceo-du',
+    tics: ["Mr. Neeraj Sehrawat","Mr. Amit Kumar"],
     pocs: [
       {
         "name": "Shreya Choudhary",
@@ -424,6 +431,7 @@ export const DEMO_SOCIETIES = [
   // --- 8. Communique (The Promotion Cell / Prodigy) ---
   {
     id: 'communique-pr',
+    tics: ["Dr. Neeraj Kumar Sehrawat","Mr. Amit Kumar"],
     pocs: [
       {
         "name": "Madhav Singhal",
@@ -473,6 +481,7 @@ export const DEMO_SOCIETIES = [
   // --- 9. Convergence (College Seminar) ---
   {
     id: 'convergence-seminar',
+    tics: ["Dr. Ramesh Kumar (Convenor)","Dr. Amrina Kausar","Dr. Mona Verma","Dr. Madhu Totla"],
     pocs: [
       {
         "name": "Suditi Sharma",
@@ -523,6 +532,7 @@ export const DEMO_SOCIETIES = [
   // --- 10. Crescendo (Annual Cultural Fest Body) ---
   {
     id: 'crescendo-cultural',
+    tics: [],
     pocs: [
       {
         "name": "Anushka Singh",
@@ -553,6 +563,7 @@ export const DEMO_SOCIETIES = [
   // --- 11. Darkroom (Photography Society) ---
   {
     id: 'darkroom-photography',
+    tics: ["Ms. Shalini Prakash","Ms. Kavita Rastogi"],
     pocs: [
       {
         "name": "Gajanan Ingewad",
@@ -612,6 +623,7 @@ export const DEMO_SOCIETIES = [
   // --- 12. Debating Society ---
   {
     id: 'debating-society',
+    tics: ["Dr. Rishi Rajan Sahay (Convenor)","Mohd. Rashid Shamim"],
     pocs: [
       {
         "name": "Sneh Shukla",
@@ -671,6 +683,7 @@ export const DEMO_SOCIETIES = [
   // --- 13. Dhwani (Music Society) ---
   {
     id: 'dhwani-music',
+    tics: ["Dr. Amrina Kausar (Convenor)","Dr. Mona Verma","Dr. Paridhi"],
     pocs: [
       {
         "name": "Shreya Pandey",
@@ -723,6 +736,7 @@ export const DEMO_SOCIETIES = [
   // --- 14. Ecovision (Economics Society) ---
   {
     id: 'ecovision-economics',
+    tics: ["Mr. Raj Kumar","Md Rashid Shamim"],
     pocs: [
       {
         "name": "Kanish Garg",
@@ -773,6 +787,7 @@ export const DEMO_SOCIETIES = [
   // --- 15. Enactus ---
   {
     id: 'enactus-sscbs',
+    tics: ["Dr. Anuja Mathur","Mr. Tushar Marwaha","Mr. Amit Kumar","Dr. Neeraj Kumar Sehrawat","Dr. Kumar Bijoy"],
     pocs: [
       {
         "name": "Pari Aggarwal",
@@ -823,6 +838,7 @@ export const DEMO_SOCIETIES = [
   // --- 16. FMA ---
   {
     id: 'fma-finance',
+    tics: ["Mr. Amit Kumar","Dr. Neeraj Kumar Sehrawat"],
     pocs: [
       {
         "name": "Chirag Malhotra",
@@ -882,6 +898,7 @@ export const DEMO_SOCIETIES = [
   // --- 17. Finx (Finance Society) ---
   {
     id: 'finx-finance',
+    tics: ["Mr. Amit Kumar","Mr. Neeraj Kumar Sehrawat","Dr. Madhu Totla"],
     pocs: [
       {
         "name": "Viddushi Kheraa",
@@ -932,6 +949,7 @@ export const DEMO_SOCIETIES = [
   // --- 18. Fourth Wall (Dramatics Society) ---
   {
     id: 'fourth-wall-dramatics',
+    tics: ["Dr. Tarannum Ahmad","Ms. Kavita Rastogi"],
     pocs: [
       {
         "name": "Sarthak Pandey",
@@ -982,6 +1000,7 @@ export const DEMO_SOCIETIES = [
   // --- 19. GIRL UP RUHI ---
   {
     id: 'girl-up-ruhi',
+    tics: ["Ms. Shalini Prakash","Dr. Sonika Thakral"],
     pocs: [
       {
         "name": "Tanisha Meena",
@@ -1044,6 +1063,7 @@ export const DEMO_SOCIETIES = [
   // --- 20. Grandeur ---
   {
     id: 'grandeur-consulting',
+    tics: ["Mr. Tushar Marwaha","Dr. Sushmita"],
     pocs: [
       {
         "name": "Harshit Chandnani",
@@ -1106,6 +1126,7 @@ export const DEMO_SOCIETIES = [
   // --- 21. IFSA Network India ---
   {
     id: 'ifsa-network',
+    tics: ["Mr. Amit Kumar","Mr. Neeraj Kumar Sehrawat"],
     pocs: [
       {
         "name": "Ekam Singh",
@@ -1156,6 +1177,7 @@ export const DEMO_SOCIETIES = [
   // --- 22. Illuminati (Quiz Society) ---
   {
     id: 'illuminati-quiz',
+    tics: ["Dr. Rishi Rajan Sahay","Mr. Tushar Marwaha"],
     pocs: [
       {
         "name": "Mohd Maaz Naim",
@@ -1206,6 +1228,7 @@ export const DEMO_SOCIETIES = [
   // --- 23. Kriti (Art Society) ---
   {
     id: 'kriti-art',
+    tics: ["Ms. Shalini Prakash","Dr. Anamika Gupta"],
     pocs: [
       {
         "name": "Titiksha Singh",
@@ -1267,6 +1290,7 @@ export const DEMO_SOCIETIES = [
   // --- 24. Kronos (IT Society) ---
   {
     id: 'kronos-it',
+    tics: ["Dr. Sonika Thakral","Mr. Onkar Singh (Convenor)"],
     pocs: [
       {
         "name": "Poorvanshi Rawat",
@@ -1317,6 +1341,7 @@ export const DEMO_SOCIETIES = [
   // --- 25. Lawrence (Law Society) ---
   {
     id: 'lawrence-law',
+    tics: ["Dr. Saumya Jain","Dr. Sushmita"],
     pocs: [
       {
         "name": "Hardik Baweja",
@@ -1367,6 +1392,7 @@ export const DEMO_SOCIETIES = [
   // --- 26. Literary Society ---
   {
     id: 'literary-society',
+    tics: ["Dr. Nidhi Kesari","Mr. Tushar Marwaha"],
     pocs: [
       {
         "name": "Mayank Yadav",
@@ -1417,6 +1443,7 @@ export const DEMO_SOCIETIES = [
   // --- 27. Mark-it (Marketing Society) ---
   {
     id: 'mark-it-marketing',
+    tics: ["Dr. Anuja Mathur","Mr. Tushar Marwaha"],
     pocs: [
       {
         "name": "Kashvi Aggarwal",
@@ -1476,6 +1503,7 @@ export const DEMO_SOCIETIES = [
   // --- 28. MIC (Management Interaction Cell) ---
   {
     id: 'mic-corporate',
+    tics: ["Mr. Tushar Marwaha","Dr. Ramesh Kumar"],
     pocs: [
       {
         "name": "Kashish Raj",
@@ -1526,6 +1554,7 @@ export const DEMO_SOCIETIES = [
   // --- 29. Kartavya ---
   {
     id: 'kartavya',
+    tics: ["Dr. Saumya Jain","Dr. Satish Kumar Goel","Dr. Ramesh Kumar"],
     pocs: [
       {
         "name": "Aaditya Bhatnagar",
@@ -1585,6 +1614,7 @@ export const DEMO_SOCIETIES = [
   // --- 29b. Connecting Dreams Foundation (CDF) ---
   {
     id: 'cdf-sscbs',
+    tics: ["Dr. Saumya Jain"],
     pocs: [
       {
         "name": "Kanishka Kashyap",
@@ -1644,6 +1674,7 @@ export const DEMO_SOCIETIES = [
   // --- 30. NUCLEUS ---
   {
     id: 'nucleus-analytics',
+    tics: ["Dr. Amrina Kausar","Dr. Mona Verma","Dr. Rishi Rajan Sahay","Dr. Satish Kumar Goel"],
     pocs: [
       {
         "name": "Srisham Dash",
@@ -1694,6 +1725,7 @@ export const DEMO_SOCIETIES = [
   // --- 31. Parishram (Sports Society) ---
   {
     id: 'parishram-sports',
+    tics: ["Dr. Mona Verma","Dr. Madhu Totla","Md Rashid Shamim"],
     pocs: [
       {
         "name": "Khushal Bansal",
@@ -1753,6 +1785,7 @@ export const DEMO_SOCIETIES = [
   // --- 32. QSA ---
   {
     id: 'qsa-inclusivity',
+    tics: ["Dr. Anuja Mathur","Dr. Shikha Gupta"],
     pocs: [
       {
         "name": "Himanshu Anand",
@@ -1803,6 +1836,7 @@ export const DEMO_SOCIETIES = [
   // --- 33. CBS Post ---
   {
     id: 'cbs-post',
+    tics: [],
     pocs: [
       {
         "name": "Riddhima Rawat",
@@ -1862,6 +1896,7 @@ export const DEMO_SOCIETIES = [
   // --- 34. Rotaract SSCBS ---
   {
     id: 'rotaract-sscbs',
+    tics: ["Dr. Anuja Mathur (Convenor)","Mr. Tushar Marwaha"],
     pocs: [
       {
         "name": "Arshita",
@@ -1921,6 +1956,7 @@ export const DEMO_SOCIETIES = [
   // --- 35. Synergy (The Corporate Events Society) ---
   {
     id: 'synergy-corporate',
+    tics: ["Dr. Neeraj Kumar Sehrawat","Dr. Satish Kumar Goel"],
     pocs: [
       {
         "name": "Princy Sanghvi",
@@ -1980,6 +2016,7 @@ export const DEMO_SOCIETIES = [
   // --- 36. Verve (Street Play Society) ---
   {
     id: 'verve-streetplay',
+    tics: ["Dr. Tarannum Ahmad","Ms. Kavita Rastogi"],
     pocs: [
       {
         "name": "Vanshika Kumari",
@@ -2039,6 +2076,7 @@ export const DEMO_SOCIETIES = [
   // --- 37. Yuva (Entrepreneurship Cell) ---
   {
     id: 'yuva-ecell',
+    tics: ["Dr. Poonam Verma","Mr. Ramesh Barpa","Dr. Kumar Bijoy","Mr. Amit Kumar"],
     pocs: [
       {
         "name": "Yohan Kaul",
@@ -2101,6 +2139,7 @@ export const DEMO_SOCIETIES = [
   // --- 38. 180 Degree Consulting ---
   {
     id: '180dc-consulting',
+    tics: ["Dr. Neeraj K Sehrawat (Convenor)","Mr. Amit Kumar","Mr. Deepak Tiwari"],
     pocs: [
       {
         "name": "Siddhi Garg",
@@ -2151,6 +2190,7 @@ export const DEMO_SOCIETIES = [
   // --- 39. IMA Chapter ---
   {
     id: 'ima-chapter',
+    tics: ["Dr. Neeraj Kumar Sehrawat","Mr. Amit Kumar"],
     pocs: [
       {
         "name": "Nitansh Yadav",
@@ -2202,6 +2242,7 @@ export const DEMO_SOCIETIES = [
   // --- 40. APICS Chapter ---
   {
     id: 'apics-operations',
+    tics: ["Dr. Mona Verma (Convenor)","Dr. Amrina Kausar","Dr. Paridhi"],
     pocs: [
       {
         "name": "Manya",
@@ -2264,6 +2305,7 @@ export const DEMO_SOCIETIES = [
   // --- 41. Eco Club ---
   {
     id: 'eco-club',
+    tics: ["Dr. Saumya Jain","Dr. Satish Kumar Goel","Dr. Ramesh Kumar"],
     pocs: [
       {
         "name": "Piyush Kumar Pandit",
@@ -2323,6 +2365,7 @@ export const DEMO_SOCIETIES = [
   // --- 42. Sadhna + Make Sense ---
   {
     id: 'sadhna-makesense',
+    tics: ["Dr. Onkar Singh","Mr. Tushar Marwaha (Convenor)"],
     pocs: [
       {
         "name": "Gaurav Kumar",
@@ -2381,6 +2424,7 @@ export const DEMO_SOCIETIES = [
   // --- 43. Bridges for Enterprise ---
   {
     id: 'bridges-enterprise',
+    tics: ["Mr. Tushar Marwaha (Convenor)","Dr. Sushmita"],
     pocs: [
       {
         "name": "Gaurang Garg",
@@ -2431,6 +2475,7 @@ export const DEMO_SOCIETIES = [
   // --- 44. Financial Literacy Club ---
   {
     id: 'financial-literacy',
+    tics: ["Dr. Paridhi (Convenor)","Mr. Tushar Marwaha","Mr. Raj Kumar"],
     pocs: [
       {
         "name": "Bhomik Kumar Sahu",
@@ -2493,6 +2538,7 @@ export const DEMO_SOCIETIES = [
   // --- 45. Skill Development Cell ---
   {
     id: 'sdc-sscbs',
+    tics: [],
     pocs: [
       {
         "name": "Piyush Kumar (President)",
@@ -2543,6 +2589,7 @@ export const DEMO_SOCIETIES = [
   // --- 46. NCC SSCBS (National Cadet Corps) ---
   {
     id: 'ncc-sscbs',
+    tics: ["Dr. Ramesh Kumar Barpa"],
     pocs: [
       {
         name: 'Naman Yadav',
@@ -2574,6 +2621,7 @@ export const DEMO_SOCIETIES = [
   // --- 47. North East Cell (NESWC) ---
   {
     id: 'north-east-cell',
+    tics: ["Dr. Mona Verma"],
     pocs: [
       {
         name: 'Madang Sangdo',

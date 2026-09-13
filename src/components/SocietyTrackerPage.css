@@ -1919,5 +1919,201 @@
   }
 }
 
+/* ── Compact Teacher-in-Charge (TIC) Strip on Society Card ── */
+.st-card-tic-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 10px 0;
+  padding: 5px 8px;
+  background: var(--tint);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  color: var(--ink-dim);
+  overflow: hidden;
+  white-space: nowrap;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.st-card:hover .st-card-tic-row {
+  border-color: rgba(113, 34, 44, 0.25);
+  background: var(--accent-tint, rgba(113, 34, 44, 0.04));
+}
+
+.st-card-tic-icon {
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.st-card-tic-label {
+  font-weight: 800;
+  color: var(--ink);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+
+.st-card-tic-names {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-dim);
+  flex: 1;
+  min-width: 0;
+}
+
+.st-card-tic-names.is-unspecified {
+  font-style: italic;
+  opacity: 0.72;
+}
+
+/* ── Modal Teacher-in-Charge (TIC) Section & Cards ── */
+.st-tic-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.st-tic-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.st-tic-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.st-tic-card.is-convenor {
+  background: var(--surface);
+  border-color: rgba(113, 34, 44, 0.28);
+  box-shadow: 0 1px 4px rgba(113, 34, 44, 0.06);
+}
+
+.st-tic-card-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.st-tic-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--tint);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  flex-shrink: 0;
+}
+
+.st-tic-card.is-convenor .st-tic-avatar {
+  background: var(--accent-tint, rgba(113, 34, 44, 0.08));
+  border-color: rgba(113, 34, 44, 0.2);
+}
+
+.st-tic-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.st-tic-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+}
+
+.st-tic-role {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.st-tic-card.is-convenor .st-tic-role {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.st-tic-details-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-tint, rgba(113, 34, 44, 0.08));
+  border: 1px solid rgba(113, 34, 44, 0.2);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+}
+
+.st-tic-details-btn:hover {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(113, 34, 44, 0.25);
+}
+
+.st-tic-details-btn .st-btn-arrow {
+  transition: transform 0.18s ease;
+}
+
+.st-tic-details-btn:hover .st-btn-arrow {
+  transform: translateX(3px);
+}
+
+.st-tic-note-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  background: var(--tint);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ink-dim);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.st-tic-empty-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--tint);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  margin-top: 6px;
+}
+
 
 

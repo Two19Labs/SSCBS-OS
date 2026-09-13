@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import facultyDataRaw from '../data/faculty_directory.json';
 import {
   BackIcon,
@@ -9,7 +9,7 @@ import {
 } from './icons';
 import './FacultyDatabasePage.css';
 
-export default function FacultyDatabasePage({ onBack }) {
+export default function FacultyDatabasePage({ onBack, initialProfId, onClearPrefill }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [designationFilter, setDesignationFilter] = useState('all');
   const [selectedProf, setSelectedProf] = useState(null);
@@ -18,6 +18,25 @@ export default function FacultyDatabasePage({ onBack }) {
   const facultyList = useMemo(() => {
     return Array.isArray(facultyDataRaw) ? facultyDataRaw : [];
   }, []);
+
+  // Handle deep-linked professor selection from Society Tracker
+  useEffect(() => {
+    if (initialProfId && facultyList.length > 0) {
+      const targetId = String(initialProfId).toLowerCase();
+      const match = facultyList.find(
+        (f) =>
+          f.id === targetId ||
+          f.name.toLowerCase() === targetId ||
+          f.name.toLowerCase().includes(targetId)
+      );
+      if (match) {
+        setSelectedProf(match);
+      }
+      if (typeof onClearPrefill === 'function') {
+        onClearPrefill();
+      }
+    }
+  }, [initialProfId, facultyList, onClearPrefill]);
 
   // Compute designation counts for filter chips
   const designationCounts = useMemo(() => {

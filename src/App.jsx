@@ -109,6 +109,7 @@ function App() {
   const [isGpaOpen, setIsGpaOpen] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [teamFinderPrefill, setTeamFinderPrefill] = useState(null);
+  const [facultyDbPrefillProfId, setFacultyDbPrefillProfId] = useState(null);
 
   const setView = (newView) => {
     if (VALID_VIEWS.includes(newView)) {
@@ -214,6 +215,9 @@ function App() {
     if (id === 'team-finder' && extra) {
       setTeamFinderPrefill(extra);
     }
+    if (id === 'faculty-db' && extra) {
+      setFacultyDbPrefillProfId(extra.profId || extra);
+    }
     setReturnView(TOOL_VIEWS.includes(view) ? 'home' : view);
     setView(id);
   };
@@ -286,7 +290,7 @@ function App() {
       case 'society-tracker':
         return hasSocietyTrackerAccess ? (
           <Suspense fallback={<PageLoader />}>
-            <SocietyTrackerPage onBack={goBack} />
+            <SocietyTrackerPage onBack={goBack} onNavigate={openTool} />
           </Suspense>
         ) : <HomeDashboard onNavigate={openTool} onOpenProfile={() => setView('profile')} />;
 
@@ -308,7 +312,11 @@ function App() {
       case 'faculty-db':
         return canAccessFacultyDatabase(user?.email) ? (
           <Suspense fallback={<PageLoader />}>
-            <FacultyDatabasePage onBack={goBack} />
+            <FacultyDatabasePage 
+              onBack={goBack} 
+              initialProfId={facultyDbPrefillProfId}
+              onClearPrefill={() => setFacultyDbPrefillProfId(null)}
+            />
           </Suspense>
         ) : <HomeDashboard onNavigate={openTool} onOpenProfile={() => setView('profile')} />;
       case 'team-finder':
