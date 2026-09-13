@@ -866,22 +866,6 @@ export default function SocietyTrackerPage({ onBack, onNavigate }) {
                   </div>
                 </div>
               )}
-
-              <div className="st-modal-section">
-                <h4 className="st-modal-sec-title">🗓️ Annual Induction &amp; Recruitment Cycle</h4>
-                <div className="st-induction-info-box">
-                  <span className="st-induction-icon">📢</span>
-                  <div>
-                    <strong style={{ display: 'block', marginBottom: '3px', color: 'var(--ink)' }}>
-                      Annual Recruitment Window
-                    </strong>
-                    <p style={{ margin: 0, fontSize: '0.84rem', lineHeight: '1.45', color: 'var(--ink-dim)' }}>
-                      Official society inductions at SSCBS are conducted annually at the beginning of the odd semester (typically in August/September) for freshers and prospective applicants.
-                      Applications for the 2026–27 session have completed. Follow their official social handles and reach out to the PoRs above for updates on campus events, workshops, and future recruitment cycles!
-                    </p>
-                  </div>
-                </div>
-              </div>
             </div>
 
             <div className="st-modal-footer">
