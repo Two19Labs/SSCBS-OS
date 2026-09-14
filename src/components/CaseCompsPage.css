@@ -467,14 +467,26 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 3px 8px 3px 10px;
+  padding: 0 8px 0 10px;
+  height: 32px;
   font-size: 0.76rem;
   color: var(--ink-dim);
   font-weight: 600;
+  transition: all 0.15s ease;
 }
 
-.cc-sort-box svg {
+.cc-sort-box:hover {
+  border-color: var(--ink-dim);
+}
+
+.cc-sort-box:focus-within {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 2px rgba(113, 34, 44, 0.08);
+}
+
+.cc-sort-icon {
   color: var(--ink-dim);
+  flex-shrink: 0;
 }
 
 .cc-sort-label {
@@ -482,18 +494,43 @@
   color: var(--ink-dim);
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
+}
+
+.cc-sort-select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .cc-sort-select {
   background: transparent;
-  border: none;
-  outline: none;
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
   font-size: 0.76rem;
   font-weight: 700;
   color: var(--ink);
   cursor: pointer;
-  padding: 4px 2px;
+  padding: 0 18px 0 4px;
   font-family: inherit;
+  line-height: 1;
+}
+
+.cc-sort-chevron {
+  position: absolute;
+  right: 2px;
+  pointer-events: none;
+  color: var(--ink-dim);
+  transition: transform 0.15s ease;
+}
+
+.cc-sort-select:focus + .cc-sort-chevron {
+  transform: rotate(180deg);
+  color: var(--ink);
 }
 
 [data-theme='dark'] .cc-sort-select option {
@@ -502,10 +539,14 @@
 }
 
 .cc-reset-btn {
-  background: none;
-  border: 1px dashed var(--border);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--surface);
+  border: 1px solid rgba(113, 34, 44, 0.22);
   border-radius: 8px;
-  padding: 5px 11px;
+  padding: 0 11px;
+  height: 32px;
   font-size: 0.74rem;
   font-weight: 700;
   color: var(--accent, #71222c);
@@ -517,6 +558,29 @@
 .cc-reset-btn:hover {
   background: var(--accent-tint, rgba(113, 34, 44, 0.08));
   border-color: var(--accent, #71222c);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(113, 34, 44, 0.08);
+}
+
+.cc-reset-btn:active {
+  transform: translateY(0);
+}
+
+.cc-reset-icon {
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+[data-theme='dark'] .cc-reset-btn {
+  background: rgba(248, 113, 113, 0.08);
+  border-color: rgba(248, 113, 113, 0.28);
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .cc-reset-btn:hover {
+  background: rgba(248, 113, 113, 0.16);
+  border-color: #f87171;
+  color: #ffffff;
 }
 
 /* ── Status Bar ── */
