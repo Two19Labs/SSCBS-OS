@@ -336,7 +336,10 @@ function App() {
       case 'empty-room':
         return (
           <Suspense fallback={<PageLoader />}>
-            <EmptyRoomFinderPage onBack={goBack} />
+            <EmptyRoomFinderPage 
+              onBack={goBack} 
+              headerAction={<NotificationCenter onNavigate={openTool} />} 
+            />
           </Suspense>
         );
       case 'contact':
@@ -528,7 +531,7 @@ function App() {
 
         {/* ── Main content ── */}
         <main className="app-main">
-          {view !== 'home' && view !== 'case-comps' && (
+          {view !== 'home' && view !== 'case-comps' && view !== 'empty-room' && (
             <div className="page-heading-desktop">
               <h1 style={{ margin: 0 }}>{pageTitle || 'SSCBS OS'}</h1>
               <NotificationCenter onNavigate={openTool} />

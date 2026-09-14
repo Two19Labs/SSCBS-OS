@@ -24,6 +24,20 @@
   margin-bottom: 4px;
 }
 
+.empty-room-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.empty-room-header-action {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
 .empty-room-back-btn {
   display: inline-flex;
   align-items: center;

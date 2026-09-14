@@ -12,7 +12,7 @@ import {
 import { DoorIcon, SearchIcon, BackIcon, RefreshIcon, CalendarIcon } from './icons';
 import './EmptyRoomFinderPage.css';
 
-export function EmptyRoomFinderPage({ onBack }) {
+export function EmptyRoomFinderPage({ onBack, headerAction }) {
   const { timetable, holidays } = useTimetable();
   const { user } = useAuth();
 
@@ -202,10 +202,19 @@ export function EmptyRoomFinderPage({ onBack }) {
     <div className="empty-room-page">
       {/* Top Header */}
       <div className="empty-room-header">
-        <button className="empty-room-back-btn" onClick={onBack} aria-label="Go back">
-          <BackIcon size={18} />
-          <span>Back</span>
-        </button>
+        <div className="empty-room-header-top">
+          {onBack && (
+            <button className="empty-room-back-btn" onClick={onBack} aria-label="Go back">
+              <BackIcon size={18} />
+              <span>Back</span>
+            </button>
+          )}
+          {headerAction && (
+            <div className="empty-room-header-action desktop-only-notif">
+              {headerAction}
+            </div>
+          )}
+        </div>
 
         <div className="empty-room-title-section">
           <div className="empty-room-title-row">
