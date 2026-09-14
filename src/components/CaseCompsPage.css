@@ -362,6 +362,46 @@
   color: #ffffff;
 }
 
+/* ── Discipline Track Filter Bar (Row 2) ── */
+.cc-category-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 2px 0 4px;
+}
+
+.cc-cat-pill {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--ink-dim);
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.cc-cat-pill:hover {
+  border-color: var(--ink-dim);
+  color: var(--ink);
+}
+
+.cc-cat-pill.active {
+  background: var(--accent-tint, rgba(113, 34, 44, 0.08));
+  border-color: var(--accent, #71222c);
+  color: var(--accent, #71222c);
+  font-weight: 700;
+}
+
+[data-theme='dark'] .cc-cat-pill.active {
+  background: rgba(248, 113, 113, 0.12);
+  border-color: #f87171;
+  color: #fca5a5;
+}
+
 /* ── Secondary Controls & Sort Toolbar ── */
 .cc-controls-bar {
   display: flex;
@@ -603,6 +643,73 @@
   min-width: 0;
   flex: 1;
 }
+
+.cc-top-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.cc-category-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cc-category-badge.case {
+  background: rgba(139, 92, 246, 0.1);
+  color: #7c3aed;
+  border: 1px solid rgba(139, 92, 246, 0.25);
+}
+
+.cc-category-badge.hackathon {
+  background: rgba(14, 165, 233, 0.1);
+  color: #0284c7;
+  border: 1px solid rgba(14, 165, 233, 0.25);
+}
+
+.cc-category-badge.simulation {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.cc-category-badge.writing {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.cc-category-badge.quiz {
+  background: rgba(244, 63, 94, 0.1);
+  color: #e11d48;
+  border: 1px solid rgba(244, 63, 94, 0.25);
+}
+
+.cc-category-badge.debate {
+  background: rgba(249, 115, 22, 0.1);
+  color: #ea580c;
+  border: 1px solid rgba(249, 115, 22, 0.25);
+}
+
+.cc-category-badge.general {
+  background: var(--bg);
+  color: var(--ink-dim);
+  border: 1px solid var(--border);
+}
+
+[data-theme='dark'] .cc-category-badge.case { color: #a78bfa; border-color: rgba(167, 139, 250, 0.35); }
+[data-theme='dark'] .cc-category-badge.hackathon { color: #38bdf8; border-color: rgba(56, 189, 248, 0.35); }
+[data-theme='dark'] .cc-category-badge.simulation { color: #34d399; border-color: rgba(52, 211, 153, 0.35); }
+[data-theme='dark'] .cc-category-badge.writing { color: #fbbf24; border-color: rgba(251, 191, 36, 0.35); }
+[data-theme='dark'] .cc-category-badge.quiz { color: #fb7185; border-color: rgba(251, 113, 133, 0.35); }
+[data-theme='dark'] .cc-category-badge.debate { color: #fb923c; border-color: rgba(251, 146, 60, 0.35); }
 
 .cc-card-bookmark-btn {
   width: 34px;
@@ -1308,6 +1415,30 @@
     flex-shrink: 0;
     padding: 6px 11px;
     font-size: 0.78rem;
+  }
+
+  /* Smooth horizontal scroll with hidden scrollbar for track pills */
+  .cc-category-bar {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    margin: 0 -4px;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .cc-category-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cc-cat-pill {
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 5px 11px;
+    font-size: 0.76rem;
   }
 
   .cc-card-inner {

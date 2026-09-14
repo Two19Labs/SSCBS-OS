@@ -32,6 +32,7 @@ const FACULTY_NAME_TO_ID = {
   'shikha gupta': 'dr-shikha-gupta-ph-d',
   'anuja mathur': 'dr-anuja-mathur-ph-d',
   'tushar marwaha': 'tushar-marwaha-mba',
+  'tushar marwah': 'tushar-marwaha-mba',
   'rashid shamim': 'md-rashid-shamim-mba',
   'md rashid shamim': 'md-rashid-shamim-mba',
   'mohd. rashid shamim': 'md-rashid-shamim-mba',

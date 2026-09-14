@@ -110,6 +110,68 @@ function isUndergradEligible(item) {
   return true;
 }
 
+function classifyOpportunity(item) {
+  const type = (item.type || '').toLowerCase();
+  const subtype = (item.subtype || item.subType || '').toLowerCase();
+  const title = (item.title || '').toLowerCase();
+  const filterNames = (item.filters || []).map(f => (f.name || '').toLowerCase());
+
+  // 1. Hackathons & Coding Contests
+  if (
+    type === 'hackathons' ||
+    subtype === 'online_coding_challenge' ||
+    filterNames.some(f => f.includes('programming') || f.includes('hackathon') || f.includes('coding')) ||
+    /\b(hackathon|codefest|coding|hack\b|devfest|web dev|app dev|fullstack|machine learning|ai\/ml|data science|datathon|cybersecurity|blockchain|dapp|algorithmic|kaggle)\b/i.test(title)
+  ) {
+    return { category: 'hackathon', categoryLabel: 'Hackathon', categoryEmoji: '💻' };
+  }
+
+  // 2. Simulations, Auctions & Mock Stocks
+  if (
+    filterNames.some(f => f.includes('simulation')) ||
+    /\b(auction\b|ipl auction|football auction|cricket auction|mock stock|stock trading|trading simulation|simulation game|deal room|portfolio management|bidding)\b/i.test(title)
+  ) {
+    return { category: 'simulation', categoryLabel: 'Simulation & Auction', categoryEmoji: '📈' };
+  }
+
+  // 3. Writing, Essays & Research Papers
+  if (
+    filterNames.some(f => f.includes('writing') || f.includes('essay') || f.includes('paper presentation')) ||
+    /\b(article writing|essay writing|essay\b|paper presentation|research paper|editorial|journalism|case writing|call for papers|article\b|blog writing|white paper)\b/i.test(title)
+  ) {
+    return { category: 'writing', categoryLabel: 'Writing & Research', categoryEmoji: '✍️' };
+  }
+
+  // 4. Quizzes & Trivia
+  if (
+    type === 'quizzes' ||
+    filterNames.some(f => f.includes('quiz') || f.includes('quizzing')) ||
+    /\b(quiz\b|trivia\b|quizzing|brain teaser|inquisitive|inquizire|knowledge bowl)\b/i.test(title)
+  ) {
+    return { category: 'quiz', categoryLabel: 'Quiz & Trivia', categoryEmoji: '🧠' };
+  }
+
+  // 5. Debates & Model UN
+  if (
+    filterNames.some(f => f.includes('debate')) ||
+    /\b(debate\b|debating|parliamentary debate|asian pd|turncoat|mun\b|model united nations|youth parliament|oratory)\b/i.test(title)
+  ) {
+    return { category: 'debate', categoryLabel: 'Debate & MUN', categoryEmoji: '🗣️' };
+  }
+
+  // 6. Case Competitions & Strategy (Core default)
+  if (
+    subtype === 'case_competition' ||
+    subtype === 'case-competitions' ||
+    filterNames.some(f => f.includes('case') || f.includes('strategy') || f.includes('business plan') || f.includes('marketing') || f.includes('entrepreneurship')) ||
+    /\b(case\b|case study|case competition|consulting|strategy|b-plan|business plan|pitch deck|pitch\b|valuation|shark tank|ideathon|venture|entrepreneurship|consultant)\b/i.test(title)
+  ) {
+    return { category: 'case', categoryLabel: 'Case Comp', categoryEmoji: '📊' };
+  }
+
+  return { category: 'general', categoryLabel: 'General Comp', categoryEmoji: '🎯' };
+}
+
 export async function fetchCompetitionsFromUnstop() {
   const queryEndpoints = [
     // Category & Core Theme Keywords
@@ -121,6 +183,29 @@ export async function fetchCompetitionsFromUnstop() {
     'opportunity=competitions&searchTerm=strategy&per_page=50',
     'opportunity=competitions&searchTerm=b-plan&per_page=50',
     'opportunity=competitions&searchTerm=challenge&per_page=50',
+
+    // Hackathons & Coding Contests
+    'opportunity=hackathons&per_page=50',
+    'opportunity=competitions&searchTerm=hackathon&per_page=50',
+    'opportunity=competitions&searchTerm=coding&per_page=50',
+
+    // Simulations, Auctions & Mock Stocks
+    'opportunity=competitions&searchTerm=auction&per_page=50',
+    'opportunity=competitions&searchTerm=mock stock&per_page=50',
+    'opportunity=competitions&searchTerm=trading&per_page=50',
+
+    // Writing, Research & Papers
+    'opportunity=competitions&searchTerm=article writing&per_page=50',
+    'opportunity=competitions&searchTerm=essay&per_page=50',
+    'opportunity=competitions&searchTerm=paper presentation&per_page=50',
+
+    // Quizzes & Trivia
+    'opportunity=quizzes&per_page=50',
+    'opportunity=competitions&searchTerm=quiz&per_page=50',
+
+    // Debates & MUNs
+    'opportunity=competitions&searchTerm=debate&per_page=50',
+    'opportunity=competitions&searchTerm=mun&per_page=50',
 
     // Delhi University Circuit (Top Colleges)
     'opportunity=competitions&searchTerm=delhi university&per_page=50',
@@ -168,10 +253,15 @@ export async function fetchCompetitionsFromUnstop() {
       )
     );
 
-  const chunk1 = queryEndpoints.slice(0, 15);
-  const chunk2 = queryEndpoints.slice(15);
-  const [res1, res2] = await Promise.all([fetchChunk(chunk1), fetchChunk(chunk2)]);
-  const batches = [...res1, ...res2];
+  const chunk1 = queryEndpoints.slice(0, 12);
+  const chunk2 = queryEndpoints.slice(12, 24);
+  const chunk3 = queryEndpoints.slice(24);
+  const [res1, res2, res3] = await Promise.all([
+    fetchChunk(chunk1),
+    fetchChunk(chunk2),
+    fetchChunk(chunk3)
+  ]);
+  const batches = [...res1, ...res2, ...res3];
   const now = Date.now();
 
   const map = new Map();
@@ -218,6 +308,9 @@ export async function fetchCompetitionsFromUnstop() {
     const isOtherMbaOrCorporate = (isOtherMba || isCorporate) && !isDU && !isIIMorIIT;
     const isFlagship = FLAGSHIP_KEYWORDS.some(kw => matchesKeyword(combined, kw));
 
+    // Multi-track discipline classification
+    const { category, categoryLabel, categoryEmoji } = classifyOpportunity(item);
+
     const minTeam = item.regnRequirements?.min_team_size || 1;
     const maxTeam = item.regnRequirements?.max_team_size || 4;
     const isFree = !item.isPaid;
@@ -255,6 +348,9 @@ export async function fetchCompetitionsFromUnstop() {
       remainDaysText,
       daysRemainingNum,
       urgency,
+      category,
+      categoryLabel,
+      categoryEmoji,
       minTeam,
       maxTeam,
       teamSizeDisplay: minTeam === maxTeam 
@@ -279,12 +375,14 @@ export async function fetchCompetitionsFromUnstop() {
     };
   });
 
-  // Sort: Urgency / closing soon first, then by registrations
+  // Sort: Exact closing deadline timestamp first, then by registrations
   formatted.sort((a, b) => {
-    if (a.daysRemainingNum !== b.daysRemainingNum) {
-      return a.daysRemainingNum - b.daysRemainingNum;
-    }
-    return b.registeredCount - a.registeredCount;
+    const timeA = a.deadline ? new Date(a.deadline).getTime() : Infinity;
+    const timeB = b.deadline ? new Date(b.deadline).getTime() : Infinity;
+    const validA = !isNaN(timeA) ? timeA : Infinity;
+    const validB = !isNaN(timeB) ? timeB : Infinity;
+    if (validA !== validB) return validA - validB;
+    return (b.registeredCount || 0) - (a.registeredCount || 0);
   });
 
   return formatted;

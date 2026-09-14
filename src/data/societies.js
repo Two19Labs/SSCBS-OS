@@ -1838,7 +1838,7 @@ export const DEMO_SOCIETIES = [
   // --- 33. CBS Post ---
   {
     id: 'cbs-post',
-    tics: [],
+    tics: ["Dr. Anuja Mathur", "Mr. Tushar Marwaha"],
     pocs: [
       {
         "name": "Riddhima Rawat",
