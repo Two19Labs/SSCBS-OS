@@ -843,20 +843,15 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
                       </div>
                     </div>
 
-                    <div className="cc-top-right-actions">
-                      <span className={`cc-category-badge ${comp.category || 'general'}`}>
-                        {comp.categoryEmoji || '🎯'} {comp.categoryLabel || 'Comp'}
-                      </span>
-                      <button
-                        type="button"
-                        className={`cc-card-bookmark-btn ${isBookmarked ? 'active' : ''}`}
-                        onClick={(e) => toggleBookmark(comp.id, e)}
-                        title={isBookmarked ? 'Remove bookmark' : 'Bookmark this competition'}
-                        aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark this competition'}
-                      >
-                        <BookmarkIcon size={16} filled={isBookmarked} />
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      className={`cc-card-bookmark-btn ${isBookmarked ? 'active' : ''}`}
+                      onClick={(e) => toggleBookmark(comp.id, e)}
+                      title={isBookmarked ? 'Remove bookmark' : 'Bookmark this competition'}
+                      aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark this competition'}
+                    >
+                      <BookmarkIcon size={16} filled={isBookmarked} />
+                    </button>
                   </div>
 
                   {/* Competition Title */}
