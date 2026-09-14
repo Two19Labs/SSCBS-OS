@@ -25,13 +25,6 @@ const SearchIcon = ({ size = 18, className = '' }) => (
   </svg>
 );
 
-const RefreshIcon = ({ size = 18 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21.5 2v6h-6M2.5 22v-6h6" />
-    <path d="M2 11.5a10 10 0 0 1 18.8-4.3L21.5 8M22 12.5a10 10 0 0 1-18.8 4.3L2.5 16" />
-  </svg>
-);
-
 const ExternalLinkIcon = ({ size = 14 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
@@ -278,7 +271,6 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
 
   const [competitions, setCompetitions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [fetchError, setFetchError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'du' | 'iim-iit' | 'other-mba-corp' | 'bookmarked'
@@ -386,13 +378,12 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
     return () => clearInterval(timer);
   }, []);
 
-  const fetchOpportunities = useCallback(async (showRefreshing = false) => {
-    if (showRefreshing) setIsRefreshing(true);
-    else setLoading(true);
+  const fetchOpportunities = useCallback(async () => {
+    setLoading(true);
     setFetchError(null);
 
     try {
-      const res = await fetch('/api/competitions');
+      const res = await fetch(`/api/competitions?t=${Date.now()}`, { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to reach Unstop`);
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
@@ -407,7 +398,6 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
       setCompetitions([]);
     } finally {
       setLoading(false);
-      setIsRefreshing(false);
     }
   }, []);
 
@@ -563,31 +553,6 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
               It's competitions season! Find opportunities relevant to CBS folks right here, synced with and pulled from Unstop, all filterable! :)
             </p>
           </div>
-        </div>
-
-        <div className="cc-header-actions">
-          <button
-            type="button"
-            className={`cc-saved-header-btn ${activeFilter === 'bookmarked' ? 'active' : ''}`}
-            onClick={() => setActiveFilter(activeFilter === 'bookmarked' ? 'all' : 'bookmarked')}
-            title={activeFilter === 'bookmarked' ? 'Show all circuits' : 'View your bookmarked competitions'}
-          >
-            <BookmarkIcon size={15} filled={bookmarkedIds.length > 0} />
-            <span>Saved</span>
-            {bookmarkedIds.length > 0 && (
-              <span className="cc-saved-header-count">{bookmarkedIds.length}</span>
-            )}
-          </button>
-
-          <button
-            className={`cc-refresh-btn ${isRefreshing ? 'refreshing' : ''}`}
-            onClick={() => fetchOpportunities(true)}
-            disabled={isRefreshing || loading}
-            title="Refresh live Unstop feed"
-          >
-            <RefreshIcon size={15} />
-            <span>{isRefreshing ? 'Syncing...' : 'Sync Unstop'}</span>
-          </button>
         </div>
       </header>
 

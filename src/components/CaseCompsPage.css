@@ -181,94 +181,6 @@
   gap: 8px;
 }
 
-.cc-refresh-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--ink);
-  padding: 7px 12px;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.cc-refresh-btn:hover:not(:disabled) {
-  border-color: var(--ink);
-  background: var(--bg);
-}
-
-.cc-refresh-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.cc-refresh-btn.refreshing svg {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.cc-saved-header-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--ink);
-  padding: 7px 12px;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.cc-saved-header-btn:hover {
-  border-color: #d97706;
-  color: #d97706;
-  background: rgba(245, 158, 11, 0.08);
-}
-
-.cc-saved-header-btn.active {
-  background: rgba(245, 158, 11, 0.15);
-  color: #b45309;
-  border-color: #f59e0b;
-}
-
-[data-theme='dark'] .cc-saved-header-btn:hover {
-  border-color: #fbbf24;
-  color: #fbbf24;
-  background: rgba(245, 158, 11, 0.15);
-}
-
-[data-theme='dark'] .cc-saved-header-btn.active {
-  background: rgba(245, 158, 11, 0.25);
-  color: #fde68a;
-  border-color: #f59e0b;
-}
-
-.cc-saved-header-count {
-  background: #f59e0b;
-  color: #ffffff;
-  font-size: 0.68rem;
-  font-weight: 800;
-  padding: 1px 6px;
-  border-radius: 9999px;
-  line-height: 1.2;
-}
-
-[data-theme='dark'] .cc-saved-header-count {
-  background: #d97706;
-  color: #ffffff;
-}
-
 /* ── Metrics Stat Bar ── */
 .cc-metrics-grid {
   display: grid;
@@ -1417,17 +1329,6 @@
 
   .cc-subtitle {
     font-size: 0.8rem;
-  }
-
-  .cc-header-actions {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  .cc-refresh-btn {
-    padding: 6px 12px;
-    font-size: 0.78rem;
   }
 
   .cc-unstop-notice-banner {
