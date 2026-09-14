@@ -351,7 +351,10 @@ function App() {
       case 'contact':
         return (
           <Suspense fallback={<PageLoader />}>
-            <ContactPage onBack={goBack} />
+            <ContactPage 
+              onBack={goBack} 
+              headerAction={<NotificationCenter onNavigate={openTool} />} 
+            />
           </Suspense>
         );
       case 'admin':
@@ -542,7 +545,8 @@ function App() {
            view !== 'empty-room' && 
            view !== 'team-finder' && 
            view !== 'society-tracker' && 
-           view !== 'faculty-db' && (
+           view !== 'faculty-db' && 
+           view !== 'contact' && (
             <div className="page-heading-desktop">
               <h1 style={{ margin: 0 }}>{pageTitle || 'SSCBS OS'}</h1>
               <NotificationCenter onNavigate={openTool} />

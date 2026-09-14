@@ -22,7 +22,20 @@
 .contact-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.85rem;
+}
+
+.contact-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.contact-header-action {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .contact-header h2 {

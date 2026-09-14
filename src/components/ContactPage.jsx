@@ -13,7 +13,7 @@ const TOPICS = [
   { id: 'general', label: '💬 General Inquiry', text: 'Hi! I have a query regarding SSCBS OS.' },
 ];
 
-export default function ContactPage({ onBack }) {
+export default function ContactPage({ onBack, headerAction }) {
   const { user } = useAuth();
   const [selectedTopic, setSelectedTopic] = useState('general');
   const [customNote, setCustomNote] = useState('');
@@ -52,15 +52,22 @@ export default function ContactPage({ onBack }) {
   return (
     <div className="contact-page">
       <header className="contact-header">
-        {onBack && (
-          <button className="btn-back" onClick={onBack} aria-label="Back">
-            <BackIcon />
-          </button>
-        )}
-        <div>
-          <h2>Contact Us</h2>
-          <p className="contact-subtitle">Direct support & feedback for SSCBS OS</p>
+        <div className="contact-header-left">
+          {onBack && (
+            <button className="btn-back" onClick={onBack} aria-label="Back">
+              <BackIcon />
+            </button>
+          )}
+          <div>
+            <h2>Contact Us</h2>
+            <p className="contact-subtitle">Direct support & feedback for SSCBS OS</p>
+          </div>
         </div>
+        {headerAction && (
+          <div className="contact-header-action desktop-only-notif">
+            {headerAction}
+          </div>
+        )}
       </header>
 
       {/* Main WhatsApp Card */}
