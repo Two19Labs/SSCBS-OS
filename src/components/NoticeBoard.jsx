@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import { isAdminEmail } from '../lib/admin';
+import { trackNoticeEvent } from '../lib/analytics';
 import './NoticeBoard.css';
 
 export default function NoticeBoard({ onNavigate, compact = false }) {
@@ -613,6 +614,7 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="btn-notice-action"
+                    onClick={() => trackNoticeEvent('link_clicked', { title: notice.title, url: notice.link_url })}
                   >
                     Link
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="arrow-icon">

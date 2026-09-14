@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabaseClient';
+import { trackPostHogPageView, trackAuthEvent } from '../lib/analytics';
 import { EyeIcon, EyeOffIcon } from './icons';
 import './Auth.css';
 
@@ -56,6 +57,15 @@ export default function Auth({ forceMode }) {
       setMode('update_password');
     }
   }, [forceMode, isPasswordRecovery]);
+
+  // Track pageview for visitors on Auth screen (fixes missing unauthenticated web analytics)
+  useEffect(() => {
+    trackPostHogPageView('auth', {
+      auth_mode: mode,
+      is_recovery: Boolean(isPasswordRecovery),
+    });
+  }, [mode, isPasswordRecovery]);
+
 
   // Mark this device as having visited, so future opens default to Sign In.
   useEffect(() => {
@@ -149,6 +159,7 @@ export default function Auth({ forceMode }) {
     setError('');
     setSuccessMsg('');
     setLoading(true);
+    trackAuthEvent('oauth_attempt', { provider: 'google' });
 
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -163,6 +174,7 @@ export default function Auth({ forceMode }) {
       });
       if (error) throw error;
     } catch (err) {
+      trackAuthEvent('oauth_failure', { provider: 'google', error_message: err.message });
       setError(err.message || 'An error occurred during Google Sign-In.');
       setLoading(false);
     }

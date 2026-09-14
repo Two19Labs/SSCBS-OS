@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { trackGpaEvent } from '../lib/analytics';
 import './GpaCalculatorModal.css';
 
 const DEFAULT_SLOTS = [
@@ -45,6 +46,12 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
       return 'sgpa';
     }
   });
+
+  useEffect(() => {
+    if (isOpen) {
+      trackGpaEvent('modal_opened', { default_tab: activeTab });
+    }
+  }, [isOpen]);
   
   // SGPA Tab states
   const [selectedSemester, setSelectedSemester] = useState(() => {

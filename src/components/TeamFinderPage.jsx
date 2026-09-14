@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useConfig } from '../context/ConfigContext';
 import { isAdminEmail, canAccessTeamFinder } from '../lib/admin';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
+import { trackTeamFinderEvent } from '../lib/analytics';
 import {
   TrophyIcon,
   UsersIcon,
@@ -640,6 +641,12 @@ export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill,
     localStorage.setItem('sscbs_squad_posts', JSON.stringify(updated));
     invalidateSessionCache();
 
+    trackTeamFinderEvent('post_created', {
+      competition_name: postPayload.competition_name,
+      spots_left: postPayload.spots_left,
+      skills_looking_for: postPayload.skills_looking_for,
+    });
+
     // Switch to 'my' tab so the author sees their new post immediately
     setHasUserToggledTab(true);
     setActiveTab('my');
@@ -650,6 +657,7 @@ export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill,
 
   const handleDeletePost = async (id) => {
     if (!window.confirm('Are you sure you want to delete this squad listing?')) return;
+    trackTeamFinderEvent('post_deleted', { post_id: id });
 
     try {
       if (hasValidCredentials) {

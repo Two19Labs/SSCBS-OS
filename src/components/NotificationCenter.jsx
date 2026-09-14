@@ -14,6 +14,7 @@ import {
   ShieldIcon,
   UserIcon,
 } from './icons';
+import { trackPostHogEvent } from '../lib/analytics';
 import './NotificationCenter.css';
 
 export default function NotificationCenter({ onNavigate }) {
@@ -177,7 +178,13 @@ export default function NotificationCenter({ onNavigate }) {
       {/* ── Bell Button ── */}
       <button
         className={`notif-bell-btn ${unreadCount > 0 ? 'has-unread' : ''}`}
-        onClick={() => setIsOpen(prev => !prev)}
+        onClick={() => {
+          const nextVal = !isOpen;
+          if (nextVal) {
+            trackPostHogEvent('notification_center_opened', { unread_count: unreadCount });
+          }
+          setIsOpen(nextVal);
+        }}
         aria-label="Notifications Hub"
         title="Notifications Hub"
       >

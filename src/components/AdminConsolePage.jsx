@@ -5,7 +5,7 @@ import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { useConfig } from '../context/ConfigContext';
 import { isAdminEmail } from '../lib/admin';
-import { subscribeToPresence, fetchAnalyticsData, FEATURE_NAMES } from '../lib/analytics';
+import { subscribeToPresence, fetchAnalyticsData, FEATURE_NAMES, trackAdminEvent } from '../lib/analytics';
 import { DEMO_SOCIETIES, CATEGORIES } from '../data/societies';
 import DateTimePicker from './DateTimePicker';
 import './AdminConsolePage.css';
@@ -89,6 +89,10 @@ function AdminConsoleContent({ onBack }) {
   const { featureFlags, updateFeatureFlags } = useConfig();
   const { timetable, updateTimetable, holidays, addHoliday, deleteHoliday } = useTimetable();
   const [activeTab, setActiveTab] = useState('editor'); // 'editor', 'notices', 'analytics', 'holidays', 'settings'
+
+  useEffect(() => {
+    trackAdminEvent('tab_switched', { tab: activeTab });
+  }, [activeTab]);
 
   // Holidays state
   const [holidayForm, setHolidayForm] = useState({ date: '', title: '', message: '', type: 'Holiday' });

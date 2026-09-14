@@ -12,6 +12,7 @@ import {
 } from './icons';
 import { useAuth } from '../context/AuthContext';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
+import { trackSocietyEvent } from '../lib/analytics';
 import './SocietyTrackerPage.css';
 
 const LOCAL_STORAGE_KEY = 'sscbs_bookmarked_societies';
@@ -84,6 +85,18 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
   const [shuffledIds, setShuffledIds] = useState(() => shuffleArray(DEMO_SOCIETIES.map((s) => s.id)));
   const [sortBy, setSortBy] = useState('shuffled');
   const [selectedSociety, setSelectedSociety] = useState(null);
+
+  // Debounced search query telemetry
+  useEffect(() => {
+    if (!searchQuery || searchQuery.trim().length < 2) return;
+    const timer = setTimeout(() => {
+      trackSocietyEvent('search', {
+        query: searchQuery.trim(),
+        length: searchQuery.trim().length,
+      });
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   // Bookmarks (Heart / Star) state with user-scoped key
   const [bookmarkedIds, setBookmarkedIds] = useState(() => {
@@ -491,7 +504,10 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
               <div
                 key={society.id}
                 className={`st-card ${rank === 1 ? 'is-top-choice' : ''}`}
-                onClick={() => setSelectedSociety(society)}
+                onClick={() => {
+                  trackSocietyEvent('card_clicked', { society_name: society.name, category: primaryLabel });
+                  setSelectedSociety(society);
+                }}
                 title={`Click card to view dossier for ${society.name}`}
               >
                 {/* Header & Title */}

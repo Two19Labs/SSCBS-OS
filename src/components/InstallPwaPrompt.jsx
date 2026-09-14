@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { trackPwaEvent } from '../lib/analytics';
 import './InstallPwaPrompt.css';
 
 export default function InstallPwaPrompt() {
@@ -49,25 +50,32 @@ export default function InstallPwaPrompt() {
   }, []);
 
   const handleInstallClick = async () => {
+    trackPwaEvent('install_clicked', { has_deferred_prompt: Boolean(deferredPrompt), is_ios: isIOS });
     if (deferredPrompt) {
       try {
         deferredPrompt.prompt();
         const choiceResult = await deferredPrompt.userChoice;
         if (choiceResult.outcome === 'accepted') {
+          trackPwaEvent('install_accepted');
           setDeferredPrompt(null);
           setSessionDismissed(true);
+        } else {
+          trackPwaEvent('install_cancelled_by_user');
         }
       } catch (err) {
         console.error('PWA install prompt error:', err);
+        trackPwaEvent('guide_modal_opened', { is_ios: isIOS, reason: 'error_fallback' });
         setShowGuideModal(true);
       }
     } else {
       // If deferredPrompt is not directly available (e.g. iOS or browser restriction), show step-by-step guide
+      trackPwaEvent('guide_modal_opened', { is_ios: isIOS, reason: 'no_prompt_available' });
       setShowGuideModal(true);
     }
   };
 
   const handleDismiss = () => {
+    trackPwaEvent('banner_dismissed');
     setSessionDismissed(true);
   };
 

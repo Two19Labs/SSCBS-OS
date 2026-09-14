@@ -8,6 +8,7 @@ import NotificationCenter from './NotificationCenter';
 import { SearchIcon, PercentIcon, CalculatorIcon, FileIcon, TrophyIcon, DoorIcon, HeartIcon, UsersIcon, UserIcon, ImageIcon, FlameIcon } from './icons';
 import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFacultyDatabase, canAccessSocietyTracker, canAccessCaseComps, isTimeWarpEnabled } from '../lib/admin';
 import { exportScheduleAsImage } from '../utils/exportUtils';
+import { trackTimetableEvent } from '../lib/analytics';
 
 
 import './HomeDashboard.css';
@@ -75,16 +76,19 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
     if (!targetEl) return;
     setIsExporting(true);
     setExportMessage(null);
+    trackTimetableEvent('export_attempt', { course, semester, section });
     try {
       await exportScheduleAsImage({
         element: targetEl,
         title: `${course || 'Student'} Sem ${semester || ''} Sec ${section || ''}`,
         fileName: `SSCBS_${course || 'Student'}_Sem${semester || ''}_Sec${section || ''}_Timetable`
       });
+      trackTimetableEvent('export_success', { course, semester, section });
       setExportMessage('PNG Downloaded! 🎉');
       setTimeout(() => setExportMessage(null), 3500);
     } catch (err) {
       console.error('Export error:', err);
+      trackTimetableEvent('export_failure', { error: err.message });
       setExportMessage('Export failed.');
       setTimeout(() => setExportMessage(null), 3500);
     } finally {
@@ -265,13 +269,20 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
       <div className="home-tt-actions-row">
         <button
           className={`home-tt-btn ${showTimeline ? 'active' : ''}`}
-          onClick={() => setShowTimeline(!showTimeline)}
+          onClick={() => {
+            const nextVal = !showTimeline;
+            trackTimetableEvent('toggle_today_schedule', { show: nextVal });
+            setShowTimeline(nextVal);
+          }}
         >
           {showTimeline ? "Hide Today's Schedule ▲" : "View Today's Schedule ▼"}
         </button>
         <button
           className="home-tt-btn primary"
-          onClick={() => setShowWeeklyModal(true)}
+          onClick={() => {
+            trackTimetableEvent('open_weekly_schedule');
+            setShowWeeklyModal(true);
+          }}
         >
           Full Week Timetable 📅
         </button>

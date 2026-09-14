@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
+import { trackCaseCompsEvent } from '../lib/analytics';
 
 const LOCAL_STORAGE_KEY = 'sscbs_bookmarked_case_comps';
 
@@ -411,6 +412,18 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
   const [lastUpdated, setLastUpdated] = useState(null);
   const [nowMs, setNowMs] = useState(() => Date.now());
 
+  // Debounced search query telemetry
+  useEffect(() => {
+    if (!searchQuery || searchQuery.trim().length < 2) return;
+    const timer = setTimeout(() => {
+      trackCaseCompsEvent('search', {
+        query: searchQuery.trim(),
+        length: searchQuery.trim().length,
+      });
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   // Bookmarks state with user-scoped storage & fallback
   const [bookmarkedIds, setBookmarkedIds] = useState(() => {
     try {
@@ -494,7 +507,9 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
     if (e?.stopPropagation) e.stopPropagation();
     if (e?.preventDefault) e.preventDefault();
     setBookmarkedIds((prev) => {
-      const next = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
+      const willAdd = !prev.includes(id);
+      trackCaseCompsEvent(willAdd ? 'bookmark_added' : 'bookmark_removed', { comp_id: id });
+      const next = willAdd ? [...prev, id] : prev.filter((item) => item !== id);
       syncProgressToCloud(next);
       return next;
     });
@@ -537,6 +552,7 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
 
   const handleShare = (comp, e) => {
     e.stopPropagation();
+    trackCaseCompsEvent('share_clicked', { comp_id: comp.id, title: comp.title });
     const details = [
       `🏆 ${comp.title || 'Case Competition'}`,
       comp.orgName ? `🏛️ Organized by: ${comp.orgName}` : null,
@@ -555,6 +571,7 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
 
   const handleFindTeammates = (comp, e) => {
     if (e?.stopPropagation) e.stopPropagation();
+    trackCaseCompsEvent('find_teammates_clicked', { comp_id: comp.id, title: comp.title });
     const teamSize = Math.max(2, Math.min(5, comp.maxTeam || 4));
     const orgSuffix = comp.orgName ? ` (${comp.orgName})` : '';
     const prefill = {
@@ -1136,6 +1153,7 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="cc-action-btn cc-btn-apply"
+                      onClick={() => trackCaseCompsEvent('apply_clicked', { comp_id: comp.id, title: comp.title, url: comp.unstopUrl })}
                     >
                       <span>Apply on Unstop</span>
                       <ExternalLinkIcon size={12} />

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
-import { touchUserActivity } from '../lib/analytics';
+import { touchUserActivity, identifyPostHogUser, resetPostHogUser, trackAuthEvent } from '../lib/analytics';
 
 const AuthContext = createContext({
   user: null,
@@ -70,6 +70,7 @@ export const AuthProvider = ({ children }) => {
           setLoading(false);
           if (session?.user) {
             touchUserActivity(session.user);
+            identifyPostHogUser(session.user);
           }
         })
         .catch((err) => {
@@ -88,11 +89,15 @@ export const AuthProvider = ({ children }) => {
         if (event === 'PASSWORD_RECOVERY') {
           setIsPasswordRecovery(true);
         }
+        if (event === 'SIGNED_OUT') {
+          resetPostHogUser();
+        }
         setSession(session ?? null);
         setUser(session?.user ?? null);
         setLoading(false);
         if (session?.user) {
           touchUserActivity(session.user);
+          identifyPostHogUser(session.user);
         }
       });
       subscription = res?.data?.subscription;
@@ -114,27 +119,48 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const signUp = async (email, password, metadata = {}) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: metadata,
-      },
-    });
-    if (error) throw error;
-    return data;
+    trackAuthEvent('signup_attempt', { email_domain: email.split('@')[1] || 'unknown' });
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: metadata,
+        },
+      });
+      if (error) throw error;
+      if (data?.user) {
+        identifyPostHogUser(data.user);
+      }
+      trackAuthEvent('signup_success', { email_domain: email.split('@')[1] || 'unknown' });
+      return data;
+    } catch (error) {
+      trackAuthEvent('signup_failure', { error_message: error.message });
+      throw error;
+    }
   };
 
   const signIn = async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw error;
-    return data;
+    trackAuthEvent('login_attempt', { email_domain: email.split('@')[1] || 'unknown' });
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+      if (data?.user) {
+        identifyPostHogUser(data.user);
+      }
+      trackAuthEvent('login_success', { email_domain: email.split('@')[1] || 'unknown' });
+      return data;
+    } catch (error) {
+      trackAuthEvent('login_failure', { error_message: error.message });
+      throw error;
+    }
   };
 
   const resetPassword = async (email) => {
+    trackAuthEvent('password_reset_request', { email_domain: email.split('@')[1] || 'unknown' });
     const redirectUrl = window.location.origin;
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl,
@@ -144,6 +170,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updatePassword = async (newPassword) => {
+    trackAuthEvent('password_update_attempt');
     if (!hasValidCredentials) {
       setIsPasswordRecovery(false);
       return { message: 'Password updated successfully (Sandbox mode).' };
@@ -159,17 +186,21 @@ export const AuthProvider = ({ children }) => {
       password: newPassword,
     });
     if (error) {
+      trackAuthEvent('password_update_failure', { error_message: error.message });
       if (error.message && (error.message.toLowerCase().includes('session') || error.status === 401)) {
         setIsPasswordRecovery(false);
         throw new Error('Your password reset link has expired or is invalid. Please request a new password reset email.');
       }
       throw error;
     }
+    trackAuthEvent('password_update_success');
     setIsPasswordRecovery(false);
     return data;
   };
 
   const signOut = async () => {
+    trackAuthEvent('logout');
+    resetPostHogUser();
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
   };
@@ -204,6 +235,12 @@ export const AuthProvider = ({ children }) => {
     }
 
     setUser(data.user);
+    identifyPostHogUser(data.user);
+    trackAuthEvent('profile_updated', {
+      has_course: Boolean(profileData.course),
+      has_semester: Boolean(profileData.semester),
+      has_section: Boolean(profileData.section),
+    });
     return data.user;
   };
 

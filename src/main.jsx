@@ -8,6 +8,10 @@ import { ThemeProvider } from './context/ThemeContext.jsx'
 import { ConfigProvider } from './context/ConfigContext.jsx'
 import { NotificationProvider } from './context/NotificationContext.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
+import { initPostHog } from './lib/analytics'
+
+// Early initialization of PostHog so session recording & web analytics start immediately
+initPostHog();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

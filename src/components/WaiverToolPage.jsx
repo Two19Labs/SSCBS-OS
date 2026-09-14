@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import FooterCredit from './FooterCredit';
 import { useAuth } from '../context/AuthContext';
+import { trackWaiverEvent } from '../lib/analytics';
 import './WaiverToolPage.css';
 
 const MONTHS = [
@@ -817,6 +818,14 @@ function WaiverToolPage({ onBack }) {
     const solverRes = executeSolver(datesWithAbsences, targetGroups, maxWaivers, threshold);
     const recDates = solverRes.bestWaivers.map(w => w.dateStr);
 
+    trackWaiverEvent('solver_executed', {
+      success: solverRes.solverSuccess,
+      waivers_needed: solverRes.solvedSize,
+      min_pct_achieved: solverRes.bestMinRatio * 100,
+      target_threshold: threshold,
+      max_waivers: maxWaivers,
+    });
+
     setRecommendedWaivers(recDates);
     setSelectedWaivers(new Set());
     setSolverResult({
@@ -845,6 +854,12 @@ function WaiverToolPage({ onBack }) {
       const solverRes = executeSolver(parsedData.candidates, parsedData.targetGroups, maxWaivers, threshold);
       const recDates = solverRes.bestWaivers.map(w => w.dateStr);
       
+      trackWaiverEvent('recalculated', {
+        success: solverRes.solverSuccess,
+        waivers_needed: solverRes.solvedSize,
+        min_pct_achieved: solverRes.bestMinRatio * 100,
+      });
+
       setRecommendedWaivers(recDates);
       setSelectedWaivers(new Set(recDates));
       setSolverResult({

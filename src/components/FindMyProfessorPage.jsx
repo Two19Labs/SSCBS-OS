@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { PERIODS, DAYS } from '../data/timetables';
 import { isAdminEmail, isTimeWarpEnabled } from '../lib/admin';
 import { exportScheduleAsImage } from '../utils/exportUtils';
+import { trackProfessorEvent } from '../lib/analytics';
 import { ImageIcon } from './icons';
 import './FindMyProfessorPage.css';
 
@@ -293,20 +294,35 @@ export default function FindMyProfessorPage({ onBack }) {
   const [isExporting, setIsExporting] = useState(false);
   const [exportMessage, setExportMessage] = useState(null);
 
+  // Debounced search query telemetry
+  useEffect(() => {
+    if (!searchQuery || searchQuery.trim().length < 2) return;
+    const timer = setTimeout(() => {
+      trackProfessorEvent('search', {
+        query: searchQuery.trim(),
+        length: searchQuery.trim().length,
+      });
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   const handleExportImage = async () => {
     if (!scheduleExportRef.current || !selectedProf) return;
     setIsExporting(true);
     setExportMessage(null);
+    trackProfessorEvent('export_attempt', { professor: selectedProf });
     try {
       await exportScheduleAsImage({
         element: scheduleExportRef.current,
         title: selectedProf,
         fileName: `SSCBS_Prof_${selectedProf}_Schedule`
       });
+      trackProfessorEvent('export_success', { professor: selectedProf });
       setExportMessage('PNG Downloaded! 🎉');
       setTimeout(() => setExportMessage(null), 3500);
     } catch (err) {
       console.error('Export schedule error:', err);
+      trackProfessorEvent('export_failure', { professor: selectedProf, error: err.message });
       setExportMessage('Export failed. Try again.');
       setTimeout(() => setExportMessage(null), 3500);
     } finally {
@@ -640,6 +656,7 @@ export default function FindMyProfessorPage({ onBack }) {
                       className={`sidebar-prof-item ${isSelected ? 'active' : ''}`}
                       onClick={() => {
                         setSelectedProf(prof);
+                        trackProfessorEvent('selected', { professor: prof });
                         setMobileActiveTab('details');
                       }}
                     >

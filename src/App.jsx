@@ -1,7 +1,7 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useAuth } from './context/AuthContext';
 import { useConfig } from './context/ConfigContext';
-import { initPostHog, logFeatureView, logFeatureClick, subscribeToPresence, FEATURE_NAMES } from './lib/analytics';
+import { initPostHog, logFeatureView, logFeatureClick, subscribeToPresence, FEATURE_NAMES, trackNavigationEvent, trackGpaEvent, trackPostHogPageView } from './lib/analytics';
 import Auth from './components/Auth';
 import HomeDashboard from './components/HomeDashboard';
 import ProfilePage from './components/ProfilePage';
@@ -167,9 +167,11 @@ function App() {
 
   // 🟢 Real-Time Presence & Feature Usage Logger across SSCBS OS
   useEffect(() => {
+    const activeViewName = isGpaOpen ? 'gpa' : view;
+    // Log view unconditionally so PostHog tracks every visitor & view
+    logFeatureView(activeViewName, user);
+
     if (user && user.email) {
-      const activeViewName = isGpaOpen ? 'gpa' : view;
-      logFeatureView(activeViewName, user);
       const unsubscribe = subscribeToPresence(user, activeViewName);
       return () => {
         if (typeof unsubscribe === 'function') unsubscribe();
@@ -207,8 +209,10 @@ function App() {
 
   const openTool = (id, extra = null) => {
     setIsMobileSidebarOpen(false);
+    trackNavigationEvent('tool_opened', id, { source_view: view, has_extra: Boolean(extra) });
     logFeatureView(id, user);
     if (id === 'gpa') {
+      trackGpaEvent('open');
       setIsGpaOpen(true);
       return;
     }
@@ -413,7 +417,7 @@ function App() {
       <div className="app-shell">
         {/* ── Desktop sidebar ── */}
         <aside className="app-sidebar">
-          <div className="sidebar-brand" onClick={() => { setView('home'); setIsMobileSidebarOpen(false); }}>
+          <div className="sidebar-brand" onClick={() => { trackNavigationEvent('sidebar_brand', 'home'); setView('home'); setIsMobileSidebarOpen(false); }}>
             <img src="/sscbs_logo.png" alt="" width="30" height="30" />
             <div className="sidebar-brand-text">
               <span className="sidebar-brand-name">SSCBS OS</span>
@@ -444,7 +448,7 @@ function App() {
 
           <button
             className={`sidebar-user ${view === 'profile' ? 'active' : ''}`}
-            onClick={() => setView('profile')}
+            onClick={() => { trackNavigationEvent('sidebar_user_profile', 'profile'); setView('profile'); }}
           >
             <span className="sidebar-avatar">{displayName.charAt(0).toUpperCase()}</span>
             <span className="sidebar-user-text">
@@ -463,7 +467,7 @@ function App() {
         {/* ── Mobile slide-out sidebar drawer ── */}
         <aside className={`app-sidebar-mobile ${isMobileSidebarOpen ? 'open' : ''}`}>
           <div className="mobile-sidebar-header">
-            <div className="sidebar-brand" onClick={() => { setView('home'); setIsMobileSidebarOpen(false); }}>
+            <div className="sidebar-brand" onClick={() => { trackNavigationEvent('mobile_brand', 'home'); setView('home'); setIsMobileSidebarOpen(false); }}>
               <img src="/sscbs_logo.png" alt="" width="28" height="28" />
               <div className="sidebar-brand-text">
                 <span className="sidebar-brand-name">SSCBS OS</span>
@@ -472,7 +476,7 @@ function App() {
             </div>
             <button
               className="mobile-sidebar-close"
-              onClick={() => setIsMobileSidebarOpen(false)}
+              onClick={() => { trackNavigationEvent('mobile_drawer_close', view); setIsMobileSidebarOpen(false); }}
               aria-label="Close Navigation"
             >
               <CloseIcon size={20} />
@@ -509,7 +513,7 @@ function App() {
 
           <div
             className={`mobile-sidebar-user-card ${view === 'profile' ? 'active' : ''}`}
-            onClick={() => { setView('profile'); setIsMobileSidebarOpen(false); }}
+            onClick={() => { trackNavigationEvent('mobile_user_profile', 'profile'); setView('profile'); setIsMobileSidebarOpen(false); }}
           >
             <span className="sidebar-avatar">{displayName.charAt(0).toUpperCase()}</span>
             <div className="mobile-user-details">
@@ -524,13 +528,17 @@ function App() {
         <header className="app-topbar">
           <button
             className="topbar-menu-btn"
-            onClick={() => setIsMobileSidebarOpen(prev => !prev)}
+            onClick={() => {
+              const nextState = !isMobileSidebarOpen;
+              trackNavigationEvent(nextState ? 'mobile_drawer_open' : 'mobile_drawer_close', view);
+              setIsMobileSidebarOpen(nextState);
+            }}
             aria-label="Toggle Menu"
           >
             <MenuIcon size={22} />
           </button>
           
-          <div className="topbar-title-group" onClick={() => setView('home')}>
+          <div className="topbar-title-group" onClick={() => { trackNavigationEvent('topbar_brand', 'home'); setView('home'); }}>
             <img src="/sscbs_logo.png" alt="" width="24" height="24" />
             <span className="topbar-title">{pageTitle || 'SSCBS OS'}</span>
           </div>

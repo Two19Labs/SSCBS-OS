@@ -8,38 +8,230 @@ const POSTHOG_HOST = import.meta.env.VITE_POSTHOG_HOST || 'https://us.i.posthog.
 let isPostHogInitialized = false;
 
 export function initPostHog() {
-  if (typeof window === 'undefined' || isPostHogInitialized) return;
+  if (typeof window === 'undefined' || isPostHogInitialized) return posthog;
   if (POSTHOG_KEY && POSTHOG_KEY !== 'phc_your_posthog_project_api_key' && POSTHOG_KEY.trim() !== '') {
     try {
       posthog.init(POSTHOG_KEY.trim(), {
         api_host: POSTHOG_HOST.trim(),
         autocapture: true,
-        capture_pageview: false, // Custom page view tracking for SPA hash routes
+        capture_pageview: false, // Programmatic SPA hash route tracking
+        capture_pageleave: true, // Accurately measures dwell time, engagement, and fixes 75% bounce rate
+        person_profiles: 'identified_only', // Accurate person profiles for students without wasting free tier quota
+        disable_session_recording: false,
+        session_recording: {
+          maskAllInputs: false,
+          maskInputOptions: {
+            password: true,
+          },
+        },
+        persistence: 'localStorage+cookie',
+        cross_subdomain_cookie: false,
+        sanitize_properties: (props) => {
+          if (props && typeof props === 'object') {
+            delete props.password;
+            delete props.confirmPassword;
+            delete props.accessToken;
+          }
+          return props;
+        },
       });
       isPostHogInitialized = true;
     } catch (e) {
       console.warn('PostHog init notice:', e);
     }
   }
+  return posthog;
 }
 
 export function identifyPostHogUser(user) {
   if (!user || !user.id || typeof window === 'undefined') return;
   try {
     initPostHog();
-    if (isPostHogInitialized && posthog.__loaded) {
-      posthog.identify(user.id, {
-        email: user.email,
-        name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Student',
-        course: user.user_metadata?.course || 'Unset',
-        semester: user.user_metadata?.semester ? String(user.user_metadata.semester) : 'Unset',
-        section: user.user_metadata?.section || 'Unset'
-      });
-    }
+    const email = user.email || '';
+    const isCbs = email.toLowerCase().endsWith('@sscbs.du.ac.in');
+    const isAdmin = isAdminEmail(email);
+    const fullName = user.user_metadata?.full_name || email.split('@')[0] || 'Student';
+    const course = user.user_metadata?.course || 'Unset';
+    const semester = user.user_metadata?.semester ? String(user.user_metadata.semester) : 'Unset';
+    const section = user.user_metadata?.section || 'Unset';
+
+    const personProps = {
+      email,
+      name: fullName,
+      course,
+      semester,
+      section,
+      is_cbs_email: isCbs,
+      is_admin: isAdmin,
+      user_role: isAdmin ? 'admin' : (isCbs ? 'cbs_student' : 'guest_student'),
+      last_active: new Date().toISOString(),
+    };
+
+    posthog.identify(user.id, personProps);
+
+    // Register super properties so subsequent events include key student attributes
+    posthog.register({
+      student_course: course,
+      student_semester: semester,
+      student_section: section,
+      is_cbs_email: isCbs,
+      user_role: isAdmin ? 'admin' : (isCbs ? 'cbs_student' : 'guest_student'),
+    });
   } catch (e) {
     // Non-blocking
   }
 }
+
+export function resetPostHogUser() {
+  if (typeof window === 'undefined') return;
+  try {
+    initPostHog();
+    posthog.reset();
+  } catch (e) {
+    // Non-blocking
+  }
+}
+
+/**
+ * Core safe event dispatcher for PostHog
+ */
+export function trackPostHogEvent(eventName, properties = {}) {
+  if (typeof window === 'undefined') return;
+  try {
+    initPostHog();
+    const isMobile = window.innerWidth <= 768;
+    const currentHash = window.location.hash.replace(/^#\/?/, '').trim() || 'home';
+    const payload = {
+      $current_url: window.location.href,
+      current_view: currentHash,
+      platform: isMobile ? 'mobile' : 'desktop',
+      timestamp: new Date().toISOString(),
+      ...properties,
+    };
+    posthog.capture(eventName, payload);
+  } catch (err) {
+    console.debug('PostHog event capture notice:', err);
+  }
+}
+
+/**
+ * Dedicated PageView tracker for SPA routes
+ */
+export function trackPostHogPageView(viewId = 'home', properties = {}) {
+  if (typeof window === 'undefined') return;
+  try {
+    initPostHog();
+    const normalizedView = viewId || 'home';
+    const routePath = normalizedView === 'home' ? '/' : `/${normalizedView}`;
+    const fullUrl = window.location.origin + (normalizedView === 'home' ? '/' : `/#${normalizedView}`);
+    const viewTitle = FEATURE_NAMES[normalizedView] || normalizedView;
+    const isMobile = window.innerWidth <= 768;
+
+    const payload = {
+      $current_url: fullUrl,
+      $pathname: routePath,
+      $title: `SSCBS OS — ${viewTitle}`,
+      feature_id: normalizedView,
+      feature_name: viewTitle,
+      path: routePath,
+      platform: isMobile ? 'mobile' : 'desktop',
+      ...properties,
+    };
+
+    // 1. Standard $pageview for PostHog Web Analytics
+    posthog.capture('$pageview', payload);
+
+    // 2. feature_view event for funnel and conversion tracking
+    posthog.capture('feature_view', payload);
+  } catch (e) {
+    // Non-blocking
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Granular Domain-Specific Trackers
+// ─────────────────────────────────────────────────────────────
+
+export const trackAuthEvent = (action, meta = {}) => {
+  trackPostHogEvent(`auth_${action}`, meta);
+};
+
+export const trackNavigationEvent = (source, targetView, meta = {}) => {
+  trackPostHogEvent('navigation_clicked', {
+    source,
+    target_view: targetView,
+    target_name: FEATURE_NAMES[targetView] || targetView,
+    ...meta,
+  });
+};
+
+export const trackTimetableEvent = (action, meta = {}) => {
+  trackPostHogEvent(`timetable_${action}`, meta);
+};
+
+export const trackProfessorEvent = (action, meta = {}) => {
+  trackPostHogEvent(`professor_${action}`, meta);
+};
+
+export const trackEmptyRoomEvent = (action, meta = {}) => {
+  trackPostHogEvent(`empty_room_${action}`, meta);
+};
+
+export const trackCaseCompsEvent = (action, meta = {}) => {
+  trackPostHogEvent(`case_comp_${action}`, meta);
+};
+
+export const trackTeamFinderEvent = (action, meta = {}) => {
+  trackPostHogEvent(`team_finder_${action}`, meta);
+};
+
+export const trackWaiverEvent = (action, meta = {}) => {
+  trackPostHogEvent(`waiver_${action}`, meta);
+};
+
+export const trackGpaEvent = (action, meta = {}) => {
+  trackPostHogEvent(`gpa_${action}`, meta);
+};
+
+export const trackSocietyEvent = (action, meta = {}) => {
+  trackPostHogEvent(`society_${action}`, meta);
+};
+
+export const trackFacultyEvent = (action, meta = {}) => {
+  trackPostHogEvent(`faculty_${action}`, meta);
+};
+
+export const trackNoticeEvent = (action, meta = {}) => {
+  trackPostHogEvent(`notice_${action}`, meta);
+};
+
+export const trackPwaEvent = (action, meta = {}) => {
+  trackPostHogEvent(`pwa_${action}`, meta);
+};
+
+export const trackAdminEvent = (action, meta = {}) => {
+  trackPostHogEvent(`admin_${action}`, meta);
+};
+
+export const trackException = (error, context = {}) => {
+  if (typeof window === 'undefined') return;
+  try {
+    initPostHog();
+    const errorMsg = error?.message || String(error);
+    const errorStack = error?.stack || '';
+    if (typeof posthog.captureException === 'function') {
+      posthog.captureException(error, { extra: context });
+    } else {
+      posthog.capture('$exception', {
+        $exception_message: errorMsg,
+        $exception_type: error?.name || 'Error',
+        $exception_stack_trace_raw: errorStack,
+        ...context,
+      });
+    }
+  } catch (e) {}
+};
+
 
 
 export const FEATURE_NAMES = {
@@ -493,24 +685,13 @@ export async function logFeatureView(featureId, user) {
 
   // 2. Send real-time pageview and custom event to PostHog Analytics
   try {
-    initPostHog();
-    const routePath = (featureId === 'home' || !featureId) ? '/' : `/${featureId}`;
     if (user) {
       identifyPostHogUser(user);
     }
-    if (isPostHogInitialized && posthog.__loaded) {
-      posthog.capture('$pageview', {
-        $current_url: window.location.origin + (routePath === '/' ? '' : `/#${featureId}`),
-        feature_id: featureId,
-        feature_name: FEATURE_NAMES[featureId] || featureId,
-        path: routePath
-      });
-      posthog.capture('feature_view', {
-        feature_id: featureId,
-        feature_name: FEATURE_NAMES[featureId] || featureId,
-        path: routePath
-      });
-    }
+    trackPostHogPageView(featureId, {
+      user_id: user?.id || null,
+      is_authenticated: Boolean(user && user.id),
+    });
   } catch (e) {
     // Non-blocking for PostHog analytics
   }

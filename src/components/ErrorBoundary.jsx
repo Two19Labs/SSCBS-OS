@@ -1,4 +1,5 @@
 import React from 'react';
+import { trackException } from '../lib/analytics';
 
 export default class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -12,6 +13,13 @@ export default class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     console.error('SSCBS OS ErrorBoundary caught an error:', error, errorInfo);
+    try {
+      trackException(error, {
+        componentStack: errorInfo?.componentStack,
+        url: typeof window !== 'undefined' ? window.location.href : '',
+      });
+    } catch (e) {}
+
     // Auto-recover from dynamic import chunk 404s after new Vercel deployments
     if (error && (
       error.name === 'ChunkLoadError' ||

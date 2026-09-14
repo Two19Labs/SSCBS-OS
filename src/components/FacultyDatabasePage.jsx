@@ -7,6 +7,7 @@ import {
   UserIcon,
   CloseIcon,
 } from './icons';
+import { trackFacultyEvent } from '../lib/analytics';
 import './FacultyDatabasePage.css';
 
 export default function FacultyDatabasePage({ onBack, initialProfId, onClearPrefill, headerAction }) {
@@ -14,6 +15,18 @@ export default function FacultyDatabasePage({ onBack, initialProfId, onClearPref
   const [designationFilter, setDesignationFilter] = useState('all');
   const [selectedProf, setSelectedProf] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
+
+  // Debounced search query telemetry
+  useEffect(() => {
+    if (!searchQuery || searchQuery.trim().length < 2) return;
+    const timer = setTimeout(() => {
+      trackFacultyEvent('search', {
+        query: searchQuery.trim(),
+        length: searchQuery.trim().length,
+      });
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const facultyList = useMemo(() => {
     return Array.isArray(facultyDataRaw) ? facultyDataRaw : [];
@@ -183,7 +196,10 @@ export default function FacultyDatabasePage({ onBack, initialProfId, onClearPref
             <div
               key={prof.id || prof.name}
               className="faculty-card"
-              onClick={() => window.open(prof.profileUrl || 'https://sscbs.du.ac.in/faculty/', '_blank')}
+              onClick={() => {
+                trackFacultyEvent('profile_link_clicked', { name: prof.name, room: prof.room });
+                window.open(prof.profileUrl || 'https://sscbs.du.ac.in/faculty/', '_blank');
+              }}
               style={{ cursor: 'pointer' }}
             >
                 <div className="faculty-card-top">

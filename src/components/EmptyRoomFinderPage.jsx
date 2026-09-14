@@ -10,6 +10,7 @@ import {
   matchClassOccupancy
 } from '../utils/roomFinder';
 import { DoorIcon, SearchIcon, BackIcon, RefreshIcon, CalendarIcon } from './icons';
+import { trackEmptyRoomEvent } from '../lib/analytics';
 import './EmptyRoomFinderPage.css';
 
 export function EmptyRoomFinderPage({ onBack, headerAction }) {
@@ -40,6 +41,20 @@ export function EmptyRoomFinderPage({ onBack, headerAction }) {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Debounced search query telemetry
+  useEffect(() => {
+    if (!searchQuery || searchQuery.trim().length < 2) return;
+    const timer = setTimeout(() => {
+      trackEmptyRoomEvent('search', {
+        query: searchQuery.trim(),
+        length: searchQuery.trim().length,
+        floor: floorFilter,
+        status: statusFilter,
+      });
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   // Format live IST clock
   const istTimeString = useMemo(() => {
@@ -412,7 +427,10 @@ export function EmptyRoomFinderPage({ onBack, headerAction }) {
               <div
                 key={item.room}
                 className={`room-card ${isLiveHoliday ? 'holiday' : isLiveClosed ? 'closed' : item.isVacant ? 'vacant' : 'occupied'}`}
-                onClick={() => setSelectedRoomForTimeline(item.room)}
+                onClick={() => {
+                  trackEmptyRoomEvent('room_timeline_viewed', { room: item.room, floor: item.floor, is_vacant: item.isVacant });
+                  setSelectedRoomForTimeline(item.room);
+                }}
               >
                 <div className="room-card-header">
                   <div className="room-title-box">
