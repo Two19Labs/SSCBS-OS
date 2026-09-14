@@ -128,7 +128,6 @@ export default function FacultyDatabasePage({ onBack, initialProfId, onClearPref
               <UserIcon size={20} />
             </div>
             <h2>SSCBS Faculty Directory</h2>
-            <span className="micro-label success">● OFFICIAL</span>
           </div>
           <p className="faculty-db-subtitle">
             Official directory of SSCBS professors, office room numbers, contact details, subject expertise, and research publications.
