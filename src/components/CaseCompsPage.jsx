@@ -698,21 +698,6 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
         </div>
       </div>
 
-      {/* ── Quick Bookmark Navigation Banner ── */}
-      {bookmarkedIds.length > 0 && activeFilter !== 'bookmarked' && (
-        <div className="cc-bookmarked-quick-bar" onClick={() => setActiveFilter('bookmarked')}>
-          <div className="cc-bookmarked-quick-left">
-            <span className="cc-bookmarked-quick-icon">🔖</span>
-            <span className="cc-bookmarked-quick-text">
-              You have <strong>{bookmarkedIds.length}</strong> saved {bookmarkedIds.length === 1 ? 'case competition' : 'case competitions'}.
-            </span>
-          </div>
-          <button type="button" className="cc-bookmarked-quick-action">
-            View Bookmarked →
-          </button>
-        </div>
-      )}
-
       {/* ── Competitions Grid ── */}
       {loading ? (
         <div className="cc-loading-state">
