@@ -56,9 +56,11 @@ function getISTDateComponents() {
 export function useNotificationEngine() {
   const { user } = useAuth();
   const { addNotification } = useNotifications();
-  const { getTimetable } = useTimetable();
+  const { getTimetable, holidays } = useTimetable();
 
   const firedAlertsRef = useRef(new Set());
+  const lastNoticesFetchRef = useRef(0);
+  const noticesCacheRef = useRef([]);
 
   // Load fired alerts history from localStorage to avoid duplicates across page reloads
   useEffect(() => {
@@ -86,90 +88,103 @@ export function useNotificationEngine() {
     const checkScheduleAndEvents = async () => {
       const { dayName: currentDay, currentMinutes, todayDateStr } = getISTDateComponents();
 
+      // Check if today is an official college holiday
+      const todayHoliday = holidays?.find(h => h.date === todayDateStr);
+
       // Fetch user profile settings
       const meta = user.user_metadata || {};
-      const course = meta.course || localStorage.getItem('sscbs_user_course') || 'BMS';
-      const semester = meta.semester || localStorage.getItem('sscbs_user_semester') || 'Semester 1';
-      const section = meta.section || localStorage.getItem('sscbs_user_section') || 'Section A';
-
-      const userSchedule = getTimetable ? getTimetable(course, semester, section) : null;
-      const todayClasses = userSchedule && userSchedule[currentDay] ? userSchedule[currentDay] : [];
+      const course = meta.course || localStorage.getItem('sscbs_user_course');
+      const semester = meta.semester || localStorage.getItem('sscbs_user_semester');
+      const section = meta.section || localStorage.getItem('sscbs_user_section');
+      const hasProfile = Boolean(course && semester && section);
 
       // ── [#1] Upcoming Class Countdown (5 Minutes Before Class) ──
-      todayClasses.forEach((periodItem) => {
-        if (!periodItem) return;
-        const periodNum = periodItem.period !== undefined ? periodItem.period : periodItem.id;
-        const slot = PERIOD_TIME_MAP[periodNum] || {};
+      // Only process class countdowns if student profile is configured AND today is not a holiday
+      if (hasProfile && !todayHoliday) {
+        const userSchedule = getTimetable ? getTimetable(course, semester, section) : null;
+        const todayClasses = userSchedule && userSchedule[currentDay] ? userSchedule[currentDay] : [];
 
-        const start = periodItem.start || slot.start;
-        const startLabel = periodItem.startLabel || slot.startLabel || start;
-        const isBreak = periodItem.isBreak || slot.isBreak;
-        const subject = (periodItem.subject || '').trim();
+        todayClasses.forEach((periodItem) => {
+          if (!periodItem) return;
+          const periodNum = periodItem.period !== undefined ? periodItem.period : periodItem.id;
+          const slot = PERIOD_TIME_MAP[periodNum] || {};
 
-        // Skip breaks & empty slots
-        if (
-          !start ||
-          isBreak ||
-          ['Free', 'No Class', 'Break', '-', 'Infinity Hour', 'Infinity Hour (Break)'].includes(subject)
-        ) {
-          return;
-        }
+          const start = periodItem.start || slot.start;
+          const startLabel = periodItem.startLabel || slot.startLabel || start;
+          const isBreak = periodItem.isBreak || slot.isBreak;
+          const subject = (periodItem.subject || '').trim();
 
-        const startMin = parseTimeToMinutes(start);
-        const diffMins = startMin - currentMinutes;
-
-        // Catch-up window: Class starting in <= 5 mins OR started in last 2 mins
-        if (diffMins >= -2 && diffMins <= 5) {
-          const alertKey = `class_5m_${todayDateStr}_P${periodNum}_${start}_${subject}`;
-          if (!firedAlertsRef.current.has(alertKey)) {
-            markAlertFired(alertKey);
-
-            let titleText = `⏰ Class Starting in ${diffMins} mins`;
-            if (diffMins <= 0) {
-              titleText = `⏰ Class Started (${startLabel})`;
-            } else if (diffMins <= 2) {
-              titleText = `⏰ Class Starting NOW (${startLabel})`;
-            }
-
-            addNotification({
-              id: alertKey,
-              type: 'class',
-              category: 'Class Schedule',
-              title: titleText,
-              body: `${subject} starts ${diffMins <= 0 ? 'now' : `soon (${startLabel})`} in Room ${periodItem.room || 'TBA'}`,
-              actionType: 'view_room',
-              actionData: { room: periodItem.room, subject: subject },
-            });
+          // Skip breaks & empty slots
+          if (
+            !start ||
+            isBreak ||
+            ['Free', 'No Class', 'Break', '-', 'Infinity Hour', 'Infinity Hour (Break)'].includes(subject)
+          ) {
+            return;
           }
-        }
-      });
+
+          const startMin = parseTimeToMinutes(start);
+          const diffMins = startMin - currentMinutes;
+
+          // Catch-up window: Class starting in <= 5 mins OR started in last 2 mins
+          if (diffMins >= -2 && diffMins <= 5) {
+            const alertKey = `class_5m_${todayDateStr}_P${periodNum}_${start}_${subject}`;
+            if (!firedAlertsRef.current.has(alertKey)) {
+              markAlertFired(alertKey);
+
+              let titleText = `⏰ Class Starting in ${diffMins} mins`;
+              if (diffMins <= 0) {
+                titleText = `⏰ Class Started (${startLabel})`;
+              } else if (diffMins <= 2) {
+                titleText = `⏰ Class Starting NOW (${startLabel})`;
+              }
+
+              addNotification({
+                id: alertKey,
+                type: 'class',
+                category: 'Class Schedule',
+                title: titleText,
+                body: `${subject} starts ${diffMins <= 0 ? 'now' : `soon (${startLabel})`} in Room ${periodItem.room || 'TBA'}`,
+                actionType: 'view_room',
+                actionData: { room: periodItem.room, subject: subject },
+              });
+            }
+          }
+        });
+      }
 
       // ── [#15] Notice Event Reminders (15 Minutes Before Event Start) ──
       try {
         let publishedNotices = [];
 
-        if (hasValidCredentials) {
-          const { data: notices } = await supabase
-            .from('notices')
-            .select('id, title, venue, event_date, society, status')
-            .filter('status', 'eq', 'published')
-            .not('event_date', 'is', null);
-
-          if (notices) publishedNotices = notices;
-        }
-
-        // Merge with local cached notices if present
+        // Check sessionStorage cache (maintained live by NoticeBoard component)
         try {
           const cached = sessionStorage.getItem('sscbs_cached_notices');
           if (cached) {
             const parsed = JSON.parse(cached);
-            parsed.forEach(cn => {
-              if (cn.event_date && (cn.status === 'published' || !cn.status) && !publishedNotices.some(n => n.id === cn.id)) {
-                publishedNotices.push(cn);
-              }
-            });
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              publishedNotices = parsed.filter(n => n.event_date && (n.status === 'published' || !n.status));
+            }
           }
         } catch (e) {}
+
+        // If no cached notices or cache empty, query Supabase with a 3-minute throttle
+        const now = Date.now();
+        if (publishedNotices.length === 0 && hasValidCredentials && (now - lastNoticesFetchRef.current > 180000)) {
+          lastNoticesFetchRef.current = now;
+          const { data: notices, error } = await supabase
+            .from('notices')
+            .select('id, title, venue, event_date, society, status')
+            .or('status.eq.published,status.is.null')
+            .not('event_date', 'is', null);
+
+          if (!error && notices) {
+            noticesCacheRef.current = notices;
+            publishedNotices = notices;
+          }
+        } else if (publishedNotices.length === 0 && noticesCacheRef.current.length > 0) {
+          publishedNotices = noticesCacheRef.current;
+        }
 
         if (publishedNotices.length > 0) {
           publishedNotices.forEach((notice) => {
@@ -218,7 +233,7 @@ export function useNotificationEngine() {
     checkScheduleAndEvents();
     const interval = setInterval(checkScheduleAndEvents, 20000); // Ticker cycle: 20 seconds
     return () => clearInterval(interval);
-  }, [user, getTimetable, addNotification]);
+  }, [user, getTimetable, holidays, addNotification]);
 
   // 2. Realtime Supabase Listener for Team Finder Requests (#6, #7, #8)
   useEffect(() => {

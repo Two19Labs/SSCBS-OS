@@ -25,6 +25,7 @@ export default function NotificationCenter({ onNavigate }) {
     markAsRead,
     markAllAsRead,
     deleteNotification,
+    updateNotification,
     toggleDeviceNotifications,
   } = useNotifications();
 
@@ -93,8 +94,18 @@ export default function NotificationCenter({ onNavigate }) {
         }
       }
 
-      // Mark notification as read
-      markAsRead(notifId);
+      // Mark notification as read and update resolved status to lock action buttons
+      if (typeof updateNotification === 'function') {
+        updateNotification(notifId, {
+          read: true,
+          actionData: {
+            ...(typeof actionData === 'object' ? actionData : {}),
+            resolvedStatus: newStatus,
+          },
+        });
+      } else {
+        markAsRead(notifId);
+      }
     } catch (err) {
       console.error('Failed to update application status:', err);
     } finally {
@@ -276,7 +287,15 @@ export default function NotificationCenter({ onNavigate }) {
 
                         {/* Action buttons */}
                         <div className="notif-card-actions">
-                          {notif.type === 'team_req' && actionData?.appId ? (
+                          {notif.type === 'team_req' && actionData?.resolvedStatus ? (
+                            <span className={`notif-status-badge ${actionData.resolvedStatus}`}>
+                              {actionData.resolvedStatus === 'accepted' ? (
+                                <><CheckIcon size={12} /> Accepted</>
+                              ) : (
+                                <><CloseIcon size={12} /> Declined</>
+                              )}
+                            </span>
+                          ) : notif.type === 'team_req' && actionData?.appId ? (
                             <div className="notif-team-actions">
                               <button
                                 className="notif-btn notif-btn-accept"

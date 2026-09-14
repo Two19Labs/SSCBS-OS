@@ -488,6 +488,29 @@ input:checked + .notif-slider:before {
   border-color: var(--danger);
 }
 
+.notif-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.01em;
+}
+
+.notif-status-badge.accepted {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.notif-status-badge.declined {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
 .notif-btn-read-toggle {
   background: none;
   border: none;

@@ -10,6 +10,7 @@ const NotificationContext = createContext({
   markAllAsRead: () => {},
   deleteNotification: () => {},
   addNotification: () => {},
+  updateNotification: () => {},
   toggleDeviceNotifications: async () => {},
   permissionState: 'default',
 });
@@ -225,9 +226,9 @@ export function NotificationProvider({ children }) {
       return [newNotif, ...prev].slice(0, 50); // Keep max 50 items
     });
 
-    // Persist to Supabase if credentials valid
+    // Persist to Supabase if credentials valid (upsert ignores duplicates on conflict)
     if (user && hasValidCredentials) {
-      supabase.from('user_notifications').insert([{
+      supabase.from('user_notifications').upsert([{
         id: newNotif.id,
         user_email: user.email,
         type: newNotif.type,
@@ -237,28 +238,44 @@ export function NotificationProvider({ children }) {
         action_type: newNotif.actionType,
         action_data: newNotif.actionData,
         read: false,
-      }]).then();
+      }], { onConflict: 'id', ignoreDuplicates: true }).catch(err => {
+        console.warn('Cloud notification sync notice:', err);
+      });
     }
   }, [user, deviceKey]);
+
+  const updateNotification = useCallback((id, updates) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, ...updates } : n));
+    if (user && hasValidCredentials) {
+      const payload = {};
+      if ('read' in updates) payload.read = updates.read;
+      if ('actionData' in updates) payload.action_data = updates.actionData;
+      if ('title' in updates) payload.title = updates.title;
+      if ('body' in updates) payload.body = updates.body;
+      if (Object.keys(payload).length > 0) {
+        supabase.from('user_notifications').update(payload).eq('id', id).catch(() => {});
+      }
+    }
+  }, [user]);
 
   const markAsRead = useCallback((id) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
     if (user && hasValidCredentials) {
-      supabase.from('user_notifications').update({ read: true }).eq('id', id).then();
+      supabase.from('user_notifications').update({ read: true }).eq('id', id).catch(() => {});
     }
   }, [user]);
 
   const markAllAsRead = useCallback(() => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     if (user && hasValidCredentials) {
-      supabase.from('user_notifications').update({ read: true }).eq('user_email', user.email).then();
+      supabase.from('user_notifications').update({ read: true }).eq('user_email', user.email).catch(() => {});
     }
   }, [user]);
 
   const deleteNotification = useCallback((id) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
     if (user && hasValidCredentials) {
-      supabase.from('user_notifications').delete().eq('id', id).then();
+      supabase.from('user_notifications').delete().eq('id', id).catch(() => {});
     }
   }, [user]);
 
@@ -272,6 +289,7 @@ export function NotificationProvider({ children }) {
         markAllAsRead,
         deleteNotification,
         addNotification,
+        updateNotification,
         toggleDeviceNotifications,
         permissionState,
       }}
