@@ -84,6 +84,29 @@ export function identifyPostHogUser(user) {
 
 let currentTrackedPage = null;
 
+if (typeof window !== 'undefined' && !window.__sscbs_pageleave_bound) {
+  window.__sscbs_pageleave_bound = true;
+  const emitFinalPageleave = () => {
+    if (currentTrackedPage) {
+      try {
+        const dwellSeconds = Math.max(1, Math.round((Date.now() - currentTrackedPage.startTime) / 1000));
+        posthog.capture('$pageleave', {
+          $current_url: currentTrackedPage.fullUrl,
+          $pathname: currentTrackedPage.routePath,
+          $title: `SSCBS OS — ${FEATURE_NAMES[currentTrackedPage.viewId] || currentTrackedPage.viewId}`,
+          feature_id: currentTrackedPage.viewId,
+          $prev_pageview_duration: dwellSeconds,
+          $prev_pageview_pathname: currentTrackedPage.routePath,
+          dwell_time_seconds: dwellSeconds,
+          transport: 'sendBeacon',
+        });
+      } catch (e) {}
+    }
+  };
+  window.addEventListener('beforeunload', emitFinalPageleave);
+  window.addEventListener('pagehide', emitFinalPageleave);
+}
+
 export function resetPostHogUser() {
   if (typeof window === 'undefined') return;
   try {
@@ -139,6 +162,8 @@ export function trackPostHogPageView(viewId = 'home', properties = {}) {
           $pathname: currentTrackedPage.routePath,
           $title: `SSCBS OS — ${FEATURE_NAMES[currentTrackedPage.viewId] || currentTrackedPage.viewId}`,
           feature_id: currentTrackedPage.viewId,
+          $prev_pageview_duration: dwellSeconds,
+          $prev_pageview_pathname: currentTrackedPage.routePath,
           dwell_time_seconds: dwellSeconds,
         });
       } catch (e) {
