@@ -1,10 +1,20 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { supabase, hasValidCredentials } from '../lib/supabaseClient';
+
+const LOCAL_STORAGE_KEY = 'sscbs_bookmarked_case_comps';
 
 // Self-contained SVG Icons to guarantee zero bundler chunking collisions or export mismatches
 const BackIcon = ({ size = 18 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
     <line x1="19" y1="12" x2="5" y2="12" />
     <polyline points="12 19 5 12 12 5" />
+  </svg>
+);
+
+const BookmarkIcon = ({ size = 16, filled = false, className = '' }) => (
+  <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
   </svg>
 );
 
@@ -262,18 +272,111 @@ function getCardCircuit(comp) {
 }
 
 export default function CaseCompsPage({ onBack, onNavigate }) {
+  const { user } = useAuth();
+  const userKeySuffix = user?.email ? `_${user.email.toLowerCase()}` : '';
+  const bookmarksKey = `${LOCAL_STORAGE_KEY}${userKeySuffix}`;
+
   const [competitions, setCompetitions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [fetchError, setFetchError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'du' | 'iim' | 'iit' | 'flagship'
+  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'du' | 'iim-iit' | 'other-mba-corp' | 'bookmarked'
   const [teamFilter, setTeamFilter] = useState('all'); // 'all' | 'solo' | 'team'
   const [feeFilter, setFeeFilter] = useState('all'); // 'all' | 'free' | 'paid'
   const [sortBy, setSortBy] = useState('closing-soonest'); // 'closing-soonest' | 'closing-latest' | 'title-asc' | 'title-desc' | 'prize-highest' | 'popular'
   const [copiedId, setCopiedId] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [nowMs, setNowMs] = useState(() => Date.now());
+
+  // Bookmarks state with user-scoped storage & fallback
+  const [bookmarkedIds, setBookmarkedIds] = useState(() => {
+    try {
+      if (user?.email) {
+        const userKey = `${LOCAL_STORAGE_KEY}_${user.email.toLowerCase()}`;
+        const saved = localStorage.getItem(userKey);
+        if (saved !== null) return JSON.parse(saved);
+      }
+      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (saved !== null) return JSON.parse(saved);
+    } catch (err) {
+      console.error('Error reading saved case comp bookmarks:', err);
+    }
+    return [];
+  });
+
+  // Sync bookmarks to cloud across devices
+  const syncProgressToCloud = useCallback(async (newBookmarks) => {
+    if (!user || !hasValidCredentials) return;
+    try {
+      // 1. Update Supabase auth user metadata
+      const { data, error } = await supabase.auth.updateUser({
+        data: {
+          case_comp_bookmarks: newBookmarks,
+        },
+      });
+
+      // 2. Update user_progress settings table for backup
+      if (!error && data?.user?.id) {
+        const { data: progressData } = await supabase
+          .from('user_progress')
+          .select('settings')
+          .eq('user_id', data.user.id)
+          .maybeSingle();
+
+        const existingSettings = progressData?.settings || {};
+        const newSettings = {
+          ...existingSettings,
+          case_comp_bookmarks: newBookmarks,
+          email: data.user.email,
+        };
+
+        await supabase
+          .from('user_progress')
+          .update({ settings: newSettings })
+          .eq('user_id', data.user.id);
+      }
+    } catch (err) {
+      console.warn('Error syncing case comp bookmarks to cloud:', err);
+    }
+  }, [user]);
+
+  // Sync bookmarks to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(bookmarksKey, JSON.stringify(bookmarkedIds));
+      if (!userKeySuffix) {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(bookmarkedIds));
+      }
+    } catch (err) {
+      console.error('Error saving case comp bookmarks:', err);
+    }
+  }, [bookmarkedIds, bookmarksKey, userKeySuffix]);
+
+  // Hydrate from cloud metadata when user logs in
+  useEffect(() => {
+    if (!user) return;
+    const cloudBookmarks = user.user_metadata?.case_comp_bookmarks;
+    if (Array.isArray(cloudBookmarks)) {
+      setBookmarkedIds(cloudBookmarks);
+      try {
+        localStorage.setItem(bookmarksKey, JSON.stringify(cloudBookmarks));
+      } catch (e) {
+        console.error('Failed to cache bookmarks in local storage', e);
+      }
+    }
+  }, [user, bookmarksKey]);
+
+  // Toggle bookmark handler
+  const toggleBookmark = useCallback((id, e) => {
+    if (e?.stopPropagation) e.stopPropagation();
+    if (e?.preventDefault) e.preventDefault();
+    setBookmarkedIds((prev) => {
+      const next = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
+      syncProgressToCloud(next);
+      return next;
+    });
+  }, [syncProgressToCloud]);
 
   useEffect(() => {
     // Tick every 30 seconds for live countdown accuracy
@@ -355,8 +458,9 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
     const du = competitions.filter((c) => c.isDU).length;
     const iimIit = competitions.filter((c) => isIIMorIITComp(c)).length;
     const otherMbaCorp = competitions.filter((c) => isOtherMbaOrCorporateComp(c)).length;
-    return { total, du, iimIit, otherMbaCorp };
-  }, [competitions]);
+    const bookmarked = competitions.filter((c) => bookmarkedIds.includes(c.id)).length;
+    return { total, du, iimIit, otherMbaCorp, bookmarked };
+  }, [competitions, bookmarkedIds]);
 
   const hasActiveFilters = searchQuery.trim() !== '' || activeFilter !== 'all' || teamFilter !== 'all' || feeFilter !== 'all' || sortBy !== 'closing-soonest';
 
@@ -380,10 +484,14 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
         if (!matchesTitle && !matchesOrg && !matchesPrize) return false;
       }
 
-      // Circuit filter
-      if (activeFilter === 'du' && !comp.isDU) return false;
-      if (activeFilter === 'iim-iit' && !isIIMorIITComp(comp)) return false;
-      if (activeFilter === 'other-mba-corp' && !isOtherMbaOrCorporateComp(comp)) return false;
+      // Circuit or Bookmarked filter
+      if (activeFilter === 'bookmarked') {
+        if (!bookmarkedIds.includes(comp.id)) return false;
+      } else {
+        if (activeFilter === 'du' && !comp.isDU) return false;
+        if (activeFilter === 'iim-iit' && !isIIMorIITComp(comp)) return false;
+        if (activeFilter === 'other-mba-corp' && !isOtherMbaOrCorporateComp(comp)) return false;
+      }
 
       // Team filter
       if (teamFilter === 'solo' && comp.maxTeam > 1) return false;
@@ -451,6 +559,19 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
 
         <div className="cc-header-actions">
           <button
+            type="button"
+            className={`cc-saved-header-btn ${activeFilter === 'bookmarked' ? 'active' : ''}`}
+            onClick={() => setActiveFilter(activeFilter === 'bookmarked' ? 'all' : 'bookmarked')}
+            title={activeFilter === 'bookmarked' ? 'Show all circuits' : 'View your bookmarked competitions'}
+          >
+            <BookmarkIcon size={15} filled={bookmarkedIds.length > 0} />
+            <span>Saved</span>
+            {bookmarkedIds.length > 0 && (
+              <span className="cc-saved-header-count">{bookmarkedIds.length}</span>
+            )}
+          </button>
+
+          <button
             className={`cc-refresh-btn ${isRefreshing ? 'refreshing' : ''}`}
             onClick={() => fetchOpportunities(true)}
             disabled={isRefreshing || loading}
@@ -513,6 +634,12 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
             onClick={() => setActiveFilter('other-mba-corp')}
           >
             🏢 Other Colleges & Corporates ({metrics.otherMbaCorp})
+          </button>
+          <button
+            className={`cc-tab-btn cc-tab-bookmarked ${activeFilter === 'bookmarked' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('bookmarked')}
+          >
+            🔖 Bookmarked ({bookmarkedIds.length})
           </button>
         </div>
 
@@ -598,7 +725,20 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
         </div>
       </div>
 
-
+      {/* ── Quick Bookmark Navigation Banner ── */}
+      {bookmarkedIds.length > 0 && activeFilter !== 'bookmarked' && (
+        <div className="cc-bookmarked-quick-bar" onClick={() => setActiveFilter('bookmarked')}>
+          <div className="cc-bookmarked-quick-left">
+            <span className="cc-bookmarked-quick-icon">🔖</span>
+            <span className="cc-bookmarked-quick-text">
+              You have <strong>{bookmarkedIds.length}</strong> saved {bookmarkedIds.length === 1 ? 'case competition' : 'case competitions'}.
+            </span>
+          </div>
+          <button type="button" className="cc-bookmarked-quick-action">
+            View Bookmarked →
+          </button>
+        </div>
+      )}
 
       {/* ── Competitions Grid ── */}
       {loading ? (
@@ -621,17 +761,21 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
       ) : filteredCompetitions.length === 0 ? (
         <div className="cc-empty-state">
           <div className="cc-empty-icon">
-            <TrophyIcon size={36} />
+            {activeFilter === 'bookmarked' ? <BookmarkIcon size={36} filled={false} /> : <TrophyIcon size={36} />}
           </div>
-          <h3 className="cc-empty-title">No competitions match your filter</h3>
+          <h3 className="cc-empty-title">
+            {activeFilter === 'bookmarked' ? 'No bookmarked competitions yet' : 'No competitions match your filter'}
+          </h3>
           <p className="cc-empty-desc">
-            Try searching a different keyword or resetting your filter criteria.
+            {activeFilter === 'bookmarked'
+              ? 'Click the bookmark button on any competition card to save it here and keep track of deadlines and teams!'
+              : 'Try searching a different keyword or resetting your filter criteria.'}
           </p>
           <button
             className="cc-empty-btn"
             onClick={handleResetFilters}
           >
-            Clear All Filters
+            {activeFilter === 'bookmarked' ? 'Explore All Competitions' : 'Clear All Filters'}
           </button>
         </div>
       ) : (
@@ -640,11 +784,12 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
             const circuit = getCardCircuit(comp);
             const countdown = getCountdownDetails(comp.deadline, comp.remainDaysText, nowMs);
             const isSolo = comp.maxTeam === 1 || (comp.teamSizeDisplay && comp.teamSizeDisplay.toLowerCase().startsWith('solo'));
+            const isBookmarked = bookmarkedIds.includes(comp.id);
 
             return (
-              <article key={comp.id} className={`cc-card cc-card-${circuit.type}`}>
+              <article key={comp.id} className={`cc-card cc-card-${circuit.type} ${isBookmarked ? 'is-bookmarked' : ''}`}>
                 <div className="cc-card-inner">
-                  {/* Top Bar: Host Profile (Equalized Full Width) */}
+                  {/* Top Bar: Host Profile & Bookmark Button */}
                   <div className="cc-card-top-bar">
                     <div className="cc-host-identity">
                       {comp.orgLogo ? (
@@ -667,6 +812,16 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
                         </span>
                       </div>
                     </div>
+
+                    <button
+                      type="button"
+                      className={`cc-card-bookmark-btn ${isBookmarked ? 'active' : ''}`}
+                      onClick={(e) => toggleBookmark(comp.id, e)}
+                      title={isBookmarked ? 'Remove bookmark' : 'Bookmark this case comp'}
+                      aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark this case comp'}
+                    >
+                      <BookmarkIcon size={16} filled={isBookmarked} />
+                    </button>
                   </div>
 
                   {/* Competition Title */}
@@ -746,6 +901,17 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
                         <span>Find Teammates</span>
                       </button>
                     )}
+
+                    <button
+                      type="button"
+                      className={`cc-action-btn cc-action-bookmark-btn ${isBookmarked ? 'active' : ''}`}
+                      onClick={(e) => toggleBookmark(comp.id, e)}
+                      title={isBookmarked ? 'Remove from saved' : 'Save competition'}
+                      aria-label={isBookmarked ? 'Remove from saved' : 'Save competition'}
+                    >
+                      <BookmarkIcon size={13} filled={isBookmarked} />
+                      <span className="cc-action-bookmark-label">{isBookmarked ? 'Saved' : 'Save'}</span>
+                    </button>
 
                     <button
                       type="button"
