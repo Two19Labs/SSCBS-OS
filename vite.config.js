@@ -11,7 +11,7 @@ const vercelConfig = JSON.parse(
 )
 
 const previewHeaders = Object.fromEntries(
-  (vercelConfig.headers?.[0]?.headers ?? []).map(({ key, value }) => [key, value])
+  (vercelConfig.headers?.find(h => h.source === '/(.*)')?.headers ?? []).map(({ key, value }) => [key, value])
 )
 
 function devApiPlugin() {

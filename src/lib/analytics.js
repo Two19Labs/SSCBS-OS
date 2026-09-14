@@ -82,11 +82,14 @@ export function identifyPostHogUser(user) {
   }
 }
 
+let currentTrackedPage = null;
+
 export function resetPostHogUser() {
   if (typeof window === 'undefined') return;
   try {
     initPostHog();
     posthog.reset();
+    currentTrackedPage = null;
   } catch (e) {
     // Non-blocking
   }
@@ -115,7 +118,7 @@ export function trackPostHogEvent(eventName, properties = {}) {
 }
 
 /**
- * Dedicated PageView tracker for SPA routes
+ * Dedicated PageView tracker for SPA routes with paired $pageleave for accurate dwell time & bounce rates
  */
 export function trackPostHogPageView(viewId = 'home', properties = {}) {
   if (typeof window === 'undefined') return;
@@ -126,6 +129,34 @@ export function trackPostHogPageView(viewId = 'home', properties = {}) {
     const fullUrl = window.location.origin + (normalizedView === 'home' ? '/' : `/#${normalizedView}`);
     const viewTitle = FEATURE_NAMES[normalizedView] || normalizedView;
     const isMobile = window.innerWidth <= 768;
+
+    // 1. If transitioning from an existing active view, emit paired $pageleave to record dwell time
+    if (currentTrackedPage && currentTrackedPage.viewId !== normalizedView) {
+      try {
+        const dwellSeconds = Math.max(1, Math.round((Date.now() - currentTrackedPage.startTime) / 1000));
+        posthog.capture('$pageleave', {
+          $current_url: currentTrackedPage.fullUrl,
+          $pathname: currentTrackedPage.routePath,
+          $title: `SSCBS OS — ${FEATURE_NAMES[currentTrackedPage.viewId] || currentTrackedPage.viewId}`,
+          feature_id: currentTrackedPage.viewId,
+          dwell_time_seconds: dwellSeconds,
+        });
+      } catch (e) {
+        // Non-blocking
+      }
+    }
+
+    currentTrackedPage = {
+      viewId: normalizedView,
+      fullUrl,
+      routePath,
+      startTime: Date.now(),
+    };
+
+    // Update browser tab title dynamically
+    try {
+      document.title = `SSCBS OS — ${viewTitle}`;
+    } catch (e) {}
 
     const payload = {
       $current_url: fullUrl,
@@ -138,10 +169,10 @@ export function trackPostHogPageView(viewId = 'home', properties = {}) {
       ...properties,
     };
 
-    // 1. Standard $pageview for PostHog Web Analytics
+    // 2. Standard $pageview for PostHog Web Analytics
     posthog.capture('$pageview', payload);
 
-    // 2. feature_view event for funnel and conversion tracking
+    // 3. feature_view event for funnel and conversion tracking
     posthog.capture('feature_view', payload);
   } catch (e) {
     // Non-blocking
@@ -623,7 +654,8 @@ export function subscribeToPresence(user, currentView, onPresenceSync) {
   };
 }
 
-const recentLogMap = new Map();
+let lastLoggedFeature = null;
+let lastLoggedTime = 0;
 
 export async function logFeatureView(featureId, user) {
   if (user && user.id) {
@@ -632,12 +664,13 @@ export async function logFeatureView(featureId, user) {
   if (!featureId) return;
 
   const now = Date.now();
-  const lastTime = recentLogMap.get(featureId) || 0;
-  if (now - lastTime < 5000) {
-    // Session debounce: prevent double logging within 5 seconds for exact same feature
+  // Debounce consecutive duplicate triggers for the exact same active screen
+  // (e.g. React StrictMode mount or state re-renders) while immediately allowing route changes
+  if (lastLoggedFeature === featureId && (now - lastLoggedTime) < 2500) {
     return;
   }
-  recentLogMap.set(featureId, now);
+  lastLoggedFeature = featureId;
+  lastLoggedTime = now;
 
   // 1. Record in client LocalStorage and Supabase (skipping admin from internal student totals)
   if (featureId !== 'admin' && FEATURE_NAMES[featureId]) {
