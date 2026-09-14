@@ -626,36 +626,39 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
 
         {/* Primary Circuit Tabs */}
         <div className="cc-tabs">
-          <button
-            className={`cc-tab-btn ${activeFilter === 'all' ? 'active' : ''}`}
-            onClick={() => setActiveFilter('all')}
-          >
-            All Circuits ({metrics.total})
-          </button>
-          <button
-            className={`cc-tab-btn ${activeFilter === 'du' ? 'active' : ''}`}
-            onClick={() => setActiveFilter('du')}
-          >
-            🎓 DU Circuit ({metrics.du})
-          </button>
-          <button
-            className={`cc-tab-btn ${activeFilter === 'iim-iit' ? 'active' : ''}`}
-            onClick={() => setActiveFilter('iim-iit')}
-          >
-            🏛️ IIMs & IITs ({metrics.iimIit})
-          </button>
-          <button
-            className={`cc-tab-btn ${activeFilter === 'other-mba-corp' ? 'active' : ''}`}
-            onClick={() => setActiveFilter('other-mba-corp')}
-          >
-            🏢 Corporate & Other Colleges ({metrics.otherMbaCorp})
-          </button>
-          <button
-            className={`cc-tab-btn ${activeFilter === 'others' ? 'active' : ''}`}
-            onClick={() => setActiveFilter('others')}
-          >
-            🌐 Others ({metrics.others})
-          </button>
+          <div className="cc-circuit-tabs-group">
+            <button
+              className={`cc-tab-btn ${activeFilter === 'all' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('all')}
+            >
+              All Circuits ({metrics.total})
+            </button>
+            <button
+              className={`cc-tab-btn ${activeFilter === 'du' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('du')}
+            >
+              🎓 DU Circuit ({metrics.du})
+            </button>
+            <button
+              className={`cc-tab-btn ${activeFilter === 'iim-iit' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('iim-iit')}
+            >
+              🏛️ IIMs & IITs ({metrics.iimIit})
+            </button>
+            <button
+              className={`cc-tab-btn ${activeFilter === 'other-mba-corp' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('other-mba-corp')}
+            >
+              🏢 Corporate & Other Colleges ({metrics.otherMbaCorp})
+            </button>
+            <button
+              className={`cc-tab-btn ${activeFilter === 'others' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('others')}
+            >
+              🌐 Others ({metrics.others})
+            </button>
+          </div>
+
           <button
             className={`cc-tab-btn cc-tab-bookmarked ${activeFilter === 'bookmarked' ? 'active' : ''}`}
             onClick={() => setActiveFilter('bookmarked')}

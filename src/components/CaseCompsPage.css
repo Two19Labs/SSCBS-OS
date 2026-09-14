@@ -323,6 +323,14 @@
 .cc-tabs {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cc-circuit-tabs-group {
+  display: flex;
+  align-items: center;
   gap: 6px;
   flex-wrap: wrap;
 }
@@ -348,6 +356,20 @@
   background: var(--ink);
   color: var(--surface);
   border-color: var(--ink);
+}
+
+.cc-tab-btn.cc-tab-bookmarked {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.cc-tab-btn.cc-tab-bookmarked:hover {
+  color: var(--ink);
+  border-color: #d97706;
+  background: rgba(245, 158, 11, 0.06);
 }
 
 .cc-tab-btn.cc-tab-bookmarked.active {
