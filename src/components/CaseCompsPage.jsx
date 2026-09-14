@@ -132,22 +132,82 @@ const BriefcaseIcon = ({ size = 18 }) => (
 );
 import './CaseCompsPage.css';
 
-const IIM_IIT_KEYWORDS = [
-  'iim', 'iit', 'indian institute of management', 'indian institute of technology',
-  'doms', 'dms', 'sjmsom', 'vgsom'
+const DU_KEYWORDS = [
+  'delhi university', 'university of delhi', '(du)', 'sscbs', 'shaheed sukhdev',
+  'srcc', 'shri ram college', 'stephen', 'hindu', 'hansraj', 'lsr', 'lady shri ram',
+  'sggscc', 'ramjas', 'kirori mal', 'kmc', 'drc', 'daulat ram', 'gargi', 'venkateswara',
+  'venky', 'sgtb khalsa', 'khalsa', 'keshav mahavidyalaya', 'deen dayal upadhyaya', 'ddu',
+  'miranda', 'jesus and mary', 'jmc', 'atma ram', 'arsd', 'sbsc', 'shaheed bhagat singh',
+  'motilal nehru', 'indraprastha college', 'ipcw', 'maharaja agrasen', 'ramanujan', 'kalindi', 'kamala nehru'
 ];
 
-const OTHER_MBA_CORP_KEYWORDS = [
-  'isb', 'xlri', 'mdi', 'fms', 'spjimr', 'sp jain', 'sibm', 'symbiosis', 'scmhrd',
-  'nmims', 'iift', 'great lakes', 'glim', 'tapmi', 'imt', 'gim', 'somaiya',
-  'fore', 'lbsim', 'bits', 'mica', 'irma', 'tiss', 'jbims',
-  "l'oreal", 'loreal', 'brandstorm', 'tata', 'hul', 'unilever', 'itc', 'marico',
-  'mondelez', 'reckitt', 'nestle', 'p&g', 'pepsico', 'coca-cola', 'aditya birla',
-  'reliance', 'jio', 'mahindra', 'mckinsey', 'bain', 'bcg', 'kearney', 'ey',
-  'deloitte', 'pwc', 'kpmg', 'amazon', 'flipkart', 'google', 'microsoft',
-  'tvs', 'optum', 'accenture', 'hsbc', 'citi', 'jpmorgan', 'morgan stanley',
-  'goldman sachs', 'amex', 'hdfc', 'icici', 'axis bank', 'kotak', 'bajaj',
-  'hero', 'airtel', 'asian paints', 'corporate'
+const IIM_IIT_BSCHOOL_KEYWORDS = [
+  // IIMs
+  'iim', 'indian institute of management',
+  // IITs & Premier Research
+  'iit', 'indian institute of technology', 'doms', 'dms', 'sjmsom', 'vgsom', 'iisc', 'techkriti',
+  // NITs & BITS & Premier Tech
+  'bits pilani', 'bits', 'nit ', 'nit,', 'nit)', 'national institute of technology', 'iiit',
+  // Top Tier 1 & Prominent B-Schools
+  'xlri', 'xavier school of management', 'xavier labour',
+  'isb', 'indian school of business',
+  'fms', 'faculty of management studies',
+  'spjimr', 'sp jain', 's.p. jain', 's p jain',
+  'mdi', 'management development institute',
+  'iift', 'indian institute of foreign trade',
+  'nmims', 'narsee monjee', 'sbm',
+  'sibm', 'scmhrd', 'siib', 'siom', 'scit',
+  'tiss', 'tata institute of social sciences',
+  'jbims', 'jamnalal bajaj',
+  'mica', 'mudra institute',
+  'imt', 'imt ghaziabad', 'imt nagpur', 'imt hyderabad',
+  'great lakes', 'glim',
+  'tapmi', 't. a. pai', 't a pai',
+  'ximb', 'xim university', 'xavier institute of management',
+  'gim', 'goa institute of management',
+  'k j somaiya', 'kj somaiya', 'somaiya', 'simsr', 'kj sim',
+  'fore', 'fore school',
+  'lbsim', 'lal bahadur shastri',
+  'irma', 'institute of rural management',
+  'imi', 'international management institute',
+  'bimtech', 'birla institute of management',
+  'liba', 'loyola institute of business administration',
+  'welingkar', 'weschool',
+  'ibs', 'icfai business school', 'icfai',
+  'masters union', "masters' union",
+  'soil institute', 'ifmr', 'krea university',
+  'nibm', 'nia pune', 'bimm', 'balaji institute',
+  'iiswbm', 'iifm', 'ksom', 'kiit school of management',
+  'bvimr', 'gl bajaj institute of management',
+  'commerce and business management, osmania'
+];
+
+const CORPORATE_KEYWORDS = [
+  // Management Consulting & Professional Services
+  'mckinsey', 'bain', 'bcg', 'boston consulting', 'kearney', 'oliver wyman', 'strategy&',
+  'deloitte', 'pwc', 'pricewaterhousecoopers', 'ey', 'ernst & young', 'kpmg', 'grant thornton', 'bdo', 'accenture',
+  // FMCG & Consumer Brands
+  "l'oreal", 'loreal', 'brandstorm', 'hul', 'hindustan unilever', 'lime', 'unilever',
+  'itc', 'interrobang', 'marico', 'over the wall', 'mondelez', 'reckitt', 'nestle', 'p&g', 'procter & gamble',
+  'pepsico', 'coca-cola', 'coke', 'aditya birla', 'stratfresh', 'abg', 'dabur', 'godrej', 'asian paints', 'berger paints', 'britannia',
+  // Tech, E-commerce, Telecom & Semis
+  'amazon', 'flipkart', 'google', 'microsoft', 'apple', 'meta', 'uber', 'swiggy', 'zomato',
+  'qualcomm', 'intel', 'cisco', 'ibm', 'infosys', 'wipro', 'hcl', 'cognizant', 'capgemini', 'tech mahindra',
+  'airtel', 'jio', 'vodafone', 'supervity', 'salesforce', 'adobe',
+  // Conglomerates & Industrial
+  'tata group', 'tata steel', 'tata motors', 'tcs', 'tata crucible', 'tata imagination', 'tata',
+  'reliance', 'reliance retail', 'mahindra', 'war room', 'mahindra rise', 'tvs', 'tvs credit',
+  'hero motocorp', 'hero colabs', 'hero', 'bajaj finserv', 'bajaj auto', 'l&t', 'larsen & toubro', 'vedanta', 'adani', 'jsw',
+  // Banking & Financial Services
+  'goldman sachs', 'jpmorgan', 'jp morgan', 'morgan stanley', 'citi', 'citigroup', 'hsbc',
+  'american express', 'amex', 'standard chartered', 'barclays', 'deutsche bank',
+  'hdfc', 'icici', 'axis bank', 'kotak', 'optum', 'stratethon', 'raam group',
+  // Startups, Platforms & Corporate entities
+  'cogniza', 'wonksknow', 'noobsync', 'invoqe', 'upforge', 'jetlearn', 'languify',
+  'product space', 'mhtechin', 'monomousumi', 'kartexa', 'skilled sapiens', 'indiastox',
+  'godstockss', 'acecubing', 'campusorbit', 'pharmaorbit', 'boss console', 'hackathon raptors',
+  'heritage vastra', 'code-x-novas', 'elite coders', 'wecodecoders', 'interactup', 'internhill',
+  'innovation hacks', 'gradient learnings', 'bharat academix', 'cyber hx'
 ];
 
 function isMatch(text, kw) {
@@ -158,20 +218,28 @@ function isMatch(text, kw) {
   return text.includes(kw);
 }
 
-function isIIMorIITComp(comp) {
-  if (comp.isDU) return false;
-  if (typeof comp.isIIMorIIT === 'boolean') return comp.isIIMorIIT;
-  if (comp.isIIM || comp.isIIT) return true;
+function isDUComp(comp) {
+  if (comp.isDU) return true;
   const combined = `${comp.orgName || ''} ${comp.title || ''}`.toLowerCase();
-  return IIM_IIT_KEYWORDS.some(kw => isMatch(combined, kw));
+  return DU_KEYWORDS.some(kw => isMatch(combined, kw));
 }
 
-function isOtherMbaOrCorporateComp(comp) {
-  if (comp.isDU || isIIMorIITComp(comp)) return false;
-  if (typeof comp.isOtherMbaOrCorporate === 'boolean') return comp.isOtherMbaOrCorporate;
-  if (comp.isCorporate || comp.isOtherMba) return true;
+function isIIMorIITorBschoolComp(comp) {
+  if (isDUComp(comp)) return false;
+  if (typeof comp.isBschool === 'boolean') return comp.isBschool;
+  if (typeof comp.isIIMorIIT === 'boolean' && comp.isIIMorIIT) return true;
   const combined = `${comp.orgName || ''} ${comp.title || ''}`.toLowerCase();
-  return OTHER_MBA_CORP_KEYWORDS.some(kw => isMatch(combined, kw));
+  return IIM_IIT_BSCHOOL_KEYWORDS.some(kw => isMatch(combined, kw));
+}
+
+function isCorporateComp(comp) {
+  if (isDUComp(comp) || isIIMorIITorBschoolComp(comp)) return false;
+  const combined = `${comp.orgName || ''} ${comp.title || ''}`.toLowerCase();
+  return (
+    CORPORATE_KEYWORDS.some(kw => isMatch(combined, kw)) ||
+    /\b(pvt ltd|private limited|technologies pvt|solutions pvt)\b/i.test(combined) ||
+    (comp.isCorporate && !/\b(college|university|institute|school of|academy)\b/i.test(comp.orgName || ''))
+  );
 }
 
 function parsePrizeAmount(prizesStr) {
@@ -272,9 +340,9 @@ function getCountdownDetails(deadlineStr, fallbackRemainText, nowMs) {
 }
 
 function getCardCircuit(comp) {
-  if (comp.isDU) return { type: 'du', label: 'DU Circuit', icon: '🎓' };
-  if (isIIMorIITComp(comp)) return { type: 'iim-iit', label: 'IIMs & IITs', icon: '🏛️' };
-  if (isOtherMbaOrCorporateComp(comp)) return { type: 'other-mba-corp', label: 'Corporate & Other Colleges', icon: '🏢' };
+  if (isDUComp(comp)) return { type: 'du', label: 'DU Circuit', icon: '🎓' };
+  if (isIIMorIITorBschoolComp(comp)) return { type: 'iim-iit', label: 'IIMs, IITs & Other B-Schools', icon: '🏛️' };
+  if (isCorporateComp(comp)) return { type: 'corporate', label: 'Corporate', icon: '🏢' };
   return { type: 'others', label: 'Others', icon: '🌐' };
 }
 
@@ -287,7 +355,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'du' | 'iim-iit' | 'other-mba-corp' | 'others' | 'bookmarked'
+  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'du' | 'iim-iit-bschool' | 'corporate' | 'others' | 'bookmarked'
   const [categoryFilter, setCategoryFilter] = useState('all'); // 'all' | 'case' | 'hackathon' | 'writing' | 'quiz' | 'simulation' | 'debate'
   const [teamFilter, setTeamFilter] = useState('all'); // 'all' | 'solo' | 'team'
   const [feeFilter, setFeeFilter] = useState('all'); // 'all' | 'free' | 'paid'
@@ -468,10 +536,10 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
   // Metrics computation from 100% real Unstop competitions
   const metrics = useMemo(() => {
     const total = competitions.length;
-    const du = competitions.filter((c) => c.isDU).length;
-    const iimIit = competitions.filter((c) => isIIMorIITComp(c)).length;
-    const otherMbaCorp = competitions.filter((c) => isOtherMbaOrCorporateComp(c)).length;
-    const others = competitions.filter((c) => !c.isDU && !isIIMorIITComp(c) && !isOtherMbaOrCorporateComp(c)).length;
+    const du = competitions.filter((c) => isDUComp(c)).length;
+    const iimIitBschools = competitions.filter((c) => isIIMorIITorBschoolComp(c)).length;
+    const corporate = competitions.filter((c) => isCorporateComp(c)).length;
+    const others = competitions.filter((c) => !isDUComp(c) && !isIIMorIITorBschoolComp(c) && !isCorporateComp(c)).length;
     const bookmarked = competitions.filter((c) => bookmarkedIds.includes(c.id)).length;
     const cases = competitions.filter((c) => c.category === 'case').length;
     const hackathons = competitions.filter((c) => c.category === 'hackathon').length;
@@ -479,7 +547,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
     const quizzes = competitions.filter((c) => c.category === 'quiz').length;
     const simulations = competitions.filter((c) => c.category === 'simulation').length;
     const debates = competitions.filter((c) => c.category === 'debate').length;
-    return { total, du, iimIit, otherMbaCorp, others, bookmarked, cases, hackathons, writing, quizzes, simulations, debates };
+    return { total, du, iimIitBschools, corporate, others, bookmarked, cases, hackathons, writing, quizzes, simulations, debates };
   }, [competitions, bookmarkedIds]);
 
   const hasActiveFilters = searchQuery.trim() !== '' || activeFilter !== 'all' || categoryFilter !== 'all' || teamFilter !== 'all' || feeFilter !== 'all' || sortBy !== 'closing-soonest';
@@ -510,10 +578,10 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
       if (activeFilter === 'bookmarked') {
         if (!bookmarkedIds.includes(comp.id)) return false;
       } else {
-        if (activeFilter === 'du' && !comp.isDU) return false;
-        if (activeFilter === 'iim-iit' && !isIIMorIITComp(comp)) return false;
-        if (activeFilter === 'other-mba-corp' && !isOtherMbaOrCorporateComp(comp)) return false;
-        if (activeFilter === 'others' && (comp.isDU || isIIMorIITComp(comp) || isOtherMbaOrCorporateComp(comp))) return false;
+        if (activeFilter === 'du' && !isDUComp(comp)) return false;
+        if (activeFilter === 'iim-iit-bschool' && !isIIMorIITorBschoolComp(comp)) return false;
+        if (activeFilter === 'corporate' && !isCorporateComp(comp)) return false;
+        if (activeFilter === 'others' && (isDUComp(comp) || isIIMorIITorBschoolComp(comp) || isCorporateComp(comp))) return false;
       }
 
       // Discipline track filter
@@ -640,16 +708,16 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
               🎓 DU Circuit ({metrics.du})
             </button>
             <button
-              className={`cc-tab-btn ${activeFilter === 'iim-iit' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('iim-iit')}
+              className={`cc-tab-btn ${activeFilter === 'iim-iit-bschool' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('iim-iit-bschool')}
             >
-              🏛️ IIMs & IITs ({metrics.iimIit})
+              🏛️ IIMs, IITs & Other B-Schools ({metrics.iimIitBschools})
             </button>
             <button
-              className={`cc-tab-btn ${activeFilter === 'other-mba-corp' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('other-mba-corp')}
+              className={`cc-tab-btn ${activeFilter === 'corporate' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('corporate')}
             >
-              🏢 Corporate & Other Colleges ({metrics.otherMbaCorp})
+              🏢 Corporate ({metrics.corporate})
             </button>
             <button
               className={`cc-tab-btn ${activeFilter === 'others' ? 'active' : ''}`}

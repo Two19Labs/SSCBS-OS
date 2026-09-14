@@ -687,6 +687,7 @@
   border-color: rgba(2, 132, 199, 0.5);
 }
 
+.cc-card-corporate:hover,
 .cc-card-other-mba-corp:hover {
   border-color: rgba(14, 165, 233, 0.5);
 }
@@ -882,7 +883,8 @@
 }
 
 .cc-host-avatar.iit,
-.cc-host-avatar.other-mba-corp {
+.cc-host-avatar.other-mba-corp,
+.cc-host-avatar.corporate {
   background: rgba(2, 132, 199, 0.1);
   color: #0284c7;
   border-color: rgba(2, 132, 199, 0.25);
@@ -904,7 +906,8 @@
 [data-theme='dark'] .cc-host-avatar.iim,
 [data-theme='dark'] .cc-host-avatar.iim-iit { color: #fbbf24; }
 [data-theme='dark'] .cc-host-avatar.iit,
-[data-theme='dark'] .cc-host-avatar.other-mba-corp { color: #38bdf8; }
+[data-theme='dark'] .cc-host-avatar.other-mba-corp,
+[data-theme='dark'] .cc-host-avatar.corporate { color: #38bdf8; }
 
 .cc-host-meta {
   display: flex;

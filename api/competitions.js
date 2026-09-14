@@ -17,48 +17,76 @@ const DU_KEYWORDS = [
   'sggscc', 'ramjas', 'kirori mal', 'kmc', 'drc', 'daulat ram', 'gargi', 'venkateswara',
   'venky', 'sgtb khalsa', 'khalsa', 'keshav mahavidyalaya', 'deen dayal upadhyaya', 'ddu',
   'miranda', 'jesus and mary', 'jmc', 'atma ram', 'arsd', 'sbsc', 'shaheed bhagat singh',
-  'motilal nehru', 'indraprastha college', 'ipcw', 'maharaja agrasen', 'ramanujan'
+  'motilal nehru', 'indraprastha college', 'ipcw', 'maharaja agrasen', 'ramanujan', 'kalindi', 'kamala nehru'
 ];
 
-const IIM_KEYWORDS = [
-  'iim', 'indian institute of management', 'iim ahmedabad', 'iim bangalore', 'iim calcutta',
-  'iim lucknow', 'iim kozhikode', 'iim indore', 'iim shillong', 'iim ranchi', 'iim rohtak',
-  'iim trichy', 'iim kashipur', 'iim udaipur', 'iim bodh gaya', 'iim jammu', 'iim sambalpur',
-  'iim sirmaur', 'iim visakhapatnam', 'iim amritsar', 'iim nagpur', 'iim raipur'
-];
-
-const IIT_KEYWORDS = [
-  'iit', 'indian institute of technology', 'iit bombay', 'iit delhi', 'iit madras',
-  'iit kanpur', 'iit kharagpur', 'iit roorkee', 'iit guwahati', 'iit bhu', 'iit hyderabad',
-  'iit dhanbad', 'iit indore', 'iit mandi', 'iit varanasi', 'iit gandhinagar', 'iit patna',
-  'iit jodhpur', 'iit ropar', 'iit tirupati', 'iit palakkad', 'iit dharwad', 'iit bhilai',
-  'iit goa', 'doms', 'dms', 'sjmsom', 'vgsom'
-];
-
-const OTHER_MBA_KEYWORDS = [
-  'isb', 'indian school of business', 'xlri', 'xavier school of management', 'xavier labour',
-  'xavier', 'mdi', 'management development institute', 'mdi gurgaon', 'mdi murshidabad',
-  'fms', 'faculty of management studies', 'spjimr', 'sp jain', 's.p. jain', 'sibm', 'symbiosis',
-  'scmhrd', 'siom', 'nmims', 'narsee monjee', 'iift', 'indian institute of foreign trade',
-  'great lakes', 'glim', 'tapmi', 't. a. pai', 'imt', 'imt ghaziabad', 'gim', 'goa institute of management',
-  'k j somaiya', 'somaiya', 'simsr', 'fore', 'fore school', 'lbsim', 'lal bahadur shastri',
-  'bits', 'bits pilani', 'mica', 'mudra institute', 'irma', 'institute of rural management',
-  'tiss', 'tata institute of social sciences', 'jbims', 'jamnalal bajaj'
+const IIM_IIT_BSCHOOL_KEYWORDS = [
+  // IIMs
+  'iim', 'indian institute of management',
+  // IITs & Premier Research
+  'iit', 'indian institute of technology', 'doms', 'dms', 'sjmsom', 'vgsom', 'iisc', 'techkriti',
+  // NITs & BITS & Premier Tech
+  'bits pilani', 'bits', 'nit ', 'nit,', 'nit)', 'national institute of technology', 'iiit',
+  // Top Tier 1 & Prominent B-Schools
+  'xlri', 'xavier school of management', 'xavier labour',
+  'isb', 'indian school of business',
+  'fms', 'faculty of management studies',
+  'spjimr', 'sp jain', 's.p. jain', 's p jain',
+  'mdi', 'management development institute',
+  'iift', 'indian institute of foreign trade',
+  'nmims', 'narsee monjee', 'sbm',
+  'sibm', 'scmhrd', 'siib', 'siom', 'scit',
+  'tiss', 'tata institute of social sciences',
+  'jbims', 'jamnalal bajaj',
+  'mica', 'mudra institute',
+  'imt', 'imt ghaziabad', 'imt nagpur', 'imt hyderabad',
+  'great lakes', 'glim',
+  'tapmi', 't. a. pai', 't a pai',
+  'ximb', 'xim university', 'xavier institute of management',
+  'gim', 'goa institute of management',
+  'k j somaiya', 'kj somaiya', 'somaiya', 'simsr', 'kj sim',
+  'fore', 'fore school',
+  'lbsim', 'lal bahadur shastri',
+  'irma', 'institute of rural management',
+  'imi', 'international management institute',
+  'bimtech', 'birla institute of management',
+  'liba', 'loyola institute of business administration',
+  'welingkar', 'weschool',
+  'ibs', 'icfai business school', 'icfai',
+  'masters union', "masters' union",
+  'soil institute', 'ifmr', 'krea university',
+  'nibm', 'nia pune', 'bimm', 'balaji institute',
+  'iiswbm', 'iifm', 'ksom', 'kiit school of management',
+  'bvimr', 'gl bajaj institute of management',
+  'commerce and business management, osmania'
 ];
 
 const CORPORATE_KEYWORDS = [
-  "l'oreal", 'loreal', 'brandstorm', 'tata', 'tata steel', 'tata motors', 'tata crucible',
-  'tata imagination', 'tcs', 'hul', 'hindustan unilever', 'lime', 'unilever', 'itc',
-  'interrobang', 'marico', 'over the wall', 'mondelez', 'reckitt', 'nestle', 'p&g',
-  'procter & gamble', 'pepsico', 'coca-cola', 'coke', 'aditya birla', 'stratfresh', 'abg',
-  'reliance', 'jio', 'reliance retail', 'mahindra', 'war room', 'mckinsey', 'bain', 'bcg',
-  'boston consulting', 'kearney', 'oliver wyman', 'strategy&', 'ey', 'ernst & young', 'deloitte',
-  'pwc', 'kpmg', 'grant thornton', 'bdo', 'amazon', 'flipkart', 'google', 'microsoft', 'apple',
-  'meta', 'uber', 'swiggy', 'zomato', 'tvs', 'tvs credit', 'optum', 'stratethon', 'accenture',
-  'standard chartered', 'hsbc', 'citi', 'citigroup', 'jpmorgan', 'jp morgan', 'morgan stanley',
-  'goldman sachs', 'american express', 'amex', 'hdfc', 'icici', 'axis bank', 'kotak', 'bajaj',
-  'bajaj finserv', 'hero', 'hero motocorp', 'airtel', 'vodafone', 'asian paints', 'berger paints',
-  'wipro', 'infosys', 'cognizant', 'capgemini', 'hcl', 'corporate', 'enterprise', 'industry'
+  // Management Consulting & Professional Services
+  'mckinsey', 'bain', 'bcg', 'boston consulting', 'kearney', 'oliver wyman', 'strategy&',
+  'deloitte', 'pwc', 'pricewaterhousecoopers', 'ey', 'ernst & young', 'kpmg', 'grant thornton', 'bdo', 'accenture',
+  // FMCG & Consumer Brands
+  "l'oreal", 'loreal', 'brandstorm', 'hul', 'hindustan unilever', 'lime', 'unilever',
+  'itc', 'interrobang', 'marico', 'over the wall', 'mondelez', 'reckitt', 'nestle', 'p&g', 'procter & gamble',
+  'pepsico', 'coca-cola', 'coke', 'aditya birla', 'stratfresh', 'abg', 'dabur', 'godrej', 'asian paints', 'berger paints', 'britannia',
+  // Tech, E-commerce, Telecom & Semis
+  'amazon', 'flipkart', 'google', 'microsoft', 'apple', 'meta', 'uber', 'swiggy', 'zomato',
+  'qualcomm', 'intel', 'cisco', 'ibm', 'infosys', 'wipro', 'hcl', 'cognizant', 'capgemini', 'tech mahindra',
+  'airtel', 'jio', 'vodafone', 'supervity', 'salesforce', 'adobe',
+  // Conglomerates & Industrial
+  'tata group', 'tata steel', 'tata motors', 'tcs', 'tata crucible', 'tata imagination', 'tata',
+  'reliance', 'reliance retail', 'mahindra', 'war room', 'mahindra rise', 'tvs', 'tvs credit',
+  'hero motocorp', 'hero colabs', 'hero', 'bajaj finserv', 'bajaj auto', 'l&t', 'larsen & toubro', 'vedanta', 'adani', 'jsw',
+  // Banking & Financial Services
+  'goldman sachs', 'jpmorgan', 'jp morgan', 'morgan stanley', 'citi', 'citigroup', 'hsbc',
+  'american express', 'amex', 'standard chartered', 'barclays', 'deutsche bank',
+  'hdfc', 'icici', 'axis bank', 'kotak', 'optum', 'stratethon', 'raam group',
+  // Startups, Platforms & Corporate entities
+  'cogniza', 'wonksknow', 'noobsync', 'invoqe', 'upforge', 'jetlearn', 'languify',
+  'product space', 'mhtechin', 'monomousumi', 'kartexa', 'skilled sapiens', 'indiastox',
+  'godstockss', 'acecubing', 'campusorbit', 'pharmaorbit', 'boss console', 'hackathon raptors',
+  'heritage vastra', 'code-x-novas', 'elite coders', 'wecodecoders', 'interactup', 'internhill',
+  'innovation hacks', 'gradient learnings', 'bharat academix', 'cyber hx'
 ];
 
 function matchesKeyword(text, keyword) {
@@ -300,12 +328,11 @@ export async function fetchCompetitionsFromUnstop() {
 
     // Tag categorization
     const isDU = DU_KEYWORDS.some(kw => matchesKeyword(combined, kw));
-    const isIIM = IIM_KEYWORDS.some(kw => matchesKeyword(combined, kw));
-    const isIIT = IIT_KEYWORDS.some(kw => matchesKeyword(combined, kw));
-    const isIIMorIIT = isIIM || isIIT;
-    const isOtherMba = OTHER_MBA_KEYWORDS.some(kw => matchesKeyword(combined, kw));
-    const isCorporate = CORPORATE_KEYWORDS.some(kw => matchesKeyword(combined, kw));
-    const isOtherMbaOrCorporate = (isOtherMba || isCorporate) && !isDU && !isIIMorIIT;
+    const isIIMorIITorBschool = !isDU && IIM_IIT_BSCHOOL_KEYWORDS.some(kw => matchesKeyword(combined, kw));
+    const isCorporate = !isDU && !isIIMorIITorBschool && (
+      CORPORATE_KEYWORDS.some(kw => matchesKeyword(combined, kw)) ||
+      /\b(pvt ltd|private limited|technologies pvt|solutions pvt)\b/i.test(combined)
+    );
     const isFlagship = FLAGSHIP_KEYWORDS.some(kw => matchesKeyword(combined, kw));
 
     // Multi-track discipline classification
@@ -360,14 +387,9 @@ export async function fetchCompetitionsFromUnstop() {
       isFree,
       isFlagship,
       isDU,
-      isIIM,
-      isIIT,
-      isIIMorIIT,
-      isOtherMba,
+      isIIMorIIT: isIIMorIITorBschool,
+      isBschool: isIIMorIITorBschool,
       isCorporate,
-      isOtherMbaOrCorporate,
-      isIIMorMBA: isIIM || isOtherMba,
-      isIITorTech: isIIT,
       isFirstYearFriendly,
       registeredCount: item.registerCount || 0,
       viewsCount: item.viewsCount || 0,
