@@ -41,6 +41,12 @@
   gap: 12px;
 }
 
+.cc-header-right {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 .cc-back-btn {
   background: var(--surface);
   border: 1px solid var(--border);

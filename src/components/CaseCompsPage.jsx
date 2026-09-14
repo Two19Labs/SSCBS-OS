@@ -392,7 +392,7 @@ function getCardCircuit(comp) {
   return { type: 'others', label: 'Others', icon: '🏫' };
 }
 
-export default function CaseCompsPage({ onBack, onNavigate }) {
+export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
   const { user } = useAuth();
   const userKeySuffix = user?.email ? `_${user.email.toLowerCase()}` : '';
   const bookmarksKey = `${LOCAL_STORAGE_KEY}${userKeySuffix}`;
@@ -770,6 +770,11 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
             </p>
           </div>
         </div>
+        {headerAction && (
+          <div className="cc-header-right desktop-only-notif">
+            {headerAction}
+          </div>
+        )}
       </header>
 
       {/* ── Very Visible Notice: Unstop Exclusivity & Undergrad Filter ── */}

@@ -298,7 +298,11 @@ function App() {
         return hasCaseCompsAccess ? (
           <Suspense fallback={<PageLoader />}>
             <ErrorBoundary>
-              <CaseCompsPage onBack={goBack} onNavigate={openTool} />
+              <CaseCompsPage 
+                onBack={goBack} 
+                onNavigate={openTool} 
+                headerAction={<NotificationCenter onNavigate={openTool} />} 
+              />
             </ErrorBoundary>
           </Suspense>
         ) : <HomeDashboard onNavigate={openTool} onOpenProfile={() => setView('profile')} />;
@@ -524,7 +528,7 @@ function App() {
 
         {/* ── Main content ── */}
         <main className="app-main">
-          {view !== 'home' && (
+          {view !== 'home' && view !== 'case-comps' && (
             <div className="page-heading-desktop">
               <h1 style={{ margin: 0 }}>{pageTitle || 'SSCBS OS'}</h1>
               <NotificationCenter onNavigate={openTool} />
