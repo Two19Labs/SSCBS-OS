@@ -763,7 +763,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
           )}
           <div>
             <div className="cc-title-row">
-              <h1 className="cc-title">Case Competitions</h1>
+              <h1 className="cc-title">Competitions</h1>
             </div>
             <p className="cc-subtitle">
               It's competitions season! Find opportunities relevant to CBS folks right here, synced with and pulled from Unstop, all filterable! :)
