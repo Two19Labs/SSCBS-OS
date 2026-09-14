@@ -378,6 +378,13 @@ function getCountdownDetails(deadlineStr, fallbackRemainText, nowMs) {
   }
 }
 
+function getCompCircuitKey(comp) {
+  if (isDUComp(comp)) return 'du';
+  if (isIIMorIITorPremierComp(comp)) return 'iim-iit-premier';
+  if (isCorporateOrGlobalComp(comp)) return 'corporate-global';
+  return 'others';
+}
+
 function getCardCircuit(comp) {
   if (isDUComp(comp)) return { type: 'du', label: 'DU Circuit', icon: '🎓' };
   if (isIIMorIITorPremierComp(comp)) return { type: 'iim-iit', label: 'IIMs, IITs & Premier Colleges', icon: '🏛️' };
@@ -394,8 +401,9 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'du' | 'iim-iit-bschool' | 'corporate-global' | 'others' | 'bookmarked'
-  const [categoryFilter, setCategoryFilter] = useState('all'); // 'all' | 'case' | 'hackathon' | 'writing' | 'quiz' | 'simulation' | 'debate'
+  const [selectedCircuits, setSelectedCircuits] = useState([]); // [] = All circuits; otherwise: 'du' | 'iim-iit-premier' | 'corporate-global' | 'others'
+  const [bookmarkedOnly, setBookmarkedOnly] = useState(false);
+  const [selectedTracks, setSelectedTracks] = useState([]); // [] = All tracks; otherwise: 'case' | 'hackathon' | 'writing' | 'quiz' | 'simulation' | 'debate'
   const [teamFilter, setTeamFilter] = useState('all'); // 'all' | 'solo' | 'team'
   const [feeFilter, setFeeFilter] = useState('all'); // 'all' | 'free' | 'paid'
   const [sortBy, setSortBy] = useState('closing-soonest'); // 'closing-soonest' | 'closing-latest' | 'title-asc' | 'title-desc' | 'prize-highest' | 'popular'
@@ -603,12 +611,51 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
     };
   }, [competitions, bookmarkedIds]);
 
-  const hasActiveFilters = searchQuery.trim() !== '' || activeFilter !== 'all' || categoryFilter !== 'all' || teamFilter !== 'all' || feeFilter !== 'all' || sortBy !== 'closing-soonest';
+  const toggleCircuit = (circuitKey) => {
+    if (circuitKey === 'all') {
+      setSelectedCircuits([]);
+      setBookmarkedOnly(false);
+      return;
+    }
+    setSelectedCircuits((prev) => {
+      if (prev.includes(circuitKey)) {
+        return prev.filter((k) => k !== circuitKey);
+      }
+      return [...prev, circuitKey];
+    });
+  };
+
+  const toggleTrack = (trackKey) => {
+    if (trackKey === 'all') {
+      setSelectedTracks([]);
+      return;
+    }
+    setSelectedTracks((prev) => {
+      if (prev.includes(trackKey)) {
+        return prev.filter((k) => k !== trackKey);
+      }
+      return [...prev, trackKey];
+    });
+  };
+
+  const toggleBookmarkedOnly = () => {
+    setBookmarkedOnly((prev) => !prev);
+  };
+
+  const hasActiveFilters =
+    searchQuery.trim() !== '' ||
+    selectedCircuits.length > 0 ||
+    bookmarkedOnly ||
+    selectedTracks.length > 0 ||
+    teamFilter !== 'all' ||
+    feeFilter !== 'all' ||
+    sortBy !== 'closing-soonest';
 
   const handleResetFilters = () => {
     setSearchQuery('');
-    setActiveFilter('all');
-    setCategoryFilter('all');
+    setSelectedCircuits([]);
+    setBookmarkedOnly(false);
+    setSelectedTracks([]);
     setTeamFilter('all');
     setFeeFilter('all');
     setSortBy('closing-soonest');
@@ -627,18 +674,24 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
         if (!matchesTitle && !matchesOrg && !matchesPrize && !matchesCat) return false;
       }
 
-      // Circuit or Bookmarked filter
-      if (activeFilter === 'bookmarked') {
-        if (!bookmarkedIds.includes(comp.id)) return false;
-      } else {
-        if (activeFilter === 'du' && !isDUComp(comp)) return false;
-        if ((activeFilter === 'iim-iit-premier' || activeFilter === 'iim-iit-bschool') && !isIIMorIITorPremierComp(comp)) return false;
-        if (activeFilter === 'corporate-global' && !isCorporateOrGlobalComp(comp)) return false;
-        if (activeFilter === 'others' && (isDUComp(comp) || isIIMorIITorPremierComp(comp) || isCorporateOrGlobalComp(comp))) return false;
+      // Circuit filter (multi-select)
+      if (selectedCircuits.length > 0) {
+        const compCircuit = getCompCircuitKey(comp);
+        const matchesCircuit = selectedCircuits.some(
+          (c) => c === compCircuit || (c === 'iim-iit-bschool' && compCircuit === 'iim-iit-premier')
+        );
+        if (!matchesCircuit) return false;
       }
 
-      // Discipline track filter
-      if (categoryFilter !== 'all' && comp.category !== categoryFilter) return false;
+      // Bookmarked filter
+      if (bookmarkedOnly) {
+        if (!bookmarkedIds.includes(comp.id)) return false;
+      }
+
+      // Discipline track filter (multi-select)
+      if (selectedTracks.length > 0) {
+        if (!selectedTracks.includes(comp.category)) return false;
+      }
 
       // Team filter
       if (teamFilter === 'solo' && comp.maxTeam > 1) return false;
@@ -696,7 +749,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
     });
 
     return result;
-  }, [competitions, searchQuery, activeFilter, categoryFilter, teamFilter, feeFilter, sortBy, bookmarkedIds]);
+  }, [competitions, searchQuery, selectedCircuits, bookmarkedOnly, selectedTracks, teamFilter, feeFilter, sortBy, bookmarkedIds]);
 
   return (
     <div className="case-comps-container">
@@ -749,40 +802,46 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
         <div className="cc-tabs">
           <div className="cc-circuit-tabs-group">
             <button
-              className={`cc-tab-btn ${activeFilter === 'all' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('all')}
+              type="button"
+              className={`cc-tab-btn ${selectedCircuits.length === 0 && !bookmarkedOnly ? 'active' : ''}`}
+              onClick={() => toggleCircuit('all')}
             >
               All Circuits ({metrics.total})
             </button>
             <button
-              className={`cc-tab-btn ${activeFilter === 'du' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('du')}
+              type="button"
+              className={`cc-tab-btn ${selectedCircuits.includes('du') ? 'active' : ''}`}
+              onClick={() => toggleCircuit('du')}
             >
               🎓 DU Circuit ({metrics.du})
             </button>
             <button
-              className={`cc-tab-btn ${activeFilter === 'iim-iit-premier' || activeFilter === 'iim-iit-bschool' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('iim-iit-premier')}
+              type="button"
+              className={`cc-tab-btn ${selectedCircuits.includes('iim-iit-premier') || selectedCircuits.includes('iim-iit-bschool') ? 'active' : ''}`}
+              onClick={() => toggleCircuit('iim-iit-premier')}
             >
               🏛️ IIMs, IITs & Premier Colleges ({metrics.iimIitPremier})
             </button>
             <button
-              className={`cc-tab-btn ${activeFilter === 'corporate-global' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('corporate-global')}
+              type="button"
+              className={`cc-tab-btn ${selectedCircuits.includes('corporate-global') ? 'active' : ''}`}
+              onClick={() => toggleCircuit('corporate-global')}
             >
               🏢 Corporate & Global ({metrics.corporateGlobal})
             </button>
             <button
-              className={`cc-tab-btn ${activeFilter === 'others' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('others')}
+              type="button"
+              className={`cc-tab-btn ${selectedCircuits.includes('others') ? 'active' : ''}`}
+              onClick={() => toggleCircuit('others')}
             >
               🏫 Others ({metrics.others})
             </button>
           </div>
 
           <button
-            className={`cc-tab-btn cc-tab-bookmarked ${activeFilter === 'bookmarked' ? 'active' : ''}`}
-            onClick={() => setActiveFilter('bookmarked')}
+            type="button"
+            className={`cc-tab-btn cc-tab-bookmarked ${bookmarkedOnly ? 'active' : ''}`}
+            onClick={toggleBookmarkedOnly}
           >
             🔖 Bookmarked ({bookmarkedIds.length})
           </button>
@@ -791,44 +850,51 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
         {/* Discipline Track Filter Bar */}
         <div className="cc-category-bar">
           <button
-            className={`cc-cat-pill ${categoryFilter === 'all' ? 'active' : ''}`}
-            onClick={() => setCategoryFilter('all')}
+            type="button"
+            className={`cc-cat-pill ${selectedTracks.length === 0 ? 'active' : ''}`}
+            onClick={() => toggleTrack('all')}
           >
             All Tracks ({metrics.total})
           </button>
           <button
-            className={`cc-cat-pill ${categoryFilter === 'case' ? 'active' : ''}`}
-            onClick={() => setCategoryFilter('case')}
+            type="button"
+            className={`cc-cat-pill ${selectedTracks.includes('case') ? 'active' : ''}`}
+            onClick={() => toggleTrack('case')}
           >
             📊 Case Comps ({metrics.cases})
           </button>
           <button
-            className={`cc-cat-pill ${categoryFilter === 'hackathon' ? 'active' : ''}`}
-            onClick={() => setCategoryFilter('hackathon')}
+            type="button"
+            className={`cc-cat-pill ${selectedTracks.includes('hackathon') ? 'active' : ''}`}
+            onClick={() => toggleTrack('hackathon')}
           >
             💻 Hackathons ({metrics.hackathons})
           </button>
           <button
-            className={`cc-cat-pill ${categoryFilter === 'writing' ? 'active' : ''}`}
-            onClick={() => setCategoryFilter('writing')}
+            type="button"
+            className={`cc-cat-pill ${selectedTracks.includes('writing') ? 'active' : ''}`}
+            onClick={() => toggleTrack('writing')}
           >
             ✍️ Writing & Research ({metrics.writing})
           </button>
           <button
-            className={`cc-cat-pill ${categoryFilter === 'quiz' ? 'active' : ''}`}
-            onClick={() => setCategoryFilter('quiz')}
+            type="button"
+            className={`cc-cat-pill ${selectedTracks.includes('quiz') ? 'active' : ''}`}
+            onClick={() => toggleTrack('quiz')}
           >
             🧠 Quizzes ({metrics.quizzes})
           </button>
           <button
-            className={`cc-cat-pill ${categoryFilter === 'simulation' ? 'active' : ''}`}
-            onClick={() => setCategoryFilter('simulation')}
+            type="button"
+            className={`cc-cat-pill ${selectedTracks.includes('simulation') ? 'active' : ''}`}
+            onClick={() => toggleTrack('simulation')}
           >
             📈 Simulations ({metrics.simulations})
           </button>
           <button
-            className={`cc-cat-pill ${categoryFilter === 'debate' ? 'active' : ''}`}
-            onClick={() => setCategoryFilter('debate')}
+            type="button"
+            className={`cc-cat-pill ${selectedTracks.includes('debate') ? 'active' : ''}`}
+            onClick={() => toggleTrack('debate')}
           >
             🗣️ Debates ({metrics.debates})
           </button>
@@ -941,21 +1007,21 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
       ) : filteredCompetitions.length === 0 ? (
         <div className="cc-empty-state">
           <div className="cc-empty-icon">
-            {activeFilter === 'bookmarked' ? <BookmarkIcon size={36} filled={false} /> : <TrophyIcon size={36} />}
+            {bookmarkedOnly ? <BookmarkIcon size={36} filled={false} /> : <TrophyIcon size={36} />}
           </div>
           <h3 className="cc-empty-title">
-            {activeFilter === 'bookmarked' ? 'No bookmarked competitions yet' : 'No competitions match your filter'}
+            {bookmarkedOnly ? 'No bookmarked competitions match' : 'No competitions match your filter'}
           </h3>
           <p className="cc-empty-desc">
-            {activeFilter === 'bookmarked'
+            {bookmarkedOnly
               ? 'Click the bookmark button on any competition card to save it here and keep track of deadlines and teams!'
-              : 'Try searching a different keyword or resetting your filter criteria.'}
+              : 'Try searching a different keyword, selecting additional filters, or resetting criteria.'}
           </p>
           <button
             className="cc-empty-btn"
             onClick={handleResetFilters}
           >
-            {activeFilter === 'bookmarked' ? 'Explore All Competitions' : 'Clear All Filters'}
+            {bookmarkedOnly ? 'Explore All Competitions' : 'Clear All Filters'}
           </button>
         </div>
       ) : (
