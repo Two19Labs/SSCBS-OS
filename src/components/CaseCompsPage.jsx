@@ -159,6 +159,7 @@ function isMatch(text, kw) {
 }
 
 function isIIMorIITComp(comp) {
+  if (comp.isDU) return false;
   if (typeof comp.isIIMorIIT === 'boolean') return comp.isIIMorIIT;
   if (comp.isIIM || comp.isIIT) return true;
   const combined = `${comp.orgName || ''} ${comp.title || ''}`.toLowerCase();
@@ -166,9 +167,9 @@ function isIIMorIITComp(comp) {
 }
 
 function isOtherMbaOrCorporateComp(comp) {
+  if (comp.isDU || isIIMorIITComp(comp)) return false;
   if (typeof comp.isOtherMbaOrCorporate === 'boolean') return comp.isOtherMbaOrCorporate;
   if (comp.isCorporate || comp.isOtherMba) return true;
-  if (comp.isDU || isIIMorIITComp(comp)) return false;
   const combined = `${comp.orgName || ''} ${comp.title || ''}`.toLowerCase();
   return OTHER_MBA_CORP_KEYWORDS.some(kw => isMatch(combined, kw));
 }
@@ -273,8 +274,8 @@ function getCountdownDetails(deadlineStr, fallbackRemainText, nowMs) {
 function getCardCircuit(comp) {
   if (comp.isDU) return { type: 'du', label: 'DU Circuit', icon: '🎓' };
   if (isIIMorIITComp(comp)) return { type: 'iim-iit', label: 'IIMs & IITs', icon: '🏛️' };
-  if (isOtherMbaOrCorporateComp(comp)) return { type: 'other-mba-corp', label: 'Other Colleges & Corporates', icon: '🏢' };
-  return { type: 'general', label: 'National Circuit', icon: '💼' };
+  if (isOtherMbaOrCorporateComp(comp)) return { type: 'other-mba-corp', label: 'Corporate & Other Colleges', icon: '🏢' };
+  return { type: 'others', label: 'Others', icon: '🌐' };
 }
 
 export default function CaseCompsPage({ onBack, onNavigate }) {
@@ -286,7 +287,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'du' | 'iim-iit' | 'other-mba-corp' | 'bookmarked'
+  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'du' | 'iim-iit' | 'other-mba-corp' | 'others' | 'bookmarked'
   const [categoryFilter, setCategoryFilter] = useState('all'); // 'all' | 'case' | 'hackathon' | 'writing' | 'quiz' | 'simulation' | 'debate'
   const [teamFilter, setTeamFilter] = useState('all'); // 'all' | 'solo' | 'team'
   const [feeFilter, setFeeFilter] = useState('all'); // 'all' | 'free' | 'paid'
@@ -470,6 +471,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
     const du = competitions.filter((c) => c.isDU).length;
     const iimIit = competitions.filter((c) => isIIMorIITComp(c)).length;
     const otherMbaCorp = competitions.filter((c) => isOtherMbaOrCorporateComp(c)).length;
+    const others = competitions.filter((c) => !c.isDU && !isIIMorIITComp(c) && !isOtherMbaOrCorporateComp(c)).length;
     const bookmarked = competitions.filter((c) => bookmarkedIds.includes(c.id)).length;
     const cases = competitions.filter((c) => c.category === 'case').length;
     const hackathons = competitions.filter((c) => c.category === 'hackathon').length;
@@ -477,7 +479,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
     const quizzes = competitions.filter((c) => c.category === 'quiz').length;
     const simulations = competitions.filter((c) => c.category === 'simulation').length;
     const debates = competitions.filter((c) => c.category === 'debate').length;
-    return { total, du, iimIit, otherMbaCorp, bookmarked, cases, hackathons, writing, quizzes, simulations, debates };
+    return { total, du, iimIit, otherMbaCorp, others, bookmarked, cases, hackathons, writing, quizzes, simulations, debates };
   }, [competitions, bookmarkedIds]);
 
   const hasActiveFilters = searchQuery.trim() !== '' || activeFilter !== 'all' || categoryFilter !== 'all' || teamFilter !== 'all' || feeFilter !== 'all' || sortBy !== 'closing-soonest';
@@ -511,6 +513,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
         if (activeFilter === 'du' && !comp.isDU) return false;
         if (activeFilter === 'iim-iit' && !isIIMorIITComp(comp)) return false;
         if (activeFilter === 'other-mba-corp' && !isOtherMbaOrCorporateComp(comp)) return false;
+        if (activeFilter === 'others' && (comp.isDU || isIIMorIITComp(comp) || isOtherMbaOrCorporateComp(comp))) return false;
       }
 
       // Discipline track filter
@@ -645,7 +648,13 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
             className={`cc-tab-btn ${activeFilter === 'other-mba-corp' ? 'active' : ''}`}
             onClick={() => setActiveFilter('other-mba-corp')}
           >
-            🏢 Colleges & Corporates ({metrics.otherMbaCorp})
+            🏢 Corporate & Other Colleges ({metrics.otherMbaCorp})
+          </button>
+          <button
+            className={`cc-tab-btn ${activeFilter === 'others' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('others')}
+          >
+            🌐 Others ({metrics.others})
           </button>
           <button
             className={`cc-tab-btn cc-tab-bookmarked ${activeFilter === 'bookmarked' ? 'active' : ''}`}
