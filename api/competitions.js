@@ -20,13 +20,17 @@ const DU_KEYWORDS = [
   'motilal nehru', 'indraprastha college', 'ipcw', 'maharaja agrasen', 'ramanujan', 'kalindi', 'kamala nehru'
 ];
 
-const IIM_IIT_BSCHOOL_KEYWORDS = [
-  // IIMs
-  'iim', 'indian institute of management',
+const IIM_IIT_PREMIER_KEYWORDS = [
+  // IIMs (All 21 Indian Institutes of Management & IIM Mumbai / NITIE)
+  'iim', 'indian institute of management', 'nitie',
   // IITs & Premier Research
-  'iit', 'indian institute of technology', 'doms', 'dms', 'sjmsom', 'vgsom', 'iisc', 'techkriti',
-  // NITs & BITS & Premier Tech
-  'bits pilani', 'bits', 'nit ', 'nit,', 'nit)', 'national institute of technology', 'iiit',
+  'iit', 'indian institute of technology', 'doms', 'dms', 'sjmsom', 'vgsom', 'iisc', 'indian institute of science', 'techkriti', 'ism dhanbad',
+  // BITS Pilani (All campuses: Pilani, Goa, Hyderabad)
+  'bits pilani', 'birla institute of technology & science', 'birla institute of technology and science', 'bits goa', 'bits hyderabad', 'bits',
+  // NITs (All National Institutes of Technology)
+  'nit ', 'nit,', 'nit)', 'nit -', 'nit-', 'national institute of technology', 'vnit', 'mnit', 'mnnit', 'svnit', 'manit',
+  // IIITs (Indian Institutes of Information Technology)
+  'iiit', 'iiit-delhi', 'iiitd', 'iiith', 'iiitb', 'iiit hyderabad', 'iiit bangalore', 'iiit delhi', 'iiit allahabad',
   // Top Tier 1 & Prominent B-Schools
   'xlri', 'xavier school of management', 'xavier labour',
   'isb', 'indian school of business',
@@ -56,9 +60,25 @@ const IIM_IIT_BSCHOOL_KEYWORDS = [
   'masters union', "masters' union",
   'soil institute', 'ifmr', 'krea university',
   'nibm', 'nia pune', 'bimm', 'balaji institute',
-  'iiswbm', 'iifm', 'ksom', 'kiit school of management',
-  'bvimr', 'gl bajaj institute of management',
-  'commerce and business management, osmania'
+  'iiswbm', 'iifm', 'indian institute of forest management',
+  'ksom', 'kiit school of management', 'bvimr', 'gl bajaj institute of management',
+  'commerce and business management, osmania',
+  // Premier State / Central Tech Universities
+  'nsut', 'netaji subhas', 'dtu', 'delhi technological university', 'dce',
+  'bit mesra', 'birla institute of technology (bit), mesra', 'birla institute of technology, mesra',
+  'punjab engineering college', 'pec ', 'pec,', 'pec)', 'coep', 'vjti',
+  'jadavpur university', 'anna university', 'ceg guindy', 'thapar',
+  'psg tech', 'psg college of technology', 'rvce', 'bmsce', 'msrit', 'mit manipal', 'mahe',
+  // Premier Autonomous & Multidisciplinary Colleges
+  'st. xavier', 'st xavier', "xavier's college", 'xaviers college',
+  'ashoka university', 'ashoka', 'christ university', 'christ (deemed to be university)',
+  'loyola college', 'madras christian college', 'mcc chennai',
+  'presidency college', 'presidency university', 'jindal global', 'o.p. jindal',
+  'shiv nadar', 'snu', 'plaksha',
+  // Premier Law / NLUs
+  'nlsiu', 'nalsar', 'nujs', 'nlu delhi', 'nlu jodhpur', 'gnlu',
+  // Premier Science & Statistics
+  'indian statistical institute', 'isi kolkata', 'cmi', 'tifr', 'iiser', 'niser'
 ];
 
 const CORPORATE_KEYWORDS = [
@@ -264,12 +284,17 @@ export async function fetchCompetitionsFromUnstop() {
     'opportunity=competitions&searchTerm=venky&per_page=50',
     'opportunity=competitions&searchTerm=gargi&per_page=50',
 
-    // Premier National B-Schools & Tech
+    // Premier National B-Schools, IITs & Premier Colleges
     'opportunity=competitions&searchTerm=iim&per_page=50',
     'opportunity=competitions&searchTerm=iit&per_page=50',
     'opportunity=competitions&searchTerm=xlri&per_page=50',
     'opportunity=competitions&searchTerm=isb&per_page=50',
     'opportunity=competitions&searchTerm=mdi&per_page=50',
+    'opportunity=competitions&searchTerm=bits pilani&per_page=50',
+    'opportunity=competitions&searchTerm=nit&per_page=50',
+    'opportunity=competitions&searchTerm=spjimr&per_page=50',
+    'opportunity=competitions&searchTerm=dtu&per_page=50',
+    'opportunity=competitions&searchTerm=nsut&per_page=50',
 
     // Corporate & Global / International Challenges
     'opportunity=competitions&searchTerm=corporate&per_page=50',
@@ -343,8 +368,8 @@ export async function fetchCompetitionsFromUnstop() {
 
     // Tag categorization
     const isDU = DU_KEYWORDS.some(kw => matchesKeyword(combined, kw));
-    const isIIMorIITorBschool = !isDU && IIM_IIT_BSCHOOL_KEYWORDS.some(kw => matchesKeyword(combined, kw));
-    const isCorporateOrGlobal = !isDU && !isIIMorIITorBschool && (
+    const isIIMorIITorPremier = !isDU && IIM_IIT_PREMIER_KEYWORDS.some(kw => matchesKeyword(combined, kw));
+    const isCorporateOrGlobal = !isDU && !isIIMorIITorPremier && (
       CORPORATE_KEYWORDS.some(kw => matchesKeyword(combined, kw)) ||
       GLOBAL_KEYWORDS.some(kw => matchesKeyword(combined, kw)) ||
       /\b(pvt ltd|private limited|technologies pvt|solutions pvt)\b/i.test(combined) ||
@@ -405,8 +430,10 @@ export async function fetchCompetitionsFromUnstop() {
       isFree,
       isFlagship,
       isDU,
-      isIIMorIIT: isIIMorIITorBschool,
-      isBschool: isIIMorIITorBschool,
+      isIIMorIIT: isIIMorIITorPremier,
+      isBschool: isIIMorIITorPremier,
+      isPremier: isIIMorIITorPremier,
+      isIIMorIITorPremier,
       isCorporate,
       isCorporateOrGlobal,
       isFirstYearFriendly,

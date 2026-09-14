@@ -141,13 +141,17 @@ const DU_KEYWORDS = [
   'motilal nehru', 'indraprastha college', 'ipcw', 'maharaja agrasen', 'ramanujan', 'kalindi', 'kamala nehru'
 ];
 
-const IIM_IIT_BSCHOOL_KEYWORDS = [
-  // IIMs
-  'iim', 'indian institute of management',
+const IIM_IIT_PREMIER_KEYWORDS = [
+  // IIMs (All 21 Indian Institutes of Management & IIM Mumbai / NITIE)
+  'iim', 'indian institute of management', 'nitie',
   // IITs & Premier Research
-  'iit', 'indian institute of technology', 'doms', 'dms', 'sjmsom', 'vgsom', 'iisc', 'techkriti',
-  // NITs & BITS & Premier Tech
-  'bits pilani', 'bits', 'nit ', 'nit,', 'nit)', 'national institute of technology', 'iiit',
+  'iit', 'indian institute of technology', 'doms', 'dms', 'sjmsom', 'vgsom', 'iisc', 'indian institute of science', 'techkriti', 'ism dhanbad',
+  // BITS Pilani (All campuses: Pilani, Goa, Hyderabad)
+  'bits pilani', 'birla institute of technology & science', 'birla institute of technology and science', 'bits goa', 'bits hyderabad', 'bits',
+  // NITs (All National Institutes of Technology)
+  'nit ', 'nit,', 'nit)', 'nit -', 'nit-', 'national institute of technology', 'vnit', 'mnit', 'mnnit', 'svnit', 'manit',
+  // IIITs (Indian Institutes of Information Technology)
+  'iiit', 'iiit-delhi', 'iiitd', 'iiith', 'iiitb', 'iiit hyderabad', 'iiit bangalore', 'iiit delhi', 'iiit allahabad',
   // Top Tier 1 & Prominent B-Schools
   'xlri', 'xavier school of management', 'xavier labour',
   'isb', 'indian school of business',
@@ -177,9 +181,25 @@ const IIM_IIT_BSCHOOL_KEYWORDS = [
   'masters union', "masters' union",
   'soil institute', 'ifmr', 'krea university',
   'nibm', 'nia pune', 'bimm', 'balaji institute',
-  'iiswbm', 'iifm', 'ksom', 'kiit school of management',
-  'bvimr', 'gl bajaj institute of management',
-  'commerce and business management, osmania'
+  'iiswbm', 'iifm', 'indian institute of forest management',
+  'ksom', 'kiit school of management', 'bvimr', 'gl bajaj institute of management',
+  'commerce and business management, osmania',
+  // Premier State / Central Tech Universities
+  'nsut', 'netaji subhas', 'dtu', 'delhi technological university', 'dce',
+  'bit mesra', 'birla institute of technology (bit), mesra', 'birla institute of technology, mesra',
+  'punjab engineering college', 'pec ', 'pec,', 'pec)', 'coep', 'vjti',
+  'jadavpur university', 'anna university', 'ceg guindy', 'thapar',
+  'psg tech', 'psg college of technology', 'rvce', 'bmsce', 'msrit', 'mit manipal', 'mahe',
+  // Premier Autonomous & Multidisciplinary Colleges
+  'st. xavier', 'st xavier', "xavier's college", 'xaviers college',
+  'ashoka university', 'ashoka', 'christ university', 'christ (deemed to be university)',
+  'loyola college', 'madras christian college', 'mcc chennai',
+  'presidency college', 'presidency university', 'jindal global', 'o.p. jindal',
+  'shiv nadar', 'snu', 'plaksha',
+  // Premier Law / NLUs
+  'nlsiu', 'nalsar', 'nujs', 'nlu delhi', 'nlu jodhpur', 'gnlu',
+  // Premier Science & Statistics
+  'indian statistical institute', 'isi kolkata', 'cmi', 'tifr', 'iiser', 'niser'
 ];
 
 const CORPORATE_KEYWORDS = [
@@ -237,16 +257,20 @@ function isDUComp(comp) {
   return DU_KEYWORDS.some(kw => isMatch(combined, kw));
 }
 
-function isIIMorIITorBschoolComp(comp) {
+function isIIMorIITorPremierComp(comp) {
   if (isDUComp(comp)) return false;
+  if (typeof comp.isPremier === 'boolean') return comp.isPremier;
+  if (typeof comp.isIIMorIITorPremier === 'boolean') return comp.isIIMorIITorPremier;
   if (typeof comp.isBschool === 'boolean') return comp.isBschool;
   if (typeof comp.isIIMorIIT === 'boolean' && comp.isIIMorIIT) return true;
   const combined = `${comp.orgName || ''} ${comp.title || ''}`.toLowerCase();
-  return IIM_IIT_BSCHOOL_KEYWORDS.some(kw => isMatch(combined, kw));
+  return IIM_IIT_PREMIER_KEYWORDS.some(kw => isMatch(combined, kw));
 }
 
+const isIIMorIITorBschoolComp = isIIMorIITorPremierComp;
+
 function isCorporateOrGlobalComp(comp) {
-  if (isDUComp(comp) || isIIMorIITorBschoolComp(comp)) return false;
+  if (isDUComp(comp) || isIIMorIITorPremierComp(comp)) return false;
   if (typeof comp.isCorporateOrGlobal === 'boolean') return comp.isCorporateOrGlobal;
   const combined = `${comp.orgName || ''} ${comp.title || ''}`.toLowerCase();
   return (
@@ -356,7 +380,7 @@ function getCountdownDetails(deadlineStr, fallbackRemainText, nowMs) {
 
 function getCardCircuit(comp) {
   if (isDUComp(comp)) return { type: 'du', label: 'DU Circuit', icon: '🎓' };
-  if (isIIMorIITorBschoolComp(comp)) return { type: 'iim-iit', label: 'IIMs, IITs & Other B-Schools', icon: '🏛️' };
+  if (isIIMorIITorPremierComp(comp)) return { type: 'iim-iit', label: 'IIMs, IITs & Premier Colleges', icon: '🏛️' };
   if (isCorporateOrGlobalComp(comp)) return { type: 'corporate-global', label: 'Corporate & Global', icon: '🏢' };
   return { type: 'others', label: 'Others', icon: '🏫' };
 }
@@ -552,9 +576,9 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
   const metrics = useMemo(() => {
     const total = competitions.length;
     const du = competitions.filter((c) => isDUComp(c)).length;
-    const iimIitBschools = competitions.filter((c) => isIIMorIITorBschoolComp(c)).length;
+    const iimIitPremier = competitions.filter((c) => isIIMorIITorPremierComp(c)).length;
     const corporateGlobal = competitions.filter((c) => isCorporateOrGlobalComp(c)).length;
-    const others = competitions.filter((c) => !isDUComp(c) && !isIIMorIITorBschoolComp(c) && !isCorporateOrGlobalComp(c)).length;
+    const others = competitions.filter((c) => !isDUComp(c) && !isIIMorIITorPremierComp(c) && !isCorporateOrGlobalComp(c)).length;
     const bookmarked = competitions.filter((c) => bookmarkedIds.includes(c.id)).length;
     const cases = competitions.filter((c) => c.category === 'case').length;
     const hackathons = competitions.filter((c) => c.category === 'hackathon').length;
@@ -562,7 +586,21 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
     const quizzes = competitions.filter((c) => c.category === 'quiz').length;
     const simulations = competitions.filter((c) => c.category === 'simulation').length;
     const debates = competitions.filter((c) => c.category === 'debate').length;
-    return { total, du, iimIitBschools, corporateGlobal, others, bookmarked, cases, hackathons, writing, quizzes, simulations, debates };
+    return {
+      total,
+      du,
+      iimIitPremier,
+      iimIitBschools: iimIitPremier,
+      corporateGlobal,
+      others,
+      bookmarked,
+      cases,
+      hackathons,
+      writing,
+      quizzes,
+      simulations,
+      debates,
+    };
   }, [competitions, bookmarkedIds]);
 
   const hasActiveFilters = searchQuery.trim() !== '' || activeFilter !== 'all' || categoryFilter !== 'all' || teamFilter !== 'all' || feeFilter !== 'all' || sortBy !== 'closing-soonest';
@@ -594,9 +632,9 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
         if (!bookmarkedIds.includes(comp.id)) return false;
       } else {
         if (activeFilter === 'du' && !isDUComp(comp)) return false;
-        if (activeFilter === 'iim-iit-bschool' && !isIIMorIITorBschoolComp(comp)) return false;
+        if ((activeFilter === 'iim-iit-premier' || activeFilter === 'iim-iit-bschool') && !isIIMorIITorPremierComp(comp)) return false;
         if (activeFilter === 'corporate-global' && !isCorporateOrGlobalComp(comp)) return false;
-        if (activeFilter === 'others' && (isDUComp(comp) || isIIMorIITorBschoolComp(comp) || isCorporateOrGlobalComp(comp))) return false;
+        if (activeFilter === 'others' && (isDUComp(comp) || isIIMorIITorPremierComp(comp) || isCorporateOrGlobalComp(comp))) return false;
       }
 
       // Discipline track filter
@@ -723,10 +761,10 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
               🎓 DU Circuit ({metrics.du})
             </button>
             <button
-              className={`cc-tab-btn ${activeFilter === 'iim-iit-bschool' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('iim-iit-bschool')}
+              className={`cc-tab-btn ${activeFilter === 'iim-iit-premier' || activeFilter === 'iim-iit-bschool' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('iim-iit-premier')}
             >
-              🏛️ IIMs, IITs & Other B-Schools ({metrics.iimIitBschools})
+              🏛️ IIMs, IITs & Premier Colleges ({metrics.iimIitPremier})
             </button>
             <button
               className={`cc-tab-btn ${activeFilter === 'corporate-global' ? 'active' : ''}`}
@@ -887,7 +925,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
         <div className="cc-loading-state">
           <div className="cc-spinner"></div>
           <p className="cc-loading-title">Fetching live competitions from Unstop...</p>
-          <p className="cc-loading-subtitle">Pulling direct listings across DU, IIMs, IITs & corporate circuits</p>
+          <p className="cc-loading-subtitle">Pulling direct listings across DU, IIMs, IITs & premier colleges</p>
         </div>
       ) : fetchError ? (
         <div className="cc-empty-state error">
