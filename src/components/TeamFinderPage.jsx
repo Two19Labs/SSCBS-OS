@@ -85,7 +85,7 @@ function isUserPost(post, user) {
   return isEmailMatch || isUserIdMatch;
 }
 
-export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill }) {
+export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill, headerAction }) {
   const { user } = useAuth();
   const { featureFlags } = useConfig();
   const isAdmin = isAdminEmail(user?.email);
@@ -1138,6 +1138,12 @@ function getUserApp(post, applications, userEmail, userId) {
             <UsersIcon size={16} />
             <span>Post Team Opening</span>
           </button>
+
+          {headerAction && (
+            <div className="desktop-only-notif">
+              {headerAction}
+            </div>
+          )}
         </div>
       </header>
 

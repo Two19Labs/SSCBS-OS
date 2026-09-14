@@ -36,6 +36,12 @@
   border-bottom: 1px solid var(--border);
 }
 
+.st-header-right {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 .st-header-left {
   display: flex;
   align-items: flex-start;

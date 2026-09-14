@@ -9,7 +9,7 @@ import {
 } from './icons';
 import './FacultyDatabasePage.css';
 
-export default function FacultyDatabasePage({ onBack, initialProfId, onClearPrefill }) {
+export default function FacultyDatabasePage({ onBack, initialProfId, onClearPrefill, headerAction }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [designationFilter, setDesignationFilter] = useState('all');
   const [selectedProf, setSelectedProf] = useState(null);
@@ -110,10 +110,17 @@ export default function FacultyDatabasePage({ onBack, initialProfId, onClearPref
     <div className="faculty-db-page">
       {/* Header Section */}
       <div className="faculty-db-header">
-        <button onClick={onBack} className="faculty-db-back-btn" aria-label="Go Back to Dashboard">
-          <BackIcon size={16} />
-          <span>Back to Dashboard</span>
-        </button>
+        <div className="faculty-db-header-top">
+          <button onClick={onBack} className="faculty-db-back-btn" aria-label="Go Back to Dashboard">
+            <BackIcon size={16} />
+            <span>Back to Dashboard</span>
+          </button>
+          {headerAction && (
+            <div className="faculty-db-header-action desktop-only-notif">
+              {headerAction}
+            </div>
+          )}
+        </div>
 
         <div className="faculty-db-title-section">
           <div className="faculty-db-title-row">

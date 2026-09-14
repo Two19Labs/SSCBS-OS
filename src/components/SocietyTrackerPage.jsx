@@ -72,7 +72,7 @@ export function getFacultyIdForName(rawName) {
   return FACULTY_NAME_TO_ID[clean] || null;
 }
 
-export default function SocietyTrackerPage({ onBack, onNavigate }) {
+export default function SocietyTrackerPage({ onBack, onNavigate, headerAction }) {
   const { user } = useAuth();
   const userKeySuffix = user?.email ? `_${user.email.toLowerCase()}` : '';
   const bookmarksKey = `${LOCAL_STORAGE_KEY}${userKeySuffix}`;
@@ -338,6 +338,11 @@ export default function SocietyTrackerPage({ onBack, onNavigate }) {
             </p>
           </div>
         </div>
+        {headerAction && (
+          <div className="st-header-right desktop-only-notif">
+            {headerAction}
+          </div>
+        )}
       </div>
 
       {/* Directory Welcome Banner */}

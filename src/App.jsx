@@ -290,7 +290,11 @@ function App() {
       case 'society-tracker':
         return hasSocietyTrackerAccess ? (
           <Suspense fallback={<PageLoader />}>
-            <SocietyTrackerPage onBack={goBack} onNavigate={openTool} />
+            <SocietyTrackerPage 
+              onBack={goBack} 
+              onNavigate={openTool} 
+              headerAction={<NotificationCenter onNavigate={openTool} />} 
+            />
           </Suspense>
         ) : <HomeDashboard onNavigate={openTool} onOpenProfile={() => setView('profile')} />;
 
@@ -320,6 +324,7 @@ function App() {
               onBack={goBack} 
               initialProfId={facultyDbPrefillProfId}
               onClearPrefill={() => setFacultyDbPrefillProfId(null)}
+              headerAction={<NotificationCenter onNavigate={openTool} />} 
             />
           </Suspense>
         ) : <HomeDashboard onNavigate={openTool} onOpenProfile={() => setView('profile')} />;
@@ -330,6 +335,7 @@ function App() {
               onBack={goBack} 
               initialPrefill={teamFinderPrefill}
               onClearPrefill={() => setTeamFinderPrefill(null)}
+              headerAction={<NotificationCenter onNavigate={openTool} />} 
             />
           </Suspense>
         );
@@ -531,7 +537,12 @@ function App() {
 
         {/* ── Main content ── */}
         <main className="app-main">
-          {view !== 'home' && view !== 'case-comps' && view !== 'empty-room' && (
+          {view !== 'home' && 
+           view !== 'case-comps' && 
+           view !== 'empty-room' && 
+           view !== 'team-finder' && 
+           view !== 'society-tracker' && 
+           view !== 'faculty-db' && (
             <div className="page-heading-desktop">
               <h1 style={{ margin: 0 }}>{pageTitle || 'SSCBS OS'}</h1>
               <NotificationCenter onNavigate={openTool} />

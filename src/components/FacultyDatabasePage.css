@@ -24,6 +24,20 @@
   margin-bottom: 4px;
 }
 
+.faculty-db-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.faculty-db-header-action {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
 .faculty-db-back-btn {
   display: inline-flex;
   align-items: center;
