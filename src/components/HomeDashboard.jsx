@@ -54,6 +54,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
 
   // Timetable UI states
   const [showTimeline, setShowTimeline] = useState(false);
+  const [timelineViewDay, setTimelineViewDay] = useState(null); // 'today' | 'tomorrow'
   const [showWeeklyModal, setShowWeeklyModal] = useState(false);
   const [weeklyLayoutMode, setWeeklyLayoutMode] = useState('grid');
   const [activeWeeklyTab, setActiveWeeklyTab] = useState('Monday');
@@ -127,17 +128,73 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
     ? 'Good afternoon'
     : 'Good evening';
 
-  const realTodayDay = DAYS[time.getDay() - 1] || 'Sunday';
+  const WEEK_DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const realTodayDay = WEEK_DAYS[time.getDay()] || 'Sunday';
   const currentDayName = isSimulated ? simulatedDay : realTodayDay;
   const isWeekend = currentDayName === 'Sunday' || currentDayName === 'Saturday';
   const currentMinutes = hour * 60 + time.getMinutes();
 
+  const NEXT_COLLEGE_DAY = {
+    'Monday': 'Tuesday',
+    'Tuesday': 'Wednesday',
+    'Wednesday': 'Thursday',
+    'Thursday': 'Friday',
+    'Friday': 'Monday',
+    'Saturday': 'Monday',
+    'Sunday': 'Monday'
+  };
+
+  const isEveningMode = hour >= 18;
+  const nextCollegeDayName = NEXT_COLLEGE_DAY[currentDayName] || 'Monday';
+  const isEveningPreviewActive = isEveningMode && (!isWeekend || currentDayName === 'Sunday');
+
+  useEffect(() => {
+    setTimelineViewDay(null);
+  }, [currentDayName, isEveningMode]);
+
   const timetable = hasProfile ? getTimetable(course, semester, section) : null;
   const todayClasses = timetable ? timetable[currentDayName] || [] : [];
+  const nextDayClasses = timetable ? timetable[nextCollegeDayName] || [] : [];
+
+  // Find next college day's first lecture (non-break, non-free)
+  let firstNextDayClass = null;
+  let firstNextDayPeriod = null;
+  for (const cls of nextDayClasses) {
+    if (cls.isBreak || cls.subject === 'Free' || !cls.subject) continue;
+    const p = PERIODS.find(x => x.id === cls.period);
+    if (p) {
+      if (!firstNextDayClass || p.id < (firstNextDayPeriod?.id || 999)) {
+        firstNextDayClass = cls;
+        firstNextDayPeriod = p;
+      }
+    }
+  }
+
+  const nextDayRealClassCount = nextDayClasses.filter(c => !c.isBreak && c.subject !== 'Free' && c.subject).length;
+
+  const effectiveTimelineTarget = timelineViewDay || (isEveningPreviewActive || (currentDayName === 'Friday' && isEveningMode) ? 'tomorrow' : 'today');
+  const activeTimelineDayName = effectiveTimelineTarget === 'tomorrow' ? nextCollegeDayName : currentDayName;
+  const displayedTimelineClasses = timetable ? (timetable[activeTimelineDayName] || []) : [];
 
   // Check holiday
   const todayStr = time.getFullYear() + '-' + String(time.getMonth() + 1).padStart(2, '0') + '-' + String(time.getDate()).padStart(2, '0');
   const todayHoliday = holidays?.find(h => h.date === todayStr);
+
+  const tomorrowDateObj = new Date(time);
+  tomorrowDateObj.setDate(tomorrowDateObj.getDate() + 1);
+  const tomorrowStr = tomorrowDateObj.getFullYear() + '-' + String(tomorrowDateObj.getMonth() + 1).padStart(2, '0') + '-' + String(tomorrowDateObj.getDate()).padStart(2, '0');
+  const tomorrowHoliday = holidays?.find(h => h.date === tomorrowStr);
+
+  const nextCollegeDateObj = new Date(time);
+  if (currentDayName === 'Friday') {
+    nextCollegeDateObj.setDate(nextCollegeDateObj.getDate() + 3);
+  } else if (currentDayName === 'Saturday') {
+    nextCollegeDateObj.setDate(nextCollegeDateObj.getDate() + 2);
+  } else {
+    nextCollegeDateObj.setDate(nextCollegeDateObj.getDate() + 1);
+  }
+  const nextCollegeDateStr = nextCollegeDateObj.getFullYear() + '-' + String(nextCollegeDateObj.getMonth() + 1).padStart(2, '0') + '-' + String(nextCollegeDateObj.getDate()).padStart(2, '0');
+  const nextCollegeHoliday = holidays?.find(h => h.date === nextCollegeDateStr);
 
   // Room Resolver
   const resolveRoom = (room) => {
@@ -223,9 +280,12 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
     if (showWeeklyModal) {
       const isMobileScreen = window.innerWidth <= 768;
       setWeeklyLayoutMode(isMobileScreen ? 'list' : 'grid');
-      setActiveWeeklyTab(DAYS.includes(currentDayName) ? currentDayName : 'Monday');
+      const defaultTab = (isEveningPreviewActive || (currentDayName === 'Friday' && isEveningMode)) && DAYS.includes(nextCollegeDayName)
+        ? nextCollegeDayName
+        : (DAYS.includes(currentDayName) ? currentDayName : 'Monday');
+      setActiveWeeklyTab(defaultTab);
     }
-  }, [showWeeklyModal]);
+  }, [showWeeklyModal, isEveningPreviewActive, currentDayName, isEveningMode, nextCollegeDayName]);
 
   const renderLiveCard = () => {
     if (!hasProfile) {
@@ -265,31 +325,46 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
       </div>
     );
 
-    const renderActionButtons = () => (
-      <div className="home-tt-actions-row">
-        <button
-          className={`home-tt-btn ${showTimeline ? 'active' : ''}`}
-          onClick={() => {
-            const nextVal = !showTimeline;
-            trackTimetableEvent('toggle_today_schedule', { show: nextVal });
-            setShowTimeline(nextVal);
-          }}
-        >
-          {showTimeline ? "Hide Today's Schedule ▲" : "View Today's Schedule ▼"}
-        </button>
-        <button
-          className="home-tt-btn primary"
-          onClick={() => {
-            trackTimetableEvent('open_weekly_schedule');
-            setShowWeeklyModal(true);
-          }}
-        >
-          Full Week Timetable 📅
-        </button>
-      </div>
-    );
+    const renderActionButtons = (customScheduleLabel = null) => {
+      let timelineBtnLabel = showTimeline ? "Hide Today's Schedule ▲" : "View Today's Schedule ▼";
+      if (customScheduleLabel) {
+        timelineBtnLabel = customScheduleLabel;
+      } else if (isEveningPreviewActive) {
+        timelineBtnLabel = showTimeline
+          ? `Hide Tomorrow's Schedule ▲`
+          : `View Tomorrow's Schedule ▼`;
+      } else if (currentDayName === 'Friday' && isEveningMode) {
+        timelineBtnLabel = showTimeline
+          ? `Hide Monday's Schedule ▲`
+          : `Preview Monday's Schedule ▼`;
+      }
 
-    if (todayHoliday) {
+      return (
+        <div className="home-tt-actions-row">
+          <button
+            className={`home-tt-btn ${showTimeline ? 'active' : ''}`}
+            onClick={() => {
+              const nextVal = !showTimeline;
+              trackTimetableEvent('toggle_today_schedule', { show: nextVal, day: activeTimelineDayName });
+              setShowTimeline(nextVal);
+            }}
+          >
+            {timelineBtnLabel}
+          </button>
+          <button
+            className="home-tt-btn primary"
+            onClick={() => {
+              trackTimetableEvent('open_weekly_schedule');
+              setShowWeeklyModal(true);
+            }}
+          >
+            Full Week Timetable 📅
+          </button>
+        </div>
+      );
+    };
+
+    if (todayHoliday && !isEveningPreviewActive) {
       return (
         <div className="home-live-card" style={{ borderLeft: '4px solid var(--maroon)' }}>
           <span className="micro-label maroon">● {todayHoliday.type.toUpperCase()}</span>
@@ -301,15 +376,19 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
     }
 
     if (isWeekend) {
-      return (
-        <div className="home-live-card">
-          <span className="micro-label dim">WEEKEND</span>
-          <div className="live-subject">No classes today</div>
-          <div className="live-meta">Relax, catch up on projects, and enjoy your weekend!</div>
-          {renderActionButtons()}
-          {renderLiveDisclaimer()}
-        </div>
-      );
+      if (currentDayName === 'Sunday' && isEveningMode) {
+        // Fall through to evening preview below to display Monday's schedule
+      } else {
+        return (
+          <div className="home-live-card">
+            <span className="micro-label dim">WEEKEND</span>
+            <div className="live-subject">No classes today</div>
+            <div className="live-meta">Relax, catch up on projects, and enjoy your weekend!</div>
+            {renderActionButtons(currentDayName === 'Sunday' ? (showTimeline ? "Hide Monday's Schedule ▲" : "Preview Monday's Schedule ▼") : null)}
+            {renderLiveDisclaimer()}
+          </div>
+        );
+      }
     }
 
     if (isRealClass) {
@@ -466,6 +545,76 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
       );
     }
 
+    if (currentDayName === 'Friday' && isEveningMode) {
+      return (
+        <div className="home-live-card">
+          <span className="micro-label dim">DONE FOR THE WEEK</span>
+          <div className="live-subject">Weekend ahead</div>
+          <div className="live-meta">
+            Classes completed for the week! Relax, catch up on projects, and have a great weekend.
+          </div>
+          {renderActionButtons(showTimeline ? "Hide Monday's Schedule ▲" : "Preview Monday's Schedule ▼")}
+          {renderLiveDisclaimer()}
+        </div>
+      );
+    }
+
+    if (isEveningPreviewActive) {
+      if (tomorrowHoliday || nextCollegeHoliday) {
+        const holidayObj = tomorrowHoliday || nextCollegeHoliday;
+        return (
+          <div className="home-live-card" style={{ borderLeft: '4px solid var(--maroon)' }}>
+            <span className="micro-label maroon">● {holidayObj.type ? holidayObj.type.toUpperCase() : 'HOLIDAY'} · {nextCollegeDayName.toUpperCase()}</span>
+            <div className="live-subject">{holidayObj.title}</div>
+            <div className="live-meta">{holidayObj.message || `No classes scheduled for ${nextCollegeDayName}.`}</div>
+            {renderActionButtons()}
+            {renderLiveDisclaimer()}
+          </div>
+        );
+      }
+
+      if (firstNextDayClass && firstNextDayPeriod) {
+        const roomStr = resolveRoom(firstNextDayClass.room);
+        return (
+          <div className="home-live-card">
+            <div className="live-topline">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                <span className="micro-label success">● TOMORROW'S SCHEDULE · {nextCollegeDayName.toUpperCase()}</span>
+                {(firstNextDayClass.isPractical || /\b\(P\)\b/i.test(firstNextDayClass.subject) || /\bPractical\b/i.test(firstNextDayClass.subject)) && (
+                  <span className="badge-practical">🧪 Practical</span>
+                )}
+                {(firstNextDayClass.isUnsupervised || firstNextDayClass.teacher === 'Unsupervised' || /\bunsupervised\b/i.test(firstNextDayClass.subject || '')) && (
+                  <span className="badge-unsupervised">👤 Unsupervised</span>
+                )}
+              </div>
+              <span className="live-countdown">Starts {firstNextDayPeriod.startLabel}</span>
+            </div>
+            <div className="live-subject">{firstNextDayClass.subject}</div>
+            <div className="live-meta">
+              {[
+                `Period ${firstNextDayPeriod.id} (${firstNextDayPeriod.startLabel})`,
+                firstNextDayClass.teacher && firstNextDayClass.teacher !== '-' ? firstNextDayClass.teacher : null,
+                roomStr ? (roomStr.toLowerCase().startsWith('room') ? roomStr : `Room ${roomStr}`) : null,
+                `${nextDayRealClassCount} class${nextDayRealClassCount === 1 ? '' : 'es'} scheduled`
+              ].filter(Boolean).join(' · ')}
+            </div>
+            {renderActionButtons()}
+            {renderLiveDisclaimer()}
+          </div>
+        );
+      }
+
+      return (
+        <div className="home-live-card">
+          <span className="micro-label dim">TOMORROW · {nextCollegeDayName.toUpperCase()}</span>
+          <div className="live-subject">No classes scheduled</div>
+          <div className="live-meta">You have no scheduled lectures for {nextCollegeDayName}. Enjoy your free day!</div>
+          {renderActionButtons()}
+          {renderLiveDisclaimer()}
+        </div>
+      );
+    }
+
     let offClassLabel = 'DONE FOR TODAY';
     let offClassSubject = 'Classes completed';
     let offClassMeta = 'Done for the day, catch up with work or rest!';
@@ -478,7 +627,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
       offClassLabel = 'GOOD MORNING';
       offClassSubject = 'Getting ready';
       offClassMeta = 'Good morning! Getting ready for classes?';
-    } else if (hour >= 17 && hour < 23) {
+    } else if (hour >= 17 && hour < 18) {
       offClassLabel = 'DONE FOR TODAY';
       offClassSubject = 'Classes completed';
       offClassMeta = 'Done for the day, catch up with work or rest!';
@@ -539,54 +688,90 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
         {/* Live Class Card */}
         {renderLiveCard()}
 
-        {/* Original Daily Timeline Tracker */}
-        {hasProfile && timetable && showTimeline && !isWeekend && !todayHoliday && (
+        {/* Daily & Tomorrow Timeline Tracker */}
+        {hasProfile && timetable && showTimeline && (
           <div className="daily-timeline-section animate-fade-in" style={{ marginBottom: '24px' }}>
-            <h3>Today's Timeline</h3>
-            <div className="timeline-trail-container">
-              <div className="timeline-trail">
-                {todayClasses.map((cls) => {
-                  const periodInfo = PERIODS.find(p => p.id === cls.period || (cls.isBreak && p.id === 0));
-                  if (!periodInfo) return null;
-                  
-                  const startMin = parseTimeToMinutes(periodInfo.start);
-                  const endMin = parseTimeToMinutes(periodInfo.end);
-                  
-                  const isPast = currentMinutes >= endMin;
-                  const isActive = currentMinutes >= startMin && currentMinutes < endMin;
-                  const isUpcoming = currentMinutes < startMin;
-                  
-                  return (
-                    <div 
-                      key={cls.period} 
-                      className={`timeline-slot-card ${isActive ? 'active' : ''} ${isPast ? 'past' : ''} ${isUpcoming ? 'upcoming' : ''}`}
-                    >
-                      <div className="timeline-slot-time">
-                        <span>{periodInfo.startLabel}</span>
-                      </div>
-                      <div className="timeline-slot-content">
-                        <div className="timeline-subject-header" style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                          <h5 className="slot-subject" title={cls.isBreak ? "Break" : cls.subject}>
-                            {cls.isBreak ? "Break" : cls.subject}
-                          </h5>
-                          {!cls.isBreak && (cls.isPractical || /\b\(P\)\b/i.test(cls.subject) || /\bPractical\b/i.test(cls.subject)) && (
-                            <span className="badge-practical-xs">Practical</span>
-                          )}
-                          {!cls.isBreak && (cls.isUnsupervised || cls.teacher === 'Unsupervised' || /\bunsupervised\b/i.test(cls.subject || '')) && (
-                            <span className="badge-unsupervised-xs">Unsupervised</span>
+            <div className="timeline-header-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 style={{ margin: 0 }}>
+                  {activeTimelineDayName === currentDayName ? "Today's Schedule" : `${activeTimelineDayName}'s Schedule`}
+                </h3>
+                {activeTimelineDayName !== currentDayName && (
+                  <span className="micro-label dim" style={{ padding: '2px 6px', fontSize: '0.65rem' }}>PREVIEW</span>
+                )}
+              </div>
+              {(isEveningMode || isWeekend) && (
+                <div className="timeline-day-toggles" style={{ display: 'flex', gap: '6px' }}>
+                  <button
+                    type="button"
+                    className={`home-tt-btn-xs ${effectiveTimelineTarget === 'tomorrow' ? 'active' : ''}`}
+                    onClick={() => setTimelineViewDay('tomorrow')}
+                  >
+                    {currentDayName === 'Friday' || currentDayName === 'Saturday' || currentDayName === 'Sunday'
+                      ? 'Monday'
+                      : `Tomorrow (${nextCollegeDayName})`}
+                  </button>
+                  <button
+                    type="button"
+                    className={`home-tt-btn-xs ${effectiveTimelineTarget === 'today' ? 'active' : ''}`}
+                    onClick={() => setTimelineViewDay('today')}
+                  >
+                    Today ({currentDayName})
+                  </button>
+                </div>
+              )}
+            </div>
+            {displayedTimelineClasses.length === 0 ? (
+              <div style={{ padding: '12px 14px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', color: 'var(--ink-dim)', fontSize: '0.86rem' }}>
+                No lectures scheduled for {activeTimelineDayName}.
+              </div>
+            ) : (
+              <div className="timeline-trail-container">
+                <div className="timeline-trail">
+                  {displayedTimelineClasses.map((cls) => {
+                    const periodInfo = PERIODS.find(p => p.id === cls.period || (cls.isBreak && p.id === 0));
+                    if (!periodInfo) return null;
+                    
+                    const startMin = parseTimeToMinutes(periodInfo.start);
+                    const endMin = parseTimeToMinutes(periodInfo.end);
+                    
+                    const isViewingToday = activeTimelineDayName === currentDayName;
+                    const isPast = isViewingToday && currentMinutes >= endMin;
+                    const isActive = isViewingToday && (currentMinutes >= startMin && currentMinutes < endMin);
+                    const isUpcoming = !isViewingToday || currentMinutes < startMin;
+                    
+                    return (
+                      <div 
+                        key={cls.period} 
+                        className={`timeline-slot-card ${isActive ? 'active' : ''} ${isPast ? 'past' : ''} ${isUpcoming ? 'upcoming' : ''}`}
+                      >
+                        <div className="timeline-slot-time">
+                          <span>{periodInfo.startLabel}</span>
+                        </div>
+                        <div className="timeline-slot-content">
+                          <div className="timeline-subject-header" style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                            <h5 className="slot-subject" title={cls.isBreak ? "Break" : cls.subject}>
+                              {cls.isBreak ? "Break" : cls.subject}
+                            </h5>
+                            {!cls.isBreak && (cls.isPractical || /\b\(P\)\b/i.test(cls.subject) || /\bPractical\b/i.test(cls.subject)) && (
+                              <span className="badge-practical-xs">Practical</span>
+                            )}
+                            {!cls.isBreak && (cls.isUnsupervised || cls.teacher === 'Unsupervised' || /\bunsupervised\b/i.test(cls.subject || '')) && (
+                              <span className="badge-unsupervised-xs">Unsupervised</span>
+                            )}
+                          </div>
+                          {!cls.isBreak && cls.subject !== 'Free' && resolveRoom(cls.room) ? (
+                            <p className="slot-meta" title={`${resolveRoom(cls.room)} • ${cls.teacher}`}>{resolveRoom(cls.room)} • {cls.teacher}</p>
+                          ) : (
+                            <p className="slot-meta-empty">-</p>
                           )}
                         </div>
-                        {!cls.isBreak && cls.subject !== 'Free' && resolveRoom(cls.room) ? (
-                          <p className="slot-meta" title={`${resolveRoom(cls.room)} • ${cls.teacher}`}>{resolveRoom(cls.room)} • {cls.teacher}</p>
-                        ) : (
-                          <p className="slot-meta-empty">-</p>
-                        )}
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
 
