@@ -89,6 +89,19 @@ const CORPORATE_KEYWORDS = [
   'innovation hacks', 'gradient learnings', 'bharat academix', 'cyber hx'
 ];
 
+const GLOBAL_KEYWORDS = [
+  // Top Global Universities & International B-Schools
+  'harvard', 'stanford', 'wharton', 'massachusetts institute of technology', 'yale',
+  'columbia university', 'oxford', 'cambridge', 'london school of economics', 'london business school',
+  'insead', 'national university of singapore', 'nanyang technological university', 'hult prize',
+  'hec paris', 'nyu stern', 'kellogg', 'chicago booth', 'berkeley haas', 'mit sloan',
+  'imperial college', 'eth zurich', 'monash', 'melbourne university', 'sydney university', 'toronto university',
+  // Prestigious Global Case Challenges & Flagships
+  'unilever future leaders', 'brandstorm', 'imagine cup', 'solution challenge',
+  'world bank', 'bloomberg global', 'cfa institute research challenge', 'schneider go green',
+  'international case competition', 'global challenge', 'worldwide challenge'
+];
+
 function matchesKeyword(text, keyword) {
   if (keyword.length <= 4 && /^[a-z0-9]+$/i.test(keyword)) {
     const regex = new RegExp(`\\b${keyword}\\b`, 'i');
@@ -258,8 +271,10 @@ export async function fetchCompetitionsFromUnstop() {
     'opportunity=competitions&searchTerm=isb&per_page=50',
     'opportunity=competitions&searchTerm=mdi&per_page=50',
 
-    // Corporate Challenges
+    // Corporate & Global / International Challenges
     'opportunity=competitions&searchTerm=corporate&per_page=50',
+    'opportunity=competitions&searchTerm=global&per_page=50',
+    'opportunity=competitions&searchTerm=international&per_page=50',
     'opportunity=competitions&searchTerm=loreal&per_page=50'
   ];
 
@@ -329,10 +344,13 @@ export async function fetchCompetitionsFromUnstop() {
     // Tag categorization
     const isDU = DU_KEYWORDS.some(kw => matchesKeyword(combined, kw));
     const isIIMorIITorBschool = !isDU && IIM_IIT_BSCHOOL_KEYWORDS.some(kw => matchesKeyword(combined, kw));
-    const isCorporate = !isDU && !isIIMorIITorBschool && (
+    const isCorporateOrGlobal = !isDU && !isIIMorIITorBschool && (
       CORPORATE_KEYWORDS.some(kw => matchesKeyword(combined, kw)) ||
-      /\b(pvt ltd|private limited|technologies pvt|solutions pvt)\b/i.test(combined)
+      GLOBAL_KEYWORDS.some(kw => matchesKeyword(combined, kw)) ||
+      /\b(pvt ltd|private limited|technologies pvt|solutions pvt)\b/i.test(combined) ||
+      (item.isCorporate && !/\b(college|university|institute|school of|academy)\b/i.test(orgName))
     );
+    const isCorporate = isCorporateOrGlobal;
     const isFlagship = FLAGSHIP_KEYWORDS.some(kw => matchesKeyword(combined, kw));
 
     // Multi-track discipline classification
@@ -390,6 +408,7 @@ export async function fetchCompetitionsFromUnstop() {
       isIIMorIIT: isIIMorIITorBschool,
       isBschool: isIIMorIITorBschool,
       isCorporate,
+      isCorporateOrGlobal,
       isFirstYearFriendly,
       registeredCount: item.registerCount || 0,
       viewsCount: item.viewsCount || 0,

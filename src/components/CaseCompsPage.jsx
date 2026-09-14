@@ -210,6 +210,19 @@ const CORPORATE_KEYWORDS = [
   'innovation hacks', 'gradient learnings', 'bharat academix', 'cyber hx'
 ];
 
+const GLOBAL_KEYWORDS = [
+  // Top Global Universities & International B-Schools
+  'harvard', 'stanford', 'wharton', 'massachusetts institute of technology', 'yale',
+  'columbia university', 'oxford', 'cambridge', 'london school of economics', 'london business school',
+  'insead', 'national university of singapore', 'nanyang technological university', 'hult prize',
+  'hec paris', 'nyu stern', 'kellogg', 'chicago booth', 'berkeley haas', 'mit sloan',
+  'imperial college', 'eth zurich', 'monash', 'melbourne university', 'sydney university', 'toronto university',
+  // Prestigious Global Case Challenges & Flagships
+  'unilever future leaders', 'brandstorm', 'imagine cup', 'solution challenge',
+  'world bank', 'bloomberg global', 'cfa institute research challenge', 'schneider go green',
+  'international case competition', 'global challenge', 'worldwide challenge'
+];
+
 function isMatch(text, kw) {
   if (kw.length <= 4 && /^[a-z0-9]+$/i.test(kw)) {
     const regex = new RegExp(`\\b${kw}\\b`, 'i');
@@ -232,11 +245,13 @@ function isIIMorIITorBschoolComp(comp) {
   return IIM_IIT_BSCHOOL_KEYWORDS.some(kw => isMatch(combined, kw));
 }
 
-function isCorporateComp(comp) {
+function isCorporateOrGlobalComp(comp) {
   if (isDUComp(comp) || isIIMorIITorBschoolComp(comp)) return false;
+  if (typeof comp.isCorporateOrGlobal === 'boolean') return comp.isCorporateOrGlobal;
   const combined = `${comp.orgName || ''} ${comp.title || ''}`.toLowerCase();
   return (
     CORPORATE_KEYWORDS.some(kw => isMatch(combined, kw)) ||
+    GLOBAL_KEYWORDS.some(kw => isMatch(combined, kw)) ||
     /\b(pvt ltd|private limited|technologies pvt|solutions pvt)\b/i.test(combined) ||
     (comp.isCorporate && !/\b(college|university|institute|school of|academy)\b/i.test(comp.orgName || ''))
   );
@@ -342,8 +357,8 @@ function getCountdownDetails(deadlineStr, fallbackRemainText, nowMs) {
 function getCardCircuit(comp) {
   if (isDUComp(comp)) return { type: 'du', label: 'DU Circuit', icon: '🎓' };
   if (isIIMorIITorBschoolComp(comp)) return { type: 'iim-iit', label: 'IIMs, IITs & Other B-Schools', icon: '🏛️' };
-  if (isCorporateComp(comp)) return { type: 'corporate', label: 'Corporate', icon: '🏢' };
-  return { type: 'others', label: 'Others', icon: '🌐' };
+  if (isCorporateOrGlobalComp(comp)) return { type: 'corporate-global', label: 'Corporate & Global', icon: '🏢' };
+  return { type: 'others', label: 'Others', icon: '🏫' };
 }
 
 export default function CaseCompsPage({ onBack, onNavigate }) {
@@ -355,7 +370,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'du' | 'iim-iit-bschool' | 'corporate' | 'others' | 'bookmarked'
+  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'du' | 'iim-iit-bschool' | 'corporate-global' | 'others' | 'bookmarked'
   const [categoryFilter, setCategoryFilter] = useState('all'); // 'all' | 'case' | 'hackathon' | 'writing' | 'quiz' | 'simulation' | 'debate'
   const [teamFilter, setTeamFilter] = useState('all'); // 'all' | 'solo' | 'team'
   const [feeFilter, setFeeFilter] = useState('all'); // 'all' | 'free' | 'paid'
@@ -538,8 +553,8 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
     const total = competitions.length;
     const du = competitions.filter((c) => isDUComp(c)).length;
     const iimIitBschools = competitions.filter((c) => isIIMorIITorBschoolComp(c)).length;
-    const corporate = competitions.filter((c) => isCorporateComp(c)).length;
-    const others = competitions.filter((c) => !isDUComp(c) && !isIIMorIITorBschoolComp(c) && !isCorporateComp(c)).length;
+    const corporateGlobal = competitions.filter((c) => isCorporateOrGlobalComp(c)).length;
+    const others = competitions.filter((c) => !isDUComp(c) && !isIIMorIITorBschoolComp(c) && !isCorporateOrGlobalComp(c)).length;
     const bookmarked = competitions.filter((c) => bookmarkedIds.includes(c.id)).length;
     const cases = competitions.filter((c) => c.category === 'case').length;
     const hackathons = competitions.filter((c) => c.category === 'hackathon').length;
@@ -547,7 +562,7 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
     const quizzes = competitions.filter((c) => c.category === 'quiz').length;
     const simulations = competitions.filter((c) => c.category === 'simulation').length;
     const debates = competitions.filter((c) => c.category === 'debate').length;
-    return { total, du, iimIitBschools, corporate, others, bookmarked, cases, hackathons, writing, quizzes, simulations, debates };
+    return { total, du, iimIitBschools, corporateGlobal, others, bookmarked, cases, hackathons, writing, quizzes, simulations, debates };
   }, [competitions, bookmarkedIds]);
 
   const hasActiveFilters = searchQuery.trim() !== '' || activeFilter !== 'all' || categoryFilter !== 'all' || teamFilter !== 'all' || feeFilter !== 'all' || sortBy !== 'closing-soonest';
@@ -580,8 +595,8 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
       } else {
         if (activeFilter === 'du' && !isDUComp(comp)) return false;
         if (activeFilter === 'iim-iit-bschool' && !isIIMorIITorBschoolComp(comp)) return false;
-        if (activeFilter === 'corporate' && !isCorporateComp(comp)) return false;
-        if (activeFilter === 'others' && (isDUComp(comp) || isIIMorIITorBschoolComp(comp) || isCorporateComp(comp))) return false;
+        if (activeFilter === 'corporate-global' && !isCorporateOrGlobalComp(comp)) return false;
+        if (activeFilter === 'others' && (isDUComp(comp) || isIIMorIITorBschoolComp(comp) || isCorporateOrGlobalComp(comp))) return false;
       }
 
       // Discipline track filter
@@ -714,16 +729,16 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
               🏛️ IIMs, IITs & Other B-Schools ({metrics.iimIitBschools})
             </button>
             <button
-              className={`cc-tab-btn ${activeFilter === 'corporate' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('corporate')}
+              className={`cc-tab-btn ${activeFilter === 'corporate-global' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('corporate-global')}
             >
-              🏢 Corporate ({metrics.corporate})
+              🏢 Corporate & Global ({metrics.corporateGlobal})
             </button>
             <button
               className={`cc-tab-btn ${activeFilter === 'others' ? 'active' : ''}`}
               onClick={() => setActiveFilter('others')}
             >
-              🌐 Others ({metrics.others})
+              🏫 Others ({metrics.others})
             </button>
           </div>
 
