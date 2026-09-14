@@ -1187,7 +1187,8 @@
 }
 
 .cc-btn-apply {
-  flex: 1.15;
+  flex: 1.25;
+  padding: 0 14px;
   background: #1c4980;
   color: #ffffff;
   border: 1px solid #1c4980;
@@ -1214,6 +1215,7 @@
 
 .cc-btn-team {
   flex: 1;
+  padding: 0 12px;
   background: var(--accent-tint, rgba(113, 34, 44, 0.08));
   color: var(--accent, #71222c);
   border: 1px solid rgba(113, 34, 44, 0.22);
@@ -1234,58 +1236,6 @@
 [data-theme='dark'] .cc-btn-team:hover {
   background: rgba(248, 113, 113, 0.18);
   border-color: #fca5a5;
-}
-
-.cc-action-bookmark-btn {
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 0 12px;
-  height: 36px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--ink-dim);
-  border-radius: 8px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  white-space: nowrap;
-}
-
-.cc-action-bookmark-btn:hover {
-  color: #d97706;
-  border-color: #f59e0b;
-  background: rgba(245, 158, 11, 0.08);
-  transform: translateY(-1px);
-}
-
-.cc-action-bookmark-btn.active {
-  background: rgba(245, 158, 11, 0.14);
-  color: #d97706;
-  border-color: rgba(245, 158, 11, 0.4);
-}
-
-[data-theme='dark'] .cc-action-bookmark-btn {
-  color: var(--ink-dim);
-}
-
-[data-theme='dark'] .cc-action-bookmark-btn:hover {
-  color: #fbbf24;
-  border-color: #f59e0b;
-  background: rgba(245, 158, 11, 0.16);
-}
-
-[data-theme='dark'] .cc-action-bookmark-btn.active {
-  background: rgba(245, 158, 11, 0.24);
-  color: #fbbf24;
-  border-color: rgba(245, 158, 11, 0.5);
-}
-
-.cc-action-bookmark-label {
-  font-size: 0.78rem;
-  font-weight: 700;
 }
 
 .cc-share-icon-btn {
@@ -1542,17 +1492,6 @@
   .cc-action-btn {
     height: 36px;
     font-size: 0.76rem;
-  }
-
-  .cc-action-bookmark-label {
-    display: none;
-  }
-
-  .cc-action-bookmark-btn {
-    width: 36px;
-    padding: 0;
-    justify-content: center;
-    flex-shrink: 0;
   }
 }
 

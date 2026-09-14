@@ -417,9 +417,17 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
 
   const handleShare = (comp, e) => {
     e.stopPropagation();
-    const shareText = `Check out this case competition on Unstop: "${comp.title}" by ${comp.orgName}.\nApply: ${comp.unstopUrl}`;
+    const details = [
+      `🏆 ${comp.title || 'Case Competition'}`,
+      comp.orgName ? `🏛️ Organized by: ${comp.orgName}` : null,
+      comp.prizes ? `💰 Prizes: ${comp.prizes}` : null,
+      comp.teamSizeDisplay ? `👥 Format: ${comp.teamSizeDisplay}` : null,
+      comp.remainDaysText ? `⏰ Deadline: ${comp.remainDaysText}` : null,
+      `🔗 Apply on Unstop: ${comp.unstopUrl}`,
+    ].filter(Boolean).join('\n');
+
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(shareText);
+      navigator.clipboard.writeText(details);
       setCopiedId(comp.id);
       setTimeout(() => setCopiedId(null), 2000);
     }
@@ -904,22 +912,12 @@ export default function CaseCompsPage({ onBack, onNavigate }) {
 
                     <button
                       type="button"
-                      className={`cc-action-btn cc-action-bookmark-btn ${isBookmarked ? 'active' : ''}`}
-                      onClick={(e) => toggleBookmark(comp.id, e)}
-                      title={isBookmarked ? 'Remove from saved' : 'Save competition'}
-                      aria-label={isBookmarked ? 'Remove from saved' : 'Save competition'}
-                    >
-                      <BookmarkIcon size={13} filled={isBookmarked} />
-                      <span className="cc-action-bookmark-label">{isBookmarked ? 'Saved' : 'Save'}</span>
-                    </button>
-
-                    <button
-                      type="button"
                       className={`cc-share-icon-btn ${copiedId === comp.id ? 'copied' : ''}`}
                       onClick={(e) => handleShare(comp, e)}
-                      title={copiedId === comp.id ? 'Copied link!' : 'Copy competition link'}
+                      title={copiedId === comp.id ? 'Details copied!' : 'Copy competition details & link'}
+                      aria-label="Copy competition details and link"
                     >
-                      {copiedId === comp.id ? <CheckIcon size={13} /> : <CopyIcon size={13} />}
+                      {copiedId === comp.id ? <CheckIcon size={14} /> : <CopyIcon size={14} />}
                     </button>
                   </div>
                 </div>
