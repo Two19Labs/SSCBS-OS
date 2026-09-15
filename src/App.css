@@ -764,7 +764,7 @@
 
 @media (max-width: 899px) {
   .desktop-only-notif {
-    display: none;
+    display: none !important;
   }
 }
 

@@ -47,6 +47,12 @@
   flex-shrink: 0;
 }
 
+@media (max-width: 899px) {
+  .cc-header-right {
+    display: none !important;
+  }
+}
+
 .cc-back-btn {
   background: var(--surface);
   border: 1px solid var(--border);

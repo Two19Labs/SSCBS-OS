@@ -38,6 +38,12 @@
   margin-left: auto;
 }
 
+@media (max-width: 899px) {
+  .faculty-db-header-action {
+    display: none !important;
+  }
+}
+
 .faculty-db-back-btn {
   display: inline-flex;
   align-items: center;

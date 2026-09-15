@@ -38,6 +38,12 @@
   flex-shrink: 0;
 }
 
+@media (max-width: 899px) {
+  .contact-header-action {
+    display: none !important;
+  }
+}
+
 .contact-header h2 {
   font-size: 1.5rem;
   font-weight: 700;

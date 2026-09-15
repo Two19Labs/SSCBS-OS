@@ -38,6 +38,12 @@
   margin-left: auto;
 }
 
+@media (max-width: 899px) {
+  .empty-room-header-action {
+    display: none !important;
+  }
+}
+
 .empty-room-back-btn {
   display: inline-flex;
   align-items: center;

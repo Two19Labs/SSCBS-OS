@@ -42,6 +42,12 @@
   flex-shrink: 0;
 }
 
+@media (max-width: 899px) {
+  .st-header-right {
+    display: none !important;
+  }
+}
+
 .st-header-left {
   display: flex;
   align-items: flex-start;
