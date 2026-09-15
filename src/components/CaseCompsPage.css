@@ -611,30 +611,26 @@
   color: #ffffff;
 }
 
-/* ── Status Bar / Opportunities Count ── */
-.cc-status-bar {
-  display: flex;
+/* ── Inline Opportunities Count ── */
+.cc-inline-count {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  font-size: 0.82rem;
+  gap: 7px;
+  font-size: 0.78rem;
   color: var(--ink-dim);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  padding: 4px 6px;
+  white-space: nowrap;
+  user-select: none;
 }
 
-.cc-status-left {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  flex-wrap: wrap;
+.cc-inline-count strong {
+  color: var(--ink);
+  font-weight: 700;
 }
 
 .cc-pulse-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: #10b981;
   box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
@@ -646,61 +642,6 @@
   0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
   70% { box-shadow: 0 0 0 5px rgba(16, 185, 129, 0); }
   100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-}
-
-.cc-status-text {
-  color: var(--ink-dim);
-  font-size: 0.82rem;
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.cc-status-text strong {
-  color: var(--ink);
-  font-weight: 700;
-}
-
-.cc-status-total {
-  color: var(--ink-dim);
-  font-size: 0.78rem;
-  opacity: 0.85;
-}
-
-.cc-last-sync {
-  opacity: 0.75;
-}
-
-.cc-status-reset-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: transparent;
-  border: 1px solid rgba(113, 34, 44, 0.2);
-  border-radius: 6px;
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: var(--accent, #71222c);
-  cursor: pointer;
-  padding: 3px 9px;
-  transition: all 0.15s ease;
-  white-space: nowrap;
-}
-
-.cc-status-reset-btn:hover {
-  background: var(--accent-tint, rgba(113, 34, 44, 0.08));
-  border-color: var(--accent, #71222c);
-}
-
-[data-theme='dark'] .cc-status-reset-btn {
-  border-color: rgba(248, 113, 113, 0.3);
-  color: #fca5a5;
-}
-
-[data-theme='dark'] .cc-status-reset-btn:hover {
-  background: rgba(248, 113, 113, 0.14);
-  border-color: #f87171;
 }
 
 /* ── Competitions Grid ── */

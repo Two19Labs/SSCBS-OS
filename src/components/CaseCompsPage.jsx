@@ -968,6 +968,17 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
                 Paid
               </button>
             </div>
+
+            {/* Opportunities Count */}
+            {!loading && !fetchError && (
+              <div className="cc-inline-count">
+                <span className="cc-pulse-dot" title="Live Unstop sync active"></span>
+                <span>
+                  Showing <strong>{filteredCompetitions.length}</strong>{' '}
+                  {filteredCompetitions.length === 1 ? 'opportunity' : 'opportunities'}
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="cc-controls-right">
@@ -1007,31 +1018,6 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
           </div>
         </div>
       </div>
-
-      {/* ── Status Bar / Opportunities Count ── */}
-      {!loading && !fetchError && (
-        <div className="cc-status-bar">
-          <div className="cc-status-left">
-            <span className="cc-pulse-dot" title="Live Unstop sync active"></span>
-            <span className="cc-status-text">
-              Showing <strong>{filteredCompetitions.length}</strong>{' '}
-              {filteredCompetitions.length === 1 ? 'opportunity' : 'opportunities'} listed below
-            </span>
-          </div>
-
-          {hasActiveFilters && (
-            <button
-              type="button"
-              className="cc-status-reset-btn"
-              onClick={handleResetFilters}
-              title="Reset search and filters"
-            >
-              <RotateCcwIcon size={11} className="cc-reset-icon" />
-              <span>Clear filters</span>
-            </button>
-          )}
-        </div>
-      )}
 
       {/* ── Competitions Grid ── */}
       {loading ? (
