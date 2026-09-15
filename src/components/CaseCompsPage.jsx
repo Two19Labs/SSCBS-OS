@@ -659,13 +659,16 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
     setBookmarkedOnly((prev) => !prev);
   };
 
-  const hasActiveFilters =
+  const hasFilterCriteria =
     searchQuery.trim() !== '' ||
     selectedCircuits.length > 0 ||
     bookmarkedOnly ||
     selectedTracks.length > 0 ||
     teamFilter !== 'all' ||
-    feeFilter !== 'all' ||
+    feeFilter !== 'all';
+
+  const hasActiveFilters =
+    hasFilterCriteria ||
     sortBy !== 'closing-soonest';
 
   const handleResetFilters = () => {
@@ -1007,6 +1010,35 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
           </div>
         </div>
       </div>
+
+      {/* ── Status Bar / Opportunities Count ── */}
+      {!loading && !fetchError && (
+        <div className="cc-status-bar">
+          <div className="cc-status-left">
+            <span className="cc-pulse-dot" title="Live Unstop sync active"></span>
+            <span className="cc-status-text">
+              Showing <strong>{filteredCompetitions.length}</strong>{' '}
+              {filteredCompetitions.length === 1 ? 'opportunity' : 'opportunities'} listed below
+              {hasFilterCriteria && competitions.length > 0 && (
+                <span className="cc-status-total"> (filtered from {competitions.length} total)</span>
+              )}
+              {lastUpdated && <span className="cc-last-sync"> · Synced at {lastUpdated}</span>}
+            </span>
+          </div>
+
+          {hasActiveFilters && (
+            <button
+              type="button"
+              className="cc-status-reset-btn"
+              onClick={handleResetFilters}
+              title="Reset search and filters"
+            >
+              <RotateCcwIcon size={11} className="cc-reset-icon" />
+              <span>Clear filters</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* ── Competitions Grid ── */}
       {loading ? (
