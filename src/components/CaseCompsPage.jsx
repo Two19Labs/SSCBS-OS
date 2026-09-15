@@ -131,6 +131,35 @@ const BriefcaseIcon = ({ size = 18 }) => (
     <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
   </svg>
 );
+
+const FilterIcon = ({ size = 15, className = '' }) => (
+  <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+  </svg>
+);
+
+const XCloseIcon = ({ size = 13, className = '' }) => (
+  <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+
+const CIRCUIT_OPTIONS = [
+  { id: 'du', label: 'DU Circuit', countKey: 'du' },
+  { id: 'iim-iit-premier', label: 'IIMs, IITs & Premier', countKey: 'iimIitPremier' },
+  { id: 'corporate-global', label: 'Corporate & Global', countKey: 'corporateGlobal' },
+  { id: 'others', label: 'Others', countKey: 'others' },
+];
+
+const TRACK_OPTIONS = [
+  { id: 'case', label: 'Case Comps', icon: '📊', countKey: 'cases' },
+  { id: 'hackathon', label: 'Hackathons', icon: '💻', countKey: 'hackathons' },
+  { id: 'writing', label: 'Writing & Research', icon: '✍️', countKey: 'writing' },
+  { id: 'quiz', label: 'Quizzes', icon: '🧠', countKey: 'quizzes' },
+  { id: 'simulation', label: 'Simulations', icon: '📈', countKey: 'simulations' },
+  { id: 'debate', label: 'Debates', icon: '🗣️', countKey: 'debates' },
+];
 import './CaseCompsPage.css';
 
 const DU_KEYWORDS = [
@@ -411,6 +440,14 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
   const [copiedId, setCopiedId] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [nowMs, setNowMs] = useState(() => Date.now());
+  const [openSections, setOpenSections] = useState({
+    circuits: true,
+    tracks: true,
+    format: true,
+    fee: true,
+    bookmarks: true,
+  });
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
   // Debounced search query telemetry
   useEffect(() => {
@@ -628,6 +665,13 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
     };
   }, [competitions, bookmarkedIds]);
 
+  const toggleSection = (sectionKey) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [sectionKey]: !prev[sectionKey],
+    }));
+  };
+
   const toggleCircuit = (circuitKey) => {
     if (circuitKey === 'all') {
       setSelectedCircuits([]);
@@ -640,6 +684,15 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
       }
       return [...prev, circuitKey];
     });
+  };
+
+  const isAllCircuitsSelected = selectedCircuits.length === CIRCUIT_OPTIONS.length;
+  const handleToggleAllCircuits = () => {
+    if (isAllCircuitsSelected) {
+      setSelectedCircuits([]);
+    } else {
+      setSelectedCircuits(CIRCUIT_OPTIONS.map((c) => c.id));
+    }
   };
 
   const toggleTrack = (trackKey) => {
@@ -655,15 +708,41 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
     });
   };
 
+  const isAllTracksSelected = selectedTracks.length === TRACK_OPTIONS.length;
+  const handleToggleAllTracks = () => {
+    if (isAllTracksSelected) {
+      setSelectedTracks([]);
+    } else {
+      setSelectedTracks(TRACK_OPTIONS.map((t) => t.id));
+    }
+  };
+
   const toggleBookmarkedOnly = () => {
     setBookmarkedOnly((prev) => !prev);
   };
 
+  const getCircuitLabel = (id) => {
+    const found = CIRCUIT_OPTIONS.find((c) => c.id === id);
+    return found ? found.label : id;
+  };
+
+  const getTrackLabel = (id) => {
+    const found = TRACK_OPTIONS.find((t) => t.id === id);
+    return found ? `${found.icon} ${found.label}` : id;
+  };
+
+  const activeFilterCount =
+    (selectedCircuits.length > 0 && selectedCircuits.length < CIRCUIT_OPTIONS.length ? selectedCircuits.length : 0) +
+    (selectedTracks.length > 0 && selectedTracks.length < TRACK_OPTIONS.length ? selectedTracks.length : 0) +
+    (teamFilter !== 'all' ? 1 : 0) +
+    (feeFilter !== 'all' ? 1 : 0) +
+    (bookmarkedOnly ? 1 : 0);
+
   const hasActiveFilters =
     searchQuery.trim() !== '' ||
-    selectedCircuits.length > 0 ||
+    (selectedCircuits.length > 0 && selectedCircuits.length < CIRCUIT_OPTIONS.length) ||
     bookmarkedOnly ||
-    selectedTracks.length > 0 ||
+    (selectedTracks.length > 0 && selectedTracks.length < TRACK_OPTIONS.length) ||
     teamFilter !== 'all' ||
     feeFilter !== 'all' ||
     sortBy !== 'closing-soonest';
@@ -692,7 +771,7 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
       }
 
       // Circuit filter (multi-select)
-      if (selectedCircuits.length > 0) {
+      if (selectedCircuits.length > 0 && selectedCircuits.length < CIRCUIT_OPTIONS.length) {
         const compCircuit = getCompCircuitKey(comp);
         const matchesCircuit = selectedCircuits.some(
           (c) => c === compCircuit || (c === 'iim-iit-bschool' && compCircuit === 'iim-iit-premier')
@@ -706,7 +785,7 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
       }
 
       // Discipline track filter (multi-select)
-      if (selectedTracks.length > 0) {
+      if (selectedTracks.length > 0 && selectedTracks.length < TRACK_OPTIONS.length) {
         if (!selectedTracks.includes(comp.category)) return false;
       }
 
@@ -802,222 +881,430 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
         </span>
       </div>
 
-      {/* ── Filter Bar & Search ── */}
-      <div className="cc-filter-section">
-        <div className="cc-search-wrapper">
-          <SearchIcon size={16} className="cc-search-icon" />
-          <input
-            type="text"
-            className="cc-search-input"
-            placeholder="Search by name, IIM, IIT, XLRI, ISB, L'Oréal, prizes..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {searchQuery && (
-            <button className="cc-clear-search" onClick={() => setSearchQuery('')}>
-              ✕
-            </button>
-          )}
-        </div>
-
-        {/* Primary Circuit Tabs */}
-        <div className="cc-tabs">
-          <div className="cc-circuit-tabs-group">
-            <button
-              type="button"
-              className={`cc-tab-btn ${selectedCircuits.length === 0 && !bookmarkedOnly ? 'active' : ''}`}
-              onClick={() => toggleCircuit('all')}
-            >
-              All Circuits ({metrics.total})
-            </button>
-            <button
-              type="button"
-              className={`cc-tab-btn ${selectedCircuits.includes('du') ? 'active' : ''}`}
-              onClick={() => toggleCircuit('du')}
-            >
-              🎓 DU Circuit ({metrics.du})
-            </button>
-            <button
-              type="button"
-              className={`cc-tab-btn ${selectedCircuits.includes('iim-iit-premier') || selectedCircuits.includes('iim-iit-bschool') ? 'active' : ''}`}
-              onClick={() => toggleCircuit('iim-iit-premier')}
-            >
-              🏛️ IIMs, IITs & Premier Colleges ({metrics.iimIitPremier})
-            </button>
-            <button
-              type="button"
-              className={`cc-tab-btn ${selectedCircuits.includes('corporate-global') ? 'active' : ''}`}
-              onClick={() => toggleCircuit('corporate-global')}
-            >
-              🏢 Corporate & Global ({metrics.corporateGlobal})
-            </button>
-            <button
-              type="button"
-              className={`cc-tab-btn ${selectedCircuits.includes('others') ? 'active' : ''}`}
-              onClick={() => toggleCircuit('others')}
-            >
-              🏫 Others ({metrics.others})
-            </button>
-          </div>
-
-          <button
-            type="button"
-            className={`cc-tab-btn cc-tab-bookmarked ${bookmarkedOnly ? 'active' : ''}`}
-            onClick={toggleBookmarkedOnly}
-          >
-            🔖 Bookmarked ({bookmarkedIds.length})
-          </button>
-        </div>
-
-        {/* Discipline Track Filter Bar */}
-        <div className="cc-category-bar">
-          <button
-            type="button"
-            className={`cc-cat-pill ${selectedTracks.length === 0 ? 'active' : ''}`}
-            onClick={() => toggleTrack('all')}
-          >
-            All Tracks ({metrics.total})
-          </button>
-          <button
-            type="button"
-            className={`cc-cat-pill ${selectedTracks.includes('case') ? 'active' : ''}`}
-            onClick={() => toggleTrack('case')}
-          >
-            📊 Case Comps ({metrics.cases})
-          </button>
-          <button
-            type="button"
-            className={`cc-cat-pill ${selectedTracks.includes('hackathon') ? 'active' : ''}`}
-            onClick={() => toggleTrack('hackathon')}
-          >
-            💻 Hackathons ({metrics.hackathons})
-          </button>
-          <button
-            type="button"
-            className={`cc-cat-pill ${selectedTracks.includes('writing') ? 'active' : ''}`}
-            onClick={() => toggleTrack('writing')}
-          >
-            ✍️ Writing & Research ({metrics.writing})
-          </button>
-          <button
-            type="button"
-            className={`cc-cat-pill ${selectedTracks.includes('quiz') ? 'active' : ''}`}
-            onClick={() => toggleTrack('quiz')}
-          >
-            🧠 Quizzes ({metrics.quizzes})
-          </button>
-          <button
-            type="button"
-            className={`cc-cat-pill ${selectedTracks.includes('simulation') ? 'active' : ''}`}
-            onClick={() => toggleTrack('simulation')}
-          >
-            📈 Simulations ({metrics.simulations})
-          </button>
-          <button
-            type="button"
-            className={`cc-cat-pill ${selectedTracks.includes('debate') ? 'active' : ''}`}
-            onClick={() => toggleTrack('debate')}
-          >
-            🗣️ Debates ({metrics.debates})
-          </button>
-        </div>
-
-        {/* Secondary Filter & Sort Toolbar */}
-        <div className="cc-controls-bar">
-          <div className="cc-controls-left">
-            {/* Format Filter */}
-            <div className="cc-filter-pill-group">
-              <button
-                className={`cc-filter-pill-btn ${teamFilter === 'all' ? 'active' : ''}`}
-                onClick={() => setTeamFilter('all')}
-              >
-                All Formats
-              </button>
-              <button
-                className={`cc-filter-pill-btn ${teamFilter === 'solo' ? 'active' : ''}`}
-                onClick={() => setTeamFilter('solo')}
-              >
-                Solo
-              </button>
-              <button
-                className={`cc-filter-pill-btn ${teamFilter === 'team' ? 'active' : ''}`}
-                onClick={() => setTeamFilter('team')}
-              >
-                Teams (2+)
-              </button>
+      {/* ── Two-Column Layout (Left: Accordion Filters, Right: Listings) ── */}
+      <div className="cc-layout-wrapper">
+        {/* ── Filter Sidebar (Card-based Accordions matching reference image) ── */}
+        <aside className={`cc-filter-sidebar ${isMobileFiltersOpen ? 'mobile-open' : ''}`}>
+          {/* Mobile Drawer Header */}
+          <div className="cc-mobile-filter-header">
+            <div className="cc-mobile-filter-title">
+              <FilterIcon size={16} />
+              <span>Filters {activeFilterCount > 0 && `(${activeFilterCount})`}</span>
             </div>
-
-            {/* Fee Filter */}
-            <div className="cc-filter-pill-group">
-              <button
-                className={`cc-filter-pill-btn ${feeFilter === 'all' ? 'active' : ''}`}
-                onClick={() => setFeeFilter('all')}
-              >
-                All Fees
-              </button>
-              <button
-                className={`cc-filter-pill-btn ${feeFilter === 'free' ? 'active' : ''}`}
-                onClick={() => setFeeFilter('free')}
-              >
-                Free Entry
-              </button>
-              <button
-                className={`cc-filter-pill-btn ${feeFilter === 'paid' ? 'active' : ''}`}
-                onClick={() => setFeeFilter('paid')}
-              >
-                Paid
-              </button>
-            </div>
-
-            {/* Opportunities Count */}
-            {!loading && !fetchError && (
-              <div className="cc-inline-count">
-                <span className="cc-pulse-dot" title="Live Unstop sync active"></span>
-                <span>
-                  Showing <strong>{filteredCompetitions.length}</strong>{' '}
-                  {filteredCompetitions.length === 1 ? 'opportunity' : 'opportunities'}
-                </span>
-              </div>
-            )}
-          </div>
-
-          <div className="cc-controls-right">
-            {/* Sort Selector */}
-            <div className="cc-sort-box">
-              <ArrowUpDownIcon size={13} className="cc-sort-icon" />
-              <label htmlFor="cc-sort-select" className="cc-sort-label">Sort:</label>
-              <div className="cc-sort-select-wrapper">
-                <select
-                  id="cc-sort-select"
-                  className="cc-sort-select"
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                >
-                  <option value="closing-soonest">⏳ Closing Soonest</option>
-                  <option value="closing-latest">📅 Closing Latest</option>
-                  <option value="title-asc">🔤 Title: A → Z</option>
-                  <option value="title-desc">🔤 Title: Z → A</option>
-                  <option value="prize-highest">🏆 Highest Prize Pool</option>
-                  <option value="popular">🔥 Most Applied (Popular)</option>
-                </select>
-                <ChevronDownIcon size={11} className="cc-sort-chevron" />
-              </div>
-            </div>
-
-            {hasActiveFilters && (
+            <div className="cc-mobile-filter-actions">
+              {hasActiveFilters && (
+                <button type="button" className="cc-filter-reset-link" onClick={handleResetFilters}>
+                  Reset All
+                </button>
+              )}
               <button
                 type="button"
-                className="cc-reset-btn"
-                onClick={handleResetFilters}
-                title="Reset search, filters and sorting"
+                className="cc-mobile-filter-close"
+                onClick={() => setIsMobileFiltersOpen(false)}
+                aria-label="Close filters"
               >
-                <RotateCcwIcon size={12} className="cc-reset-icon" />
-                <span>Reset Filters</span>
+                <XCloseIcon size={16} />
               </button>
+            </div>
+          </div>
+
+          {/* Card 1: Target Circuits (Top Accordion Card) */}
+          <div className="cc-filter-card">
+            <button
+              type="button"
+              className={`cc-accordion-header ${openSections.circuits ? 'open' : ''}`}
+              onClick={() => toggleSection('circuits')}
+              aria-expanded={openSections.circuits}
+            >
+              <div className="cc-accordion-header-left">
+                <ChevronDownIcon size={14} className="cc-accordion-chevron" />
+                <span className="cc-accordion-title">Circuits</span>
+              </div>
+              {selectedCircuits.length > 0 && selectedCircuits.length < CIRCUIT_OPTIONS.length && (
+                <span className="cc-active-count-badge">{selectedCircuits.length}</span>
+              )}
+            </button>
+
+            {openSections.circuits && (
+              <div className="cc-accordion-content">
+                <label className="cc-filter-checkbox-row cc-select-all-row">
+                  <input
+                    type="checkbox"
+                    className="cc-filter-checkbox-input"
+                    checked={isAllCircuitsSelected}
+                    onChange={handleToggleAllCircuits}
+                  />
+                  <span className="cc-custom-checkbox">
+                    {isAllCircuitsSelected && <CheckIcon size={11} />}
+                  </span>
+                  <span className="cc-checkbox-label-text">Select All</span>
+                </label>
+
+                <div className="cc-checkbox-list">
+                  {CIRCUIT_OPTIONS.map((opt) => {
+                    const isChecked = selectedCircuits.includes(opt.id);
+                    return (
+                      <label key={opt.id} className="cc-filter-checkbox-row">
+                        <input
+                          type="checkbox"
+                          className="cc-filter-checkbox-input"
+                          checked={isChecked}
+                          onChange={() => toggleCircuit(opt.id)}
+                        />
+                        <span className="cc-custom-checkbox">
+                          {isChecked && <CheckIcon size={11} />}
+                        </span>
+                        <span className="cc-checkbox-label-text">{opt.label}</span>
+                        <span className="cc-filter-num">({metrics[opt.countKey] || 0})</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
             )}
           </div>
-        </div>
-      </div>
+
+          {/* Card 2: More Filters (Categories, Format, Fee, Bookmarks) */}
+          <div className="cc-filter-card">
+            <div className="cc-filter-card-header">
+              <span className="cc-card-heading">Filters</span>
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  className="cc-filter-reset-link"
+                  onClick={handleResetFilters}
+                  title="Reset all filters"
+                >
+                  Reset All
+                </button>
+              )}
+            </div>
+
+            {/* Section: Categories & Tracks */}
+            <div className="cc-filter-subgroup">
+              <button
+                type="button"
+                className={`cc-accordion-header ${openSections.tracks ? 'open' : ''}`}
+                onClick={() => toggleSection('tracks')}
+                aria-expanded={openSections.tracks}
+              >
+                <div className="cc-accordion-header-left">
+                  <ChevronDownIcon size={14} className="cc-accordion-chevron" />
+                  <span className="cc-accordion-title">Categories</span>
+                </div>
+                {selectedTracks.length > 0 && selectedTracks.length < TRACK_OPTIONS.length && (
+                  <span className="cc-active-count-badge">{selectedTracks.length}</span>
+                )}
+              </button>
+
+              {openSections.tracks && (
+                <div className="cc-accordion-content">
+                  <label className="cc-filter-checkbox-row cc-select-all-row">
+                    <input
+                      type="checkbox"
+                      className="cc-filter-checkbox-input"
+                      checked={isAllTracksSelected}
+                      onChange={handleToggleAllTracks}
+                    />
+                    <span className="cc-custom-checkbox">
+                      {isAllTracksSelected && <CheckIcon size={11} />}
+                    </span>
+                    <span className="cc-checkbox-label-text">Select All</span>
+                  </label>
+
+                  <div className="cc-checkbox-list">
+                    {TRACK_OPTIONS.map((opt) => {
+                      const isChecked = selectedTracks.includes(opt.id);
+                      return (
+                        <label key={opt.id} className="cc-filter-checkbox-row">
+                          <input
+                            type="checkbox"
+                            className="cc-filter-checkbox-input"
+                            checked={isChecked}
+                            onChange={() => toggleTrack(opt.id)}
+                          />
+                          <span className="cc-custom-checkbox">
+                            {isChecked && <CheckIcon size={11} />}
+                          </span>
+                          <span className="cc-checkbox-label-text">
+                            <span className="cc-cat-emoji">{opt.icon}</span> {opt.label}
+                          </span>
+                          <span className="cc-filter-num">({metrics[opt.countKey] || 0})</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Section: Format */}
+            <div className="cc-filter-subgroup">
+              <button
+                type="button"
+                className={`cc-accordion-header ${openSections.format ? 'open' : ''}`}
+                onClick={() => toggleSection('format')}
+                aria-expanded={openSections.format}
+              >
+                <div className="cc-accordion-header-left">
+                  <ChevronDownIcon size={14} className="cc-accordion-chevron" />
+                  <span className="cc-accordion-title">Participation</span>
+                </div>
+                {teamFilter !== 'all' && <span className="cc-active-count-badge">1</span>}
+              </button>
+
+              {openSections.format && (
+                <div className="cc-accordion-content">
+                  <div className="cc-checkbox-list">
+                    <label className="cc-filter-checkbox-row">
+                      <input
+                        type="checkbox"
+                        className="cc-filter-checkbox-input"
+                        checked={teamFilter === 'solo'}
+                        onChange={() => setTeamFilter((prev) => (prev === 'solo' ? 'all' : 'solo'))}
+                      />
+                      <span className="cc-custom-checkbox">
+                        {teamFilter === 'solo' && <CheckIcon size={11} />}
+                      </span>
+                      <span className="cc-checkbox-label-text">👤 Solo Participation</span>
+                    </label>
+
+                    <label className="cc-filter-checkbox-row">
+                      <input
+                        type="checkbox"
+                        className="cc-filter-checkbox-input"
+                        checked={teamFilter === 'team'}
+                        onChange={() => setTeamFilter((prev) => (prev === 'team' ? 'all' : 'team'))}
+                      />
+                      <span className="cc-custom-checkbox">
+                        {teamFilter === 'team' && <CheckIcon size={11} />}
+                      </span>
+                      <span className="cc-checkbox-label-text">👥 Teams (2+)</span>
+                    </label>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Section: Registration Fee */}
+            <div className="cc-filter-subgroup">
+              <button
+                type="button"
+                className={`cc-accordion-header ${openSections.fee ? 'open' : ''}`}
+                onClick={() => toggleSection('fee')}
+                aria-expanded={openSections.fee}
+              >
+                <div className="cc-accordion-header-left">
+                  <ChevronDownIcon size={14} className="cc-accordion-chevron" />
+                  <span className="cc-accordion-title">Entry Fee</span>
+                </div>
+                {feeFilter !== 'all' && <span className="cc-active-count-badge">1</span>}
+              </button>
+
+              {openSections.fee && (
+                <div className="cc-accordion-content">
+                  <div className="cc-checkbox-list">
+                    <label className="cc-filter-checkbox-row">
+                      <input
+                        type="checkbox"
+                        className="cc-filter-checkbox-input"
+                        checked={feeFilter === 'free'}
+                        onChange={() => setFeeFilter((prev) => (prev === 'free' ? 'all' : 'free'))}
+                      />
+                      <span className="cc-custom-checkbox">
+                        {feeFilter === 'free' && <CheckIcon size={11} />}
+                      </span>
+                      <span className="cc-checkbox-label-text">🟢 Free Entry</span>
+                    </label>
+
+                    <label className="cc-filter-checkbox-row">
+                      <input
+                        type="checkbox"
+                        className="cc-filter-checkbox-input"
+                        checked={feeFilter === 'paid'}
+                        onChange={() => setFeeFilter((prev) => (prev === 'paid' ? 'all' : 'paid'))}
+                      />
+                      <span className="cc-custom-checkbox">
+                        {feeFilter === 'paid' && <CheckIcon size={11} />}
+                      </span>
+                      <span className="cc-checkbox-label-text">💳 Paid Entry</span>
+                    </label>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Section: Saved & Bookmarks */}
+            <div className="cc-filter-subgroup">
+              <button
+                type="button"
+                className={`cc-accordion-header ${openSections.bookmarks ? 'open' : ''}`}
+                onClick={() => toggleSection('bookmarks')}
+                aria-expanded={openSections.bookmarks}
+              >
+                <div className="cc-accordion-header-left">
+                  <ChevronDownIcon size={14} className="cc-accordion-chevron" />
+                  <span className="cc-accordion-title">Saved</span>
+                </div>
+                {bookmarkedOnly && <span className="cc-active-count-badge">1</span>}
+              </button>
+
+              {openSections.bookmarks && (
+                <div className="cc-accordion-content">
+                  <label className="cc-filter-checkbox-row">
+                    <input
+                      type="checkbox"
+                      className="cc-filter-checkbox-input"
+                      checked={bookmarkedOnly}
+                      onChange={toggleBookmarkedOnly}
+                    />
+                    <span className="cc-custom-checkbox">
+                      {bookmarkedOnly && <CheckIcon size={11} />}
+                    </span>
+                    <span className="cc-checkbox-label-text">🔖 Bookmarked Only</span>
+                    <span className="cc-filter-num">({metrics.bookmarked})</span>
+                  </label>
+                </div>
+              )}
+            </div>
+          </div>
+        </aside>
+
+        {/* Backdrop for mobile drawer */}
+        {isMobileFiltersOpen && (
+          <div
+            className="cc-filter-backdrop"
+            onClick={() => setIsMobileFiltersOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+
+        {/* ── Main Content Area ── */}
+        <main className="cc-main-content">
+          {/* Top Search & Toolbar */}
+          <div className="cc-content-top-bar">
+            <div className="cc-search-wrapper">
+              <SearchIcon size={16} className="cc-search-icon" />
+              <input
+                type="text"
+                className="cc-search-input"
+                placeholder="Search competitions, IIM, IIT, XLRI, ISB, prizes..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <button
+                  className="cc-clear-search"
+                  onClick={() => setSearchQuery('')}
+                  aria-label="Clear search"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            <div className="cc-top-actions">
+              {/* Mobile Filter Trigger Button */}
+              <button
+                type="button"
+                className={`cc-mobile-filter-trigger ${activeFilterCount > 0 ? 'active' : ''}`}
+                onClick={() => setIsMobileFiltersOpen(true)}
+              >
+                <FilterIcon size={15} />
+                <span>Filters</span>
+                {activeFilterCount > 0 && (
+                  <span className="cc-filter-badge-count">{activeFilterCount}</span>
+                )}
+              </button>
+
+              {/* Sort Selector */}
+              <div className="cc-sort-box">
+                <ArrowUpDownIcon size={13} className="cc-sort-icon" />
+                <label htmlFor="cc-sort-select" className="cc-sort-label">Sort:</label>
+                <div className="cc-sort-select-wrapper">
+                  <select
+                    id="cc-sort-select"
+                    className="cc-sort-select"
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                  >
+                    <option value="closing-soonest">⏳ Closing Soonest</option>
+                    <option value="closing-latest">📅 Closing Latest</option>
+                    <option value="title-asc">🔤 Title: A → Z</option>
+                    <option value="title-desc">🔤 Title: Z → A</option>
+                    <option value="prize-highest">🏆 Highest Prize Pool</option>
+                    <option value="popular">🔥 Most Applied (Popular)</option>
+                  </select>
+                  <ChevronDownIcon size={11} className="cc-sort-chevron" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Active Filter Pills Bar (Colored pills matching reference screenshot) */}
+          {hasActiveFilters && (
+            <div className="cc-active-pills-bar">
+              <div className="cc-active-pills-list">
+                {searchQuery.trim() && (
+                  <span className="cc-active-pill pill-search">
+                    Search: "{searchQuery.trim()}"
+                    <button type="button" onClick={() => setSearchQuery('')} aria-label="Clear search query">✕</button>
+                  </span>
+                )}
+                {selectedCircuits.length > 0 && selectedCircuits.length < CIRCUIT_OPTIONS.length && selectedCircuits.map((circuitKey) => (
+                  <span key={circuitKey} className="cc-active-pill pill-circuit">
+                    {getCircuitLabel(circuitKey)}
+                    <button type="button" onClick={() => toggleCircuit(circuitKey)} aria-label={`Remove ${getCircuitLabel(circuitKey)} filter`}>✕</button>
+                  </span>
+                ))}
+                {selectedTracks.length > 0 && selectedTracks.length < TRACK_OPTIONS.length && selectedTracks.map((trackKey) => (
+                  <span key={trackKey} className="cc-active-pill pill-track">
+                    {getTrackLabel(trackKey)}
+                    <button type="button" onClick={() => toggleTrack(trackKey)} aria-label={`Remove ${getTrackLabel(trackKey)} filter`}>✕</button>
+                  </span>
+                ))}
+                {teamFilter !== 'all' && (
+                  <span className="cc-active-pill pill-format">
+                    {teamFilter === 'solo' ? '👤 Solo' : '👥 Teams (2+)'}
+                    <button type="button" onClick={() => setTeamFilter('all')} aria-label="Remove format filter">✕</button>
+                  </span>
+                )}
+                {feeFilter !== 'all' && (
+                  <span className="cc-active-pill pill-fee">
+                    {feeFilter === 'free' ? '🟢 Free Entry' : '💳 Paid'}
+                    <button type="button" onClick={() => setFeeFilter('all')} aria-label="Remove fee filter">✕</button>
+                  </span>
+                )}
+                {bookmarkedOnly && (
+                  <span className="cc-active-pill pill-bookmark">
+                    🔖 Bookmarked Only
+                    <button type="button" onClick={() => setBookmarkedOnly(false)} aria-label="Remove bookmark filter">✕</button>
+                  </span>
+                )}
+              </div>
+
+              <button
+                type="button"
+                className="cc-clear-all-pill-btn"
+                onClick={handleResetFilters}
+                title="Clear all active filters"
+              >
+                <RotateCcwIcon size={11} />
+                <span>Reset</span>
+              </button>
+            </div>
+          )}
+
+          {/* Inline Opportunities Count */}
+          {!loading && !fetchError && (
+            <div className="cc-inline-count">
+              <span className="cc-pulse-dot" title="Live Unstop sync active"></span>
+              <span>
+                Showing <strong>{filteredCompetitions.length}</strong>{' '}
+                {filteredCompetitions.length === 1 ? 'opportunity' : 'opportunities'}
+              </span>
+            </div>
+          )}
 
       {/* ── Competitions Grid ── */}
       {loading ? (
@@ -1198,6 +1485,8 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
           })}
         </div>
       )}
+        </main>
+      </div>
     </div>
   );
 }
