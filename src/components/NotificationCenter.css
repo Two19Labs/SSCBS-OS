@@ -550,3 +550,26 @@ input:checked + .notif-slider:before {
   color: var(--danger);
   transform: scale(1.08);
 }
+
+/* ── Mobile Responsive Flyout ── */
+@media (max-width: 480px) {
+  .notif-dropdown-panel {
+    position: fixed;
+    top: calc(54px + env(safe-area-inset-top, 0px));
+    left: 10px;
+    right: 10px;
+    width: auto;
+    max-width: none;
+    max-height: calc(82vh - env(safe-area-inset-top, 0px));
+    border-radius: 14px;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.3);
+  }
+
+  .notif-panel-header {
+    padding: 12px 14px;
+  }
+
+  .notif-item {
+    padding: 12px 14px;
+  }
+}

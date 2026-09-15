@@ -2,7 +2,7 @@
 
 .pwa-prompt-banner {
   position: fixed;
-  bottom: 68px; /* sits right above mobile bottom tabbar */
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 24px);
@@ -18,6 +18,18 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
   z-index: 999;
   animation: slideUpPrompt 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (max-width: 360px) {
+  .pwa-prompt-banner {
+    width: calc(100% - 16px);
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  .pwa-prompt-btn-primary {
+    padding: 7px 11px;
+    font-size: 0.75rem;
+  }
 }
 
 @keyframes slideUpPrompt {

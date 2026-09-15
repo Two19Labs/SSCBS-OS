@@ -1145,12 +1145,17 @@
   }
 
   .prof-page-content {
-    padding: 16px 12px;
+    padding: 12px 0;
+  }
+
+  .prof-page-nav-header {
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
   .prof-header-panel {
     gap: 12px;
-    padding: 16px;
+    padding: 14px;
   }
 
   .prof-header-avatar {

@@ -575,6 +575,21 @@
   }
 }
 
+@media (max-width: 340px) {
+  .app-topbar {
+    padding-left: 8px;
+    padding-right: 8px;
+    gap: 6px;
+  }
+  .topbar-title {
+    font-size: 13px;
+  }
+  .topbar-menu-btn {
+    width: 32px;
+    height: 32px;
+  }
+}
+
 .topbar-back {
   display: flex;
   align-items: center;

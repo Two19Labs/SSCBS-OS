@@ -171,6 +171,8 @@ body {
   input[type="email"],
   input[type="search"],
   input[type="password"],
+  input[type="time"],
+  input[type="date"],
   select,
   textarea {
     font-size: 16px !important; /* Prevents auto-zoom shift on iOS mobile Safari */
@@ -292,7 +294,15 @@ a.linkedin-link,
 
 @media (min-width: 1440px) {
   :root {
-    --content-max: 1240px;
+    --content-max: 1320px;
+    --page-pad-x: 36px;
+  }
+}
+
+@media (min-width: 1600px) {
+  :root {
+    --content-max: 1440px;
+    --page-pad-x: 40px;
   }
 }
 

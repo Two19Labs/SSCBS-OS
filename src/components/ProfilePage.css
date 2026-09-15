@@ -303,7 +303,7 @@
 /* Responsive adjustments for mobile/tablet */
 @media (max-width: 480px) {
   .profile-page {
-    padding: 0 16px;
+    padding: 0;
   }
   
   .profile-identity-card {

@@ -1931,7 +1931,7 @@
 
   .cc-sort-box {
     flex: 1;
-    min-width: 180px;
+    min-width: 130px;
   }
 
   .cc-sort-select {

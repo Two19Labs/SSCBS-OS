@@ -1075,7 +1075,7 @@
 /* Mobile & Small Phones (≤ 640px) */
 @media (max-width: 640px) {
   .empty-room-page {
-    padding: 0 12px 90px 12px;
+    padding: 0 0 32px 0;
     gap: 14px;
   }
 
@@ -1157,7 +1157,7 @@
   }
 
   .room-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 10px;
   }
 

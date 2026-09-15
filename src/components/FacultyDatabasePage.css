@@ -608,9 +608,7 @@
 /* Mobile Devices (≤ 640px) */
 @media (max-width: 640px) {
   .faculty-db-page {
-    padding-left: 12px;
-    padding-right: 12px;
-    padding-bottom: 120px; /* Safe clearance for mobile bottom nav bar */
+    padding: 0 0 32px 0;
     gap: 14px;
   }
 
@@ -700,7 +698,7 @@
   }
 
   .faculty-toast {
-    bottom: 84px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
     left: 16px;
     right: 16px;
     text-align: center;

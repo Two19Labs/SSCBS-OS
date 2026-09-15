@@ -413,8 +413,9 @@
   margin-bottom: 28px;
 }
 
-@media (min-width: 700px) {
+@media (min-width: 641px) and (max-width: 1199px) {
   .home-tools-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
   }
 }
@@ -1522,7 +1523,25 @@
   }
 
   .weekly-modal-header {
-    padding: 14px 16px;
+    padding: 12px 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .weekly-modal-header .header-meta-group {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .weekly-modal-header h3 {
+    font-size: 1.05rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .weekly-modal-header p {
+    font-size: 0.68rem;
   }
 
   .weekly-modal-body {
@@ -1530,7 +1549,8 @@
   }
 
   .weekly-layout-toggle-group {
-    margin-right: 8px;
+    margin-left: 0;
+    margin-right: 4px;
   }
 
   .btn-layout-toggle span {
@@ -1538,7 +1558,28 @@
   }
 
   .btn-layout-toggle {
-    padding: 6px 8px;
+    padding: 5px 7px;
+  }
+
+  .weekly-modal-header .btn-export-schedule-img {
+    padding: 5px 8px;
+    font-size: 0.72rem;
+  }
+
+  @media (max-width: 480px) {
+    .weekly-modal-header .btn-export-schedule-img span {
+      display: none;
+    }
+    .weekly-day-tab {
+      min-width: 46px;
+      padding: 6px 3px;
+    }
+    .tab-day-name {
+      font-size: 0.75rem;
+    }
+    .tab-day-full {
+      display: none;
+    }
   }
 
   .list-timeline-item {
@@ -1566,13 +1607,14 @@
   .weekly-modal-footer {
     flex-direction: column;
     gap: 12px;
-    padding: 16px;
+    padding: 14px;
     align-items: stretch;
     text-align: center;
   }
 
   .btn-close-modal {
     width: 100%;
+    min-height: 42px;
   }
 
   .debugger-controls-row {
