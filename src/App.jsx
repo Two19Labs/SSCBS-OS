@@ -236,6 +236,37 @@ function App() {
     );
   }
 
+  // Competitions Portal ships its own dedicated full-page layout (only filter sidebar on the left, no OS sidebar)
+  if (view === 'case-comps') {
+    return (
+      <>
+        {hasCaseCompsAccess ? (
+          <Suspense fallback={<PageLoader />}>
+            <ErrorBoundary>
+              <div className="case-comps-standalone-page">
+                <CaseCompsPage 
+                  onBack={goBack} 
+                  onNavigate={openTool} 
+                  headerAction={<NotificationCenter onNavigate={openTool} />} 
+                />
+                <FooterCredit />
+              </div>
+            </ErrorBoundary>
+          </Suspense>
+        ) : (
+          <div className="app-shell">
+            <HomeDashboard onNavigate={openTool} onOpenProfile={() => setView('profile')} />
+          </div>
+        )}
+        <ProfileModal isOpen={needsProfileSetup} isFirstTimeSetup={needsProfileSetup} />
+        <Suspense fallback={null}>
+          {isGpaOpen && <GpaCalculatorModal isOpen={isGpaOpen} onClose={() => setIsGpaOpen(false)} />}
+        </Suspense>
+        <InstallPwaPrompt />
+      </>
+    );
+  }
+
   const navSections = [
     {
       title: 'Main Navigation',
