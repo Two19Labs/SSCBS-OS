@@ -659,16 +659,13 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
     setBookmarkedOnly((prev) => !prev);
   };
 
-  const hasFilterCriteria =
+  const hasActiveFilters =
     searchQuery.trim() !== '' ||
     selectedCircuits.length > 0 ||
     bookmarkedOnly ||
     selectedTracks.length > 0 ||
     teamFilter !== 'all' ||
-    feeFilter !== 'all';
-
-  const hasActiveFilters =
-    hasFilterCriteria ||
+    feeFilter !== 'all' ||
     sortBy !== 'closing-soonest';
 
   const handleResetFilters = () => {
@@ -1019,10 +1016,6 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
             <span className="cc-status-text">
               Showing <strong>{filteredCompetitions.length}</strong>{' '}
               {filteredCompetitions.length === 1 ? 'opportunity' : 'opportunities'} listed below
-              {hasFilterCriteria && competitions.length > 0 && (
-                <span className="cc-status-total"> (filtered from {competitions.length} total)</span>
-              )}
-              {lastUpdated && <span className="cc-last-sync"> · Synced at {lastUpdated}</span>}
             </span>
           </div>
 
