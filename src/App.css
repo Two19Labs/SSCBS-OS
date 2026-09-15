@@ -330,15 +330,18 @@
   left: 0;
   bottom: 0;
   width: min(310px, 85vw);
+  height: 100vh;
+  height: 100dvh;
   background: var(--surface);
   border-right: 1px solid var(--border);
   z-index: 100;
   display: flex;
   flex-direction: column;
-  padding: 16px 14px 20px;
+  padding: max(16px, env(safe-area-inset-top)) 14px max(20px, env(safe-area-inset-bottom));
   transform: translateX(-100%);
   transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 12px 0 32px rgba(0, 0, 0, 0.15);
+  overscroll-behavior: contain;
 }
 
 .app-sidebar-mobile.open {
@@ -561,6 +564,17 @@
   white-space: nowrap;
 }
 
+@media (max-width: 380px) {
+  .app-topbar {
+    padding-left: 10px;
+    padding-right: 10px;
+    gap: 8px;
+  }
+  .topbar-title {
+    font-size: 14px;
+  }
+}
+
 .topbar-back {
   display: flex;
   align-items: center;
@@ -772,10 +786,18 @@
   display: none;
 }
 
-/* ═══ Laptop / desktop ≥ 900px — sidebar UI ═══ */
-@media (min-width: 900px) {
+/* ═══ Laptop / compact desktop (900px – 1140px) ═══ */
+@media (min-width: 900px) and (max-width: 1140px) {
   .app-sidebar {
     display: flex;
+    width: var(--sidebar-w, 230px);
+    padding: 16px 10px 14px;
+  }
+
+  .sidebar-item {
+    font-size: 13px;
+    padding: 8px 10px;
+    gap: 9px;
   }
 
   .app-topbar,
@@ -784,10 +806,55 @@
   }
 
   .app-main {
-    margin-left: var(--sidebar-w);
-    width: calc(100% - var(--sidebar-w));
+    margin-left: var(--sidebar-w, 230px);
+    width: calc(100% - var(--sidebar-w, 230px));
     max-width: none;
-    padding: 28px 32px 40px;
+    padding: 22px 24px 36px;
+  }
+
+  .app-main > * {
+    max-width: var(--content-max);
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .page-heading-desktop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    max-width: var(--content-max);
+    margin: 0 auto 18px;
+  }
+
+  .page-heading-desktop h1 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: var(--ink);
+  }
+}
+
+/* ═══ Standard Desktop (1141px – 1439px) ═══ */
+@media (min-width: 1141px) {
+  .app-sidebar {
+    display: flex;
+    width: var(--sidebar-w, 250px);
+  }
+
+  .app-topbar,
+  .app-tabbar {
+    display: none;
+  }
+
+  .app-main {
+    margin-left: var(--sidebar-w, 250px);
+    width: calc(100% - var(--sidebar-w, 250px));
+    max-width: none;
+    padding: 28px 32px 44px;
   }
 
   .app-main > * {
@@ -816,14 +883,14 @@
   }
 }
 
-/* ═══ Large Desktop ≥ 1440px ═══ */
+/* ═══ Large Desktop & Ultra-wide ≥ 1440px ═══ */
 @media (min-width: 1440px) {
   .app-main {
-    padding: 36px 56px 56px;
+    padding: 32px 48px 56px;
   }
 }
 
-/* ── Recruitment Home Banner Responsive ── */
+/* ── Recruitment & Competitions Home Banner Responsive ── */
 .recruitment-home-banner {
   transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease !important;
 }
@@ -834,7 +901,7 @@
   box-shadow: 0 4px 16px rgba(225, 29, 72, 0.12);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .recruitment-home-banner {
     flex-direction: column !important;
     align-items: stretch !important;
@@ -845,6 +912,8 @@
     width: 100% !important;
     justify-content: center;
   }
+}
+
 .home-case-comps-pill {
   background: rgba(37, 99, 235, 0.09);
   color: #2563eb;
@@ -864,6 +933,3 @@
   color: #60a5fa;
   border-color: rgba(96, 165, 250, 0.3);
 }
-
-
-

@@ -255,3 +255,81 @@ a.linkedin-link,
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* ── Multi-Device Fluid & Safe-Area Adjustments ── */
+:root {
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+
+@media (max-width: 380px) {
+  :root {
+    --page-pad-x: 12px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 899px) {
+  :root {
+    --page-pad-x: 24px;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1140px) {
+  :root {
+    --sidebar-w: 230px;
+    --page-pad-x: 24px;
+  }
+}
+
+@media (min-width: 1141px) {
+  :root {
+    --sidebar-w: 250px;
+    --page-pad-x: 32px;
+  }
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --content-max: 1240px;
+  }
+}
+
+/* Fluid full-width container protection */
+.os-page-shell {
+  width: 100%;
+  max-width: var(--content-max);
+  margin-left: auto;
+  margin-right: auto;
+  min-width: 0;
+}
+
+/* Universal Table & Matrix Scroll Container */
+.os-table-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  border-radius: 12px;
+  position: relative;
+}
+
+.os-table-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.os-table-scroll::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+}
+
+/* Sticky topbar blur support across Safari & Chrome */
+@supports ((-webkit-backdrop-filter: blur(12px)) or (backdrop-filter: blur(12px))) {
+  .app-topbar,
+  .mobile-sidebar-backdrop {
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+}

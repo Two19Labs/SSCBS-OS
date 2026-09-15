@@ -543,6 +543,29 @@
   }
 }
 
+@media (max-width: 380px) {
+  .auth-panel-left {
+    padding: 20px 14px;
+  }
+
+  .auth-panel-right {
+    padding: 16px 12px;
+  }
+
+  .auth-card-inner {
+    padding: 18px 14px;
+  }
+
+  .auth-title {
+    font-size: 1.3rem;
+  }
+
+  .google-signin-button.google-primary {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+}
+
   .auth-credit-footer {
     margin-top: 24px;
     margin-bottom: 8px;

@@ -77,11 +77,13 @@
   display: flex;
   gap: 24px;
   align-items: flex-start;
+  width: 100%;
 }
 
 /* Sidebar Styling */
 .prof-page-sidebar {
   width: 280px;
+  flex-shrink: 0;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: 12px;
@@ -92,6 +94,16 @@
   position: sticky;
   top: 20px;
 }
+
+@media (min-width: 769px) and (max-width: 1140px) {
+  .prof-page-layout {
+    gap: 16px;
+  }
+  .prof-page-sidebar {
+    width: 240px;
+  }
+}
+
 
 .sidebar-search-box {
   padding: 16px;
