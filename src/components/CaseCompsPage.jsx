@@ -445,7 +445,6 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
     tracks: true,
     format: true,
     fee: true,
-    bookmarks: true,
   });
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
@@ -735,13 +734,11 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
     (selectedCircuits.length > 0 && selectedCircuits.length < CIRCUIT_OPTIONS.length ? selectedCircuits.length : 0) +
     (selectedTracks.length > 0 && selectedTracks.length < TRACK_OPTIONS.length ? selectedTracks.length : 0) +
     (teamFilter !== 'all' ? 1 : 0) +
-    (feeFilter !== 'all' ? 1 : 0) +
-    (bookmarkedOnly ? 1 : 0);
+    (feeFilter !== 'all' ? 1 : 0);
 
   const hasActiveFilters =
     searchQuery.trim() !== '' ||
     (selectedCircuits.length > 0 && selectedCircuits.length < CIRCUIT_OPTIONS.length) ||
-    bookmarkedOnly ||
     (selectedTracks.length > 0 && selectedTracks.length < TRACK_OPTIONS.length) ||
     teamFilter !== 'all' ||
     feeFilter !== 'all' ||
@@ -750,7 +747,6 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
   const handleResetFilters = () => {
     setSearchQuery('');
     setSelectedCircuits([]);
-    setBookmarkedOnly(false);
     setSelectedTracks([]);
     setTeamFilter('all');
     setFeeFilter('all');
@@ -1133,40 +1129,6 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
                 </div>
               )}
             </div>
-
-            {/* Section: Saved & Bookmarks */}
-            <div className="cc-filter-subgroup">
-              <button
-                type="button"
-                className={`cc-accordion-header ${openSections.bookmarks ? 'open' : ''}`}
-                onClick={() => toggleSection('bookmarks')}
-                aria-expanded={openSections.bookmarks}
-              >
-                <div className="cc-accordion-header-left">
-                  <ChevronDownIcon size={14} className="cc-accordion-chevron" />
-                  <span className="cc-accordion-title">Saved</span>
-                </div>
-                {bookmarkedOnly && <span className="cc-active-count-badge">1</span>}
-              </button>
-
-              {openSections.bookmarks && (
-                <div className="cc-accordion-content">
-                  <label className="cc-filter-checkbox-row">
-                    <input
-                      type="checkbox"
-                      className="cc-filter-checkbox-input"
-                      checked={bookmarkedOnly}
-                      onChange={toggleBookmarkedOnly}
-                    />
-                    <span className="cc-custom-checkbox">
-                      {bookmarkedOnly && <CheckIcon size={11} />}
-                    </span>
-                    <span className="cc-checkbox-label-text">🔖 Bookmarked Only</span>
-                    <span className="cc-filter-num">({metrics.bookmarked})</span>
-                  </label>
-                </div>
-              )}
-            </div>
           </div>
         </aside>
 
@@ -1201,6 +1163,34 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
                   ✕
                 </button>
               )}
+            </div>
+
+            {/* Dedicated Section Tabs: All vs Bookmarked (Section of its own next to searchbar) */}
+            <div className="cc-section-tabs" role="tablist" aria-label="Competitions view section">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={!bookmarkedOnly}
+                className={`cc-section-tab ${!bookmarkedOnly ? 'active' : ''}`}
+                onClick={() => setBookmarkedOnly(false)}
+              >
+                <span>All</span>
+                <span className="cc-section-tab-count">{competitions.length}</span>
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={bookmarkedOnly}
+                className={`cc-section-tab cc-section-tab-bookmark ${bookmarkedOnly ? 'active' : ''}`}
+                onClick={() => setBookmarkedOnly((prev) => !prev)}
+                title={bookmarkedOnly ? 'Showing bookmarked competitions (click to show all)' : 'Show bookmarked competitions'}
+              >
+                <BookmarkIcon size={14} filled={bookmarkedOnly || metrics.bookmarked > 0} />
+                <span>Bookmarked</span>
+                <span className={`cc-section-tab-count ${metrics.bookmarked > 0 ? 'has-count' : ''}`}>
+                  {metrics.bookmarked}
+                </span>
+              </button>
             </div>
 
             <div className="cc-top-actions">
@@ -1273,12 +1263,6 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
                   <span className="cc-active-pill pill-fee">
                     {feeFilter === 'free' ? '🟢 Free Entry' : '💳 Paid'}
                     <button type="button" onClick={() => setFeeFilter('all')} aria-label="Remove fee filter">✕</button>
-                  </span>
-                )}
-                {bookmarkedOnly && (
-                  <span className="cc-active-pill pill-bookmark">
-                    🔖 Bookmarked Only
-                    <button type="button" onClick={() => setBookmarkedOnly(false)} aria-label="Remove bookmark filter">✕</button>
                   </span>
                 )}
               </div>
