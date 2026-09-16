@@ -153,12 +153,12 @@ const CIRCUIT_OPTIONS = [
 ];
 
 const TRACK_OPTIONS = [
-  { id: 'case', label: 'Case Comps', icon: '📊', countKey: 'cases' },
-  { id: 'hackathon', label: 'Hackathons', icon: '💻', countKey: 'hackathons' },
-  { id: 'writing', label: 'Writing & Research', icon: '✍️', countKey: 'writing' },
-  { id: 'quiz', label: 'Quizzes', icon: '🧠', countKey: 'quizzes' },
-  { id: 'simulation', label: 'Simulations', icon: '📈', countKey: 'simulations' },
-  { id: 'debate', label: 'Debates', icon: '🗣️', countKey: 'debates' },
+  { id: 'case', label: 'Case Comps', countKey: 'cases' },
+  { id: 'hackathon', label: 'Hackathons', countKey: 'hackathons' },
+  { id: 'writing', label: 'Writing & Research', countKey: 'writing' },
+  { id: 'quiz', label: 'Quizzes', countKey: 'quizzes' },
+  { id: 'simulation', label: 'Simulations', countKey: 'simulations' },
+  { id: 'debate', label: 'Debates', countKey: 'debates' },
 ];
 import './CaseCompsPage.css';
 
@@ -416,10 +416,10 @@ function getCompCircuitKey(comp) {
 }
 
 function getCardCircuit(comp) {
-  if (isDUComp(comp)) return { type: 'du', label: 'DU Circuit', icon: '🎓' };
-  if (isIIMorIITorPremierComp(comp)) return { type: 'iim-iit', label: 'IIMs, IITs & Premier Colleges', icon: '🏛️' };
-  if (isCorporateOrGlobalComp(comp)) return { type: 'corporate-global', label: 'Corporate & Global', icon: '🏢' };
-  return { type: 'others', label: 'Others', icon: '🏫' };
+  if (isDUComp(comp)) return { type: 'du', label: 'DU Circuit' };
+  if (isIIMorIITorPremierComp(comp)) return { type: 'iim-iit', label: 'IIMs, IITs & Premier Colleges' };
+  if (isCorporateOrGlobalComp(comp)) return { type: 'corporate-global', label: 'Corporate & Global' };
+  return { type: 'others', label: 'Others' };
 }
 
 export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
@@ -590,12 +590,12 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
     e.stopPropagation();
     trackCaseCompsEvent('share_clicked', { comp_id: comp.id, title: comp.title });
     const details = [
-      `🏆 ${comp.title || 'Case Competition'}`,
-      comp.orgName ? `🏛️ Organized by: ${comp.orgName}` : null,
-      comp.prizes ? `💰 Prizes: ${comp.prizes}` : null,
-      comp.teamSizeDisplay ? `👥 Format: ${comp.teamSizeDisplay}` : null,
-      comp.remainDaysText ? `⏰ Deadline: ${comp.remainDaysText}` : null,
-      `🔗 Apply on Unstop: ${comp.unstopUrl}`,
+      comp.title || 'Case Competition',
+      comp.orgName ? `Organized by: ${comp.orgName}` : null,
+      comp.prizes ? `Prizes: ${comp.prizes}` : null,
+      comp.teamSizeDisplay ? `Format: ${comp.teamSizeDisplay}` : null,
+      comp.remainDaysText ? `Deadline: ${comp.remainDaysText}` : null,
+      `Apply on Unstop: ${comp.unstopUrl}`,
     ].filter(Boolean).join('\n');
 
     if (navigator.clipboard) {
@@ -1033,7 +1033,7 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
                             {isChecked && <CheckIcon size={11} />}
                           </span>
                           <span className="cc-checkbox-label-text">
-                            <span className="cc-cat-emoji">{opt.icon}</span> {opt.label}
+                            {opt.label}
                           </span>
                           <span className="cc-filter-num">({metrics[opt.countKey] || 0})</span>
                         </label>
@@ -1072,7 +1072,7 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
                       <span className="cc-custom-checkbox">
                         {teamFilter === 'solo' && <CheckIcon size={11} />}
                       </span>
-                      <span className="cc-checkbox-label-text">👤 Solo Participation</span>
+                      <span className="cc-checkbox-label-text">Solo Participation</span>
                     </label>
 
                     <label className="cc-filter-checkbox-row">
@@ -1085,7 +1085,7 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
                       <span className="cc-custom-checkbox">
                         {teamFilter === 'team' && <CheckIcon size={11} />}
                       </span>
-                      <span className="cc-checkbox-label-text">👥 Teams (2+)</span>
+                      <span className="cc-checkbox-label-text">Teams (2+)</span>
                     </label>
                   </div>
                 </div>
@@ -1120,7 +1120,7 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
                       <span className="cc-custom-checkbox">
                         {feeFilter === 'free' && <CheckIcon size={11} />}
                       </span>
-                      <span className="cc-checkbox-label-text">🟢 Free Entry</span>
+                      <span className="cc-checkbox-label-text">Free Entry</span>
                     </label>
 
                     <label className="cc-filter-checkbox-row">
@@ -1133,7 +1133,7 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
                       <span className="cc-custom-checkbox">
                         {feeFilter === 'paid' && <CheckIcon size={11} />}
                       </span>
-                      <span className="cc-checkbox-label-text">💳 Paid Entry</span>
+                      <span className="cc-checkbox-label-text">Paid Entry</span>
                     </label>
                   </div>
                 </div>
@@ -1228,12 +1228,12 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
                   >
-                    <option value="closing-soonest">⏳ Closing Soonest</option>
-                    <option value="closing-latest">📅 Closing Latest</option>
-                    <option value="title-asc">🔤 Title: A → Z</option>
-                    <option value="title-desc">🔤 Title: Z → A</option>
-                    <option value="prize-highest">🏆 Highest Prize Pool</option>
-                    <option value="popular">🔥 Most Applied (Popular)</option>
+                    <option value="closing-soonest">Closing Soonest</option>
+                    <option value="closing-latest">Closing Latest</option>
+                    <option value="title-asc">Title: A → Z</option>
+                    <option value="title-desc">Title: Z → A</option>
+                    <option value="prize-highest">Highest Prize Pool</option>
+                    <option value="popular">Most Applied (Popular)</option>
                   </select>
                   <ChevronDownIcon size={11} className="cc-sort-chevron" />
                 </div>
@@ -1275,13 +1275,13 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
                     ))}
                     {teamFilter !== 'all' && (
                       <span className="cc-active-pill pill-format">
-                        {teamFilter === 'solo' ? '👤 Solo' : '👥 Teams (2+)'}
+                        {teamFilter === 'solo' ? 'Solo' : 'Teams (2+)'}
                         <button type="button" onClick={() => setTeamFilter('all')} aria-label="Remove format filter">✕</button>
                       </span>
                     )}
                     {feeFilter !== 'all' && (
                       <span className="cc-active-pill pill-fee">
-                        {feeFilter === 'free' ? '🟢 Free Entry' : '💳 Paid'}
+                        {feeFilter === 'free' ? 'Free Entry' : 'Paid Entry'}
                         <button type="button" onClick={() => setFeeFilter('all')} aria-label="Remove fee filter">✕</button>
                       </span>
                     )}
@@ -1425,7 +1425,7 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
                           <strong>{Number(comp.registeredCount).toLocaleString()}</strong> registrations
                         </span>
                       ) : (
-                        <span className="cc-meta-fresh">⚡ Recently Listed</span>
+                        <span className="cc-meta-fresh">Recently Listed</span>
                       )}
                     </div>
 

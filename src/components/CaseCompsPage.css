@@ -652,10 +652,6 @@
   font-weight: 500;
 }
 
-.cc-cat-emoji {
-  margin-right: 2px;
-}
-
 .cc-filter-num {
   font-size: 0.72rem;
   color: var(--ink-dim);
