@@ -1262,9 +1262,23 @@ function getUserApp(post, applications, userEmail, userId) {
             const openStatus = isPostOpen(post, applications);
 
             return (
-              <div key={post.id} className={`tf-post-card ${!openStatus ? 'closed' : ''}`}>
+              <div
+                key={post.id}
+                className={`tf-post-card ${!openStatus ? 'closed' : ''}`}
+                onClick={() => setSelectedPostForView(post)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedPostForView(post);
+                  }
+                }}
+              >
                 <div className="card-top-bar">
-                  <span className="comp-organizer">{post.organizer || 'Corporate / Society'}</span>
+                  <span className="comp-organizer" title={post.organizer || 'Corporate / Society'}>
+                    {post.organizer || 'Corporate / Society'}
+                  </span>
                   <div className="card-top-right">
                     {renderSquadDots(post.total_members || 4, openSpots, openStatus)}
                     {isAdmin && (
@@ -1287,7 +1301,8 @@ function getUserApp(post, applications, userEmail, userId) {
                             </div>
                             <button
                               className="tf-admin-menu-item"
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 setActiveAdminMenuPostId(null);
                                 setSelectedPostForReview(post);
                               }}
@@ -1296,7 +1311,8 @@ function getUserApp(post, applications, userEmail, userId) {
                             </button>
                             <button
                               className="tf-admin-menu-item"
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 setActiveAdminMenuPostId(null);
                                 handleToggleStatus(post.id, openStatus);
                               }}
@@ -1305,7 +1321,8 @@ function getUserApp(post, applications, userEmail, userId) {
                             </button>
                             <button
                               className="tf-admin-menu-item danger"
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 setActiveAdminMenuPostId(null);
                                 handleDeletePost(post.id);
                               }}
@@ -1321,7 +1338,7 @@ function getUserApp(post, applications, userEmail, userId) {
 
                 <div className="card-main-content">
                   <div className="comp-title-row">
-                    <h2 className="comp-name">{post.competition_name}</h2>
+                    <h2 className="comp-name" title={post.competition_name}>{post.competition_name}</h2>
 
                     {post.competition_link && (
                       <a
@@ -1330,6 +1347,7 @@ function getUserApp(post, applications, userEmail, userId) {
                         rel="noopener noreferrer"
                         className="comp-link-pill"
                         title="Visit Competition Website"
+                        onClick={(e) => e.stopPropagation()}
                       >
                         <span>Click to visit</span>
                         <ExternalLinkIcon size={12} />
@@ -1339,7 +1357,7 @@ function getUserApp(post, applications, userEmail, userId) {
 
                   {/* User Application Status Callout Banner */}
                   {userApp && !isHost && (
-                    <div className={`user-app-banner ${userApp.status}`}>
+                    <div className={`user-app-banner compact ${userApp.status}`} onClick={(e) => e.stopPropagation()}>
                       <div className="user-app-banner-icon">
                         {userApp.status === 'accepted' ? '🎉' : userApp.status === 'declined' ? '❌' : userApp.status === 'removed' ? '⚠️' : '⏳'}
                       </div>
@@ -1353,79 +1371,99 @@ function getUserApp(post, applications, userEmail, userId) {
                             ? 'Removed from Squad'
                             : 'Request Pending Review'}
                         </span>
-                        <span className="user-app-banner-sub">
-                          {userApp.status === 'accepted'
-                            ? 'You are part of this team! Connect on WhatsApp below.'
-                            : userApp.status === 'declined'
-                            ? 'The host declined your request.'
-                            : userApp.status === 'removed'
-                            ? 'You were removed from this squad by the host.'
-                            : 'The team lead is reviewing your application.'}
-                        </span>
                       </div>
                     </div>
                   )}
 
-                  {/* Title & Description rendering */}
-                  {(() => {
-                    const hasDistinctTitle = Boolean(
-                      post.title &&
-                      post.title.trim() &&
-                      post.description &&
-                      post.title.trim().toLowerCase() !== post.description.trim().toLowerCase()
-                    );
-
-                    return hasDistinctTitle ? (
-                      <>
-                        <h3 className="post-title">{post.title}</h3>
-                        {post.description && <p className="post-desc">{post.description}</p>}
-                      </>
-                    ) : (
-                      <p className="post-desc post-desc-standalone">{post.description || post.title}</p>
-                    );
-                  })()}
+                  {/* Description Clamped to Uniform 2 Lines */}
+                  <p className="post-desc" title={post.description || post.title}>
+                    {post.description || post.title}
+                  </p>
 
                   {/* Read More Trigger */}
-                  {((post.description && post.description.length > 50) || (post.title && post.title.length > 35)) && (
-                    <button
-                      type="button"
-                      className="tf-read-more-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedPostForView(post);
-                      }}
-                    >
-                      Read full opening →
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    className="tf-read-more-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedPostForView(post);
+                    }}
+                  >
+                    Open full squad card →
+                  </button>
 
-                  {/* Skills Present */}
-                  {post.skills_have && post.skills_have.length > 0 && (
-                    <div className="skills-group">
-                      <span className="skills-group-label">Skills Present:</span>
-                      <div className="skills-pills">
-                        {post.skills_have.map((s, idx) => (
-                          <span key={idx} className="skill-pill present">
-                            ✓ {s}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  {/* Squeezed Skills Preview Section ("if too many things, squeeze, show some") */}
+                  <div className="card-skills-preview">
+                    {(() => {
+                      const hasPresent = post.skills_have && post.skills_have.length > 0;
+                      const hasLooking = post.skills_looking_for && post.skills_looking_for.length > 0;
 
-                  {/* Skills Needed */}
-                  {post.skills_looking_for && post.skills_looking_for.length > 0 && (
-                    <div className="skills-group">
-                      <span className="skills-group-label">Looking For:</span>
-                      <div className="skills-pills">
-                        {post.skills_looking_for.map((s, idx) => (
-                          <span key={idx} className="skill-pill needed">
-                            ⚡ {s}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                      if (!hasPresent && !hasLooking) {
+                        return (
+                          <div className="skills-empty-slot">
+                            <span className="skills-empty-tag">Open Squad</span>
+                            <span className="skills-empty-note">All skills & backgrounds welcome</span>
+                          </div>
+                        );
+                      }
+
+                      const MAX_PILLS = 2;
+
+                      return (
+                        <>
+                          {hasPresent && (
+                            <div className="skills-group">
+                              <span className="skills-group-label">Skills Present:</span>
+                              <div className="skills-pills">
+                                {post.skills_have.slice(0, MAX_PILLS).map((s, idx) => (
+                                  <span key={idx} className="skill-pill present" title={s}>
+                                    ✓ {s}
+                                  </span>
+                                ))}
+                                {post.skills_have.length > MAX_PILLS && (
+                                  <span
+                                    className="skill-pill more-pill"
+                                    title={post.skills_have.slice(MAX_PILLS).join(', ')}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedPostForView(post);
+                                    }}
+                                  >
+                                    +{post.skills_have.length - MAX_PILLS} more
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {hasLooking && (
+                            <div className="skills-group">
+                              <span className="skills-group-label">Looking For:</span>
+                              <div className="skills-pills">
+                                {post.skills_looking_for.slice(0, MAX_PILLS).map((s, idx) => (
+                                  <span key={idx} className="skill-pill needed" title={s}>
+                                    ⚡ {s}
+                                  </span>
+                                ))}
+                                {post.skills_looking_for.length > MAX_PILLS && (
+                                  <span
+                                    className="skill-pill more-pill"
+                                    title={post.skills_looking_for.slice(MAX_PILLS).join(', ')}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedPostForView(post);
+                                    }}
+                                  >
+                                    +{post.skills_looking_for.length - MAX_PILLS} more
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </div>
                 </div>
 
                 {/* Card Footer */}
@@ -1453,7 +1491,10 @@ function getUserApp(post, applications, userEmail, userId) {
                           <>
                             <button
                               className="btn-review-apps"
-                              onClick={() => setSelectedPostForReview(post)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedPostForReview(post);
+                              }}
                               title="Review Applicant Requests"
                             >
                               <MailIcon size={14} />
@@ -1462,20 +1503,29 @@ function getUserApp(post, applications, userEmail, userId) {
                             </button>
                             <button
                               className="btn-card-subtle"
-                              onClick={() => handleOpenEditModal(post)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenEditModal(post);
+                              }}
                               title="Edit Listing Details"
                             >
                               Edit
                             </button>
                             <button
                               className="btn-card-subtle"
-                              onClick={() => handleToggleStatus(post.id, openStatus)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleStatus(post.id, openStatus);
+                              }}
                             >
                               {openStatus ? 'Close' : 'Reopen'}
                             </button>
                             <button
                               className="btn-card-subtle danger"
-                              onClick={() => handleDeletePost(post.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeletePost(post.id);
+                              }}
                               title="Delete Post"
                             >
                               Delete
@@ -1491,6 +1541,7 @@ function getUserApp(post, applications, userEmail, userId) {
                                 rel="noopener noreferrer"
                                 className="wa-connect-btn"
                                 title="Direct WhatsApp Connect"
+                                onClick={(e) => e.stopPropagation()}
                               >
                                 <WhatsAppIcon size={14} /> WhatsApp
                               </a>
@@ -1499,7 +1550,10 @@ function getUserApp(post, applications, userEmail, userId) {
                             {openStatus && (!userApp || userApp.status === 'declined' || userApp.status === 'removed') && (
                               <button
                                 className="btn-tf-primary"
-                                onClick={() => handleOpenApplyModal(post)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleOpenApplyModal(post);
+                                }}
                               >
                                 <MailIcon size={13} /> {userApp ? 'Re-apply to Join' : 'Request to Join'}
                               </button>
@@ -2016,6 +2070,35 @@ function getUserApp(post, applications, userEmail, userId) {
               </div>
 
               <div className="tf-modal-body tf-view-modal-body" style={{ padding: '20px 24px', maxHeight: '65vh', overflowY: 'auto' }}>
+                {/* User Application Status Callout in Modal */}
+                {userApp && !isHost && (
+                  <div className={`user-app-banner ${userApp.status}`} style={{ marginBottom: '16px' }}>
+                    <div className="user-app-banner-icon">
+                      {userApp.status === 'accepted' ? '🎉' : userApp.status === 'declined' ? '❌' : userApp.status === 'removed' ? '⚠️' : '⏳'}
+                    </div>
+                    <div className="user-app-banner-content">
+                      <span className="user-app-banner-title">
+                        {userApp.status === 'accepted'
+                          ? 'Accepted into Squad'
+                          : userApp.status === 'declined'
+                          ? 'Application Declined'
+                          : userApp.status === 'removed'
+                          ? 'Removed from Squad'
+                          : 'Request Pending Review'}
+                      </span>
+                      <span className="user-app-banner-sub">
+                        {userApp.status === 'accepted'
+                          ? 'You are part of this team! Connect on WhatsApp below.'
+                          : userApp.status === 'declined'
+                          ? 'The host declined your request.'
+                          : userApp.status === 'removed'
+                          ? 'You were removed from this squad by the host.'
+                          : 'The team lead is reviewing your application.'}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
                 {post.competition_link && (
                   <div style={{ marginBottom: '14px' }}>
                     <a
@@ -2053,7 +2136,7 @@ function getUserApp(post, applications, userEmail, userId) {
                   );
                 })()}
 
-                {/* Skills Present */}
+                {/* All Skills Present */}
                 {post.skills_have && post.skills_have.length > 0 && (
                   <div className="skills-group" style={{ marginTop: '16px' }}>
                     <span className="skills-group-label">Skills Present in Squad:</span>
@@ -2067,7 +2150,7 @@ function getUserApp(post, applications, userEmail, userId) {
                   </div>
                 )}
 
-                {/* Skills Needed */}
+                {/* All Skills Needed */}
                 {post.skills_looking_for && post.skills_looking_for.length > 0 && (
                   <div className="skills-group" style={{ marginTop: '12px' }}>
                     <span className="skills-group-label">Looking For Teammates With:</span>
@@ -2078,6 +2161,14 @@ function getUserApp(post, applications, userEmail, userId) {
                         </span>
                       ))}
                     </div>
+                  </div>
+                )}
+
+                {(!post.skills_have || post.skills_have.length === 0) && (!post.skills_looking_for || post.skills_looking_for.length === 0) && (
+                  <div style={{ marginTop: '16px', padding: '12px 14px', background: 'var(--border-light, rgba(0,0,0,0.02))', borderRadius: '8px', border: '1px dashed var(--border)' }}>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--ink-dim)' }}>
+                      No specific skills specified — open squad welcoming all roles and backgrounds.
+                    </span>
                   </div>
                 )}
 
