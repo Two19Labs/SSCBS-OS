@@ -1136,6 +1136,10 @@
     font-size: 16px !important; /* Prevents auto-zoom on iOS Safari */
   }
 
+  .room-search-box input {
+    font-size: 16px !important; /* Prevents auto-zoom on iOS Safari */
+  }
+
   .empty-room-active-banner {
     flex-direction: column;
     align-items: flex-start;

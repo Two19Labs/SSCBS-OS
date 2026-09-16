@@ -1290,6 +1290,12 @@
     gap: 1.2rem;
   }
 
+  .form-item select,
+  .form-item input {
+    font-size: 16px; /* Prevents auto-zoom in iOS Safari */
+    min-height: 44px;
+  }
+
   .selector-view-tabs {
     display: flex;
     overflow-x: auto;
@@ -2169,20 +2175,20 @@
 }
 
 .subject-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 0.85rem 1rem;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .subject-card:hover {
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
-  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: var(--border-strong);
 }
 
 .subject-card-header {
@@ -2191,20 +2197,20 @@
   justify-content: space-between;
   gap: 0.5rem;
   padding-bottom: 0.4rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border);
 }
 
 .subject-card-title {
   font-size: 0.92rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--ink);
   line-height: 1.25;
 }
 
 .subject-card-roll {
   font-size: 0.76rem;
   font-weight: 600;
-  color: #94a3b8;
+  color: var(--ink-dim);
   white-space: nowrap;
 }
 
@@ -2235,13 +2241,13 @@
 
 .row-type-name {
   font-weight: 650;
-  color: #1e293b;
+  color: var(--ink);
 }
 
 .info-only-badge {
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  color: #475467;
+  background: var(--tint);
+  border: 1px solid var(--border);
+  color: var(--ink-dim);
   font-size: 0.65rem;
   padding: 0.08rem 0.35rem;
   border-radius: 4px;
@@ -2251,7 +2257,7 @@
 .cap-exceeded-pill {
   background: rgba(239, 68, 68, 0.12);
   border: 1px solid rgba(239, 68, 68, 0.35);
-  color: #dc2626;
+  color: var(--danger);
   font-size: 0.64rem;
   padding: 0.08rem 0.4rem;
   border-radius: 4px;
@@ -2262,7 +2268,7 @@
 .cap-reached-pill {
   background: rgba(245, 158, 11, 0.12);
   border: 1px solid rgba(245, 158, 11, 0.35);
-  color: #d97706;
+  color: var(--amber);
   font-size: 0.64rem;
   padding: 0.08rem 0.4rem;
   border-radius: 4px;
@@ -2277,7 +2283,7 @@
 }
 
 .row-stat-fraction {
-  color: #94a3b8;
+  color: var(--ink-dim);
   font-size: 0.78rem;
   font-weight: 500;
 }
@@ -2288,19 +2294,19 @@
 }
 
 .row-stat-pct.text-green {
-  color: #10b981;
+  color: var(--success);
 }
 
 .row-stat-pct.text-orange {
-  color: #f59e0b;
+  color: var(--amber);
 }
 
 .row-stat-pct.text-red {
-  color: #ef4444;
+  color: var(--danger);
 }
 
 .no-classes-lbl {
-  color: #cbd5e1;
+  color: var(--ink-faint);
   font-size: 0.78rem;
   font-weight: 400;
 }
@@ -2308,7 +2314,7 @@
 .row-progress-bar-track {
   height: 5px;
   width: 100%;
-  background: #f1f5f9;
+  background: var(--track, rgba(36, 26, 20, 0.08));
   border-radius: 3px;
   overflow: hidden;
   position: relative;
@@ -2323,7 +2329,7 @@
 .row-progress-bar-empty {
   height: 100%;
   width: 100%;
-  background: #f8fafc;
+  background: var(--tint);
   border-radius: 3px;
 }
 
@@ -2331,7 +2337,7 @@
 .card-extra-cdc-row {
   margin-top: 0.6rem;
   padding-top: 0.85rem;
-  border-top: 1px dashed #e2e8f0;
+  border-top: 1px dashed var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2346,51 +2352,51 @@
 
 .cdc-icon {
   font-size: 0.85rem;
-  color: #6366f1;
+  color: var(--accent);
 }
 
 .cdc-title {
   font-size: 0.85rem;
   font-weight: 650;
-  color: #334155;
+  color: var(--ink);
 }
 
 .cdc-hint {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--ink-dim);
 }
 
 .cdc-stepper {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  background: #f8fafc;
-  border: 1px solid #cbd5e1;
+  background: var(--tint);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 2px 4px;
 }
 
 .btn-cdc-step {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 5px;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   font-size: 0.9rem;
-  color: #0f172a;
+  color: var(--ink);
   cursor: pointer;
   line-height: 1;
   transition: all 0.15s ease;
 }
 
 .btn-cdc-step:hover:not(:disabled) {
-  background: #6366f1;
-  color: #ffffff;
-  border-color: #6366f1;
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
 }
 
 .btn-cdc-step:disabled {
@@ -2401,13 +2407,13 @@
 .cdc-val {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #64748b;
+  color: var(--ink-dim);
   min-width: 22px;
   text-align: center;
 }
 
 .cdc-val.has-extra {
-  color: #6366f1;
+  color: var(--accent);
 }
 
 

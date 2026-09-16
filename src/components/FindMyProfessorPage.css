@@ -1148,6 +1148,11 @@
     padding: 12px 0;
   }
 
+  .sidebar-search-input {
+    font-size: 16px !important; /* Prevents auto-zoom in iOS Safari */
+    min-height: 42px;
+  }
+
   .prof-page-nav-header {
     flex-wrap: wrap;
     gap: 10px;

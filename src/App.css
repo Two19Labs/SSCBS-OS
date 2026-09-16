@@ -524,11 +524,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  min-height: 42px;
   margin-left: -6px;
   border: none;
-  border-radius: 9px;
+  border-radius: 10px;
   background: transparent;
   color: var(--ink);
   cursor: pointer;
