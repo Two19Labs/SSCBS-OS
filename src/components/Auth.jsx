@@ -492,7 +492,7 @@ export default function Auth({ forceMode }) {
               </span>
               <span className="auth-credit-sep"> · </span>
               <span className="house-credit">
-                From the House of{' '}
+                From the House of&nbsp;
                 <a href="https://two19labs.in/" target="_blank" rel="noopener noreferrer" className="developer-name linkedin-link">Two19 Labs</a>
               </span>
             </div>

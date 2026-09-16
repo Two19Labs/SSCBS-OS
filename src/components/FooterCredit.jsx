@@ -27,7 +27,7 @@ export default function FooterCredit({ className = '' }) {
         </span>
         <span className="credit-separator"> · </span>
         <span className="house-credit">
-          From the House of{' '}
+          From the House of&nbsp;
           <a
             href="https://two19labs.in/"
             target="_blank"
