@@ -145,6 +145,18 @@
   line-height: 1.45;
 }
 
+.cc-subtitle-desktop {
+  display: block;
+}
+
+.cc-subtitle-mobile {
+  display: none;
+}
+
+.cc-unstop-pill-badge {
+  display: none;
+}
+
 /* ── Slim Notice: Unstop Exclusivity ── */
 .cc-unstop-notice-banner {
   display: flex;
@@ -2052,9 +2064,79 @@
     gap: 14px;
   }
 
+  /* ── Compact Unified Mobile Header ── */
+  .cc-unstop-notice-banner {
+    display: none !important;
+  }
+
+  .cc-subtitle-desktop {
+    display: none !important;
+  }
+
+  .cc-subtitle-mobile {
+    display: block !important;
+    font-size: 0.75rem;
+    line-height: 1.35;
+    color: var(--ink-dim);
+    margin: 0;
+  }
+
+  .cc-subtitle-mobile strong {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .cc-unstop-pill-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(28, 73, 128, 0.08);
+    border: 1px solid rgba(28, 73, 128, 0.22);
+    color: #1c4980;
+    padding: 2.5px 7.5px;
+    border-radius: 6px;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.45px;
+    line-height: 1.25;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+
+  [data-theme='dark'] .cc-unstop-pill-badge {
+    background: rgba(59, 130, 246, 0.14);
+    border-color: rgba(59, 130, 246, 0.32);
+    color: #93c5fd;
+  }
+
+  .cc-unstop-pulse-dot {
+    width: 5.5px;
+    height: 5.5px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    animation: ccPulse 2s infinite;
+  }
+
+  @keyframes ccPulse {
+    0% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+      transform: scale(1);
+      box-shadow: 0 0 0 5px rgba(16, 185, 129, 0);
+    }
+    100% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+  }
+
   .cc-header {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     gap: 12px;
     padding-bottom: 12px;
   }
@@ -2062,25 +2144,40 @@
   .cc-header-left {
     align-items: center;
     gap: 10px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .cc-back-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    margin-top: 0;
+    flex-shrink: 0;
+  }
+
+  .cc-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .cc-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 0;
   }
 
   .cc-title {
     font-size: 1.25rem;
-  }
-
-  .cc-subtitle {
-    font-size: 0.8rem;
-  }
-
-  .cc-unstop-notice-banner {
-    padding: 6px 10px;
-    font-size: 0.74rem;
-    gap: 8px;
-    align-items: flex-start;
-  }
-
-  .cc-unstop-notice-tag {
-    margin-top: 1px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.3px;
+    margin: 0;
   }
 
   .cc-search-input {
@@ -2166,6 +2263,19 @@
   .case-comps-container {
     gap: 12px;
     padding: 0 0 24px;
+  }
+
+  .cc-title {
+    font-size: 1.15rem;
+  }
+
+  .cc-unstop-pill-badge {
+    padding: 2px 6px;
+    font-size: 0.58rem;
+  }
+
+  .cc-subtitle-mobile {
+    font-size: 0.72rem;
   }
 
   .cc-card-inner {

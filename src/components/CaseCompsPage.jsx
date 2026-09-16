@@ -853,12 +853,22 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
               <BackIcon size={18} />
             </button>
           )}
-          <div>
+          <div className="cc-header-info">
             <div className="cc-title-row">
               <h1 className="cc-title">Competitions</h1>
+              {/* Compact Unstop status badge (elevated into title row on mobile) */}
+              <div className="cc-unstop-pill-badge" title="Live synced from Unstop. Undergrad eligibility only.">
+                <span className="cc-unstop-pulse-dot" />
+                <span className="cc-unstop-pill-text">UNSTOP ONLY</span>
+              </div>
             </div>
-            <p className="cc-subtitle">
+            {/* Desktop Subtitle */}
+            <p className="cc-subtitle cc-subtitle-desktop">
               It's competitions season! Find opportunities relevant to CBS folks right here, synced with and pulled from Unstop, all filterable! :)
+            </p>
+            {/* Mobile Combined Subtitle & Notice */}
+            <p className="cc-subtitle cc-subtitle-mobile">
+              Curated for <strong>Undergraduate eligibility</strong> &bull; Synced live from <strong>Unstop</strong>
             </p>
           </div>
         </div>
@@ -869,7 +879,7 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
         )}
       </header>
 
-      {/* ── Very Visible Notice: Unstop Exclusivity & Undergrad Filter ── */}
+      {/* ── Very Visible Notice: Unstop Exclusivity & Undergrad Filter (Desktop only; merged into header on mobile) ── */}
       <div className="cc-unstop-notice-banner">
         <span className="cc-unstop-notice-tag">UNSTOP ONLY</span>
         <span className="cc-unstop-notice-text">
