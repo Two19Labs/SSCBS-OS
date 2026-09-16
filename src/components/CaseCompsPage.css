@@ -946,36 +946,44 @@
   }
 }
 
-/* ── Active Filter Pills Bar (matching colored tags in reference) ── */
-.cc-active-pills-bar {
+/* ── Results Status Bar: Count + Inline Active Filter Pills (Single Row) ── */
+.cc-results-status-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
-  padding: 8px 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  margin: 0 0 4px;
+  padding: 2px 0;
+  min-height: 28px;
+}
+
+.cc-inline-active-filters {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
   animation: fadeIn 0.15s ease-out;
 }
 
 .cc-active-pills-list {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
 .cc-active-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 3px 10px;
+  gap: 5px;
+  padding: 2.5px 9px;
   border-radius: 9999px;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 600;
+  line-height: 1.25;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .cc-active-pill button {
@@ -983,12 +991,15 @@
   border: none;
   padding: 0;
   margin: 0;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   line-height: 1;
   color: inherit;
   cursor: pointer;
   opacity: 0.65;
   transition: opacity 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .cc-active-pill button:hover {
@@ -2183,6 +2194,43 @@
   .cc-search-input {
     font-size: 16px; /* Prevents auto-zoom in iOS Safari */
     padding: 9px 36px 9px 36px;
+  }
+
+  /* Inline active filters on mobile: single smooth scroll row */
+  .cc-results-status-bar {
+    gap: 8px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+    margin-bottom: 2px;
+  }
+
+  .cc-results-status-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cc-inline-active-filters {
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+  }
+
+  .cc-active-pills-list {
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+  }
+
+  .cc-active-pill {
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+  }
+
+  .cc-clear-all-pill-btn {
+    flex-shrink: 0;
+    font-size: 0.68rem;
+    padding: 2px 6px;
   }
 
   /* Smooth horizontal scroll with hidden scrollbar for tabs */

@@ -1241,62 +1241,63 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
             </div>
           </div>
 
-          {/* Active Filter Pills Bar (Colored pills matching reference screenshot) */}
-          {hasActiveFilters && (
-            <div className="cc-active-pills-bar">
-              <div className="cc-active-pills-list">
-                {searchQuery.trim() && (
-                  <span className="cc-active-pill pill-search">
-                    Search: "{searchQuery.trim()}"
-                    <button type="button" onClick={() => setSearchQuery('')} aria-label="Clear search query">✕</button>
-                  </span>
-                )}
-                {selectedCircuits.length > 0 && selectedCircuits.length < CIRCUIT_OPTIONS.length && selectedCircuits.map((circuitKey) => (
-                  <span key={circuitKey} className="cc-active-pill pill-circuit">
-                    {getCircuitLabel(circuitKey)}
-                    <button type="button" onClick={() => toggleCircuit(circuitKey)} aria-label={`Remove ${getCircuitLabel(circuitKey)} filter`}>✕</button>
-                  </span>
-                ))}
-                {selectedTracks.length > 0 && selectedTracks.length < TRACK_OPTIONS.length && selectedTracks.map((trackKey) => (
-                  <span key={trackKey} className="cc-active-pill pill-track">
-                    {getTrackLabel(trackKey)}
-                    <button type="button" onClick={() => toggleTrack(trackKey)} aria-label={`Remove ${getTrackLabel(trackKey)} filter`}>✕</button>
-                  </span>
-                ))}
-                {teamFilter !== 'all' && (
-                  <span className="cc-active-pill pill-format">
-                    {teamFilter === 'solo' ? '👤 Solo' : '👥 Teams (2+)'}
-                    <button type="button" onClick={() => setTeamFilter('all')} aria-label="Remove format filter">✕</button>
-                  </span>
-                )}
-                {feeFilter !== 'all' && (
-                  <span className="cc-active-pill pill-fee">
-                    {feeFilter === 'free' ? '🟢 Free Entry' : '💳 Paid'}
-                    <button type="button" onClick={() => setFeeFilter('all')} aria-label="Remove fee filter">✕</button>
-                  </span>
-                )}
+          {/* Results Status Bar: Inline Count & Active Filters (Single compact row) */}
+          {!loading && !fetchError && (
+            <div className="cc-results-status-bar">
+              <div className="cc-inline-count">
+                <span className="cc-pulse-dot" title="Live Unstop sync active"></span>
+                <span>
+                  Showing <strong>{filteredCompetitions.length}</strong>{' '}
+                  {filteredCompetitions.length === 1 ? 'opportunity' : 'opportunities'}
+                </span>
               </div>
 
-              <button
-                type="button"
-                className="cc-clear-all-pill-btn"
-                onClick={handleResetFilters}
-                title="Clear all active filters"
-              >
-                <RotateCcwIcon size={11} />
-                <span>Reset</span>
-              </button>
-            </div>
-          )}
+              {hasActiveFilters && (
+                <div className="cc-inline-active-filters">
+                  <div className="cc-active-pills-list">
+                    {searchQuery.trim() && (
+                      <span className="cc-active-pill pill-search">
+                        Search: "{searchQuery.trim()}"
+                        <button type="button" onClick={() => setSearchQuery('')} aria-label="Clear search query">✕</button>
+                      </span>
+                    )}
+                    {selectedCircuits.length > 0 && selectedCircuits.length < CIRCUIT_OPTIONS.length && selectedCircuits.map((circuitKey) => (
+                      <span key={circuitKey} className="cc-active-pill pill-circuit">
+                        {getCircuitLabel(circuitKey)}
+                        <button type="button" onClick={() => toggleCircuit(circuitKey)} aria-label={`Remove ${getCircuitLabel(circuitKey)} filter`}>✕</button>
+                      </span>
+                    ))}
+                    {selectedTracks.length > 0 && selectedTracks.length < TRACK_OPTIONS.length && selectedTracks.map((trackKey) => (
+                      <span key={trackKey} className="cc-active-pill pill-track">
+                        {getTrackLabel(trackKey)}
+                        <button type="button" onClick={() => toggleTrack(trackKey)} aria-label={`Remove ${getTrackLabel(trackKey)} filter`}>✕</button>
+                      </span>
+                    ))}
+                    {teamFilter !== 'all' && (
+                      <span className="cc-active-pill pill-format">
+                        {teamFilter === 'solo' ? '👤 Solo' : '👥 Teams (2+)'}
+                        <button type="button" onClick={() => setTeamFilter('all')} aria-label="Remove format filter">✕</button>
+                      </span>
+                    )}
+                    {feeFilter !== 'all' && (
+                      <span className="cc-active-pill pill-fee">
+                        {feeFilter === 'free' ? '🟢 Free Entry' : '💳 Paid'}
+                        <button type="button" onClick={() => setFeeFilter('all')} aria-label="Remove fee filter">✕</button>
+                      </span>
+                    )}
+                  </div>
 
-          {/* Inline Opportunities Count */}
-          {!loading && !fetchError && (
-            <div className="cc-inline-count">
-              <span className="cc-pulse-dot" title="Live Unstop sync active"></span>
-              <span>
-                Showing <strong>{filteredCompetitions.length}</strong>{' '}
-                {filteredCompetitions.length === 1 ? 'opportunity' : 'opportunities'}
-              </span>
+                  <button
+                    type="button"
+                    className="cc-clear-all-pill-btn"
+                    onClick={handleResetFilters}
+                    title="Clear all active filters"
+                  >
+                    <RotateCcwIcon size={11} />
+                    <span>Reset</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
