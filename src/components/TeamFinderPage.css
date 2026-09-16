@@ -1355,6 +1355,10 @@
     width: 100%;
   }
 
+  .tf-search-box input {
+    font-size: 16px; /* Prevents auto-zoom in iOS Safari */
+  }
+
   .tf-posts-grid {
     grid-template-columns: 1fr;
     gap: 12px;
