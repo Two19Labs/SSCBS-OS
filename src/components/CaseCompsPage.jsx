@@ -918,66 +918,16 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
             </div>
           </div>
 
-          {/* Card 1: Target Circuits (Top Accordion Card) */}
-          <div className="cc-filter-card">
-            <button
-              type="button"
-              className={`cc-accordion-header ${openSections.circuits ? 'open' : ''}`}
-              onClick={() => toggleSection('circuits')}
-              aria-expanded={openSections.circuits}
-            >
-              <div className="cc-accordion-header-left">
-                <ChevronDownIcon size={14} className="cc-accordion-chevron" />
-                <span className="cc-accordion-title">Circuits</span>
-              </div>
-              {selectedCircuits.length > 0 && selectedCircuits.length < CIRCUIT_OPTIONS.length && (
-                <span className="cc-active-count-badge">{selectedCircuits.length}</span>
-              )}
-            </button>
-
-            {openSections.circuits && (
-              <div className="cc-accordion-content">
-                <label className="cc-filter-checkbox-row cc-select-all-row">
-                  <input
-                    type="checkbox"
-                    className="cc-filter-checkbox-input"
-                    checked={isAllCircuitsSelected}
-                    onChange={handleToggleAllCircuits}
-                  />
-                  <span className="cc-custom-checkbox">
-                    {isAllCircuitsSelected && <CheckIcon size={11} />}
-                  </span>
-                  <span className="cc-checkbox-label-text">Select All</span>
-                </label>
-
-                <div className="cc-checkbox-list">
-                  {CIRCUIT_OPTIONS.map((opt) => {
-                    const isChecked = selectedCircuits.includes(opt.id);
-                    return (
-                      <label key={opt.id} className="cc-filter-checkbox-row">
-                        <input
-                          type="checkbox"
-                          className="cc-filter-checkbox-input"
-                          checked={isChecked}
-                          onChange={() => toggleCircuit(opt.id)}
-                        />
-                        <span className="cc-custom-checkbox">
-                          {isChecked && <CheckIcon size={11} />}
-                        </span>
-                        <span className="cc-checkbox-label-text">{opt.label}</span>
-                        <span className="cc-filter-num">({metrics[opt.countKey] || 0})</span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Card 2: More Filters (Categories, Format, Fee, Bookmarks) */}
-          <div className="cc-filter-card">
+          {/* Unified Filter Card — All filters visible without scrolling */}
+          <div className="cc-filter-card cc-unified-filter-card">
+            {/* Header: Title & Reset All */}
             <div className="cc-filter-card-header">
-              <span className="cc-card-heading">Filters</span>
+              <div className="cc-card-heading-group">
+                <span className="cc-card-heading">Filters</span>
+                {activeFilterCount > 0 && (
+                  <span className="cc-active-count-badge">{activeFilterCount}</span>
+                )}
+              </div>
               {hasActiveFilters && (
                 <button
                   type="button"
@@ -990,38 +940,88 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
               )}
             </div>
 
-            {/* Section: Categories & Tracks */}
+            {/* Section 1: Target Circuits */}
             <div className="cc-filter-subgroup">
-              <button
-                type="button"
-                className={`cc-accordion-header ${openSections.tracks ? 'open' : ''}`}
-                onClick={() => toggleSection('tracks')}
-                aria-expanded={openSections.tracks}
-              >
-                <div className="cc-accordion-header-left">
-                  <ChevronDownIcon size={14} className="cc-accordion-chevron" />
-                  <span className="cc-accordion-title">Categories</span>
+              <div className="cc-subgroup-header-row">
+                <button
+                  type="button"
+                  className={`cc-accordion-header ${openSections.circuits ? 'open' : ''}`}
+                  onClick={() => toggleSection('circuits')}
+                  aria-expanded={openSections.circuits}
+                >
+                  <div className="cc-accordion-header-left">
+                    <ChevronDownIcon size={13} className="cc-accordion-chevron" />
+                    <span className="cc-accordion-title">Circuits</span>
+                  </div>
+                  {selectedCircuits.length > 0 && selectedCircuits.length < CIRCUIT_OPTIONS.length && (
+                    <span className="cc-active-count-badge">{selectedCircuits.length}</span>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className="cc-mini-select-all"
+                  onClick={handleToggleAllCircuits}
+                  title={isAllCircuitsSelected ? "Deselect all circuits" : "Select all circuits"}
+                >
+                  {isAllCircuitsSelected ? "Clear" : "All"}
+                </button>
+              </div>
+
+              {openSections.circuits && (
+                <div className="cc-accordion-content">
+                  <div className="cc-checkbox-list">
+                    {CIRCUIT_OPTIONS.map((opt) => {
+                      const isChecked = selectedCircuits.includes(opt.id);
+                      return (
+                        <label key={opt.id} className="cc-filter-checkbox-row">
+                          <input
+                            type="checkbox"
+                            className="cc-filter-checkbox-input"
+                            checked={isChecked}
+                            onChange={() => toggleCircuit(opt.id)}
+                          />
+                          <span className="cc-custom-checkbox">
+                            {isChecked && <CheckIcon size={10} />}
+                          </span>
+                          <span className="cc-checkbox-label-text">{opt.label}</span>
+                          <span className="cc-filter-num">({metrics[opt.countKey] || 0})</span>
+                        </label>
+                      );
+                    })}
+                  </div>
                 </div>
-                {selectedTracks.length > 0 && selectedTracks.length < TRACK_OPTIONS.length && (
-                  <span className="cc-active-count-badge">{selectedTracks.length}</span>
-                )}
-              </button>
+              )}
+            </div>
+
+            {/* Section 2: Categories */}
+            <div className="cc-filter-subgroup">
+              <div className="cc-subgroup-header-row">
+                <button
+                  type="button"
+                  className={`cc-accordion-header ${openSections.tracks ? 'open' : ''}`}
+                  onClick={() => toggleSection('tracks')}
+                  aria-expanded={openSections.tracks}
+                >
+                  <div className="cc-accordion-header-left">
+                    <ChevronDownIcon size={13} className="cc-accordion-chevron" />
+                    <span className="cc-accordion-title">Categories</span>
+                  </div>
+                  {selectedTracks.length > 0 && selectedTracks.length < TRACK_OPTIONS.length && (
+                    <span className="cc-active-count-badge">{selectedTracks.length}</span>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className="cc-mini-select-all"
+                  onClick={handleToggleAllTracks}
+                  title={isAllTracksSelected ? "Deselect all categories" : "Select all categories"}
+                >
+                  {isAllTracksSelected ? "Clear" : "All"}
+                </button>
+              </div>
 
               {openSections.tracks && (
                 <div className="cc-accordion-content">
-                  <label className="cc-filter-checkbox-row cc-select-all-row">
-                    <input
-                      type="checkbox"
-                      className="cc-filter-checkbox-input"
-                      checked={isAllTracksSelected}
-                      onChange={handleToggleAllTracks}
-                    />
-                    <span className="cc-custom-checkbox">
-                      {isAllTracksSelected && <CheckIcon size={11} />}
-                    </span>
-                    <span className="cc-checkbox-label-text">Select All</span>
-                  </label>
-
                   <div className="cc-checkbox-list">
                     {TRACK_OPTIONS.map((opt) => {
                       const isChecked = selectedTracks.includes(opt.id);
@@ -1034,7 +1034,7 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
                             onChange={() => toggleTrack(opt.id)}
                           />
                           <span className="cc-custom-checkbox">
-                            {isChecked && <CheckIcon size={11} />}
+                            {isChecked && <CheckIcon size={10} />}
                           </span>
                           <span className="cc-checkbox-label-text">
                             {opt.label}
@@ -1048,100 +1048,60 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
               )}
             </div>
 
-            {/* Section: Format */}
-            <div className="cc-filter-subgroup">
-              <button
-                type="button"
-                className={`cc-accordion-header ${openSections.format ? 'open' : ''}`}
-                onClick={() => toggleSection('format')}
-                aria-expanded={openSections.format}
-              >
-                <div className="cc-accordion-header-left">
-                  <ChevronDownIcon size={14} className="cc-accordion-chevron" />
-                  <span className="cc-accordion-title">Participation</span>
-                </div>
-                {teamFilter !== 'all' && <span className="cc-active-count-badge">1</span>}
-              </button>
-
-              {openSections.format && (
-                <div className="cc-accordion-content">
-                  <div className="cc-checkbox-list">
-                    <label className="cc-filter-checkbox-row">
-                      <input
-                        type="checkbox"
-                        className="cc-filter-checkbox-input"
-                        checked={teamFilter === 'solo'}
-                        onChange={() => setTeamFilter((prev) => (prev === 'solo' ? 'all' : 'solo'))}
-                      />
-                      <span className="cc-custom-checkbox">
-                        {teamFilter === 'solo' && <CheckIcon size={11} />}
-                      </span>
-                      <span className="cc-checkbox-label-text">Solo Participation</span>
-                    </label>
-
-                    <label className="cc-filter-checkbox-row">
-                      <input
-                        type="checkbox"
-                        className="cc-filter-checkbox-input"
-                        checked={teamFilter === 'team'}
-                        onChange={() => setTeamFilter((prev) => (prev === 'team' ? 'all' : 'team'))}
-                      />
-                      <span className="cc-custom-checkbox">
-                        {teamFilter === 'team' && <CheckIcon size={11} />}
-                      </span>
-                      <span className="cc-checkbox-label-text">Teams (2+)</span>
-                    </label>
-                  </div>
-                </div>
-              )}
+            {/* Section 3: Format (Compact Segmented Toggle) */}
+            <div className="cc-filter-subgroup cc-segmented-subgroup">
+              <span className="cc-subgroup-label">Participation</span>
+              <div className="cc-segmented-bar">
+                <button
+                  type="button"
+                  className={`cc-seg-btn ${teamFilter === 'all' ? 'active' : ''}`}
+                  onClick={() => setTeamFilter('all')}
+                >
+                  All
+                </button>
+                <button
+                  type="button"
+                  className={`cc-seg-btn ${teamFilter === 'solo' ? 'active' : ''}`}
+                  onClick={() => setTeamFilter((prev) => (prev === 'solo' ? 'all' : 'solo'))}
+                >
+                  Solo
+                </button>
+                <button
+                  type="button"
+                  className={`cc-seg-btn ${teamFilter === 'team' ? 'active' : ''}`}
+                  onClick={() => setTeamFilter((prev) => (prev === 'team' ? 'all' : 'team'))}
+                >
+                  Teams (2+)
+                </button>
+              </div>
             </div>
 
-            {/* Section: Registration Fee */}
-            <div className="cc-filter-subgroup">
-              <button
-                type="button"
-                className={`cc-accordion-header ${openSections.fee ? 'open' : ''}`}
-                onClick={() => toggleSection('fee')}
-                aria-expanded={openSections.fee}
-              >
-                <div className="cc-accordion-header-left">
-                  <ChevronDownIcon size={14} className="cc-accordion-chevron" />
-                  <span className="cc-accordion-title">Entry Fee</span>
-                </div>
-                {feeFilter !== 'all' && <span className="cc-active-count-badge">1</span>}
-              </button>
-
-              {openSections.fee && (
-                <div className="cc-accordion-content">
-                  <div className="cc-checkbox-list">
-                    <label className="cc-filter-checkbox-row">
-                      <input
-                        type="checkbox"
-                        className="cc-filter-checkbox-input"
-                        checked={feeFilter === 'free'}
-                        onChange={() => setFeeFilter((prev) => (prev === 'free' ? 'all' : 'free'))}
-                      />
-                      <span className="cc-custom-checkbox">
-                        {feeFilter === 'free' && <CheckIcon size={11} />}
-                      </span>
-                      <span className="cc-checkbox-label-text">Free Entry</span>
-                    </label>
-
-                    <label className="cc-filter-checkbox-row">
-                      <input
-                        type="checkbox"
-                        className="cc-filter-checkbox-input"
-                        checked={feeFilter === 'paid'}
-                        onChange={() => setFeeFilter((prev) => (prev === 'paid' ? 'all' : 'paid'))}
-                      />
-                      <span className="cc-custom-checkbox">
-                        {feeFilter === 'paid' && <CheckIcon size={11} />}
-                      </span>
-                      <span className="cc-checkbox-label-text">Paid Entry</span>
-                    </label>
-                  </div>
-                </div>
-              )}
+            {/* Section 4: Registration Fee (Compact Segmented Toggle) */}
+            <div className="cc-filter-subgroup cc-segmented-subgroup">
+              <span className="cc-subgroup-label">Entry Fee</span>
+              <div className="cc-segmented-bar">
+                <button
+                  type="button"
+                  className={`cc-seg-btn ${feeFilter === 'all' ? 'active' : ''}`}
+                  onClick={() => setFeeFilter('all')}
+                >
+                  All
+                </button>
+                <button
+                  type="button"
+                  className={`cc-seg-btn ${feeFilter === 'free' ? 'active' : ''}`}
+                  onClick={() => setFeeFilter((prev) => (prev === 'free' ? 'all' : 'free'))}
+                >
+                  Free
+                </button>
+                <button
+                  type="button"
+                  className={`cc-seg-btn ${feeFilter === 'paid' ? 'active' : ''}`}
+                  onClick={() => setFeeFilter((prev) => (prev === 'paid' ? 'all' : 'paid'))}
+                >
+                  Paid
+                </button>
+              </div>
             </div>
           </div>
         </aside>

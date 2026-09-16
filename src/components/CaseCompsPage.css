@@ -24,7 +24,7 @@
 .case-comps-container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
   max-width: 1480px;
   margin: 0 auto;
   padding: 0 0 32px;
@@ -50,7 +50,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  padding-bottom: 16px;
+  padding-bottom: 10px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -166,10 +166,11 @@
   border: 1px solid rgba(28, 73, 128, 0.18);
   border-left: 3px solid #1c4980;
   border-radius: 6px;
-  padding: 5px 11px;
-  font-size: 0.77rem;
+  padding: 4px 11px;
+  font-size: 0.75rem;
   line-height: 1.35;
   color: var(--ink-dim);
+  margin-top: -4px;
 }
 
 .cc-unstop-notice-tag {
@@ -454,12 +455,23 @@
   border-color: rgba(255, 255, 255, 0.08);
 }
 
+.cc-unified-filter-card {
+  padding: 10px 12px;
+  gap: 7px;
+}
+
 .cc-filter-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding-bottom: 6px;
   border-bottom: 1px solid var(--border);
+}
+
+.cc-card-heading-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .cc-card-heading {
@@ -508,6 +520,37 @@
   user-select: none;
 }
 
+.cc-subgroup-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.cc-mini-select-all {
+  background: none;
+  border: none;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--ink-dim);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.cc-mini-select-all:hover {
+  color: var(--accent, #71222c);
+  background: rgba(113, 34, 44, 0.08);
+}
+
+[data-theme='dark'] .cc-mini-select-all:hover {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.12);
+}
+
 .cc-accordion-header-left {
   display: flex;
   align-items: center;
@@ -526,7 +569,7 @@
 }
 
 .cc-accordion-title {
-  font-size: 0.86rem;
+  font-size: 0.84rem;
   font-weight: 700;
   color: var(--ink);
   letter-spacing: -0.1px;
@@ -535,9 +578,9 @@
 .cc-active-count-badge {
   background: rgba(113, 34, 44, 0.1);
   color: var(--accent, #71222c);
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 800;
-  padding: 1px 7px;
+  padding: 1px 6px;
   border-radius: 9999px;
   letter-spacing: 0.2px;
 }
@@ -549,17 +592,17 @@
 
 /* ── Accordion Content & Checkbox Rows ── */
 .cc-accordion-content {
-  padding-top: 8px;
+  padding-top: 4px;
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 4px;
   animation: fadeIn 0.18s ease-out;
 }
 
 .cc-filter-subgroup {
   display: flex;
   flex-direction: column;
-  padding-top: 8px;
+  padding-top: 6px;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
@@ -569,24 +612,24 @@
 
 .cc-filter-subgroup:first-of-type {
   border-top: none;
-  padding-top: 4px;
+  padding-top: 2px;
 }
 
 .cc-checkbox-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .cc-filter-checkbox-row {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   cursor: pointer;
-  font-size: 0.81rem;
+  font-size: 0.775rem;
   color: var(--ink-dim);
   user-select: none;
-  padding: 3px 0;
+  padding: 2px 0;
   transition: color 0.15s ease;
   position: relative;
 }
@@ -596,7 +639,7 @@
 }
 
 .cc-select-all-row {
-  padding-bottom: 7px;
+  padding-bottom: 5px;
   margin-bottom: 2px;
   border-bottom: 1px solid var(--border);
   font-weight: 600;
@@ -613,9 +656,9 @@
 
 /* Custom Square Checkbox (matching reference image) */
 .cc-custom-checkbox {
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 3.5px;
   border: 1.5px solid #cbd5e1;
   background: var(--surface);
   display: flex;
@@ -648,15 +691,76 @@
 
 .cc-checkbox-label-text {
   flex: 1;
-  line-height: 1.3;
+  line-height: 1.25;
   font-weight: 500;
 }
 
 .cc-filter-num {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: var(--ink-dim);
   font-weight: 600;
   opacity: 0.85;
+}
+
+/* ── Segmented Control Filter Rows (Participation & Entry Fee) ── */
+.cc-segmented-subgroup {
+  padding-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cc-subgroup-label {
+  font-size: 0.71rem;
+  font-weight: 700;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 1px 0;
+}
+
+.cc-segmented-bar {
+  display: flex;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 2px;
+  gap: 2px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.cc-seg-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--ink-dim);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.cc-seg-btn:hover {
+  color: var(--ink);
+}
+
+.cc-seg-btn.active {
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] .cc-seg-btn.active {
+  background: #27272a;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
 /* ── Main Content Area (Right Column) ── */
