@@ -194,7 +194,7 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
         )}
       </div>
 
-      {/* Directory Welcome Banner (Desktop only, hidden on mobile for screen economy) */}
+      {/* Directory Welcome Banner (Desktop only) */}
       <div className="st-directory-hero">
         <div className="st-hero-icon">🏛️</div>
         <div className="st-hero-content">
@@ -239,7 +239,7 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
             <input
               type="text"
               className="st-search-input"
-              placeholder="Search by name, acronym (e.g. ACM, FinX), domain, TIC, or PoR..."
+              placeholder="Search by name, acronym, domain, TIC, or PoR..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -255,35 +255,60 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
               </button>
             )}
           </div>
-          <select
-            className="st-sort-select"
-            value={sortBy}
-            aria-label="Sort societies"
-            onChange={(e) => {
-              const val = e.target.value;
-              if (val === 'shuffled' && sortBy === 'shuffled') {
-                setShuffledIds(shuffleArray(DEMO_SOCIETIES.map((s) => s.id)));
-              }
-              setSortBy(val);
-            }}
-          >
-            <option value="shuffled">Sort: Shuffled (Default)</option>
-            <option value="name">Sort: Name (A-Z)</option>
-            <option value="name-desc">Sort: Name (Z-A)</option>
-          </select>
+
+          <div className="st-filter-subbar">
+            <div className="st-results-counter">
+              <span className="st-results-dot" />
+              <span className="st-results-text">
+                Showing <strong>{sortedSocieties.length}</strong> of {totalCount} societies
+              </span>
+            </div>
+
+            <div className="st-sort-wrapper">
+              <label htmlFor="st-sort-select" className="st-sort-label">Sort:</label>
+              <select
+                id="st-sort-select"
+                className="st-sort-select"
+                value={sortBy}
+                aria-label="Sort societies"
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === 'shuffled' && sortBy === 'shuffled') {
+                    setShuffledIds(shuffleArray(DEMO_SOCIETIES.map((s) => s.id)));
+                  }
+                  setSortBy(val);
+                }}
+              >
+                <option value="shuffled">Shuffled (Default)</option>
+                <option value="name">Name (A-Z)</option>
+                <option value="name-desc">Name (Z-A)</option>
+              </select>
+            </div>
+          </div>
         </div>
 
-        {/* Category Filter Pills */}
+        {/* Category Filter Pills with Accurate Counts */}
         <div className="st-category-pills">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              className={`st-category-pill ${selectedCategory === cat.id ? 'active' : ''}`}
-              onClick={() => setSelectedCategory(cat.id)}
-            >
-              <span className="st-cat-icon">{cat.icon}</span> {cat.label}
-            </button>
-          ))}
+          {CATEGORIES.map((cat) => {
+            const isAll = cat.id === 'all';
+            const count = isAll
+              ? totalCount
+              : DEMO_SOCIETIES.filter(
+                  (s) => s.category === cat.id || (Array.isArray(s.categories) && s.categories.includes(cat.id))
+                ).length;
+            const label = isAll ? `All Domains (${totalCount})` : cat.label;
+            return (
+              <button
+                key={cat.id}
+                className={`st-category-pill ${selectedCategory === cat.id ? 'active' : ''}`}
+                onClick={() => setSelectedCategory(cat.id)}
+              >
+                <span className="st-cat-icon">{cat.icon}</span>
+                <span>{label}</span>
+                {!isAll && <span className="st-cat-count">({count})</span>}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -304,13 +329,13 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
                   trackSocietyEvent('card_clicked', { society_name: society.name, category: primaryLabel });
                   setSelectedSociety(society);
                 }}
-                title={`Click to view dossier for ${society.name}`}
+                title={`Click to view full dossier for ${society.name}`}
               >
                 {/* Header & Title */}
                 <div className="st-card-main">
                   <div className="st-card-top">
                     <div className="st-card-badges">
-                      <span className="st-domain-badge">
+                      <span className="st-domain-badge" title={primaryLabel}>
                         {primaryLabel.toUpperCase()}
                       </span>
                       {extraCount > 0 && (
@@ -320,7 +345,7 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
                             e.stopPropagation();
                             setSelectedSociety(society);
                           }}
-                          title="Click to view all categories &amp; details"
+                          title={`+${extraCount} more domain(s): ${categoryList.slice(1).join(', ')}`}
                         >
                           +{extraCount} MORE
                         </span>
@@ -331,8 +356,12 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
                     </span>
                   </div>
 
-                  <h3 className="st-society-title">{society.name}</h3>
-                  <p className="st-card-desc">{society.description || '\u00A0'}</p>
+                  <h3 className="st-society-title" title={society.name}>
+                    {society.name}
+                  </h3>
+                  <p className="st-card-desc" title={society.description}>
+                    {society.description || '\u00A0'}
+                  </p>
 
                   {/* Compact Single-Line TIC Strip */}
                   {(() => {
@@ -352,9 +381,9 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
                   })()}
                 </div>
 
-                {/* Card Bottom / Action Row */}
+                {/* Card Bottom / Action Row - ALL OPTIONS VISIBLE & AVAILABLE */}
                 <div className="st-card-bottom">
-                  {/* Left: Social Handles Icons */}
+                  {/* Left: Official Social Handles */}
                   <div className="st-social-row">
                     <a
                       href={society.officialPageUrl || OFFICIAL_COLLEGE_SOCIETIES_URL}
@@ -382,7 +411,7 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
                         target="_blank"
                         rel="noopener noreferrer"
                         className="st-social-btn whatsapp"
-                        title="Official WhatsApp Group"
+                        title="Official WhatsApp Community"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <WhatsAppIcon size={16} />
@@ -401,9 +430,9 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
                     )}
                   </div>
 
-                  {/* Right: Actions (PoR Contact & View Dossier) */}
+                  {/* Right: Actions (PoR Contact on WhatsApp & View Dossier) */}
                   <div className="st-card-actions-group">
-                    {primaryPoc && (() => {
+                    {primaryPoc ? (() => {
                       const cleanPhone = primaryPoc.phone.replace(/[^0-9]/g, '').slice(-10);
                       const textMsg = encodeURIComponent(
                         `Hi ${primaryPoc.name}! I'm an SSCBS student reaching out regarding ${society.shortName || society.name}.`
@@ -414,24 +443,24 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
                           target="_blank"
                           rel="noopener noreferrer"
                           className="st-card-por-btn"
-                          title={`Chat with ${primaryPoc.name} (PoR) on WhatsApp`}
+                          title={`Chat with ${primaryPoc.name} (Student PoR) on WhatsApp`}
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <WhatsAppIcon size={13} />
+                          <WhatsAppIcon size={14} />
                           <span>PoR</span>
                         </a>
                       );
-                    })()}
+                    })() : null}
                     <button
                       type="button"
                       className="st-card-view-btn"
-                      title="View full dossier and leadership directory"
+                      title="View full dossier, faculty TIC &amp; PoR directory"
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedSociety(society);
                       }}
                     >
-                      <span>Details</span>
+                      <span>Dossier</span>
                       <span className="st-btn-arrow">↗</span>
                     </button>
                   </div>
