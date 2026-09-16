@@ -1,21 +1,15 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { CATEGORIES, DEMO_SOCIETIES, OFFICIAL_COLLEGE_SOCIETIES_URL } from '../data/societies';
 import {
   SearchIcon,
   InstagramIcon,
   LinktreeIcon,
   LinkedinIcon,
-  BriefcaseIcon,
-  HeartIcon,
   BackIcon,
   WhatsAppIcon,
 } from './icons';
-import { useAuth } from '../context/AuthContext';
-import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import { trackSocietyEvent } from '../lib/analytics';
 import './SocietyTrackerPage.css';
-
-const LOCAL_STORAGE_KEY = 'sscbs_bookmarked_societies';
 
 // Fisher-Yates shuffle algorithm helper
 function shuffleArray(array) {
@@ -74,11 +68,6 @@ export function getFacultyIdForName(rawName) {
 }
 
 export default function SocietyTrackerPage({ onBack, onNavigate, headerAction }) {
-  const { user } = useAuth();
-  const userKeySuffix = user?.email ? `_${user.email.toLowerCase()}` : '';
-  const bookmarksKey = `${LOCAL_STORAGE_KEY}${userKeySuffix}`;
-
-  const [activeTab, setActiveTab] = useState('all'); // 'all' | 'preferred'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   // Randomized shuffled order generated once per load/refresh
@@ -98,194 +87,58 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Bookmarks (Heart / Star) state with user-scoped key
-  const [bookmarkedIds, setBookmarkedIds] = useState(() => {
-    try {
-      if (user?.email) {
-        const userKey = `${LOCAL_STORAGE_KEY}_${user.email.toLowerCase()}`;
-        const saved = localStorage.getItem(userKey);
-        if (saved !== null) {
-          return JSON.parse(saved);
-        }
-        return [];
-      } else {
-        const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-        if (saved !== null) {
-          return JSON.parse(saved);
-        }
-      }
-    } catch (err) {
-      console.error('Error reading saved bookmarks:', err);
-    }
-    return DEMO_SOCIETIES.filter((s) => s.defaultBookmarked).map((s) => s.id);
-  });
+  const filteredSocieties = useMemo(() => {
+    return DEMO_SOCIETIES.filter((society) => {
+      const rawQuery = searchQuery.trim();
+      if (rawQuery) {
+        const query = rawQuery.toLowerCase();
+        const cleanQ = query.replace(/[^a-z0-9]/g, '');
 
-  // Helper for background cloud sync across devices
-  const syncProgressToCloud = useCallback(async (newBookmarks) => {
-    if (!user || !hasValidCredentials) return;
-    try {
-      // 1. Save to Supabase auth user metadata (syncs across devices on login)
-      const { data, error } = await supabase.auth.updateUser({
-        data: {
-          society_bookmarks: newBookmarks,
-        },
-      });
+        const nameStr = (society.name || '').toLowerCase();
+        const shortNameStr = (society.shortName || '').toLowerCase();
+        const idStr = (society.id || '').toLowerCase();
+        const descStr = (society.description || '').toLowerCase();
+        const catLabelStr = (society.categoryLabel || '').toLowerCase();
 
-      // 2. Save to user_progress settings table for cloud backup
-      if (!error && data?.user?.id) {
-        const { data: progressData } = await supabase
-          .from('user_progress')
-          .select('settings')
-          .eq('user_id', data.user.id)
-          .maybeSingle();
+        const cleanName = nameStr.replace(/[^a-z0-9]/g, '');
+        const cleanShortName = shortNameStr.replace(/[^a-z0-9]/g, '');
+        const cleanId = idStr.replace(/[^a-z0-9]/g, '');
 
-        const existingSettings = progressData?.settings || {};
-        const newSettings = {
-          ...existingSettings,
-          society_bookmarks: newBookmarks,
-          email: data.user.email,
-        };
+        const matchName = nameStr.includes(query) || (cleanQ && cleanName.includes(cleanQ));
+        const matchShortName = shortNameStr.includes(query) || (cleanQ && cleanShortName.includes(cleanQ));
+        const matchId = idStr.includes(query) || (cleanQ && cleanId.includes(cleanQ));
+        const matchDesc = descStr.includes(query);
+        const matchCat = catLabelStr.includes(query);
+        const matchSubCats =
+          Array.isArray(society.categoryLabels) &&
+          society.categoryLabels.some((lbl) => lbl.toLowerCase().includes(query));
+        const matchPocs =
+          Array.isArray(society.pocs) &&
+          society.pocs.some(
+            (poc) =>
+              poc.name.toLowerCase().includes(query) ||
+              (cleanQ && poc.phone.replace(/[^0-9]/g, '').includes(cleanQ))
+          );
+        const matchTics =
+          Array.isArray(society.tics) &&
+          society.tics.some((tic) => {
+            const tLower = tic.toLowerCase();
+            const cleanT = tLower.replace(/[^a-z0-9]/g, '');
+            return tLower.includes(query) || (cleanQ && cleanT.includes(cleanQ));
+          });
 
-        await supabase
-          .from('user_progress')
-          .update({ settings: newSettings })
-          .eq('user_id', data.user.id);
-      }
-    } catch (err) {
-      console.warn('Cross-device cloud sync warning:', err);
-    }
-  }, [user]);
-
-  // Load cloud data from Supabase user_metadata / user_progress on mount / user load
-  useEffect(() => {
-    if (!user) return;
-    let isMounted = true;
-
-    const loadCloudData = async () => {
-      let cloudBookmarks = user.user_metadata?.society_bookmarks;
-
-      // If user_metadata does not have society_bookmarks yet, attempt lookup in user_progress settings table
-      if (!Array.isArray(cloudBookmarks) && hasValidCredentials) {
-        try {
-          const { data: progressData } = await supabase
-            .from('user_progress')
-            .select('settings')
-            .eq('user_id', user.id)
-            .maybeSingle();
-
-          if (progressData?.settings && Array.isArray(progressData.settings.society_bookmarks)) {
-            cloudBookmarks = progressData.settings.society_bookmarks;
-          }
-        } catch (err) {
-          console.warn('Notice loading user_progress backup:', err);
-        }
+        const isMatch = matchName || matchShortName || matchId || matchDesc || matchCat || matchSubCats || matchPocs || matchTics;
+        if (!isMatch) return false;
+      } else if (selectedCategory !== 'all') {
+        const hasCat =
+          society.category === selectedCategory ||
+          (Array.isArray(society.categories) && society.categories.includes(selectedCategory));
+        if (!hasCat) return false;
       }
 
-      if (!isMounted) return;
-
-      if (Array.isArray(cloudBookmarks)) {
-        setBookmarkedIds(cloudBookmarks);
-        try {
-          localStorage.setItem(bookmarksKey, JSON.stringify(cloudBookmarks));
-        } catch (e) {}
-      } else {
-        setBookmarkedIds([]);
-      }
-    };
-
-    loadCloudData();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [user, bookmarksKey]);
-
-  // Sync bookmarks with localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem(bookmarksKey, JSON.stringify(bookmarkedIds));
-    } catch (err) {
-      console.error('Error saving bookmarks:', err);
-    }
-  }, [bookmarkedIds, bookmarksKey]);
-
-  const toggleBookmark = (id) => {
-    setBookmarkedIds((prev) => {
-      const next = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
-      syncProgressToCloud(next);
-      return next;
+      return true;
     });
-  };
-
-  const moveBookmarkRank = (id, direction) => {
-    setBookmarkedIds((prev) => {
-      const idx = prev.indexOf(id);
-      if (idx === -1) return prev;
-      const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
-      if (targetIdx < 0 || targetIdx >= prev.length) return prev;
-      const next = [...prev];
-      const temp = next[idx];
-      next[idx] = next[targetIdx];
-      next[targetIdx] = temp;
-      syncProgressToCloud(next);
-      return next;
-    });
-  };
-
-  const filteredSocieties = DEMO_SOCIETIES.filter((society) => {
-    if (activeTab === 'preferred' && !bookmarkedIds.includes(society.id)) {
-      return false;
-    }
-
-    const rawQuery = searchQuery.trim();
-    if (rawQuery) {
-      const query = rawQuery.toLowerCase();
-      const cleanQ = query.replace(/[^a-z0-9]/g, '');
-
-      const nameStr = (society.name || '').toLowerCase();
-      const shortNameStr = (society.shortName || '').toLowerCase();
-      const idStr = (society.id || '').toLowerCase();
-      const descStr = (society.description || '').toLowerCase();
-      const catLabelStr = (society.categoryLabel || '').toLowerCase();
-
-      const cleanName = nameStr.replace(/[^a-z0-9]/g, '');
-      const cleanShortName = shortNameStr.replace(/[^a-z0-9]/g, '');
-      const cleanId = idStr.replace(/[^a-z0-9]/g, '');
-
-      const matchName = nameStr.includes(query) || (cleanQ && cleanName.includes(cleanQ));
-      const matchShortName = shortNameStr.includes(query) || (cleanQ && cleanShortName.includes(cleanQ));
-      const matchId = idStr.includes(query) || (cleanQ && cleanId.includes(cleanQ));
-      const matchDesc = descStr.includes(query);
-      const matchCat = catLabelStr.includes(query);
-      const matchSubCats =
-        Array.isArray(society.categoryLabels) &&
-        society.categoryLabels.some((lbl) => lbl.toLowerCase().includes(query));
-      const matchPocs =
-        Array.isArray(society.pocs) &&
-        society.pocs.some(
-          (poc) =>
-            poc.name.toLowerCase().includes(query) ||
-            (cleanQ && poc.phone.replace(/[^0-9]/g, '').includes(cleanQ))
-        );
-      const matchTics =
-        Array.isArray(society.tics) &&
-        society.tics.some((tic) => {
-          const tLower = tic.toLowerCase();
-          const cleanT = tLower.replace(/[^a-z0-9]/g, '');
-          return tLower.includes(query) || (cleanQ && cleanT.includes(cleanQ));
-        });
-
-      const isMatch = matchName || matchShortName || matchId || matchDesc || matchCat || matchSubCats || matchPocs || matchTics;
-      if (!isMatch) return false;
-    } else if (selectedCategory !== 'all') {
-      const hasCat =
-        society.category === selectedCategory ||
-        (Array.isArray(society.categories) && society.categories.includes(selectedCategory));
-      if (!hasCat) return false;
-    }
-
-    return true;
-  });
+  }, [searchQuery, selectedCategory]);
 
   const shuffledIndexMap = useMemo(() => {
     const map = new Map();
@@ -293,41 +146,24 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
     return map;
   }, [shuffledIds]);
 
-  const sortedSocieties = [...filteredSocieties].sort((a, b) => {
-    // In "Starred" tab, default to preference rank order
-    if (activeTab === 'preferred') {
+  const sortedSocieties = useMemo(() => {
+    return [...filteredSocieties].sort((a, b) => {
+      if (sortBy === 'shuffled') {
+        const idxA = shuffledIndexMap.get(a.id) ?? 0;
+        const idxB = shuffledIndexMap.get(b.id) ?? 0;
+        return idxA - idxB;
+      }
       if (sortBy === 'name' || sortBy === 'name-asc') {
         return a.name.localeCompare(b.name);
       }
       if (sortBy === 'name-desc') {
         return b.name.localeCompare(a.name);
       }
-      // Rank order (shuffled / rank)
-      const rankA = bookmarkedIds.indexOf(a.id);
-      const rankB = bookmarkedIds.indexOf(b.id);
-      if (rankA !== -1 && rankB !== -1) return rankA - rankB;
-      if (rankA !== -1) return -1;
-      if (rankB !== -1) return 1;
-      return a.name.localeCompare(b.name);
-    }
-
-    if (sortBy === 'shuffled') {
-      const idxA = shuffledIndexMap.get(a.id) ?? 0;
-      const idxB = shuffledIndexMap.get(b.id) ?? 0;
-      return idxA - idxB;
-    }
-    if (sortBy === 'name' || sortBy === 'name-asc') {
-      return a.name.localeCompare(b.name);
-    }
-    if (sortBy === 'name-desc') {
-      return b.name.localeCompare(a.name);
-    }
-    return 0;
-  });
+      return 0;
+    });
+  }, [filteredSocieties, sortBy, shuffledIndexMap]);
 
   const totalCount = DEMO_SOCIETIES.length;
-  const validSocietyIds = useMemo(() => new Set(DEMO_SOCIETIES.map((s) => s.id)), []);
-  const bookmarkedCount = bookmarkedIds.filter((id) => validSocietyIds.has(id)).length;
   const totalDomainsCount = CATEGORIES.length - 1;
   const totalPocsCount = useMemo(
     () => DEMO_SOCIETIES.reduce((acc, s) => acc + (Array.isArray(s.pocs) ? s.pocs.length : 0), 0),
@@ -344,10 +180,10 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
               <BackIcon size={16} />
             </button>
           )}
-          <div>
-            <h1 className="st-title">Central Societies Database</h1>
+          <div className="st-header-text">
+            <h1 className="st-title">Societies Database</h1>
             <p className="st-subtitle">
-              Comprehensive directory of all {totalCount} official societies, cells, and student initiatives at SSCBS.
+              Comprehensive directory of all {totalCount} official societies, cells &amp; student initiatives at SSCBS.
             </p>
           </div>
         </div>
@@ -358,14 +194,14 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
         )}
       </div>
 
-      {/* Directory Welcome Banner */}
+      {/* Directory Welcome Banner (Desktop only, hidden on mobile for screen economy) */}
       <div className="st-directory-hero">
         <div className="st-hero-icon">🏛️</div>
         <div className="st-hero-content">
           <div className="st-hero-title">SSCBS Central Societies Database</div>
           <p className="st-hero-desc">
             Explore SSCBS's ecosystem of student-run societies and cells across {totalDomainsCount} distinct domains.
-            Browse full society dossiers, connect directly with student Points of Responsibility (PoRs) on WhatsApp, and follow official portals.
+            Browse full society dossiers, connect directly with student Points of Contact (PoRs) on WhatsApp, and follow official portals.
           </p>
         </div>
       </div>
@@ -374,53 +210,24 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
       <div className="st-metrics-grid">
         <div className="st-metric-card">
           <div className="st-metric-icon">🏛️</div>
-          <div>
+          <div className="st-metric-info">
             <div className="st-metric-val">{totalCount}</div>
             <div className="st-metric-lbl">Official Societies</div>
           </div>
         </div>
         <div className="st-metric-card">
           <div className="st-metric-icon">🏷️</div>
-          <div>
+          <div className="st-metric-info">
             <div className="st-metric-val">{totalDomainsCount}</div>
             <div className="st-metric-lbl">Active Domains</div>
           </div>
         </div>
         <div className="st-metric-card">
           <div className="st-metric-icon">💬</div>
-          <div>
+          <div className="st-metric-info">
             <div className="st-metric-val">{totalPocsCount}+</div>
             <div className="st-metric-lbl">Student PoRs</div>
           </div>
-        </div>
-        <div className="st-metric-card">
-          <div className="st-metric-icon">⭐</div>
-          <div>
-            <div className="st-metric-val">{bookmarkedCount}</div>
-            <div className="st-metric-lbl">Starred Societies</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Navigation Tabs Header */}
-      <div className="st-tabs-header">
-        <div className="st-tabs-nav">
-          <button
-            className={`st-tab-btn ${activeTab === 'all' ? 'active' : ''}`}
-            onClick={() => setActiveTab('all')}
-          >
-            <BriefcaseIcon size={16} /> All Societies
-            <span className="st-tab-count">{totalCount}</span>
-          </button>
-          <button
-            className={`st-tab-btn ${activeTab === 'preferred' ? 'active' : ''}`}
-            onClick={() => setActiveTab('preferred')}
-          >
-            <HeartIcon filled={activeTab === 'preferred'} size={16} /> Starred Societies
-            {bookmarkedCount > 0 && (
-              <span className="st-tab-count">{bookmarkedCount}</span>
-            )}
-          </button>
         </div>
       </div>
 
@@ -442,6 +249,7 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
                 onClick={() => setSearchQuery('')}
                 title="Clear search"
                 type="button"
+                aria-label="Clear search"
               >
                 ✕
               </button>
@@ -450,28 +258,18 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
           <select
             className="st-sort-select"
             value={sortBy}
+            aria-label="Sort societies"
             onChange={(e) => {
               const val = e.target.value;
               if (val === 'shuffled' && sortBy === 'shuffled') {
-                // Re-trigger a fresh shuffle if user re-selects shuffled option
                 setShuffledIds(shuffleArray(DEMO_SOCIETIES.map((s) => s.id)));
               }
               setSortBy(val);
             }}
           >
-            {activeTab === 'preferred' ? (
-              <>
-                <option value="rank">Sort by: Saved Rank Order</option>
-                <option value="name">Sort by: Name (A-Z)</option>
-                <option value="name-desc">Sort by: Name (Z-A)</option>
-              </>
-            ) : (
-              <>
-                <option value="shuffled">Sort by: Shuffled (Default)</option>
-                <option value="name">Sort by: Name (A-Z)</option>
-                <option value="name-desc">Sort by: Name (Z-A)</option>
-              </>
-            )}
+            <option value="shuffled">Sort: Shuffled (Default)</option>
+            <option value="name">Sort: Name (A-Z)</option>
+            <option value="name-desc">Sort: Name (Z-A)</option>
           </select>
         </div>
 
@@ -483,7 +281,7 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
               className={`st-category-pill ${selectedCategory === cat.id ? 'active' : ''}`}
               onClick={() => setSelectedCategory(cat.id)}
             >
-              <span>{cat.icon}</span> {cat.label}
+              <span className="st-cat-icon">{cat.icon}</span> {cat.label}
             </button>
           ))}
         </div>
@@ -493,22 +291,20 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
       {sortedSocieties.length > 0 ? (
         <div className="st-societies-grid">
           {sortedSocieties.map((society) => {
-            const isSaved = bookmarkedIds.includes(society.id);
-            const rankIndex = bookmarkedIds.indexOf(society.id);
-            const rank = rankIndex !== -1 ? rankIndex + 1 : null;
             const categoryList = society.categoryLabels || [society.categoryLabel];
             const primaryLabel = categoryList[0];
             const extraCount = categoryList.length - 1;
+            const primaryPoc = Array.isArray(society.pocs) && society.pocs.length > 0 ? society.pocs[0] : null;
 
             return (
               <div
                 key={society.id}
-                className={`st-card ${rank === 1 ? 'is-top-choice' : ''}`}
+                className="st-card"
                 onClick={() => {
                   trackSocietyEvent('card_clicked', { society_name: society.name, category: primaryLabel });
                   setSelectedSociety(society);
                 }}
-                title={`Click card to view dossier for ${society.name}`}
+                title={`Click to view dossier for ${society.name}`}
               >
                 {/* Header & Title */}
                 <div className="st-card-main">
@@ -524,52 +320,15 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
                             e.stopPropagation();
                             setSelectedSociety(society);
                           }}
-                          title="Click to view all categories & details"
+                          title="Click to view all categories &amp; details"
                         >
                           +{extraCount} MORE
                         </span>
                       )}
-                      {isSaved && rank !== null && (
-                        <span
-                          className={`st-rank-badge ${rank === 1 ? 'rank-top' : ''}`}
-                          title={`Starred #${rank}`}
-                        >
-                          ⭐ #{rank} {rank === 1 ? 'Top Pick' : 'Starred'}
-                        </span>
-                      )}
                     </div>
-                    <div className="st-action-btns">
-                      {isSaved && rankIndex !== -1 && activeTab === 'preferred' && (
-                        <div className="st-rank-reorder-group" onClick={(e) => e.stopPropagation()}>
-                          <button
-                            className="st-reorder-btn"
-                            disabled={rankIndex === 0}
-                            onClick={() => moveBookmarkRank(society.id, 'up')}
-                            title="Move up"
-                          >
-                            ▲
-                          </button>
-                          <button
-                            className="st-reorder-btn"
-                            disabled={rankIndex === bookmarkedIds.length - 1}
-                            onClick={() => moveBookmarkRank(society.id, 'down')}
-                            title="Move down"
-                          >
-                            ▼
-                          </button>
-                        </div>
-                      )}
-                      <button
-                        className={`st-heart-btn ${isSaved ? 'active' : ''}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleBookmark(society.id);
-                        }}
-                        title={isSaved ? 'Remove from starred' : 'Add to starred societies'}
-                      >
-                        <HeartIcon filled={isSaved} size={15} />
-                      </button>
-                    </div>
+                    <span className="st-card-dossier-pill">
+                      Dossier ↗
+                    </span>
                   </div>
 
                   <h3 className="st-society-title">{society.name}</h3>
@@ -579,7 +338,7 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
                   {(() => {
                     const hasTics = Array.isArray(society.tics) && society.tics.length > 0;
                     const tooltipText = hasTics
-                      ? `Teacher(s)-in-Charge: ${society.tics.join(', ')} (Click card for full profiles)`
+                      ? `Teacher(s)-in-Charge: ${society.tics.join(', ')}`
                       : 'Teacher-in-Charge details to be updated';
                     return (
                       <div className="st-card-tic-row" title={tooltipText}>
@@ -595,59 +354,56 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
 
                 {/* Card Bottom / Action Row */}
                 <div className="st-card-bottom">
-                  <div className="st-card-social-strip">
-                    <span className="st-social-strip-label">Official Handles</span>
-                    <div className="st-social-row">
+                  {/* Left: Social Handles Icons */}
+                  <div className="st-social-row">
+                    <a
+                      href={society.officialPageUrl || OFFICIAL_COLLEGE_SOCIETIES_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="st-social-btn sscbs"
+                      title="Visit Official SSCBS Page"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <img src="/sscbs_college_logo.png" alt="SSCBS" className="st-sscbs-logo" />
+                    </a>
+                    <a
+                      href={society.instagramVideoUrl || 'https://instagram.com'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`st-social-btn ${society.id === 'literary-society' ? 'linktree' : 'insta'}`}
+                      title={society.id === 'literary-society' ? 'Linktree' : 'Instagram Updates'}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {society.id === 'literary-society' ? <LinktreeIcon size={16} /> : <InstagramIcon size={16} />}
+                    </a>
+                    {society.whatsappGroupUrl && !society.linkedinUrl ? (
                       <a
-                        href={society.officialPageUrl || OFFICIAL_COLLEGE_SOCIETIES_URL}
+                        href={society.whatsappGroupUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="st-social-btn sscbs"
-                        title="Visit Official SSCBS Page"
+                        className="st-social-btn whatsapp"
+                        title="Official WhatsApp Group"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <img src="/sscbs_college_logo.png" alt="SSCBS" className="st-sscbs-logo" />
+                        <WhatsAppIcon size={16} />
                       </a>
+                    ) : (
                       <a
-                        href={society.instagramVideoUrl || 'https://instagram.com'}
+                        href={society.linkedinUrl || 'https://linkedin.com'}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`st-social-btn ${society.id === 'literary-society' ? 'linktree' : 'insta'}`}
-                        title={society.id === 'literary-society' ? 'Linktree' : 'Instagram Updates'}
+                        className="st-social-btn linkedin"
+                        title="LinkedIn Profile"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        {society.id === 'literary-society' ? <LinktreeIcon size={18} /> : <InstagramIcon size={18} />}
+                        <LinkedinIcon size={16} />
                       </a>
-                      {society.whatsappGroupUrl && !society.linkedinUrl ? (
-                        <a
-                          href={society.whatsappGroupUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="st-social-btn whatsapp"
-                          title="Official WhatsApp Group"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <WhatsAppIcon size={18} />
-                        </a>
-                      ) : (
-                        <a
-                          href={society.linkedinUrl || 'https://linkedin.com'}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="st-social-btn linkedin"
-                          title="LinkedIn Profile"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <LinkedinIcon size={18} />
-                        </a>
-                      )}
-                    </div>
+                    )}
                   </div>
 
-                  {/* Dedicated Card-Bottom 50/50 Action Footer Bar (Contact PoR + View Dossier) */}
-                  <div className="st-card-por-footer">
-                    {Array.isArray(society.pocs) && society.pocs.length > 0 && (() => {
-                      const primaryPoc = society.pocs[0];
+                  {/* Right: Actions (PoR Contact & View Dossier) */}
+                  <div className="st-card-actions-group">
+                    {primaryPoc && (() => {
                       const cleanPhone = primaryPoc.phone.replace(/[^0-9]/g, '').slice(-10);
                       const textMsg = encodeURIComponent(
                         `Hi ${primaryPoc.name}! I'm an SSCBS student reaching out regarding ${society.shortName || society.name}.`
@@ -657,25 +413,25 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
                           href={`https://wa.me/91${cleanPhone}?text=${textMsg}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="st-card-por-link"
-                          title={`Contact PoR (${primaryPoc.name}) on WhatsApp`}
+                          className="st-card-por-btn"
+                          title={`Chat with ${primaryPoc.name} (PoR) on WhatsApp`}
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <WhatsAppIcon size={14} />
-                          <span>Contact PoR</span>
+                          <WhatsAppIcon size={13} />
+                          <span>PoR</span>
                         </a>
                       );
                     })()}
                     <button
                       type="button"
-                      className="st-card-expand-btn"
-                      title="Expand for full dossier, contacts & domains"
+                      className="st-card-view-btn"
+                      title="View full dossier and leadership directory"
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedSociety(society);
                       }}
                     >
-                      <span>View Dossier</span>
+                      <span>Details</span>
                       <span className="st-btn-arrow">↗</span>
                     </button>
                   </div>
@@ -687,31 +443,21 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
       ) : (
         <div className="st-empty-box">
           <div className="st-empty-icon">
-            <HeartIcon size={24} />
+            <SearchIcon size={24} />
           </div>
-          <h3 className="st-empty-title">
-            {activeTab === 'preferred'
-              ? 'No Starred Societies Saved Yet'
-              : 'No Societies Found'}
-          </h3>
+          <h3 className="st-empty-title">No Societies Found</h3>
           <p className="st-empty-sub">
-            {activeTab === 'preferred'
-              ? 'Click the heart or star icon on any society card in "All Societies" to save them to your favorites roster!'
-              : 'Try clearing your search query or selecting a different domain filter.'}
+            Try clearing your search query or selecting a different domain category.
           </p>
-          {activeTab === 'preferred' && (
-            <button
-              className="st-college-btn"
-              style={{ display: 'inline-flex', width: 'auto', padding: '9px 18px', marginTop: '12px' }}
-              onClick={() => {
-                setActiveTab('all');
-                setSelectedCategory('all');
-                setSearchQuery('');
-              }}
-            >
-              Browse All Societies
-            </button>
-          )}
+          <button
+            className="st-clear-filter-btn"
+            onClick={() => {
+              setSelectedCategory('all');
+              setSearchQuery('');
+            }}
+          >
+            Reset Filters
+          </button>
         </div>
       )}
 
@@ -726,7 +472,7 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
             onClick={(e) => e.stopPropagation()}
           >
             <div className="st-modal-header">
-              <div>
+              <div className="st-modal-header-info">
                 <div className="st-modal-badges">
                   {(selectedSociety.categoryLabels || [selectedSociety.categoryLabel]).map(
                     (lbl, idx) => (
@@ -735,37 +481,17 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
                       </span>
                     )
                   )}
-                  {bookmarkedIds.includes(selectedSociety.id) && (
-                    <span
-                      className={`st-rank-badge ${bookmarkedIds.indexOf(selectedSociety.id) === 0 ? 'rank-top' : ''}`}
-                    >
-                      ⭐ #{bookmarkedIds.indexOf(selectedSociety.id) + 1} Starred Pick
-                    </span>
-                  )}
                 </div>
                 <h2 className="st-modal-title">{selectedSociety.name}</h2>
               </div>
-              <div className="st-modal-header-actions">
-                <button
-                  className={`st-heart-btn ${
-                    bookmarkedIds.includes(selectedSociety.id) ? 'active' : ''
-                  }`}
-                  onClick={() => toggleBookmark(selectedSociety.id)}
-                  title={bookmarkedIds.includes(selectedSociety.id) ? 'Remove from starred' : 'Add to starred'}
-                >
-                  <HeartIcon
-                    filled={bookmarkedIds.includes(selectedSociety.id)}
-                    size={16}
-                  />
-                </button>
-                <button
-                  className="st-modal-close-btn"
-                  onClick={() => setSelectedSociety(null)}
-                  title="Close"
-                >
-                  ✕
-                </button>
-              </div>
+              <button
+                className="st-modal-close-btn"
+                onClick={() => setSelectedSociety(null)}
+                title="Close"
+                aria-label="Close modal"
+              >
+                ✕
+              </button>
             </div>
 
             <div className="st-modal-body">
@@ -824,7 +550,7 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
                               }}
                               title={`View room, contacts & portfolio for ${cleanName} in Faculty Directory`}
                             >
-                              <span>View Details</span>
+                              <span>View Profile</span>
                               <span className="st-btn-arrow">→</span>
                             </button>
                           ) : (
@@ -842,13 +568,14 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
                     <div>
                       <strong style={{ color: 'var(--ink)' }}>Official TIC To Be Updated</strong>
                       <p style={{ margin: '2px 0 0 0', fontSize: '0.82rem', color: 'var(--ink-dim)' }}>
-                        Teacher-in-Charge details have not yet been officially updated in current college records for this initiative. Please check with society PoRs above for details.
+                        Teacher-in-Charge details have not yet been officially updated in current college records for this initiative. Please check with society PoRs below for details.
                       </p>
                     </div>
                   </div>
                 )}
               </div>
 
+              {/* Student PoR Contacts */}
               {Array.isArray(selectedSociety.pocs) && selectedSociety.pocs.length > 0 && (
                 <div className="st-modal-section">
                   <h4 className="st-modal-sec-title">💬 Student Leadership &amp; PoR Contacts</h4>
@@ -888,8 +615,9 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
               )}
             </div>
 
+            {/* Modal Footer with handles & quick connect */}
             <div className="st-modal-footer">
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <div className="st-modal-footer-por">
                 {Array.isArray(selectedSociety.pocs) && selectedSociety.pocs.length > 0 && (() => {
                   const primaryPoc = selectedSociety.pocs[0];
                   const cleanPhone = primaryPoc.phone.replace(/[^0-9]/g, '').slice(-10);
@@ -901,11 +629,10 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
                       href={`https://wa.me/91${cleanPhone}?text=${textMsg}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="st-card-por-link"
-                      style={{ padding: '8px 14px', height: '36px' }}
+                      className="st-modal-por-btn"
                       title={`Message ${primaryPoc.name} on WhatsApp`}
                     >
-                      <WhatsAppIcon size={15} />
+                      <WhatsAppIcon size={16} />
                       <span>WhatsApp PoR ({primaryPoc.name})</span>
                     </a>
                   );
@@ -928,7 +655,7 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
                   className={`st-social-btn ${selectedSociety.id === 'literary-society' ? 'linktree' : 'insta'}`}
                   title={selectedSociety.id === 'literary-society' ? 'Linktree' : 'Instagram Updates'}
                 >
-                  {selectedSociety.id === 'literary-society' ? <LinktreeIcon size={20} /> : <InstagramIcon size={20} />}
+                  {selectedSociety.id === 'literary-society' ? <LinktreeIcon size={18} /> : <InstagramIcon size={18} />}
                 </a>
                 {selectedSociety.whatsappGroupUrl && !selectedSociety.linkedinUrl ? (
                   <a
@@ -938,7 +665,7 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
                     className="st-social-btn whatsapp"
                     title="Official WhatsApp Group"
                   >
-                    <WhatsAppIcon size={20} />
+                    <WhatsAppIcon size={18} />
                   </a>
                 ) : (
                   <a
@@ -948,7 +675,7 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
                     className="st-social-btn linkedin"
                     title="LinkedIn Profile"
                   >
-                    <LinkedinIcon size={20} />
+                    <LinkedinIcon size={18} />
                   </a>
                 )}
               </div>
@@ -956,7 +683,6 @@ export default function SocietyTrackerPage({ onBack, onNavigate, headerAction })
           </div>
         </div>
       )}
-
     </div>
   );
 }
