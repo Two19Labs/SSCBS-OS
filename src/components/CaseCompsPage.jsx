@@ -731,7 +731,7 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
 
   const getTrackLabel = (id) => {
     const found = TRACK_OPTIONS.find((t) => t.id === id);
-    return found ? `${found.icon} ${found.label}` : id;
+    return found ? found.label : id;
   };
 
   const activeFilterCount =
