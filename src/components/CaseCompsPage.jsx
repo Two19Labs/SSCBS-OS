@@ -568,7 +568,11 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
       if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to reach Unstop`);
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
-        setCompetitions(data.data);
+        const sanitized = data.data.map((c) => ({
+          ...c,
+          prizes: c.prizes ? c.prizes.replace(/Cash Pool/gi, 'Prize Pool') : c.prizes,
+        }));
+        setCompetitions(sanitized);
         setLastUpdated(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
       } else {
         throw new Error(data.error || 'Empty response received from Unstop');
@@ -1394,8 +1398,8 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
                   <div className="cc-prize-bar">
                     <div className="cc-prize-left">
                       <TrophyIcon size={14} className="cc-prize-trophy" />
-                      <span className="cc-prize-text" title={comp.prizes || 'Certificates & Recognition'}>
-                        {comp.prizes || 'Certificates & Recognition'}
+                      <span className="cc-prize-text" title={(comp.prizes || 'Certificates & Recognition').replace(/Cash Pool/gi, 'Prize Pool')}>
+                        {(comp.prizes || 'Certificates & Recognition').replace(/Cash Pool/gi, 'Prize Pool')}
                       </span>
                     </div>
                     <span className={`cc-entry-tag ${comp.isFree ? 'free' : 'paid'}`}>

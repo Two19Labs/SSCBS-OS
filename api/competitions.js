@@ -391,7 +391,7 @@ export async function fetchCompetitionsFromUnstop() {
     if (Array.isArray(item.prizes) && item.prizes.length > 0) {
       const totalCash = item.prizes.reduce((sum, p) => sum + (Number(p.cash) || 0), 0);
       if (totalCash > 0) {
-        prizeDisplay = `₹${totalCash.toLocaleString('en-IN')} Cash Pool`;
+        prizeDisplay = `₹${totalCash.toLocaleString('en-IN')} Prize Pool`;
       } else if (item.prizes.some(p => p.rank)) {
         prizeDisplay = item.prizes.map(p => p.rank).filter(Boolean).slice(0, 2).join(' · ');
       }
