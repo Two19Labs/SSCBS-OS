@@ -152,35 +152,41 @@ export const TimetableProvider = ({ children }) => {
         const cachedUpdatedAt = localStorage.getItem('sscbs_os_timetable_last_updated');
         const cachedRaw = localStorage.getItem('sscbs_os_timetable');
 
-        let cacheHit = false;
-        if (!metaError && serverUpdatedAt && cachedUpdatedAt === serverUpdatedAt && cachedRaw) {
+        if (serverUpdatedAt) {
+          // If server timestamp matches our cache, use cached version
+          if (cachedUpdatedAt === serverUpdatedAt && cachedRaw) {
+            try {
+              const parsed = JSON.parse(cachedRaw);
+              if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+                setTimetable(sanitizeTimetableData(parsed));
+              }
+            } catch (e) {}
+          } else {
+            // Only download full timetable JSON (~188KB) if admin updated it in Supabase
+            const { data: configData, error: configError } = await supabase
+              .from('system_configs')
+              .select('value, updated_at')
+              .eq('key', 'timetable')
+              .maybeSingle();
+
+            if (!configError && configData?.value && typeof configData.value === 'object') {
+              const sanitized = sanitizeTimetableData(configData.value);
+              setTimetable(sanitized);
+              try {
+                localStorage.setItem('sscbs_os_timetable', JSON.stringify(sanitized));
+                if (configData.updated_at) {
+                  localStorage.setItem('sscbs_os_timetable_last_updated', configData.updated_at);
+                }
+              } catch (e) {}
+            }
+          }
+        } else if (cachedRaw) {
           try {
             const parsed = JSON.parse(cachedRaw);
             if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
               setTimetable(sanitizeTimetableData(parsed));
-              cacheHit = true;
             }
           } catch (e) {}
-        }
-
-        // Only download full timetable JSON (~200KB+) if server timestamp changed or cache missing
-        if (!cacheHit) {
-          const { data: configData, error: configError } = await supabase
-            .from('system_configs')
-            .select('value, updated_at')
-            .eq('key', 'timetable')
-            .maybeSingle();
-
-          if (!configError && configData && configData.value && typeof configData.value === 'object') {
-            const sanitized = sanitizeTimetableData(configData.value);
-            setTimetable(sanitized);
-            try {
-              localStorage.setItem('sscbs_os_timetable', JSON.stringify(sanitized));
-              if (configData.updated_at) {
-                localStorage.setItem('sscbs_os_timetable_last_updated', configData.updated_at);
-              }
-            } catch (e) {}
-          }
         }
 
         // 2. Fetch holidays

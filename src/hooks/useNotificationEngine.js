@@ -231,8 +231,26 @@ export function useNotificationEngine() {
     };
 
     checkScheduleAndEvents();
-    const interval = setInterval(checkScheduleAndEvents, 20000); // Ticker cycle: 20 seconds
-    return () => clearInterval(interval);
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+      checkScheduleAndEvents();
+    }, 20000); // Ticker cycle: 20 seconds
+
+    const handleVisibility = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        checkScheduleAndEvents();
+      }
+    };
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibility);
+    }
+
+    return () => {
+      clearInterval(interval);
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', handleVisibility);
+      }
+    };
   }, [user, getTimetable, holidays, addNotification]);
 
   // 2. Realtime Supabase Listener for Team Finder Requests (#6, #7, #8)
@@ -333,7 +351,11 @@ export function useNotificationEngine() {
     const userEmail = user.email;
 
     const pollTeamFinderNotifications = async () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+
       try {
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
         // A. Fetch squad posts created by current user
         // Ownership resolves via created_by_email / user_id only — squad_posts has no user_email column.
         const ownerFilters = [`created_by_email.ilike."${userEmail}"`];
@@ -342,7 +364,8 @@ export function useNotificationEngine() {
         const { data: myPostsData } = await supabase
           .from('squad_posts')
           .select('id, title, competition_name, created_by_email, user_id')
-          .or(ownerFilters.join(','));
+          .or(ownerFilters.join(','))
+          .limit(20);
 
         const myPosts = myPostsData || [];
 
@@ -356,7 +379,9 @@ export function useNotificationEngine() {
             .from('squad_applications')
             .select('id, post_id, applicant_name, applicant_email, status, created_at')
             .in('post_id', postIds)
-            .eq('status', 'pending');
+            .eq('status', 'pending')
+            .gte('created_at', sevenDaysAgo)
+            .limit(50);
 
           if (incomingApps && incomingApps.length > 0) {
             incomingApps.forEach(app => {
@@ -385,14 +410,17 @@ export function useNotificationEngine() {
           .from('squad_applications')
           .select('id, post_id, applicant_email, status, updated_at')
           .eq('applicant_email', userEmail)
-          .in('status', ['accepted', 'declined']);
+          .in('status', ['accepted', 'declined'])
+          .gte('updated_at', sevenDaysAgo)
+          .limit(50);
 
         if (mySubmittedApps && mySubmittedApps.length > 0) {
           const postIds = [...new Set(mySubmittedApps.map(a => a.post_id))];
           const { data: posts } = await supabase
             .from('squad_posts')
             .select('id, title, competition_name')
-            .in('id', postIds);
+            .in('id', postIds)
+            .limit(20);
 
           const postMap = {};
           if (posts) posts.forEach(p => { postMap[p.id] = p.competition_name || p.title || 'Team'; });
@@ -432,8 +460,30 @@ export function useNotificationEngine() {
       }
     };
 
-    pollTeamFinderNotifications();
-    const interval = setInterval(pollTeamFinderNotifications, 15000); // Polls every 15s
-    return () => clearInterval(interval);
+    let lastPollTime = Date.now();
+    const executePoll = () => {
+      lastPollTime = Date.now();
+      pollTeamFinderNotifications();
+    };
+
+    executePoll();
+    // 90s fallback polling (Supabase Realtime handles instant notifications via WebSockets)
+    const interval = setInterval(executePoll, 90000);
+
+    const handleVisibility = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible' && (Date.now() - lastPollTime > 30000)) {
+        executePoll();
+      }
+    };
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibility);
+    }
+
+    return () => {
+      clearInterval(interval);
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', handleVisibility);
+      }
+    };
   }, [user, addNotification]);
 }

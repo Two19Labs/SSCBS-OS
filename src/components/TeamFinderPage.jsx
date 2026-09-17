@@ -214,6 +214,7 @@ export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill,
           supabase
             .from('squad_applications')
             .select('id, post_id, applicant_id, applicant_name, applicant_email, applicant_phone, applicant_course, applicant_year, pitch_note, highlighted_skills, status, created_at, updated_at')
+            .gte('created_at', sevenDaysAgo)
             .order('created_at', { ascending: false })
             .limit(100),
         ]);
