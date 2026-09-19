@@ -284,8 +284,6 @@ export default function OtherSectionsModal({
     }
   };
 
-  const isUserOwnSection = selectedCourse === userCourse && selectedSemester === userSem && selectedSection === userSec;
-
   if (!isOpen) return null;
 
   // Render Real-Time Class Status Card
@@ -503,12 +501,6 @@ export default function OtherSectionsModal({
         {/* Modal Header */}
         <header className="other-modal-header">
           <div className="other-header-titles">
-            <div className="other-header-badges">
-              <span className="other-header-chip">TIMETABLE EXPLORER</span>
-              {isUserOwnSection && (
-                <span className="other-own-badge">YOUR ENROLLED SECTION</span>
-              )}
-            </div>
             <h3>View Other Sections</h3>
             <p>Browse real-time status & weekly timetables for any course, semester, or section.</p>
           </div>
