@@ -520,7 +520,14 @@ export default function OtherSectionsModal({
                   className={`filter-btn ${selectedCourse === c ? 'active' : ''}`}
                   onClick={() => handleCourseChange(c)}
                 >
-                  {c}
+                  {c === 'Bsc Comp Sci' ? (
+                    <>
+                      <span className="course-text-full">Bsc Comp Sci</span>
+                      <span className="course-text-short">CS</span>
+                    </>
+                  ) : (
+                    c
+                  )}
                 </button>
               ))}
             </div>
@@ -537,7 +544,7 @@ export default function OtherSectionsModal({
                   className={`filter-btn ${selectedSemester === s ? 'active' : ''}`}
                   onClick={() => handleSemesterChange(s)}
                 >
-                  Sem {s}
+                  <span className="filter-prefix">Sem </span>{s}
                 </button>
               ))}
             </div>
@@ -554,7 +561,7 @@ export default function OtherSectionsModal({
                   className={`filter-btn ${selectedSection === sec ? 'active' : ''}`}
                   onClick={() => handleSectionChange(sec)}
                 >
-                  Sec {sec}
+                  <span className="filter-prefix">Sec </span>{sec}
                 </button>
               ))}
             </div>
@@ -572,7 +579,7 @@ export default function OtherSectionsModal({
                 trackTimetableEvent('switch_other_sections_tab', { tab: 'realtime' });
               }}
             >
-              <span>⚡ Real-Time Schedule</span>
+              <span>⚡ <span className="tab-label-full">Real-Time Schedule</span><span className="tab-label-short">Real-Time</span></span>
             </button>
             <button
               type="button"
@@ -582,7 +589,7 @@ export default function OtherSectionsModal({
                 trackTimetableEvent('switch_other_sections_tab', { tab: 'weekly' });
               }}
             >
-              <span>📅 Full Week Timetable</span>
+              <span>📅 <span className="tab-label-full">Full Week Timetable</span><span className="tab-label-short">Full Week</span></span>
             </button>
           </div>
 
@@ -627,7 +634,8 @@ export default function OtherSectionsModal({
                 title="Export schedule as PNG"
               >
                 <ImageIcon size={13} />
-                <span>{isExporting ? 'Exporting...' : 'Export PNG'}</span>
+                <span className="export-text-full">{isExporting ? 'Exporting...' : 'Export PNG'}</span>
+                <span className="export-text-short">{isExporting ? '...' : 'PNG'}</span>
               </button>
             </div>
           )}
