@@ -9,7 +9,7 @@ import { SearchIcon, PercentIcon, CalculatorIcon, FileIcon, TrophyIcon, DoorIcon
 import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFacultyDatabase, canAccessSocietyTracker, canAccessCaseComps, isTimeWarpEnabled } from '../lib/admin';
 import { exportScheduleAsImage } from '../utils/exportUtils';
 import { trackTimetableEvent } from '../lib/analytics';
-
+import OtherSectionsModal from './OtherSectionsModal';
 
 import './HomeDashboard.css';
 
@@ -66,11 +66,21 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
   const [isExporting, setIsExporting] = useState(false);
   const [exportMessage, setExportMessage] = useState(null);
 
-  // Profile setup
-  const course = user?.user_metadata?.course;
-  const semester = user?.user_metadata?.semester;
-  const section = user?.user_metadata?.section;
-  const hasProfile = Boolean(course && semester && section);
+  // Other Sections & Preview State
+  const [showOtherSectionsModal, setShowOtherSectionsModal] = useState(false);
+  const [previewSection, setPreviewSection] = useState(null); // { course, semester, section }
+
+  // Profile setup & active schedule target
+  const profileCourse = user?.user_metadata?.course;
+  const profileSemester = user?.user_metadata?.semester;
+  const profileSection = user?.user_metadata?.section;
+  const hasProfile = Boolean(profileCourse && profileSemester && profileSection);
+
+  const isPreviewingOtherSection = Boolean(previewSection);
+  const course = previewSection?.course || profileCourse;
+  const semester = previewSection?.semester || profileSemester;
+  const section = previewSection?.section || profileSection;
+  const hasActiveSchedule = Boolean(course && semester && section);
 
   const handleExportStudentSchedule = async () => {
     const targetEl = fullWeeklyGridRef.current || scheduleExportRef.current;
@@ -152,7 +162,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
     setTimelineViewDay(null);
   }, [currentDayName, isEveningMode]);
 
-  const timetable = hasProfile ? getTimetable(course, semester, section) : null;
+  const timetable = hasActiveSchedule ? getTimetable(course, semester, section) : null;
   const todayClasses = timetable ? timetable[currentDayName] || [] : [];
   const nextDayClasses = timetable ? timetable[nextCollegeDayName] || [] : [];
 
@@ -288,15 +298,26 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
   }, [showWeeklyModal, isEveningPreviewActive, currentDayName, isEveningMode, nextCollegeDayName]);
 
   const renderLiveCard = () => {
-    if (!hasProfile) {
+    if (!hasActiveSchedule) {
       return (
         <div className="home-live-card">
           <span className="micro-label dim">SETUP REQUIRED</span>
           <div className="live-subject">Set up your class schedule</div>
           <div className="live-meta">Configure your course, semester, and section to view your live timetable & schedules.</div>
-          <button className="btn-ink" style={{ marginTop: 12 }} onClick={onOpenProfile}>
-            Set up profile
-          </button>
+          <div style={{ display: 'flex', gap: '10px', marginTop: 12, flexWrap: 'wrap' }}>
+            <button className="btn-ink" onClick={onOpenProfile}>
+              Set up profile
+            </button>
+            <button
+              className="home-tt-btn"
+              onClick={() => {
+                trackTimetableEvent('open_other_sections_modal');
+                setShowOtherSectionsModal(true);
+              }}
+            >
+              View Other Sections 👥
+            </button>
+          </div>
         </div>
       );
     }
@@ -309,6 +330,17 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
           <div className="live-meta">
             The official timetable for {course} · Sem {semester} · Section {section} hasn't been published to SSCBS OS yet.
             We'll switch this on as soon as it's out.
+          </div>
+          <div style={{ marginTop: 12 }}>
+            <button
+              className="home-tt-btn"
+              onClick={() => {
+                trackTimetableEvent('open_other_sections_modal');
+                setShowOtherSectionsModal(true);
+              }}
+            >
+              View Other Sections 👥
+            </button>
           </div>
         </div>
       );
@@ -359,6 +391,15 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
             }}
           >
             Full Week Timetable 📅
+          </button>
+          <button
+            className="home-tt-btn"
+            onClick={() => {
+              trackTimetableEvent('open_other_sections_modal');
+              setShowOtherSectionsModal(true);
+            }}
+          >
+            View Other Sections 👥
           </button>
         </div>
       );
@@ -670,7 +711,9 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
           <div>
             <h1 className="home-greeting">{greeting}, {firstName}</h1>
             <div className="micro-label dim home-class-label">
-              {hasProfile
+              {isPreviewingOtherSection
+                ? `PREVIEWING: ${course} · SEM ${semester} · SECTION ${section}`.toUpperCase()
+                : hasProfile
                 ? `${course} · SEM ${semester} · SECTION ${section}`.toUpperCase()
                 : 'PROFILE NOT CONFIGURED'}
             </div>
@@ -685,11 +728,31 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
           </div>
         </div>
 
+        {/* Session Preview Banner when previewing another section */}
+        {isPreviewingOtherSection && (
+          <div className="preview-section-banner animate-fade-in">
+            <div className="preview-section-banner-content">
+              <span className="preview-banner-badge">👀 SESSION PREVIEW</span>
+              <span>
+                Following <strong>{course} · Sem {semester} · Sec {section}</strong> timetable
+              </span>
+            </div>
+            <button
+              type="button"
+              className="preview-banner-reset-btn"
+              onClick={() => setPreviewSection(null)}
+              title="Return to your enrolled section schedule"
+            >
+              Reset to My Schedule ↺
+            </button>
+          </div>
+        )}
+
         {/* Live Class Card */}
         {renderLiveCard()}
 
         {/* Daily & Tomorrow Timeline Tracker */}
-        {hasProfile && timetable && showTimeline && (
+        {hasActiveSchedule && timetable && showTimeline && (
           <div className="daily-timeline-section animate-fade-in" style={{ marginBottom: '24px' }}>
             <div className="timeline-header-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -927,7 +990,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
       </div>
 
       {/* Original Full Weekly Timetable Modal Dialog */}
-      {showWeeklyModal && hasProfile && timetable && (
+      {showWeeklyModal && hasActiveSchedule && timetable && (
         <div className="weekly-modal-overlay" onClick={() => setShowWeeklyModal(false)}>
           <div className="weekly-modal-card" onClick={(e) => e.stopPropagation()}>
             <header className="weekly-modal-header">
@@ -1287,6 +1350,16 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
           </div>
         </div>
       )}
+
+      {/* View Other Sections Modal */}
+      <OtherSectionsModal
+        isOpen={showOtherSectionsModal}
+        onClose={() => setShowOtherSectionsModal(false)}
+        initialCourse={course || 'BMS'}
+        initialSemester={semester || '1'}
+        initialSection={section || 'A'}
+        onPreviewOnDashboard={(sec) => setPreviewSection(sec)}
+      />
     </div>
   );
 }
