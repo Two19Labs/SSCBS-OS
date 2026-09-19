@@ -8,6 +8,8 @@ import { trackTimetableEvent } from '../lib/analytics';
 import { getISTTime, computeSectionSchedule, parseTimeToMinutes } from '../utils/timetableSchedule';
 import './OtherSectionsModal.css';
 
+const STANDARD_COURSES = ['BMS', 'BBA FIA', 'Bsc Comp Sci'];
+
 export default function OtherSectionsModal({
   isOpen,
   onClose,
@@ -19,14 +21,37 @@ export default function OtherSectionsModal({
   const { timetable, getTimetable, holidays } = useTimetable();
   const { user } = useAuth();
 
-  const userCourse = user?.user_metadata?.course || 'BMS';
-  const userSem = user?.user_metadata?.semester || '1';
-  const userSec = user?.user_metadata?.section || 'A';
+  // Dynamic Courses - strictly real academic courses, completely excluding metadata keys like _meta
+  const availableCourses = useMemo(() => {
+    if (!timetable || typeof timetable !== 'object') {
+      return STANDARD_COURSES;
+    }
+    const found = Object.keys(timetable).filter(c => 
+      c !== '_meta' && 
+      !c.startsWith('_') && 
+      typeof timetable[c] === 'object' &&
+      timetable[c] !== null &&
+      !Array.isArray(timetable[c])
+    );
+    const sorted = [
+      ...STANDARD_COURSES.filter(c => found.includes(c)),
+      ...found.filter(c => !STANDARD_COURSES.includes(c))
+    ];
+    return sorted.length > 0 ? sorted : STANDARD_COURSES;
+  }, [timetable]);
+
+  const userCourse = user?.user_metadata?.course;
+  const userSem = user?.user_metadata?.semester;
+  const userSec = user?.user_metadata?.section;
+
+  const safeInitialCourse = (initialCourse && availableCourses.includes(initialCourse))
+    ? initialCourse
+    : (userCourse && availableCourses.includes(userCourse) ? userCourse : availableCourses[0] || 'BMS');
 
   // Selection states
-  const [selectedCourse, setSelectedCourse] = useState(initialCourse || userCourse);
-  const [selectedSemester, setSelectedSemester] = useState(initialSemester || userSem);
-  const [selectedSection, setSelectedSection] = useState(initialSection || userSec);
+  const [selectedCourse, setSelectedCourse] = useState(safeInitialCourse);
+  const [selectedSemester, setSelectedSemester] = useState(initialSemester || userSem || '1');
+  const [selectedSection, setSelectedSection] = useState(initialSection || userSec || 'A');
 
   // Tab & Layout states
   const [viewTab, setViewTab] = useState('realtime'); // 'realtime' | 'weekly'
@@ -50,17 +75,85 @@ export default function OtherSectionsModal({
     return () => clearInterval(interval);
   }, [isOpen]);
 
-  // Sync initial props when opened
+  // Dynamic Semesters for Selected Course - strictly valid semester numbers (1-8)
+  const availableSemesters = useMemo(() => {
+    if (timetable && timetable[selectedCourse] && typeof timetable[selectedCourse] === 'object') {
+      const sems = Object.keys(timetable[selectedCourse]).filter(s => {
+        if (s.startsWith('_')) return false;
+        return /^[1-8]$/.test(s.trim());
+      });
+      if (sems.length > 0) return sems.sort((a, b) => Number(a) - Number(b));
+    }
+    return ['1', '3', '5', '7'];
+  }, [timetable, selectedCourse]);
+
+  // Dynamic Sections for Selected Course & Semester - strictly valid section keys (A, B, C, D)
+  const availableSections = useMemo(() => {
+    if (
+      timetable &&
+      timetable[selectedCourse] &&
+      timetable[selectedCourse][selectedSemester] &&
+      typeof timetable[selectedCourse][selectedSemester] === 'object'
+    ) {
+      const secs = Object.keys(timetable[selectedCourse][selectedSemester]).filter(sec => {
+        if (sec.startsWith('_')) return false;
+        return /^[A-Za-z0-9]$/.test(sec.trim());
+      });
+      if (secs.length > 0) return secs.sort();
+    }
+    if (selectedCourse === 'BMS') return ['A', 'B', 'C', 'D'];
+    if (selectedCourse === 'BBA FIA') return ['A', 'B'];
+    return ['A'];
+  }, [timetable, selectedCourse, selectedSemester]);
+
+  // Sync initial props and reset selection safely when opened
   useEffect(() => {
     if (isOpen) {
-      if (initialCourse) setSelectedCourse(initialCourse);
-      if (initialSemester) setSelectedSemester(initialSemester);
-      if (initialSection) setSelectedSection(initialSection);
+      const validCourse = (initialCourse && availableCourses.includes(initialCourse))
+        ? initialCourse
+        : (userCourse && availableCourses.includes(userCourse) ? userCourse : availableCourses[0] || 'BMS');
+      setSelectedCourse(validCourse);
+
+      const validSems = (timetable && timetable[validCourse] && typeof timetable[validCourse] === 'object')
+        ? Object.keys(timetable[validCourse]).filter(s => /^[1-8]$/.test(s.trim())).sort((a, b) => Number(a) - Number(b))
+        : ['1', '3', '5', '7'];
+      const validSem = validSems.includes(initialSemester) ? initialSemester : (validSems.includes(userSem) ? userSem : validSems[0] || '1');
+      setSelectedSemester(validSem);
+
+      const validSecs = (timetable && timetable[validCourse] && timetable[validCourse][validSem] && typeof timetable[validCourse][validSem] === 'object')
+        ? Object.keys(timetable[validCourse][validSem]).filter(sec => /^[A-Za-z0-9]$/.test(sec.trim())).sort()
+        : (validCourse === 'BMS' ? ['A', 'B', 'C', 'D'] : validCourse === 'BBA FIA' ? ['A', 'B'] : ['A']);
+      const validSec = validSecs.includes(initialSection) ? initialSection : (validSecs.includes(userSec) ? userSec : validSecs[0] || 'A');
+      setSelectedSection(validSec);
 
       const isMobileScreen = window.innerWidth <= 768;
       setWeeklyLayoutMode(isMobileScreen ? 'list' : 'grid');
     }
-  }, [isOpen, initialCourse, initialSemester, initialSection]);
+  }, [isOpen, initialCourse, initialSemester, initialSection, availableCourses, userCourse, userSem, userSec, timetable]);
+
+  // Ensure selectedCourse is always valid
+  useEffect(() => {
+    if (!isOpen) return;
+    if (selectedCourse === '_meta' || !availableCourses.includes(selectedCourse)) {
+      setSelectedCourse(availableCourses[0] || 'BMS');
+    }
+  }, [isOpen, availableCourses, selectedCourse]);
+
+  // Ensure selectedSemester is always valid
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!availableSemesters.includes(selectedSemester)) {
+      setSelectedSemester(availableSemesters[0] || '1');
+    }
+  }, [isOpen, availableSemesters, selectedSemester]);
+
+  // Ensure selectedSection is always valid
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!availableSections.includes(selectedSection)) {
+      setSelectedSection(availableSections[0] || 'A');
+    }
+  }, [isOpen, availableSections, selectedSection]);
 
   // ESC key listener to close
   useEffect(() => {
@@ -72,52 +165,25 @@ export default function OtherSectionsModal({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  // Dynamic Courses
-  const availableCourses = useMemo(() => {
-    if (timetable && Object.keys(timetable).length > 0) {
-      return Object.keys(timetable);
-    }
-    return ['BMS', 'BBA FIA', 'Bsc Comp Sci'];
-  }, [timetable]);
-
-  // Dynamic Semesters for Selected Course
-  const availableSemesters = useMemo(() => {
-    if (timetable && timetable[selectedCourse]) {
-      const sems = Object.keys(timetable[selectedCourse]);
-      if (sems.length > 0) return sems.sort((a, b) => Number(a) - Number(b));
-    }
-    return ['1', '3', '5', '7'];
-  }, [timetable, selectedCourse]);
-
-  // Dynamic Sections for Selected Course & Semester
-  const availableSections = useMemo(() => {
-    if (timetable && timetable[selectedCourse] && timetable[selectedCourse][selectedSemester]) {
-      const secs = Object.keys(timetable[selectedCourse][selectedSemester]);
-      if (secs.length > 0) return secs.sort();
-    }
-    if (selectedCourse === 'BMS') return ['A', 'B', 'C', 'D'];
-    if (selectedCourse === 'BBA FIA') return ['A', 'B'];
-    return ['A'];
-  }, [timetable, selectedCourse, selectedSemester]);
-
-  // Auto-adjust semester when course changes
+  // Auto-adjust semester and section when course changes
   const handleCourseChange = (newCourse) => {
+    if (!availableCourses.includes(newCourse)) return;
     setSelectedCourse(newCourse);
     let newSem = selectedSemester;
     let newSec = selectedSection;
 
-    if (timetable && timetable[newCourse]) {
-      const sems = Object.keys(timetable[newCourse]).sort((a, b) => Number(a) - Number(b));
-      if (!sems.includes(newSem) && sems.length > 0) {
-        newSem = sems[0];
-      }
-      const secs = timetable[newCourse][newSem] ? Object.keys(timetable[newCourse][newSem]).sort() : ['A'];
-      if (!secs.includes(newSec) && secs.length > 0) {
-        newSec = secs[0];
-      }
-    } else {
-      if (newCourse === 'Bsc Comp Sci') newSec = 'A';
-      else if (newCourse === 'BBA FIA' && (newSec === 'C' || newSec === 'D')) newSec = 'A';
+    const sems = (timetable && timetable[newCourse] && typeof timetable[newCourse] === 'object')
+      ? Object.keys(timetable[newCourse]).filter(s => /^[1-8]$/.test(s.trim())).sort((a, b) => Number(a) - Number(b))
+      : ['1', '3', '5', '7'];
+    if (!sems.includes(newSem) && sems.length > 0) {
+      newSem = sems[0];
+    }
+
+    const secs = (timetable && timetable[newCourse] && timetable[newCourse][newSem] && typeof timetable[newCourse][newSem] === 'object')
+      ? Object.keys(timetable[newCourse][newSem]).filter(sec => /^[A-Za-z0-9]$/.test(sec.trim())).sort()
+      : (newCourse === 'BMS' ? ['A', 'B', 'C', 'D'] : newCourse === 'BBA FIA' ? ['A', 'B'] : ['A']);
+    if (!secs.includes(newSec) && secs.length > 0) {
+      newSec = secs[0];
     }
 
     setSelectedSemester(newSem);
@@ -129,11 +195,11 @@ export default function OtherSectionsModal({
   const handleSemesterChange = (newSem) => {
     setSelectedSemester(newSem);
     let newSec = selectedSection;
-    if (timetable && timetable[selectedCourse] && timetable[selectedCourse][newSem]) {
-      const secs = Object.keys(timetable[selectedCourse][newSem]).sort();
-      if (!secs.includes(newSec) && secs.length > 0) {
-        newSec = secs[0];
-      }
+    const secs = (timetable && timetable[selectedCourse] && timetable[selectedCourse][newSem] && typeof timetable[selectedCourse][newSem] === 'object')
+      ? Object.keys(timetable[selectedCourse][newSem]).filter(sec => /^[A-Za-z0-9]$/.test(sec.trim())).sort()
+      : (selectedCourse === 'BMS' ? ['A', 'B', 'C', 'D'] : selectedCourse === 'BBA FIA' ? ['A', 'B'] : ['A']);
+    if (!secs.includes(newSec) && secs.length > 0) {
+      newSec = secs[0];
     }
     setSelectedSection(newSec);
     trackTimetableEvent('change_other_section_semester', { semester: newSem });
@@ -159,15 +225,12 @@ export default function OtherSectionsModal({
   }, [sectionTimetable, time, holidays]);
 
   const {
-    hour,
     currentDayName,
     isWeekend,
     currentMinutes,
     isEveningMode,
     nextCollegeDayName,
     isEveningPreviewActive,
-    todayClasses,
-    nextDayClasses,
     firstNextDayClass,
     firstNextDayPeriod,
     nextDayRealClassCount,

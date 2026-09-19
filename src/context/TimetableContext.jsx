@@ -299,22 +299,26 @@ export const TimetableProvider = ({ children }) => {
   const getActiveSemesters = (course) => {
     if (!timetable || Object.keys(timetable).length === 0) return ['1', '3', '5', '7'];
     
-    if (course && timetable[course]) {
-      const sems = Object.keys(timetable[course]);
-      if (sems.length > 0) return sems.sort((a, b) => parseInt(a) - parseInt(b));
+    if (course && timetable[course] && typeof timetable[course] === 'object') {
+      const sems = Object.keys(timetable[course]).filter(s => /^[1-8]$/.test(s.trim()));
+      if (sems.length > 0) return sems.sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
     }
     
-    // Gather all semesters across all available courses
+    // Gather all semesters across all available courses (excluding _meta and metadata)
     const set = new Set();
     Object.keys(timetable).forEach(c => {
-      if (timetable[c]) {
-        Object.keys(timetable[c]).forEach(s => set.add(s));
+      if (c !== '_meta' && !c.startsWith('_') && timetable[c] && typeof timetable[c] === 'object') {
+        Object.keys(timetable[c]).forEach(s => {
+          if (/^[1-8]$/.test(s.trim())) {
+            set.add(s.trim());
+          }
+        });
       }
     });
     
     const sems = Array.from(set);
     if (sems.length === 0) return ['1', '3', '5', '7'];
-    return sems.sort((a, b) => parseInt(a) - parseInt(b));
+    return sems.sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
   };
 
   return (
