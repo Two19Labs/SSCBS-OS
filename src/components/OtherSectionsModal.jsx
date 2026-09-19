@@ -15,8 +15,7 @@ export default function OtherSectionsModal({
   onClose,
   initialCourse,
   initialSemester,
-  initialSection,
-  onPreviewOnDashboard
+  initialSection
 }) {
   const { timetable, getTimetable, holidays } = useTimetable();
   const { user } = useAuth();
@@ -688,58 +687,60 @@ export default function OtherSectionsModal({
                       No lectures scheduled for {activeTimelineDayName}.
                     </div>
                   ) : (
-                    <div className="other-timeline-trail">
-                      {displayedTimelineClasses.map((cls) => {
-                        const periodInfo = PERIODS.find(p => p.id === cls.period || (cls.isBreak && p.id === 0));
-                        if (!periodInfo) return null;
+                    <div className="timeline-trail-container">
+                      <div className="timeline-trail">
+                        {displayedTimelineClasses.map((cls) => {
+                          const periodInfo = PERIODS.find(p => p.id === cls.period || (cls.isBreak && p.id === 0));
+                          if (!periodInfo) return null;
 
-                        const startMin = parseTimeToMinutes(periodInfo.start);
-                        const endMin = parseTimeToMinutes(periodInfo.end);
+                          const startMin = parseTimeToMinutes(periodInfo.start);
+                          const endMin = parseTimeToMinutes(periodInfo.end);
 
-                        const isViewingToday = activeTimelineDayName === currentDayName;
-                        const isPast = isViewingToday && currentMinutes >= endMin;
-                        const isActive = isViewingToday && (currentMinutes >= startMin && currentMinutes < endMin);
-                        const isUpcoming = !isViewingToday || currentMinutes < startMin;
+                          const isViewingToday = activeTimelineDayName === currentDayName;
+                          const isPast = isViewingToday && currentMinutes >= endMin;
+                          const isActive = isViewingToday && (currentMinutes >= startMin && currentMinutes < endMin);
+                          const isUpcoming = !isViewingToday || currentMinutes < startMin;
 
-                        return (
-                          <div
-                            key={cls.period}
-                            className={`timeline-slot-card ${isActive ? 'active' : ''} ${isPast ? 'past' : ''} ${isUpcoming ? 'upcoming' : ''}`}
-                          >
-                            <div className="timeline-slot-time">
-                              <span>{periodInfo.startLabel}</span>
-                            </div>
-                            <div className="timeline-slot-content">
-                              <div className="timeline-slot-topline">
-                                <span className="timeline-slot-period">
-                                  {cls.isBreak ? 'Break' : periodInfo.label}
-                                </span>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                  {isActive && <span className="timeline-slot-status active">LIVE</span>}
-                                  {isPast && <span className="timeline-slot-status past">DONE</span>}
-                                  {(cls.isPractical || /\b\(P\)\b/i.test(cls.subject) || /\bPractical\b/i.test(cls.subject)) && (
-                                    <span className="badge-practical-sm">P</span>
+                          const roomStr = resolveRoom(cls.room);
+                          const metaItems = [
+                            roomStr && roomStr !== '-' ? roomStr : null,
+                            cls.teacher && cls.teacher !== '-' ? cls.teacher : null
+                          ].filter(Boolean);
+
+                          return (
+                            <div
+                              key={cls.period}
+                              className={`timeline-slot-card ${isActive ? 'active' : ''} ${isPast ? 'past' : ''} ${isUpcoming ? 'upcoming' : ''}`}
+                            >
+                              <div className="timeline-slot-time">
+                                <span>{periodInfo.startLabel}</span>
+                                {isActive && <span className="timeline-slot-status active">LIVE</span>}
+                                {isPast && <span className="timeline-slot-status past">DONE</span>}
+                              </div>
+                              <div className="timeline-slot-content">
+                                <div className="timeline-subject-header" style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                                  <h5 className="slot-subject" title={cls.isBreak ? "Break" : cls.subject}>
+                                    {cls.isBreak ? "Break" : cls.subject}
+                                  </h5>
+                                  {!cls.isBreak && (cls.isPractical || /\b\(P\)\b/i.test(cls.subject) || /\bPractical\b/i.test(cls.subject)) && (
+                                    <span className="badge-practical-xs">Practical</span>
                                   )}
-                                  {(cls.isUnsupervised || cls.teacher === 'Unsupervised' || /\bunsupervised\b/i.test(cls.subject || '')) && (
-                                    <span className="badge-unsupervised-sm">U</span>
+                                  {!cls.isBreak && (cls.isUnsupervised || cls.teacher === 'Unsupervised' || /\bunsupervised\b/i.test(cls.subject || '')) && (
+                                    <span className="badge-unsupervised-xs">Unsupervised</span>
                                   )}
                                 </div>
+                                {!cls.isBreak && cls.subject !== 'Free' ? (
+                                  <p className="slot-meta" title={metaItems.join(' • ')}>
+                                    {metaItems.join(' • ') || '-'}
+                                  </p>
+                                ) : (
+                                  <p className="slot-meta-empty">{cls.isBreak ? 'Infinity Hour' : 'Free Block'}</p>
+                                )}
                               </div>
-                              <div className="timeline-slot-subject">
-                                {cls.isBreak ? 'Infinity Hour (Break)' : (cls.subject || 'Free')}
-                              </div>
-                              {!cls.isBreak && cls.subject !== 'Free' && (
-                                <div className="timeline-slot-meta">
-                                  {cls.teacher && cls.teacher !== '-' && <span>{cls.teacher}</span>}
-                                  {resolveRoom(cls.room) && resolveRoom(cls.room) !== '-' && (
-                                    <span className="timeline-slot-room">{resolveRoom(cls.room)}</span>
-                                  )}
-                                </div>
-                              )}
                             </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1021,28 +1022,6 @@ export default function OtherSectionsModal({
             </span>
           </div>
           <div className="other-footer-actions">
-            {onPreviewOnDashboard && (
-              <button
-                type="button"
-                className="btn-preview-dashboard"
-                onClick={() => {
-                  trackTimetableEvent('pin_section_to_dashboard', {
-                    course: selectedCourse,
-                    semester: selectedSemester,
-                    section: selectedSection
-                  });
-                  onPreviewOnDashboard({
-                    course: selectedCourse,
-                    semester: selectedSemester,
-                    section: selectedSection
-                  });
-                  onClose();
-                }}
-                title="Follow this section on your home screen during this session"
-              >
-                Preview on Dashboard ↗
-              </button>
-            )}
             <button type="button" className="btn-close-modal" onClick={onClose}>
               Close View
             </button>
