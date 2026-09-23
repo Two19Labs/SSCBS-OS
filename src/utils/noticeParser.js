@@ -25,11 +25,199 @@ function cleanLine(line) {
 }
 
 /**
- * Strip emoji characters from a string
+ * Strip emoji characters, variation selectors, zero-width joiners from a string
  */
 function stripEmojis(str) {
   if (!str) return '';
-  return str.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}]/gu, '').trim();
+  return str
+    .replace(/\p{Extended_Pictographic}/gu, '')
+    .replace(/[\uFE00-\uFE0F\u200B-\u200D\u2060\u00A0]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Remove markdown asterisks, underscores from text
+ */
+function cleanMarkdown(str) {
+  if (!str) return '';
+  return str.replace(/\*+([^*]+)\*+/g, '$1').replace(/_+([^_]+)_+/g, '$1').trim();
+}
+
+/**
+ * Check if a line is a redundant header, society intro, or presentation line
+ */
+function isHeaderOrPresentation(line, meta = {}) {
+  const l = line.toLowerCase().trim();
+  if (l.includes('shaheed sukhdev') || l.includes('university of delhi') || l.includes('office of the principal')) {
+    return true;
+  }
+  if (meta.title && (l === meta.title.toLowerCase() || l.includes(meta.title.toLowerCase()))) {
+    return true;
+  }
+  if (meta.society && (l === meta.society.toLowerCase() || l.startsWith(`${meta.society.toLowerCase()} -`))) {
+    return true;
+  }
+  if (/^(?:presents|in collaboration with|proudly announces|invites you to|announces|presents its)\s*$/i.test(l)) {
+    return true;
+  }
+  if (/the (?:tech|cultural|corporate|debating|dance|music|drama|finance|marketing|literary|consulting|social) society of/i.test(l)) {
+    return true;
+  }
+  if (/^(?:career development centre|placement cell|rotaract club|national service scheme)\s*(?:\([a-z]+\))?$/i.test(l)) {
+    return true;
+  }
+  if (/^(?:notice|announcement|circular)\s*[:\-–—]?$/i.test(l)) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Generates an apt, concise 3-4 line description from a raw message,
+ * stripping out redundant date, venue, links, and contact lines.
+ */
+export function generateAptDescription(rawText, meta = {}) {
+  if (!rawText) return '';
+
+  const rawLines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+
+  const isDateLine = /^(?:date|day|when)\s*[:\-–—]/i;
+  const isTimeLine = /^(?:time|timing)\s*[:\-–—]/i;
+  const isVenueLine = /^(?:venue|location|place|where|held at|platform|room)\s*[:\-–—]/i;
+  const isLinkLine = /^(?:register|registration|form|link|apply|rsvp|portal)\s*[:\-–—]|https?:\/\//i;
+  const isGreetingLine = /^(?:greetings|hello|hey|dear\s+all|hope\s+you\s+are|good\s+(?:morning|afternoon|evening))\b/i;
+  const isSignoffLine = /^(?:warm\s+regards|regards|team\s+[a-z0-9\s&-]+|best\s+wishes|sincerely|thanks\s+and\s+regards|see\s+you\s+there|see\s+you\s+in|cheers|yours\s+truly)\b/i;
+  const isPocLine = /(?:for\s+queries|for\s+any\s+queries|contact\s*[:\-–—]|reach\s+out\s*[:\-–—]|poc\s*[:\-–—]|convenor|president|coordinator|\+?91[\s-]?\d{10}|\b\d{10}\b)/i;
+  const isDividerLine = /^[\s*~_\-═━▪️🔹🔸•=•·✦✧]+$/;
+
+  const candidateLines = [];
+  const bulletLines = [];
+  let speakerLine = '';
+  let noteLine = '';
+  let deadlineLine = '';
+
+  for (let i = 0; i < rawLines.length; i++) {
+    const rawLine = rawLines[i];
+    const stripped = stripEmojis(rawLine);
+    const cleaned = cleanMarkdown(stripped);
+
+    if (!cleaned || isDividerLine.test(cleaned)) continue;
+
+    // Check Speaker
+    if (/^(?:speaker|guest\s+speaker|mentor|session\s+by)\s*[:\-–—]/i.test(cleaned)) {
+      speakerLine = cleaned;
+      continue;
+    }
+
+    // Check Note / Guidelines
+    if (/^(?:note|guidelines|mandatory|important)\s*[:\-–—]/i.test(cleaned)) {
+      noteLine = cleaned;
+      continue;
+    }
+
+    // Check Deadline
+    if (/^(?:deadline|last\s+date|reporting\s+discrepancies)\s*[:\-–—]/i.test(cleaned)) {
+      deadlineLine = cleaned;
+      continue;
+    }
+
+    // Skip redundant metadata lines
+    if (
+      isDateLine.test(cleaned) ||
+      isTimeLine.test(cleaned) ||
+      isVenueLine.test(cleaned) ||
+      isLinkLine.test(cleaned) ||
+      isGreetingLine.test(cleaned) ||
+      isSignoffLine.test(cleaned) ||
+      isPocLine.test(cleaned)
+    ) {
+      continue;
+    }
+
+    // Skip headers and presentation lines
+    if (isHeaderOrPresentation(cleaned, meta)) {
+      continue;
+    }
+
+    // Check if it's a bullet item / perk
+    if (/^[-•*▪️🔹🔸]\s+/.test(rawLine)) {
+      bulletLines.push(cleaned.replace(/^[-•*▪️🔹🔸]\s+/, '').trim());
+      continue;
+    }
+
+    // Check bullet section header like "Perks:" or "What's in it for you:"
+    if (/^(?:perks|benefits|highlights|eligibility|agenda)\s*[:\-–—]?$/i.test(cleaned)) {
+      continue;
+    }
+
+    // Skip "NOTICE: ..." line if title already captures it
+    if (/^notice\s*[:\-–—]/i.test(cleaned)) {
+      const remainingNotice = cleaned.replace(/^notice\s*[:\-–—]\s*/i, '').trim();
+      if (!remainingNotice || (meta.title && remainingNotice.toLowerCase().includes(meta.title.toLowerCase()))) {
+        continue;
+      }
+    }
+
+    // Clean trailing colons on general lines
+    const lineFormatted = cleaned.replace(/[:\-–—]+$/, '.');
+    candidateLines.push(lineFormatted);
+  }
+
+  // Compose description
+  const resultParts = [];
+
+  // 1. Speaker Info (if any)
+  if (speakerLine) {
+    resultParts.push(speakerLine);
+  }
+
+  // 2. Main Hook/Body: take candidate lines
+  if (candidateLines.length > 0) {
+    if (/^(?:is back with|invites you to|announces)\b/i.test(candidateLines[0]) && meta.society) {
+      candidateLines[0] = `${meta.society} ${candidateLines[0]}`;
+    }
+
+    const meaningfulLines = candidateLines.filter(l => l.length > 5);
+    let bodyText = meaningfulLines.join(' ').replace(/\s+/g, ' ').trim();
+    if (bodyText) {
+      const safeText = bodyText
+        .replace(/B\.Sc\.\(H\)/gi, 'BSc(H)')
+        .replace(/B\.Sc\./gi, 'BSc')
+        .replace(/Mr\./gi, 'Mr')
+        .replace(/Dr\./gi, 'Dr')
+        .replace(/Prof\./gi, 'Prof')
+        .replace(/Co\./gi, 'Co')
+        .replace(/No\./gi, 'No');
+
+      const sentences = safeText.match(/[^.!?]+[.!?]+/g) || [safeText];
+      if (sentences.length > 3) {
+        bodyText = sentences.slice(0, 3).join(' ').trim();
+      } else if (bodyText.length > 280) {
+        bodyText = bodyText.slice(0, 277).trim() + '...';
+      }
+      resultParts.push(bodyText);
+    }
+  }
+
+  // 3. Bullets / Key Perks (top 2 maximum)
+  if (bulletLines.length > 0 && resultParts.length < 3) {
+    const topBullets = bulletLines.slice(0, 2).map(b => `• ${b}`);
+    resultParts.push(topBullets.join('\n'));
+  }
+
+  // 4. Note or Deadline
+  if (deadlineLine && resultParts.length < 4) {
+    resultParts.push(deadlineLine);
+  } else if (noteLine && resultParts.length < 4) {
+    resultParts.push(noteLine);
+  }
+
+  if (resultParts.length === 0) {
+    return meta.title ? `Announcement regarding ${meta.title}. Check venue and event schedule above.` : 'Check notice details and schedule above.';
+  }
+
+  return resultParts.join('\n\n').trim();
 }
 
 /**
@@ -320,16 +508,12 @@ export function parseNoticeText(rawText) {
     title = society ? `${society} Announcement` : 'Campus Notice';
   }
 
-  // 7. Clean Description (Content)
-  // Filter out decorative borders, ASCII lines, emoji dividers
-  const cleanedLines = rawLines.filter(l => {
-    const stripped = l.replace(/[\s*~_\-═━▪️🔹🔸•=]/g, '');
-    return stripped.length > 0;
-  });
-
-  const content = cleanedLines.join('\n\n');
+  // 7. Generate Apt 3-4 Line Description
+  // Strips out redundant venue, date/time, links, contacts, and WhatsApp greetings
+  const aptDescription = generateAptDescription(text, { title, society, venue, event_date, link_url });
+  const content = aptDescription || (society ? `Announcement by ${society}. Check details above.` : 'Check campus notice details above.');
   if (content) {
-    extractedFields.push('Description');
+    extractedFields.push('Apt Description');
   }
 
   return {
