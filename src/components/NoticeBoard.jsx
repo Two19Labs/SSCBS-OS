@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import { isAdminEmail } from '../lib/admin';
 import { trackNoticeEvent } from '../lib/analytics';
+import { parseNoticeText, SAMPLE_WHATSAPP_NOTICE } from '../utils/noticeParser';
 import './NoticeBoard.css';
 
 export default function NoticeBoard({ onNavigate, compact = false }) {
@@ -52,6 +53,58 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
     active_from: '',
     active_to: '',
   });
+
+  const [rawNoticeText, setRawNoticeText] = useState('');
+  const [parseFeedback, setParseFeedback] = useState(null);
+
+  const handleSmartAutoFillNotice = () => {
+    if (!rawNoticeText.trim()) return;
+    const parsed = parseNoticeText(rawNoticeText);
+    if (!parsed) return;
+
+    setNoticeForm(prev => ({
+      ...prev,
+      title: parsed.title || prev.title,
+      society: parsed.society || prev.society,
+      venue: parsed.venue || prev.venue,
+      content: parsed.content || prev.content,
+      link_url: parsed.link_url || prev.link_url,
+      category: parsed.category || prev.category,
+      event_date: parsed.event_date || prev.event_date,
+      active_from: parsed.active_from || prev.active_from,
+      active_to: parsed.active_to || prev.active_to,
+    }));
+
+    setParseFeedback({
+      type: 'success',
+      message: `Extracted ${parsed.extractedFields.length} fields successfully!`,
+      fields: parsed.extractedFields
+    });
+  };
+
+  const handleTrySampleNotice = () => {
+    setRawNoticeText(SAMPLE_WHATSAPP_NOTICE);
+    const parsed = parseNoticeText(SAMPLE_WHATSAPP_NOTICE);
+    if (parsed) {
+      setNoticeForm(prev => ({
+        ...prev,
+        title: parsed.title || prev.title,
+        society: parsed.society || prev.society,
+        venue: parsed.venue || prev.venue,
+        content: parsed.content || prev.content,
+        link_url: parsed.link_url || prev.link_url,
+        category: parsed.category || prev.category,
+        event_date: parsed.event_date || prev.event_date,
+        active_from: parsed.active_from || prev.active_from,
+        active_to: parsed.active_to || prev.active_to,
+      }));
+      setParseFeedback({
+        type: 'success',
+        message: 'Sample notice loaded & all fields auto-filled!',
+        fields: parsed.extractedFields
+      });
+    }
+  };
 
   const THREE_MINUTES_MS = 3 * 60 * 1000;
 
@@ -293,6 +346,8 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
         setTimeout(() => {
           setShowDraftModal(false);
           setNoticeForm({ title: '', category: 'Event', society: '', venue: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
+          setRawNoticeText('');
+          setParseFeedback(null);
         }, 1200);
         return;
       }
@@ -316,6 +371,8 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
       setTimeout(() => {
         setShowDraftModal(false);
         setNoticeForm({ title: '', category: 'Event', society: '', venue: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
+        setRawNoticeText('');
+        setParseFeedback(null);
       }, 1200);
     } catch (err) {
       console.error('Failed to submit notice draft:', err);
@@ -356,6 +413,8 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
             className="btn-create-notice-draft"
             onClick={() => {
               setSubmitStatus({ type: '', text: '' });
+              setRawNoticeText('');
+              setParseFeedback(null);
               setShowDraftModal(true);
             }}
           >
@@ -391,6 +450,82 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
                 {submitStatus.text}
               </div>
             )}
+
+            {/* 🪄 Smart WhatsApp & Announcement Auto-Fill Parser */}
+            <div className="admin-notice-smart-parser">
+              <div className="smart-parser-header">
+                <div className="smart-parser-title">
+                  <span className="smart-parser-icon">🪄</span>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-main)' }}>Quick Paste & Auto-Fill</h4>
+                    <p style={{ margin: '0.15rem 0 0 0', fontSize: '0.78rem', color: 'var(--text-dim)', lineHeight: 1.3 }}>
+                      Paste any WhatsApp forward, email, or circular to auto-fill all notice fields instantly.
+                    </p>
+                  </div>
+                </div>
+                {rawNoticeText && (
+                  <button
+                    type="button"
+                    className="btn-clear-raw-text"
+                    onClick={() => {
+                      setRawNoticeText('');
+                      setParseFeedback(null);
+                    }}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+
+              <div className="smart-parser-body">
+                <textarea
+                  rows={3}
+                  placeholder="Paste raw WhatsApp message, circular text, or brochure details here..."
+                  value={rawNoticeText}
+                  onChange={(e) => setRawNoticeText(e.target.value)}
+                  className="smart-parser-textarea"
+                />
+
+                <div className="smart-parser-actions">
+                  <button
+                    type="button"
+                    className="btn-smart-autofill"
+                    onClick={handleSmartAutoFillNotice}
+                    disabled={!rawNoticeText.trim()}
+                  >
+                    <span className="btn-icon">⚡</span> Extract & Auto-Fill Fields
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-try-sample"
+                    onClick={handleTrySampleNotice}
+                    title="Load sample WhatsApp notice"
+                  >
+                    💡 Try Sample Notice
+                  </button>
+                </div>
+
+                {parseFeedback && (
+                  <div className={`smart-parser-feedback ${parseFeedback.type}`}>
+                    <div className="feedback-message">
+                      <strong>{parseFeedback.message}</strong>
+                    </div>
+                    {parseFeedback.fields && parseFeedback.fields.length > 0 && (
+                      <div className="extracted-fields-tags">
+                        {parseFeedback.fields.map((field, idx) => (
+                          <span key={idx} className="field-tag">✓ {field}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="notice-form-divider">
+              <span>REVIEW & TWEAK NOTICE DETAILS</span>
+            </div>
+
             <form className="notice-draft-form" onSubmit={handleSubmitNoticeDraft}>
               <div className="form-row-2col">
                 <label>

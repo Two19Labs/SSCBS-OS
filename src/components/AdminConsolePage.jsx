@@ -8,6 +8,7 @@ import { isAdminEmail } from '../lib/admin';
 import { subscribeToPresence, fetchAnalyticsData, FEATURE_NAMES, trackAdminEvent } from '../lib/analytics';
 import { DEMO_SOCIETIES, CATEGORIES } from '../data/societies';
 import DateTimePicker from './DateTimePicker';
+import { parseNoticeText, SAMPLE_WHATSAPP_NOTICE } from '../utils/noticeParser';
 import './AdminConsolePage.css';
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
@@ -149,6 +150,57 @@ function AdminConsoleContent({ onBack }) {
     active_from: '',
     active_to: ''
   });
+  const [rawNoticeText, setRawNoticeText] = useState('');
+  const [parseFeedback, setParseFeedback] = useState(null);
+
+  const handleSmartAutoFillNotice = () => {
+    if (!rawNoticeText.trim()) return;
+    const parsed = parseNoticeText(rawNoticeText);
+    if (!parsed) return;
+
+    setNoticeForm(prev => ({
+      ...prev,
+      title: parsed.title || prev.title,
+      society: parsed.society || prev.society,
+      venue: parsed.venue || prev.venue,
+      content: parsed.content || prev.content,
+      link_url: parsed.link_url || prev.link_url,
+      category: parsed.category || prev.category,
+      event_date: parsed.event_date || prev.event_date,
+      active_from: parsed.active_from || prev.active_from,
+      active_to: parsed.active_to || prev.active_to,
+    }));
+
+    setParseFeedback({
+      type: 'success',
+      message: `Extracted ${parsed.extractedFields.length} fields successfully!`,
+      fields: parsed.extractedFields
+    });
+  };
+
+  const handleTrySampleNotice = () => {
+    setRawNoticeText(SAMPLE_WHATSAPP_NOTICE);
+    const parsed = parseNoticeText(SAMPLE_WHATSAPP_NOTICE);
+    if (parsed) {
+      setNoticeForm(prev => ({
+        ...prev,
+        title: parsed.title || prev.title,
+        society: parsed.society || prev.society,
+        venue: parsed.venue || prev.venue,
+        content: parsed.content || prev.content,
+        link_url: parsed.link_url || prev.link_url,
+        category: parsed.category || prev.category,
+        event_date: parsed.event_date || prev.event_date,
+        active_from: parsed.active_from || prev.active_from,
+        active_to: parsed.active_to || prev.active_to,
+      }));
+      setParseFeedback({
+        type: 'success',
+        message: 'Sample notice loaded & all fields auto-filled!',
+        fields: parsed.extractedFields
+      });
+    }
+  };
 
   const handleEditNoticeClick = (notice) => {
     setEditingNoticeId(notice.id);
@@ -163,6 +215,8 @@ function AdminConsoleContent({ onBack }) {
       active_from: notice.active_from || '',
       active_to: notice.active_to || ''
     });
+    setRawNoticeText('');
+    setParseFeedback(null);
     setNoticeMobileSection('form');
     const element = document.querySelector('.notice-creator-card');
     if (element) {
@@ -173,6 +227,8 @@ function AdminConsoleContent({ onBack }) {
   const handleCancelEdit = () => {
     setEditingNoticeId(null);
     setNoticeForm({ title: '', category: 'General', society: '', venue: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
+    setRawNoticeText('');
+    setParseFeedback(null);
     setNoticeMobileSection('list');
   };
 
@@ -429,6 +485,8 @@ function AdminConsoleContent({ onBack }) {
           setSaveStatus({ type: 'success', message: 'Notice updated successfully!' });
           setEditingNoticeId(null);
           setNoticeForm({ title: '', category: 'General', society: '', venue: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
+          setRawNoticeText('');
+          setParseFeedback(null);
           setIsSaving(false);
           return;
         }
@@ -452,6 +510,8 @@ function AdminConsoleContent({ onBack }) {
         setSaveStatus({ type: 'success', message: 'Notice updated successfully!' });
         setEditingNoticeId(null);
         setNoticeForm({ title: '', category: 'General', society: '', venue: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
+        setRawNoticeText('');
+        setParseFeedback(null);
         fetchAdminNotices();
       } else {
         // CREATE NEW NOTICE
@@ -494,6 +554,8 @@ function AdminConsoleContent({ onBack }) {
           });
           setSaveStatus({ type: 'success', message: 'Notice published successfully!' });
           setNoticeForm({ title: '', category: 'General', society: '', venue: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
+          setRawNoticeText('');
+          setParseFeedback(null);
           setIsSaving(false);
           return;
         }
@@ -517,6 +579,8 @@ function AdminConsoleContent({ onBack }) {
 
         setSaveStatus({ type: 'success', message: 'Notice published successfully onto the Campus Notice Board!' });
         setNoticeForm({ title: '', category: 'General', society: '', venue: '', content: '', link_url: '', event_date: '', active_from: '', active_to: '' });
+        setRawNoticeText('');
+        setParseFeedback(null);
         fetchAdminNotices();
       }
     } catch (err) {
@@ -2617,19 +2681,112 @@ Extract ALL timetable blocks from the attached Excel file now:`;
                   ? 'Modify details, location, event schedule, or expiry date of this notice.' 
                   : 'Create announcements for events, society updates, guest lectures, and other college activities.'}
               </p>
+
+              {/* 🪄 Smart WhatsApp & Announcement Auto-Fill Parser */}
+              {!editingNoticeId && (
+                <div className="admin-notice-smart-parser">
+                  <div className="smart-parser-header">
+                    <div className="smart-parser-title">
+                      <span className="smart-parser-icon">🪄</span>
+                      <div>
+                        <h4>Quick Paste & Auto-Fill</h4>
+                        <p>Paste any WhatsApp forward, email, or circular to auto-fill all notice fields instantly.</p>
+                      </div>
+                    </div>
+                    {rawNoticeText && (
+                      <button
+                        type="button"
+                        className="btn-clear-raw-text"
+                        onClick={() => {
+                          setRawNoticeText('');
+                          setParseFeedback(null);
+                        }}
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="smart-parser-body">
+                    <textarea
+                      rows={3}
+                      placeholder="Paste raw WhatsApp message, circular text, or brochure details here..."
+                      value={rawNoticeText}
+                      onChange={(e) => setRawNoticeText(e.target.value)}
+                      className="smart-parser-textarea"
+                    />
+
+                    <div className="smart-parser-actions">
+                      <button
+                        type="button"
+                        className="btn-smart-autofill"
+                        onClick={handleSmartAutoFillNotice}
+                        disabled={!rawNoticeText.trim()}
+                      >
+                        <span className="btn-icon">⚡</span> Extract & Auto-Fill Fields
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-try-sample"
+                        onClick={handleTrySampleNotice}
+                        title="Load sample WhatsApp notice"
+                      >
+                        💡 Try Sample Notice
+                      </button>
+                    </div>
+
+                    {parseFeedback && (
+                      <div className={`smart-parser-feedback ${parseFeedback.type}`}>
+                        <div className="feedback-message">
+                          <strong>{parseFeedback.message}</strong>
+                        </div>
+                        {parseFeedback.fields && parseFeedback.fields.length > 0 && (
+                          <div className="extracted-fields-tags">
+                            {parseFeedback.fields.map((field, idx) => (
+                              <span key={idx} className="field-tag">✓ {field}</span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div className="notice-form-divider">
+                <span>{editingNoticeId ? 'NOTICE DETAILS' : 'NOTICE DETAILS (REVIEW & TWEAK)'}</span>
+              </div>
               
               <form onSubmit={handleCreateNotice} className="admin-notice-form">
-                <div className="form-item-admin">
-                  <label htmlFor="notice-title">Notice Title</label>
-                  <input
-                    type="text"
-                    id="notice-title"
-                    placeholder="e.g. HackSSCBS 2026 Registration Open"
-                    value={noticeForm.title}
-                    onChange={(e) => setNoticeForm(prev => ({ ...prev, title: e.target.value }))}
-                    required
-                    className="admin-input-field"
-                  />
+                <div className="form-row-admin">
+                  <div className="form-item-admin flex-1">
+                    <label htmlFor="notice-title">Notice Title *</label>
+                    <input
+                      type="text"
+                      id="notice-title"
+                      placeholder="e.g. HackSSCBS 2026 Registration Open"
+                      value={noticeForm.title}
+                      onChange={(e) => setNoticeForm(prev => ({ ...prev, title: e.target.value }))}
+                      required
+                      className="admin-input-field"
+                    />
+                  </div>
+
+                  <div className="form-item-admin" style={{ minWidth: '150px' }}>
+                    <label htmlFor="notice-category">Category</label>
+                    <select
+                      id="notice-category"
+                      value={noticeForm.category || 'General'}
+                      onChange={(e) => setNoticeForm(prev => ({ ...prev, category: e.target.value }))}
+                      className="admin-input-field"
+                    >
+                      <option value="Event">Event</option>
+                      <option value="Session">Session</option>
+                      <option value="Society">Society</option>
+                      <option value="Academic">Academic</option>
+                      <option value="General">General</option>
+                    </select>
+                  </div>
                 </div>
                 
                 <div className="form-row-admin">
