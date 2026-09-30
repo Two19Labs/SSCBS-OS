@@ -288,6 +288,7 @@ export default function FindMyProfessorPage({ onBack }) {
 
   // View mode: 'today' or 'weekly'
   const [viewMode, setViewMode] = useState('today');
+  const [selectedWeeklyDay, setSelectedWeeklyDay] = useState('Monday');
 
   // Mobile navigation mode: 'list' (show faculty sidebar) or 'details' (show professor details panel)
   const [mobileActiveTab, setMobileActiveTab] = useState('list');
@@ -746,10 +747,26 @@ export default function FindMyProfessorPage({ onBack }) {
             </button>
           </div>
 
+          {/* 5-day picker when viewing weekly */}
+          {viewMode === 'weekly' && (
+            <div className="m-chip-row" style={{ margin: '4px 0 2px' }}>
+              {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((d) => (
+                <button
+                  key={d}
+                  type="button"
+                  className={`m-chip ${selectedWeeklyDay === d ? 'active' : ''}`}
+                  onClick={() => setSelectedWeeklyDay(d)}
+                >
+                  {d.substring(0, 3).toUpperCase()}
+                </button>
+              ))}
+            </div>
+          )}
+
           {/* Period Timeline List */}
           <div className="m-card m-prof-timeline">
             {PERIODS.map((period, idx) => {
-              const targetDay = viewMode === 'today' ? dayOfWeek : simulatedDay;
+              const targetDay = viewMode === 'today' ? (isSimulated ? simulatedDay : dayOfWeek) : selectedWeeklyDay;
               const matchSchedule = profSchedules.find(s => s.day === targetDay && s.period === period.id);
               const isActiveSlot = isTeachingNow && currentStatus?.period?.id === period.id;
 

@@ -537,8 +537,8 @@
   }
 
   .m-pmodal-segment.active {
-    background: #241A14;
-    color: #F7F3EC;
+    background: var(--ink, #241A14);
+    color: var(--on-ink, #F7F3EC);
     font-weight: 800;
   }
 

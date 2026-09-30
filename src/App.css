@@ -757,13 +757,57 @@
 
 /* ── Main content ── */
 .app-main {
-  padding: 16px var(--page-pad-x) calc(28px + env(safe-area-inset-bottom, 16px));
+  padding: 14px var(--page-pad-x, 16px) calc(28px + env(safe-area-inset-bottom, 16px));
   max-width: var(--content-max);
   margin: 0 auto;
   width: 100%;
   min-width: 0;
   flex: 1;
   -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent double headers on mobile when pages are rendered inside app-shell */
+@media (max-width: 899px) {
+  .app-main .m-appbar,
+  .app-main .m-tf-topbar,
+  .app-main .m-soc-topbar,
+  .app-main .m-fac-topbar,
+  .app-main .m-cnt-topbar,
+  .app-main .m-adm-topbar,
+  .app-main .m-comps-topbar,
+  .app-main .m-prof-topbar,
+  .app-main .m-waiver-topbar {
+    display: none !important;
+  }
+
+  .app-main .m-prof-screen,
+  .app-main .m-prof-root,
+  .app-main .m-tf-root,
+  .app-main .m-soc-root,
+  .app-main .m-fac-root,
+  .app-main .m-cnt-root,
+  .app-main .m-adm-root,
+  .app-main .m-comps-root,
+  .app-main .m-waiver-root {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    min-height: auto;
+  }
+
+  .app-main .m-prof-content,
+  .app-main .m-prof-scroll-area,
+  .app-main .m-radar-content,
+  .app-main .m-tf-scroll-area,
+  .app-main .m-soc-scroll-area,
+  .app-main .m-fac-scroll-area,
+  .app-main .m-cnt-scroll-area,
+  .app-main .m-adm-scroll-area,
+  .app-main .m-comps-scroll-area,
+  .app-main .m-waiver-scroll-area {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 
 /* Tablet / large phone (still tab-bar UI): roomier gutters */

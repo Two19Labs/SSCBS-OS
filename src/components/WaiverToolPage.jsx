@@ -1555,6 +1555,29 @@ function WaiverToolPage({ onBack }) {
         ) : (
           /* Screen 14 · Results */
           <div className="m-waiver-scroll-area">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <span style={{ fontSize: '12px', color: 'var(--ink-dim)', fontWeight: 600 }}>
+                {fileMeta?.name ? `Sheet: ${fileMeta.name}` : 'Attendance Simulation'}
+              </span>
+              <button
+                type="button"
+                onClick={handleUploadNewSheet}
+                style={{
+                  background: 'none',
+                  border: '1px solid var(--border)',
+                  borderRadius: '8px',
+                  padding: '5px 12px',
+                  fontSize: '11.5px',
+                  fontWeight: 700,
+                  color: 'var(--accent)',
+                  cursor: 'pointer',
+                  minHeight: '32px'
+                }}
+              >
+                + New sheet
+              </button>
+            </div>
+
             {/* Recommended Maroon Card */}
             <div className="m-waiver-hero-card">
               <span className="m-waiver-hero-badge">RECOMMENDED</span>

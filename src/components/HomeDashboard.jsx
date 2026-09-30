@@ -860,8 +860,8 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
           </div>
         )}
 
-        {/* Case Competitions Alerts Highlight Banner (Live for Aditya / Testers) */}
-        {hasCaseCompsAccess && (
+        {/* Case Competitions Alerts Highlight Banner (Desktop Only) */}
+        {!(MOBILE_V2 && isMobile) && hasCaseCompsAccess && (
           <div 
             className="recruitment-home-banner" 
             onClick={() => onNavigate('case-comps')}

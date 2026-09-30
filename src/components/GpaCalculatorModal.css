@@ -1260,7 +1260,7 @@
     border-radius: 12px;
     border: none;
     background: var(--ink, #241A14);
-    color: #F7F3EC;
+    color: var(--on-ink, #F7F3EC);
     font-size: 13.5px;
     font-weight: 800;
     cursor: pointer;

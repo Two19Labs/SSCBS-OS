@@ -156,6 +156,17 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Lock body scroll when mobile navigation drawer is open
+  useEffect(() => {
+    if (isMobileSidebarOpen) {
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = prevOverflow;
+      };
+    }
+  }, [isMobileSidebarOpen]);
+
   // Ensure current view is recorded in URL hash & localStorage on mount
   useEffect(() => {
     if (!isPasswordRecovery && view && view !== 'home' && typeof window !== 'undefined') {
@@ -355,7 +366,7 @@ function App() {
     'case-comps': 'Competitions',
     'find-prof': 'Find My Professor',
     'faculty-db': 'Faculty Directory',
-    'team-finder': 'Team Finder & Compete Hub',
+    'team-finder': 'Team Finder',
     'empty-room': 'Classroom Radar',
     admin: 'Admin Console',
     buzz: 'Campus Buzz',

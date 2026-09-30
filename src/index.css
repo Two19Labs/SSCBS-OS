@@ -39,6 +39,9 @@
   --border-strong: rgba(36, 26, 20, 0.14);
   --track: rgba(36, 26, 20, 0.08);    /* progress-bar track */
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --page-pad-x: 16px;
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sat: env(safe-area-inset-top, 0px);
 
   /* ── Legacy aliases (older component CSS reads these) ── */
   --bg-darker: var(--bg);

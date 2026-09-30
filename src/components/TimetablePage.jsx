@@ -104,7 +104,7 @@ export function TimetablePage({ onNavigate, onOpenDrawer }) {
           aria-label="Change Section"
         >
           <span>{activeCourse} · Sem {activeSem} · Section {activeSection}</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
             <polyline points="6 9 12 15 18 9" />
           </svg>
         </button>
@@ -119,7 +119,7 @@ export function TimetablePage({ onNavigate, onOpenDrawer }) {
           {exportMessage ? (
             <span style={{ fontSize: '11px', fontWeight: 800 }}>{exportMessage}</span>
           ) : (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
@@ -148,8 +148,8 @@ export function TimetablePage({ onNavigate, onOpenDrawer }) {
       <div ref={timetableRef} className="timetable-period-list">
         {PERIODS.map((period) => {
           const periodClasses = periodMap[period.id] || [];
-          const startMin = parseTimeToMinutes(period.startTime);
-          const endMin = parseTimeToMinutes(period.endTime);
+          const startMin = parseTimeToMinutes(period.start);
+          const endMin = parseTimeToMinutes(period.end);
 
           const isCurrent = isSelectedDayToday && currentMinutes >= startMin && currentMinutes < endMin;
           const isPast = isSelectedDayToday && currentMinutes >= endMin;
@@ -165,7 +165,7 @@ export function TimetablePage({ onNavigate, onOpenDrawer }) {
           return (
             <div key={period.id} className={`timetable-row ${isPast ? 'is-past' : ''}`}>
               <div className={`timetable-time-col ${isCurrent ? 'is-current' : ''}`}>
-                <span>{period.startTime}</span>
+                <span>{period.startLabel ? period.startLabel.replace(/\s*[AP]M/i, '') : period.start}</span>
               </div>
 
               <div className="timetable-content-col">
