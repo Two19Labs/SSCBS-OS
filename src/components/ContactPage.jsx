@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { WhatsAppIcon, MailIcon, CopyIcon, CheckIcon, BackIcon } from './icons';
-import { MOBILE_V2 } from '../lib/uiFlags';
-import { useIsMobile } from '../hooks/useIsMobile';
 import './ContactPage.css';
 
 const DEFAULT_WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '917007679485';
@@ -16,7 +14,6 @@ const TOPICS = [
 ];
 
 export default function ContactPage({ onBack, headerAction }) {
-  const isMobile = useIsMobile();
   const { user } = useAuth();
   const [selectedTopic, setSelectedTopic] = useState('general');
   const [customNote, setCustomNote] = useState('');
@@ -51,104 +48,6 @@ export default function ContactPage({ onBack, headerAction }) {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
-  if (MOBILE_V2 && isMobile) {
-    return (
-      <div className="m-cnt-root">
-        {/* Top App Bar (56px) */}
-        <header className="m-cnt-topbar">
-          <button className="m-cnt-icon-btn" onClick={onBack} aria-label="Open menu">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          </button>
-          <h2 className="m-cnt-title">Contact us</h2>
-        </header>
-
-        {/* Scrollable Area */}
-        <div className="m-cnt-scroll-area">
-          <div className="m-cnt-intro">
-            <h1 className="m-cnt-heading">Chat with us on WhatsApp</h1>
-            <p className="m-cnt-subheading">
-              Pick a topic, add details if you like, and we'll open WhatsApp with the message ready.
-            </p>
-          </div>
-
-          {/* Topic Section */}
-          <div className="m-cnt-section">
-            <span className="m-cnt-label">TOPIC</span>
-            <div className="m-cnt-topics-grid">
-              {[
-                { id: 'timetable', label: 'Timetable error' },
-                { id: 'feature', label: 'Feature request' },
-                { id: 'bug', label: 'Report a bug' },
-                { id: 'general', label: 'General question' },
-              ].map(t => (
-                <button
-                  key={t.id}
-                  type="button"
-                  className={`m-cnt-topic-tile ${selectedTopic === t.id ? 'active' : ''}`}
-                  onClick={() => setSelectedTopic(t.id)}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Details Section */}
-          <div className="m-cnt-section">
-            <span className="m-cnt-label">DETAILS (OPTIONAL)</span>
-            <textarea
-              className="m-cnt-textarea"
-              placeholder="Hi! I noticed an issue with my timetable on SSCBS OS. BMS 1A Monday P3 shows the wrong room."
-              value={customNote}
-              onChange={(e) => setCustomNote(e.target.value)}
-              rows={4}
-            />
-          </div>
-
-          {/* Open WhatsApp Button */}
-          <button
-            type="button"
-            className="m-cnt-wa-btn"
-            onClick={handleOpenWhatsApp}
-          >
-            <WhatsAppIcon size={18} />
-            <span>Open WhatsApp</span>
-          </button>
-
-          {/* Support Info Card */}
-          <div className="m-cnt-info-card">
-            <div className="m-cnt-info-row" onClick={handleCopyNumber}>
-              <div className="m-cnt-info-text">
-                <span className="m-cnt-info-title">WhatsApp support</span>
-                <span className="m-cnt-info-desc">Usually replies within a day · {copied ? 'Copied!' : DISPLAY_NUMBER}</span>
-              </div>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A89A90" strokeWidth="2" strokeLinecap="round"><polyline points="9 6 15 12 9 18"></polyline></svg>
-            </div>
-            <div className="m-cnt-divider" />
-            <a
-              href="mailto:two19labs@gmail.com"
-              className="m-cnt-info-row"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <div className="m-cnt-info-text">
-                <span className="m-cnt-info-title">House of Two19 Labs</span>
-                <span className="m-cnt-info-desc">Built for SSCBS students · two19labs@gmail.com</span>
-              </div>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A89A90" strokeWidth="2" strokeLinecap="round"><polyline points="9 6 15 12 9 18"></polyline></svg>
-            </a>
-          </div>
-
-          <div style={{ height: 40 }} />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="contact-page">

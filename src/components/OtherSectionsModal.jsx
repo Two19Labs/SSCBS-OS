@@ -6,8 +6,6 @@ import { ImageIcon } from './icons';
 import { exportScheduleAsImage } from '../utils/exportUtils';
 import { trackTimetableEvent } from '../lib/analytics';
 import { getISTTime, computeSectionSchedule, parseTimeToMinutes } from '../utils/timetableSchedule';
-import { MOBILE_V2 } from '../lib/uiFlags';
-import { useIsMobile } from '../hooks/useIsMobile';
 import './OtherSectionsModal.css';
 
 const STANDARD_COURSES = ['BMS', 'BBA FIA', 'Bsc Comp Sci'];
@@ -21,7 +19,6 @@ export default function OtherSectionsModal({
 }) {
   const { timetable, getTimetable, holidays } = useTimetable();
   const { user } = useAuth();
-  const isMobile = useIsMobile();
 
   // Dynamic Courses - strictly real academic courses, completely excluding metadata keys like _meta
   const availableCourses = useMemo(() => {
@@ -497,182 +494,6 @@ export default function OtherSectionsModal({
       </div>
     );
   };
-
-  if (MOBILE_V2 && isMobile) {
-    const activeTimelineDay = effectiveTimelineTarget === 'tomorrow' ? nextCollegeDayName : currentDayName;
-    const todayList = sectionTimetable ? (sectionTimetable[activeTimelineDay] || []) : [];
-    const weekList = sectionTimetable ? (sectionTimetable[activeWeeklyTab] || []) : [];
-
-    return (
-      <div className="m-other-screen">
-        {/* Header App Bar */}
-        <header className="m-appbar">
-          <button className="m-appbar-icon-btn" onClick={onClose} aria-label="Close">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-          </button>
-          <span className="m-appbar-title">Other sections</span>
-          <button className="m-appbar-icon-btn" onClick={handleExportSchedule} disabled={isExporting} aria-label="Export PNG">
-            <ImageIcon size={20} />
-          </button>
-        </header>
-
-        <div className="m-other-scroll" ref={scheduleExportRef}>
-          {/* Dynamic Courses Segmented */}
-          <div className="m-segmented" style={{ gridTemplateColumns: `repeat(${availableCourses.length}, 1fr)` }}>
-            {availableCourses.map((c) => (
-              <button
-                key={c}
-                type="button"
-                className={`m-segmented-btn ${selectedCourse === c ? 'active' : ''}`}
-                onClick={() => handleCourseChange(c)}
-              >
-                {c === 'Bsc Comp Sci' ? 'BSc CS' : c}
-              </button>
-            ))}
-          </div>
-
-          {/* Dynamic Semesters Pills */}
-          <div className="m-pills-row">
-            {availableSemesters.map((s) => (
-              <button
-                key={s}
-                type="button"
-                className={`m-chip ${selectedSemester === s ? 'active' : ''}`}
-                onClick={() => handleSemesterChange(s)}
-              >
-                Sem {s}
-              </button>
-            ))}
-          </div>
-
-          {/* Dynamic Sections Grid */}
-          <div className="m-sec-grid" style={{ gridTemplateColumns: `repeat(${availableSections.length > 4 ? 4 : availableSections.length}, 1fr)` }}>
-            {availableSections.map((sec) => (
-              <button
-                key={sec}
-                type="button"
-                className={`m-sec-tile ${selectedSection === sec ? 'active' : ''}`}
-                onClick={() => handleSectionChange(sec)}
-              >
-                {sec}
-              </button>
-            ))}
-          </div>
-
-          <div className="m-divider"></div>
-
-          {/* View Mode Switcher */}
-          <div className="m-segmented">
-            <button
-              type="button"
-              className={`m-segmented-btn ${viewTab === 'realtime' ? 'active' : ''}`}
-              onClick={() => setViewTab('realtime')}
-            >
-              Right now
-            </button>
-            <button
-              type="button"
-              className={`m-segmented-btn ${viewTab === 'weekly' ? 'active' : ''}`}
-              onClick={() => setViewTab('weekly')}
-            >
-              Full week
-            </button>
-          </div>
-
-          {viewTab === 'realtime' ? (
-            <div className="m-other-body">
-              {/* Screen 07 Live Status Card */}
-              <div className="m-card m-other-live-card">
-                <div className="m-other-live-top">
-                  <span className="m-status-text">
-                    ● {selectedCourse} {selectedSemester}{selectedSection} · {isRealClass ? 'IN CLASS' : isWeekend ? 'WEEKEND' : todayHoliday ? 'HOLIDAY' : 'FREE'}
-                  </span>
-                  <span className="m-mono-countdown">{remainingStr}</span>
-                </div>
-                <span className="m-other-live-title">
-                  {isRealClass ? activeClass.subject : todayHoliday ? todayHoliday.title : isWeekend ? 'No classes today' : 'Free Period'}
-                </span>
-                <span className="m-other-live-sub">
-                  {[
-                    isRealClass && activeClass.teacher && activeClass.teacher !== '-' ? activeClass.teacher : null,
-                    isRealClass && resolveRoom(activeClass.room) ? (resolveRoom(activeClass.room).toLowerCase().startsWith('room') ? resolveRoom(activeClass.room) : `Room ${resolveRoom(activeClass.room)}`) : null
-                  ].filter(Boolean).join(' · ') || (isRealClass ? '' : 'Classes resume on schedule')}
-                </span>
-                {isRealClass && (
-                  <div className="m-progress-bar-bg">
-                    <div className="m-progress-bar-fill" style={{ width: `${Math.min(100, Math.max(0, progressPct))}%` }}></div>
-                  </div>
-                )}
-              </div>
-
-              {/* Day Period List */}
-              {todayList.length > 0 && (
-                <div className="m-card m-period-list">
-                  {todayList.map((cls, idx) => {
-                    const periodInfo = PERIODS.find(p => p.id === cls.period || (cls.isBreak && p.id === 0));
-                    if (!periodInfo) return null;
-                    const roomStr = resolveRoom(cls.room);
-                    return (
-                      <React.Fragment key={cls.period || idx}>
-                        {idx > 0 && <div className="m-period-divider"></div>}
-                        <div className="m-period-row">
-                          <span className="m-mono-time">{periodInfo.startLabel}</span>
-                          <span className={`m-period-desc ${cls.isBreak ? 'gold' : ''}`}>
-                            {cls.isBreak ? 'Infinity Hour' : `${cls.subject}${roomStr && roomStr !== '-' ? ` · ${roomStr.toLowerCase().startsWith('room') ? roomStr : `Room ${roomStr}`}` : ''}`}
-                          </span>
-                        </div>
-                      </React.Fragment>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="m-other-body">
-              {/* 5-day tabs without numeric calendar dates */}
-              <div className="m-pills-row">
-                {DAYS.map((day) => (
-                  <button
-                    key={day}
-                    type="button"
-                    className={`m-chip ${activeWeeklyTab === day ? 'active' : ''}`}
-                    onClick={() => setActiveWeeklyTab(day)}
-                  >
-                    {day.substring(0, 3).toUpperCase()}
-                  </button>
-                ))}
-              </div>
-
-              {/* Chronological period list for activeWeeklyTab */}
-              <div className="m-card m-period-list">
-                {PERIODS.map((period, idx) => {
-                  const matchClass = weekList.find(c => c.period === period.id || (period.isBreak && c.isBreak));
-                  const roomStr = matchClass ? resolveRoom(matchClass.room) : null;
-                  return (
-                    <React.Fragment key={period.id}>
-                      {idx > 0 && <div className="m-period-divider"></div>}
-                      <div className="m-period-row">
-                        <span className="m-mono-time">{period.startLabel}</span>
-                        <span className={`m-period-desc ${period.isBreak ? 'gold' : ''}`}>
-                          {period.isBreak
-                            ? 'Infinity Hour'
-                            : matchClass
-                            ? (matchClass.subject === 'Free' ? 'Free' : `${matchClass.subject}${roomStr && roomStr !== '-' ? ` · ${roomStr.toLowerCase().startsWith('room') ? roomStr : `Room ${roomStr}`}` : ''}`)
-                            : 'Free'}
-                        </span>
-                      </div>
-                    </React.Fragment>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="other-modal-overlay" onClick={onClose}>

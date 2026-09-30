@@ -6,8 +6,6 @@ import { isAdminEmail, isTimeWarpEnabled } from '../lib/admin';
 import { exportScheduleAsImage } from '../utils/exportUtils';
 import { trackProfessorEvent } from '../lib/analytics';
 import { ImageIcon } from './icons';
-import { MOBILE_V2 } from '../lib/uiFlags';
-import { useIsMobile } from '../hooks/useIsMobile';
 import './FindMyProfessorPage.css';
 
 const ROOM_DISPLAY_MAP = {
@@ -273,7 +271,6 @@ const disambiguateClassForTeacher = (c, profName) => {
 export default function FindMyProfessorPage({ onBack }) {
   const { timetable: timetablesData, holidays } = useTimetable();
   const { user } = useAuth();
-  const isMobile = useIsMobile();
   const canTimeWarp = isAdminEmail(user?.email) && isTimeWarpEnabled();
   const [professorsList, setProfessorsList] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -288,7 +285,6 @@ export default function FindMyProfessorPage({ onBack }) {
 
   // View mode: 'today' or 'weekly'
   const [viewMode, setViewMode] = useState('today');
-  const [selectedWeeklyDay, setSelectedWeeklyDay] = useState('Monday');
 
   // Mobile navigation mode: 'list' (show faculty sidebar) or 'details' (show professor details panel)
   const [mobileActiveTab, setMobileActiveTab] = useState('list');
@@ -587,220 +583,6 @@ export default function FindMyProfessorPage({ onBack }) {
   const clockMin = String(time.getMinutes()).padStart(2, '0');
   const clockSec = String(time.getSeconds()).padStart(2, '0');
   const clockAmPm = time.getHours() >= 12 ? 'PM' : 'AM';
-
-  const getFloorText = (room) => {
-    if (!room || room === '-') return '-';
-    const clean = String(room).replace(/^room\s*/i, '').trim();
-    const firstChar = clean.charAt(0);
-    if (firstChar === 'G' || firstChar === 'g') return 'Ground';
-    if (/^[1-9]$/.test(firstChar)) {
-      const num = Number(firstChar);
-      if (num === 1) return '1st';
-      if (num === 2) return '2nd';
-      if (num === 3) return '3rd';
-      return `${num}th`;
-    }
-    return '-';
-  };
-
-  const cleanRoomNumber = (room) => {
-    if (!room || room === '-') return '-';
-    return String(room).replace(/^room\s*/i, '').trim();
-  };
-
-  if (MOBILE_V2 && isMobile) {
-    const activeProf = selectedProf || professorsList[0] || 'Dr. Mona Verma';
-    const isTeachingNow = currentStatus?.status === 'teaching';
-    const roomStr = isTeachingNow ? currentStatus.room : '-';
-    const floorStr = isTeachingNow ? getFloorText(roomStr) : '-';
-    const endsStr = isTeachingNow && currentStatus?.period ? currentStatus.period.endLabel : '-';
-    const initials = (activeProf.replace(/^(dr|prof|mr|ms|mrs)\.?\s+/i, '').trim().charAt(0) || 'P').toUpperCase();
-
-    return (
-      <div className="m-prof-screen">
-        {/* Header App Bar */}
-        <header className="m-appbar">
-          <button className="m-appbar-icon-btn" onClick={onBack} aria-label="Back">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-          </button>
-          <span className="m-appbar-title">Find My Professor</span>
-          <button className="m-appbar-icon-btn" onClick={handleExportSchedule} disabled={isExporting} aria-label="Export PNG">
-            <ImageIcon size={20} />
-          </button>
-        </header>
-
-        <div className="m-prof-content" ref={scheduleExportRef}>
-          {/* Search Input Bar */}
-          <div className="m-prof-search-wrap">
-            <div className="m-prof-search-box">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7A6D5F" strokeWidth="1.75" strokeLinecap="round">
-                <circle cx="11" cy="11" r="7"></circle>
-                <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
-              </svg>
-              <input
-                type="text"
-                placeholder="Search by name or initials"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="m-prof-search-input"
-              />
-              {searchQuery && (
-                <button className="m-prof-search-clear" onClick={() => setSearchQuery('')}>✕</button>
-              )}
-            </div>
-
-            {/* Quick autocomplete dropdown when searching */}
-            {searchQuery.trim().length > 0 && (
-              <div className="m-prof-search-dropdown">
-                {professorsList
-                  .filter(p => p.toLowerCase().includes(searchQuery.toLowerCase()))
-                  .slice(0, 6)
-                  .map(prof => (
-                    <button
-                      key={prof}
-                      className="m-prof-dropdown-item"
-                      onClick={() => {
-                        setSelectedProf(prof);
-                        setSearchQuery('');
-                      }}
-                    >
-                      {prof}
-                    </button>
-                  ))}
-              </div>
-            )}
-          </div>
-
-          {/* Active Professor Card (Gold/Amber Border Screen 08) */}
-          <div className="m-prof-card">
-            <div className="m-prof-card-top">
-              <span className="m-prof-avatar">{initials}</span>
-              <div className="m-prof-info">
-                <span className="m-prof-name">{activeProf}</span>
-                <span className={`m-prof-live-status ${isTeachingNow ? 'teaching' : 'free'}`}>
-                  ● {isTeachingNow ? 'TEACHING NOW' : currentStatus?.status === 'break' ? 'INFINITY HOUR' : todayHoliday ? 'HOLIDAY' : isWeekend ? 'WEEKEND' : 'FREE'}
-                </span>
-              </div>
-              <button
-                className="m-prof-change-btn"
-                onClick={() => {
-                  const input = document.querySelector('.m-prof-search-input');
-                  if (input) input.focus();
-                }}
-              >
-                Change
-              </button>
-            </div>
-
-            {/* 3-box stats grid: ROOM / FLOOR / ENDS */}
-            <div className="m-prof-stats-grid">
-              <div className={`m-prof-stat-box ${isTeachingNow ? 'highlight' : ''}`}>
-                <span className="m-prof-stat-label">ROOM</span>
-                <span className="m-prof-stat-val">{cleanRoomNumber(roomStr)}</span>
-              </div>
-              <div className="m-prof-stat-box">
-                <span className="m-prof-stat-label">FLOOR</span>
-                <span className="m-prof-stat-val">{floorStr}</span>
-              </div>
-              <div className="m-prof-stat-box">
-                <span className="m-prof-stat-label">ENDS</span>
-                <span className="m-prof-stat-val">{endsStr}</span>
-              </div>
-            </div>
-
-            {/* Subject description */}
-            <div className="m-prof-subject-desc">
-              {isTeachingNow ? (
-                <>
-                  <span className="bold">{currentStatus.subject}</span> · {currentStatus.classes}
-                </>
-              ) : (
-                <span className="dim">No active lecture at this moment.</span>
-              )}
-            </div>
-
-            {/* Next class row */}
-            {nextClass && (
-              <div className="m-prof-next-row">
-                Next — {PERIODS.find(p => p.id === nextClass.period)?.startLabel || ''} · {nextClass.subject} ({nextClass.course} Sem {nextClass.semester}{nextClass.section}) · Room {nextClass.room}
-              </div>
-            )}
-          </div>
-
-          {/* Segmented Switcher: Today / This week */}
-          <div className="m-segmented">
-            <button
-              type="button"
-              className={`m-segmented-btn ${viewMode === 'today' ? 'active' : ''}`}
-              onClick={() => setViewMode('today')}
-            >
-              Today
-            </button>
-            <button
-              type="button"
-              className={`m-segmented-btn ${viewMode === 'weekly' ? 'active' : ''}`}
-              onClick={() => setViewMode('weekly')}
-            >
-              This week
-            </button>
-          </div>
-
-          {/* 5-day picker when viewing weekly */}
-          {viewMode === 'weekly' && (
-            <div className="m-chip-row" style={{ margin: '4px 0 2px' }}>
-              {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((d) => (
-                <button
-                  key={d}
-                  type="button"
-                  className={`m-chip ${selectedWeeklyDay === d ? 'active' : ''}`}
-                  onClick={() => setSelectedWeeklyDay(d)}
-                >
-                  {d.substring(0, 3).toUpperCase()}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Period Timeline List */}
-          <div className="m-card m-prof-timeline">
-            {PERIODS.map((period, idx) => {
-              const targetDay = viewMode === 'today' ? (isSimulated ? simulatedDay : dayOfWeek) : selectedWeeklyDay;
-              const matchSchedule = profSchedules.find(s => s.day === targetDay && s.period === period.id);
-              const isActiveSlot = isTeachingNow && currentStatus?.period?.id === period.id;
-
-              return (
-                <React.Fragment key={period.id}>
-                  {idx > 0 && <div className="m-period-divider"></div>}
-                  <div className={`m-prof-period-row ${isActiveSlot ? 'active' : ''} ${!matchSchedule && !period.isBreak ? 'empty' : ''}`}>
-                    <span className="m-mono-time">{period.startLabel}</span>
-                    <div className="m-prof-slot-details">
-                      {period.isBreak ? (
-                        <span className="m-slot-title gold">Infinity Hour</span>
-                      ) : matchSchedule ? (
-                        <>
-                          <span className="m-slot-title">{matchSchedule.subject} · {matchSchedule.course} {matchSchedule.semester}{matchSchedule.section}</span>
-                          <span className="m-slot-room">Room {matchSchedule.room}</span>
-                        </>
-                      ) : (
-                        <span className="m-slot-title dim">Free</span>
-                      )}
-                    </div>
-                  </div>
-                </React.Fragment>
-              );
-            })}
-          </div>
-
-          {/* Footer note */}
-          <div className="m-prof-footer-note">
-            Based on the emailed timetable, not live location. <span className="m-link-text">Details</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="prof-page-container animate-fade-in">

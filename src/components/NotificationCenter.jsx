@@ -17,7 +17,7 @@ import {
 import { trackPostHogEvent } from '../lib/analytics';
 import './NotificationCenter.css';
 
-export default function NotificationCenter({ onNavigate, isFullPage = false, onBack }) {
+export default function NotificationCenter({ onNavigate }) {
   const { user } = useAuth();
   const {
     notifications,
@@ -172,119 +172,6 @@ export default function NotificationCenter({ onNavigate, isFullPage = false, onB
     if (hours < 24) return `${hours}h ago`;
     return `${Math.floor(hours / 24)}d ago`;
   };
-
-  if (isFullPage) {
-    return (
-      <div className="m-notif-screen">
-        <header className="m-appbar">
-          <button className="m-appbar-icon-btn" onClick={onBack} aria-label="Back">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-          </button>
-          <span className="m-appbar-title">Notifications</span>
-          {unreadCount > 0 ? (
-            <button className="m-notif-mark-all" onClick={markAllAsRead}>
-              Mark all read
-            </button>
-          ) : (
-            <div style={{ width: 44 }}></div>
-          )}
-        </header>
-
-        {/* Filter Pills */}
-        <div className="m-pills-row m-notif-filters">
-          {[
-            { id: 'all', label: `All · ${notifications.length}` },
-            { id: 'class', label: 'Classes' },
-            { id: 'team', label: 'Teams' },
-            { id: 'event', label: 'Events' },
-          ].map(tab => (
-            <button
-              key={tab.id}
-              className={`m-chip ${filter === tab.id ? 'active' : ''}`}
-              onClick={() => setFilter(tab.id)}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* List of items */}
-        <div className="m-notif-list">
-          {filteredNotifications.length === 0 ? (
-            <div className="m-notif-empty">
-              <BellIcon size={36} />
-              <p>No notifications right now.</p>
-            </div>
-          ) : (
-            filteredNotifications.map(notif => {
-              const actionData = notif.actionData || notif.action_data;
-              return (
-                <div
-                  key={notif.id}
-                  className={`m-notif-item ${notif.read ? 'read' : 'unread'}`}
-                  onClick={() => handleActionClick(notif)}
-                >
-                  <span className="m-notif-icon-box">
-                    {getCategoryIcon(notif.type)}
-                  </span>
-                  <div className="m-notif-content">
-                    <span className="m-notif-title">{notif.title}</span>
-                    {notif.message && <span className="m-notif-sub">{notif.message}</span>}
-                    
-                    {notif.type === 'team_req' && actionData?.appId && !actionData?.resolvedStatus && (
-                      <div className="m-notif-actions">
-                        <button
-                          className="m-btn-accept"
-                          disabled={actionLoading[notif.id]}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleTeamAction(notif.id, actionData, 'accepted');
-                          }}
-                        >
-                          Accept
-                        </button>
-                        <button
-                          className="m-btn-decline"
-                          disabled={actionLoading[notif.id]}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleTeamAction(notif.id, actionData, 'declined');
-                          }}
-                        >
-                          Decline
-                        </button>
-                      </div>
-                    )}
-
-                    <span className="m-notif-time">{formatTimeAgo(notif.created_at)}</span>
-                  </div>
-                  {!notif.read && <span className="m-notif-unread-dot"></span>}
-                </div>
-              );
-            })
-          )}
-        </div>
-
-        {/* Pinned Device OS Notifications Toggle Card */}
-        <div className="m-notif-device-card">
-          <div className="m-notif-device-info">
-            <span className="m-notif-device-title">Device notifications</span>
-            <span className="m-notif-device-sub">Class reminders on this phone</span>
-          </div>
-          <label className="notif-switch">
-            <input
-              type="checkbox"
-              checked={deviceNotificationsEnabled}
-              onChange={toggleDeviceNotifications}
-            />
-            <span className="notif-slider round"></span>
-          </label>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="notif-center-wrapper" ref={dropdownRef}>

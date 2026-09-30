@@ -4,15 +4,10 @@ import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import { isAdminEmail } from '../lib/admin';
 import { trackNoticeEvent } from '../lib/analytics';
 import { parseNoticeText, SAMPLE_WHATSAPP_NOTICE } from '../utils/noticeParser';
-import { MOBILE_V2 } from '../lib/uiFlags';
-import { useIsMobile } from '../hooks/useIsMobile';
-import BottomSheet from './BottomSheet';
 import './NoticeBoard.css';
 
 export default function NoticeBoard({ onNavigate, compact = false }) {
   const { user } = useAuth();
-  const isMobile = useIsMobile();
-  const [selectedCategory, setSelectedCategory] = useState('All');
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lastSeenTime, setLastSeenTime] = useState(() => {
@@ -39,11 +34,6 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
     const baseline = lastSeenTime || (Date.now() - 48 * 3600 * 1000);
     return noticeTime > baseline;
   };
-
-  const filteredNotices = notices.filter(n => {
-    if (selectedCategory === 'All') return true;
-    return (n.category || '').toLowerCase() === selectedCategory.toLowerCase();
-  });
 
   // Drafter state & auto-dismiss after 3 minutes (180,000 ms) of being seen
   const [isApprovedDrafter, setIsApprovedDrafter] = useState(false);
@@ -433,176 +423,26 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
         )}
       </div>
 
-      {/* Category Filter Badges */}
-      <div className="notice-filters">
-        {['All', 'Event', 'Session', 'Society', 'Academic'].map(cat => (
-          <button
-            key={cat}
-            type="button"
-            className={`filter-badge ${selectedCategory === cat ? 'active' : ''}`}
-            onClick={() => setSelectedCategory(cat)}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
       {/* Top New Notices Banner */}
       {newNoticesCount > 0 && (
         <div className="new-notices-banner">
           <div className="new-notices-banner-info">
             <span className="new-notice-pulse-dot"></span>
-            <span className="new-notices-title">● {newNoticesCount} new since your last visit</span>
+            <span className="new-notices-title">⚡ New notices!</span>
+            <span className="new-notices-count">{newNoticesCount} new {newNoticesCount === 1 ? 'notice' : 'notices'} available</span>
           </div>
           <button className="btn-mark-seen" onClick={handleMarkAllSeen}>
-            Mark read
+            Mark as read ✓
           </button>
         </div>
       )}
 
-      {/* Drafter Modal (Desktop Dialog or Mobile BottomSheet Screen 16) */}
+      {/* Drafter Modal */}
       {showDraftModal && (
-        MOBILE_V2 && isMobile ? (
-          <BottomSheet
-            isOpen={showDraftModal}
-            onClose={() => setShowDraftModal(false)}
-            title="Draft a notice"
-            fullHeight={true}
-          >
-            <div className="m-draft-body">
-              {submitStatus.text && (
-                <div className={`notice-alert ${submitStatus.type}`}>
-                  {submitStatus.text}
-                </div>
-              )}
-
-              {/* Quick Paste Card (Screen 16) */}
-              <div className="m-quick-paste-card">
-                <span className="m-quick-paste-title">Quick paste</span>
-                <span className="m-quick-paste-desc">Paste a WhatsApp forward or circular and we'll fill the fields.</span>
-                <textarea
-                  rows={3}
-                  placeholder="Paste message here…"
-                  value={rawNoticeText}
-                  onChange={(e) => setRawNoticeText(e.target.value)}
-                  className="m-quick-paste-textarea"
-                />
-                <div className="m-quick-paste-btns">
-                  <button
-                    type="button"
-                    className="m-btn-dark"
-                    onClick={handleSmartAutoFillNotice}
-                    disabled={!rawNoticeText.trim()}
-                  >
-                    Auto-fill
-                  </button>
-                  <button
-                    type="button"
-                    className="m-btn-outline"
-                    onClick={handleTrySampleNotice}
-                  >
-                    Try a sample
-                  </button>
-                </div>
-              </div>
-
-              <form className="m-draft-form" onSubmit={handleSubmitNoticeDraft}>
-                <div className="m-form-field">
-                  <span className="m-label-cap">TITLE</span>
-                  <input
-                    type="text"
-                    required
-                    className="m-field-input"
-                    placeholder="e.g. Blood Donation Drive"
-                    value={noticeForm.title}
-                    onChange={(e) => setNoticeForm({ ...noticeForm, title: e.target.value })}
-                  />
-                </div>
-
-                <div className="m-form-field">
-                  <span className="m-label-cap">CATEGORY</span>
-                  <div className="m-pills-row">
-                    {['Event', 'Session', 'Society', 'Academic'].map((cat) => (
-                      <button
-                        key={cat}
-                        type="button"
-                        className={`m-chip ${noticeForm.category === cat ? 'active' : ''}`}
-                        onClick={() => setNoticeForm({ ...noticeForm, category: cat })}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="m-form-field">
-                  <span className="m-label-cap">SOCIETY</span>
-                  <input
-                    type="text"
-                    className="m-field-input"
-                    placeholder="e.g. Rotaract"
-                    value={noticeForm.society}
-                    onChange={(e) => setNoticeForm({ ...noticeForm, society: e.target.value })}
-                  />
-                </div>
-
-                <div className="m-form-field">
-                  <span className="m-label-cap">VENUE</span>
-                  <input
-                    type="text"
-                    className="m-field-input"
-                    placeholder="e.g. Auditorium"
-                    value={noticeForm.venue}
-                    onChange={(e) => setNoticeForm({ ...noticeForm, venue: e.target.value })}
-                  />
-                </div>
-
-                <div className="m-form-field">
-                  <span className="m-label-cap">DATE & TIME</span>
-                  <input
-                    type="datetime-local"
-                    className="m-field-input"
-                    value={noticeForm.event_date}
-                    onChange={(e) => setNoticeForm({ ...noticeForm, event_date: e.target.value })}
-                  />
-                </div>
-
-                <div className="m-form-field">
-                  <span className="m-label-cap">REGISTRATION / LINK URL</span>
-                  <input
-                    type="url"
-                    className="m-field-input"
-                    placeholder="https://..."
-                    value={noticeForm.link_url}
-                    onChange={(e) => setNoticeForm({ ...noticeForm, link_url: e.target.value })}
-                  />
-                </div>
-
-                <div className="m-form-field">
-                  <span className="m-label-cap">DESCRIPTION *</span>
-                  <textarea
-                    rows={3}
-                    required
-                    className="m-field-input m-textarea"
-                    placeholder="Provide details about the event, rules, eligibility..."
-                    value={noticeForm.content}
-                    onChange={(e) => setNoticeForm({ ...noticeForm, content: e.target.value })}
-                  />
-                </div>
-
-                <div className="m-draft-submit-wrap">
-                  <button type="submit" className="m-btn-primary" disabled={submitting}>
-                    {submitting ? 'Submitting...' : 'Submit for approval'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </BottomSheet>
-        ) : (
-          <div className="notice-modal-backdrop" onClick={() => setShowDraftModal(false)}>
-            <div className="notice-modal-card" onClick={(e) => e.stopPropagation()}>
-              <div className="notice-modal-header">
-                <h4>📢 Draft Campus Notice</h4>
+        <div className="notice-modal-backdrop" onClick={() => setShowDraftModal(false)}>
+          <div className="notice-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="notice-modal-header">
+              <h4>📢 Draft Campus Notice</h4>
               <button className="btn-modal-close" onClick={() => setShowDraftModal(false)}>✕</button>
             </div>
             {submitStatus.text && (
@@ -794,7 +634,7 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
             </form>
           </div>
         </div>
-      ))}
+      )}
 
       {/* My Submissions for Drafters (Auto-disappears 3 mins after first seen) */}
       {isApprovedDrafter && visibleMyDrafts.length > 0 && (
@@ -835,14 +675,14 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
           <span className="notice-spinner"></span>
           <p>Fetching campus notices...</p>
         </div>
-      ) : filteredNotices.length === 0 ? (
+      ) : notices.length === 0 ? (
         <div className="notice-board-empty">
           <div className="empty-icon">📢</div>
-          <p>No active notices found in this category.</p>
+          <p>No active notices found.</p>
         </div>
       ) : (
         <div className="notice-grid">
-          {filteredNotices.map(notice => (
+          {notices.map(notice => (
             <div key={notice.id} className="notice-card">
               <div className="notice-card-header">
                 <div className="notice-header-left">
@@ -911,33 +751,17 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
                     className="btn-notice-action"
                     onClick={() => trackNoticeEvent('link_clicked', { title: notice.title, url: notice.link_url })}
                   >
-                    {notice.category === 'Event' ? 'Register →' : 'Open link ↗'}
+                    Link
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="arrow-icon">
+                      <line x1="7" y1="17" x2="17" y2="7"></line>
+                      <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
                   </a>
                 )}
               </div>
             </div>
           ))}
         </div>
-      )}
-
-      {/* Floating Action Button (Screen 15) */}
-      {(isApprovedDrafter || isAdmin) && (
-        <button
-          className="m-fab"
-          onClick={() => {
-            setSubmitStatus({ type: '', text: '' });
-            setRawNoticeText('');
-            setParseFeedback(null);
-            setShowDraftModal(true);
-          }}
-          aria-label="Draft notice"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          <span>Draft notice</span>
-        </button>
       )}
     </section>
   );
