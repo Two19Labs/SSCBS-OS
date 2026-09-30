@@ -3546,3 +3546,236 @@ input:checked + .admin-slider:before {
   font-weight: 800 !important;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   Mobile V2 — Screen 25: Admin Console Hub (<= 899px)
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 899px) {
+  .m-adm-root {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  .m-adm-topbar {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .m-adm-icon-btn {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--ink);
+    cursor: pointer;
+    border-radius: 8px;
+  }
+
+  .m-adm-title {
+    flex: 1;
+    font-size: 17px;
+    font-weight: 800;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  .m-adm-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .m-adm-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .m-adm-stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .m-adm-stat-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+  }
+
+  .m-adm-stat-label.green {
+    color: #0B7A54;
+  }
+
+  .m-adm-stat-label.muted {
+    color: var(--ink-dim);
+  }
+
+  .m-adm-stat-val {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  .m-adm-stat-val.maroon {
+    color: var(--maroon, #71222C);
+  }
+
+  .m-adm-list-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .m-adm-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    min-height: 60px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .m-adm-row:active {
+    background: rgba(36, 26, 20, 0.04);
+  }
+
+  .m-adm-row.toggle-row {
+    cursor: default;
+    justify-content: space-between;
+  }
+
+  .m-adm-row-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .m-adm-row-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--ink);
+  }
+
+  .m-adm-row-sub {
+    font-size: 11.5px;
+    color: var(--ink-dim);
+  }
+
+  .m-adm-badge {
+    min-width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: var(--maroon, #71222C);
+    color: #F7EAD9;
+    font-size: 11px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+  }
+
+  .m-adm-divider {
+    height: 1px;
+    background: var(--border);
+    margin-left: 14px;
+  }
+
+  .m-adm-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .m-adm-section-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+    color: var(--ink-dim);
+    padding-left: 4px;
+    text-transform: uppercase;
+  }
+
+  .m-adm-toggle-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .m-adm-switch {
+    width: 44px;
+    height: 26px;
+    border-radius: 999px;
+    background: rgba(36, 26, 20, 0.16);
+    border: none;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    padding: 2px;
+  }
+
+  .m-adm-switch.on {
+    background: var(--maroon, #71222C);
+  }
+
+  .m-adm-switch-knob {
+    display: block;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+  }
+
+  .m-adm-switch.on .m-adm-switch-knob {
+    transform: translateX(18px);
+  }
+
+  .m-adm-sub-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .m-adm-sub-back-btn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    cursor: pointer;
+  }
+}
+

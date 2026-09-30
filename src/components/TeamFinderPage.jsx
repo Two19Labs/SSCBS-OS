@@ -4,6 +4,9 @@ import { useConfig } from '../context/ConfigContext';
 import { isAdminEmail, canAccessTeamFinder } from '../lib/admin';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import { trackTeamFinderEvent } from '../lib/analytics';
+import BottomSheet from './BottomSheet';
+import { MOBILE_V2 } from '../lib/uiFlags';
+import { useIsMobile } from '../hooks/useIsMobile';
 import {
   TrophyIcon,
   UsersIcon,
@@ -88,6 +91,7 @@ function isUserPost(post, user) {
 
 export default function TeamFinderPage({ onBack, initialPrefill, onClearPrefill, headerAction }) {
   const { user } = useAuth();
+  const isMobile = useIsMobile();
   const { featureFlags } = useConfig();
   const isAdmin = isAdminEmail(user?.email);
   const hasAccess = featureFlags['team-finder'] || canAccessTeamFinder(user?.email);
@@ -1109,6 +1113,354 @@ function getUserApp(post, applications, userEmail, userId) {
             </button>
           )}
         </div>
+      </div>
+    );
+  }
+
+  function getPostTimeAgo(createdAt) {
+    if (!createdAt) return 'Recently';
+    const diff = Date.now() - new Date(createdAt).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return `${Math.max(1, mins)}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    if (days === 1) return 'Yesterday';
+    return `${days}d ago`;
+  }
+
+  if (MOBILE_V2 && isMobile) {
+    return (
+      <div className="m-tf-root">
+        {/* Top App Bar (56px) */}
+        <header className="m-tf-topbar">
+          <button className="m-tf-icon-btn" onClick={headerAction || onBack} aria-label="Open menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <h2 className="m-tf-title">Team Finder</h2>
+          <button
+            className={`m-tf-icon-btn ${isRefreshing ? 'refreshing' : ''}`}
+            onClick={handleManualRefresh}
+            aria-label="Refresh listings"
+          >
+            <RefreshIcon size={18} className={isRefreshing ? 'spin-icon' : ''} />
+          </button>
+        </header>
+
+        {/* Scrollable Area */}
+        <div className="m-tf-scroll-area">
+          {/* Segmented Control */}
+          <div className="m-segmented">
+            <button
+              type="button"
+              className={`m-segmented-item ${activeTab === 'other' ? 'active' : ''}`}
+              onClick={() => {
+                setHasUserToggledTab(true);
+                setActiveTab('other');
+              }}
+            >
+              Open teams
+            </button>
+            <button
+              type="button"
+              className={`m-segmented-item ${activeTab === 'my' ? 'active' : ''}`}
+              onClick={() => {
+                setHasUserToggledTab(true);
+                setActiveTab('my');
+              }}
+            >
+              My posts {myPostsCount > 0 ? `(${myPostsCount})` : ''}
+              {pendingRequestsCount > 0 && (
+                <span className="m-tf-badge-pill">{pendingRequestsCount}</span>
+              )}
+            </button>
+          </div>
+
+          {/* Search Box */}
+          <div className="m-tf-search-bar">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7A6D5F" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+            </svg>
+            <input
+              type="text"
+              className="m-tf-search-input"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Competitions, skills, organisers"
+            />
+            {searchQuery && (
+              <button className="m-tf-clear-btn" onClick={() => setSearchQuery('')}>×</button>
+            )}
+          </div>
+
+          {/* Posts Feed */}
+          {loading ? (
+            <div className="m-tf-loading">
+              <span className="m-loading-spinner" />
+              <span>Loading squad listings…</span>
+            </div>
+          ) : filteredPosts.length === 0 ? (
+            <div className="m-tf-empty">
+              <h4>No team openings found</h4>
+              <p>
+                {activeTab === 'my'
+                  ? "You haven't posted any team openings yet. Tap '+ Post an opening' below to get started!"
+                  : "No open teams match your current search."}
+              </p>
+            </div>
+          ) : (
+            <div className="m-tf-feed">
+              {filteredPosts.map((post) => {
+                const isHost = isUserPost(post, user);
+                const postApps = applications.filter((a) => a.post_id === post.id);
+                const userApp = getUserApp(post, applications, user?.email, user?.id);
+                const openSpots = getPostOpenSpots(post, applications);
+                const openStatus = isPostOpen(post, applications);
+                const authorName = formatStudentName(post.created_by_name, post.created_by_email);
+                const avatarChar = (authorName || 'S').charAt(0).toUpperCase();
+
+                return (
+                  <div
+                    key={post.id}
+                    className="m-tf-card"
+                    onClick={() => setSelectedPostForView(post)}
+                  >
+                    {/* Header: Open spots + time */}
+                    <div className="m-tf-card-top">
+                      <span className={`m-tf-spots-pill ${openSpots > 0 ? 'open' : 'full'}`}>
+                        {openSpots > 0 ? `${openSpots} OF ${post.total_members || 4} SPOTS OPEN` : 'SQUAD FULL'}
+                      </span>
+                      <span className="m-tf-time-ago">{getPostTimeAgo(post.created_at)}</span>
+                    </div>
+
+                    {/* Comp Name & Org */}
+                    <div>
+                      <h3 className="m-tf-comp-name">{post.competition_name || post.title}</h3>
+                      {post.organizer && (
+                        <div className="m-tf-comp-org">{post.organizer}</div>
+                      )}
+                    </div>
+
+                    {/* Looking For Skills */}
+                    {post.skills_looking_for && post.skills_looking_for.length > 0 && (
+                      <div className="m-tf-skills-block">
+                        <span className="m-tf-skills-lbl">LOOKING FOR</span>
+                        <div className="m-tf-skills-wrap">
+                          {post.skills_looking_for.map((skill, sIdx) => (
+                            <span key={sIdx} className="m-tf-skill-chip">{skill}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Bottom Row: Creator Info + Action Button */}
+                    <div className="m-tf-card-foot">
+                      <div className="m-tf-creator">
+                        <span className="m-tf-avatar">{avatarChar}</span>
+                        <div className="m-tf-creator-details">
+                          <span className="m-tf-creator-name">{authorName}</span>
+                          <span className="m-tf-creator-course">{post.course} · {post.year}</span>
+                        </div>
+                      </div>
+
+                      {isHost ? (
+                        <button
+                          type="button"
+                          className="m-tf-action-btn manage"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedPostForReview(post);
+                          }}
+                        >
+                          Review {postApps.length > 0 ? `(${postApps.length})` : ''}
+                        </button>
+                      ) : userApp ? (
+                        <span className={`m-tf-applied-pill ${userApp.status}`}>
+                          {userApp.status === 'accepted' ? 'Joined ✓' : 'Requested'}
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          className="m-tf-action-btn"
+                          disabled={!openStatus}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedPostForApply(post);
+                          }}
+                        >
+                          Request to join
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <div style={{ height: 80 }} />
+        </div>
+
+        {/* Floating Action Button (FAB) */}
+        <button
+          type="button"
+          className="m-tf-fab"
+          onClick={handleOpenCreateModal}
+          aria-label="Post team opening"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Post an opening</span>
+        </button>
+
+        {/* Create Opening BottomSheet */}
+        <BottomSheet
+          isOpen={isCreateModalOpen}
+          onClose={handleCloseCreateModal}
+          title={editingPost ? "Edit Team Opening" : "Post a Team Opening"}
+          fullHeight={true}
+        >
+          <div className="m-tf-sheet-form">
+            <form onSubmit={handleCreateOrUpdatePost}>
+              {formError && <div className="m-tf-form-error">{formError}</div>}
+              
+              <div className="m-tf-form-group">
+                <label>Competition Name *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. EY NextGen Leader 2026"
+                  value={formData.competition_name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, competition_name: e.target.value }))}
+                />
+              </div>
+
+              <div className="m-tf-form-group">
+                <label>Organizer</label>
+                <input
+                  type="text"
+                  placeholder="e.g. EY India / IIM Ahmedabad"
+                  value={formData.organizer}
+                  onChange={(e) => setFormData(prev => ({ ...prev, organizer: e.target.value }))}
+                />
+              </div>
+
+              <div className="m-tf-form-group">
+                <label>Open Spots</label>
+                <div className="m-tf-stepper">
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, spots_left: Math.max(1, prev.spots_left - 1) }))}
+                    disabled={formData.spots_left <= 1}
+                  >−</button>
+                  <span>{formData.spots_left}</span>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, spots_left: Math.min(prev.total_members - 1, prev.spots_left + 1) }))}
+                    disabled={formData.spots_left >= formData.total_members - 1}
+                  >+</button>
+                </div>
+              </div>
+
+              <div className="m-tf-form-group">
+                <label>Looking for Skills</label>
+                <div className="m-tf-chips-picker">
+                  {DEFAULT_SKILLS.map(s => {
+                    const isSel = formData.skills_looking_for.includes(s);
+                    return (
+                      <button
+                        key={s}
+                        type="button"
+                        className={`m-tf-pick-chip ${isSel ? 'active' : ''}`}
+                        onClick={() => {
+                          setFormData(prev => ({
+                            ...prev,
+                            skills_looking_for: isSel
+                              ? prev.skills_looking_for.filter(x => x !== s)
+                              : [...prev.skills_looking_for, s]
+                          }));
+                        }}
+                      >
+                        {s}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="m-tf-form-group">
+                <label>Contact WhatsApp Number</label>
+                <input
+                  type="tel"
+                  placeholder="10-digit mobile number"
+                  value={formData.phone_number}
+                  onChange={(e) => setFormData(prev => ({ ...prev, phone_number: e.target.value }))}
+                />
+              </div>
+
+              <div className="m-tf-form-pinned-submit">
+                <button type="submit" className="m-btn-primary" disabled={submitting}>
+                  {submitting ? "Publishing..." : editingPost ? "Save Changes" : "Publish Team Opening"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </BottomSheet>
+
+        {/* Apply Modal BottomSheet */}
+        <BottomSheet
+          isOpen={!!selectedPostForApply}
+          onClose={() => setSelectedPostForApply(null)}
+          title="Join Squad"
+        >
+          {selectedPostForApply && (
+            <div className="m-tf-sheet-form">
+              <form onSubmit={handleSubmitApply}>
+                {applyError && <div className="m-tf-form-error">{applyError}</div>}
+                {applySuccess ? (
+                  <div className="m-tf-form-success">{applySuccess}</div>
+                ) : (
+                  <>
+                    <p style={{ margin: '0 0 12px', fontSize: 13, color: 'var(--ink-dim)' }}>
+                      Send an introduction to join {selectedPostForApply.competition_name || selectedPostForApply.title}
+                    </p>
+                    <div className="m-tf-form-group">
+                      <label>Brief Pitch</label>
+                      <textarea
+                        rows={3}
+                        required
+                        placeholder="Why you're a great fit for this squad..."
+                        value={applyForm.pitch_note}
+                        onChange={(e) => setApplyForm(prev => ({ ...prev, pitch_note: e.target.value }))}
+                      />
+                    </div>
+                    <div className="m-tf-form-group">
+                      <label>Your WhatsApp / Mobile</label>
+                      <input
+                        type="tel"
+                        required
+                        placeholder="10-digit number"
+                        value={applyForm.applicant_phone}
+                        onChange={(e) => setApplyForm(prev => ({ ...prev, applicant_phone: e.target.value }))}
+                      />
+                    </div>
+                    <div style={{ height: 16 }} />
+                    <button type="submit" className="m-btn-primary" disabled={applySubmitting}>
+                      {applySubmitting ? "Sending..." : "Submit Join Request"}
+                    </button>
+                  </>
+                )}
+              </form>
+            </div>
+          )}
+        </BottomSheet>
       </div>
     );
   }

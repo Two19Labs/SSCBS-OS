@@ -5,6 +5,9 @@ import { useTimetable } from '../context/TimetableContext';
 import { isAdminEmail, isTimeWarpEnabled, setTimeWarpEnabled } from '../lib/admin';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import { ChevronRight } from './icons';
+import { MOBILE_V2 } from '../lib/uiFlags';
+import { useIsMobile } from '../hooks/useIsMobile';
+import BottomSheet from './BottomSheet';
 import './ProfilePage.css';
 
 const COURSES = ['BMS', 'BBA FIA', 'Bsc Comp Sci'];
@@ -25,7 +28,9 @@ const sectionOptionsFor = (course) => {
   return ['A'];
 };
 
-export default function ProfilePage({ onNavigate }) {
+export default function ProfilePage({ onNavigate, headerAction }) {
+  const isMobile = useIsMobile();
+  const [showDrafterSheet, setShowDrafterSheet] = useState(false);
   const { user, updateProfile, signOut } = useAuth();
   const { preference, setPreference } = useTheme();
   const { getActiveSemesters } = useTimetable();
@@ -191,6 +196,249 @@ export default function ProfilePage({ onNavigate }) {
       alert(err.message || 'Failed to sign out.');
     }
   };
+
+  if (MOBILE_V2 && isMobile) {
+    return (
+      <div className="m-prof-root">
+        {/* Top App Bar (56px) */}
+        <header className="m-prof-topbar">
+          <button className="m-prof-icon-btn" onClick={headerAction || (() => onNavigate('home'))} aria-label="Open menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <h2 className="m-prof-title">Profile</h2>
+          <div className="m-prof-status">
+            {saveState === 'saving' && <span className="m-prof-status-saving">Saving...</span>}
+            {saveState === 'saved' && <span className="m-prof-status-saved">✓ Saved</span>}
+            {saveState === 'error' && <span className="m-prof-status-error">Error</span>}
+          </div>
+        </header>
+
+        {/* Scrollable Area */}
+        <div className="m-prof-scroll-area">
+          {/* Identity Card */}
+          <div className="m-prof-identity-card">
+            <div className="m-prof-avatar">
+              {displayName.charAt(0).toUpperCase()}
+            </div>
+            <div className="m-prof-identity-info">
+              <span className="m-prof-name">{displayName}</span>
+              <span className="m-prof-email">{email}</span>
+              <span className="m-prof-pill">
+                {course} · SEM {semester} · {section}
+              </span>
+            </div>
+          </div>
+
+          {/* Academic Info Group */}
+          <div className="m-prof-section">
+            <span className="m-prof-section-label">ACADEMIC</span>
+            <div className="m-prof-card">
+              <div className="m-prof-row">
+                <span className="m-prof-row-label">Full name</span>
+                <input
+                  type="text"
+                  className="m-prof-input"
+                  value={fullName}
+                  onChange={(e) => markDirty(setFullName)(e.target.value)}
+                  placeholder="Your full name"
+                />
+              </div>
+              <div className="m-prof-divider" />
+              <label className="m-prof-row m-prof-select-row">
+                <span className="m-prof-row-label">Course</span>
+                <span className="m-prof-row-val">
+                  <select
+                    className="m-prof-select"
+                    value={course}
+                    onChange={(e) => markDirty(setCourse)(e.target.value)}
+                  >
+                    {COURSES.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A89A90" strokeWidth="2" strokeLinecap="round"><polyline points="9 6 15 12 9 18"></polyline></svg>
+                </span>
+              </label>
+              <div className="m-prof-divider" />
+              <label className="m-prof-row m-prof-select-row">
+                <span className="m-prof-row-label">Semester</span>
+                <span className="m-prof-row-val">
+                  <select
+                    className="m-prof-select"
+                    value={semester}
+                    onChange={(e) => markDirty(setSemester)(e.target.value)}
+                  >
+                    {availableSemesters.map((s) => (
+                      <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                  </select>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A89A90" strokeWidth="2" strokeLinecap="round"><polyline points="9 6 15 12 9 18"></polyline></svg>
+                </span>
+              </label>
+              <div className="m-prof-divider" />
+              <label className="m-prof-row m-prof-select-row">
+                <span className="m-prof-row-label">Section</span>
+                <span className="m-prof-row-val">
+                  <select
+                    className="m-prof-select"
+                    value={section}
+                    onChange={(e) => markDirty(setSection)(e.target.value)}
+                    disabled={sectionOptionsFor(course).length <= 1}
+                  >
+                    {sectionOptionsFor(course).map((s) => (
+                      <option key={s} value={s}>Section {s}</option>
+                    ))}
+                  </select>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A89A90" strokeWidth="2" strokeLinecap="round"><polyline points="9 6 15 12 9 18"></polyline></svg>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          {/* Appearance */}
+          <div className="m-prof-section">
+            <span className="m-prof-section-label">APPEARANCE</span>
+            <div className="m-prof-segmented">
+              {['light', 'dark', 'system'].map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  className={`m-prof-segment ${preference === mode ? 'active' : ''}`}
+                  onClick={() => setPreference(mode)}
+                >
+                  {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Campus Buzz & Support */}
+          <div className="m-prof-section">
+            <span className="m-prof-section-label">CAMPUS BUZZ &amp; SUPPORT</span>
+            <div className="m-prof-card">
+              <div
+                className="m-prof-row clickable"
+                onClick={() => setShowDrafterSheet(true)}
+              >
+                <div className="m-prof-stacked-label">
+                  <span className="m-prof-main-text">Notice drafter access</span>
+                  <span className="m-prof-sub-text">For society leads posting to Buzz</span>
+                </div>
+                <span className="m-prof-row-val">
+                  <span className="m-prof-req-text">
+                    {drafterRequest?.status === 'approved' ? 'Active' : drafterRequest?.status === 'pending' ? 'Pending' : 'Request'}
+                  </span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A89A90" strokeWidth="2" strokeLinecap="round"><polyline points="9 6 15 12 9 18"></polyline></svg>
+                </span>
+              </div>
+              <div className="m-prof-divider" />
+              <div
+                className="m-prof-row clickable"
+                onClick={() => onNavigate('contact')}
+              >
+                <span className="m-prof-main-text">Contact us / WhatsApp DM</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A89A90" strokeWidth="2" strokeLinecap="round"><polyline points="9 6 15 12 9 18"></polyline></svg>
+              </div>
+            </div>
+          </div>
+
+          {/* Admin link if applicable */}
+          {isAdmin && (
+            <div className="m-prof-section">
+              <span className="m-prof-section-label">ADMINISTRATION</span>
+              <div className="m-prof-card">
+                <div
+                  className="m-prof-row clickable"
+                  onClick={() => onNavigate('admin')}
+                >
+                  <div className="m-prof-stacked-label">
+                    <span className="m-prof-main-text">Admin Console</span>
+                    <span className="m-prof-sub-text">Approvals, schedules, controls</span>
+                  </div>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A89A90" strokeWidth="2" strokeLinecap="round"><polyline points="9 6 15 12 9 18"></polyline></svg>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Sign Out */}
+          <button
+            type="button"
+            className="m-prof-signout-btn"
+            onClick={handleSignOut}
+          >
+            Sign out
+          </button>
+
+          <div className="m-prof-footer-note">
+            Made with ♥ by Two19 Labs
+          </div>
+
+          <div style={{ height: 40 }} />
+        </div>
+
+        {/* Drafter Access BottomSheet */}
+        <BottomSheet
+          isOpen={showDrafterSheet}
+          onClose={() => setShowDrafterSheet(false)}
+          title="Notice Drafter Access"
+        >
+          <div className="m-prof-sheet-body">
+            <p className="m-prof-sheet-desc">
+              Society leads and coordinators can request permission to post official announcements to Campus Buzz.
+            </p>
+
+            {requestMsg.text && (
+              <div className={`drafter-status-alert ${requestMsg.type}`} style={{ marginBottom: 12 }}>
+                {requestMsg.text}
+              </div>
+            )}
+
+            {drafterRequest?.status === 'approved' ? (
+              <div className="drafter-approved-box">
+                <p>🎉 You have notice drafting access! You can now create notice drafts on Campus Buzz for admin approval.</p>
+                <button
+                  className="btn-drafter-action"
+                  onClick={() => {
+                    setShowDrafterSheet(false);
+                    onNavigate('buzz');
+                  }}
+                >
+                  Go to Campus Buzz &amp; Draft Notice →
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleRequestDrafterAccess} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, fontWeight: 700 }}>
+                  <span>Society Name &amp; Position</span>
+                  <input
+                    type="text"
+                    className="drafter-input"
+                    placeholder="e.g. Coordinator, Rotaract"
+                    value={societyNote}
+                    onChange={(e) => setSocietyNote(e.target.value)}
+                    required
+                  />
+                </label>
+                <button
+                  type="submit"
+                  className="btn-drafter-submit"
+                  disabled={requestLoading}
+                  style={{ height: 44, borderRadius: 10, background: 'var(--maroon, #71222C)', color: '#fff', border: 'none', fontWeight: 800, fontSize: 14 }}
+                >
+                  {requestLoading ? 'Submitting...' : drafterRequest?.status === 'pending' ? 'Update Request' : 'Submit Access Request'}
+                </button>
+              </form>
+            )}
+          </div>
+        </BottomSheet>
+      </div>
+    );
+  }
 
   return (
     <div className="profile-page">

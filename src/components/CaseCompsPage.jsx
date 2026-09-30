@@ -2,6 +2,9 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import { trackCaseCompsEvent } from '../lib/analytics';
+import BottomSheet from './BottomSheet';
+import { MOBILE_V2 } from '../lib/uiFlags';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const LOCAL_STORAGE_KEY = 'sscbs_bookmarked_case_comps';
 
@@ -424,6 +427,7 @@ function getCardCircuit(comp) {
 
 export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
   const { user } = useAuth();
+  const isMobile = useIsMobile();
   const userKeySuffix = user?.email ? `_${user.email.toLowerCase()}` : '';
   const bookmarksKey = `${LOCAL_STORAGE_KEY}${userKeySuffix}`;
 
@@ -846,6 +850,362 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
 
     return result;
   }, [competitions, searchQuery, selectedCircuits, bookmarkedOnly, selectedTracks, teamFilter, feeFilter, sortBy, bookmarkedIds]);
+
+  if (MOBILE_V2 && isMobile) {
+    const activeFiltersCount = selectedCircuits.length + selectedTracks.length + (teamFilter !== 'all' ? 1 : 0) + (feeFilter !== 'all' ? 1 : 0);
+
+    const handleClearAllFilters = () => {
+      setSelectedCircuits([]);
+      setSelectedTracks([]);
+      setTeamFilter('all');
+      setFeeFilter('all');
+    };
+
+    return (
+      <div className="m-comps-root">
+        {/* Top App Bar (56px) */}
+        <header className="m-comps-topbar">
+          <button className="m-comps-icon-btn" onClick={headerAction || onBack} aria-label="Open menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <h2 className="m-comps-title">Competitions</h2>
+          <button 
+            className={`m-comps-icon-btn ${bookmarkedOnly ? 'active' : ''}`}
+            onClick={() => setBookmarkedOnly(!bookmarkedOnly)}
+            aria-label="Filter bookmarks"
+            title="Saved competitions"
+          >
+            <BookmarkIcon size={20} filled={bookmarkedOnly} />
+          </button>
+        </header>
+
+        {/* Scrollable Container */}
+        <div className="m-comps-scroll-area">
+          {/* Search Bar */}
+          <div className="m-comps-search-bar">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7A6D5F" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+            </svg>
+            <input
+              type="text"
+              className="m-comps-search-input"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search IIM, IIT, XLRI, prizes…"
+            />
+            {searchQuery && (
+              <button className="m-comps-clear-btn" onClick={() => setSearchQuery('')}>×</button>
+            )}
+          </div>
+
+          {/* Active Filter Chips Row */}
+          <div className="m-comps-chips-row">
+            <button
+              type="button"
+              className="m-comps-filter-trigger"
+              onClick={() => setIsMobileFiltersOpen(true)}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <line x1="4" y1="6" x2="20" y2="6"></line>
+                <line x1="7" y1="12" x2="17" y2="12"></line>
+                <line x1="10" y1="18" x2="14" y2="18"></line>
+              </svg>
+              <span>Filters {activeFiltersCount > 0 ? `· ${activeFiltersCount}` : ''}</span>
+            </button>
+
+            {selectedCircuits.map(cid => {
+              const opt = CIRCUIT_OPTIONS.find(c => c.id === cid);
+              return (
+                <button
+                  key={cid}
+                  type="button"
+                  className="m-comps-active-chip"
+                  onClick={() => setSelectedCircuits(prev => prev.filter(c => c !== cid))}
+                >
+                  {opt?.label || cid} ×
+                </button>
+              );
+            })}
+
+            {selectedTracks.map(tid => {
+              const opt = TRACK_OPTIONS.find(t => t.id === tid);
+              return (
+                <button
+                  key={tid}
+                  type="button"
+                  className="m-comps-active-chip"
+                  onClick={() => setSelectedTracks(prev => prev.filter(t => t !== tid))}
+                >
+                  {opt?.label || tid} ×
+                </button>
+              );
+            })}
+
+            {teamFilter !== 'all' && (
+              <button
+                type="button"
+                className="m-comps-active-chip"
+                onClick={() => setTeamFilter('all')}
+              >
+                {teamFilter === 'solo' ? 'Solo only' : 'Teams only'} ×
+              </button>
+            )}
+
+            {feeFilter !== 'all' && (
+              <button
+                type="button"
+                className="m-comps-active-chip"
+                onClick={() => setFeeFilter('all')}
+              >
+                {feeFilter === 'free' ? 'Free entry' : 'Paid entry'} ×
+              </button>
+            )}
+          </div>
+
+          {/* Count and Sort Bar */}
+          <div className="m-comps-meta-row">
+            <span><b>{filteredComps.length}</b> open · synced from Unstop</span>
+            <button 
+              type="button" 
+              className="m-comps-sort-toggle"
+              onClick={() => setSortBy(prev => prev === 'closing-soonest' ? 'popular' : 'closing-soonest')}
+            >
+              {sortBy === 'closing-soonest' ? 'Deadline ↓' : 'Popularity ↓'}
+            </button>
+          </div>
+
+          {/* Competitions Cards Feed */}
+          {loading ? (
+            <div className="m-comps-loading">
+              <span className="m-loading-spinner" />
+              <span>Loading live competitions…</span>
+            </div>
+          ) : filteredComps.length === 0 ? (
+            <div className="m-comps-empty">
+              <h4>No competitions match your filters</h4>
+              <p>Try searching for a different keyword or resetting your filter criteria.</p>
+              <button type="button" className="m-comps-btn-reset" onClick={handleClearAllFilters}>
+                Reset all filters
+              </button>
+            </div>
+          ) : (
+            <div className="m-comps-feed">
+              {filteredComps.map(comp => {
+                const circuit = getCardCircuit(comp);
+                const deadlineInfo = getDeadlineUrgency(comp.deadline, comp.remainingTime, nowMs);
+                const isFree = !comp.fee || comp.fee.toLowerCase().includes('free') || comp.fee === '0';
+
+                return (
+                  <div key={comp.id} className="m-comp-card">
+                    {/* Top Row: Category + Deadline */}
+                    <div className="m-comp-card-top">
+                      <span className="m-comp-circuit-pill">
+                        {(comp.track || 'COMP').toUpperCase()} · {circuit.label.toUpperCase()}
+                      </span>
+                      <span className={`m-comp-deadline-pill ${deadlineInfo.urgencyClass}`}>
+                        {deadlineInfo.text}
+                      </span>
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="m-comp-card-title">{comp.title}</h3>
+                    
+                    {/* Organization */}
+                    {comp.orgName && (
+                      <p className="m-comp-card-org">{comp.orgName}</p>
+                    )}
+
+                    {/* Tags row */}
+                    <div className="m-comp-tags-row">
+                      <span className="m-comp-tag">
+                        Team of {comp.teamSize || '2–4'}
+                      </span>
+                      <span className={`m-comp-tag ${isFree ? 'free' : ''}`}>
+                        {isFree ? 'Free' : comp.fee}
+                      </span>
+                      {comp.prizes && comp.prizes !== 'Unspecified' && (
+                        <span className="m-comp-tag prize">
+                          🏆 {comp.prizes}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* 2-Button Action Grid */}
+                    <div className="m-comp-action-grid">
+                      <button
+                        type="button"
+                        className="m-comp-btn-team"
+                        onClick={() => {
+                          if (typeof onNavigate === 'function') {
+                            onNavigate('team-finder', {
+                              prefillComp: comp.title,
+                              prefillOrg: comp.orgName,
+                              prefillUrl: comp.unstopUrl || comp.applyUrl
+                            });
+                          }
+                        }}
+                      >
+                        Find teammates
+                      </button>
+                      <a
+                        href={comp.unstopUrl || comp.applyUrl || 'https://unstop.com'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="m-comp-btn-unstop"
+                      >
+                        Open on Unstop ↗
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <div style={{ height: 40 }} />
+        </div>
+
+        {/* Screen 18: Filter BottomSheet */}
+        <BottomSheet
+          isOpen={isMobileFiltersOpen}
+          onClose={() => setIsMobileFiltersOpen(false)}
+          title="Filters"
+          fullHeight={true}
+        >
+          <div className="m-filter-sheet-body">
+            <div className="m-filter-sheet-header">
+              <span className="m-filter-sheet-title">Refine Competitions</span>
+              <button type="button" className="m-filter-clear-all" onClick={handleClearAllFilters}>
+                Clear all
+              </button>
+            </div>
+
+            {/* CIRCUIT */}
+            <div className="m-filter-group">
+              <span className="m-filter-group-label">CIRCUIT</span>
+              <div className="m-filter-chip-wrap">
+                {CIRCUIT_OPTIONS.map(opt => {
+                  const isSel = selectedCircuits.includes(opt.id);
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      className={`m-filter-chip ${isSel ? 'active' : ''}`}
+                      onClick={() => {
+                        setSelectedCircuits(prev =>
+                          prev.includes(opt.id) ? prev.filter(c => c !== opt.id) : [...prev, opt.id]
+                        );
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* TRACK */}
+            <div className="m-filter-group">
+              <span className="m-filter-group-label">TRACK</span>
+              <div className="m-filter-chip-wrap">
+                {TRACK_OPTIONS.map(opt => {
+                  const isSel = selectedTracks.includes(opt.id);
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      className={`m-filter-chip ${isSel ? 'active' : ''}`}
+                      onClick={() => {
+                        setSelectedTracks(prev =>
+                          prev.includes(opt.id) ? prev.filter(t => t !== opt.id) : [...prev, opt.id]
+                        );
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* FORMAT */}
+            <div className="m-filter-group">
+              <span className="m-filter-group-label">FORMAT</span>
+              <div className="m-segmented">
+                <button
+                  type="button"
+                  className={`m-segmented-item ${teamFilter === 'all' ? 'active' : ''}`}
+                  onClick={() => setTeamFilter('all')}
+                >
+                  Any
+                </button>
+                <button
+                  type="button"
+                  className={`m-segmented-item ${teamFilter === 'solo' ? 'active' : ''}`}
+                  onClick={() => setTeamFilter('solo')}
+                >
+                  Solo
+                </button>
+                <button
+                  type="button"
+                  className={`m-segmented-item ${teamFilter === 'team' ? 'active' : ''}`}
+                  onClick={() => setTeamFilter('team')}
+                >
+                  Team
+                </button>
+              </div>
+            </div>
+
+            {/* ENTRY FEE */}
+            <div className="m-filter-group">
+              <span className="m-filter-group-label">ENTRY FEE</span>
+              <div className="m-segmented">
+                <button
+                  type="button"
+                  className={`m-segmented-item ${feeFilter === 'all' ? 'active' : ''}`}
+                  onClick={() => setFeeFilter('all')}
+                >
+                  Any
+                </button>
+                <button
+                  type="button"
+                  className={`m-segmented-item ${feeFilter === 'free' ? 'active' : ''}`}
+                  onClick={() => setFeeFilter('free')}
+                >
+                  Free
+                </button>
+                <button
+                  type="button"
+                  className={`m-segmented-item ${feeFilter === 'paid' ? 'active' : ''}`}
+                  onClick={() => setFeeFilter('paid')}
+                >
+                  Paid
+                </button>
+              </div>
+            </div>
+
+            <div style={{ height: 70 }} />
+
+            {/* Pinned Bottom CTA */}
+            <div className="m-filter-pinned-cta">
+              <button
+                type="button"
+                className="m-btn-primary"
+                onClick={() => setIsMobileFiltersOpen(false)}
+              >
+                Show {filteredComps.length} competitions
+              </button>
+            </div>
+          </div>
+        </BottomSheet>
+      </div>
+    );
+  }
 
   return (
     <div className="case-comps-container">

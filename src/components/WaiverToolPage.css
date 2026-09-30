@@ -2416,5 +2416,491 @@
   color: var(--accent);
 }
 
+/* ═══════════════════════════════════════════════════════════
+   Mobile Redesign v2: Waiver Tool (Screens 13 & 14)
+   Strictly isolated to (max-width: 899px)
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 899px) {
+  .m-waiver-root {
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--bg-main, #F7F3EC);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .m-waiver-topbar {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+    background: var(--bg-main, #F7F3EC);
+    border-bottom: 1px solid var(--border, rgba(36,26,20,.10));
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .m-waiver-icon-btn {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--ink, #241A14);
+    cursor: pointer;
+  }
+
+  .m-waiver-title {
+    font-size: 17px;
+    font-weight: 800;
+    margin: 0;
+    color: var(--ink, #241A14);
+    letter-spacing: -0.01em;
+  }
+
+  .m-waiver-text-btn {
+    height: 44px;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    background: transparent;
+    border: none;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #71222C;
+    cursor: pointer;
+  }
+
+  .m-waiver-loading-bar {
+    padding: 8px 16px;
+    background: #71222C;
+    color: #F7EAD9;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .m-waiver-scroll-area {
+    flex: 1;
+    padding: 14px 16px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .m-waiver-intro {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-dim, #7A6D5F);
+    margin: 0;
+  }
+
+  .m-waiver-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .m-waiver-sec-header {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .09em;
+    color: var(--ink-dim, #7A6D5F);
+  }
+
+  .m-waiver-card {
+    background: var(--surface, #FFFDF9);
+    border: 1px solid var(--border, rgba(36,26,20,.10));
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .m-waiver-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 56px;
+    padding: 0 14px;
+  }
+
+  .m-waiver-row-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .m-waiver-row-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink, #241A14);
+  }
+
+  .m-waiver-row-desc {
+    font-size: 11px;
+    color: var(--ink-dim, #7A6D5F);
+  }
+
+  .m-waiver-divider {
+    height: 1px;
+    background: var(--border, rgba(36,26,20,.08));
+    margin-left: 14px;
+  }
+
+  .m-waiver-select {
+    border: none;
+    background: transparent;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #71222C;
+    cursor: pointer;
+    outline: none;
+    padding: 4px;
+  }
+
+  .m-waiver-stepper {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border, rgba(36,26,20,.14));
+    border-radius: 10px;
+    height: 40px;
+    background: var(--surface, #FFFDF9);
+  }
+
+  .m-waiver-step-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    color: var(--ink-dim, #7A6D5F);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .m-waiver-step-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .m-waiver-step-val {
+    min-width: 36px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--ink, #241A14);
+  }
+
+  .m-waiver-dropzone {
+    background: var(--surface, #FFFDF9);
+    border: 1.5px dashed var(--border, rgba(36,26,20,.20));
+    border-radius: 14px;
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .m-drop-icon {
+    color: var(--ink-dim, #7A6D5F);
+  }
+
+  .m-drop-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 13px;
+    color: var(--ink, #241A14);
+  }
+  .m-drop-text span {
+    font-size: 11px;
+    color: var(--ink-dim, #7A6D5F);
+  }
+
+  .m-file-badge {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 13px;
+    color: #0B7A54;
+  }
+
+  .m-waiver-error {
+    padding: 10px 14px;
+    background: rgba(192, 57, 43, 0.1);
+    border: 1px solid rgba(192, 57, 43, 0.3);
+    border-radius: 10px;
+    color: #C0392B;
+    font-size: 12.5px;
+  }
+
+  .m-waiver-pinned-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: var(--bg-main, #F7F3EC);
+    border-top: 1px solid var(--border, rgba(36,26,20,.10));
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 16px;
+    z-index: 10;
+  }
+
+  .m-waiver-cta-btn {
+    width: 100%;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: var(--ink, #241A14);
+    color: #F7F3EC;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .m-waiver-cta-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .m-waiver-hero-card {
+    background: #71222C;
+    color: #F7EAD9;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .m-waiver-hero-badge {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .09em;
+    opacity: .8;
+  }
+
+  .m-waiver-hero-title {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    line-height: 1.25;
+  }
+
+  .m-waiver-hero-sub {
+    font-size: 12px;
+    opacity: .85;
+  }
+
+  .m-waiver-dates-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .m-waiver-date-card {
+    background: var(--surface, #FFFDF9);
+    border: 1.5px solid var(--border, rgba(36,26,20,.12));
+    border-radius: 14px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+  }
+  .m-waiver-date-card.active {
+    border-color: #71222C;
+  }
+
+  .m-waiver-date-badge {
+    width: 48px;
+    height: 52px;
+    border-radius: 10px;
+    background: rgba(113,34,44,.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .m-w-date-num {
+    font-size: 18px;
+    font-weight: 800;
+    color: #71222C;
+    line-height: 1;
+  }
+
+  .m-w-date-mo {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .09em;
+    color: #71222C;
+  }
+
+  .m-waiver-date-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .m-w-date-title {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: var(--ink, #241A14);
+  }
+
+  .m-w-date-sub {
+    font-size: 12px;
+    color: var(--ink-dim, #7A6D5F);
+  }
+
+  .m-waiver-check {
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    border: 1.5px solid var(--border, rgba(36,26,20,.25));
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .m-waiver-check.checked {
+    background: #71222C;
+    border-color: #71222C;
+    color: #F7EAD9;
+  }
+
+  .m-waiver-subjects-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .m-waiver-subject-card {
+    background: var(--surface, #FFFDF9);
+    border: 1px solid var(--border, rgba(36,26,20,.10));
+    border-radius: 14px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .m-w-sub-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .m-w-sub-name {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: var(--ink, #241A14);
+  }
+
+  .m-w-sub-badge {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+  .m-w-sub-badge.safe {
+    background: rgba(11,122,84,.12);
+    color: #0B7A54;
+  }
+  .m-w-sub-badge.short {
+    background: rgba(192,57,43,.12);
+    color: #C0392B;
+  }
+
+  .m-w-sub-bar-wrap {
+    width: 100%;
+    position: relative;
+  }
+
+  .m-w-sub-bar-bg {
+    width: 100%;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(36,26,20,.08);
+    position: relative;
+  }
+
+  .m-w-sub-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+  }
+  .m-w-sub-bar-fill.safe {
+    background: #0B7A54;
+  }
+  .m-w-sub-bar-fill.short {
+    background: #C0392B;
+  }
+
+  .m-w-sub-target-tick {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    width: 2px;
+    background: var(--ink, #241A14);
+    z-index: 2;
+  }
+
+  .m-w-sub-foot {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--ink-dim, #7A6D5F);
+  }
+
+  .m-waiver-calendar-wrap {
+    background: var(--surface, #FFFDF9);
+    border: 1px solid var(--border, rgba(36,26,20,.10));
+    border-radius: 14px;
+    padding: 12px;
+    overflow-x: auto;
+  }
+
+  .m-waiver-bar-sec {
+    flex: 1;
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid var(--border, rgba(36,26,20,.16));
+    background: var(--surface, #FFFDF9);
+    color: var(--ink, #241A14);
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .m-waiver-bar-pri {
+    flex: 1.4;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: var(--ink, #241A14);
+    color: #F7F3EC;
+    font-size: 13.5px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+}
+
+
 
 

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTimetable } from '../context/TimetableContext';
+import { MOBILE_V2 } from '../lib/uiFlags';
+import { useIsMobile } from '../hooks/useIsMobile';
 import './ProfileModal.css';
 
 const ALL_SEMESTERS = [
@@ -15,6 +17,7 @@ const ALL_SEMESTERS = [
 ];
 
 export default function ProfileModal({ isOpen, onClose, isFirstTimeSetup = false }) {
+  const isMobile = useIsMobile();
   const { user, updateProfile, signOut } = useAuth();
   const { getActiveSemesters } = useTimetable();
   
@@ -108,6 +111,117 @@ export default function ProfileModal({ isOpen, onClose, isFirstTimeSetup = false
   };
 
   if (!isOpen) return null;
+
+  if (MOBILE_V2 && isMobile) {
+    const courseLabels = [
+      { id: 'BMS', label: 'BMS' },
+      { id: 'BBA FIA', label: 'BBA FIA' },
+      { id: 'Bsc Comp Sci', label: 'BSc CS' }
+    ];
+    const sectionOptions = getSectionOptions();
+
+    return (
+      <div className="m-pmodal-overlay" onClick={isFirstTimeSetup ? undefined : onClose}>
+        <div className="m-pmodal-sheet" onClick={(e) => e.stopPropagation()}>
+          <div className="m-pmodal-handle" />
+          
+          <div className="m-pmodal-header">
+            <span className="m-pmodal-step-badge">STEP 1 OF 1</span>
+            <h2 className="m-pmodal-title">Set up your timetable</h2>
+            <p className="m-pmodal-desc">
+              We use this to show your live classes. You can change it later in Profile.
+            </p>
+          </div>
+
+          {status.message && (
+            <div className={`m-pmodal-alert ${status.type}`}>
+              {status.type === 'success' ? '✓ ' : '⚠️ '}
+              {status.message}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="m-pmodal-form">
+            {/* FULL NAME */}
+            <div className="m-pmodal-field">
+              <span className="m-pmodal-field-label">FULL NAME</span>
+              <input
+                type="text"
+                className="m-pmodal-input"
+                placeholder="e.g. Aarav Sharma"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+              />
+            </div>
+
+            {/* COURSE */}
+            <div className="m-pmodal-field">
+              <span className="m-pmodal-field-label">COURSE</span>
+              <div className="m-pmodal-segmented">
+                {courseLabels.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    className={`m-pmodal-segment ${course === c.id ? 'active' : ''}`}
+                    onClick={() => setCourse(c.id)}
+                  >
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* SEMESTER */}
+            <div className="m-pmodal-field">
+              <span className="m-pmodal-field-label">SEMESTER</span>
+              <div className="m-pmodal-chips-row">
+                {availableSemesters.map((s) => {
+                  const shortLabel = `Sem ${s.value}`;
+                  return (
+                    <button
+                      key={s.value}
+                      type="button"
+                      className={`m-pmodal-chip ${semester === s.value ? 'active' : ''}`}
+                      onClick={() => setSemester(s.value)}
+                    >
+                      {shortLabel}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* SECTION */}
+            <div className="m-pmodal-field">
+              <span className="m-pmodal-field-label">SECTION</span>
+              <div className="m-pmodal-grid-sections">
+                {sectionOptions.map((sec) => (
+                  <button
+                    key={sec}
+                    type="button"
+                    className={`m-pmodal-tile ${section === sec ? 'active' : ''}`}
+                    onClick={() => setSection(sec)}
+                  >
+                    {sec}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ flex: 1, minHeight: 16 }} />
+
+            <button
+              type="submit"
+              className="m-pmodal-submit-btn"
+              disabled={loading}
+            >
+              {loading ? 'Setting up...' : 'Show my timetable'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="profile-modal-overlay" onClick={isFirstTimeSetup ? undefined : onClose}>

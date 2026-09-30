@@ -3,6 +3,8 @@ import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabaseClient';
 import { trackPostHogPageView, trackAuthEvent } from '../lib/analytics';
 import { EyeIcon, EyeOffIcon } from './icons';
+import { MOBILE_V2 } from '../lib/uiFlags';
+import { useIsMobile } from '../hooks/useIsMobile';
 import './Auth.css';
 
 const slides = [
@@ -25,6 +27,7 @@ const slides = [
 ];
 
 export default function Auth({ forceMode }) {
+  const isMobile = useIsMobile();
   const { signIn, signUp, resetPassword, updatePassword, isPasswordRecovery, setIsPasswordRecovery, isConfigured } = useAuth();
   
   // mode: 'signin' | 'signup' | 'forgot' | 'update_password'
@@ -197,6 +200,176 @@ export default function Auth({ forceMode }) {
       default: return 'Sign in to access your student dashboard.';
     }
   };
+
+  if (MOBILE_V2 && isMobile) {
+    return (
+      <div className="m-auth-root">
+        <div className="m-auth-scroll-area">
+          {/* Header Brand */}
+          <div className="m-auth-brand">
+            <img
+              src="/sscbs_logo.png"
+              alt="SSCBS"
+              className="m-auth-logo"
+              onError={(e) => { e.target.style.display = 'none'; }}
+            />
+            <h1 className="m-auth-title">SSCBS Campus OS</h1>
+            <p className="m-auth-subtitle">Timetable, tools and campus notices in one place.</p>
+          </div>
+
+          {/* Segmented Control (Sign in / Create account) */}
+          <div className="m-auth-segmented">
+            <button
+              type="button"
+              className={`m-auth-segment ${mode === 'signin' ? 'active' : ''}`}
+              onClick={() => {
+                setMode('signin');
+                setError('');
+                setSuccessMsg('');
+              }}
+            >
+              Sign in
+            </button>
+            <button
+              type="button"
+              className={`m-auth-segment ${mode === 'signup' ? 'active' : ''}`}
+              onClick={() => {
+                setMode('signup');
+                setError('');
+                setSuccessMsg('');
+              }}
+            >
+              Create account
+            </button>
+          </div>
+
+          {/* Error / Success Notifications */}
+          {error && <div className="m-auth-alert error">{error}</div>}
+          {successMsg && <div className="m-auth-alert success">{successMsg}</div>}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="m-auth-form">
+            {mode === 'signup' && (
+              <div className="m-auth-field">
+                <span className="m-auth-field-label">FULL NAME</span>
+                <input
+                  type="text"
+                  className="m-auth-input"
+                  placeholder="Your full name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                />
+              </div>
+            )}
+
+            {mode !== 'update_password' && (
+              <div className="m-auth-field">
+                <span className="m-auth-field-label">COLLEGE EMAIL</span>
+                <input
+                  type="email"
+                  className="m-auth-input"
+                  placeholder="name@sscbs.du.ac.in"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+            )}
+
+            {mode !== 'forgot' && (
+              <div className="m-auth-field">
+                <span className="m-auth-field-label">PASSWORD</span>
+                <div className="m-auth-password-wrapper">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    className="m-auth-input password-input"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="m-auth-eye-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label="Toggle password"
+                  >
+                    {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+                  </button>
+                </div>
+                {mode === 'signin' && (
+                  <button
+                    type="button"
+                    className="m-auth-forgot-btn"
+                    onClick={() => {
+                      setMode('forgot');
+                      setError('');
+                      setSuccessMsg('');
+                    }}
+                  >
+                    Forgot password?
+                  </button>
+                )}
+              </div>
+            )}
+
+            {mode === 'forgot' && (
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  className="m-auth-forgot-btn"
+                  onClick={() => {
+                    setMode('signin');
+                    setError('');
+                    setSuccessMsg('');
+                  }}
+                >
+                  Back to Sign In
+                </button>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="m-auth-submit-btn"
+              disabled={loading}
+            >
+              {loading ? 'Please wait...' : mode === 'signup' ? 'Create Account' : mode === 'forgot' ? 'Send Reset Link' : 'Sign in'}
+            </button>
+          </form>
+
+          {/* Google SSO */}
+          {supabase && (
+            <button
+              type="button"
+              className="m-auth-google-btn"
+              onClick={handleGoogleSignIn}
+              disabled={loading}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05" />
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335" />
+              </svg>
+              <span>Continue with College Google</span>
+            </button>
+          )}
+
+          {/* Feature Tiles 2x2 Grid */}
+          <div className="m-auth-features-grid">
+            <div className="m-auth-feature-tile">Class schedules</div>
+            <div className="m-auth-feature-tile">Waiver calculator</div>
+            <div className="m-auth-feature-tile">GPA tracker</div>
+            <div className="m-auth-feature-tile">Society directory</div>
+          </div>
+
+          <div style={{ height: 40 }} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="auth-container">

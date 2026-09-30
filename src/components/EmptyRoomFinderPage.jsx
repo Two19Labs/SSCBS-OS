@@ -11,11 +11,15 @@ import {
 } from '../utils/roomFinder';
 import { DoorIcon, SearchIcon, BackIcon, RefreshIcon, CalendarIcon } from './icons';
 import { trackEmptyRoomEvent } from '../lib/analytics';
+import { MOBILE_V2 } from '../lib/uiFlags';
+import { useIsMobile } from '../hooks/useIsMobile';
+import BottomSheet from './BottomSheet';
 import './EmptyRoomFinderPage.css';
 
 export function EmptyRoomFinderPage({ onBack, headerAction }) {
   const { timetable, holidays } = useTimetable();
   const { user } = useAuth();
+  const isMobile = useIsMobile();
 
   // Mode: 'live' or 'slot'
   const [mode, setMode] = useState('live');
@@ -212,6 +216,221 @@ export function EmptyRoomFinderPage({ onBack, headerAction }) {
     return getRoomDailyTimeline(timetable, activeDay, selectedRoomForTimeline);
   }, [selectedRoomForTimeline, timetable, activeDay]);
 
+
+  if (MOBILE_V2 && isMobile) {
+    const selectedRoomObj = roomStatuses.find(r => r.room === selectedRoomForTimeline);
+    const isSelectedRoomVacant = selectedRoomObj ? selectedRoomObj.isVacant : false;
+
+    return (
+      <div className="m-radar-screen">
+        {/* Header App Bar */}
+        <header className="m-appbar">
+          <button className="m-appbar-icon-btn" onClick={onBack} aria-label="Back">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <span className="m-appbar-title">Classroom Radar</span>
+          {headerAction ? (
+            <div className="m-radar-header-action">{headerAction}</div>
+          ) : (
+            <div style={{ width: 44 }}></div>
+          )}
+        </header>
+
+        <div className="m-radar-content">
+          {/* Segmented Mode: Live now / Pick a slot */}
+          <div className="m-segmented">
+            <button
+              type="button"
+              className={`m-segmented-btn ${mode === 'live' ? 'active' : ''}`}
+              onClick={() => setMode('live')}
+            >
+              <span className="live-dot-green">●</span> Live now
+            </button>
+            <button
+              type="button"
+              className={`m-segmented-btn ${mode === 'slot' ? 'active' : ''}`}
+              onClick={() => setMode('slot')}
+            >
+              Pick a slot
+            </button>
+          </div>
+
+          {/* Slot pickers if in slot mode */}
+          {mode === 'slot' && (
+            <div className="m-slot-pickers-card">
+              <div className="m-slot-select-group">
+                <label className="m-label-cap">DAY</label>
+                <select value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)} className="m-select">
+                  {DAYS.map(d => <option key={d} value={d}>{d}</option>)}
+                </select>
+              </div>
+              <div className="m-slot-select-group">
+                <label className="m-label-cap">PERIOD</label>
+                <select value={selectedPeriodId} onChange={(e) => setSelectedPeriodId(Number(e.target.value))} className="m-select">
+                  {PERIODS.filter(p => !p.isBreak).map(p => (
+                    <option key={p.id} value={p.id}>{p.label} ({p.startLabel})</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+
+          {/* Summary Card (Screen 09) */}
+          <div className="m-card m-radar-summary-card">
+            <div className="m-radar-summary-left">
+              <span className="m-radar-summary-day">
+                {activeDay.toUpperCase()} · PERIOD {activePeriod.roman || activePeriod.id}
+              </span>
+              <span className="m-mono-time" style={{ fontSize: '13px', marginTop: '2px', color: 'var(--ink)' }}>
+                {activePeriod.startLabel} – {activePeriod.endLabel}
+              </span>
+            </div>
+            <div className="m-radar-summary-right">
+              <div className="m-counter-col">
+                <span className="m-counter-num green">{vacantCount}</span>
+                <span className="m-counter-label">FREE</span>
+              </div>
+              <div className="m-counter-col">
+                <span className="m-counter-num">{occupiedCount}</span>
+                <span className="m-counter-label">IN CLASS</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Search Bar */}
+          <div className="m-prof-search-box">
+            <SearchIcon size={16} />
+            <input
+              type="text"
+              placeholder="Room, section or professor"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="m-prof-search-input"
+            />
+            {searchQuery && (
+              <button className="m-prof-search-clear" onClick={() => setSearchQuery('')}>✕</button>
+            )}
+          </div>
+
+          {/* Filter Pills */}
+          <div className="m-pills-row">
+            <button
+              type="button"
+              className={`m-chip ${statusFilter === 'VACANT' ? 'active' : ''}`}
+              onClick={() => setStatusFilter(statusFilter === 'VACANT' ? 'ALL' : 'VACANT')}
+            >
+              Free · {vacantCount}
+            </button>
+            <button
+              type="button"
+              className={`m-chip ${statusFilter === 'OCCUPIED' ? 'active' : ''}`}
+              onClick={() => setStatusFilter(statusFilter === 'OCCUPIED' ? 'ALL' : 'OCCUPIED')}
+            >
+              In class · {occupiedCount}
+            </button>
+            <div className="m-floor-select-wrap">
+              <select
+                value={floorFilter}
+                onChange={(e) => setFloorFilter(e.target.value)}
+                className="m-chip m-floor-select"
+              >
+                <option value="ALL">Floor: All ▾</option>
+                {[2, 3, 4, 5, 6, 7].map(f => (
+                  <option key={f} value={f}>Floor {f}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Room List Feed */}
+          <div className="m-rooms-feed">
+            {filteredRooms.map(item => (
+              <div
+                key={item.room}
+                className="m-card m-room-card"
+                onClick={() => setSelectedRoomForTimeline(item.room)}
+              >
+                <div className="m-room-card-left">
+                  <span className="m-room-number">{item.room.replace(/^room\s*/i, '')}</span>
+                  <span className="m-room-floor-tag">{getOrdinalSuffix(item.floor)} floor</span>
+                </div>
+                <div className="m-room-card-mid">
+                  <span className={`m-room-chip ${item.isVacant ? 'free' : 'in-class'}`}>
+                    {item.isVacant ? 'FREE' : 'IN CLASS'}
+                  </span>
+                  <span className="m-room-status-line">
+                    {item.isVacant
+                      ? (item.isFreeRestOfDay ? 'Free for the rest of the day' : `Free until ${item.freeUntilPeriodLabel}`)
+                      : `${item.occupiedBy?.subject || 'Class'}`}
+                  </span>
+                  <span className="m-room-sub-detail">
+                    {item.isVacant
+                      ? (item.consecutiveFreePeriods > 1 ? `${item.consecutiveFreePeriods} periods in a row` : 'Available now')
+                      : `${item.occupiedBy?.course || ''} Sem ${item.occupiedBy?.sem || ''}${item.occupiedBy?.sec || ''} · ${item.occupiedBy?.teacher || ''}`}
+                  </span>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A89A90" strokeWidth="2" strokeLinecap="round">
+                  <polyline points="9 6 15 12 9 18"></polyline>
+                </svg>
+              </div>
+            ))}
+          </div>
+
+          {/* Footer note */}
+          <div className="m-prof-footer-note">
+            Based on the official timetable. Rooms can change. <span className="m-link-text">Details</span>
+          </div>
+        </div>
+
+        {/* Screen 10 Room Schedule BottomSheet */}
+        {selectedRoomForTimeline && roomTimelineData && (
+          <BottomSheet
+            isOpen={!!selectedRoomForTimeline}
+            onClose={() => setSelectedRoomForTimeline(null)}
+            title=""
+            fullHeight={false}
+          >
+            <div className="m-room-sheet-body">
+              <div className="m-room-sheet-header">
+                <span className={`m-room-chip ${isSelectedRoomVacant ? 'free' : 'in-class'}`}>
+                  {isSelectedRoomVacant ? 'FREE NOW' : 'IN CLASS NOW'}
+                </span>
+                <h3 className="m-sheet-title">Room {selectedRoomForTimeline.replace(/^room\s*/i, '')}</h3>
+                <span className="m-sheet-sub">
+                  {getOrdinalSuffix(roomTimelineData.floor)} floor · {activeDay}
+                </span>
+              </div>
+
+              {/* Schedule periods list */}
+              <div className="m-card m-period-list">
+                {roomTimelineData.timeline.map((slot, idx) => (
+                  <React.Fragment key={slot.period}>
+                    {idx > 0 && <div className="m-period-divider"></div>}
+                    <div className={`m-period-row ${slot.isCurrent ? 'active' : ''} ${!slot.isCurrent && slot.isVacant ? 'free-dim' : ''}`}>
+                      <span className="m-mono-time">{slot.startLabel}</span>
+                      <div className="m-prof-slot-details">
+                        {slot.isBreak ? (
+                          <span className="gold">Infinity Hour</span>
+                        ) : slot.isVacant ? (
+                          <span className="green">{slot.isCurrent ? 'Free · now' : 'Free'}</span>
+                        ) : (
+                          <span className="dark">
+                            {slot.occupiedBy?.course} Sem {slot.occupiedBy?.sem}{slot.occupiedBy?.sec} · {slot.occupiedBy?.subject}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+          </BottomSheet>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="empty-room-page">

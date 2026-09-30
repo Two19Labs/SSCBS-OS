@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { trackGpaEvent } from '../lib/analytics';
+import { MOBILE_V2 } from '../lib/uiFlags';
+import { useIsMobile } from '../hooks/useIsMobile';
 import './GpaCalculatorModal.css';
 
 const DEFAULT_SLOTS = [
@@ -36,6 +38,7 @@ const STORAGE_KEYS = {
 
 export default function GpaCalculatorModal({ isOpen, onClose }) {
   const { user } = useAuth();
+  const isMobile = useIsMobile();
   
   // Tabs: 'sgpa' | 'cgpa'
   const [activeTab, setActiveTab] = useState(() => {
@@ -340,6 +343,230 @@ export default function GpaCalculatorModal({ isOpen, onClose }) {
   };
 
   if (!isOpen) return null;
+
+  if (MOBILE_V2 && isMobile) {
+    return (
+      <div className="m-gpa-modal-root" role="dialog" aria-modal="true">
+        {/* Top App Bar (56px) */}
+        <header className="m-gpa-topbar">
+          <button className="m-gpa-icon-btn" onClick={onClose} aria-label="Close GPA Calculator">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+          <h2 className="m-gpa-title">GPA Calculator</h2>
+          {activeTab === 'sgpa' ? (
+            <button className="m-gpa-reset-btn" onClick={handleResetSgpa}>Reset</button>
+          ) : (
+            <div style={{ width: 44 }} />
+          )}
+        </header>
+
+        {/* Scroll Area */}
+        <div className="m-gpa-scroll-area">
+          {/* Segmented SGPA / CGPA */}
+          <div className="m-segmented">
+            <button 
+              className={`m-segmented-item ${activeTab === 'sgpa' ? 'active' : ''}`}
+              onClick={() => setActiveTab('sgpa')}
+            >
+              SGPA
+            </button>
+            <button 
+              className={`m-segmented-item ${activeTab === 'cgpa' ? 'active' : ''}`}
+              onClick={() => setActiveTab('cgpa')}
+            >
+              CGPA
+            </button>
+          </div>
+
+          {activeTab === 'sgpa' ? (
+            <>
+              {/* S1 - S8 Horizontal Scroll Chips */}
+              <div className="m-gpa-sem-scroll">
+                {Array.from({ length: 8 }, (_, i) => {
+                  const sNum = (i + 1).toString();
+                  const isSel = sNum === selectedSemester;
+                  return (
+                    <button
+                      key={sNum}
+                      type="button"
+                      className={`m-gpa-sem-chip ${isSel ? 'active' : ''}`}
+                      onClick={() => handleSemesterSelect(sNum)}
+                    >
+                      S{sNum}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Maroon Hero Card */}
+              <div className="m-gpa-hero-card">
+                <div className="m-gpa-hero-left">
+                  <span className="m-gpa-hero-sub">SEMESTER {selectedSemester} SGPA</span>
+                  <span className="m-gpa-hero-val">{sgpaResult.toFixed(2)}</span>
+                </div>
+                <div className="m-gpa-hero-right">
+                  <span><strong>{totalSgpaCredits}</strong> credits</span>
+                  <span><strong>{totalSgpaPoints}</strong> grade points</span>
+                  <span>≈ {(sgpaResult * 10).toFixed(1)}%</span>
+                </div>
+              </div>
+
+              {/* Subject list */}
+              <div className="m-gpa-subjects-card">
+                {subjects.map((sub, idx) => (
+                  <React.Fragment key={sub.id}>
+                    {idx > 0 && <div className="m-gpa-sub-divider" />}
+                    <div className="m-gpa-subject-row">
+                      <div className="m-gpa-sub-left">
+                        <input
+                          type="text"
+                          className="m-gpa-sub-input"
+                          value={sub.name}
+                          onChange={(e) => handleSubjectChange(sub.id, 'name', e.target.value)}
+                          placeholder="Subject name"
+                        />
+                        <div className="m-gpa-credits-row">
+                          <span className="m-gpa-credits-lbl">{sub.credits} credits</span>
+                          <button 
+                            className="m-gpa-mini-btn"
+                            type="button"
+                            onClick={() => handleStepCredits(sub.id, -1)}
+                            disabled={parseInt(sub.credits) <= 1}
+                            aria-label="Decrease credits"
+                          >−</button>
+                          <button 
+                            className="m-gpa-mini-btn"
+                            type="button"
+                            onClick={() => handleStepCredits(sub.id, 1)}
+                            disabled={parseInt(sub.credits) >= 10}
+                            aria-label="Increase credits"
+                          >+</button>
+                          <button 
+                            className="m-gpa-sub-del-btn"
+                            type="button"
+                            onClick={() => handleDeleteSubject(sub.id)}
+                            title="Delete subject"
+                            aria-label="Delete subject"
+                          >×</button>
+                        </div>
+                      </div>
+
+                      {/* Stepper < Grade > */}
+                      <div className="m-gpa-grade-stepper">
+                        <button
+                          type="button"
+                          className="m-gpa-step-arrow"
+                          onClick={() => handleStepGrade(sub.id, 'down')}
+                          disabled={sub.grade === 'Ab' || GRADES_ORDER.indexOf(sub.grade) === GRADES_ORDER.length - 1}
+                          aria-label="Lower grade"
+                        >‹</button>
+                        <span className={`m-gpa-grade-badge grade-${sub.grade}`}>{sub.grade}</span>
+                        <button
+                          type="button"
+                          className="m-gpa-step-arrow"
+                          onClick={() => handleStepGrade(sub.id, 'up')}
+                          disabled={sub.grade === 'O' || GRADES_ORDER.indexOf(sub.grade) === 0}
+                          aria-label="Higher grade"
+                        >›</button>
+                      </div>
+                    </div>
+                  </React.Fragment>
+                ))}
+              </div>
+
+              <div style={{ height: 80 }} />
+            </>
+          ) : (
+            <>
+              {/* CGPA 2-card stats */}
+              <div className="m-cgpa-stats-grid">
+                <div className="m-cgpa-card maroon">
+                  <div className="m-cgpa-card-lbl">CGPA</div>
+                  <div className="m-cgpa-card-val">{cgpaResult.toFixed(2)}</div>
+                  <div className="m-cgpa-card-sub">≈ {(cgpaResult * 10).toFixed(1)}%</div>
+                </div>
+                <div className="m-cgpa-card white">
+                  <div className="m-cgpa-card-lbl">CREDITS</div>
+                  <div className="m-cgpa-card-val">{totalCgpaCredits}</div>
+                  <div className="m-cgpa-card-sub">{semestersData.filter(s => s.enabled).length} semesters</div>
+                </div>
+              </div>
+
+              <div className="m-cgpa-instruction">
+                Tick the semesters you've completed. SGPA and credits come from the SGPA tab.
+              </div>
+
+              {/* Semester Checklist */}
+              <div className="m-cgpa-sem-card">
+                {semestersData.map((sem, idx) => {
+                  const { sgpa, credits } = getSemSgpaAndCredits(sem.number);
+                  const hasData = sem.enabled || credits > 0;
+                  return (
+                    <React.Fragment key={sem.number}>
+                      {idx > 0 && <div className="m-gpa-sub-divider" />}
+                      <div className="m-cgpa-sem-row">
+                        <button
+                          type="button"
+                          className={`m-cgpa-check-box ${sem.enabled ? 'checked' : ''}`}
+                          onClick={() => handleSemesterDataChange(sem.number, 'enabled', !sem.enabled)}
+                          aria-label={`Toggle semester ${sem.number}`}
+                        >
+                          {sem.enabled && <span>✓</span>}
+                        </button>
+                        <span 
+                          className="m-cgpa-sem-title"
+                          onClick={() => handleSemesterDataChange(sem.number, 'enabled', !sem.enabled)}
+                        >
+                          Semester {sem.number}
+                        </span>
+                        {hasData ? (
+                          <div className="m-cgpa-sem-metrics">
+                            <span className="m-cgpa-sem-gpa-val">{sgpa.toFixed(2)}</span>
+                            <span className="m-cgpa-sem-cr-val">{credits} cr</span>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            className="m-cgpa-enter-btn"
+                            onClick={() => {
+                              handleSemesterSelect(sem.number.toString());
+                              setActiveTab('sgpa');
+                            }}
+                          >
+                            Enter grades →
+                          </button>
+                        )}
+                      </div>
+                    </React.Fragment>
+                  );
+                })}
+              </div>
+
+              <div className="m-cgpa-disclaimer">
+                DU NEP 2020: 1 credit = 25 marks. Pass grade is 4.00 (Letter D).
+              </div>
+              <div style={{ height: 40 }} />
+            </>
+          )}
+        </div>
+
+        {/* Pinned Bottom Bar (SGPA) */}
+        {activeTab === 'sgpa' && (
+          <div className="m-gpa-pinned-bar">
+            <button type="button" className="m-gpa-bar-btn-sec" onClick={handleAddSubject}>
+              + Subject
+            </button>
+            <button type="button" className="m-gpa-bar-btn-pri" onClick={handleCopySgpaToCgpa}>
+              Add to CGPA →
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="gpa-modal-overlay" onClick={onClose}>

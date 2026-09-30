@@ -10,6 +10,8 @@ import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFaculty
 import { exportScheduleAsImage } from '../utils/exportUtils';
 import { trackTimetableEvent } from '../lib/analytics';
 import OtherSectionsModal from './OtherSectionsModal';
+import { useIsMobile } from '../hooks/useIsMobile';
+import { MOBILE_V2 } from '../lib/uiFlags';
 
 import './HomeDashboard.css';
 
@@ -41,6 +43,7 @@ const ROOM_DISPLAY_MAP = {
 export default function HomeDashboard({ onNavigate, onOpenProfile }) {
   const { user } = useAuth();
   const { featureFlags } = useConfig();
+  const isMobile = useIsMobile();
   const isAdmin = isAdminEmail(user?.email);
   const canTimeWarp = isAdmin && isTimeWarpEnabled();
 
@@ -340,17 +343,48 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
     }
 
     const renderLiveDisclaimer = () => (
-      <div className="live-card-disclaimer">
-        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2" fill="none" style={{ flexShrink: 0, marginTop: '2px' }}>
-          <circle cx="12" cy="12" r="10" />
-          <line x1="12" y1="16" x2="12" y2="12" />
-          <line x1="12" y1="8" x2="12.01" y2="8" />
-        </svg>
-        <span>Uses latest official timetable. Subject to professor changes/cancellations.</span>
-      </div>
+      MOBILE_V2 && isMobile ? (
+        <div className="live-card-disclaimer-mobile">
+          From the latest official timetable. Professors may reschedule.
+        </div>
+      ) : (
+        <div className="live-card-disclaimer">
+          <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" strokeWidth="2" fill="none" style={{ flexShrink: 0, marginTop: '2px' }}>
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="16" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12.01" y2="8" />
+          </svg>
+          <span>Uses latest official timetable. Subject to professor changes/cancellations.</span>
+        </div>
+      )
     );
 
     const renderActionButtons = (customScheduleLabel = null) => {
+      if (MOBILE_V2 && isMobile) {
+        return (
+          <div className="home-live-mobile-actions">
+            <button
+              className="home-live-btn-primary"
+              onClick={() => {
+                trackTimetableEvent('open_timetable_page');
+                onNavigate('timetable');
+              }}
+            >
+              Full timetable
+            </button>
+            <button
+              className="home-live-btn-secondary"
+              onClick={() => {
+                trackTimetableEvent('open_other_sections_modal');
+                setShowOtherSectionsModal(true);
+              }}
+            >
+              Other sections
+            </button>
+          </div>
+        );
+      }
+
       let timelineBtnLabel = showTimeline ? "Hide Today's Schedule ▲" : "View Today's Schedule ▼";
       if (customScheduleLabel) {
         timelineBtnLabel = customScheduleLabel;
@@ -700,30 +734,47 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
     <div className="home-dashboard">
       <div className="home-main-col">
         {/* Greeting & Header */}
-        <div className="home-greeting-row">
-          <div>
-            <h1 className="home-greeting">{greeting}, {firstName}</h1>
-            <div className="micro-label dim home-class-label">
+        {MOBILE_V2 && isMobile ? (
+          <div className="home-mobile-greeting-block">
+            <div className="home-mobile-date-line">
+              {time.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase()} ·{' '}
+              <span className="home-mobile-mono-time">
+                {String(hour % 12 || 12).padStart(2, '0')}:{String(time.getMinutes()).padStart(2, '0')} {hour >= 12 ? 'PM' : 'AM'} IST
+              </span>
+            </div>
+            <h1 className="home-mobile-greeting">{greeting}, {firstName}</h1>
+            <div className="home-mobile-sub">
               {hasProfile
                 ? `${course} · SEM ${semester} · SECTION ${section}`.toUpperCase()
                 : 'PROFILE NOT CONFIGURED'}
             </div>
           </div>
-          <div className="home-greeting-actions" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span className="ist-pill">
-              IST {String(hour % 12 || 12).padStart(2, '0')}:{String(time.getMinutes()).padStart(2, '0')}:{String(time.getSeconds()).padStart(2, '0')} {hour >= 12 ? 'PM' : 'AM'}
-            </span>
-            <div className="desktop-only-notif">
-              <NotificationCenter onNavigate={onNavigate} />
+        ) : (
+          <div className="home-greeting-row">
+            <div>
+              <h1 className="home-greeting">{greeting}, {firstName}</h1>
+              <div className="micro-label dim home-class-label">
+                {hasProfile
+                  ? `${course} · SEM ${semester} · SECTION ${section}`.toUpperCase()
+                  : 'PROFILE NOT CONFIGURED'}
+              </div>
+            </div>
+            <div className="home-greeting-actions" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span className="ist-pill">
+                IST {String(hour % 12 || 12).padStart(2, '0')}:{String(time.getMinutes()).padStart(2, '0')}:{String(time.getSeconds()).padStart(2, '0')} {hour >= 12 ? 'PM' : 'AM'}
+              </span>
+              <div className="desktop-only-notif">
+                <NotificationCenter onNavigate={onNavigate} />
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Live Class Card */}
         {renderLiveCard()}
 
-        {/* Daily & Tomorrow Timeline Tracker */}
-        {hasProfile && timetable && showTimeline && (
+        {/* Daily & Tomorrow Timeline Tracker (Hidden on mobile per Screen 03 spec) */}
+        {!(MOBILE_V2 && isMobile) && hasProfile && timetable && showTimeline && (
           <div className="daily-timeline-section animate-fade-in" style={{ marginBottom: '24px' }}>
             <div className="timeline-header-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -934,25 +985,49 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
         )}
 
         {/* Tools Section */}
-        <div className="home-tools-section">
-          <div className="home-section-head">
-            <span className="home-section-title">Tools</span>
+        {!(MOBILE_V2 && isMobile) ? (
+          <div className="home-tools-section">
+            <div className="home-section-head">
+              <span className="home-section-title">Tools</span>
+            </div>
+            <div className="home-tools-grid">
+              {tools.map(({ id, title, desc, Icon, locked }) => (
+                <button
+                  key={id}
+                  className={`home-tool-card ${locked ? 'locked' : ''}`}
+                  onClick={() => !locked && onNavigate(id)}
+                  disabled={locked}
+                >
+                  <span className="tool-title">{title}</span>
+                  <span className="tool-desc">{desc}</span>
+                  {!locked && <span className="tool-launch">Launch →</span>}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="home-tools-grid">
-            {tools.map(({ id, title, desc, Icon, locked }) => (
-              <button
-                key={id}
-                className={`home-tool-card ${locked ? 'locked' : ''}`}
-                onClick={() => !locked && onNavigate(id)}
-                disabled={locked}
-              >
-                <span className="tool-title">{title}</span>
-                <span className="tool-desc">{desc}</span>
-                {!locked && <span className="tool-launch">Launch →</span>}
+        ) : (
+          <div className="home-quick-tools-mobile">
+            <span className="home-quick-tools-title">Quick tools</span>
+            <div className="home-quick-tools-grid">
+              <button className="home-quick-tool-tile" onClick={() => onNavigate('find-prof')}>
+                <div className="home-quick-tool-icon"><SearchIcon size={22} /></div>
+                <span className="home-quick-tool-label">Find<br />Professor</span>
               </button>
-            ))}
+              <button className="home-quick-tool-tile" onClick={() => onNavigate('empty-room')}>
+                <div className="home-quick-tool-icon"><DoorIcon size={22} /></div>
+                <span className="home-quick-tool-label">Classroom<br />Radar</span>
+              </button>
+              <button className="home-quick-tool-tile" onClick={() => onNavigate('gpa')}>
+                <div className="home-quick-tool-icon"><CalculatorIcon size={22} /></div>
+                <span className="home-quick-tool-label">GPA<br />Calculator</span>
+              </button>
+              <button className="home-quick-tool-tile" onClick={() => onNavigate('case-comps')}>
+                <div className="home-quick-tool-icon"><FlameIcon size={22} /></div>
+                <span className="home-quick-tool-label">Compet-<br />itions</span>
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Campus Buzz / Notice Board Column */}

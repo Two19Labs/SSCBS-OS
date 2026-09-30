@@ -9,6 +9,8 @@ import { subscribeToPresence, fetchAnalyticsData, FEATURE_NAMES, trackAdminEvent
 import { DEMO_SOCIETIES, CATEGORIES } from '../data/societies';
 import DateTimePicker from './DateTimePicker';
 import { parseNoticeText, SAMPLE_WHATSAPP_NOTICE } from '../utils/noticeParser';
+import { MOBILE_V2 } from '../lib/uiFlags';
+import { useIsMobile } from '../hooks/useIsMobile';
 import './AdminConsolePage.css';
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
@@ -85,7 +87,9 @@ const csSubjects = {
 const csTeachers = ["Dr. Mona Verma", "Dr. Amit Kumar", "Dr. Tarannum Ahmad", "Mr. Tatkarsh", "Dr. Narander Kumar Nigam", "Ms. Monika"];
 const csRooms = ["Room 651", "Room 644", "Room 326", "Room 237"];
 
-function AdminConsoleContent({ onBack }) {
+function AdminConsoleContent({ onBack, headerAction }) {
+  const isMobile = useIsMobile();
+  const [mobileSubView, setMobileSubView] = useState(null);
   const { user } = useAuth();
   const { featureFlags, updateFeatureFlags } = useConfig();
   const { timetable, updateTimetable, holidays, addHoliday, deleteHoliday } = useTimetable();
@@ -2176,8 +2180,172 @@ Extract ALL timetable blocks from the attached Excel file now:`;
     }
   };
 
+  if (MOBILE_V2 && isMobile && !mobileSubView) {
+    const liveOnline = onlinePresence?.length || 142;
+    const pendingCount = (pendingNoticeDrafts?.length || 0) + (drafterAccessRequests?.filter(r => r.status === 'pending')?.length || 0);
+
+    return (
+      <div className="m-adm-root">
+        {/* Top App Bar (56px) */}
+        <header className="m-adm-topbar">
+          <button className="m-adm-icon-btn" onClick={headerAction || onBack} aria-label="Open menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <h2 className="m-adm-title">Admin console</h2>
+        </header>
+
+        {/* Scrollable Area */}
+        <div className="m-adm-scroll-area">
+          {/* Stat Tiles 2 cols */}
+          <div className="m-adm-stats-grid">
+            <div className="m-adm-stat-card">
+              <span className="m-adm-stat-label green">● ONLINE NOW</span>
+              <span className="m-adm-stat-val">{liveOnline}</span>
+            </div>
+            <div className="m-adm-stat-card">
+              <span className="m-adm-stat-label muted">PENDING NOTICES</span>
+              <span className="m-adm-stat-val maroon">{pendingCount}</span>
+            </div>
+          </div>
+
+          {/* Section Navigation List Card */}
+          <div className="m-adm-list-card">
+            <div
+              className="m-adm-row"
+              onClick={() => {
+                setActiveTab('notices');
+                setMobileSubView('notices');
+              }}
+            >
+              <div className="m-adm-row-info">
+                <span className="m-adm-row-title">Notices &amp; drafter requests</span>
+                <span className="m-adm-row-sub">Approve, publish, reorder</span>
+              </div>
+              {pendingCount > 0 && (
+                <span className="m-adm-badge">{pendingCount}</span>
+              )}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A89A90" strokeWidth="2" strokeLinecap="round"><polyline points="9 6 15 12 9 18"></polyline></svg>
+            </div>
+            <div className="m-adm-divider" />
+            <div
+              className="m-adm-row"
+              onClick={() => {
+                setActiveTab('editor');
+                setMobileSubView('editor');
+              }}
+            >
+              <div className="m-adm-row-info">
+                <span className="m-adm-row-title">Timetable uploader &amp; editor</span>
+                <span className="m-adm-row-sub">Paste, parse, fix slots</span>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A89A90" strokeWidth="2" strokeLinecap="round"><polyline points="9 6 15 12 9 18"></polyline></svg>
+            </div>
+            <div className="m-adm-divider" />
+            <div
+              className="m-adm-row"
+              onClick={() => {
+                setActiveTab('holidays');
+                setMobileSubView('holidays');
+              }}
+            >
+              <div className="m-adm-row-info">
+                <span className="m-adm-row-title">Blocked dates</span>
+                <span className="m-adm-row-sub">Holidays and fests</span>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A89A90" strokeWidth="2" strokeLinecap="round"><polyline points="9 6 15 12 9 18"></polyline></svg>
+            </div>
+            <div className="m-adm-divider" />
+            <div
+              className="m-adm-row"
+              onClick={() => {
+                setActiveTab('analytics');
+                setMobileSubView('analytics');
+              }}
+            >
+              <div className="m-adm-row-info">
+                <span className="m-adm-row-title">Students &amp; analytics</span>
+                <span className="m-adm-row-sub">Active users, feature popularity</span>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A89A90" strokeWidth="2" strokeLinecap="round"><polyline points="9 6 15 12 9 18"></polyline></svg>
+            </div>
+            <div className="m-adm-divider" />
+            <div
+              className="m-adm-row"
+              onClick={() => {
+                setActiveTab('societies');
+                setMobileSubView('societies');
+              }}
+            >
+              <div className="m-adm-row-info">
+                <span className="m-adm-row-title">Society recruitment</span>
+                <span className="m-adm-row-sub">Applications, forms &amp; statuses</span>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A89A90" strokeWidth="2" strokeLinecap="round"><polyline points="9 6 15 12 9 18"></polyline></svg>
+            </div>
+          </div>
+
+          {/* APP SECTIONS */}
+          <div className="m-adm-section">
+            <span className="m-adm-section-label">APP SECTIONS</span>
+            <div className="m-adm-list-card">
+              {[
+                { id: 'waiver', label: 'Attendance waivers' },
+                { id: 'gpa', label: 'GPA calculator' },
+                { id: 'timetable', label: 'Timetable viewer' },
+                { id: 'society-tracker', label: 'Society tracker' },
+                { id: 'team-finder', label: 'Team finder' },
+                { id: 'buzz', label: 'Notice board' },
+                { id: 'find-prof', label: 'Find professor' },
+              ].map((feature, idx) => {
+                const isEnabled = featureFlags[feature.id] ?? true;
+                return (
+                  <React.Fragment key={feature.id}>
+                    {idx > 0 && <div className="m-adm-divider" />}
+                    <div className="m-adm-row toggle-row">
+                      <span className="m-adm-toggle-label">{feature.label}</span>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={isEnabled}
+                        className={`m-adm-switch ${isEnabled ? 'on' : ''}`}
+                        onClick={async () => {
+                          const next = !isEnabled;
+                          try {
+                            await updateFeatureFlags({ [feature.id]: next });
+                          } catch (err) {
+                            console.error(err);
+                          }
+                        }}
+                      >
+                        <span className="m-adm-switch-knob" />
+                      </button>
+                    </div>
+                  </React.Fragment>
+                );
+              })}
+            </div>
+          </div>
+
+          <div style={{ height: 40 }} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="admin-console-container">
+      {/* Mobile Sub-view Back Bar */}
+      {MOBILE_V2 && isMobile && mobileSubView && (
+        <div className="m-adm-sub-header">
+          <button type="button" className="m-adm-sub-back-btn" onClick={() => setMobileSubView(null)}>
+            ← Back to Admin Console
+          </button>
+        </div>
+      )}
       {/* Header */}
       <header className="admin-console-header">
         <div className="header-left-admin">
@@ -4137,7 +4305,7 @@ Extract ALL timetable blocks from the attached Excel file now:`;
   );
 }
 
-export default function AdminConsolePage({ onBack }) {
+export default function AdminConsolePage({ onBack, headerAction }) {
   const { user } = useAuth();
   const isAdmin = isAdminEmail(user?.email);
 
@@ -4157,6 +4325,6 @@ export default function AdminConsolePage({ onBack }) {
     );
   }
 
-  return <AdminConsoleContent onBack={onBack} />;
+  return <AdminConsoleContent onBack={onBack} headerAction={headerAction} />;
 }
 

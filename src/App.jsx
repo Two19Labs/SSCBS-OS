@@ -76,8 +76,13 @@ const PageLoader = () => (
   </div>
 );
 
+import { useIsMobile } from './hooks/useIsMobile';
+import { MOBILE_V2 } from './lib/uiFlags';
+import { useTheme } from './context/ThemeContext';
+import TimetablePage from './components/TimetablePage';
+
 const TOOL_VIEWS = ['find-prof', 'waiver', 'admin', 'team-finder', 'empty-room', 'faculty-db', 'society-tracker', 'case-comps'];
-const VALID_VIEWS = ['home', 'find-prof', 'waiver', 'tools', 'buzz', 'profile', 'admin', 'contact', 'team-finder', 'empty-room', 'faculty-db', 'society-tracker', 'case-comps'];
+const VALID_VIEWS = ['home', 'timetable', 'find-prof', 'waiver', 'tools', 'buzz', 'profile', 'admin', 'contact', 'team-finder', 'empty-room', 'faculty-db', 'society-tracker', 'case-comps', 'notifications', 'pyqs'];
 
 
 const getInitialView = () => {
@@ -97,6 +102,8 @@ const getInitialView = () => {
 function App() {
   const { user, loading, isPasswordRecovery } = useAuth();
   const { featureFlags } = useConfig();
+  const isMobile = useIsMobile();
+  const { theme, setPreference } = useTheme();
   useNotificationEngine();
 
   useEffect(() => {
@@ -303,10 +310,47 @@ function App() {
     }] : []),
   ];
 
+  const mobileNavSections = [
+    {
+      title: 'MAIN',
+      items: [
+        { id: 'home', label: 'Home', Icon: HomeIcon },
+        { id: 'timetable', label: 'Timetable', Icon: CalendarIcon },
+        { id: 'buzz', label: 'Campus Buzz', Icon: MegaphoneIcon, locked: !featureFlags['buzz'] && !isAdmin, badge: '3' },
+      ],
+    },
+    {
+      title: 'ACADEMIC & TOOLS',
+      items: [
+        { id: 'find-prof', label: 'Find My Professor', Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
+        { id: 'empty-room', label: 'Classroom Radar', Icon: DoorIcon, liveTag: true },
+        { id: 'gpa', label: 'GPA Calculator', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
+        { id: 'waiver', label: 'Waiver Tool', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
+        { id: 'pyqs', label: 'PYQs & Resources', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin, soonTag: true },
+      ],
+    },
+    {
+      title: 'COMMUNITY',
+      items: [
+        ...(hasCaseCompsAccess ? [{ id: 'case-comps', label: 'Competitions', Icon: FlameIcon, liveTag: true }] : []),
+        ...(hasTeamFinderAccess ? [{ id: 'team-finder', label: 'Team Finder', Icon: TrophyIcon }] : []),
+        ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', label: 'Societies Database', Icon: UsersIcon }] : []),
+        ...(hasFacultyDbAccess ? [{ id: 'faculty-db', label: 'Faculty Directory', Icon: UserIcon }] : []),
+      ],
+    },
+    ...(isAdmin ? [{
+      title: 'ADMINISTRATION',
+      items: [
+        { id: 'admin', label: 'Admin Console', Icon: ShieldIcon },
+      ],
+    }] : []),
+  ];
+
   const activeTab = TOOL_VIEWS.includes(view) || view === 'tools' ? 'tools' : view === 'buzz' ? 'home' : view;
 
   const pageTitle = {
     tools: 'Tools',
+    timetable: 'Timetable',
     'society-tracker': 'Societies Database',
     'case-comps': 'Competitions',
     'find-prof': 'Find My Professor',
@@ -317,10 +361,34 @@ function App() {
     buzz: 'Campus Buzz',
     profile: 'Profile',
     contact: 'Contact Us',
+    pyqs: 'PYQs & Resources',
   }[view];
 
   const renderView = () => {
     switch (view) {
+      case 'timetable':
+        return (
+          <TimetablePage
+            onNavigate={openTool}
+            onOpenDrawer={() => setIsMobileSidebarOpen(true)}
+          />
+        );
+      case 'pyqs':
+        return (
+          <div className="pyqs-page-container">
+            <div className="pyqs-card">
+              <span className="pyqs-icon">
+                <FileIcon size={32} />
+              </span>
+              <span className="m-chip" style={{ fontSize: '10px', height: '28px', pointerEvents: 'none' }}>COMING SOON</span>
+              <h2>Past papers, syllabus and notes</h2>
+              <p>Organised by course and semester. We'll tell you on Campus Buzz when it opens.</p>
+              <button className="m-chip active" style={{ height: '44px', padding: '0 20px', cursor: 'pointer', marginTop: '12px' }} onClick={() => setView('home')}>
+                Back to Home
+              </button>
+            </div>
+          </div>
+        );
       case 'society-tracker':
         return hasSocietyTrackerAccess ? (
           <Suspense fallback={<PageLoader />}>
@@ -493,11 +561,11 @@ function App() {
           onClick={() => setIsMobileSidebarOpen(false)}
         />
 
-        {/* ── Mobile slide-out sidebar drawer ── */}
+        {/* ── Mobile slide-out sidebar drawer (Screen 04) ── */}
         <aside className={`app-sidebar-mobile ${isMobileSidebarOpen ? 'open' : ''}`}>
           <div className="mobile-sidebar-header">
             <div className="sidebar-brand" onClick={() => { trackNavigationEvent('mobile_brand', 'home'); setView('home'); setIsMobileSidebarOpen(false); }}>
-              <img src="/sscbs_logo.png" alt="" width="28" height="28" />
+              <img src="/sscbs_logo.png" alt="" width="26" height="26" style={{ borderRadius: '6px' }} />
               <div className="sidebar-brand-text">
                 <span className="sidebar-brand-name">SSCBS OS</span>
                 <span className="sidebar-brand-sub">CAMPUS WORKSPACE</span>
@@ -512,14 +580,31 @@ function App() {
             </button>
           </div>
 
+          {/* Profile Card right below header (Screen 04) */}
+          <div
+            className="mobile-drawer-profile-card"
+            onClick={() => { trackNavigationEvent('mobile_drawer_profile', 'profile'); setView('profile'); setIsMobileSidebarOpen(false); }}
+          >
+            <span className="mobile-drawer-avatar">{displayName.charAt(0).toUpperCase()}</span>
+            <div className="mobile-drawer-user-info">
+              <span className="mobile-drawer-name">{displayName}</span>
+              <span className="mobile-drawer-sub">
+                {user?.user_metadata?.course || 'Student'} · Sem {user?.user_metadata?.semester || '1'} · Section {user?.user_metadata?.section || 'A'}
+              </span>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink-faint)" strokeWidth="2" strokeLinecap="round">
+              <polyline points="9 6 15 12 9 18" />
+            </svg>
+          </div>
+
           <nav className="mobile-sidebar-nav">
-            {navSections.map((section, idx) => (
+            {mobileNavSections.map((section, idx) => (
               <div key={idx} className="mobile-sidebar-section">
                 <div className="mobile-section-header">{section.title}</div>
-                {section.items.map(({ id, label, Icon, locked, featured }) => (
+                {section.items.map(({ id, label, Icon, locked, liveTag, soonTag, badge }) => (
                   <button
                     key={id}
-                    className={`mobile-sidebar-item ${view === id ? 'active' : ''} ${locked ? 'locked' : ''} ${featured ? 'featured-nav-item' : ''}`}
+                    className={`mobile-sidebar-item ${view === id ? 'active' : ''} ${locked ? 'locked' : ''}`}
                     onClick={() => {
                       if (!locked) {
                         setIsMobileSidebarOpen(false);
@@ -529,31 +614,46 @@ function App() {
                     disabled={locked}
                   >
                     <div className="mobile-item-left">
-                      <Icon filled={view === id} size={18} />
+                      <Icon filled={view === id} size={19} />
                       <span>{label}</span>
                     </div>
-                    {featured && <span className="sidebar-featured-badge">LIVE</span>}
-                    {locked && <span className="sidebar-soon">SOON</span>}
+                    {badge && <span className="mobile-item-badge">{badge}</span>}
+                    {liveTag && <span className="mobile-item-live">● LIVE</span>}
+                    {soonTag && <span className="mobile-item-soon">SOON</span>}
+                    {locked && !soonTag && <span className="mobile-item-soon">SOON</span>}
                   </button>
                 ))}
               </div>
             ))}
           </nav>
 
-          <div
-            className={`mobile-sidebar-user-card ${view === 'profile' ? 'active' : ''}`}
-            onClick={() => { trackNavigationEvent('mobile_user_profile', 'profile'); setView('profile'); setIsMobileSidebarOpen(false); }}
-          >
-            <span className="sidebar-avatar">{displayName.charAt(0).toUpperCase()}</span>
-            <div className="mobile-user-details">
-              <span className="mobile-user-name">{displayName}</span>
-              <span className="mobile-user-email">{user.email}</span>
+          {/* Drawer Footer with Contact Us & Theme Toggle (Screen 04) */}
+          <div className="mobile-drawer-footer">
+            <button
+              className="mobile-drawer-contact-btn"
+              onClick={() => { setIsMobileSidebarOpen(false); setView('contact'); }}
+            >
+              <MessageIcon size={18} />
+              <span>Contact us</span>
+            </button>
+            <div className="mobile-drawer-theme-toggle">
+              <button
+                className={`mobile-drawer-theme-pill ${theme === 'light' ? 'active' : ''}`}
+                onClick={() => setPreference('light')}
+              >
+                Light
+              </button>
+              <button
+                className={`mobile-drawer-theme-pill ${theme === 'dark' ? 'active' : ''}`}
+                onClick={() => setPreference('dark')}
+              >
+                Dark
+              </button>
             </div>
-            <span className="mobile-profile-tag">Profile</span>
           </div>
         </aside>
 
-        {/* ── Mobile top bar ── */}
+        {/* ── Mobile top bar (56px) ── */}
         <header className="app-topbar">
           <button
             className="topbar-menu-btn"
@@ -568,11 +668,19 @@ function App() {
           </button>
           
           <div className="topbar-title-group" onClick={() => { trackNavigationEvent('topbar_brand', 'home'); setView('home'); }}>
-            <img src="/sscbs_logo.png" alt="" width="24" height="24" />
-            <span className="topbar-title">{pageTitle || 'SSCBS OS'}</span>
+            {view === 'home' && <img src="/sscbs_logo.png" alt="" width="26" height="26" style={{ borderRadius: '6px' }} />}
+            <span className="topbar-title">{view === 'home' ? 'SSCBS OS' : (pageTitle || 'SSCBS OS')}</span>
           </div>
 
-          <NotificationCenter onNavigate={openTool} />
+          <div className="topbar-right-action">
+            {view === 'profile' ? (
+              <span className="topbar-saved-badge">✓ Saved</span>
+            ) : view === 'timetable' ? (
+              <div style={{ width: '44px' }} />
+            ) : (
+              <NotificationCenter onNavigate={openTool} />
+            )}
+          </div>
         </header>
 
         {/* ── Main content ── */}

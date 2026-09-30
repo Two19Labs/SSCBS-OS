@@ -3,6 +3,8 @@ import * as XLSX from 'xlsx';
 import FooterCredit from './FooterCredit';
 import { useAuth } from '../context/AuthContext';
 import { trackWaiverEvent } from '../lib/analytics';
+import { MOBILE_V2 } from '../lib/uiFlags';
+import { useIsMobile } from '../hooks/useIsMobile';
 import './WaiverToolPage.css';
 
 const MONTHS = [
@@ -183,6 +185,8 @@ function WaiverToolPage({ onBack }) {
   // Tabs inside results selector
   const [activeSelectorTab, setActiveSelectorTab] = useState('grid'); // 'grid' | 'calendar' | 'list'
   const [activeMonthKey, setActiveMonthKey] = useState(""); // e.g. "2026-01"
+  const [mobileTab, setMobileTab] = useState('dates'); // 'dates' | 'subjects' | 'calendar'
+  const isMobile = useIsMobile();
 
   // CDC & Placement Cell Extra Attendance (+1 Numerator & +1 Denominator)
   const [extraAttendance, setExtraAttendance] = useState({}); // { [subjectName]: number }
@@ -1385,6 +1389,324 @@ function WaiverToolPage({ onBack }) {
 
   const simulatedStats = getSimulatedStats();
   const allSafe = simulatedStats.every(s => s.simPct >= threshold);
+
+  if (MOBILE_V2 && isMobile) {
+    return (
+      <div className="m-waiver-root">
+        {/* App Bar (56px) */}
+        <header className="m-waiver-topbar">
+          <button className="m-waiver-icon-btn" onClick={onBack} aria-label="Back to OS">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+          </button>
+          <h2 className="m-waiver-title">Waiver Tool</h2>
+          {parsedData ? (
+            <button className="m-waiver-text-btn" onClick={handleUploadNewSheet}>
+              New sheet
+            </button>
+          ) : (
+            <div style={{ width: 44 }} />
+          )}
+        </header>
+
+        {isProcessing && (
+          <div className="m-waiver-loading-bar">
+            <span>Processing Attendance Spreadsheet...</span>
+          </div>
+        )}
+
+        {!parsedData ? (
+          /* Screen 13 · Setup */
+          <div className="m-waiver-scroll-area">
+            <p className="m-waiver-intro">
+              Upload your attendance sheet and we'll pick the dates to waive so every subject clears your target.
+            </p>
+
+            {/* 1 · YOUR LIMITS */}
+            <div className="m-waiver-section">
+              <span className="m-waiver-sec-header">1 · YOUR LIMITS</span>
+              <div className="m-waiver-card">
+                {/* Semester started */}
+                <div className="m-waiver-row">
+                  <div className="m-waiver-row-left">
+                    <span className="m-waiver-row-title">Semester started</span>
+                    <span className="m-waiver-row-desc">Month the sheet begins</span>
+                  </div>
+                  <select
+                    className="m-waiver-select"
+                    value={startingMonth}
+                    onChange={(e) => setStartingMonth(parseInt(e.target.value, 10))}
+                  >
+                    {MONTHS.map((m, idx) => (
+                      <option key={m} value={idx}>{m}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="m-waiver-divider" />
+
+                {/* Waivers available */}
+                <div className="m-waiver-row">
+                  <div className="m-waiver-row-left">
+                    <span className="m-waiver-row-title">Waivers available</span>
+                    <span className="m-waiver-row-desc">Most dates you can waive</span>
+                  </div>
+                  <div className="m-waiver-stepper">
+                    <button
+                      type="button"
+                      className="m-waiver-step-btn"
+                      onClick={() => setMaxWaivers(prev => Math.max(1, prev - 1))}
+                      disabled={maxWaivers <= 1}
+                      aria-label="Decrease waivers"
+                    >−</button>
+                    <span className="m-waiver-step-val">{maxWaivers}</span>
+                    <button
+                      type="button"
+                      className="m-waiver-step-btn"
+                      onClick={() => setMaxWaivers(prev => Math.min(30, prev + 1))}
+                      disabled={maxWaivers >= 30}
+                      aria-label="Increase waivers"
+                    >+</button>
+                  </div>
+                </div>
+
+                <div className="m-waiver-divider" />
+
+                {/* Target attendance */}
+                <div className="m-waiver-row">
+                  <div className="m-waiver-row-left">
+                    <span className="m-waiver-row-title">Target attendance</span>
+                    <span className="m-waiver-row-desc">Minimum per subject</span>
+                  </div>
+                  <div className="m-waiver-stepper">
+                    <button
+                      type="button"
+                      className="m-waiver-step-btn"
+                      onClick={() => setThreshold(prev => Math.max(50, prev - 1))}
+                      disabled={threshold <= 50}
+                      aria-label="Decrease target"
+                    >−</button>
+                    <span className="m-waiver-step-val">{threshold}%</span>
+                    <button
+                      type="button"
+                      className="m-waiver-step-btn"
+                      onClick={() => setThreshold(prev => Math.min(100, prev + 1))}
+                      disabled={threshold >= 100}
+                      aria-label="Increase target"
+                    >+</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 2 · ATTENDANCE SHEET */}
+            <div className="m-waiver-section">
+              <span className="m-waiver-sec-header">2 · ATTENDANCE SHEET</span>
+              <div 
+                className="m-waiver-dropzone"
+                onClick={() => document.getElementById('m-file-input')?.click()}
+              >
+                <input
+                  type="file"
+                  id="m-file-input"
+                  accept=".xls,.xlsx"
+                  onChange={handleFileChange}
+                  style={{ display: 'none' }}
+                />
+                <div className="m-drop-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                </div>
+                {file ? (
+                  <div className="m-file-badge">
+                    <strong>{file.name}</strong>
+                    <span>({(file.size / 1024).toFixed(1)} KB)</span>
+                  </div>
+                ) : (
+                  <div className="m-drop-text">
+                    <strong>Tap to choose file</strong> (.xls or .xlsx)
+                    <span>DU attendance sheet export</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {error && <div className="m-waiver-error">{error}</div>}
+
+            <div style={{ height: 80 }} />
+
+            {/* Pinned Bottom Bar */}
+            <div className="m-waiver-pinned-bar">
+              <button
+                type="button"
+                className="m-waiver-cta-btn"
+                onClick={processAttendance}
+                disabled={!file || isProcessing}
+              >
+                {isProcessing ? "Calculating..." : "Find best waivers"}
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* Screen 14 · Results */
+          <div className="m-waiver-scroll-area">
+            {/* Recommended Maroon Card */}
+            <div className="m-waiver-hero-card">
+              <span className="m-waiver-hero-badge">RECOMMENDED</span>
+              <span className="m-waiver-hero-title">
+                {solverResult?.success
+                  ? `Use ${solverResult.waiversCount} waivers to clear every subject`
+                  : `Max waivers reached · Target ${threshold}%`}
+              </span>
+              <span className="m-waiver-hero-sub">
+                {Math.max(0, maxWaivers - (solverResult?.waiversCount || selectedWaivers.size))} of {maxWaivers} waivers left over · target {threshold}%
+              </span>
+            </div>
+
+            {/* Segmented Dates / Subjects / Calendar */}
+            <div className="m-segmented">
+              <button
+                type="button"
+                className={`m-segmented-item ${mobileTab === 'dates' ? 'active' : ''}`}
+                onClick={() => setMobileTab('dates')}
+              >
+                Dates
+              </button>
+              <button
+                type="button"
+                className={`m-segmented-item ${mobileTab === 'subjects' ? 'active' : ''}`}
+                onClick={() => setMobileTab('subjects')}
+              >
+                Subjects
+              </button>
+              <button
+                type="button"
+                className={`m-segmented-item ${mobileTab === 'calendar' ? 'active' : ''}`}
+                onClick={() => setMobileTab('calendar')}
+              >
+                Calendar
+              </button>
+            </div>
+
+            {/* Tab 1: Dates */}
+            {mobileTab === 'dates' && (
+              <div className="m-waiver-dates-list">
+                {parsedData.candidates
+                  .sort((a, b) => b.totalAbsences - a.totalAbsences)
+                  .map((cand) => {
+                    const isChecked = selectedWaivers.has(cand.dateStr);
+                    const isRec = recommendedWaivers.includes(cand.dateStr);
+                    const parts = cand.dateStr.split('-');
+                    const dayNum = parts[2] || '01';
+                    const monthIdx = parseInt(parts[1], 10) - 1;
+                    const monthStr = MONTHS[monthIdx]?.substring(0, 3).toUpperCase() || 'AUG';
+
+                    let weekday = '';
+                    try {
+                      const dt = new Date(parseInt(parts[0], 10), monthIdx, parseInt(dayNum, 10));
+                      weekday = dt.toLocaleDateString('en-US', { weekday: 'long' });
+                    } catch (e) {
+                      weekday = 'Class day';
+                    }
+
+                    return (
+                      <div
+                        key={cand.dateStr}
+                        className={`m-waiver-date-card ${isChecked ? 'active' : ''} ${isRec ? 'recommended' : ''}`}
+                        onClick={() => handleCheckboxChange(cand.dateStr)}
+                      >
+                        <div className="m-waiver-date-badge">
+                          <span className="m-w-date-num">{dayNum}</span>
+                          <span className="m-w-date-mo">{monthStr}</span>
+                        </div>
+                        <div className="m-waiver-date-info">
+                          <span className="m-w-date-title">{weekday} · {cand.totalAbsences} absences</span>
+                          <span className="m-w-date-sub">
+                            {cand.totalPresents > 0 ? `${cand.totalPresents} attended · ` : ''}
+                            {isRec ? 'Recommended for high impact' : 'Available waiver date'}
+                          </span>
+                        </div>
+                        <div className={`m-waiver-check ${isChecked ? 'checked' : ''}`}>
+                          {isChecked && <span>✓</span>}
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
+
+            {/* Tab 2: Subjects */}
+            {mobileTab === 'subjects' && (
+              <div className="m-waiver-subjects-list">
+                {simulatedStats.map((s, idx) => {
+                  const isSafe = s.simPct >= threshold;
+                  return (
+                    <div key={idx} className="m-waiver-subject-card">
+                      <div className="m-w-sub-head">
+                        <span className="m-w-sub-name">{s.name}</span>
+                        <span className={`m-w-sub-badge ${isSafe ? 'safe' : 'short'}`}>
+                          {s.simPct.toFixed(1)}% · {isSafe ? 'SAFE' : 'SHORT'}
+                        </span>
+                      </div>
+                      <div className="m-w-sub-bar-wrap">
+                        <div className="m-w-sub-bar-bg">
+                          <div
+                            className={`m-w-sub-bar-fill ${isSafe ? 'safe' : 'short'}`}
+                            style={{ width: `${Math.min(100, s.simPct)}%` }}
+                          />
+                          <div 
+                            className="m-w-sub-target-tick" 
+                            style={{ left: `${threshold}%` }} 
+                            title={`Target: ${threshold}%`}
+                          />
+                        </div>
+                      </div>
+                      <div className="m-w-sub-foot">
+                        <span>Attended {s.simTotalAtt} / {s.simTotalHeld} classes</span>
+                        <span className="m-w-target-note">Target: {threshold}%</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Tab 3: Calendar */}
+            {mobileTab === 'calendar' && (
+              <div className="m-waiver-calendar-wrap">
+                {renderCalendarView()}
+              </div>
+            )}
+
+            <div style={{ height: 80 }} />
+
+            {/* Pinned Bottom Bar */}
+            <div className="m-waiver-pinned-bar">
+              <button
+                type="button"
+                className="m-waiver-bar-sec"
+                onClick={clearAllWaivers}
+              >
+                Clear all
+              </button>
+              <button
+                type="button"
+                className="m-waiver-bar-pri"
+                onClick={resetToRecommended}
+              >
+                Apply recommended
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="waiver-tool-fullpage">
