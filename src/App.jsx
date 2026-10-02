@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { useAuth } from './context/AuthContext';
 import { useConfig } from './context/ConfigContext';
 import { initPostHog, logFeatureView, logFeatureClick, subscribeToPresence, FEATURE_NAMES, trackNavigationEvent, trackGpaEvent, trackPostHogPageView } from './lib/analytics';
@@ -8,6 +8,7 @@ import ProfilePage from './components/ProfilePage';
 import ProfileModal from './components/ProfileModal';
 import NoticeBoard from './components/NoticeBoard';
 import ErrorBoundary from './components/ErrorBoundary';
+import OneStopTeaserModal from './components/OneStopTeaserModal';
 import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFacultyDatabase, canAccessSocietyTracker, canAccessCaseComps } from './lib/admin';
 import {
   HomeIcon,
@@ -109,6 +110,8 @@ function App() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [teamFinderPrefill, setTeamFinderPrefill] = useState(null);
   const [facultyDbPrefillProfId, setFacultyDbPrefillProfId] = useState(null);
+  const [isOneStopPopoverOpen, setIsOneStopPopoverOpen] = useState(false);
+  const competitionsButtonRef = useRef(null);
 
   const setView = (newView) => {
     if (VALID_VIEWS.includes(newView)) {
@@ -208,6 +211,10 @@ function App() {
 
   const openTool = (id, extra = null) => {
     setIsMobileSidebarOpen(false);
+    if (id === 'case-comps') {
+      setIsOneStopPopoverOpen((prev) => !prev);
+      return;
+    }
     trackNavigationEvent('tool_opened', id, { source_view: view, has_extra: Boolean(extra) });
     logFeatureView(id, user);
     if (id === 'gpa') {
@@ -243,7 +250,7 @@ function App() {
       title: 'Main Navigation',
       items: [
         { id: 'home', label: 'Home', Icon: HomeIcon },
-        ...(hasCaseCompsAccess ? [{ id: 'case-comps', label: 'Competitions', Icon: FlameIcon, featured: true }] : []),
+        ...(hasCaseCompsAccess ? [{ id: 'case-comps', label: 'Competitions', Icon: FlameIcon, featured: true, isSoon: true }] : []),
         { id: 'buzz', label: 'Campus Buzz', Icon: MegaphoneIcon, locked: !featureFlags['buzz'] && !isAdmin },
       ],
     },
@@ -429,16 +436,17 @@ function App() {
             {navSections.map((section, idx) => (
               <div key={idx} className="sidebar-section">
                 <span className="sidebar-section-title">{section.title}</span>
-                {section.items.map(({ id, label, Icon, locked, featured }) => (
+                {section.items.map(({ id, label, Icon, locked, featured, isSoon }) => (
                   <button
                     key={id}
-                    className={`sidebar-item ${view === id ? 'active' : ''} ${locked ? 'locked' : ''} ${featured ? 'featured-nav-item' : ''}`}
+                    ref={id === 'case-comps' ? competitionsButtonRef : undefined}
+                    className={`sidebar-item ${view === id ? 'active' : ''} ${id === 'case-comps' && isOneStopPopoverOpen ? 'active popover-active' : ''} ${locked ? 'locked' : ''} ${featured ? 'featured-nav-item' : ''}`}
                     onClick={() => !locked && openTool(id)}
                     disabled={locked}
                   >
-                    <Icon filled={view === id} />
+                    <Icon filled={view === id || (id === 'case-comps' && isOneStopPopoverOpen)} />
                     <span>{label}</span>
-                    {featured && <span className="sidebar-featured-badge">LIVE</span>}
+                    {featured && <span className={`sidebar-featured-badge ${isSoon ? 'soon-badge' : ''}`}>{isSoon ? 'SOON' : 'LIVE'}</span>}
                     {locked && <span className="sidebar-soon">SOON</span>}
                   </button>
                 ))}
@@ -487,10 +495,10 @@ function App() {
             {navSections.map((section, idx) => (
               <div key={idx} className="mobile-sidebar-section">
                 <div className="mobile-section-header">{section.title}</div>
-                {section.items.map(({ id, label, Icon, locked, featured }) => (
+                {section.items.map(({ id, label, Icon, locked, featured, isSoon }) => (
                   <button
                     key={id}
-                    className={`mobile-sidebar-item ${view === id ? 'active' : ''} ${locked ? 'locked' : ''} ${featured ? 'featured-nav-item' : ''}`}
+                    className={`mobile-sidebar-item ${view === id ? 'active' : ''} ${id === 'case-comps' && isOneStopPopoverOpen ? 'active popover-active' : ''} ${locked ? 'locked' : ''} ${featured ? 'featured-nav-item' : ''}`}
                     onClick={() => {
                       if (!locked) {
                         setIsMobileSidebarOpen(false);
@@ -500,10 +508,10 @@ function App() {
                     disabled={locked}
                   >
                     <div className="mobile-item-left">
-                      <Icon filled={view === id} size={18} />
+                      <Icon filled={view === id || (id === 'case-comps' && isOneStopPopoverOpen)} size={18} />
                       <span>{label}</span>
                     </div>
-                    {featured && <span className="sidebar-featured-badge">LIVE</span>}
+                    {featured && <span className={`sidebar-featured-badge ${isSoon ? 'soon-badge' : ''}`}>{isSoon ? 'SOON' : 'LIVE'}</span>}
                     {locked && <span className="sidebar-soon">SOON</span>}
                   </button>
                 ))}
@@ -570,6 +578,11 @@ function App() {
         {isGpaOpen && <GpaCalculatorModal isOpen={isGpaOpen} onClose={() => setIsGpaOpen(false)} />}
       </Suspense>
       <InstallPwaPrompt />
+      <OneStopTeaserModal
+        isOpen={isOneStopPopoverOpen}
+        onClose={() => setIsOneStopPopoverOpen(false)}
+        anchorRef={competitionsButtonRef}
+      />
     </>
   );
 }

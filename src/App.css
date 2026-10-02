@@ -239,6 +239,20 @@
   }
 }
 
+.sidebar-featured-badge.soon-badge {
+  background: linear-gradient(135deg, #9333ea 0%, #ec4899 100%);
+  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.45);
+  font-weight: 900;
+  letter-spacing: 0.09em;
+}
+
+.sidebar-item.popover-active,
+.mobile-sidebar-item.popover-active {
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.12) 0%, rgba(168, 85, 247, 0.12) 100%) !important;
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+}
+
 .sidebar-soon {
   margin-left: auto;
   font-size: 8.5px;
