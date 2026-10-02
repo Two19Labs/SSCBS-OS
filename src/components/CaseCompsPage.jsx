@@ -145,6 +145,30 @@ const XCloseIcon = ({ size = 13, className = '' }) => (
   </svg>
 );
 
+const LinkedInIcon = ({ size = 18, className = '' }) => (
+  <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9h2.8v8.37h-2.8V10.9M7.86 6.54a1.63 1.63 0 1 0 0 3.26 1.63 1.63 0 0 0 0-3.26z" />
+  </svg>
+);
+
+const BellIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+  </svg>
+);
+
+const TargetIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <circle cx="12" cy="12" r="6" />
+    <circle cx="12" cy="12" r="2" />
+  </svg>
+);
+
+// Toggle teaser mode: hides existing list functions cleanly without deleting any code
+const SHOW_TEASER_MODE = true;
+
 const CIRCUIT_OPTIONS = [
   { id: 'du', label: 'DU Circuit', countKey: 'du' },
   { id: 'iim-iit-premier', label: 'IIMs, IITs & Premier', countKey: 'iimIitPremier' },
@@ -846,6 +870,207 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
 
     return result;
   }, [competitions, searchQuery, selectedCircuits, bookmarkedOnly, selectedTracks, teamFilter, feeFilter, sortBy, bookmarkedIds]);
+
+  if (SHOW_TEASER_MODE) {
+    return (
+      <div className="onestop-teaser-container">
+        {/* Navigation & Header Breadcrumb */}
+        <div className="onestop-teaser-nav-row">
+          <div className="onestop-teaser-nav-left">
+            {onBack && (
+              <button 
+                type="button" 
+                className="onestop-back-btn" 
+                onClick={onBack} 
+                aria-label="Back to home"
+              >
+                <BackIcon size={16} />
+                <span>Back</span>
+              </button>
+            )}
+            <div className="onestop-breadcrumbs">
+              <span className="onestop-bc-root">SSCBS OS</span>
+              <span className="onestop-bc-slash">/</span>
+              <span className="onestop-bc-current">Competitions</span>
+            </div>
+          </div>
+          {headerAction && (
+            <div className="onestop-teaser-nav-right desktop-only-notif">
+              {headerAction}
+            </div>
+          )}
+        </div>
+
+        {/* Hero Card */}
+        <div className="onestop-hero-banner">
+          <div className="onestop-badge-row">
+            <span className="onestop-pill-badge">
+              <span className="onestop-pulsing-dot" />
+              <SparklesIcon size={13} />
+              <span>Two19 Labs Initiative &bull; Upgrade in Progress</span>
+            </span>
+            <span className="onestop-circuit-pill">Teasing OneStop</span>
+          </div>
+
+          <h1 className="onestop-hero-heading">
+            We’re working on something big — Competitions is getting a massive upgrade.
+          </h1>
+
+          <p className="onestop-hero-paragraph">
+            No more scattered PDF brochures, missed Round 2 valuation deck deadlines, or hunting across WhatsApp groups for team members. We’re integrating <strong>OneStop</strong> directly into SSCBS OS to bring you Delhi University’s fastest competition engine and squad finder.
+          </p>
+
+          <div className="onestop-hero-action-group">
+            <a
+              href="https://lnkd.in/p/g3xH3enr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="onestop-linkedin-cta"
+              onClick={() => trackCaseCompsEvent('linkedin_teaser_clicked', { placement: 'hero_primary' })}
+            >
+              <LinkedInIcon size={19} className="onestop-linkedin-icon" />
+              <span>Read the announcement on LinkedIn</span>
+              <ExternalLinkIcon size={14} />
+            </a>
+
+            {onBack && (
+              <button
+                type="button"
+                className="onestop-secondary-btn"
+                onClick={onBack}
+              >
+                Return to Campus Home
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Bento Grid: 4 Feature Highlights */}
+        <div className="onestop-grid-section">
+          <div className="onestop-grid-heading-group">
+            <h2 className="onestop-grid-title">What’s coming in the new OneStop experience</h2>
+            <p className="onestop-grid-subtitle">
+              Engineered specifically for undergraduate competitors, society members, and case comp squads.
+            </p>
+          </div>
+
+          <div className="onestop-bento-grid">
+            {/* Card 1: Strict Undergrad Filtration */}
+            <div className="onestop-bento-card">
+              <div className="onestop-card-header">
+                <div className="onestop-card-icon-tile icon-circuit">
+                  <TargetIcon size={20} />
+                </div>
+                <span className="onestop-card-tag">Strict Curation</span>
+              </div>
+              <h3 className="onestop-card-title">Undergrad-First Opportunities</h3>
+              <p className="onestop-card-desc">
+                Real-time aggregated listings across the DU Circuit (SSCBS, SRCC, Hindu, Hansraj), Tier-1 IIM/IIT opens, and Corporate Flagships (McKinsey, Bain, BCG, L’Oréal, HUL) with MBA-only restrictions strictly purged.
+              </p>
+              <div className="onestop-card-chips">
+                <span className="onestop-chip">DU Circuit</span>
+                <span className="onestop-chip">IIMs &amp; IITs</span>
+                <span className="onestop-chip">Corporate Flagships</span>
+              </div>
+            </div>
+
+            {/* Card 2: Multi-Round Deadline Radar */}
+            <div className="onestop-bento-card">
+              <div className="onestop-card-header">
+                <div className="onestop-card-icon-tile icon-radar">
+                  <ClockIcon size={20} />
+                </div>
+                <span className="onestop-card-tag">Multi-Stage</span>
+              </div>
+              <h3 className="onestop-card-title">Round-by-Round Deadline Radar</h3>
+              <p className="onestop-card-desc">
+                Competition tracking shouldn't stop at registration. Track Round 1 online quizzes, Round 2 executive decks, valuation models, and the Grand Finale with live ticking countdowns.
+              </p>
+              <div className="onestop-card-chips">
+                <span className="onestop-chip">Round 1 Quiz</span>
+                <span className="onestop-chip">Valuation Decks</span>
+                <span className="onestop-chip">Final Pitch</span>
+              </div>
+            </div>
+
+            {/* Card 3: Smart Alerts & Extension Detection */}
+            <div className="onestop-bento-card">
+              <div className="onestop-card-header">
+                <div className="onestop-card-icon-tile icon-alerts">
+                  <BellIcon size={20} />
+                </div>
+                <span className="onestop-card-tag">Smart Notifications</span>
+              </div>
+              <h3 className="onestop-card-title">Instant Alerts &amp; Extension Pings</h3>
+              <p className="onestop-card-desc">
+                Get a heads-up before portal lockout (1h &amp; 30m warnings), plus instant alerts whenever an organizer extends a submission deadline (+2d) so your dashboard always reflects current dates.
+              </p>
+              <div className="onestop-card-chips">
+                <span className="onestop-chip">1h Cutoff Warnings</span>
+                <span className="onestop-chip">Deadline +2d Radar</span>
+                <span className="onestop-chip">In-App Alerts</span>
+              </div>
+            </div>
+
+            {/* Card 4: Squad Finder & 1-Tap Handshake */}
+            <div className="onestop-bento-card">
+              <div className="onestop-card-header">
+                <div className="onestop-card-icon-tile icon-squad">
+                  <UsersIcon size={20} />
+                </div>
+                <span className="onestop-card-tag">Squad Engine</span>
+              </div>
+              <h3 className="onestop-card-title">Squad Finder &amp; 1-Tap Handshake</h3>
+              <p className="onestop-card-desc">
+                Need a financial modeler, a deck designer, or a coder? Post squad openings with required skills, review batchmates’ profiles, and connect immediately via 1-tap WhatsApp handshakes.
+              </p>
+              <div className="onestop-card-chips">
+                <span className="onestop-chip">Skill Matching</span>
+                <span className="onestop-chip">1-Tap WhatsApp</span>
+                <span className="onestop-chip">Batchmate Roster</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Community & Early Access Callout Banner */}
+        <div className="onestop-community-box">
+          <div className="onestop-community-inner">
+            <div className="onestop-community-info">
+              <div className="onestop-community-meta">
+                <span className="onestop-comment-pill">60+ students commented</span>
+                <span className="onestop-meta-sub">on the LinkedIn reveal</span>
+              </div>
+              <h3 className="onestop-community-headline">
+                Want early beta access for your society or case team?
+              </h3>
+              <p className="onestop-community-sub">
+                Drop your email or say hi on Aditya’s LinkedIn post to be first in line when the new OneStop competitions upgrade goes live for SSCBS.
+              </p>
+            </div>
+            <a
+              href="https://lnkd.in/p/g3xH3enr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="onestop-community-link-btn"
+              onClick={() => trackCaseCompsEvent('linkedin_teaser_clicked', { placement: 'community_box' })}
+            >
+              <LinkedInIcon size={16} />
+              <span>Join the LinkedIn Discussion ↗</span>
+            </a>
+          </div>
+        </div>
+
+        {/* Closing Tagline */}
+        <div className="onestop-teaser-footer-note">
+          <span className="onestop-footer-pulse-dot" />
+          <p className="onestop-footer-text">
+            <strong>Coming very soon</strong> to SSCBS OS &bull; Built with pride by Two19 Labs
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="case-comps-container">
