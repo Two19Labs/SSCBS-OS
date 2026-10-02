@@ -118,7 +118,7 @@ export default function OneStopTeaserModal({ isOpen, onClose, anchorRef }) {
 
         {/* Subtitle */}
         <p className="onestop-popover-desc">
-          We’re working on something new for competitions at CBS. It’s coming very soon.
+          We’re working on something new (and awesome) for finding and tracking competitions.
         </p>
 
         {/* Brand identity box */}
