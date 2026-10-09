@@ -847,6 +847,9 @@ export default function CaseCompsPage({ onBack, onNavigate, headerAction }) {
     return result;
   }, [competitions, searchQuery, selectedCircuits, bookmarkedOnly, selectedTracks, teamFilter, feeFilter, sortBy, bookmarkedIds]);
 
+  // Legacy filtering disabled: all functions, data fetchers and helpers remain preserved in this file
+  return null;
+
   return (
     <div className="case-comps-container">
       {/* ── Top Header ── */}

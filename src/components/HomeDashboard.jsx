@@ -686,7 +686,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
 
   const tools = [
     ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', micro: 'DATABASE', microClass: 'success', title: 'Societies Database', desc: 'Directory of 62+ societies, domains & PoR contacts', Icon: UsersIcon, locked: false }] : []),
-    ...(hasCaseCompsAccess ? [{ id: 'case-comps', micro: 'LIVE', microClass: 'success', title: 'Competitions', desc: 'Live opportunities from Unstop for SSCBS students across all circuits', Icon: FlameIcon, locked: false }] : []),
+    { id: 'case-comps', micro: 'SOON', microClass: 'dim', title: 'Competitions', desc: 'OneStop early access — discover & track top competitions', Icon: FlameIcon, locked: false },
     ...(hasTeamFinderAccess ? [{ id: 'team-finder', micro: 'NEW', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post comp openings', Icon: TrophyIcon, locked: false }] : []),
     { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
     { id: 'waiver', micro: 'SOON', microClass: 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
@@ -809,81 +809,79 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
           </div>
         )}
 
-        {/* Case Competitions Alerts Highlight Banner (Live for Aditya / Testers) */}
-        {hasCaseCompsAccess && (
-          <div 
-            className="recruitment-home-banner" 
-            onClick={() => onNavigate('case-comps')}
-            style={{
-              background: 'var(--surface)',
-              border: '1px solid var(--border)',
-              borderLeft: '4px solid var(--accent)',
-              borderRadius: '12px',
-              padding: '16px 20px',
-              marginBottom: '20px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '16px',
-              transition: 'border-color 0.15s ease, transform 0.15s ease',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: '1.4rem', background: 'var(--tint)', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', flexShrink: 0 }}>🏆</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                  <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--ink)' }}>Competitions</span>
-                  <span
-                    className="home-case-comps-tag"
-                    style={{
-                      background: '#1c4980',
-                      color: '#ffffff',
-                      fontWeight: 700,
-                      fontSize: '0.75rem',
-                      padding: '3px 10px',
-                      borderRadius: '20px',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      letterSpacing: '0.2px',
-                      boxShadow: '0 1px 3px rgba(28, 73, 128, 0.3)',
-                    }}
-                  >
-                    Live from Unstop
-                  </span>
-                </div>
-                <div style={{ fontSize: '0.84rem', color: 'var(--ink-dim)', marginTop: '4px', lineHeight: '1.45' }}>
-                  It's competitions season! Find opportunities relevant to CBS folks right here, synced with and pulled from Unstop, all filterable! :)
-                </div>
+        {/* Case Competitions / OneStop Upgrade Highlight Banner */}
+        <div 
+          className="recruitment-home-banner" 
+          onClick={() => onNavigate('case-comps')}
+          style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderLeft: '4px solid #0052ff',
+            borderRadius: '12px',
+            padding: '16px 20px',
+            marginBottom: '20px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '16px',
+            transition: 'border-color 0.15s ease, transform 0.15s ease',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: '1.4rem', background: 'var(--tint)', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', flexShrink: 0 }}>🏆</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--ink)' }}>Competitions</span>
+                <span
+                  className="home-case-comps-tag"
+                  style={{
+                    background: '#0052ff',
+                    color: '#ffffff',
+                    fontWeight: 700,
+                    fontSize: '0.75rem',
+                    padding: '3px 10px',
+                    borderRadius: '20px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    letterSpacing: '0.2px',
+                    boxShadow: '0 1px 3px rgba(0, 82, 255, 0.3)',
+                  }}
+                >
+                  OneStop Early Access
+                </span>
+              </div>
+              <div style={{ fontSize: '0.84rem', color: 'var(--ink-dim)', marginTop: '4px', lineHeight: '1.45' }}>
+                We’re working on something new (and awesome) for finding and tracking competitions. OneStop is live in early access!
               </div>
             </div>
-            <div className="home-case-comps-actions">
+          </div>
+          <div className="home-case-comps-actions">
+            <button 
+              className="home-tt-btn primary" 
+              style={{ whiteSpace: 'nowrap', justifyContent: 'center', background: '#0052ff', borderColor: '#0052ff', color: '#ffffff' }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onNavigate('case-comps');
+              }}
+            >
+              Try OneStop Early →
+            </button>
+            {hasTeamFinderAccess && (
               <button 
-                className="home-tt-btn primary" 
+                className="home-tt-btn" 
                 style={{ whiteSpace: 'nowrap', justifyContent: 'center' }}
                 onClick={(e) => {
                   e.stopPropagation();
-                  onNavigate('case-comps');
+                  onNavigate('team-finder');
                 }}
+                title="Find teammates on Team Finder"
               >
-                Explore Competitions →
+                Find teammates →
               </button>
-              {hasTeamFinderAccess && (
-                <button 
-                  className="home-tt-btn" 
-                  style={{ whiteSpace: 'nowrap', justifyContent: 'center' }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onNavigate('team-finder');
-                  }}
-                  title="Find teammates on Team Finder"
-                >
-                  Find teammates →
-                </button>
-              )}
-            </div>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Time Warp Testing Debugger for Admins */}
         {canTimeWarp && (

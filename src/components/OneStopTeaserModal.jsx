@@ -132,24 +132,36 @@ export default function OneStopTeaserModal({ isOpen, onClose, anchorRef }) {
           <span className="onestop-popover-credit">by Two19 Labs</span>
         </div>
 
-        {/* Action button */}
-        <a
-          href="https://lnkd.in/p/g3xH3enr"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="onestop-popover-cta"
-        >
-          <span className="onestop-linkedin-icon-box">
-            <LinkedInIcon size={15} />
-          </span>
-          <span>Read the LinkedIn post</span>
-          <span className="onestop-popover-arrow">↗</span>
-        </a>
-
-        {/* Early access comment notice */}
-        <p className="onestop-popover-note">
-          Want early access? Drop your email in the post's comments.
+        {/* Early access live note */}
+        <p className="onestop-popover-live-note">
+          OneStop is live in early access, open to CBSites right now.
         </p>
+
+        {/* Action buttons */}
+        <div className="onestop-popover-actions">
+          <a
+            href="https://onestop.two19labs.in"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="onestop-popover-btn-primary"
+          >
+            <span>Try OneStop early</span>
+            <span className="onestop-popover-arrow">↗</span>
+          </a>
+
+          <a
+            href="https://lnkd.in/p/g3xH3enr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="onestop-popover-btn-secondary"
+          >
+            <span className="onestop-linkedin-icon-box">
+              <LinkedInIcon size={15} />
+            </span>
+            <span>Read the LinkedIn post</span>
+            <span className="onestop-popover-arrow">↗</span>
+          </a>
+        </div>
       </div>
     </div>
   );

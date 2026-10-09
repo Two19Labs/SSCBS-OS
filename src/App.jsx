@@ -77,9 +77,14 @@ const PageLoader = () => (
   </div>
 );
 
-const TOOL_VIEWS = ['find-prof', 'waiver', 'admin', 'team-finder', 'empty-room', 'faculty-db', 'society-tracker', 'case-comps'];
-const VALID_VIEWS = ['home', 'find-prof', 'waiver', 'tools', 'buzz', 'profile', 'admin', 'contact', 'team-finder', 'empty-room', 'faculty-db', 'society-tracker', 'case-comps'];
+const TOOL_VIEWS = ['find-prof', 'waiver', 'admin', 'team-finder', 'empty-room', 'faculty-db', 'society-tracker'];
+const VALID_VIEWS = ['home', 'find-prof', 'waiver', 'tools', 'buzz', 'profile', 'admin', 'contact', 'team-finder', 'empty-room', 'faculty-db', 'society-tracker'];
 
+const isCaseCompsHash = () => {
+  if (typeof window === 'undefined') return false;
+  const hash = window.location.hash.replace(/^#\/?/, '').trim();
+  return hash === 'case-comps';
+};
 
 const getInitialView = () => {
   if (typeof window !== 'undefined') {
@@ -110,7 +115,7 @@ function App() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [teamFinderPrefill, setTeamFinderPrefill] = useState(null);
   const [facultyDbPrefillProfId, setFacultyDbPrefillProfId] = useState(null);
-  const [isOneStopPopoverOpen, setIsOneStopPopoverOpen] = useState(false);
+  const [isOneStopPopoverOpen, setIsOneStopPopoverOpen] = useState(isCaseCompsHash);
   const competitionsButtonRef = useRef(null);
 
   const setView = (newView) => {
@@ -128,6 +133,15 @@ function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace(/^#\/?/, '').trim();
+      if (hash === 'case-comps') {
+        setIsOneStopPopoverOpen(true);
+        try {
+          window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        } catch {
+          window.location.hash = '';
+        }
+        return;
+      }
       if (hash && VALID_VIEWS.includes(hash)) {
         setViewState(hash);
         localStorage.setItem('sscbs_active_view', hash);
@@ -136,6 +150,14 @@ function App() {
         localStorage.setItem('sscbs_active_view', 'home');
       }
     };
+
+    if (isCaseCompsHash()) {
+      try {
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      } catch {
+        window.location.hash = '';
+      }
+    }
 
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
@@ -250,7 +272,7 @@ function App() {
       title: 'Main Navigation',
       items: [
         { id: 'home', label: 'Home', Icon: HomeIcon },
-        ...(hasCaseCompsAccess ? [{ id: 'case-comps', label: 'Competitions', Icon: FlameIcon, featured: true, isSoon: true }] : []),
+        { id: 'case-comps', label: 'Competitions', Icon: FlameIcon, featured: true, isSoon: true },
         { id: 'buzz', label: 'Campus Buzz', Icon: MegaphoneIcon, locked: !featureFlags['buzz'] && !isAdmin },
       ],
     },
@@ -311,17 +333,7 @@ function App() {
         ) : <HomeDashboard onNavigate={openTool} onOpenProfile={() => setView('profile')} />;
 
       case 'case-comps':
-        return hasCaseCompsAccess ? (
-          <Suspense fallback={<PageLoader />}>
-            <ErrorBoundary>
-              <CaseCompsPage 
-                onBack={goBack} 
-                onNavigate={openTool} 
-                headerAction={<NotificationCenter onNavigate={openTool} />} 
-              />
-            </ErrorBoundary>
-          </Suspense>
-        ) : <HomeDashboard onNavigate={openTool} onOpenProfile={() => setView('profile')} />;
+        return <HomeDashboard onNavigate={openTool} onOpenProfile={() => setView('profile')} />;
 
       case 'find-prof':
         return (
@@ -388,7 +400,7 @@ function App() {
           <div className="tools-hub">
             {[
               ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', micro: 'DATABASE', microClass: 'success', title: 'Societies Database', desc: 'Directory of 62+ societies, domains & PoR contacts', Icon: UsersIcon, locked: false }] : []),
-              ...(hasCaseCompsAccess ? [{ id: 'case-comps', micro: 'LIVE', microClass: 'success', title: 'Competitions', desc: 'Live opportunities from Unstop for SSCBS students across all circuits', Icon: FlameIcon, locked: false }] : []),
+              { id: 'case-comps', micro: 'SOON', microClass: 'dim', title: 'Competitions', desc: 'OneStop early access — discover & track top competitions', Icon: FlameIcon, locked: false },
               ...(hasTeamFinderAccess ? [{ id: 'team-finder', micro: 'NEW', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post case comp openings', Icon: TrophyIcon, locked: false }] : []),
 
               { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },

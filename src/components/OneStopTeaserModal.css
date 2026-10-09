@@ -163,8 +163,57 @@
   letter-spacing: 0.01em;
 }
 
-/* ── CTA Button ── */
-.onestop-popover-cta {
+/* ── Early Access Live Note ── */
+.onestop-popover-live-note {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink, #1c1917);
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 16px;
+}
+
+/* ── CTA Buttons Group ── */
+.onestop-popover-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.onestop-popover-btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  background: #0052ff;
+  color: #ffffff !important;
+  border: 1px solid #0052ff;
+  border-radius: 14px;
+  padding: 13.5px 20px;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+  box-shadow: 0 4px 14px rgba(0, 82, 255, 0.28);
+}
+
+.onestop-popover-btn-primary:hover {
+  background: #0045d8;
+  border-color: #0045d8;
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 18px rgba(0, 82, 255, 0.38);
+  color: #ffffff !important;
+}
+
+.onestop-popover-btn-primary:active {
+  transform: translateY(0);
+}
+
+.onestop-popover-btn-secondary {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -174,7 +223,7 @@
   color: #ffffff !important;
   border: 1px solid #1c1917;
   border-radius: 14px;
-  padding: 14px 20px;
+  padding: 13.5px 20px;
   font-size: 15px;
   font-weight: 700;
   text-decoration: none;
@@ -184,7 +233,7 @@
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
 }
 
-.onestop-popover-cta:hover {
+.onestop-popover-btn-secondary:hover {
   background: #2c2826;
   border-color: #2c2826;
   transform: translateY(-1.5px);
@@ -192,7 +241,7 @@
   color: #ffffff !important;
 }
 
-.onestop-popover-cta:active {
+.onestop-popover-btn-secondary:active {
   transform: translateY(0);
 }
 
@@ -207,15 +256,6 @@
   font-size: 15px;
   font-weight: 700;
   margin-left: 2px;
-}
-
-.onestop-popover-note {
-  font-size: 13px;
-  line-height: 1.45;
-  color: var(--ink-dim, #78716c);
-  text-align: center;
-  margin: 14px 0 0;
-  font-weight: 500;
 }
 
 /* ── Dark Theme Support ── */
@@ -250,13 +290,13 @@
   background: rgba(255, 255, 255, 0.15);
 }
 
-[data-theme='dark'] .onestop-popover-cta {
+[data-theme='dark'] .onestop-popover-btn-secondary {
   background: #f7f3ec;
   color: #181114 !important;
   border-color: #f7f3ec;
 }
 
-[data-theme='dark'] .onestop-popover-cta:hover {
+[data-theme='dark'] .onestop-popover-btn-secondary:hover {
   background: #ffffff;
   border-color: #ffffff;
 }
