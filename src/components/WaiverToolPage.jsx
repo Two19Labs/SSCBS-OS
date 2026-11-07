@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import FooterCredit from './FooterCredit';
 import { useAuth } from '../context/AuthContext';
 import { canAccessWaiver } from '../lib/admin';
 import { PercentIcon } from './icons';
 import { trackWaiverEvent } from '../lib/analytics';
-import { parseAttendanceFile, WEEKDAYS, MONTH_NAMES, MONTHS_FULL } from '../lib/waiverParser';
+import { parseAttendanceFile, MONTH_NAMES, MONTHS_FULL } from '../lib/waiverParser';
 import {
   solveExactBnb,
   solveKPlusOne,
@@ -19,6 +18,56 @@ import './WaiverToolPage.css';
 export default function WaiverToolPage({ onBack }) {
   const { user } = useAuth();
   const hasAccess = canAccessWaiver(user?.email);
+
+  // Mobile check: Screen width <= 768px or mobile user-agent
+  const [isMobileScreen, setIsMobileScreen] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const isSmall = window.innerWidth <= 768;
+    const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent || ''
+    );
+    return isSmall || isMobileUA;
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      const isSmall = window.innerWidth <= 768;
+      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent || ''
+      );
+      setIsMobileScreen(isSmall || isMobileUA);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  if (isMobileScreen) {
+    return (
+      <div className="waiver-mobile-gate-screen">
+        <div className="waiver-mobile-card-wrapper">
+          <div className="waiver-mobile-card">
+            <div className="mobile-icon-badge">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                <line x1="8" y1="21" x2="16" y2="21" />
+                <line x1="12" y1="17" x2="12" y2="21" />
+              </svg>
+            </div>
+            <h2>Please open on a PC or Laptop</h2>
+            <p>
+              The Waiver Tool requires a larger screen to display subject analytics, multi-column date tables, and the attendance grid accurately.
+            </p>
+            <div className="mobile-hint-box">
+              💡 For the best experience, open <strong>sscbsos.in/#waiver</strong> on your desktop browser.
+            </div>
+            <button className="btn-back-portal-primary" onClick={onBack}>
+              ← Back to Campus OS
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!hasAccess) {
     return (
@@ -62,16 +111,15 @@ export default function WaiverToolPage({ onBack }) {
   const [solverResult, setSolverResult] = useState(null);
   const [kPlusOneResult, setKPlusOneResult] = useState(null);
 
-  // View toggle: 'health' (Subject health cards) or 'grid' (Interactive Excel-like spreadsheet grid)
-  const [viewMode, setViewMode] = useState('health');
+  // Grid modal expansion state
+  const [isGridExpanded, setIsGridExpanded] = useState(false);
 
-  // Submit Modal state
-  const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+  // Copy feedback
   const [copyFeedback, setCopyFeedback] = useState(null);
 
-  // Hovered day tooltip for live diff preview in grid
-  const [hoveredDay, setHoveredDay] = useState(null);
-  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+  // Hovered date tooltip for live diff preview
+  const [hoveredDate, setHoveredDate] = useState(null);
+  const [popoverPos, setPopoverPos] = useState({ x: 0, y: 0 });
 
   // Web Worker ref
   const workerRef = useRef(null);
@@ -111,7 +159,6 @@ export default function WaiverToolPage({ onBack }) {
           if (saved.maxWaivers !== undefined) setMaxWaivers(saved.maxWaivers);
           if (saved.threshold !== undefined) setThreshold(saved.threshold);
           if (saved.fileMeta) setFileMeta(saved.fileMeta);
-          if (saved.viewMode) setViewMode(saved.viewMode);
         } else {
           localStorage.removeItem(storageKey);
         }
@@ -132,16 +179,46 @@ export default function WaiverToolPage({ onBack }) {
         kPlusOneResult,
         maxWaivers,
         threshold,
-        fileMeta,
-        viewMode
+        fileMeta
       };
       localStorage.setItem(storageKey, JSON.stringify(stateToSave));
     } catch (err) {
       console.warn('Failed to persist Waiver Tool state:', err);
     }
-  }, [parsedData, selectedWaivers, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, viewMode, storageKey]);
+  }, [parsedData, selectedWaivers, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, storageKey]);
 
-  // Drag and drop handlers
+  // Prevent scroll when expanded grid modal is open
+  useEffect(() => {
+    if (!isGridExpanded) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isGridExpanded]);
+
+  // Close expanded grid on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsGridExpanded(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Track solver parameters
+  const [lastSolvedParams, setLastSolvedParams] = useState(null);
+  useEffect(() => {
+    if (solverResult) {
+      setLastSolvedParams({ t: threshold, k: maxWaivers });
+    }
+  }, [solverResult]);
+
+  const hasParamsChanged = lastSolvedParams && (lastSolvedParams.t !== threshold || lastSolvedParams.k !== maxWaivers);
+
+  // File Drag & Drop handlers
   const handleDragOver = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -152,54 +229,54 @@ export default function WaiverToolPage({ onBack }) {
     e.stopPropagation();
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const droppedFile = e.dataTransfer.files[0];
-      handleFileSelection(droppedFile);
+      handleFileSelected(droppedFile);
     }
   };
 
-  const handleFileChange = (e) => {
+  const handleFileInputChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
-      handleFileSelection(e.target.files[0]);
+      handleFileSelected(e.target.files[0]);
     }
   };
 
-  const handleFileSelection = (selectedFile) => {
+  const handleFileSelected = (selectedFile) => {
     setFile(selectedFile);
     setError(null);
   };
 
-  // Run Solver (async via worker or synchronous fallback)
-  const runSolver = (data, tVal, kVal, onComplete) => {
+  // Run Solver Async with Worker or Fallback
+  const executeSolverAsync = (data, targetT, limitK, callback) => {
     if (workerRef.current) {
-      const msgId = Date.now();
-      const handleMessage = (e) => {
-        if (e.data?.id === msgId) {
-          workerRef.current.removeEventListener('message', handleMessage);
-          if (e.data.success) {
-            setSolverResult(e.data.solution);
-            setKPlusOneResult(e.data.kPlusOneSolution);
-            if (onComplete) onComplete(e.data.solution);
+      const solveId = Date.now();
+      const onMessage = (ev) => {
+        if (ev.data?.id === solveId) {
+          workerRef.current.removeEventListener('message', onMessage);
+          if (ev.data.success) {
+            setSolverResult(ev.data.solution);
+            setKPlusOneResult(ev.data.kPlusOneSolution);
+            if (callback) callback(ev.data.solution);
           }
           setIsProcessing(false);
         }
       };
-      workerRef.current.addEventListener('message', handleMessage);
+      workerRef.current.addEventListener('message', onMessage);
       workerRef.current.postMessage({
-        id: msgId,
+        id: solveId,
         parsedData: data,
-        targetPct: tVal,
-        maxWaiversK: kVal
+        targetPct: targetT,
+        maxWaiversK: limitK
       });
     } else {
       setTimeout(() => {
         try {
-          const solution = solveExactBnb(data, tVal, kVal);
-          let kPlus = null;
+          const solution = solveExactBnb(data, targetT, limitK);
+          let kPlusOne = null;
           if (solution.status === 'SHORTAGE') {
-            kPlus = solveKPlusOne(data, tVal, kVal);
+            kPlusOne = solveKPlusOne(data, targetT, limitK);
           }
           setSolverResult(solution);
-          setKPlusOneResult(kPlus);
-          if (onComplete) onComplete(solution);
+          setKPlusOneResult(kPlusOne);
+          if (callback) callback(solution);
         } catch (err) {
           console.error('Solver error:', err);
         }
@@ -230,28 +307,26 @@ export default function WaiverToolPage({ onBack }) {
     reader.onload = (e) => {
       try {
         const text = e.target.result;
-        const parsed = parseAttendanceFile(text, file.name);
+        const parsed = parseAttendanceFile(text, file.name, {
+          userStartingMonth: startingMonth
+        });
 
-        trackWaiverEvent('sheet_parsed', {
-          file_name: file.name,
-          subjects_count: parsed.subjects.length,
-          days_count: parsed.dayColumns.length
+        trackWaiverEvent('waiver_file_parsed', {
+          fileName: file.name,
+          subjectsCount: parsed.subjects.length,
+          dayColumnsCount: parsed.dayColumns.length
         });
 
         setParsedData(parsed);
 
-        // Run solver and automatically pre-select recommended waivers
-        runSolver(parsed, threshold, maxWaivers, (solution) => {
-          trackWaiverEvent('solver_executed', {
+        executeSolverAsync(parsed, threshold, maxWaivers, (solution) => {
+          trackWaiverEvent('waiver_solved', {
             status: solution.status,
-            pass_count: solution.passCount,
-            total_target_parts: solution.totalTargetParts,
-            days_used: solution.chosenDays.length,
-            target: threshold,
-            k: maxWaivers
+            passCount: solution.passCount,
+            totalTargetParts: solution.totalTargetParts,
+            chosenDaysCount: solution.chosenDays.length
           });
 
-          // Pre-populate with recommended optimal dates
           if (solution.chosenDays && solution.chosenDays.length > 0) {
             setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
           } else {
@@ -273,18 +348,16 @@ export default function WaiverToolPage({ onBack }) {
     reader.readAsText(file, 'utf-8');
   };
 
-  // Re-run solver when user changes slider or max waivers
-  const handleRecalculate = () => {
+  const handleUpdateRecommendation = () => {
     if (!parsedData) return;
     setIsProcessing(true);
-    runSolver(parsedData, threshold, maxWaivers, (solution) => {
-      if (solution.chosenDays && solution.chosenDays.length > 0) {
+    executeSolverAsync(parsedData, threshold, maxWaivers, (solution) => {
+      if (solution?.chosenDays && solution.chosenDays.length > 0) {
         setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
       }
     });
   };
 
-  // Reset to initial upload state
   const handleReplaceSheet = () => {
     setParsedData(null);
     setSelectedWaivers(new Set());
@@ -295,33 +368,32 @@ export default function WaiverToolPage({ onBack }) {
     setError(null);
     try {
       localStorage.removeItem(storageKey);
-    } catch (e) {}
-  };
-
-  // Whole-day waiver toggle: clicking ANY cell or header toggles the whole day
-  const handleToggleDay = (dateStr) => {
-    const updated = new Set(selectedWaivers);
-    if (updated.has(dateStr)) {
-      updated.delete(dateStr);
-    } else {
-      updated.add(dateStr);
+    } catch {
+      // ignore
     }
-    setSelectedWaivers(updated);
   };
 
-  // Reset to suggested optimal dates
-  const handleApplySuggested = () => {
+  const handleToggleDay = (dateStr) => {
+    const next = new Set(selectedWaivers);
+    if (next.has(dateStr)) {
+      next.delete(dateStr);
+    } else {
+      next.add(dateStr);
+    }
+    setSelectedWaivers(next);
+  };
+
+  const handleResetRecommended = () => {
     if (solverResult?.chosenDays) {
       setSelectedWaivers(new Set(solverResult.chosenDays.map(d => d.dateStr)));
     }
   };
 
-  // Clear all active waivers
   const handleClearAll = () => {
     setSelectedWaivers(new Set());
   };
 
-  // Map of candidate days by dateStr for quick lookup of missed subjects
+  // Candidate days mapping for fast missed-subject lookups
   const candidateDaysMap = useMemo(() => {
     if (!parsedData) return new Map();
     const { targetParts } = extractTargetParts(parsedData);
@@ -331,18 +403,18 @@ export default function WaiverToolPage({ onBack }) {
     return map;
   }, [parsedData]);
 
-  // Sorted list of selected date info objects for the right sidebar
-  const selectedDatesList = useMemo(() => {
+  // Chronologically ordered selected waiver cards for the right sidebar
+  const selectedDaysList = useMemo(() => {
     if (!parsedData?.dayColumns) return [];
     const list = [];
-    parsedData.dayColumns.forEach(d => {
-      if (selectedWaivers.has(d.dateStr)) {
-        const cand = candidateDaysMap.get(d.dateStr);
+    parsedData.dayColumns.forEach(col => {
+      if (selectedWaivers.has(col.dateStr)) {
+        const cand = candidateDaysMap.get(col.dateStr);
         list.push({
-          dateStr: d.dateStr,
-          dayNum: String(d.dayNum).padStart(2, '0'),
-          monthShort: MONTH_NAMES[d.month - 1]?.toUpperCase() || '',
-          weekday: d.weekday,
+          dateStr: col.dateStr,
+          dayNum: String(col.dayNum).padStart(2, '0'),
+          monthShort: MONTH_NAMES[col.month - 1]?.toUpperCase() || '',
+          weekday: col.weekday,
           totalMissed: cand ? cand.totalAbsences : 0,
           missedSubjects: cand?.missedSubjects || []
         });
@@ -351,52 +423,34 @@ export default function WaiverToolPage({ onBack }) {
     return list;
   }, [parsedData, selectedWaivers, candidateDaysMap]);
 
-  // Real-time simulated statistics for all subjects
-  const simulatedStats = useMemo(() => {
+  // Live simulated stats
+  const simStats = useMemo(() => {
     if (!parsedData) return null;
     return calculateSimulatedStats(parsedData, selectedWaivers, threshold);
   }, [parsedData, selectedWaivers, threshold]);
 
-  // Live diff preview for hovered day in grid
+  // Hover impact difference
   const hoverDiff = useMemo(() => {
-    if (!hoveredDay || !parsedData) return null;
-    return calculateDayImpactDiff(hoveredDay, parsedData, selectedWaivers, threshold);
-  }, [hoveredDay, parsedData, selectedWaivers, threshold]);
+    if (!hoveredDate || !parsedData) return null;
+    return calculateDayImpactDiff(hoveredDate, parsedData, selectedWaivers, threshold);
+  }, [hoveredDate, parsedData, selectedWaivers, threshold]);
 
-  // Group columns by month for the spreadsheet grid header
-  const monthGroups = useMemo(() => {
-    if (!parsedData?.dayColumns) return [];
-    const groups = [];
-    parsedData.dayColumns.forEach(d => {
-      const key = `${d.month}-${d.year}`;
-      const monthName = MONTHS_FULL[d.month - 1];
-      let g = groups.find(item => item.key === key);
-      if (!g) {
-        g = { key, monthName, year: d.year, dates: [] };
-        groups.push(g);
-      }
-      g.dates.push(d);
-    });
-    return groups;
-  }, [parsedData]);
-
-  // Check if current selection matches recommended
-  const isRecommendedActive = useMemo(() => {
-    if (!solverResult?.chosenDays) return false;
-    if (solverResult.chosenDays.length !== selectedWaivers.size) return false;
+  const isOptimalSuggested = useMemo(() => {
+    if (!solverResult?.chosenDays || solverResult.chosenDays.length !== selectedWaivers.size) {
+      return false;
+    }
     return solverResult.chosenDays.every(d => selectedWaivers.has(d.dateStr));
   }, [solverResult, selectedWaivers]);
 
-  // Copy dates formatted list to clipboard
+  // Copy list to clipboard
   const handleCopyDates = () => {
-    if (selectedDatesList.length === 0) return;
-    const lines = selectedDatesList.map(d => {
-      const subInfo = d.missedSubjects.length > 0 ? ` (${d.missedSubjects.join(', ')})` : '';
-      return `${d.weekday}, ${d.dayNum} ${d.monthShort} - ${d.totalMissed} class(es) missed${subInfo}`;
+    if (selectedDaysList.length === 0) return;
+    const lines = selectedDaysList.map(item => {
+      const subs = item.missedSubjects.length > 0 ? ` (${item.missedSubjects.join(', ')})` : '';
+      return `${item.weekday}, ${item.dayNum} ${item.monthShort} - ${item.totalMissed} class(es) missed${subs}`;
     });
-    const textToCopy = `SSCBS Attendance Waiver Dates (${selectedDatesList.length} dates):\n` + lines.join('\n');
-
-    navigator.clipboard.writeText(textToCopy).then(() => {
+    const text = `SSCBS Attendance Waiver Dates (${selectedDaysList.length} dates):\n` + lines.join('\n');
+    navigator.clipboard.writeText(text).then(() => {
       setCopyFeedback('✓ Copied to clipboard!');
       setTimeout(() => setCopyFeedback(null), 3000);
     }).catch(() => {
@@ -405,321 +459,486 @@ export default function WaiverToolPage({ onBack }) {
     });
   };
 
-  // Render Subject Health Cards (matching Image 2)
-  const renderSubjectHealthCards = () => {
-    const list = simulatedStats?.subjectSummaries || simulatedStats?.subjectsStats || [];
-    if (list.length === 0) return null;
+  const getPartStatus = (part) => {
+    const held = part.simN === undefined ? part.n : part.simN;
+    if (!held) return 'none';
+    if (part.type === 'pr') return 'info';
+    const buff = calculatePartBufferAndNeeded(part.simAttended ?? part.simP, part.simHeld ?? part.simN, threshold);
+    return buff.passes ? (buff.missableBuffer <= 1 ? 'tight' : 'safe') : 'fail';
+  };
+
+  const subjectSummaries = simStats?.subjectSummaries || simStats?.subjectsStats || [];
+  const totalTargetParts = simStats?.totalTargetParts || 0;
+  const passingTargetCount = simStats?.passingTargetCount ?? simStats?.passingCount ?? 0;
+
+  const partOrder = { th: 0, tu: 1, pr: 2 };
+
+  const renderPart = (part) => {
+    const status = getPartStatus(part);
+    const held = part.simN === undefined ? part.n : part.simN;
+    if (status === 'none') {
+      return (
+        <div key={part.type} className="rd-part">
+          <div className="rd-part-top">
+            <span className="rd-part-name muted">{part.shortType || (part.type === 'th' ? 'Theory' : part.type === 'tu' ? 'Tutorial' : 'Practical')}</span>
+            <span className="rd-noclass">No classes</span>
+          </div>
+          <div className="rd-bar rd-bar-empty" />
+        </div>
+      );
+    }
+
+    const currentPct = Number.isFinite(part.simPct) ? part.simPct : (Number.isFinite(part.pct) ? part.pct : 100);
+    const basePct = Number.isFinite(part.basePct) ? part.basePct : currentPct;
+    const hasChanged = Math.abs(currentPct - basePct) > 0.05;
+    const buff = status === 'info' ? null : calculatePartBufferAndNeeded(part.simAttended ?? part.simP, part.simHeld ?? part.simN, threshold);
 
     return (
-      <div className="subject-health-cards-container">
-        {list.map((sub, sIdx) => {
-          const partsArray = sub.partsList || Object.values(sub.parts || {});
-          const isClear = partsArray.filter(p => p.type !== 'pr').every(p => p.passes);
+      <div key={part.type} className="rd-part">
+        <div className="rd-part-top">
+          <div className="rd-part-left">
+            <span className="rd-part-name">{part.shortType || (part.type === 'th' ? 'Theory' : part.type === 'tu' ? 'Tutorial' : 'Practical')}</span>
+            <span className="rd-part-frac">{part.simP ?? part.simAttended}/{held} classes</span>
+            {status === 'info' && <span className="rd-info-tag">Info only</span>}
+          </div>
+          <div className="rd-part-right">
+            <span className="rd-was">{hasChanged ? `was ${basePct.toFixed(1)}%` : 'unchanged'}</span>
+            <span className={`rd-pct s-${status}`}>{currentPct.toFixed(1)}%</span>
+          </div>
+        </div>
+        <div className="rd-bar">
+          <div className={`rd-fill f-${status}`} style={{ width: `${Math.min(100, Math.max(0, currentPct))}%` }} />
+          {hasChanged && basePct < currentPct && (
+            <div className="rd-ghost" style={{ left: `${Math.max(0, basePct)}%` }} title={`Before waivers: ${basePct.toFixed(1)}%`} />
+          )}
+          {status !== 'info' && (
+            <div className="rd-tick" style={{ left: `${threshold}%` }} title={`${threshold}% target`} />
+          )}
+        </div>
+        <div className="rd-caption">
+          {status === 'info' ? (
+            `Not counted toward the ${threshold}% target`
+          ) : buff.passes ? (
+            <>Can miss <strong>{buff.missableBuffer}</strong> more and stay above {threshold}%</>
+          ) : (
+            <>Attend <strong>{buff.classesNeeded}</strong> in a row to reach {threshold}%</>
+          )}
+        </div>
+      </div>
+    );
+  };
 
-          return (
-            <div key={sIdx} className="subject-health-card">
-              <div className="subject-card-top-row">
-                <span className="subject-title-name">{sub.name}</span>
-                <span className={`status-pill ${isClear ? 'pill-clear' : 'pill-shortage'}`}>
-                  {isClear ? 'CLEAR' : 'SHORTAGE'}
-                </span>
-              </div>
+  const renderSubjectCards = () => (
+    <div className="rd-cards">
+      {subjectSummaries.map((sub, sIdx) => {
+        const parts = [...(sub.partsList || Object.values(sub.parts || {}))].sort(
+          (a, b) => partOrder[a.type] - partOrder[b.type]
+        );
+        const statuses = parts.map(getPartStatus);
+        const pill = statuses.includes('fail')
+          ? ['Shortage', 'fail']
+          : statuses.includes('tight')
+          ? ['Clear, tight', 'tight']
+          : ['Clear', 'safe'];
 
-              <div className="subject-parts-rows">
-                {partsArray.map((part, pIdx) => {
-                  const hasClasses = (part.simN !== undefined ? part.simN : part.n) > 0 || (part.baseHeld > 0);
-                  const passes = part.passes;
-                  const isPractical = part.type === 'pr';
-
-                  // Before and After percentages
-                  const rawBefore = typeof part.basePct === 'number' ? part.basePct : (typeof part.baselinePct === 'number' ? part.baselinePct : 100);
-                  const beforePct = isNaN(rawBefore) ? 100 : rawBefore;
-                  const rawAfter = hasClasses ? (typeof part.simPct === 'number' ? part.simPct : (typeof part.pct === 'number' ? part.pct : 100)) : 100;
-                  const afterPct = isNaN(rawAfter) ? 100 : rawAfter;
-
-                  // Advice caption
-                  const advice = !isPractical && hasClasses
-                    ? calculatePartBufferAndNeeded(part.simAttended !== undefined ? part.simAttended : part.simP, part.simHeld !== undefined ? part.simHeld : part.simN, threshold)
-                    : null;
-
-                  return (
-                    <div key={pIdx} className="subject-part-row">
-                      <div className="part-info-line">
-                        <div className="part-name-group">
-                          <span className="part-type-label">
-                            {part.shortType}
-                          </span>
-                          {hasClasses && (
-                            <span className="part-fraction-count">
-                              {part.simP}/{part.simN}
-                            </span>
-                          )}
-                          {isPractical && (
-                            <span className="badge-info-only">info only</span>
-                          )}
-                        </div>
-
-                        <div className="part-pct-transition">
-                          {hasClasses ? (
-                            <>
-                              <span className="pct-before">{beforePct.toFixed(1)}%</span>
-                              <span className="pct-arrow">&rarr;</span>
-                              <span className={`pct-after ${passes || isPractical ? 'txt-pass' : 'txt-fail'}`}>
-                                {afterPct.toFixed(1)}%
-                              </span>
-                            </>
-                          ) : (
-                            <span className="pct-none">no classes &mdash;</span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Dual Progress Bar Track with Target Tick Line */}
-                      {hasClasses && (
-                        <div className="dual-progress-bar-wrapper">
-                          <div className="dual-progress-track">
-                            {/* Before fill (light gray) */}
-                            <div
-                              className="bar-fill-before"
-                              style={{ width: `${Math.min(100, Math.max(0, beforePct))}%` }}
-                            />
-                            {/* After fill (green if pass, red if fail) */}
-                            <div
-                              className={`bar-fill-after ${passes || isPractical ? 'fill-green' : 'fill-red'}`}
-                              style={{ width: `${Math.min(100, Math.max(0, afterPct))}%` }}
-                            />
-                            {/* 85% Target Indicator Line */}
-                            {!isPractical && (
-                              <div
-                                className="target-threshold-tick"
-                                style={{ left: `${threshold}%` }}
-                                title={`Target threshold: ${threshold}%`}
-                              />
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Advice caption */}
-                      {advice && hasClasses && (
-                        <div className="part-advice-caption">
-                          {advice.passes ? (
-                            <span className="advice-safe">
-                              Can miss <strong>{advice.missableBuffer}</strong> more and stay above {threshold}%
-                            </span>
-                          ) : (
-                            <span className="advice-need">
-                              Must attend <strong>{advice.classesNeeded}</strong> in a row to reach {threshold}%
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+        return (
+          <article key={sIdx} className="rd-card">
+            <div className="rd-card-head">
+              <h3>{sub.name}</h3>
+              <span className={`rd-pill p-${pill[1]}`}>{pill[0]}</span>
             </div>
-          );
-        })}
-      </div>
-    );
-  };
+            {parts.map((p, pIdx) => (
+              <React.Fragment key={p.type}>
+                {pIdx > 0 && <div className="rd-divider" />}
+                {renderPart(p)}
+              </React.Fragment>
+            ))}
+          </article>
+        );
+      })}
+    </div>
+  );
 
-  // Render Detailed Spreadsheet Grid (where user can see greens & reds and click any cell)
-  const renderSpreadsheetGrid = () => {
-    if (!parsedData || !simulatedStats) return null;
+  const getHoverEvents = (dateStr) => ({
+    onMouseEnter: (e) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      setHoveredDate(dateStr);
+      setPopoverPos({
+        x: Math.min(window.innerWidth - 182, Math.max(182, rect.left + rect.width / 2)),
+        y: rect.bottom + 6
+      });
+    },
+    onMouseLeave: () => setHoveredDate(null)
+  });
+
+  const renderGridTable = (columns, isExpanded) => {
+    const monthGroups = [];
+    columns.forEach(col => {
+      const key = `${col.month}-${col.year}`;
+      const last = monthGroups[monthGroups.length - 1];
+      if (last && last.key === key) {
+        last.count++;
+      } else {
+        monthGroups.push({
+          key,
+          label: `${MONTHS_FULL[col.month - 1]} ${col.year}`,
+          count: 1
+        });
+      }
+    });
 
     return (
-      <div className="spreadsheet-grid-wrapper">
-        <div className="grid-helper-callout">
-          <span>💡 <strong>Interactive Grid:</strong> Click any cell or date column to toggle that whole day as waived. Attendance re-calculates in real-time.</span>
-        </div>
+      <table className="rd-grid">
+        <thead>
+          <tr>
+            <th className="rd-sticky rd-subj-h" rowSpan={2}>Subject</th>
+            {monthGroups.map(mg => (
+              <th key={mg.key} colSpan={mg.count} className="rd-month">
+                {mg.label}
+              </th>
+            ))}
+            {isExpanded && <th className="rd-tot-h" rowSpan={2}>Classes</th>}
+            {isExpanded && <th className="rd-tot-h" rowSpan={2}>Attendance</th>}
+          </tr>
+          <tr>
+            {columns.map(col => {
+              const isWaived = selectedWaivers.has(col.dateStr);
+              return (
+                <th key={col.dateStr} className="rd-date-th">
+                  <button
+                    type="button"
+                    className={`rd-date-btn ${isWaived ? 'on' : ''}`}
+                    aria-pressed={isWaived}
+                    aria-label={`Toggle waiver for ${col.fullLabel}`}
+                    onClick={() => handleToggleDay(col.dateStr)}
+                    {...getHoverEvents(col.dateStr)}
+                  >
+                    <span className="wd">{col.weekday}</span>
+                    <span className="dn">{col.dayNum}</span>
+                  </button>
+                </th>
+              );
+            })}
+          </tr>
+        </thead>
+        <tbody>
+          {subjectSummaries.map((sub, sIdx) => {
+            const rawSub = parsedData.subjects?.[sIdx];
+            const nonPrParts = (sub.partsList || Object.values(sub.parts || {})).filter(
+              p => p.type !== 'pr' && (p.simN ?? p.n) > 0
+            );
+            const simAtt = nonPrParts.reduce((acc, cur) => acc + (cur.simP ?? 0), 0);
+            const simHeld = nonPrParts.reduce((acc, cur) => acc + (cur.simN ?? 0), 0);
+            const pct = simHeld > 0 ? (simAtt / simHeld) * 100 : 100;
+            const passes = nonPrParts.every(p => p.passes);
 
-        <div className="grid-table-scrollable">
-          <table className="excel-attendance-table">
-            <thead>
-              {/* Row 1: Month Groups */}
-              <tr className="tr-month-header">
-                <th className="sticky-sub-header" rowSpan={2}>Subject</th>
-                {monthGroups.map(g => (
-                  <th key={g.key} colSpan={g.dates.length} className="th-month-span">
-                    {g.monthName} {g.year}
-                  </th>
-                ))}
-                <th className="sticky-stat-header" rowSpan={2}>Total Classes</th>
-                <th className="sticky-pct-header" rowSpan={2}>Attendance</th>
-              </tr>
-
-              {/* Row 2: Date Columns */}
-              <tr className="tr-date-header">
-                {parsedData.dayColumns.map(d => {
-                  const isChecked = selectedWaivers.has(d.dateStr);
-                  const isCandidate = candidateDaysMap.has(d.dateStr);
-                  const isWeekend = d.weekday === 'Sat' || d.weekday === 'Sun';
-
+            return (
+              <tr key={sIdx}>
+                <th scope="row" className="rd-sticky rd-subj">
+                  {sub.name}
+                </th>
+                {columns.map(col => {
+                  const isWaived = selectedWaivers.has(col.dateStr);
+                  const dayClasses = rawSub?.dayClasses?.[col.dateStr] || [];
                   return (
-                    <th
-                      key={d.dateStr}
-                      className={`th-date-col ${isChecked ? 'col-waived' : ''} ${isCandidate ? 'col-candidate' : ''} ${isWeekend ? 'col-weekend' : ''}`}
-                      onClick={() => handleToggleDay(d.dateStr)}
-                      onMouseEnter={(e) => {
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        setHoveredDay(d.dateStr);
-                        setTooltipPos({ x: rect.left + rect.width / 2, y: rect.bottom + 6 });
-                      }}
-                      onMouseLeave={() => setHoveredDay(null)}
-                      title={`Click to toggle ${d.fullLabel}`}
+                    <td
+                      key={col.dateStr}
+                      className={`rd-cell ${isWaived ? 'on' : ''}`}
+                      onClick={() => handleToggleDay(col.dateStr)}
+                      {...getHoverEvents(col.dateStr)}
                     >
-                      <div className="date-header-inner">
-                        <span className="th-weekday">{d.weekday}</span>
-                        <span className="th-daynum">{d.dayNum}</span>
-                        <span className={`th-waiver-indicator ${isChecked ? 'active' : ''}`} />
-                      </div>
-                    </th>
+                      {dayClasses.length === 0 ? (
+                        <span className="rd-dot">·</span>
+                      ) : (
+                        <div className="rd-chips">
+                          {dayClasses.map((c, cIdx) => (
+                            <span
+                              key={cIdx}
+                              className={`rd-chip ${isWaived ? 'w' : (c.attended ? 'p' : 'a')}`}
+                            >
+                              {c.attended ? 'P' : 'A'}
+                              <small>{c.type === 'th' ? 'Th' : (c.type === 'tu' ? 'Tu' : 'Pr')}</small>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </td>
                   );
                 })}
+                {isExpanded && (
+                  <td className="rd-tot">
+                    {simAtt}/{simHeld}
+                  </td>
+                )}
+                {isExpanded && (
+                  <td className={`rd-tot rd-tot-pct ${passes ? 'ok' : 'bad'}`}>
+                    {pct.toFixed(1)}%
+                  </td>
+                )}
               </tr>
-            </thead>
-
-            <tbody>
-              {(simulatedStats?.subjectSummaries || simulatedStats?.subjectsStats || []).map((sub, sIdx) => {
-                const originalSubject = parsedData.subjects?.[sIdx];
-
-                return (
-                  <tr key={sIdx} className="tr-subject-row">
-                    <td className="sticky-col-name">
-                      <div className="sub-grid-name">{sub.name}</div>
-                    </td>
-
-                    {parsedData.dayColumns.map(d => {
-                      const dayClasses = originalSubject?.dayClasses?.[d.dateStr] || [];
-                      const isChecked = selectedWaivers.has(d.dateStr);
-
-                      return (
-                        <td
-                          key={d.dateStr}
-                          className={`td-attendance-cell ${isChecked ? 'cell-waived' : ''}`}
-                          onClick={() => handleToggleDay(d.dateStr)}
-                          onMouseEnter={(e) => {
-                            const rect = e.currentTarget.getBoundingClientRect();
-                            setHoveredDay(d.dateStr);
-                            setTooltipPos({ x: rect.left + rect.width / 2, y: rect.bottom + 6 });
-                          }}
-                          onMouseLeave={() => setHoveredDay(null)}
-                        >
-                          {dayClasses.length === 0 ? (
-                            <span className="cell-no-class">&mdash;</span>
-                          ) : (
-                            <div className="cell-badges-stack">
-                              {dayClasses.map((cls, cIdx) => (
-                                <span
-                                  key={cIdx}
-                                  className={`attendance-badge ${cls.attended ? 'badge-p' : 'badge-a'} ${cls.type}`}
-                                  title={`${cls.type.toUpperCase()}: ${cls.attended ? 'Present' : 'Absent'}`}
-                                >
-                                  {cls.attended ? 'P' : 'A'}
-                                  <sub className="sub-type">{cls.type}</sub>
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </td>
-                      );
-                    })}
-
-                    <td className="sticky-col-stat">
-                      <span className="sim-stat-val">{sub.simAttended ?? 0}/{sub.simHeld ?? 0}</span>
-                      <span className="base-stat-val">({sub.baselineAttended ?? 0}/{sub.baselineHeld ?? 0})</span>
-                    </td>
-
-                    <td className={`sticky-col-pct ${(sub.simPct ?? 0) >= threshold ? 'pass' : 'fail'}`}>
-                      <span className="sim-pct-val">{(typeof sub.simPct === 'number' && !isNaN(sub.simPct) ? sub.simPct : 100).toFixed(1)}%</span>
-                      <span className="base-pct-val">({(typeof sub.baselinePct === 'number' && !isNaN(sub.baselinePct) ? sub.baselinePct : 100).toFixed(1)}%)</span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
+            );
+          })}
+        </tbody>
+      </table>
     );
   };
+
+  const allDayColumns = parsedData?.dayColumns || [];
+  const previewColumns = allDayColumns.slice(0, 17);
+  const lastPreviewCol = previewColumns[previewColumns.length - 1];
 
   return (
-    <div className="waiver-tool-fullpage">
-      {/* Top Navbar Header */}
-      <nav className="fullpage-navbar">
-        <button className="btn-back-portal" onClick={onBack} title="Back to main OS dashboard">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
+    <div className="waiver-tool-fullpage rd-root">
+      {/* Top Navigation */}
+      <nav className="rd-nav">
+        <button className="rd-btn-outline" onClick={onBack}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <line x1="19" y1="12" x2="5" y2="12" />
+            <polyline points="12 19 5 12 12 5" />
           </svg>
-          Back to Campus OS
+          Campus OS
         </button>
 
-        <div className="navbar-logo-area">
-          <img src="/sscbs_logo.png" alt="SSCBS Crest" width="28" height="28" />
-          <span className="navbar-logo-text">
-            SSCBS <span className="logo-accent">Waiver Tool</span>
-          </span>
+        <div className="rd-brand">
+          <img src="/sscbs_college_logo.png" alt="" width="28" height="28" />
+          <span>SSCBS <span className="accent">Waiver Tool</span></span>
         </div>
 
-        <div className="navbar-badge-area">
-          <span className="navbar-portal-badge">PC Optimized</span>
+        <div className="rd-nav-right">
+          {parsedData && (
+            <span className="rd-sheet-name" title={fileMeta?.name}>
+              {fileMeta?.name || 'attendance-export.xls'}
+            </span>
+          )}
+          {parsedData && (
+            <button className="rd-btn-outline sm" onClick={handleReplaceSheet}>
+              Replace sheet
+            </button>
+          )}
         </div>
       </nav>
 
-      {/* Inline Loading Overlay */}
+      {/* Loading Overlay */}
       {isProcessing && (
         <div className="loading-screen-inline">
           <div className="loader-container">
-            <span className="system-spinner"></span>
+            <span className="system-spinner" />
             <p>Calculating optimal waiver plan...</p>
           </div>
         </div>
       )}
 
-      {/* Floating Hover Popover in Grid */}
+      {/* Day Diff Popover */}
       {hoverDiff && (
-        <div
-          className="day-diff-floating-popover"
-          style={{
-            position: 'fixed',
-            left: `${tooltipPos.x}px`,
-            top: `${tooltipPos.y}px`,
-            transform: 'translateX(-50%)',
-            pointerEvents: 'none',
-            zIndex: 9999
-          }}
-        >
-          <div className="popover-inner-card">
-            <div className="popover-header">
-              <strong>{hoverDiff.day?.fullLabel || hoverDiff.dateStr}</strong>
-              <span className={`popover-action-tag ${hoverDiff.isCurrentlyWaived ? 'tag-remove' : 'tag-add'}`}>
-                {hoverDiff.isCurrentlyWaived ? 'Click to restore day' : 'Click to waive day'}
-              </span>
-            </div>
-            <div className="popover-body">
-              {(!hoverDiff.affectedParts || hoverDiff.affectedParts.length === 0) ? (
-                <div className="popover-empty-notice">No Theory/Tute classes on this day.</div>
-              ) : (
-                hoverDiff.affectedParts.map((part, pIdx) => (
-                  <div key={pIdx} className="popover-diff-row">
-                    <span className="popover-part-name">{part.label}</span>
-                    <span className={`popover-diff-val ${part.isHarmful ? 'text-harm' : 'text-help'}`}>
-                      {(part.curPct ?? part.beforePct ?? 0).toFixed(1)}% &rarr; {(part.newPct ?? part.afterPct ?? 0).toFixed(1)}% {((part.deltaPct ?? part.delta ?? 0) >= 0 ? '+' : '')}{((part.deltaPct ?? part.delta ?? 0)).toFixed(1)}%
-                    </span>
-                  </div>
-                ))
-              )}
-            </div>
+        <div className="rd-popover" style={{ left: `${popoverPos.x}px`, top: `${popoverPos.y}px` }}>
+          <div className="rd-pop-head">
+            <strong>{hoverDiff.day?.fullLabel || hoverDiff.dateStr}</strong>
+            <span className={`rd-pop-tag ${hoverDiff.isCurrentlyWaived ? 'rm' : 'add'}`}>
+              {hoverDiff.isCurrentlyWaived ? 'Click to restore' : 'Click to waive'}
+            </span>
           </div>
+          {!hoverDiff.affectedParts || hoverDiff.affectedParts.length === 0 ? (
+            <div className="rd-pop-empty">No theory or tute classes on this day.</div>
+          ) : (
+            hoverDiff.affectedParts.map((p, idx) => {
+              const delta = p.deltaPct ?? p.delta ?? 0;
+              const cur = p.curPct ?? p.beforePct ?? 0;
+              const nxt = p.newPct ?? p.afterPct ?? 0;
+              return (
+                <div key={idx} className="rd-pop-row">
+                  <span className="nm">{p.label}</span>
+                  <span className={`val ${p.isHarmful ? 'harm' : 'help'}`}>
+                    {cur.toFixed(1)}% → {nxt.toFixed(1)}%
+                    <em>{delta >= 0 ? '+' : ''}{delta.toFixed(1)}</em>
+                  </span>
+                </div>
+              );
+            })
+          )}
         </div>
       )}
 
-      {/* View 1: Upload Card (Matching Image 1) */}
-      {!parsedData ? (
+      {/* Main Body */}
+      {parsedData ? (
+        <main className="rd-main">
+          {/* Top Metrics Row */}
+          <div className="rd-top">
+            {/* Target Stepper */}
+            <div className="rd-stat">
+              <span className="lbl">Target</span>
+              <div className="row">
+                <span className="num">{threshold}</span>
+                <span className="unit">%</span>
+                <span className="rd-steps">
+                  <button type="button" aria-label="Lower target" onClick={() => setThreshold(e => Math.max(50, e - 1))}>−</button>
+                  <button type="button" aria-label="Raise target" onClick={() => setThreshold(e => Math.min(99, e + 1))}>+</button>
+                </span>
+              </div>
+            </div>
+
+            {/* Waivers Used Stepper */}
+            <div className="rd-stat">
+              <span className="lbl">Waivers used</span>
+              <div className="row">
+                <span className="num">
+                  {selectedWaivers.size}
+                  <span className="of">/{maxWaivers}</span>
+                </span>
+                <span className="unit">dates</span>
+                <span className="rd-steps">
+                  <button type="button" aria-label="Lower waiver limit" onClick={() => setMaxWaivers(e => Math.max(1, e - 1))}>−</button>
+                  <button type="button" aria-label="Raise waiver limit" onClick={() => setMaxWaivers(e => Math.min(30, e + 1))}>+</button>
+                </span>
+              </div>
+            </div>
+
+            {/* Status Banner */}
+            <div className={`rd-status ${simStats?.allPassing ? 'ok' : 'bad'}`}>
+              {simStats?.allPassing ? (
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="8 12.5 11 15.5 16 9.5" />
+                </svg>
+              ) : (
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+                  <line x1="12" y1="9" x2="12" y2="13" />
+                  <line x1="12" y1="17" x2="12" y2="17" />
+                </svg>
+              )}
+              <div>
+                <strong>{passingTargetCount} of {totalTargetParts} theory and tute parts are above {threshold}%</strong>
+                <span>With the {selectedWaivers.size} waiver date{selectedWaivers.size === 1 ? '' : 's'} selected. Practicals are shown for info only.</span>
+              </div>
+              {hasParamsChanged && (
+                <button type="button" className="rd-btn-outline sm" onClick={handleUpdateRecommendation}>
+                  Update recommendation
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* 2-Column Layout */}
+          <div className="rd-columns">
+            {/* Left: Subject Health */}
+            <section className="rd-health" aria-label="Subject health">
+              <div className="rd-sec-head">
+                <h2>Subject health</h2>
+                <div className="rd-legend">
+                  <span><i className="f-safe" />On track</span>
+                  <span><i className="f-tight" />Close to the line</span>
+                  <span><i className="f-fail" />Below {threshold}%</span>
+                  <span><i className="tick" />{threshold}% target</span>
+                </div>
+              </div>
+              {renderSubjectCards()}
+            </section>
+
+            {/* Right: Sidebar with Preview Grid & Recommended Dates */}
+            <div className="rd-side">
+              {/* Spreadsheet Grid Preview */}
+              <section className="rd-panel rd-preview" aria-label="Spreadsheet grid preview">
+                <div className="rd-panel-head">
+                  <div>
+                    <h2>Spreadsheet grid</h2>
+                    <span>Click a date to waive or restore that whole day</span>
+                  </div>
+                  <button type="button" className="rd-btn-dark" onClick={() => setIsGridExpanded(true)}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <polyline points="15 3 21 3 21 9" />
+                      <polyline points="9 21 3 21 3 15" />
+                      <line x1="21" y1="3" x2="14" y2="10" />
+                      <line x1="3" y1="21" x2="10" y2="14" />
+                    </svg>
+                    Expand grid
+                  </button>
+                </div>
+                <div className="rd-preview-body">
+                  {renderGridTable(previewColumns, false)}
+                  <div className="rd-fade" />
+                </div>
+                <div className="rd-panel-foot">
+                  <span>
+                    Showing {previewColumns[0]?.label} to {lastPreviewCol?.label} of {allDayColumns.length} class days
+                  </span>
+                  <span className="rd-key">
+                    <i />Waived day
+                  </span>
+                </div>
+              </section>
+
+              {/* Recommended Dates Panel */}
+              <section className="rd-panel rd-dates" aria-label="Recommended dates">
+                <div className="rd-dates-head">
+                  <div className="ttl">
+                    <h2>Recommended dates</h2>
+                    <span className="rd-count">{selectedWaivers.size} of {maxWaivers}</span>
+                  </div>
+                  <div className="acts">
+                    {copyFeedback && <span className="rd-copied">{copyFeedback}</span>}
+                    {!isOptimalSuggested && solverResult?.chosenDays?.length > 0 && (
+                      <button type="button" className="rd-btn-outline sm" onClick={handleResetRecommended}>
+                        Reset
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="rd-btn-outline sm"
+                      onClick={handleCopyDates}
+                      disabled={selectedDaysList.length === 0}
+                    >
+                      Copy list
+                    </button>
+                    <button
+                      type="button"
+                      className="rd-btn-outline sm muted"
+                      onClick={handleClearAll}
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </div>
+
+                {selectedDaysList.length === 0 ? (
+                  <div className="rd-empty">
+                    <p>No dates waived yet.</p>
+                    <button type="button" className="rd-btn-dark" onClick={handleResetRecommended}>
+                      Apply recommended dates
+                    </button>
+                  </div>
+                ) : (
+                  <ul className="rd-date-list">
+                    {selectedDaysList.map(item => (
+                      <li key={item.dateStr}>
+                        <div className="cal">
+                          <b>{item.dayNum}</b>
+                          <span>{item.monthShort}</span>
+                        </div>
+                        <div className="txt">
+                          <span className="l1">
+                            {item.weekday} <em>· {item.totalMissed} missed</em>
+                          </span>
+                          <span className="l2">
+                            {item.missedSubjects.length ? item.missedSubjects.join(', ') : 'No absences recorded'}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          aria-label={`Remove ${item.dayNum} ${item.monthShort}`}
+                          onClick={() => handleToggleDay(item.dateStr)}
+                        >
+                          ×
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            </div>
+          </div>
+        </main>
+      ) : (
+        /* Upload Screen */
         <main className="upload-screen-container">
           <div className="upload-card-wrapper">
             <h1 className="upload-card-title">Upload your attendance sheet</h1>
@@ -727,24 +946,20 @@ export default function WaiverToolPage({ onBack }) {
               Use the attendance report exported from the college ERP portal. We read every class you attended or missed and work out which dates are worth waiving.
             </p>
 
-            <div
-              className={`dropzone-upload-box ${file ? 'has-file' : ''}`}
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-            >
+            <div className={`dropzone-upload-box ${file ? 'has-file' : ''}`} onDragOver={handleDragOver} onDrop={handleDrop}>
               <input
                 type="file"
                 id="attendance-file-input"
                 accept=".xls,.xlsx"
-                onChange={handleFileChange}
+                onChange={handleFileInputChange}
                 style={{ display: 'none' }}
               />
               <label htmlFor="attendance-file-input" className="dropzone-clickable-label">
                 <div className="upload-icon-circle">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="17 8 12 3 7 8"></polyline>
-                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
                   </svg>
                 </div>
                 {file ? (
@@ -768,48 +983,34 @@ export default function WaiverToolPage({ onBack }) {
               </div>
             )}
 
-            {/* 3 Parameter Input Boxes */}
             <div className="upload-params-row">
+              {/* Target Parameter */}
               <div className="param-input-box">
                 <span className="param-label">TARGET</span>
                 <div className="param-stepper-wrap">
                   <span className="param-number">{threshold}</span>
                   <span className="param-unit">%</span>
                   <div className="param-stepper-arrows">
-                    <button
-                      type="button"
-                      className="arrow-btn"
-                      onClick={() => setThreshold(prev => Math.min(99, prev + 1))}
-                    >▲</button>
-                    <button
-                      type="button"
-                      className="arrow-btn"
-                      onClick={() => setThreshold(prev => Math.max(50, prev - 1))}
-                    >▼</button>
+                    <button type="button" className="arrow-btn" onClick={() => setThreshold(e => Math.min(99, e + 1))}>▲</button>
+                    <button type="button" className="arrow-btn" onClick={() => setThreshold(e => Math.max(50, e - 1))}>▼</button>
                   </div>
                 </div>
               </div>
 
+              {/* Waiver Limit Parameter */}
               <div className="param-input-box">
                 <span className="param-label">WAIVER LIMIT</span>
                 <div className="param-stepper-wrap">
                   <span className="param-number">{maxWaivers}</span>
                   <span className="param-unit">dates</span>
                   <div className="param-stepper-arrows">
-                    <button
-                      type="button"
-                      className="arrow-btn"
-                      onClick={() => setMaxWaivers(prev => Math.min(30, prev + 1))}
-                    >▲</button>
-                    <button
-                      type="button"
-                      className="arrow-btn"
-                      onClick={() => setMaxWaivers(prev => Math.max(1, prev - 1))}
-                    >▼</button>
+                    <button type="button" className="arrow-btn" onClick={() => setMaxWaivers(e => Math.min(30, e + 1))}>▲</button>
+                    <button type="button" className="arrow-btn" onClick={() => setMaxWaivers(e => Math.max(1, e - 1))}>▼</button>
                   </div>
                 </div>
               </div>
 
+              {/* Semester Starts Parameter */}
               <div className="param-input-box">
                 <span className="param-label">SEMESTER STARTS</span>
                 <div className="param-select-wrap">
@@ -843,203 +1044,51 @@ export default function WaiverToolPage({ onBack }) {
             </footer>
           </div>
         </main>
-      ) : (
-        /* View 2: Results Screen (Matching Image 2) */
-        <main className="results-screen-container">
-          <div className="results-columns-layout">
-            {/* Left Column: Subject Health / Grid */}
-            <section className="left-main-section">
-              <div className="section-header-row">
-                <div className="header-titles">
-                  <h2 className="section-heading">Subject health</h2>
-                  <p className="section-subheading">With the waiver dates you have selected</p>
-                </div>
-
-                <div className="header-actions-cluster">
-                  {/* View Mode Switcher */}
-                  <div className="view-mode-toggle-pills">
-                    <button
-                      className={`pill-toggle-btn ${viewMode === 'health' ? 'active' : ''}`}
-                      onClick={() => setViewMode('health')}
-                      title="View subject health cards"
-                    >
-                      📈 Subject Health
-                    </button>
-                    <button
-                      className={`pill-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                      onClick={() => setViewMode('grid')}
-                      title="View detailed Excel spreadsheet grid"
-                    >
-                      📊 Spreadsheet Grid
-                    </button>
-                  </div>
-
-                  {/* Legend */}
-                  <div className="legend-items-wrap">
-                    <span className="legend-item"><span className="legend-dash dash-before"></span>Before</span>
-                    <span className="legend-item"><span className="legend-dash dash-after"></span>After</span>
-                    <span className="legend-item"><span className="legend-tick"></span>{threshold}% target</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* View Content */}
-              {viewMode === 'health' ? renderSubjectHealthCards() : renderSpreadsheetGrid()}
-            </section>
-
-            {/* Right Column: Your Waiver Dates Sidebar */}
-            <aside className="right-sidebar-section">
-              <div className="waiver-dates-card">
-                <div className="dates-card-top-row">
-                  <h3 className="dates-card-title">Your waiver dates</h3>
-                  <span className="dates-card-counter">
-                    {selectedWaivers.size} / {maxWaivers}
-                  </span>
-                </div>
-
-                <div className="dates-card-status-bar">
-                  <span className="badge-recommended">RECOMMENDED</span>
-                  <div className="dates-actions-group">
-                    {!isRecommendedActive && solverResult?.chosenDays?.length > 0 && (
-                      <button className="btn-text-action" onClick={handleApplySuggested} title="Reset to solver recommendations">
-                        Reset
-                      </button>
-                    )}
-                    <button className="btn-text-action" onClick={handleClearAll} title="Clear all waiver dates">
-                      Clear
-                    </button>
-                  </div>
-                </div>
-
-                {/* List of Selected Waiver Date Cards */}
-                <div className="selected-dates-scrollable-list">
-                  {selectedDatesList.length === 0 ? (
-                    <div className="empty-dates-notice">
-                      <p>No dates waived yet.</p>
-                      <button className="btn-restore-suggested" onClick={handleApplySuggested}>
-                        Apply Recommended Plan
-                      </button>
-                    </div>
-                  ) : (
-                    selectedDatesList.map(item => (
-                      <div key={item.dateStr} className="waiver-date-card-item">
-                        <div className="date-card-calendar-badge">
-                          <span className="badge-day-number">{item.dayNum}</span>
-                          <span className="badge-month-label">{item.monthShort}</span>
-                        </div>
-
-                        <div className="date-card-details">
-                          <div className="date-card-main-line">
-                            <strong>{item.weekday}</strong> &middot; {item.totalMissed} missed
-                          </div>
-                          <div className="date-card-sub-line" title={item.missedSubjects.join(', ')}>
-                            {item.missedSubjects.length > 0
-                              ? item.missedSubjects.join(', ')
-                              : 'No absences recorded'}
-                          </div>
-                        </div>
-
-                        <button
-                          className="btn-remove-date-card"
-                          onClick={() => handleToggleDay(item.dateStr)}
-                          title={`Remove waiver for ${item.dateStr}`}
-                        >
-                          &times;
-                        </button>
-                      </div>
-                    ))
-                  )}
-                </div>
-
-                {/* Status Indicator Banner */}
-                <div className="dates-card-footer-status">
-                  {simulatedStats?.allPassing ? (
-                    <span className="status-all-clear">
-                      <span className="dot-green">&bull;</span> Every subject is at {threshold}% or above
-                    </span>
-                  ) : (
-                    <span className="status-shortage-warn">
-                      <span className="dot-warn">&#9650;</span> {Math.max(0, (simulatedStats?.totalTargetParts || 0) - (simulatedStats?.passingTargetCount ?? simulatedStats?.passingCount ?? 0))} part(s) below {threshold}%
-                    </span>
-                  )}
-                </div>
-
-                {/* Main Action Button */}
-                <button
-                  className="btn-continue-submit"
-                  onClick={() => setIsSubmitModalOpen(true)}
-                  disabled={selectedWaivers.size === 0}
-                >
-                  Continue to submit
-                </button>
-              </div>
-
-              {/* Sheet Replacement Box */}
-              <div className="active-sheet-info-box">
-                <div className="sheet-label-column">
-                  <span className="sheet-tag-label">SHEET</span>
-                  <span className="sheet-file-name" title={fileMeta?.name || 'attendance-export.xls'}>
-                    {fileMeta?.name || 'attendance-export.xls'}
-                  </span>
-                </div>
-                <button className="btn-replace-sheet" onClick={handleReplaceSheet}>
-                  Replace
-                </button>
-              </div>
-            </aside>
-          </div>
-        </main>
       )}
 
-      {/* Submission List Modal (Triggered by "Continue to submit") */}
-      {isSubmitModalOpen && (
-        <div className="waiver-modal-backdrop" onClick={() => setIsSubmitModalOpen(false)}>
-          <div className="waiver-modal-card" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header-row">
+      {/* Expanded Grid Modal Overlay */}
+      {isGridExpanded && parsedData && (
+        <div className="rd-overlay" onClick={() => setIsGridExpanded(false)}>
+          <section className="rd-expanded" role="dialog" aria-label="Spreadsheet grid, expanded" onClick={(e) => e.stopPropagation()}>
+            <div className="rd-panel-head">
               <div>
-                <h3 className="modal-title">Recommended Waiver Dates</h3>
-                <p className="modal-subtitle">Official list of dates to enter on your college attendance portal</p>
+                <h2>Spreadsheet grid</h2>
+                <span>Scroll sideways for every class day. Click a date or cell to waive or restore the whole day.</span>
               </div>
-              <button className="modal-close-btn" onClick={() => setIsSubmitModalOpen(false)}>
-                &times;
-              </button>
+              <div className="rd-exp-acts">
+                <span className="rd-count lg">{selectedWaivers.size} of {maxWaivers} waivers used</span>
+                {!isOptimalSuggested && solverResult?.chosenDays?.length > 0 && (
+                  <button type="button" className="rd-btn-outline sm" onClick={handleResetRecommended}>
+                    Reset to recommended
+                  </button>
+                )}
+                <button type="button" className="rd-btn-dark" onClick={() => setIsGridExpanded(false)}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <polyline points="4 14 10 14 10 20" />
+                    <polyline points="20 10 14 10 14 4" />
+                    <line x1="14" y1="10" x2="21" y2="3" />
+                    <line x1="3" y1="21" x2="10" y2="14" />
+                  </svg>
+                  Collapse
+                </button>
+              </div>
             </div>
 
-            <div className="modal-summary-banner">
-              <span><strong>{selectedDatesList.length}</strong> date(s) selected</span>
-              <span className="summary-dot">&middot;</span>
-              <span>{simulatedStats?.allPassing ? 'All subjects clear' : `${Math.max(0, (simulatedStats?.totalTargetParts || 0) - (simulatedStats?.passingTargetCount ?? simulatedStats?.passingCount ?? 0))} part(s) below target`}</span>
+            <div className="rd-exp-body">
+              {renderGridTable(allDayColumns, true)}
             </div>
 
-            <div className="modal-dates-list">
-              {selectedDatesList.map(item => (
-                <div key={item.dateStr} className="modal-date-row">
-                  <div className="modal-date-left">
-                    <span className="modal-date-badge">{item.dayNum} {item.monthShort}</span>
-                    <span className="modal-date-weekday">{item.weekday}</span>
-                  </div>
-                  <div className="modal-date-right">
-                    <span className="modal-date-missed">{item.totalMissed} class(es) missed</span>
-                    <span className="modal-date-subs">{item.missedSubjects.join(', ')}</span>
-                  </div>
-                </div>
-              ))}
+            <div className="rd-panel-foot">
+              <div className="rd-exp-legend">
+                <span><span className="rd-chip p">P<small>Th</small></span> Present</span>
+                <span><span className="rd-chip a">A<small>Th</small></span> Absent</span>
+                <span className="rd-key"><i /> Waived day (its classes are removed)</span>
+              </div>
+              <span>Attendance column counts theory and tute only</span>
             </div>
-
-            <div className="modal-actions-footer">
-              <button className="btn-copy-submit-dates" onClick={handleCopyDates}>
-                📋 Copy Dates List
-              </button>
-              {copyFeedback && <span className="copy-feedback-toast">{copyFeedback}</span>}
-              <button className="btn-modal-done" onClick={() => setIsSubmitModalOpen(false)}>
-                Done
-              </button>
-            </div>
-          </div>
+          </section>
         </div>
       )}
-
-      <FooterCredit />
     </div>
   );
 }
