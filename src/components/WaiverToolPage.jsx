@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import FooterCredit from './FooterCredit';
 import { useAuth } from '../context/AuthContext';
 import { trackWaiverEvent } from '../lib/analytics';
-import { parseAttendanceFile, WEEKDAYS, MONTH_NAMES } from '../lib/waiverParser';
+import { parseAttendanceFile, WEEKDAYS, MONTH_NAMES, MONTHS_FULL } from '../lib/waiverParser';
 import {
   solveExactBnb,
   solveKPlusOne,
