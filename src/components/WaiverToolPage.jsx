@@ -909,7 +909,6 @@ export default function WaiverToolPage({ onBack }) {
                   <span><i className="f-safe" />{threshold}% or above (Target)</span>
                   <span><i className="f-warn" />66.7% – {threshold - 0.1}% (Below Target)</span>
                   <span><i className="f-fail" />Below 66.7% (Risk)</span>
-                  <span><i className="tick" />{threshold}% target</span>
                 </div>
               </div>
               {renderSubjectCards()}
