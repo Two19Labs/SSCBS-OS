@@ -81,4 +81,32 @@ if (fs.existsSync(samplePath)) {
   console.warn('Sample benchmark file not found at:', samplePath);
 }
 
+// 4. Test Starred Subject Priority & Debarment Floor Guard
+console.log('4. Testing Starred Subject Priority & Floor Guard...');
+const nov6Path = path.resolve(__dirname, '../../Student Attandance_2026-11-06_15_48_08.xls');
+if (fs.existsSync(nov6Path)) {
+  const html = fs.readFileSync(nov6Path, 'utf-8');
+  const parsed = parseAttendanceFile(html, 'Student Attandance_2026-11-06_15_48_08.xls');
+
+  // Find Financial Accounting Analysis and star it with K=12
+  const targetSub = 'Financial Accounting Analysis';
+  const solStarred = solveExactBnb(parsed, 85, 12, [targetSub]);
+
+  // Check that the solver prioritized the starred subject to pass or reach higher tier
+  const finAccTheory = solStarred.evalPlan.finalStats.find(s => s.label.includes(targetSub) && s.label.includes('theory'));
+  assert(finAccTheory, 'Financial Accounting Analysis theory must exist in results');
+  assert.strictEqual(finAccTheory.pass, true, 'Starred Financial Accounting Theory must reach >85% target');
+
+  // Verify non-negotiable Priority 0: no subject is allowed below 66.67% debarment floor
+  for (const part of solStarred.evalPlan.finalStats) {
+    if (part.n > 0) {
+      assert(part.pct >= 66.66, `${part.label} must not violate debarment floor (${part.pct}%)`);
+    }
+  }
+
+  // Verify that in shortage mode with K=12, all 12 waivers are utilized (waterfilling)
+  assert.strictEqual(solStarred.chosenDays.length, 12, 'In shortage mode, all 12 available waivers must be utilized');
+  console.log('✓ Starred subject prioritization, 66.67% debarment guard, and full waiver utilization verified.');
+}
+
 console.log('\nALL UNIT TESTS PASSED SUCCESSFULLY! ✓✓✓');

@@ -107,6 +107,9 @@ export default function WaiverToolPage({ onBack }) {
   // Active selected waivers (Set of 'YYYY-MM-DD' date strings)
   const [selectedWaivers, setSelectedWaivers] = useState(new Set());
 
+  // Prioritized / starred subjects (Set of subject names)
+  const [starredSubjects, setStarredSubjects] = useState(new Set());
+
   // Solver outcome
   const [solverResult, setSolverResult] = useState(null);
   const [kPlusOneResult, setKPlusOneResult] = useState(null);
@@ -154,6 +157,9 @@ export default function WaiverToolPage({ onBack }) {
           if (Array.isArray(saved.selectedWaivers)) {
             setSelectedWaivers(new Set(saved.selectedWaivers));
           }
+          if (Array.isArray(saved.starredSubjects)) {
+            setStarredSubjects(new Set(saved.starredSubjects));
+          }
           if (saved.solverResult) setSolverResult(saved.solverResult);
           if (saved.kPlusOneResult) setKPlusOneResult(saved.kPlusOneResult);
           if (saved.maxWaivers !== undefined) setMaxWaivers(saved.maxWaivers);
@@ -175,6 +181,7 @@ export default function WaiverToolPage({ onBack }) {
       const stateToSave = {
         parsedData,
         selectedWaivers: Array.from(selectedWaivers),
+        starredSubjects: Array.from(starredSubjects),
         solverResult,
         kPlusOneResult,
         maxWaivers,
@@ -185,7 +192,7 @@ export default function WaiverToolPage({ onBack }) {
     } catch (err) {
       console.warn('Failed to persist Waiver Tool state:', err);
     }
-  }, [parsedData, selectedWaivers, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, storageKey]);
+  }, [parsedData, selectedWaivers, starredSubjects, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, storageKey]);
 
   // Prevent scroll when expanded grid modal is open
   useEffect(() => {
@@ -245,7 +252,17 @@ export default function WaiverToolPage({ onBack }) {
   };
 
   // Run Solver Async with Worker or Fallback
-  const executeSolverAsync = (data, targetT, limitK, callback) => {
+  const executeSolverAsync = (data, targetT, limitK, starsOrCb, maybeCb) => {
+    let stars = starredSubjects;
+    let callback = null;
+    if (typeof starsOrCb === 'function') {
+      callback = starsOrCb;
+    } else if (starsOrCb !== undefined) {
+      stars = starsOrCb;
+      callback = maybeCb;
+    }
+    const starredList = Array.from(stars || []);
+
     if (workerRef.current) {
       const solveId = Date.now();
       const onMessage = (ev) => {
@@ -264,15 +281,16 @@ export default function WaiverToolPage({ onBack }) {
         id: solveId,
         parsedData: data,
         targetPct: targetT,
-        maxWaiversK: limitK
+        maxWaiversK: limitK,
+        starredSubjects: starredList
       });
     } else {
       setTimeout(() => {
         try {
-          const solution = solveExactBnb(data, targetT, limitK);
+          const solution = solveExactBnb(data, targetT, limitK, starredList);
           let kPlusOne = null;
           if (solution.status === 'SHORTAGE') {
-            kPlusOne = solveKPlusOne(data, targetT, limitK);
+            kPlusOne = solveKPlusOne(data, targetT, limitK, starredList);
           }
           setSolverResult(solution);
           setKPlusOneResult(kPlusOne);
@@ -361,6 +379,7 @@ export default function WaiverToolPage({ onBack }) {
   const handleReplaceSheet = () => {
     setParsedData(null);
     setSelectedWaivers(new Set());
+    setStarredSubjects(new Set());
     setSolverResult(null);
     setKPlusOneResult(null);
     setFile(null);
@@ -370,6 +389,27 @@ export default function WaiverToolPage({ onBack }) {
       localStorage.removeItem(storageKey);
     } catch {
       // ignore
+    }
+  };
+
+  // Toggle priority star on subject with instant live re-solve
+  const handleToggleStar = (subjectName) => {
+    const next = new Set(starredSubjects);
+    if (next.has(subjectName)) {
+      next.delete(subjectName);
+    } else {
+      next.add(subjectName);
+    }
+    setStarredSubjects(next);
+    if (parsedData) {
+      setIsProcessing(true);
+      executeSolverAsync(parsedData, threshold, maxWaivers, next, (solution) => {
+        if (solution?.chosenDays && solution.chosenDays.length > 0) {
+          setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+        } else {
+          setSelectedWaivers(new Set());
+        }
+      });
     }
   };
 
@@ -589,10 +629,26 @@ export default function WaiverToolPage({ onBack }) {
           pill = ['Below Target', 'warn'];
         }
 
+        const isStarred = starredSubjects.has(sub.name);
+
         return (
-          <article key={sIdx} className="rd-card">
+          <article key={sIdx} className={`rd-card ${isStarred ? 'rd-card-starred' : ''}`}>
             <div className="rd-card-head">
-              <h3>{sub.name}</h3>
+              <div className="rd-card-title-group">
+                <button
+                  type="button"
+                  className={`rd-star-btn ${isStarred ? 'starred' : ''}`}
+                  onClick={() => handleToggleStar(sub.name)}
+                  title={isStarred ? 'Priority subject (click to remove priority)' : 'Star as priority subject for 85% target'}
+                  aria-label={isStarred ? `Remove star from ${sub.name}` : `Star ${sub.name} as priority`}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill={isStarred ? '#f59e0b' : 'none'} stroke={isStarred ? '#b45309' : 'currentColor'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                  </svg>
+                  {isStarred && <span className="rd-star-tag">Priority</span>}
+                </button>
+                <h3>{sub.name}</h3>
+              </div>
               <span className={`rd-pill p-${pill[1]}`}>{pill[0]}</span>
             </div>
             {parts.map((p, pIdx) => (
@@ -931,7 +987,14 @@ export default function WaiverToolPage({ onBack }) {
             {/* Left: Subject Health */}
             <section className="rd-health" aria-label="Subject health">
               <div className="rd-sec-head">
-                <h2>Subject health</h2>
+                <div>
+                  <h2>Subject health</h2>
+                  <span className="rd-sec-sub">
+                    {starredSubjects.size > 0
+                      ? `⭐ Prioritizing ${starredSubjects.size} starred subject${starredSubjects.size === 1 ? '' : 's'}`
+                      : 'Star any subject to prioritize it for waivers'}
+                  </span>
+                </div>
                 <div className="rd-legend">
                   <span><i className="f-safe" />{threshold}% or above (Target)</span>
                   <span><i className="f-warn" />66.7% – {threshold - 0.1}% (Below Target)</span>

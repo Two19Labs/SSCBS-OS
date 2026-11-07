@@ -188,18 +188,34 @@ export function extractCandidateDays(parsedData, targetParts) {
 /**
  * Ultra-fast exact branch-and-bound solver adhering to Sections 6.1 and 6.2.
  */
-export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
+export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, starredSubjects = []) {
   const startTime = (typeof performance !== 'undefined' ? performance.now() : Date.now());
   const T = targetPct;
 
   const { targetParts } = extractTargetParts(parsedData);
   const numParts = targetParts.length;
 
+  const starredSet = starredSubjects instanceof Set
+    ? starredSubjects
+    : new Set(Array.isArray(starredSubjects) ? starredSubjects : []);
+  const hasStarred = starredSet.size > 0;
+
+  const isPartStarred = new Uint8Array(numParts);
+  let totalStarredParts = 0;
+  for (let c = 0; c < numParts; c++) {
+    if (starredSet.has(targetParts[c].subject)) {
+      isPartStarred[c] = 1;
+      totalStarredParts++;
+    }
+  }
+
   if (numParts === 0) {
     return {
       status: 'OPTIMAL',
       chosenDays: [],
       passCount: 0,
+      starredPassCount: 0,
+      totalStarredParts: 0,
       totalTargetParts: 0,
       lowestPartPct: 100,
       lowestPart: null,
@@ -268,8 +284,10 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
 
   const evaluateState = (chosenIndices) => {
     let passCount = 0;
+    let starredPassCount = 0;
     let debarSafeCount = 0;
     let tierScore = 0;
+    let starredTierScore = 0;
     let minPct = 100;
     const finalStats = [];
 
@@ -284,7 +302,10 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
       const simP = targetParts[c].p - waivedP;
       const simN = targetParts[c].n - waivedN;
       const pass = isPartPassing(simP, simN, T);
-      if (pass) passCount++;
+      if (pass) {
+        passCount++;
+        if (isPartStarred[c]) starredPassCount++;
+      }
 
       let pct = 100;
       if (simN > 0) {
@@ -293,29 +314,37 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
       }
       if (pct >= 66.666) debarSafeCount++;
 
+      let pScore = 0;
       if (pass) {
-        tierScore += 100000 + pct;
+        pScore = 100000 + pct;
       } else if (pct >= 80) {
-        tierScore += 20000 + pct;
+        pScore = 20000 + pct;
       } else if (pct >= 75) {
-        tierScore += 8000 + pct;
+        pScore = 8000 + pct;
       } else if (pct >= 70) {
-        tierScore += 3000 + pct;
+        pScore = 3000 + pct;
       } else if (pct >= 66.666) {
-        tierScore += 1000 + pct;
+        pScore = 1000 + pct;
       } else {
-        tierScore += pct;
+        pScore = pct;
       }
 
-      finalStats.push({ label: targetParts[c].label, p: simP, n: simN, pct, pass });
+      tierScore += pScore;
+      if (isPartStarred[c]) starredTierScore += pScore;
+
+      finalStats.push({ label: targetParts[c].label, p: simP, n: simN, pct, pass, isStarred: Boolean(isPartStarred[c]) });
     }
 
     return {
       passCount,
+      starredPassCount,
+      totalStarredParts,
       debarSafeCount,
       tierScore,
+      starredTierScore,
       total: numParts,
       allPass: passCount === numParts,
+      allStarredPass: totalStarredParts === 0 || starredPassCount === totalStarredParts,
       minPct,
       finalStats
     };
@@ -325,11 +354,14 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
   let best = {
     chosen: [],
     passCount: baseEval.passCount,
+    starredPassCount: baseEval.starredPassCount,
     debarSafeCount: baseEval.debarSafeCount,
     tierScore: baseEval.tierScore,
+    starredTierScore: baseEval.starredTierScore,
     size: 0,
     minPct: baseEval.minPct,
-    allPass: baseEval.allPass
+    allPass: baseEval.allPass,
+    allStarredPass: baseEval.allStarredPass
   };
 
   const curW = new Int32Array(numParts);
@@ -339,15 +371,19 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
   function dfs(orderIdx, targetSize) {
     if (currentChosen.length === targetSize) {
       let passCount = 0;
+      let starredPassCount = 0;
       let debarSafeCount = 0;
       let tierScore = 0;
+      let starredTierScore = 0;
       let minPct = 100;
 
       for (let c = 0; c < numParts; c++) {
         if (curN[c] === targetParts[c].n) {
           passCount++;
+          if (isPartStarred[c]) starredPassCount++;
           debarSafeCount++;
           tierScore += 100000 + 100;
+          if (isPartStarred[c]) starredTierScore += 100000 + 100;
         } else {
           let waivedP = 0;
           for (let k = 0; k < currentChosen.length; k++) {
@@ -359,30 +395,47 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
           if (pct < minPct) minPct = pct;
 
           const passes = (curW[c] >= rhs[c]) || (100 * simP > T * simN);
-          if (passes) passCount++;
+          if (passes) {
+            passCount++;
+            if (isPartStarred[c]) starredPassCount++;
+          }
           if (pct >= 66.666) debarSafeCount++;
 
+          let pScore = 0;
           if (passes) {
-            tierScore += 100000 + pct;
+            pScore = 100000 + pct;
           } else if (pct >= 80) {
-            tierScore += 20000 + pct;
+            pScore = 20000 + pct;
           } else if (pct >= 75) {
-            tierScore += 8000 + pct;
+            pScore = 8000 + pct;
           } else if (pct >= 70) {
-            tierScore += 3000 + pct;
+            pScore = 3000 + pct;
           } else if (pct >= 66.666) {
-            tierScore += 1000 + pct;
+            pScore = 1000 + pct;
           } else {
-            tierScore += pct;
+            pScore = pct;
           }
+          tierScore += pScore;
+          if (isPartStarred[c]) starredTierScore += pScore;
         }
       }
 
       let isBetter = false;
-      if (passCount > best.passCount) {
+
+      // Priority 0: Debarment floor across ALL subjects (non-negotiable)
+      if (debarSafeCount > best.debarSafeCount) {
         isBetter = true;
-      } else if (passCount === best.passCount) {
-        if (passCount === numParts) {
+      } else if (debarSafeCount < best.debarSafeCount) {
+        isBetter = false;
+      } else {
+        // Debarment safety tied:
+        if (hasStarred && starredPassCount !== best.starredPassCount) {
+          // Priority 1: Starred subjects passing >= Target (85%)
+          isBetter = starredPassCount > best.starredPassCount;
+        } else if (passCount !== best.passCount) {
+          // Priority 2: Overall count of parts passing >= Target (85%)
+          isBetter = passCount > best.passCount;
+        } else if (passCount === numParts) {
           // All parts pass: strictly prefer fewer waivers
           if (currentChosen.length < best.size) {
             isBetter = true;
@@ -390,23 +443,19 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
             isBetter = true;
           }
         } else {
-          // Shortage mode: All parts cannot pass within budget.
-          // Priority 1: Avoid debarment! Maximize parts >= 66.7%
-          if (debarSafeCount > best.debarSafeCount) {
-            isBetter = true;
-          } else if (debarSafeCount === best.debarSafeCount) {
-            // Priority 2: Waterfill remaining waivers to climb DU mark slabs (80%, 75%, 70%)
-            if (tierScore > best.tierScore + 1e-4) {
-              isBetter = true;
-            } else if (Math.abs(tierScore - best.tierScore) <= 1e-4) {
-              // Priority 3: In shortage mode, NEVER discard waivers when subjects are below target!
-              // Prefer using more waivers to maximize attendance percentages and future buffer
-              if (currentChosen.length > best.size) {
-                isBetter = true;
-              } else if (currentChosen.length === best.size && minPct > best.minPct + 1e-9) {
-                isBetter = true;
-              }
-            }
+          // Shortage mode:
+          if (hasStarred && Math.abs(starredTierScore - best.starredTierScore) > 1e-4) {
+            // Priority 3: Starred subjects tier score (pushing starred parts up mark slabs: 80%, 75%, 70%)
+            isBetter = starredTierScore > best.starredTierScore;
+          } else if (Math.abs(tierScore - best.tierScore) > 1e-4) {
+            // Priority 4: Overall tier score across all subjects
+            isBetter = tierScore > best.tierScore;
+          } else if (currentChosen.length !== best.size) {
+            // Priority 5: In shortage, NEVER discard waivers! Put every available waiver to work
+            isBetter = currentChosen.length > best.size;
+          } else {
+            // Priority 6: Higher minimum percentage floor
+            isBetter = minPct > best.minPct + 1e-9;
           }
         }
       }
@@ -415,11 +464,14 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
         best = {
           chosen: [...currentChosen],
           passCount,
+          starredPassCount,
           debarSafeCount,
           tierScore,
+          starredTierScore,
           size: currentChosen.length,
           minPct,
-          allPass: passCount === numParts
+          allPass: passCount === numParts,
+          allStarredPass: totalStarredParts === 0 || starredPassCount === totalStarredParts
         };
       }
       return;
@@ -431,19 +483,26 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
 
     for (let i = orderIdx; i <= numCandidates - remainingToPick; i++) {
       let maxPotentialPass = 0;
+      let maxPotentialStarredPass = 0;
       for (let c = 0; c < numParts; c++) {
         if (curN[c] === targetParts[c].n || curW[c] >= rhs[c]) {
           maxPotentialPass++;
+          if (isPartStarred[c]) maxPotentialStarredPass++;
         } else {
           const maxGainW = orderedW[c][i] + suffixMaxW[c][i + 1][remainingToPick - 1];
           const maxGainN = orderedCandidates[i].nDeltas[c] + suffixMaxN[c][i + 1][remainingToPick - 1];
           if (curW[c] + maxGainW >= rhs[c] || curN[c] + maxGainN >= targetParts[c].n) {
             maxPotentialPass++;
+            if (isPartStarred[c]) maxPotentialStarredPass++;
           }
         }
       }
 
-      if (maxPotentialPass < best.passCount) continue;
+      if (hasStarred) {
+        if (maxPotentialStarredPass < best.starredPassCount) continue;
+      } else {
+        if (maxPotentialPass < best.passCount) continue;
+      }
 
       const cd = orderedCandidates[i];
       for (let c = 0; c < numParts; c++) {
@@ -495,6 +554,9 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
     status: evalPlan.allPass ? 'OPTIMAL' : 'SHORTAGE',
     chosenDays,
     passCount: evalPlan.passCount,
+    starredPassCount: evalPlan.starredPassCount,
+    totalStarredParts,
+    allStarredPass: evalPlan.allStarredPass,
     totalTargetParts: numParts,
     debarSafeCount: evalPlan.debarSafeCount,
     lowestPartPct: evalPlan.minPct,
@@ -509,8 +571,8 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
 /**
  * Section 6.3: Calculate K+1 outcome for shortage states
  */
-export function solveKPlusOne(parsedData, targetPct = 85, maxWaiversK = 12) {
-  return solveExactBnb(parsedData, targetPct, maxWaiversK + 1);
+export function solveKPlusOne(parsedData, targetPct = 85, maxWaiversK = 12, starredSubjects = []) {
+  return solveExactBnb(parsedData, targetPct, maxWaiversK + 1, starredSubjects);
 }
 
 /**
