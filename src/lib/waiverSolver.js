@@ -399,8 +399,11 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
             if (tierScore > best.tierScore + 1e-4) {
               isBetter = true;
             } else if (Math.abs(tierScore - best.tierScore) <= 1e-4) {
-              // Priority 3: If tier score is tied, prefer fewer waivers
-              if (currentChosen.length < best.size) {
+              // Priority 3: In shortage mode, NEVER discard waivers when subjects are below target!
+              // Prefer using more waivers to maximize attendance percentages and future buffer
+              if (currentChosen.length > best.size) {
+                isBetter = true;
+              } else if (currentChosen.length === best.size && minPct > best.minPct + 1e-9) {
                 isBetter = true;
               }
             }

@@ -383,14 +383,13 @@ export default function WaiverToolPage({ onBack }) {
     setSelectedWaivers(next);
   };
 
-  // Reset to recommended waivers with automatic re-solve safeguard if parameters changed
-  const handleResetRecommended = () => {
-    if (!parsedData) return;
-    if (solverResult?.chosenDays && !hasParamsChanged) {
-      setSelectedWaivers(new Set(solverResult.chosenDays.map(d => d.dateStr)));
-    } else {
+  // Live parameter changes with automatic solver re-execution
+  const handleMaxWaiversChange = (newLimit) => {
+    const clamped = Math.max(1, Math.min(30, newLimit));
+    setMaxWaivers(clamped);
+    if (parsedData) {
       setIsProcessing(true);
-      executeSolverAsync(parsedData, threshold, maxWaivers, (solution) => {
+      executeSolverAsync(parsedData, threshold, clamped, (solution) => {
         if (solution?.chosenDays && solution.chosenDays.length > 0) {
           setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
         } else {
@@ -398,6 +397,34 @@ export default function WaiverToolPage({ onBack }) {
         }
       });
     }
+  };
+
+  const handleThresholdChange = (newThreshold) => {
+    const clamped = Math.max(50, Math.min(99, newThreshold));
+    setThreshold(clamped);
+    if (parsedData) {
+      setIsProcessing(true);
+      executeSolverAsync(parsedData, clamped, maxWaivers, (solution) => {
+        if (solution?.chosenDays && solution.chosenDays.length > 0) {
+          setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+        } else {
+          setSelectedWaivers(new Set());
+        }
+      });
+    }
+  };
+
+  // Reset to recommended waivers with automatic re-solve for active parameters
+  const handleResetRecommended = () => {
+    if (!parsedData) return;
+    setIsProcessing(true);
+    executeSolverAsync(parsedData, threshold, maxWaivers, (solution) => {
+      if (solution?.chosenDays && solution.chosenDays.length > 0) {
+        setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+      } else {
+        setSelectedWaivers(new Set());
+      }
+    });
   };
 
   const handleClearAll = () => {
@@ -820,8 +847,8 @@ export default function WaiverToolPage({ onBack }) {
                 <span className="num">{threshold}</span>
                 <span className="unit">%</span>
                 <span className="rd-steps">
-                  <button type="button" aria-label="Lower target" onClick={() => setThreshold(e => Math.max(50, e - 1))}>−</button>
-                  <button type="button" aria-label="Raise target" onClick={() => setThreshold(e => Math.min(99, e + 1))}>+</button>
+                  <button type="button" aria-label="Lower target" onClick={() => handleThresholdChange(threshold - 1)}>−</button>
+                  <button type="button" aria-label="Raise target" onClick={() => handleThresholdChange(threshold + 1)}>+</button>
                 </span>
               </div>
             </div>
@@ -836,8 +863,8 @@ export default function WaiverToolPage({ onBack }) {
                 </span>
                 <span className="unit">dates</span>
                 <span className="rd-steps">
-                  <button type="button" aria-label="Lower waiver limit" onClick={() => setMaxWaivers(e => Math.max(1, e - 1))}>−</button>
-                  <button type="button" aria-label="Raise waiver limit" onClick={() => setMaxWaivers(e => Math.min(30, e + 1))}>+</button>
+                  <button type="button" aria-label="Lower waiver limit" onClick={() => handleMaxWaiversChange(maxWaivers - 1)}>−</button>
+                  <button type="button" aria-label="Raise waiver limit" onClick={() => handleMaxWaiversChange(maxWaivers + 1)}>+</button>
                 </span>
               </div>
             </div>
