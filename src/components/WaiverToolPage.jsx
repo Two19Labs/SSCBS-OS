@@ -537,7 +537,7 @@ export default function WaiverToolPage({ onBack }) {
           {status === 'info' ? (
             `Not counted toward the ${threshold}% target`
           ) : status === 'fail' ? (
-            <>⚠️ <strong style={{ color: 'var(--red, #b91c1c)' }}>Debarment Risk:</strong> Below 66.7% minimum. Attend <strong>{buff.classesNeededForDebarSafe || 1}</strong> class(es) to avoid debarment.</>
+            <>⚠️ <strong style={{ color: 'var(--red, #b91c1c)' }}>Risk:</strong> Below 66.7% minimum. Attend <strong>{buff.classesNeededForDebarSafe || 1}</strong> class(es) to avoid debarment.</>
           ) : buff.passes ? (
             <>Can miss <strong>{buff.missableBuffer}</strong> more and stay above {threshold}%</>
           ) : (
@@ -557,7 +557,7 @@ export default function WaiverToolPage({ onBack }) {
         const statuses = parts.map(getPartStatus);
         let pill = ['Clear', 'safe'];
         if (statuses.includes('fail')) {
-          pill = ['Debarment Risk', 'fail'];
+          pill = ['Risk', 'fail'];
         } else if (statuses.includes('warn')) {
           pill = ['Below Target', 'warn'];
         }
@@ -908,7 +908,7 @@ export default function WaiverToolPage({ onBack }) {
                 <div className="rd-legend">
                   <span><i className="f-safe" />{threshold}% or above (Target)</span>
                   <span><i className="f-warn" />66.7% – {threshold - 0.1}% (Below Target)</span>
-                  <span><i className="f-fail" />Below 66.7% (Debarment Risk)</span>
+                  <span><i className="f-fail" />Below 66.7% (Risk)</span>
                   <span><i className="tick" />{threshold}% target</span>
                 </div>
               </div>
