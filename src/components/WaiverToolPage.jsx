@@ -660,6 +660,7 @@ export default function WaiverToolPage({ onBack }) {
         const parts = [...(sub.partsList || Object.values(sub.parts || {}))].sort(
           (a, b) => partOrder[a.type] - partOrder[b.type]
         );
+        const statuses = parts.map(getPartStatus);
         const hasTargetParts = parts.some(p => (p.type === 'th' || p.type === 'tu') && ((p.simN ?? p.n ?? 0) > 0 || (p.baseHeld ?? 0) > 0));
         let pill = ['Clear', 'safe'];
         if (!hasTargetParts) {
