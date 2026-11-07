@@ -520,7 +520,7 @@ export default function WaiverToolPage({ onBack }) {
     return solverResult.chosenDays.every(d => selectedWaivers.has(d.dateStr));
   }, [solverResult, selectedWaivers]);
 
-  // Copy list to clipboard
+  // Copy list to clipboard with robust fallback
   const handleCopyDates = () => {
     if (selectedDaysList.length === 0) return;
     const lines = selectedDaysList.map(item => {
@@ -528,13 +528,52 @@ export default function WaiverToolPage({ onBack }) {
       return `${item.weekday}, ${item.dayNum} ${item.monthShort} - ${item.totalMissed} class(es) missed${subs}`;
     });
     const text = `SSCBS Attendance Waiver Dates (${selectedDaysList.length} dates):\n` + lines.join('\n');
-    navigator.clipboard.writeText(text).then(() => {
+
+    const onSuccess = () => {
       setCopyFeedback('✓ Copied to clipboard!');
       setTimeout(() => setCopyFeedback(null), 3000);
-    }).catch(() => {
+    };
+
+    const onFail = () => {
       setCopyFeedback('Failed to copy');
       setTimeout(() => setCopyFeedback(null), 2500);
-    });
+    };
+
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).then(onSuccess).catch(() => {
+        try {
+          const textArea = document.createElement('textarea');
+          textArea.value = text;
+          textArea.style.position = 'fixed';
+          textArea.style.opacity = '0';
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          const successful = document.execCommand('copy');
+          document.body.removeChild(textArea);
+          if (successful) onSuccess();
+          else onFail();
+        } catch {
+          onFail();
+        }
+      });
+    } else {
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        if (successful) onSuccess();
+        else onFail();
+      } catch {
+        onFail();
+      }
+    }
   };
 
   // 3-Tier Status:
@@ -621,9 +660,11 @@ export default function WaiverToolPage({ onBack }) {
         const parts = [...(sub.partsList || Object.values(sub.parts || {}))].sort(
           (a, b) => partOrder[a.type] - partOrder[b.type]
         );
-        const statuses = parts.map(getPartStatus);
+        const hasTargetParts = parts.some(p => (p.type === 'th' || p.type === 'tu') && ((p.simN ?? p.n ?? 0) > 0 || (p.baseHeld ?? 0) > 0));
         let pill = ['Clear', 'safe'];
-        if (statuses.includes('fail')) {
+        if (!hasTargetParts) {
+          pill = ['Info Only', 'info'];
+        } else if (statuses.includes('fail')) {
           pill = ['Risk', 'fail'];
         } else if (statuses.includes('warn')) {
           pill = ['Below Target', 'warn'];
@@ -635,19 +676,25 @@ export default function WaiverToolPage({ onBack }) {
           <article key={sIdx} className={`rd-card ${isStarred ? 'rd-card-starred' : ''}`}>
             <div className="rd-card-head">
               <div className="rd-card-title-group">
-                <button
-                  type="button"
-                  className={`rd-star-btn ${isStarred ? 'starred' : ''}`}
-                  onClick={() => handleToggleStar(sub.name)}
-                  title={isStarred ? 'Priority subject (click to remove priority)' : 'Star as priority subject for 85% target'}
-                  aria-label={isStarred ? `Remove star from ${sub.name}` : `Star ${sub.name} as priority`}
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill={isStarred ? '#f59e0b' : 'none'} stroke={isStarred ? '#b45309' : 'currentColor'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                  </svg>
-                  {isStarred && <span className="rd-star-tag">Priority</span>}
-                </button>
-                <h3>{sub.name}</h3>
+                {hasTargetParts ? (
+                  <button
+                    type="button"
+                    className={`rd-star-btn ${isStarred ? 'starred' : ''}`}
+                    onClick={() => handleToggleStar(sub.name)}
+                    title={isStarred ? 'Priority subject (click to remove priority)' : `Star as priority subject for ${threshold}% target`}
+                    aria-label={isStarred ? `Remove star from ${sub.name}` : `Star ${sub.name} as priority`}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill={isStarred ? '#f59e0b' : 'none'} stroke={isStarred ? '#b45309' : 'currentColor'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                    {isStarred && <span className="rd-star-tag">Priority</span>}
+                  </button>
+                ) : (
+                  <span className="rd-no-target-badge" title="Practicals are not counted toward attendance targets">
+                    Practical
+                  </span>
+                )}
+                <h3 title={sub.name}>{sub.name}</h3>
               </div>
               <span className={`rd-pill p-${pill[1]}`}>{pill[0]}</span>
             </div>
@@ -997,10 +1044,35 @@ export default function WaiverToolPage({ onBack }) {
                 </div>
                 <div className="rd-legend">
                   <span><i className="f-safe" />{threshold}% or above (Target)</span>
-                  <span><i className="f-warn" />66.7% – {threshold - 0.1}% (Below Target)</span>
+                  <span><i className="f-warn" />66.7% – {(threshold - 0.1).toFixed(1)}% (Below Target)</span>
                   <span><i className="f-fail" />Below 66.7% (Risk)</span>
+                  <span className="rd-legend-star" title={`Star icon prioritizes subjects to reach ${threshold}% first when waivers are scarce`}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b" stroke="#b45309" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                    ★ Star (Prioritize)
+                  </span>
                 </div>
               </div>
+
+              {/* Attendance Health & Star Priority Guide Note */}
+              <div className="rd-health-note">
+                <div className="rd-note-title">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="16" x2="12" y2="12" />
+                    <line x1="12" y1="8" x2="12.01" y2="8" />
+                  </svg>
+                  <span>Understanding Attendance Colors & Star Priority</span>
+                </div>
+                <p className="rd-note-text">
+                  <strong className="text-safe">Green (≥{threshold}%)</strong> meets your target attendance for maximum marks.
+                  {' '}<strong className="text-warn">Yellow (66.7%–{(threshold - 0.1).toFixed(1)}%)</strong> is safe from debarment but below your target.
+                  {' '}<strong className="text-fail">Red (&lt;66.7%)</strong> is at risk of college debarment from semester exams.
+                  {' '}Click the <span className="rd-note-star">★ star icon</span> next to high-credit or core subjects to ensure they get priority to reach {threshold}% over other subjects when waivers are limited (the 66.7% safety floor is always protected for every course).
+                </p>
+              </div>
+
               {renderSubjectCards()}
             </section>
 

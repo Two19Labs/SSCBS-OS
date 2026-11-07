@@ -198,7 +198,6 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
   const starredSet = starredSubjects instanceof Set
     ? starredSubjects
     : new Set(Array.isArray(starredSubjects) ? starredSubjects : []);
-  const hasStarred = starredSet.size > 0;
 
   const isPartStarred = new Uint8Array(numParts);
   let totalStarredParts = 0;
@@ -208,6 +207,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
       totalStarredParts++;
     }
   }
+  const hasStarred = totalStarredParts > 0;
 
   if (numParts === 0) {
     return {
@@ -368,7 +368,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
   const curN = new Int32Array(numParts);
   const currentChosen = [];
 
-  function dfs(orderIdx, targetSize) {
+  function dfs(orderIdx, targetSize, isAllPassSearch = false) {
     if (currentChosen.length === targetSize) {
       let passCount = 0;
       let starredPassCount = 0;
@@ -498,8 +498,11 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
         }
       }
 
-      if (hasStarred) {
+      if (isAllPassSearch) {
+        if (maxPotentialPass < numParts) continue;
+      } else if (hasStarred) {
         if (maxPotentialStarredPass < best.starredPassCount) continue;
+        if (best.starredPassCount === totalStarredParts && maxPotentialPass < best.passCount) continue;
       } else {
         if (maxPotentialPass < best.passCount) continue;
       }
@@ -511,7 +514,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
       }
       currentChosen.push(i);
 
-      dfs(i + 1, targetSize);
+      dfs(i + 1, targetSize, isAllPassSearch);
 
       currentChosen.pop();
       for (let c = 0; c < numParts; c++) {
@@ -533,7 +536,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
     const budgetBest = { ...best, chosen: [...best.chosen] };
     const maxSearch = Math.min(numCandidates, K + 15);
     for (let s = K + 1; s <= maxSearch; s++) {
-      dfs(0, s);
+      dfs(0, s, true);
       if (best.allPass) {
         neededWaiversForAllPass = s;
         shortfall = s - K;
