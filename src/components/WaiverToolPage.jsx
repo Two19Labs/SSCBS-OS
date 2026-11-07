@@ -693,20 +693,20 @@ export default function WaiverToolPage({ onBack }) {
         >
           <div className="popover-inner-card">
             <div className="popover-header">
-              <strong>{hoverDiff.day.fullLabel}</strong>
+              <strong>{hoverDiff.day?.fullLabel || hoverDiff.dateStr}</strong>
               <span className={`popover-action-tag ${hoverDiff.isCurrentlyWaived ? 'tag-remove' : 'tag-add'}`}>
                 {hoverDiff.isCurrentlyWaived ? 'Click to restore day' : 'Click to waive day'}
               </span>
             </div>
             <div className="popover-body">
-              {hoverDiff.affectedParts.length === 0 ? (
+              {(!hoverDiff.affectedParts || hoverDiff.affectedParts.length === 0) ? (
                 <div className="popover-empty-notice">No Theory/Tute classes on this day.</div>
               ) : (
                 hoverDiff.affectedParts.map((part, pIdx) => (
                   <div key={pIdx} className="popover-diff-row">
                     <span className="popover-part-name">{part.label}</span>
                     <span className={`popover-diff-val ${part.isHarmful ? 'text-harm' : 'text-help'}`}>
-                      {part.curPct.toFixed(1)}% &rarr; {part.newPct.toFixed(1)}% ({part.deltaPct >= 0 ? '+' : ''}{part.deltaPct.toFixed(1)}%)
+                      {(part.curPct ?? part.beforePct ?? 0).toFixed(1)}% &rarr; {(part.newPct ?? part.afterPct ?? 0).toFixed(1)}% {((part.deltaPct ?? part.delta ?? 0) >= 0 ? '+' : '')}{((part.deltaPct ?? part.delta ?? 0)).toFixed(1)}%
                     </span>
                   </div>
                 ))

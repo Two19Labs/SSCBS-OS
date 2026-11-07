@@ -563,6 +563,7 @@ export function calculateDayImpactDiff(dateStr, parsedData, currentSelectedWaive
       const nxtPart = nextSub.parts[t];
       if (curPart.baseHeld > 0 && (curPart.simHeld !== nxtPart.simHeld || curPart.simAttended !== nxtPart.simAttended)) {
         const delta = nxtPart.simPct - curPart.simPct;
+        const isHarmful = delta < -0.0001;
         partDiffs.push({
           subject: sub.name,
           type: t === 'th' ? 'Theory' : t === 'tu' ? 'Tute' : 'Practical',
@@ -571,20 +572,34 @@ export function calculateDayImpactDiff(dateStr, parsedData, currentSelectedWaive
           beforeAtt: curPart.simAttended,
           beforeHeld: curPart.simHeld,
           beforePct: curPart.simPct,
+          curPct: curPart.simPct,
           afterAtt: nxtPart.simAttended,
           afterHeld: nxtPart.simHeld,
           afterPct: nxtPart.simPct,
+          newPct: nxtPart.simPct,
           delta,
-          dropped: delta < -0.0001
+          deltaPct: delta,
+          dropped: isHarmful,
+          isHarmful
         });
       }
     });
   });
 
+  const dayObj = (parsedData.dayColumns || []).find(d => d.dateStr === dateStr) || {
+    dateStr,
+    label: dateStr,
+    fullLabel: dateStr,
+    weekday: '',
+    dayNum: ''
+  };
+
   return {
     dateStr,
+    day: dayObj,
     isCurrentlyWaived,
     partDiffs,
+    affectedParts: partDiffs,
     thTuAbsencesRemoved,
     thTuPresentsRemoved,
     practicalAbsencesRemoved,
