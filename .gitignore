@@ -33,3 +33,20 @@ dist-ssr
 # Attendance sheets
 Student Attandance*.xls
 
+# Temporary research dumps
+/*.pdf
+/*.txt
+/*.zip
+/*.html
+!/index.html
+/sscbs_societies_*
+/annual_reports_*
+/scripts/*.html
+/scripts/*.txt
+/scripts/*.json
+/scripts/*.cjs
+/scripts/inspect_target_socs.js
+/scripts/list_demo_societies.js
+
+
+

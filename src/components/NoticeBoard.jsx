@@ -4,6 +4,7 @@ import { supabase, hasValidCredentials } from '../lib/supabaseClient';
 import { isAdminEmail } from '../lib/admin';
 import { trackNoticeEvent } from '../lib/analytics';
 import { parseNoticeText, SAMPLE_WHATSAPP_NOTICE } from '../utils/noticeParser';
+import { STATIC_NOTICES } from '../data/staticNotices';
 import './NoticeBoard.css';
 
 export default function NoticeBoard({ onNavigate, compact = false }) {
@@ -156,6 +157,17 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
     });
   };
 
+  const mergeWithStatic = (dbNotices = []) => {
+    const combined = [...(STATIC_NOTICES || [])];
+    const existingIds = new Set(combined.map(n => n.id));
+    (dbNotices || []).forEach(item => {
+      if (!existingIds.has(item.id)) {
+        combined.push(item);
+      }
+    });
+    return filterActiveNotices(sortNotices(combined));
+  };
+
   const filterActiveNotices = (rawNotices) => {
     const now = new Date();
     return (rawNotices || []).filter(notice => {
@@ -235,7 +247,7 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
         // 5-minute cache TTL (Realtime channel invalidates & forces refresh on new notices)
         if (cached && cachedTime && (Date.now() - Number(cachedTime)) < 300000) {
           try {
-            setNotices(JSON.parse(cached));
+            setNotices(mergeWithStatic(JSON.parse(cached)));
             setLoading(false);
             return;
           } catch (e) {}
@@ -244,7 +256,7 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
 
       setLoading(true);
       if (!hasValidCredentials) {
-        setNotices([]);
+        setNotices(mergeWithStatic([]));
         setLoading(false);
         return;
       }
@@ -258,16 +270,16 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
 
       if (error) {
         console.error('Error loading notices from Supabase:', error);
-        setNotices([]);
+        setNotices(mergeWithStatic([]));
       } else {
-        const activeNotices = filterActiveNotices(sortNotices(data || []));
+        const activeNotices = mergeWithStatic(data || []);
         setNotices(activeNotices);
         sessionStorage.setItem('sscbs_cached_notices', JSON.stringify(activeNotices));
         sessionStorage.setItem('sscbs_cached_notices_time', String(Date.now()));
       }
     } catch (err) {
       console.error('Failed to fetch notices:', err);
-      setNotices([]);
+      setNotices(mergeWithStatic([]));
     } finally {
       setLoading(false);
     }
@@ -306,6 +318,14 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
       fetchMyDrafts();
     }
   }, [isApprovedDrafter, userEmail]);
+
+  // Real-time auto-expiry check: whenever a notice's active_to is passed, it drops off automatically
+  useEffect(() => {
+    const expiryInterval = setInterval(() => {
+      setNotices(prev => filterActiveNotices(prev));
+    }, 15000);
+    return () => clearInterval(expiryInterval);
+  }, []);
 
   const handleSubmitNoticeDraft = async (e) => {
     e.preventDefault();
@@ -398,6 +418,29 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
       hour: '2-digit',
       minute: '2-digit',
       hour12: true
+    });
+  };
+
+  const renderContentWithLinks = (text) => {
+    if (!text) return null;
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    return parts.map((part, i) => {
+      if (urlRegex.test(part)) {
+        return (
+          <a
+            key={i}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: '#2563eb', textDecoration: 'underline', wordBreak: 'break-all' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {part}
+          </a>
+        );
+      }
+      return part;
     });
   };
 
@@ -726,7 +769,7 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
                 <p className={`notice-content ${compact ? 'compact' : 'full'}`}>
                   {compact && notice.content.length > 110
                     ? notice.content.slice(0, 110).trim() + '...'
-                    : notice.content}
+                    : renderContentWithLinks(notice.content)}
                 </p>
               )}
               
@@ -751,7 +794,7 @@ export default function NoticeBoard({ onNavigate, compact = false }) {
                     className="btn-notice-action"
                     onClick={() => trackNoticeEvent('link_clicked', { title: notice.title, url: notice.link_url })}
                   >
-                    Link
+                    {notice.link_url.includes('form') || notice.link_url.includes('register') || notice.category === 'Session' || notice.category === 'Event' ? 'Register Here' : 'Link'}
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="arrow-icon">
                       <line x1="7" y1="17" x2="17" y2="7"></line>
                       <polyline points="7 7 17 7 17 17"></polyline>

@@ -17,6 +17,7 @@
     "@vercel/analytics": "^2.0.1",
     "html-to-image": "^1.11.13",
     "html2canvas": "^1.4.1",
+    "javascript-lp-solver": "^1.0.3",
     "jspdf": "^4.2.1",
     "pdf-parse": "^2.4.5",
     "posthog-js": "^1.422.4",

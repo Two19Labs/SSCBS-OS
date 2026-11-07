@@ -1,191 +1,69 @@
-import React, { useState, useEffect } from 'react';
-import * as XLSX from 'xlsx';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import FooterCredit from './FooterCredit';
 import { useAuth } from '../context/AuthContext';
 import { trackWaiverEvent } from '../lib/analytics';
+import { parseAttendanceFile, WEEKDAYS, MONTH_NAMES } from '../lib/waiverParser';
+import {
+  solveExactBnb,
+  solveKPlusOne,
+  calculateSimulatedStats,
+  calculateDayImpactDiff
+} from '../lib/waiverSolver';
 import './WaiverToolPage.css';
-
-const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
-];
-
-// Pure Solver Helper
-const executeSolver = (candidatesList, groupsList, limit, targetPct) => {
-  const targetRatio = targetPct / 100;
-  const highAbsence = candidatesList.filter(c => c.totalAbsences >= 2);
-  const lowAbsence = candidatesList.filter(c => c.totalAbsences === 1);
-  
-  let bestMinRatio = -1;
-  let bestWaivers = [];
-  let solverSuccess = false;
-
-  const checkSolution = (selectedCandidates) => {
-    const adjusted = groupsList.map((g, gIdx) => {
-      let rawWaivedAttended = 0;
-      let rawWaivedHeld = 0;
-      
-      selectedCandidates.forEach(c => {
-        const eff = c.groupEffects[gIdx];
-        if (eff) {
-          rawWaivedAttended += eff.attended;
-          rawWaivedHeld += eff.held;
-        }
-      });
-
-      // 1/3rd Waiver Cap Rule: Max waivable classes = Math.floor(baselineHeld / 3)
-      const maxWaivable = Math.floor(g.baselineHeld / 3);
-      const effectiveWaivedHeld = Math.min(rawWaivedHeld, maxWaivable);
-      const ratio = rawWaivedHeld > 0 ? (effectiveWaivedHeld / rawWaivedHeld) : 1;
-      const effectiveWaivedAttended = Math.round(rawWaivedAttended * ratio);
-
-      const simAttended = Math.max(0, g.baselineAttended - effectiveWaivedAttended);
-      const simHeld = Math.max(1, g.baselineHeld - effectiveWaivedHeld);
-
-      const pct = simHeld > 0 ? (simAttended / simHeld) : 1.0;
-      return pct;
-    });
-    
-    const allClear = adjusted.every(pct => pct >= targetRatio);
-    const minPct = Math.min(...adjusted);
-    return { allClear, minPct };
-  };
-
-  let solvedSize = 99;
-  
-  // Backtracking solver
-  for (let size = 1; size <= limit; size++) {
-    let foundSolution = false;
-    const solutions = [];
-
-    const maxHighToCheck = Math.min(size, highAbsence.length);
-    const minHighToCheck = Math.max(0, size - lowAbsence.length);
-
-    for (let hc = maxHighToCheck; hc >= minHighToCheck; hc--) {
-      if (foundSolution) break;
-      const lc = size - hc;
-      
-      const hcCombos = [];
-      const getHcCombos = (start, curr) => {
-        if (curr.length === hc) {
-          hcCombos.push([...curr]);
-          return;
-        }
-        for (let i = start; i < highAbsence.length; i++) {
-          curr.push(highAbsence[i]);
-          getHcCombos(i + 1, curr);
-          curr.pop();
-        }
-      };
-      getHcCombos(0, []);
-
-      const lcCombos = [];
-      const getLcCombos = (start, curr) => {
-        if (curr.length === lc) {
-          lcCombos.push([...curr]);
-          return;
-        }
-        if (lcCombos.length > 5000) return; 
-        for (let i = start; i < lowAbsence.length; i++) {
-          curr.push(lowAbsence[i]);
-          getLcCombos(i + 1, curr);
-          curr.pop();
-        }
-      };
-      getLcCombos(0, []);
-
-      for (let hCombo of hcCombos) {
-        for (let lCombo of lcCombos) {
-          const selected = [...hCombo, ...lCombo];
-          const evalRes = checkSolution(selected);
-          if (evalRes.allClear) {
-            solutions.push({
-              combo: selected,
-              minPct: evalRes.minPct
-            });
-            foundSolution = true;
-          }
-        }
-      }
-    }
-
-    if (foundSolution) {
-      solutions.sort((a, b) => b.minPct - a.minPct);
-      bestWaivers = solutions[0].combo;
-      bestMinRatio = solutions[0].minPct;
-      solvedSize = size;
-      solverSuccess = true;
-      break;
-    }
-  }
-
-  // Fallback Greedy Solver
-  if (!solverSuccess) {
-    let currentSelected = [];
-    const tempCandidates = [...candidatesList];
-
-    for (let step = 0; step < limit; step++) {
-      let bestIdx = -1;
-      let highestMinPct = -1;
-      
-      for (let i = 0; i < tempCandidates.length; i++) {
-        if (currentSelected.includes(tempCandidates[i])) continue;
-        currentSelected.push(tempCandidates[i]);
-        const evalRes = checkSolution(currentSelected);
-        currentSelected.pop();
-        
-        if (evalRes.minPct > highestMinPct) {
-          highestMinPct = evalRes.minPct;
-          bestIdx = i;
-        }
-      }
-
-      if (bestIdx !== -1) {
-        currentSelected.push(tempCandidates[bestIdx]);
-      }
-    }
-    bestWaivers = currentSelected;
-    const finalEval = checkSolution(bestWaivers);
-    bestMinRatio = finalEval.minPct;
-    solvedSize = limit;
-    solverSuccess = false;
-  }
-
-  return {
-    bestWaivers,
-    solvedSize,
-    solverSuccess,
-    bestMinRatio
-  };
-};
 
 function WaiverToolPage({ onBack }) {
   const { user } = useAuth();
   const userKey = user?.id || user?.email || 'guest';
-  const storageKey = `sscbs_waiver_tool_state_${userKey}`;
+  const storageKey = `sscbs_waiver_tool_state_v2_${userKey}`;
 
+  // Inputs
   const [file, setFile] = useState(null);
   const [fileMeta, setFileMeta] = useState(null);
-  const [startingMonth, setStartingMonth] = useState(0); // 0 = Jan
-  const [maxWaivers, setMaxWaivers] = useState(12);
-  const [threshold, setThreshold] = useState(85);
+  const [maxWaivers, setMaxWaivers] = useState(12); // K: 1 - 30
+  const [threshold, setThreshold] = useState(85); // T: 50 - 99
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
+  const [copyFeedback, setCopyFeedback] = useState(null);
 
   // Parsed attendance data
   const [parsedData, setParsedData] = useState(null);
-  // User's active selected waivers (set of dateStr)
+
+  // User's active selected waivers (Set of dateStr 'YYYY-MM-DD')
   const [selectedWaivers, setSelectedWaivers] = useState(new Set());
-  // Recommended optimal waivers
-  const [recommendedWaivers, setRecommendedWaivers] = useState([]);
-  const [solverResult, setSolverResult] = useState(null); // { success: boolean, waiversCount: number }
 
-  // Tabs inside results selector
-  const [activeSelectorTab, setActiveSelectorTab] = useState('grid'); // 'grid' | 'calendar' | 'list'
-  const [activeMonthKey, setActiveMonthKey] = useState(""); // e.g. "2026-01"
+  // Solver outcome
+  const [solverResult, setSolverResult] = useState(null);
+  const [kPlusOneResult, setKPlusOneResult] = useState(null);
 
-  // CDC & Placement Cell Extra Attendance (+1 Numerator & +1 Denominator)
-  const [extraAttendance, setExtraAttendance] = useState({}); // { [subjectName]: number }
+  // Active view tab: 'grid' | 'calendar' | 'list'
+  const [activeTab, setActiveTab] = useState('grid');
+  const [activeCalendarMonth, setActiveCalendarMonth] = useState(''); // e.g. "2026-08"
+
+  // Hovered day tooltip for live diff preview
+  const [hoveredDay, setHoveredDay] = useState(null);
+  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+
+  // Web Worker ref
+  const workerRef = useRef(null);
+
+  // Initialize Web Worker for solver
+  useEffect(() => {
+    try {
+      workerRef.current = new Worker(
+        new URL('../workers/waiverSolverWorker.js', import.meta.url),
+        { type: 'module' }
+      );
+    } catch (e) {
+      console.warn('Web Worker not supported in environment, fallback to main thread:', e);
+      workerRef.current = null;
+    }
+
+    return () => {
+      if (workerRef.current) {
+        workerRef.current.terminate();
+      }
+    };
+  }, []);
 
   // Restore persisted state on mount or user change
   useEffect(() => {
@@ -193,33 +71,24 @@ function WaiverToolPage({ onBack }) {
       const savedStr = localStorage.getItem(storageKey);
       if (savedStr) {
         const saved = JSON.parse(savedStr);
-        if (
-          saved &&
-          saved.parsedData &&
-          Array.isArray(saved.parsedData.allDates) &&
-          Array.isArray(saved.parsedData.allSubjects) &&
-          Array.isArray(saved.parsedData.candidates) &&
-          Array.isArray(saved.parsedData.targetGroups)
-        ) {
+        if (saved && saved.parsedData && Array.isArray(saved.parsedData.dayColumns) && Array.isArray(saved.parsedData.subjects)) {
           setParsedData(saved.parsedData);
           if (Array.isArray(saved.selectedWaivers)) {
             setSelectedWaivers(new Set(saved.selectedWaivers));
           }
-          if (Array.isArray(saved.recommendedWaivers)) setRecommendedWaivers(saved.recommendedWaivers);
           if (saved.solverResult) setSolverResult(saved.solverResult);
-          if (saved.startingMonth !== undefined) setStartingMonth(saved.startingMonth);
+          if (saved.kPlusOneResult) setKPlusOneResult(saved.kPlusOneResult);
           if (saved.maxWaivers !== undefined) setMaxWaivers(saved.maxWaivers);
           if (saved.threshold !== undefined) setThreshold(saved.threshold);
           if (saved.fileMeta) setFileMeta(saved.fileMeta);
-          if (saved.activeMonthKey) setActiveMonthKey(saved.activeMonthKey);
-          if (saved.extraAttendance && typeof saved.extraAttendance === 'object') setExtraAttendance(saved.extraAttendance);
+          if (saved.activeTab) setActiveTab(saved.activeTab);
+          if (saved.activeCalendarMonth) setActiveCalendarMonth(saved.activeCalendarMonth);
         } else {
           localStorage.removeItem(storageKey);
         }
       }
     } catch (err) {
-      console.warn("Failed to restore Waiver Tool state:", err);
-      try { localStorage.removeItem(storageKey); } catch (_) {}
+      console.warn('Failed to restore Waiver Tool state:', err);
     }
   }, [storageKey]);
 
@@ -230,844 +99,282 @@ function WaiverToolPage({ onBack }) {
       const stateToSave = {
         parsedData,
         selectedWaivers: Array.from(selectedWaivers),
-        recommendedWaivers,
         solverResult,
-        startingMonth,
+        kPlusOneResult,
         maxWaivers,
         threshold,
         fileMeta,
-        activeMonthKey,
-        extraAttendance
+        activeTab,
+        activeCalendarMonth
       };
       localStorage.setItem(storageKey, JSON.stringify(stateToSave));
     } catch (err) {
-      console.warn("Failed to persist Waiver Tool state:", err);
+      console.warn('Failed to persist Waiver Tool state:', err);
     }
-  }, [parsedData, selectedWaivers, recommendedWaivers, solverResult, startingMonth, maxWaivers, threshold, fileMeta, activeMonthKey, extraAttendance, storageKey]);
+  }, [parsedData, selectedWaivers, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, activeTab, activeCalendarMonth, storageKey]);
+
+  // Set initial calendar month tab when data is parsed
+  useEffect(() => {
+    if (parsedData && parsedData.dayColumns.length > 0 && !activeCalendarMonth) {
+      const firstDate = parsedData.dayColumns[0].dateStr;
+      const [y, m] = firstDate.split('-');
+      setActiveCalendarMonth(`${y}-${m}`);
+    }
+  }, [parsedData, activeCalendarMonth]);
 
   const handleUploadNewSheet = () => {
     setParsedData(null);
     setFile(null);
     setFileMeta(null);
     setSelectedWaivers(new Set());
-    setRecommendedWaivers([]);
     setSolverResult(null);
-    setExtraAttendance({});
+    setKPlusOneResult(null);
+    setError(null);
     try {
       localStorage.removeItem(storageKey);
-    } catch (e) {}
+    } catch (_) {}
   };
 
-  const handleExtraAttendanceChange = (subjectName, delta) => {
-    setExtraAttendance(prev => {
-      const current = prev[subjectName] || 0;
-      const next = Math.max(0, current + delta);
-      return { ...prev, [subjectName]: next };
-    });
-  };
-
-  // Clean error on changes
-  useEffect(() => {
-    setError(null);
-  }, [file, startingMonth]);
-
-  // Set default calendar month key when data is parsed
-  useEffect(() => {
-    if (parsedData) {
-      const months = getMonthsInSheet();
-      if (months.length > 0) {
-        setActiveMonthKey(months[0]);
-      }
-    }
-  }, [parsedData]);
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
-
+  const handleDragOver = (e) => e.preventDefault();
   const handleDrop = (e) => {
     e.preventDefault();
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       setFile(e.dataTransfer.files[0]);
+      setError(null);
     }
   };
-
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
+      setError(null);
     }
   };
 
-  // Helper to extract attendance tokens flexible regex matching (P/A, Th/tu/PR/Prac)
-  const parseAttendanceTokens = (text) => {
-    if (!text) return [];
-    const tokens = [];
-    const pattern = /(P|A)\s*\(\s*(Th|tu|PR|Prac)\s*\)/gi;
-    let match;
-    while ((match = pattern.exec(text)) !== null) {
-      const status = match[1].toUpperCase();
-      const rawType = match[2].toLowerCase();
-      let type = 'PR';
-      if (rawType === 'th') type = 'Th';
-      else if (rawType === 'tu') type = 'tu';
-
-      tokens.push({
-        type,
-        attended: status === 'P'
+  // Run Solver (async via worker or synchronous fallback)
+  const runSolver = (data, tVal, kVal, onComplete) => {
+    if (workerRef.current) {
+      const msgId = Date.now();
+      const handleMessage = (e) => {
+        if (e.data?.id === msgId) {
+          workerRef.current.removeEventListener('message', handleMessage);
+          if (e.data.success) {
+            setSolverResult(e.data.solution);
+            setKPlusOneResult(e.data.kPlusOneSolution);
+            if (onComplete) onComplete(e.data.solution);
+          }
+          setIsProcessing(false);
+        }
+      };
+      workerRef.current.addEventListener('message', handleMessage);
+      workerRef.current.postMessage({
+        id: msgId,
+        parsedData: data,
+        targetPct: tVal,
+        maxWaiversK: kVal
       });
+    } else {
+      setTimeout(() => {
+        try {
+          const solution = solveExactBnb(data, tVal, kVal);
+          let kPlus = null;
+          if (solution.status === 'SHORTAGE') {
+            kPlus = solveKPlusOne(data, tVal, kVal);
+          }
+          setSolverResult(solution);
+          setKPlusOneResult(kPlus);
+          if (onComplete) onComplete(solution);
+        } catch (err) {
+          console.error('Solver error:', err);
+        }
+        setIsProcessing(false);
+      }, 30);
     }
-    return tokens;
   };
 
-  // Helper to extract report date from header string or filename
-  const extractReportDate = (text, fileName) => {
-    let year = 2026;
-    let monthIndex = null;
-
-    const textMatch = text && text.match(/REPORT ON\s+([\d]{4})-([\d]{2})-([\d]{2})/i);
-    const fileMatch = fileName && fileName.match(/([\d]{4})-([\d]{2})-([\d]{2})/);
-    const match = textMatch || fileMatch;
-
-    if (match) {
-      year = parseInt(match[1], 10);
-      monthIndex = parseInt(match[2], 10) - 1; // 0 = Jan
-    }
-    return { year, monthIndex };
-  };
-
-  // Main parser runner
+  // Process uploaded attendance file
   const processAttendance = () => {
     if (!file) {
-      setError("Please select or drop an attendance file first.");
-      return;
-    }
-
-    // Filename check: make sure it is not a timetable
-    const lowercaseName = file.name.toLowerCase();
-    if (lowercaseName.includes("time table") || lowercaseName.includes("timetable") || lowercaseName.includes("schedule")) {
-      setError(`It looks like you uploaded a Timetable file ('${file.name}') instead of your Attendance Report. Please upload your student attendance Excel sheet exported from the ERP portal (e.g. 'Student Attandance...').`);
+      setError('Please select or drop an attendance file first.');
       return;
     }
 
     setIsProcessing(true);
     setError(null);
 
-    setFileMeta({
+    const meta = {
       name: file.name,
       size: file.size,
       lastModified: file.lastModified,
       uploadedAt: new Date().toISOString()
-    });
+    };
+    setFileMeta(meta);
 
     const reader = new FileReader();
-
     reader.onload = (e) => {
       try {
-        const buffer = e.target.result;
-        const arr = new Uint8Array(buffer);
-        
-        let isHtml = false;
-        let encoding = 'utf-8';
+        const text = e.target.result;
+        const parsed = parseAttendanceFile(text, file.name);
 
-        // Detect BOM or check content for HTML tags
-        if (arr[0] === 0xFF && arr[1] === 0xFE) {
-          encoding = 'utf-16le';
-        } else if (arr[0] === 0xFE && arr[1] === 0xFF) {
-          encoding = 'utf-16be';
-        }
+        trackWaiverEvent('sheet_parsed', {
+          file_name: file.name,
+          subjects_count: parsed.subjects.length,
+          days_count: parsed.dayColumns.length
+        });
 
-        const sample = new TextDecoder(encoding).decode(arr.subarray(0, Math.min(arr.length, 4000)));
-        if (sample.toLowerCase().includes('<table') || sample.toLowerCase().includes('report on')) {
-          isHtml = true;
-        }
+        setParsedData(parsed);
+        setSelectedWaivers(new Set()); // Option A: 0 days selected initially
 
-        if (isHtml) {
-          const text = new TextDecoder(encoding).decode(arr);
-          parseHtmlSpreadsheet(text);
-        } else {
-          parseBinarySpreadsheet(buffer);
-        }
+        // Run solver
+        runSolver(parsed, threshold, maxWaivers, (solution) => {
+          trackWaiverEvent('solver_executed', {
+            status: solution.status,
+            pass_count: solution.passCount,
+            total_target_parts: solution.totalTargetParts,
+            days_used: solution.chosenDays.length,
+            target: threshold,
+            k: maxWaivers
+          });
+        });
       } catch (err) {
-        console.error(err);
-        const errMsg = err.message || "";
-        if (errMsg.includes("Total Present") || errMsg.includes("header structure") || errMsg.includes("table rows")) {
-          setError(`Parsing failed: ${err.message}. Please ensure this file is a valid attendance report exported from the college portal, NOT a timetable.`);
-        } else {
-          setError("Failed to parse the file. Please ensure it is a valid attendance report exported from the college portal.");
-        }
+        console.error('Attendance parse error:', err);
+        setError(err.message || 'Failed to parse attendance file.');
         setIsProcessing(false);
       }
     };
 
-    reader.readAsArrayBuffer(file);
-  };
-
-  // Custom HTML table parser for malformed ERP exports
-  const parseHtmlSpreadsheet = (htmlText) => {
-    const { year: detectedYear, monthIndex: detectedMonth } = extractReportDate(htmlText, file ? file.name : '');
-    const activeMonth = detectedMonth !== null ? detectedMonth : startingMonth;
-    if (detectedMonth !== null && detectedMonth !== startingMonth) {
-      setStartingMonth(detectedMonth);
-    }
-
-    const cleanHtml = htmlText.replace(/<!--[\s\S]*?-->/g, '');
-
-    let outerRowHtmls = [];
-
-    // Attempt browser DOMParser first if available
-    if (typeof window !== 'undefined' && window.DOMParser) {
-      try {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(cleanHtml, 'text/html');
-        const mainTable = doc.querySelector('table');
-        if (mainTable) {
-          const rows = Array.from(mainTable.rows);
-          if (rows.length >= 2) {
-            outerRowHtmls = rows.map(r => r.outerHTML);
-          }
-        }
-      } catch (domErr) {
-        console.warn("DOMParser fallback used due to error:", domErr);
-      }
-    }
-
-    // Fallback string-based table level parser
-    if (outerRowHtmls.length < 2) {
-      const firstTableIdx = cleanHtml.toLowerCase().indexOf('<table');
-      const tableContent = firstTableIdx !== -1 ? cleanHtml.substring(firstTableIdx) : cleanHtml;
-
-      let idx = 0;
-      let tableLevel = 0;
-      let insideOuterTr = false;
-      let currentTr = "";
-
-      while (idx < tableContent.length) {
-        const sub = tableContent.substring(idx).toLowerCase();
-        if (sub.startsWith('<table')) {
-          tableLevel++;
-          if (insideOuterTr) currentTr += tableContent.substr(idx, 6);
-          idx += 6;
-          continue;
-        }
-        if (sub.startsWith('</table>')) {
-          tableLevel--;
-          if (insideOuterTr) currentTr += tableContent.substr(idx, 8);
-          idx += 8;
-          continue;
-        }
-        if (tableLevel === 1 && sub.startsWith('<tr')) {
-          insideOuterTr = true;
-          currentTr = "<tr";
-          idx += 3;
-          continue;
-        }
-        if (tableLevel === 1 && insideOuterTr && sub.startsWith('</tr>')) {
-          insideOuterTr = false;
-          currentTr += "</tr>";
-          outerRowHtmls.push(currentTr);
-          idx += 5;
-          continue;
-        }
-        if (insideOuterTr) {
-          currentTr += tableContent[idx];
-        }
-        idx++;
-      }
-    }
-
-    if (outerRowHtmls.length < 2) {
-      throw new Error("No outer table rows found in attendance file.");
-    }
-
-    const extractOuterCells = (rowHtml) => {
-      const cells = [];
-      let cIdx = 0;
-      let tLevel = 0;
-      let insideCell = false;
-      let cellTag = "";
-      let cellContent = "";
-
-      while (cIdx < rowHtml.length) {
-        const sub = rowHtml.substring(cIdx).toLowerCase();
-
-        if (sub.startsWith('<table')) {
-          tLevel++;
-          if (insideCell) cellContent += rowHtml.substr(cIdx, 6);
-          cIdx += 6;
-          continue;
-        }
-        if (sub.startsWith('</table>')) {
-          tLevel--;
-          if (insideCell) cellContent += rowHtml.substr(cIdx, 8);
-          cIdx += 8;
-          continue;
-        }
-        if (tLevel === 0 && !insideCell && (sub.startsWith('<td') || sub.startsWith('<th'))) {
-          insideCell = true;
-          cellTag = sub.startsWith('<td') ? 'td' : 'th';
-          cellContent = "";
-          const tagEnd = rowHtml.indexOf('>', cIdx);
-          cIdx = tagEnd !== -1 ? tagEnd + 1 : cIdx + 3;
-          continue;
-        }
-        if (tLevel === 0 && insideCell && sub.startsWith(`</${cellTag}>`)) {
-          insideCell = false;
-          cells.push(cellContent.trim());
-          cIdx += cellTag.length + 3;
-          continue;
-        }
-        if (insideCell) {
-          cellContent += rowHtml[cIdx];
-        }
-        cIdx++;
-      }
-      return cells;
+    reader.onerror = () => {
+      setError('Could not read the uploaded file.');
+      setIsProcessing(false);
     };
 
-    const headerCellsRaw = extractOuterCells(outerRowHtmls[0]);
-    const headerCells = headerCellsRaw.map(h => h.replace(/<[^>]*>/g, '').trim());
-
-    if (headerCells.length < 5) {
-      throw new Error("Invalid header structure.");
-    }
-
-    let totalPresentIdx = headerCells.findIndex(h => h.toLowerCase().includes('present'));
-    let totalAbsentIdx = headerCells.findIndex(h => h.toLowerCase().includes('absent'));
-
-    if (totalPresentIdx === -1) totalPresentIdx = headerCells.length - 2;
-    if (totalAbsentIdx === -1) totalAbsentIdx = headerCells.length - 1;
-    
-    let currentMonthOffset = activeMonth;
-    let lastDateVal = 0;
-    const parsedDates = [];
-
-    for (let c = 3; c < totalPresentIdx; c++) {
-      const dateVal = parseInt(headerCells[c], 10);
-      if (isNaN(dateVal)) continue;
-
-      if (dateVal < lastDateVal) {
-        currentMonthOffset = (currentMonthOffset + 1) % 12;
-      }
-      lastDateVal = dateVal;
-
-      const monthLabel = MONTHS[currentMonthOffset];
-      const dateStr = `${detectedYear}-${String(currentMonthOffset + 1).padStart(2, '0')}-${String(dateVal).padStart(2, '0')}`;
-
-      parsedDates.push({
-        colIdx: c,
-        dateStr,
-        label: `${dateVal} ${monthLabel.substring(0, 3)}`
-      });
-    }
-
-    const parsedSubjects = [];
-    for (let r = 1; r < outerRowHtmls.length; r++) {
-      const cells = extractOuterCells(outerRowHtmls[r]);
-      if (cells.length < headerCells.length) continue;
-
-      const subjectName = cells[1].replace(/<[^>]*>/g, '').trim();
-      const rollNo = cells[2].replace(/<[^>]*>/g, '').trim();
-      const reportedPresent = parseInt(cells[totalPresentIdx].replace(/<[^>]*>/g, ''), 10) || 0;
-      const reportedAbsent = parseInt(cells[totalAbsentIdx].replace(/<[^>]*>/g, ''), 10) || 0;
-
-      const dateAttendanceMap = {};
-      let baselineThAttended = 0;
-      let baselineThHeld = 0;
-      let baselineTuAttended = 0;
-      let baselineTuHeld = 0;
-      let baselinePrAttended = 0;
-      let baselinePrHeld = 0;
-
-      parsedDates.forEach(d => {
-        const cellHtml = cells[d.colIdx] || "";
-        const tokens = parseAttendanceTokens(cellHtml);
-
-        const dateRecord = [];
-
-        tokens.forEach(tok => {
-          if (tok.type === 'Th') {
-            baselineThHeld++;
-            if (tok.attended) baselineThAttended++;
-          } else if (tok.type === 'tu') {
-            baselineTuHeld++;
-            if (tok.attended) baselineTuAttended++;
-          } else if (tok.type === 'PR') {
-            baselinePrHeld++;
-            if (tok.attended) baselinePrAttended++;
-          }
-          dateRecord.push(tok);
-        });
-
-        if (dateRecord.length > 0) {
-          dateAttendanceMap[d.dateStr] = dateRecord;
-        }
-      });
-
-      parsedSubjects.push({
-        name: subjectName,
-        rollNo,
-        reportedPresent,
-        reportedAbsent,
-        baselineStats: {
-          Th: { attended: baselineThAttended, held: baselineThHeld },
-          tu: { attended: baselineTuAttended, held: baselineTuHeld },
-          PR: { attended: baselinePrAttended, held: baselinePrHeld }
-        },
-        dateAttendance: dateAttendanceMap
-      });
-    }
-
-    finalizeData(parsedDates, parsedSubjects);
+    reader.readAsText(file, 'utf-8');
   };
 
-  // Fallback XLSX parser (reading binary sheets)
-  const parseBinarySpreadsheet = (arrayBuffer) => {
-    const data = new Uint8Array(arrayBuffer);
-    const workbook = XLSX.read(data, { type: 'array' });
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
-
-    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-    
-    if (rows.length < 2) {
-      throw new Error("No attendance data rows found.");
-    }
-
-    // Check if XLSX parsed HTML tags as raw cells (indicates HTML text disguised as .xls)
-    const rawSampleStr = rows.slice(0, 10).map(r => JSON.stringify(r)).join(' ');
-    if (rawSampleStr.toLowerCase().includes('<table') || rawSampleStr.toLowerCase().includes('<tr>')) {
-      const text = new TextDecoder('utf-8').decode(data);
-      return parseHtmlSpreadsheet(text);
-    }
-
-    const headerRow = rows[0].map(c => String(c || '').trim());
-    const totalPresentIdx = headerRow.findIndex(h => h.toLowerCase().includes('present'));
-    const totalAbsentIdx = headerRow.findIndex(h => h.toLowerCase().includes('absent'));
-
-    if (totalPresentIdx === -1 || totalAbsentIdx === -1) {
-      throw new Error("Could not locate 'Total Present' or 'Total Absent' summary columns.");
-    }
-
-    const { year: detectedYear, monthIndex: detectedMonth } = extractReportDate('', file ? file.name : '');
-    const activeMonth = detectedMonth !== null ? detectedMonth : startingMonth;
-    if (detectedMonth !== null && detectedMonth !== startingMonth) {
-      setStartingMonth(detectedMonth);
-    }
-
-    const parsedDates = [];
-    let currentMonthOffset = activeMonth;
-    let lastDateVal = 0;
-
-    for (let c = 3; c < totalPresentIdx; c++) {
-      const cellVal = headerRow[c];
-      const dateVal = parseInt(cellVal, 10);
-      if (isNaN(dateVal)) continue;
-
-      if (dateVal < lastDateVal) {
-        currentMonthOffset = (currentMonthOffset + 1) % 12;
-      }
-      lastDateVal = dateVal;
-
-      const monthLabel = MONTHS[currentMonthOffset];
-      const dateStr = `${detectedYear}-${String(currentMonthOffset + 1).padStart(2, '0')}-${String(dateVal).padStart(2, '0')}`;
-
-      parsedDates.push({
-        colIdx: c,
-        dateStr,
-        label: `${dateVal} ${monthLabel.substring(0, 3)}`
-      });
-    }
-
-    const parsedSubjects = [];
-    for (let r = 1; r < rows.length; r++) {
-      const row = rows[r];
-      if (!row || row.length === 0 || !row[1]) continue;
-
-      const subjectName = String(row[1]).trim();
-      const rollNo = String(row[2] || '').trim();
-      const reportedPresent = parseInt(row[totalPresentIdx], 10) || 0;
-      const reportedAbsent = parseInt(row[totalAbsentIdx], 10) || 0;
-
-      const dateAttendanceMap = {};
-      let baselineThAttended = 0;
-      let baselineThHeld = 0;
-      let baselineTuAttended = 0;
-      let baselineTuHeld = 0;
-      let baselinePrAttended = 0;
-      let baselinePrHeld = 0;
-
-      parsedDates.forEach(d => {
-        const val = String(row[d.colIdx] || '').trim();
-        if (!val) return;
-
-        const tokens = parseAttendanceTokens(val);
-        const dateRecord = [];
-
-        tokens.forEach(tok => {
-          if (tok.type === 'Th') {
-            baselineThHeld++;
-            if (tok.attended) baselineThAttended++;
-          } else if (tok.type === 'tu') {
-            baselineTuHeld++;
-            if (tok.attended) baselineTuAttended++;
-          } else if (tok.type === 'PR') {
-            baselinePrHeld++;
-            if (tok.attended) baselinePrAttended++;
-          }
-          dateRecord.push(tok);
-        });
-
-        if (dateRecord.length > 0) {
-          dateAttendanceMap[d.dateStr] = dateRecord;
-        }
-      });
-
-      parsedSubjects.push({
-        name: subjectName,
-        rollNo,
-        reportedPresent,
-        reportedAbsent,
-        baselineStats: {
-          Th: { attended: baselineThAttended, held: baselineThHeld },
-          tu: { attended: baselineTuAttended, held: baselineTuHeld },
-          PR: { attended: baselinePrAttended, held: baselinePrHeld }
-        },
-        dateAttendance: dateAttendanceMap
-      });
-    }
-
-    finalizeData(parsedDates, parsedSubjects);
-  };
-
-  // Compile final results & execute solver
-  const finalizeData = (parsedDates, parsedSubjects) => {
-    const monitoredSubjects = parsedSubjects.filter(sub => 
-      sub.baselineStats.Th.held > 0 || sub.baselineStats.tu.held > 0
-    );
-
-    const targetGroups = [];
-    monitoredSubjects.forEach((sub) => {
-      if (sub.baselineStats.Th.held > 0) {
-        targetGroups.push({
-          subjectName: sub.name,
-          type: "Theory",
-          baselineAttended: sub.baselineStats.Th.attended,
-          baselineHeld: sub.baselineStats.Th.held,
-          key: `${sub.name}-Th`
-        });
-      }
-      if (sub.baselineStats.tu.held > 0) {
-        targetGroups.push({
-          subjectName: sub.name,
-          type: "Tutorial",
-          baselineAttended: sub.baselineStats.tu.attended,
-          baselineHeld: sub.baselineStats.tu.held,
-          key: `${sub.name}-tu`
-        });
-      }
-    });
-
-    const datesWithAbsences = [];
-    
-    parsedDates.forEach(d => {
-      let absencesCount = 0;
-      let presentsCount = 0;
-      
-      const groupEffects = targetGroups.map(g => {
-        let attended = 0;
-        let held = 0;
-        
-        const sub = parsedSubjects.find(s => s.name === g.subjectName);
-        const dayRecord = sub.dateAttendance[d.dateStr] || [];
-        
-        dayRecord.forEach(cls => {
-          if (g.type === "Theory" && cls.type === "Th") {
-            held++;
-            if (cls.attended) {
-              attended++;
-              presentsCount++;
-            } else {
-              absencesCount++;
-            }
-          } else if (g.type === "Tutorial" && cls.type === "tu") {
-            held++;
-            if (cls.attended) {
-              attended++;
-              presentsCount++;
-            } else {
-              absencesCount++;
-            }
-          }
-        });
-        
-        return { attended, held };
-      });
-
-      if (absencesCount > 0) {
-        datesWithAbsences.push({
-          dateStr: d.dateStr,
-          label: d.label,
-          groupEffects,
-          totalAbsences: absencesCount,
-          totalPresents: presentsCount
-        });
-      }
-    });
-
-    // Run Optimization Solver
-    const solverRes = executeSolver(datesWithAbsences, targetGroups, maxWaivers, threshold);
-    const recDates = solverRes.bestWaivers.map(w => w.dateStr);
-
-    trackWaiverEvent('solver_executed', {
-      success: solverRes.solverSuccess,
-      waivers_needed: solverRes.solvedSize,
-      min_pct_achieved: solverRes.bestMinRatio * 100,
-      target_threshold: threshold,
-      max_waivers: maxWaivers,
-    });
-
-    setRecommendedWaivers(recDates);
-    setSelectedWaivers(new Set());
-    setSolverResult({
-      success: solverRes.solverSuccess,
-      waiversCount: solverRes.solvedSize,
-      minPctAchieved: solverRes.bestMinRatio * 100
-    });
-
-    setParsedData({
-      allDates: parsedDates,
-      allSubjects: parsedSubjects,
-      targetGroups,
-      candidates: datesWithAbsences
-    });
-
-    setIsProcessing(false);
-  };
-
-  // Recalculator Handler on the results page
+  // Recalculate button handler
   const handleRecalculate = () => {
     if (!parsedData) return;
     setIsProcessing(true);
-    
-    // Smooth loader delay
-    setTimeout(() => {
-      const solverRes = executeSolver(parsedData.candidates, parsedData.targetGroups, maxWaivers, threshold);
-      const recDates = solverRes.bestWaivers.map(w => w.dateStr);
-      
-      trackWaiverEvent('recalculated', {
-        success: solverRes.solverSuccess,
-        waivers_needed: solverRes.solvedSize,
-        min_pct_achieved: solverRes.bestMinRatio * 100,
+    runSolver(parsedData, threshold, maxWaivers, (solution) => {
+      trackWaiverEvent('solver_recalculated', {
+        status: solution.status,
+        target: threshold,
+        k: maxWaivers
       });
-
-      setRecommendedWaivers(recDates);
-      setSelectedWaivers(new Set(recDates));
-      setSolverResult({
-        success: solverRes.solverSuccess,
-        waiversCount: solverRes.solvedSize,
-        minPctAchieved: solverRes.bestMinRatio * 100
-      });
-      setIsProcessing(false);
-    }, 150);
-  };
-
-  const getSimulatedStats = () => {
-    if (!parsedData) return [];
-
-    return parsedData.targetGroups.map(g => {
-      let rawWaivedAttended = 0;
-      let rawWaivedHeld = 0;
-      
-      selectedWaivers.forEach(dateStr => {
-        const cand = parsedData.candidates.find(c => c.dateStr === dateStr);
-        if (!cand) return;
-        
-        const gIdx = parsedData.targetGroups.findIndex(tg => tg.key === g.key);
-        const eff = cand.groupEffects[gIdx];
-        if (eff) {
-          rawWaivedAttended += eff.attended;
-          rawWaivedHeld += eff.held;
-        }
-      });
-
-      // 1/3rd Waiver Cap Rule: Max waivable classes = Math.floor(baselineHeld / 3)
-      const maxWaivable = Math.floor(g.baselineHeld / 3);
-      const effectiveWaivedHeld = Math.min(rawWaivedHeld, maxWaivable);
-      const ratio = rawWaivedHeld > 0 ? (effectiveWaivedHeld / rawWaivedHeld) : 1;
-      const effectiveWaivedAttended = Math.round(rawWaivedAttended * ratio);
-
-      const extra = extraAttendance[g.subjectName] || 0;
-      const simAttended = Math.max(0, g.baselineAttended - effectiveWaivedAttended) + extra;
-      const simHeld = Math.max(1, g.baselineHeld - effectiveWaivedHeld) + extra;
-
-      const pct = simHeld > 0 ? (simAttended / simHeld * 100) : 100;
-      const baselinePct = g.baselineHeld > 0 ? (g.baselineAttended / g.baselineHeld * 100) : 100;
-      
-      return {
-        ...g,
-        baselinePct,
-        baselineAttended: g.baselineAttended,
-        baselineHeld: g.baselineHeld,
-        simPct: pct,
-        simAttended,
-        simHeld,
-        extraCount: extra,
-        maxWaivable,
-        rawWaivedHeld,
-        effectiveWaivedHeld,
-        isCapReached: rawWaivedHeld >= maxWaivable && maxWaivable > 0,
-        isCapExceeded: rawWaivedHeld > maxWaivable,
-        excessCount: Math.max(0, rawWaivedHeld - maxWaivable)
-      };
     });
   };
 
-  const getSimulatedSubjectStats = () => {
-    if (!parsedData || !Array.isArray(parsedData.allSubjects)) return [];
-
-    return parsedData.allSubjects.map(sub => {
-      const rawWaived = {
-        Th: { attended: 0, held: 0 },
-        tu: { attended: 0, held: 0 },
-        PR: { attended: 0, held: 0 }
-      };
-
-      selectedWaivers.forEach(dateStr => {
-        const dayRecord = sub?.dateAttendance?.[dateStr] || [];
-        dayRecord.forEach(cls => {
-          if (cls.attended) {
-            if (cls.type === 'Th') rawWaived.Th.attended++;
-            if (cls.type === 'tu') rawWaived.tu.attended++;
-            if (cls.type === 'PR') rawWaived.PR.attended++;
-          }
-          if (cls.type === 'Th') rawWaived.Th.held++;
-          if (cls.type === 'tu') rawWaived.tu.held++;
-          if (cls.type === 'PR') rawWaived.PR.held++;
-        });
-      });
-
-      const types = ['Th', 'tu', 'PR'];
-      const stats = {};
-      const capInfo = {};
-
-      types.forEach(t => {
-        const baseHeld = sub?.baselineStats?.[t]?.held || 0;
-        const baseAtt = sub?.baselineStats?.[t]?.attended || 0;
-        const maxWaivable = Math.floor(baseHeld / 3);
-        const attemptedHeld = rawWaived[t].held;
-        const effectiveHeld = Math.min(attemptedHeld, maxWaivable);
-        const ratio = attemptedHeld > 0 ? (effectiveHeld / attemptedHeld) : 1;
-        const effectiveAttended = Math.round(rawWaived[t].attended * ratio);
-
-        const simHeld = Math.max(0, baseHeld - effectiveHeld);
-        const simAttended = Math.max(0, baseAtt - effectiveAttended);
-
-        stats[t] = {
-          attended: simAttended,
-          held: simHeld,
-          effectiveHeld,
-          attemptedHeld,
-          maxWaivable
-        };
-
-        capInfo[t] = {
-          maxWaivable,
-          attemptedHeld,
-          effectiveHeld,
-          isCapExceeded: attemptedHeld > maxWaivable,
-          isCapReached: attemptedHeld >= maxWaivable && maxWaivable > 0,
-          excess: Math.max(0, attemptedHeld - maxWaivable)
-        };
-      });
-
-      const extra = extraAttendance[sub?.name] || 0;
-
-      const baselineTotalHeld = (sub?.baselineStats?.Th?.held || 0) + (sub?.baselineStats?.tu?.held || 0) + (sub?.baselineStats?.PR?.held || 0);
-      const baselineTotalAtt = (sub?.baselineStats?.Th?.attended || 0) + (sub?.baselineStats?.tu?.attended || 0) + (sub?.baselineStats?.PR?.attended || 0);
-      const baselinePct = baselineTotalHeld > 0 ? (baselineTotalAtt / baselineTotalHeld * 100) : 100;
-
-      const simTotalHeld = stats.Th.held + stats.tu.held + stats.PR.held + extra;
-      const simTotalAtt = stats.Th.attended + stats.tu.attended + stats.PR.attended + extra;
-      const simPct = simTotalHeld > 0 ? (simTotalAtt / simTotalHeld * 100) : 100;
-
-      return {
-        name: sub.name,
-        rollNo: sub.rollNo,
-        extraCount: extra,
-        baselinePct,
-        simPct,
-        stats,
-        capInfo,
-        baselineStats: sub.baselineStats,
-        simTotalAtt,
-        simTotalHeld,
-        baselineTotalAtt,
-        baselineTotalHeld
-      };
+  // Whole-day toggle (Section 2: clicking ANY cell toggles its whole DAY)
+  const handleToggleDay = (dateStr) => {
+    setSelectedWaivers(prev => {
+      const next = new Set(prev);
+      if (next.has(dateStr)) next.delete(dateStr);
+      else next.add(dateStr);
+      return next;
     });
   };
 
-  const handleCheckboxChange = (dateStr) => {
-    const updated = new Set(selectedWaivers);
-    if (updated.has(dateStr)) {
-      updated.delete(dateStr);
-    } else {
-      updated.add(dateStr);
-    }
-    setSelectedWaivers(updated);
+  // Apply suggested days from solver
+  const handleApplySuggested = () => {
+    if (!solverResult?.chosenDays) return;
+    const suggestedSet = new Set(solverResult.chosenDays.map(d => d.dateStr));
+    setSelectedWaivers(suggestedSet);
+    trackWaiverEvent('suggested_applied', { count: suggestedSet.size });
   };
 
-  const resetToRecommended = () => {
-    setSelectedWaivers(new Set(recommendedWaivers));
-  };
-
-  const clearAllWaivers = () => {
+  // Clear all active waivers
+  const handleClearAll = () => {
     setSelectedWaivers(new Set());
+    trackWaiverEvent('waivers_cleared');
   };
 
-  // Extract months represented in sheet for calendar tabs
-  const getMonthsInSheet = () => {
-    if (!parsedData) return [];
-    const months = new Set();
-    parsedData.allDates.forEach(d => {
-      const parts = d.dateStr.split('-');
-      months.add(`${parts[0]}-${parts[1]}`); // e.g. "2026-01"
+  // Copy dates plain-text list with weekdays (Section 7.4)
+  const handleCopyDates = () => {
+    if (!parsedData || selectedWaivers.size === 0) return;
+    const sortedDates = Array.from(selectedWaivers).sort();
+    const formatted = sortedDates.map(dateStr => {
+      const col = parsedData.dayColumns.find(d => d.dateStr === dateStr);
+      return col ? col.fullLabel : dateStr;
     });
-    return Array.from(months).sort();
+
+    const textToCopy = formatted.join(', ');
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      setCopyFeedback('Copied to clipboard!');
+      setTimeout(() => setCopyFeedback(null), 2500);
+      trackWaiverEvent('dates_copied', { count: sortedDates.length });
+    });
   };
 
-  // Compile calendar blocks for active month key
-  const getCalendarMonthBlocks = () => {
-    if (!parsedData || !activeMonthKey) return [];
-    const [year, month] = activeMonthKey.split('-').map(Number);
-    const monthIndex = month - 1;
+  // Live simulated stats calculated instantaneously on any change
+  const simulatedStats = useMemo(() => {
+    if (!parsedData) return null;
+    return calculateSimulatedStats(parsedData, selectedWaivers, threshold);
+  }, [parsedData, selectedWaivers, threshold]);
 
-    const daysInMonth = new Date(year, month, 0).getDate();
-    const startDayIndex = new Date(year, monthIndex, 1).getDay(); // 0 = Sun
+  // Compute impact diff for hovered day
+  const dayImpactTooltip = useMemo(() => {
+    if (!hoveredDay || !parsedData) return null;
+    return calculateDayImpactDiff(hoveredDay, parsedData, selectedWaivers, threshold);
+  }, [hoveredDay, parsedData, selectedWaivers, threshold]);
+
+  // Group columns by month for the spreadsheet grid header
+  const monthGroups = useMemo(() => {
+    if (!parsedData?.dayColumns) return [];
+    const groups = [];
+    parsedData.dayColumns.forEach(d => {
+      const key = `${d.month}-${d.year}`;
+      const monthName = MONTHS_FULL[d.month - 1];
+      let g = groups.find(item => item.key === key);
+      if (!g) {
+        g = { key, monthName, year: d.year, dates: [] };
+        groups.push(g);
+      }
+      g.dates.push(d);
+    });
+    return groups;
+  }, [parsedData]);
+
+  // Calendar view month keys
+  const calendarMonths = useMemo(() => {
+    if (!parsedData?.dayColumns) return [];
+    const map = new Map();
+    parsedData.dayColumns.forEach(d => {
+      const key = `${d.year}-${String(d.month).padStart(2, '0')}`;
+      if (!map.has(key)) {
+        map.set(key, `${MONTH_NAMES[d.month - 1]} ${d.year}`);
+      }
+    });
+    return Array.from(map.entries()).map(([key, label]) => ({ key, label }));
+  }, [parsedData]);
+
+  // Calendar blocks for active month
+  const calendarBlocks = useMemo(() => {
+    if (!parsedData || !activeCalendarMonth) return [];
+    const [yr, mn] = activeCalendarMonth.split('-').map(Number);
+    const daysInMonth = new Date(yr, mn, 0).getDate();
+    const firstDayIdx = new Date(yr, mn - 1, 1).getDay(); // 0 = Sun
 
     const blocks = [];
-
-    // Spacers for prefix
-    for (let i = 0; i < startDayIndex; i++) {
-      blocks.push({ type: 'empty', id: `empty-${i}` });
+    for (let i = 0; i < firstDayIdx; i++) {
+      blocks.push({ type: 'empty', id: `emp-${i}` });
     }
 
-    // Days blocks
     for (let d = 1; d <= daysInMonth; d++) {
-      const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      const sheetDate = parsedData.allDates.find(ad => ad.dateStr === dateStr);
-      
-      let totalAbsences = 0;
-      let totalPresents = 0;
+      const dateStr = `${yr}-${String(mn).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const col = parsedData.dayColumns.find(c => c.dateStr === dateStr);
 
-      if (sheetDate) {
-        parsedData.allSubjects.forEach(sub => {
-          const records = sub.dateAttendance[dateStr] || [];
-          records.forEach(cls => {
-            if (cls.attended) {
-              totalPresents++;
-            } else {
-              totalAbsences++;
+      let thTuAbs = 0;
+      let thTuPres = 0;
+      let prCount = 0;
+
+      if (col) {
+        parsedData.subjects.forEach(sub => {
+          const classes = sub.dayClasses?.[dateStr] || [];
+          classes.forEach(c => {
+            if (c.type === 'th' || c.type === 'tu') {
+              if (c.attended) thTuPres++;
+              else thTuAbs++;
+            } else if (c.type === 'pr') {
+              prCount++;
             }
           });
         });
@@ -1077,319 +384,137 @@ function WaiverToolPage({ onBack }) {
         type: 'day',
         dayNum: d,
         dateStr,
-        hasClasses: !!sheetDate,
-        totalAbsences,
-        totalPresents,
+        hasClasses: !!col,
+        col,
+        thTuAbs,
+        thTuPres,
+        prCount,
         id: dateStr
       });
     }
 
     return blocks;
-  };
+  }, [parsedData, activeCalendarMonth]);
 
-  const renderSubjectsCards = () => {
-    if (!parsedData) return null;
-    const subjectStats = getSimulatedSubjectStats();
+  // Render subject cards for Subject Monitor
+  const renderSubjectMonitor = () => {
+    if (!simulatedStats) return null;
 
     return (
-      <div className="subjects-cards-wrapper">
-        <div className="subjects-cards-grid">
-          {subjectStats.map((sub, sIdx) => {
-            const types = [
-              { key: 'Th', label: 'Theory', infoOnly: false, stat: sub.stats.Th },
-              { key: 'tu', label: 'Tutorial', infoOnly: false, stat: sub.stats.tu },
-              { key: 'PR', label: 'Practical', infoOnly: true, stat: sub.stats.PR }
-            ];
+      <div className="subjects-cards-list">
+        {simulatedStats.subjectsStats.map(sub => {
+          const rows = [
+            { key: 'th', label: 'Theory', data: sub.parts.th },
+            { key: 'tu', label: 'Tutorial', data: sub.parts.tu },
+            { key: 'pr', label: 'Practical', data: sub.parts.pr }
+          ];
 
-            return (
-              <div key={sIdx} className="subject-card">
-                <div className="subject-card-header">
-                  <span className="subject-card-title">{sub.name}</span>
-                  <span className="subject-card-roll">{sub.rollNo}</span>
-                </div>
+          return (
+            <div key={sub.name} className="subject-card-v2">
+              <div className="subject-card-header-v2">
+                <span className="subject-card-title-v2">{sub.name}</span>
+                <span className="subject-card-roll-v2">{sub.rollNo}</span>
+              </div>
 
-                <div className="subject-card-body">
-                  {types.map(({ key, label, infoOnly, stat }) => {
-                    const baseHeld = sub.baselineStats?.[key]?.held || 0;
-                    const hasClasses = baseHeld > 0;
-                    const pct = hasClasses && stat.held > 0 ? (stat.attended / stat.held) * 100 : (hasClasses ? 0 : 100);
-                    const cap = sub.capInfo?.[key] || {};
+              <div className="subject-card-body-v2">
+                {rows.map(({ key, label, data }) => {
+                  if (data.baseHeld === 0) return null;
 
-                    let pctClass = 'text-green';
-                    let barColor = '#10b981';
-                    if (pct < 75) {
-                      pctClass = 'text-red';
-                      barColor = '#ef4444';
-                    } else if (pct < 85) {
+                  const isPrac = key === 'pr';
+                  const isPassing = data.passes;
+                  const pct = data.simPct;
+
+                  // Bar color: green only when passing (> T), amber if within 10% below T, red below that, practical grey
+                  let barColor = '#10b981'; // green
+                  let pctClass = 'text-green';
+                  if (isPrac) {
+                    barColor = '#94a3b8'; // grey
+                    pctClass = 'text-muted';
+                  } else if (!isPassing) {
+                    if (pct >= threshold - 10) {
+                      barColor = '#f59e0b'; // amber
                       pctClass = 'text-orange';
-                      barColor = '#f59e0b';
+                    } else {
+                      barColor = '#ef4444'; // red
+                      pctClass = 'text-red';
                     }
+                  }
 
-                    return (
-                      <div key={key} className="subject-row-item">
-                        <div className="row-item-top">
-                          <div className="row-item-label-group">
-                            <span className="row-type-name">{label}</span>
-                            {infoOnly && <span className="info-only-badge">info only</span>}
-                            {hasClasses && cap.isCapExceeded && (
-                              <span className="cap-exceeded-pill" title={`Attempted ${cap.attemptedHeld} waivers. Max waivable is ${cap.maxWaivable} (1/3rd limit of ${baseHeld} held classes). ${cap.excess} class(es) ignored.`}>
-                                ⚠️ 1/3 Cap Exceeded ({cap.excess} ignored)
-                              </span>
-                            )}
-                            {hasClasses && cap.isCapReached && !cap.isCapExceeded && (
-                              <span className="cap-reached-pill" title={`Reached maximum waivable limit of ${cap.maxWaivable} classes (1/3rd of total held).`}>
-                                🔒 1/3 Cap Reached ({cap.effectiveHeld}/{cap.maxWaivable})
-                              </span>
-                            )}
-                          </div>
-                          <div className="row-item-stats-group">
-                            {hasClasses ? (
-                              <>
-                                <span className="row-stat-fraction">{stat.attended}/{stat.held}</span>
-                                <span className={`row-stat-pct ${pctClass}`}>{pct.toFixed(1)}%</span>
-                              </>
-                            ) : (
-                              <span className="no-classes-lbl">no classes &mdash;</span>
-                            )}
-                          </div>
+                  return (
+                    <div key={key} className="part-monitor-row">
+                      <div className="part-monitor-top">
+                        <div className="part-label-group">
+                          <span className="part-type-name">{label}</span>
+                          {isPrac && <span className="badge-info-only">info only</span>}
+                          {!isPrac && isPassing && (
+                            <span className="badge-passing">pass (&gt;{threshold}%)</span>
+                          )}
                         </div>
 
-                        <div className="row-progress-bar-track">
-                          {hasClasses ? (
-                            <div 
-                              className="row-progress-bar-fill" 
-                              style={{ width: `${Math.min(100, Math.max(0, pct))}%`, backgroundColor: barColor }}
-                            ></div>
-                          ) : (
-                            <div className="row-progress-bar-empty"></div>
-                          )}
+                        <div className="part-metrics-group">
+                          <span className="part-fraction">{data.simAttended} / {data.simHeld}</span>
+                          <span className={`part-pct ${pctClass}`}>{pct.toFixed(1)}%</span>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
 
-  const getMonthGroups = () => {
-    if (!parsedData || !Array.isArray(parsedData.allDates)) return [];
-    const groups = [];
-    parsedData.allDates.forEach(d => {
-      const parts = d.dateStr.split('-');
-      const year = parts[0];
-      const monthIdx = parseInt(parts[1], 10) - 1;
-      const monthName = MONTHS[monthIdx] || '';
-      const key = `${monthName} ${year}`;
-      
-      let group = groups.find(g => g.key === key);
-      if (!group) {
-        group = { key, monthName, year, dates: [] };
-        groups.push(group);
-      }
-      group.dates.push(d);
-    });
-    return groups;
-  };
+                      {/* Bar track with threshold marker line */}
+                      <div className="part-progress-track">
+                        <div
+                          className="part-progress-fill"
+                          style={{
+                            width: `${Math.min(100, Math.max(0, pct))}%`,
+                            backgroundColor: barColor
+                          }}
+                        />
+                        {!isPrac && (
+                          <div
+                            className="threshold-marker-line"
+                            style={{ left: `${threshold}%` }}
+                            title={`Target Threshold: ${threshold}%`}
+                          />
+                        )}
+                      </div>
 
-  const renderAttendanceGrid = () => {
-    if (!parsedData) return null;
-
-    const subjectStats = getSimulatedSubjectStats();
-    const monthGroups = getMonthGroups();
-
-    return (
-      <div className="attendance-grid-container">
-        <div className="grid-scroll-wrapper">
-          <table className="attendance-spreadsheet-table">
-            <thead>
-              <tr className="header-month-row">
-                <th rowSpan={2} className="sticky-col subject-header">Subject Name</th>
-                {monthGroups.map(g => (
-                  <th key={g.key} colSpan={g.dates.length} className="month-group-header">
-                    {g.monthName.toUpperCase()} {g.year}
-                  </th>
-                ))}
-                <th rowSpan={2} className="sticky-col-right stats-header">
-                  <div className="header-stacked">
-                    <span>Simulated</span>
-                    <span>Pres / Held</span>
-                  </div>
-                </th>
-                <th rowSpan={2} className="sticky-col-right pct-header">%</th>
-              </tr>
-              <tr className="header-days-row">
-                {parsedData.allDates.map((d) => {
-                  const isChecked = selectedWaivers.has(d.dateStr);
-                  const isRecommended = recommendedWaivers.includes(d.dateStr);
-                  const dayNum = parseInt(d.dateStr.split('-')[2], 10);
-                  return (
-                    <th 
-                      key={d.dateStr} 
-                      className={`date-header-cell ${isChecked ? 'waived' : ''} ${isRecommended ? 'recommended' : ''}`}
-                      onClick={() => handleCheckboxChange(d.dateStr)}
-                      title={`${d.dateStr}: Click to toggle waiver for this date`}
-                    >
-                      <div className="header-date-label">{dayNum}</div>
-                      {isChecked && <span className="waiver-pill-indicator">W</span>}
-                    </th>
+                      {/* Consecutive classes needed / missable buffer status */}
+                      {!isPrac && (
+                        <div className="part-advice-caption">
+                          {isPassing ? (
+                            data.missableBuffer > 0 ? (
+                              <span className="text-green-dim">
+                                ✓ Can miss <strong>{data.missableBuffer}</strong> more class{data.missableBuffer === 1 ? '' : 'es'} and stay passing
+                              </span>
+                            ) : (
+                              <span className="text-orange-dim">
+                                ⚠ On the edge: cannot miss any classes without dropping below {threshold}%
+                              </span>
+                            )
+                          ) : (
+                            <span className="text-red-dim">
+                              ✕ Must attend <strong>{data.classesNeeded}</strong> class{data.classesNeeded === 1 ? '' : 'es'} in a row to pass
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   );
                 })}
-              </tr>
-            </thead>
-            <tbody>
-              {subjectStats.map((sub, sIdx) => {
-                const originalSubject = parsedData?.allSubjects?.[sIdx];
-                return (
-                  <tr key={sIdx}>
-                    <td className="sticky-col subject-cell">
-                      <div className="sub-name">{sub.name}</div>
-                      <div className="sub-roll txt-muted">Roll: {sub.rollNo}</div>
-                    </td>
-                    {parsedData?.allDates?.map((d) => {
-                      const dayRecord = originalSubject?.dateAttendance?.[d.dateStr] || [];
-                      const isChecked = selectedWaivers.has(d.dateStr);
-                      
-                      return (
-                        <td 
-                          key={d.dateStr} 
-                          className={`attendance-cell ${isChecked ? 'waived-cell' : ''}`}
-                          onClick={() => handleCheckboxChange(d.dateStr)}
-                          title={`${d.dateStr}: Click to toggle waiver`}
-                        >
-                          {dayRecord.length === 0 ? (
-                            <span className="no-class">-</span>
-                          ) : (
-                            <div className="cell-classes-stack">
-                              {dayRecord.map((cls, cIdx) => (
-                                <span 
-                                  key={cIdx} 
-                                  className={`class-badge ${cls.attended ? 'present' : 'absent'} ${cls.type.toLowerCase()}`}
-                                  title={`${cls.type === 'Th' ? 'Theory' : cls.type === 'tu' ? 'Tutorial' : 'Practical'}: ${cls.attended ? 'Present' : 'Absent'}`}
-                                >
-                                  {cls.attended ? 'P' : 'A'}
-                                  <sub className="type-sub">{cls.type}</sub>
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </td>
-                      );
-                    })}
-                    <td className="sticky-col-right stats-cell">
-                      <span className="bold">{sub.simTotalAtt}/{sub.simTotalHeld}</span>
-                      <span className="txt-muted block-size">({sub.baselineTotalAtt}/{sub.baselineTotalHeld})</span>
-                    </td>
-                    <td className={`sticky-col-right pct-cell bold ${sub.simPct < threshold ? 'text-red' : 'text-green'}`}>
-                      <span>{sub.simPct.toFixed(1)}%</span>
-                      <span className="txt-muted block-size font-normal">({sub.baselinePct.toFixed(1)}%)</span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    );
-  };
-
-  const renderCalendarView = () => {
-    if (!parsedData) return null;
-    return (
-      <div className="calendar-simulation-view">
-        <div className="card-header-row pt-0">
-          <div className="title-block">
-            <h3>Interactive Calendar</h3>
-            <p className="subtitle">Toggle waivers by clicking days</p>
-          </div>
-        </div>
-        
-        {/* Month key selectors */}
-        <div className="calendar-month-tabs">
-          {getMonthsInSheet().map(mKey => {
-            const [yr, mn] = mKey.split('-');
-            const label = MONTHS[parseInt(mn, 10) - 1].substring(0, 3);
-            return (
-              <button 
-                key={mKey}
-                className={`month-tab-btn ${activeMonthKey === mKey ? 'active' : ''}`}
-                onClick={() => setActiveMonthKey(mKey)}
-              >
-                {label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Weekday headers */}
-        <div className="calendar-week-headers">
-          <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
-        </div>
-
-        {/* Calendar Days Grid */}
-        <div className="calendar-days-grid">
-          {getCalendarMonthBlocks().map((block) => {
-            if (block.type === 'empty') {
-              return <div key={block.id} className="calendar-day-cell empty"></div>;
-            }
-
-            const isChecked = selectedWaivers.has(block.dateStr);
-            const isRecommended = recommendedWaivers.includes(block.dateStr);
-            
-            let cellClass = "calendar-day-cell";
-            if (!block.hasClasses) {
-              cellClass += " inactive";
-            } else {
-              cellClass += " active-day";
-              if (isChecked) cellClass += " waived";
-              if (isRecommended) cellClass += " recommended-cell";
-            }
-
-            return (
-              <div 
-                key={block.id}
-                className={cellClass}
-                onClick={() => block.hasClasses && handleCheckboxChange(block.dateStr)}
-                title={block.hasClasses ? `${block.dateStr}: ${block.totalAbsences} Abs, ${block.totalPresents} Pres` : "No classes held"}
-              >
-                <span className="day-number">{block.dayNum}</span>
-                {block.hasClasses && (
-                  <div className="day-dot-indicators">
-                    {block.totalAbsences > 0 && (
-                      <span className="abs-dot-count">{block.totalAbsences}</span>
-                    )}
-                    {block.totalPresents > 0 && (
-                      <span className="pres-dot-count">{block.totalPresents}</span>
-                    )}
-                  </div>
-                )}
-                {isChecked && <span className="waived-cell-indicator"></span>}
               </div>
-            );
-          })}
-        </div>
-
-        <div className="calendar-legend-row">
-          <div className="legend-item"><span className="legend-dot red"></span>Absence</div>
-          <div className="legend-item"><span className="legend-dot green"></span>Present</div>
-          <div className="legend-item"><span className="legend-dot blue"></span>Waived</div>
-        </div>
+            </div>
+          );
+        })}
       </div>
     );
   };
-
-  const simulatedStats = getSimulatedStats();
-  const allSafe = simulatedStats.every(s => s.simPct >= threshold);
 
   return (
     <div className="waiver-tool-fullpage">
-      {/* Standalone Navigation Navbar Header */}
-      <div className="fullpage-navbar">
+      {/* PC Recommended Advisory Banner */}
+      <div className="pc-experience-banner">
+        <span>💻 <strong>PC Recommended for Best Experience:</strong> The interactive spreadsheet grid and real-time simulator are built for desktop screens.</span>
+      </div>
+
+      {/* Top Navbar Header */}
+      <nav className="fullpage-navbar">
         <button className="btn-back-portal" onClick={onBack} title="Back to main OS dashboard">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -1397,93 +522,88 @@ function WaiverToolPage({ onBack }) {
           </svg>
           Back to Campus OS
         </button>
+
         <div className="navbar-logo-area">
           <img src="/sscbs_logo.png" alt="SSCBS Crest" width="28" height="28" />
-          <span className="navbar-logo-text">SSCBS <span className="logo-accent">Waiver Assistant</span></span>
+          <span className="navbar-logo-text">
+            SSCBS <span className="logo-accent">Waiver Assistant</span>
+          </span>
           {fileMeta?.name && (
             <span className="active-file-pill" title={`Active uploaded sheet: ${fileMeta.name}`}>
               📄 {fileMeta.name}
             </span>
           )}
         </div>
-        <div className="navbar-badge-area">
-          <span className="navbar-portal-badge">Interactive Simulation Mode</span>
-        </div>
-      </div>
 
+        <div className="navbar-badge-area">
+          <span className="navbar-portal-badge">Interactive Simulation</span>
+        </div>
+      </nav>
+
+      {/* Processing Loader */}
       {isProcessing && (
         <div className="loading-screen-inline">
           <div className="loader-container">
             <span className="system-spinner"></span>
-            <p>Re-calculating Condonation Options...</p>
+            <p>Solving optimal waiver plan...</p>
           </div>
         </div>
       )}
 
+      {/* Upload View (Before Sheet Upload) */}
       {!parsedData ? (
         <div className="upload-view-container">
           <div className="settings-glass-panel">
-            <h3>Configuration Panel</h3>
-            <p className="settings-intro">Set up your semester targets and waiver constraints before uploading your sheet.</p>
-            
+            <h3>Configuration & Targets</h3>
+            <p className="settings-intro">Set your desired targets before uploading your college attendance sheet.</p>
+
             <div className="form-group-row">
               <div className="form-item">
-                <label htmlFor="starting-month">Starting Month</label>
-                <select 
-                  id="starting-month" 
-                  value={startingMonth} 
-                  onChange={(e) => setStartingMonth(parseInt(e.target.value))}
-                >
-                  {MONTHS.map((m, idx) => (
-                    <option key={m} value={idx}>{m}</option>
-                  ))}
-                </select>
-                <span className="field-help">Semester commencement anchor</span>
-              </div>
-
-              <div className="form-item">
-                <label htmlFor="max-waivers">Max Available Waivers</label>
-                <input 
-                  id="max-waivers"
-                  type="number" 
-                  min="1" 
-                  max="30" 
-                  value={maxWaivers} 
-                  onChange={(e) => setMaxWaivers(Math.max(1, parseInt(e.target.value) || 1))}
-                />
-                <span className="field-help">Maximum dates you can waive</span>
-              </div>
-
-              <div className="form-item">
-                <label htmlFor="target-threshold">Target Threshold (%)</label>
-                <input 
+                <div className="slider-label-row">
+                  <label htmlFor="target-threshold">Target Threshold: <strong>{threshold}%</strong></label>
+                </div>
+                <input
                   id="target-threshold"
-                  type="number" 
-                  min="50" 
-                  max="100" 
-                  value={threshold} 
-                  onChange={(e) => setThreshold(Math.max(50, Math.min(100, parseInt(e.target.value) || 85)))}
+                  type="range"
+                  min="50"
+                  max="99"
+                  step="1"
+                  value={threshold}
+                  onChange={(e) => setThreshold(parseInt(e.target.value, 10))}
                 />
-                <span className="field-help">Minimum target requirement</span>
+                <span className="field-help">85% is the target for full attendance marks (range 50–99%)</span>
+              </div>
+
+              <div className="form-item">
+                <label htmlFor="max-waivers">Max Available Waivers (K)</label>
+                <input
+                  id="max-waivers"
+                  type="number"
+                  min="1"
+                  max="30"
+                  value={maxWaivers}
+                  onChange={(e) => setMaxWaivers(Math.max(1, Math.min(30, parseInt(e.target.value, 10) || 12)))}
+                />
+                <span className="field-help">Maximum number of days you can waive (1–30, default 12)</span>
               </div>
             </div>
           </div>
 
-          <div 
+          <div
             className="dropzone-area"
             onDragOver={handleDragOver}
             onDrop={handleDrop}
           >
-            <input 
-              type="file" 
-              id="file-upload" 
-              accept=".xls,.xlsx" 
+            <input
+              type="file"
+              id="file-upload"
+              accept=".xls,.xlsx"
               onChange={handleFileChange}
               style={{ display: 'none' }}
             />
             <label htmlFor="file-upload" className="dropzone-label">
               <div className="upload-icon-pulse">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                   <polyline points="17 8 12 3 7 8"></polyline>
                   <line x1="12" y1="3" x2="12" y2="15"></line>
@@ -1497,7 +617,7 @@ function WaiverToolPage({ onBack }) {
               ) : (
                 <div className="upload-prompt">
                   <strong>Drag and drop</strong> your college attendance Excel sheet here, or <span>browse files</span>.
-                  <p className="format-spec">Accepts .xls (HTML-export) or .xlsx formats</p>
+                  <p className="format-spec">Upload the original attendance export (.xls) directly downloaded from the portal</p>
                 </div>
               )}
             </label>
@@ -1505,73 +625,105 @@ function WaiverToolPage({ onBack }) {
 
           {error && <div className="error-toast-glass">{error}</div>}
 
-          <button 
-            className={`btn-optimize-run ${isProcessing ? 'loading' : ''}`} 
+          <button
+            className={`btn-optimize-run ${isProcessing ? 'loading' : ''}`}
             onClick={processAttendance}
             disabled={!file || isProcessing}
           >
-            {isProcessing ? "Processing Spreadsheet..." : "Extract & Calculate Optimal Waivers"}
+            {isProcessing ? 'Analyzing Attendance...' : 'Extract & Calculate Optimal Waivers'}
           </button>
         </div>
       ) : (
+        /* Workspace Layout (Post Sheet Upload) */
         <div className="fullpage-workspace-layout">
-          {/* Top Horizontal Toolbar Controls & Status */}
+          {/* Top Horizontal Toolbar */}
           <header className="workspace-top-toolbar">
             <div className="toolbar-controls-cluster">
               <div className="toolbar-input-item">
-                <label htmlFor="top-max-w">Max Waivers</label>
-                <input 
-                  type="number" 
-                  id="top-max-w"
-                  min="1" 
-                  max="30"
-                  value={maxWaivers}
-                  onChange={(e) => setMaxWaivers(Math.max(1, parseInt(e.target.value) || 1))}
+                <label htmlFor="top-thresh">Target (%): <strong>{threshold}%</strong></label>
+                <input
+                  type="range"
+                  id="top-thresh"
+                  min="50"
+                  max="99"
+                  step="1"
+                  value={threshold}
+                  onChange={(e) => setThreshold(parseInt(e.target.value, 10))}
                 />
               </div>
 
               <div className="toolbar-input-item">
-                <label htmlFor="top-thresh">Target (%)</label>
-                <input 
-                  type="number" 
-                  id="top-thresh"
-                  min="50" 
-                  max="100"
-                  value={threshold}
-                  onChange={(e) => setThreshold(Math.max(50, Math.min(100, parseInt(e.target.value) || 85)))}
+                <label htmlFor="top-max-w">Max Waivers (K)</label>
+                <input
+                  type="number"
+                  id="top-max-w"
+                  min="1"
+                  max="30"
+                  value={maxWaivers}
+                  onChange={(e) => setMaxWaivers(Math.max(1, Math.min(30, parseInt(e.target.value, 10) || 12)))}
                 />
               </div>
 
-              <button className="btn-recalculate-toolbar" onClick={handleRecalculate} title="Recalculate waiver recommendations">
+              <button className="btn-recalculate-toolbar" onClick={handleRecalculate} title="Recalculate optimal waivers">
                 🔄 Recalculate
               </button>
             </div>
 
+            {/* Metrics Cluster */}
             <div className="toolbar-metrics-cluster">
               <div className="metric-pill">
                 <span className="metric-lbl">Status:</span>
-                <span className={`status-tag ${solverResult?.success ? "safe-tag" : "alert-tag"}`}>
-                  {solverResult?.success ? "OPTIMAL" : "SHORTAGE"}
+                <span className={`status-tag ${simulatedStats?.isOptimal ? 'safe-tag' : 'alert-tag'}`}>
+                  {simulatedStats?.isOptimal ? 'OPTIMAL' : 'SHORTAGE'}
                 </span>
               </div>
+
               <div className="metric-pill">
-                <span className="metric-lbl">Waivers Used:</span>
-                <strong className="metric-val">{selectedWaivers.size} / {maxWaivers}</strong>
-              </div>
-              <div className="metric-pill">
-                <span className="metric-lbl">Min Attendance:</span>
-                <strong className={`metric-val ${allSafe ? "safe-text" : "alert-text"}`}>
-                  {solverResult?.minPctAchieved ? `${solverResult.minPctAchieved.toFixed(1)}%` : "N/A"}
+                <span className="metric-lbl">Passing:</span>
+                <strong className="metric-val">
+                  {simulatedStats?.passingTargetCount} of {simulatedStats?.totalTargetParts} parts
                 </strong>
               </div>
+
+              <div className="metric-pill">
+                <span className="metric-lbl">Lowest Part:</span>
+                <strong className={`metric-val ${simulatedStats?.isOptimal ? 'safe-text' : 'alert-text'}`}>
+                  {simulatedStats?.lowestPartPct ? `${simulatedStats.lowestPartPct.toFixed(1)}%` : '100%'}
+                </strong>
+              </div>
+
+              <div className="metric-pill">
+                <span className="metric-lbl">Dates Waived:</span>
+                <strong className="metric-val">{selectedWaivers.size} / {maxWaivers}</strong>
+              </div>
+
+              {!simulatedStats?.isOptimal && kPlusOneResult && (
+                <div className="metric-pill k-plus-one-pill" title="Passing parts if you can get one more waiver date">
+                  <span className="metric-lbl">With K+1 waivers:</span>
+                  <strong>{kPlusOneResult.passCount} of {kPlusOneResult.totalTargetParts} pass</strong>
+                </div>
+              )}
             </div>
 
+            {/* Actions Cluster */}
             <div className="toolbar-actions-cluster">
-              <button className="btn-toolbar-primary" onClick={resetToRecommended} title="Apply suggested optimal waivers">
-                Apply Suggested
+              <button
+                className="btn-toolbar-primary"
+                onClick={handleApplySuggested}
+                title="Apply suggested optimal days from solver"
+              >
+                Apply Suggested ({solverResult?.chosenDays?.length || 0})
               </button>
-              <button className="btn-toolbar-sec" onClick={clearAllWaivers} title="Clear all active waivers">
+              <button className="btn-toolbar-sec" onClick={handleClearAll} title="Clear all active waived dates">
                 Clear All
+              </button>
+              <button
+                className="btn-toolbar-copy"
+                onClick={handleCopyDates}
+                disabled={selectedWaivers.size === 0}
+                title="Copy plain-text list of selected waiver dates"
+              >
+                📋 {copyFeedback || 'Copy Dates'}
               </button>
               <button className="btn-toolbar-upload" onClick={handleUploadNewSheet} title="Upload a new attendance sheet">
                 📄 New Sheet
@@ -1579,145 +731,390 @@ function WaiverToolPage({ onBack }) {
             </div>
           </header>
 
-          {/* Main 2-Column Split: Left = Spreadsheet Grid, Right = Subjects Cards */}
+          {/* Main 2-Column Split: Left = Interactive Views, Right = Subject Monitor */}
           <div className="workspace-columns-grid">
-            {/* Left Pane: Interactive Spreadsheet Grid & Views */}
+            {/* Left Pane */}
             <div className="workspace-left-pane">
               <div className="results-card-glass customizer-card-container">
-                {/* TAB SELECTORS ROW */}
+                {/* 3 View Tabs: Grid, Calendar, List (side-by-side removed per instruction) */}
                 <div className="selector-view-tabs-row">
                   <div className="selector-view-tabs">
-                    <button 
-                      className={`tab-btn ${activeSelectorTab === 'grid' ? 'active' : ''}`}
-                      onClick={() => setActiveSelectorTab('grid')}
+                    <button
+                      className={`tab-btn ${activeTab === 'grid' ? 'active' : ''}`}
+                      onClick={() => setActiveTab('grid')}
                     >
                       📊 Spreadsheet Grid
                     </button>
-                    <button 
-                      className={`tab-btn ${activeSelectorTab === 'calendar' ? 'active' : ''}`}
-                      onClick={() => setActiveSelectorTab('calendar')}
+                    <button
+                      className={`tab-btn ${activeTab === 'calendar' ? 'active' : ''}`}
+                      onClick={() => setActiveTab('calendar')}
                     >
                       📅 Calendar View
                     </button>
-                    <button 
-                      className={`tab-btn ${activeSelectorTab === 'split' ? 'active' : ''}`}
-                      onClick={() => setActiveSelectorTab('split')}
-                    >
-                      ⚡ Side-by-Side
-                    </button>
-                    <button 
-                      className={`tab-btn ${activeSelectorTab === 'list' ? 'active' : ''}`}
-                      onClick={() => setActiveSelectorTab('list')}
+                    <button
+                      className={`tab-btn ${activeTab === 'list' ? 'active' : ''}`}
+                      onClick={() => setActiveTab('list')}
                     >
                       📋 Recommended List
                     </button>
                   </div>
-                  <div className="actions-cluster">
-                    <button className="btn-suggest-apply" onClick={resetToRecommended} title="Apply auto-recommended optimal waivers">Apply Recommended</button>
-                    <button className="btn-sec-small" onClick={clearAllWaivers} title="Clear all active waivers">Clear All</button>
+                  <div className="tab-quick-info">
+                    <span>Click any cell to toggle its whole day</span>
                   </div>
                 </div>
 
-                {/* TAB CONTENT PANELS */}
-                {activeSelectorTab === 'grid' && (
-                  <div className="customizer-fullwidth-grid-pane">
-                    {renderAttendanceGrid()}
-                  </div>
-                )}
+                {/* Tab 1: Spreadsheet Grid */}
+                {activeTab === 'grid' && (
+                  <div className="attendance-grid-container">
+                    <div className="grid-scroll-wrapper">
+                      <table className="attendance-spreadsheet-table">
+                        <thead>
+                          <tr className="header-month-row">
+                            <th rowSpan={2} className="sticky-col subject-header">Subject Name</th>
+                            {monthGroups.map(g => (
+                              <th key={g.key} colSpan={g.dates.length} className="month-group-header">
+                                {g.monthName.toUpperCase()} {g.year}
+                              </th>
+                            ))}
+                            <th rowSpan={2} className="sticky-col-right stats-header">
+                              <div className="header-stacked">
+                                <span>Simulated</span>
+                                <span>Pres / Held</span>
+                              </div>
+                            </th>
+                            <th rowSpan={2} className="sticky-col-right pct-header">%</th>
+                          </tr>
+                          <tr className="header-days-row">
+                            {parsedData.dayColumns.map(d => {
+                              const isChecked = selectedWaivers.has(d.dateStr);
+                              const isRecommended = solverResult?.chosenDays?.some(cd => cd.dateStr === d.dateStr);
 
-                {activeSelectorTab === 'calendar' && (
-                  <div className="customizer-fullwidth-calendar-pane">
-                    {renderCalendarView()}
-                  </div>
-                )}
+                              return (
+                                <th
+                                  key={d.dateStr}
+                                  className={`date-header-cell ${isChecked ? 'waived' : ''} ${isRecommended ? 'recommended' : ''}`}
+                                  onClick={() => handleToggleDay(d.dateStr)}
+                                  onMouseEnter={(e) => {
+                                    setHoveredDay(d.dateStr);
+                                    setTooltipPos({ x: e.clientX, y: e.clientY });
+                                  }}
+                                  onMouseLeave={() => setHoveredDay(null)}
+                                  title={`${d.fullLabel}: Click to toggle day waiver`}
+                                >
+                                  <div className="header-weekday-label">{d.weekday}</div>
+                                  <div className="header-date-label">{d.dayNum}</div>
+                                  {isChecked && <span className="waiver-pill-indicator">W</span>}
+                                </th>
+                              );
+                            })}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {simulatedStats?.subjectsStats?.map((sub, sIdx) => {
+                            const rawSubject = parsedData.subjects[sIdx];
+                            const thStats = sub.parts.th;
+                            const tuStats = sub.parts.tu;
+                            const prStats = sub.parts.pr;
 
-                {activeSelectorTab === 'split' && (
-                  <div className="customizer-split-layout">
-                    <div className="customizer-grid-pane">
-                      {renderAttendanceGrid()}
+                            // Overall simulated present / held across all parts
+                            const totalSimAtt = thStats.simAttended + tuStats.simAttended + prStats.simAttended;
+                            const totalSimHeld = thStats.simHeld + tuStats.simHeld + prStats.simHeld;
+                            const overallSimPct = totalSimHeld > 0 ? (totalSimAtt / totalSimHeld) * 100 : 100;
+                            const totalBaseAtt = thStats.baseAtt + tuStats.baseAtt + prStats.baseAtt;
+                            const totalBaseHeld = thStats.baseHeld + tuStats.baseHeld + prStats.baseHeld;
+                            const overallBasePct = totalBaseHeld > 0 ? (totalBaseAtt / totalBaseHeld) * 100 : 100;
+
+                            const overallPass = (thStats.baseHeld === 0 || thStats.passes) && (tuStats.baseHeld === 0 || tuStats.passes);
+
+                            return (
+                              <tr key={sub.name}>
+                                <td className="sticky-col subject-cell">
+                                  <div className="sub-name">{sub.name}</div>
+                                  <div className="sub-roll txt-muted">Roll: {sub.rollNo}</div>
+                                </td>
+
+                                {parsedData.dayColumns.map(d => {
+                                  const dayClasses = rawSubject?.dayClasses?.[d.dateStr] || [];
+                                  const isChecked = selectedWaivers.has(d.dateStr);
+
+                                  return (
+                                    <td
+                                      key={d.dateStr}
+                                      className={`attendance-cell ${isChecked ? 'waived-cell' : ''}`}
+                                      onClick={() => handleToggleDay(d.dateStr)}
+                                      onMouseEnter={(e) => {
+                                        setHoveredDay(d.dateStr);
+                                        setTooltipPos({ x: e.clientX, y: e.clientY });
+                                      }}
+                                      onMouseLeave={() => setHoveredDay(null)}
+                                      title={`${d.fullLabel}: Click to toggle day waiver`}
+                                    >
+                                      {dayClasses.length === 0 ? (
+                                        <span className="no-class">-</span>
+                                      ) : (
+                                        <div className="cell-classes-stack">
+                                          {dayClasses.map((cls, cIdx) => (
+                                            <span
+                                              key={cIdx}
+                                              className={`class-badge ${cls.attended ? 'present' : 'absent'} ${cls.type}`}
+                                            >
+                                              {cls.attended ? 'P' : 'A'}
+                                              <sub className="type-sub">{cls.type.toUpperCase()}</sub>
+                                            </span>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </td>
+                                  );
+                                })}
+
+                                <td className="sticky-col-right stats-cell">
+                                  <span className="bold">{totalSimAtt}/{totalSimHeld}</span>
+                                  <span className="txt-muted block-size">({totalBaseAtt}/{totalBaseHeld})</span>
+                                </td>
+                                <td className={`sticky-col-right pct-cell bold ${overallPass ? 'text-green' : 'text-red'}`}>
+                                  <span>{overallSimPct.toFixed(1)}%</span>
+                                  <span className="txt-muted block-size font-normal">({overallBasePct.toFixed(1)}%)</span>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
                     </div>
-                    <div className="customizer-calendar-pane">
-                      {renderCalendarView()}
+                  </div>
+                )}
+
+                {/* Tab 2: Calendar View */}
+                {activeTab === 'calendar' && (
+                  <div className="calendar-simulation-view">
+                    <div className="calendar-month-tabs">
+                      {calendarMonths.map(m => (
+                        <button
+                          key={m.key}
+                          className={`month-tab-btn ${activeCalendarMonth === m.key ? 'active' : ''}`}
+                          onClick={() => setActiveCalendarMonth(m.key)}
+                        >
+                          {m.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="calendar-week-headers">
+                      <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                    </div>
+
+                    <div className="calendar-days-grid">
+                      {calendarBlocks.map(block => {
+                        if (block.type === 'empty') {
+                          return <div key={block.id} className="calendar-day-cell empty"></div>;
+                        }
+
+                        const isChecked = selectedWaivers.has(block.dateStr);
+                        const isRecommended = solverResult?.chosenDays?.some(cd => cd.dateStr === block.dateStr);
+
+                        let cellClass = 'calendar-day-cell';
+                        if (!block.hasClasses) {
+                          cellClass += ' inactive';
+                        } else {
+                          cellClass += ' active-day';
+                          if (isChecked) cellClass += ' waived';
+                          if (isRecommended) cellClass += ' recommended-cell';
+                        }
+
+                        return (
+                          <div
+                            key={block.id}
+                            className={cellClass}
+                            onClick={() => block.hasClasses && handleToggleDay(block.dateStr)}
+                            onMouseEnter={(e) => {
+                              if (block.hasClasses) {
+                                setHoveredDay(block.dateStr);
+                                setTooltipPos({ x: e.clientX, y: e.clientY });
+                              }
+                            }}
+                            onMouseLeave={() => setHoveredDay(null)}
+                          >
+                            <span className="day-number">{block.dayNum}</span>
+                            {block.hasClasses && (
+                              <div className="day-dot-indicators">
+                                {block.thTuAbs > 0 && (
+                                  <span className="abs-dot-count" title={`${block.thTuAbs} Theory/Tute absence(s)`}>
+                                    {block.thTuAbs}A
+                                  </span>
+                                )}
+                                {block.thTuPres > 0 && (
+                                  <span className="pres-dot-count" title={`${block.thTuPres} Theory/Tute present`}>
+                                    {block.thTuPres}P
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                            {isChecked && <span className="waived-cell-indicator">W</span>}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <div className="calendar-legend-row">
+                      <div className="legend-item"><span className="legend-dot red"></span>Absence</div>
+                      <div className="legend-item"><span className="legend-dot green"></span>Present</div>
+                      <div className="legend-item"><span className="legend-dot blue"></span>Waived (W)</div>
                     </div>
                   </div>
                 )}
 
-                {activeSelectorTab === 'list' && (
+                {/* Tab 3: Recommended List View */}
+                {activeTab === 'list' && (
                   <div className="recommended-list-view">
                     <div className="card-header-row pt-0">
                       <div className="title-block">
-                        <h3>Recommended Dates</h3>
+                        <h3>Recommended Waiver Dates</h3>
                         <p className="subtitle">
-                          {solverResult?.success ? (
-                            <span>Optimal combination clears target using <strong>{solverResult.waiversCount}</strong> waivers.</span>
+                          {solverResult?.status === 'OPTIMAL' ? (
+                            <span>Optimal combination clears target using <strong>{solverResult.chosenDays.length}</strong> waivers.</span>
                           ) : (
-                            <span className="text-orange">Max waivers used. Closest best solution shown.</span>
+                            <span className="text-orange">Maximum waivers reached. Best available plan shown.</span>
                           )}
                         </p>
                       </div>
                     </div>
 
-                    <div className="dates-selector-list">
-                      {parsedData.candidates
-                        .sort((a, b) => b.totalAbsences - a.totalAbsences)
-                        .map((cand, idx) => {
-                          const isChecked = selectedWaivers.has(cand.dateStr);
-                          const isRecommended = recommendedWaivers.includes(cand.dateStr);
-                          
+                    <div className="recommended-cards-column">
+                      {solverResult?.chosenDays?.length === 0 ? (
+                        <div className="empty-waivers-notice">
+                          <p>All target subjects are already passing at &gt;{threshold}%! No waivers needed.</p>
+                        </div>
+                      ) : (
+                        solverResult?.chosenDays?.map(d => {
+                          const isChecked = selectedWaivers.has(d.dateStr);
+                          const diff = calculateDayImpactDiff(d.dateStr, parsedData, selectedWaivers, threshold);
+
                           return (
-                            <div 
-                              key={idx} 
-                              className={`date-selection-item ${isChecked ? 'active' : ''} ${isRecommended ? 'recommended-border' : ''}`}
-                              onClick={() => handleCheckboxChange(cand.dateStr)}
+                            <div
+                              key={d.dateStr}
+                              className={`recommended-day-card ${isChecked ? 'active' : ''}`}
+                              onClick={() => handleToggleDay(d.dateStr)}
                             >
-                              <div className="checkbox-glow-wrapper">
-                                <input 
-                                  type="checkbox" 
-                                  checked={isChecked}
-                                  onChange={() => {}} 
-                                  id={`date-chk-${idx}`}
-                                />
-                                <label htmlFor={`date-chk-${idx}`} onClick={(e) => e.stopPropagation()}></label>
+                              <div className="rec-card-top">
+                                <div className="rec-card-date-group">
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={() => {}}
+                                    id={`chk-${d.dateStr}`}
+                                  />
+                                  <label htmlFor={`chk-${d.dateStr}`} onClick={(e) => e.stopPropagation()}></label>
+                                  <strong className="rec-date-text">{d.fullLabel}</strong>
+                                </div>
+
+                                <div className="rec-card-badges">
+                                  <span className="badge-absences-removed">
+                                    -{d.thOrTuAbsences} Absences
+                                  </span>
+                                  {d.totalPresents > 0 && (
+                                    <span className="badge-presents-removed">
+                                      -{d.totalPresents} Presents
+                                    </span>
+                                  )}
+                                </div>
                               </div>
-                              <div className="date-info">
-                                <span className="date-label">{cand.label}</span>
-                                <span className="date-sub">Absences: <strong>{cand.totalAbsences}</strong> | Presents: <strong>{cand.totalPresents}</strong></span>
+
+                              {/* Diff description */}
+                              <div className="rec-card-diffs-list">
+                                {diff.partDiffs.map(pd => (
+                                  <div key={pd.label} className={`rec-diff-row ${pd.dropped ? 'dropped-part' : ''}`}>
+                                    <span className="diff-part-name">{pd.label}:</span>
+                                    <span className="diff-pct-shift">
+                                      {pd.beforePct.toFixed(1)}% → <strong>{pd.afterPct.toFixed(1)}%</strong>
+                                      <span className={`diff-delta ${pd.delta >= 0 ? 'text-green' : 'text-red'}`}>
+                                        ({pd.delta >= 0 ? '+' : ''}{pd.delta.toFixed(1)}%)
+                                      </span>
+                                    </span>
+                                  </div>
+                                ))}
                               </div>
-                              {isRecommended && <span className="recommended-tag">Rec</span>}
                             </div>
                           );
-                        })}
+                        })
+                      )}
                     </div>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Right Pane: Subjects Overview & Attendance Cards */}
+            {/* Right Pane: Subject Monitor */}
             <div className="workspace-right-pane">
               <div className="results-card-glass subjects-summary-card">
                 <div className="card-header-row">
                   <div className="title-block">
-                    <h3>Subjects Overview</h3>
+                    <h3>Subject Monitor</h3>
                     <p className="subtitle">Real-time attendance simulator across Theory, Tutorial & Practical</p>
                   </div>
                   <div className="summary-header-right-cluster">
-                    <div className={`status-pill ${allSafe ? 'safe' : 'alert'}`}>
-                      {allSafe ? "ALL SAFE (≥85%)" : "SHORTAGE DETECTED"}
+                    <div className={`status-pill ${simulatedStats?.isOptimal ? 'safe' : 'alert'}`}>
+                      {simulatedStats?.isOptimal ? 'ALL SAFE (>85%)' : 'SHORTAGE DETECTED'}
                     </div>
                   </div>
                 </div>
 
-                {renderSubjectsCards()}
+                {renderSubjectMonitor()}
 
-                <div className="subjects-note-container">
-                  <p>📌 <strong>1/3rd Waiver Policy Enforced:</strong> Waivers are capped at <strong>1/3rd (33.3%)</strong> of total baseline held classes per subject component (e.g. 12 held = max 4 waivers). Excess waivers beyond the cap are ignored by college rules and will not reduce held count further. Practical (`PR`) classes are info only.</p>
+                {/* Required Legal Disclaimers (Section 7.5) */}
+                <div className="subjects-disclaimers-box">
+                  <p>📌 <strong>A waiver removes every class that day,</strong> including the ones you attended.</p>
+                  <p>⏳ <strong>Waivers are applied at the end of the semester,</strong> so your portal won't show them yet.</p>
+                  <p>⚖️ <strong>Estimates based on your file.</strong> The college's final records decide.</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
       )}
+
+      {/* Floating Hover Impact Preview Tooltip (Section 7.1) */}
+      {hoveredDay && dayImpactTooltip && (
+        <div
+          className="day-impact-popover"
+          style={{
+            position: 'fixed',
+            left: `${Math.min(window.innerWidth - 320, Math.max(10, tooltipPos.x + 15))}px`,
+            top: `${Math.min(window.innerHeight - 250, Math.max(10, tooltipPos.y + 15))}px`,
+            zIndex: 9999
+          }}
+        >
+          <div className="popover-header">
+            <strong>{dayImpactTooltip.isCurrentlyWaived ? 'Unwaiving' : 'Waiving'} {hoveredDay}</strong>
+          </div>
+          <div className="popover-removals">
+            <span>Removes: <strong>{dayImpactTooltip.thTuAbsencesRemoved}</strong> absences, <strong>{dayImpactTooltip.thTuPresentsRemoved}</strong> presents</span>
+            {dayImpactTooltip.practicalAbsencesRemoved + dayImpactTooltip.practicalPresentsRemoved > 0 && (
+              <span className="popover-sub-text">
+                +{dayImpactTooltip.practicalAbsencesRemoved + dayImpactTooltip.practicalPresentsRemoved} practical classes (info only)
+              </span>
+            )}
+          </div>
+          <div className="popover-diffs-list">
+            {dayImpactTooltip.partDiffs.length === 0 ? (
+              <span className="text-muted">No attendance changes for target components.</span>
+            ) : (
+              dayImpactTooltip.partDiffs.map(pd => (
+                <div key={pd.label} className={`popover-diff-item ${pd.dropped ? 'dropped' : ''}`}>
+                  <span className="part-short-label">{pd.label}</span>
+                  <span className="part-shift-vals">
+                    {pd.beforePct.toFixed(1)}% → <strong>{pd.afterPct.toFixed(1)}%</strong>
+                    <span className={pd.delta >= 0 ? 'text-green' : 'text-red'}>
+                      ({pd.delta >= 0 ? '+' : ''}{pd.delta.toFixed(1)}%)
+                    </span>
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
       <FooterCredit />
     </div>
   );

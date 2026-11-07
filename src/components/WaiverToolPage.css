@@ -2418,3 +2418,440 @@
 
 
 
+
+
+/* ==========================================================================
+   WAIVER TOOL MASTER REDESIGN STYLES
+   ========================================================================== */
+
+/* PC Recommended Banner */
+.pc-experience-banner {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  color: var(--ink-dim);
+  font-size: 0.82rem;
+  padding: 0.45rem 1.5rem;
+  text-align: center;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.pc-experience-banner strong {
+  color: var(--ink);
+  font-weight: 650;
+}
+
+/* Copy Dates Button in Toolbar */
+.btn-toolbar-copy {
+  background: var(--surface);
+  border: 1.5px solid var(--border-strong);
+  border-radius: 8px;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 650;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-toolbar-copy:hover:not(:disabled) {
+  background: var(--bg);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-toolbar-copy:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.k-plus-one-pill {
+  border-left: 2px solid var(--amber) !important;
+  background: rgba(245, 158, 11, 0.08) !important;
+}
+
+.header-weekday-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.date-header-cell.waived .header-weekday-label {
+  color: #93c5fd;
+}
+
+/* Subject Monitor V2 */
+.subjects-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.subject-card-v2 {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.95rem 1.15rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  transition: border-color 0.2s ease;
+}
+
+.subject-card-v2:hover {
+  border-color: var(--border-strong);
+}
+
+.subject-card-header-v2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.subject-card-title-v2 {
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+.subject-card-roll-v2 {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--ink-dim);
+}
+
+.subject-card-body-v2 {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.part-monitor-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.part-monitor-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+}
+
+.part-label-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.part-type-name {
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.badge-info-only {
+  background: var(--tint, #f1f5f9);
+  border: 1px solid var(--border, #cbd5e1);
+  color: var(--ink-dim, #64748b);
+  font-size: 0.65rem;
+  padding: 0.08rem 0.35rem;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-passing {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: var(--success, #10b981);
+  font-size: 0.65rem;
+  padding: 0.08rem 0.35rem;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.part-metrics-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.part-fraction {
+  color: var(--ink-dim);
+  font-size: 0.78rem;
+  font-weight: 550;
+}
+
+.part-pct {
+  font-weight: 750;
+  font-size: 0.85rem;
+}
+
+.part-progress-track {
+  height: 6px;
+  width: 100%;
+  background: var(--track, rgba(36, 26, 20, 0.08));
+  border-radius: 3px;
+  overflow: visible;
+  position: relative;
+}
+
+.part-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.threshold-marker-line {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  background: var(--ink);
+  opacity: 0.8;
+  z-index: 2;
+}
+
+.threshold-marker-line::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 6px;
+  height: 2px;
+  background: var(--ink);
+  border-radius: 1px;
+}
+
+.part-advice-caption {
+  font-size: 0.74rem;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.text-green-dim {
+  color: #059669;
+}
+
+.text-orange-dim {
+  color: #d97706;
+}
+
+.text-red-dim {
+  color: #dc2626;
+}
+
+/* Legal Disclaimers Box (Section 7.5) */
+.subjects-disclaimers-box {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  background: var(--tint, #f8fafc);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.subjects-disclaimers-box p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--ink-dim);
+  line-height: 1.4;
+}
+
+.subjects-disclaimers-box strong {
+  color: var(--ink);
+  font-weight: 650;
+}
+
+/* Recommended Cards Column */
+.recommended-cards-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.recommended-day-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.recommended-day-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.recommended-day-card.active {
+  background: rgba(99, 102, 241, 0.03);
+  border-color: var(--accent);
+}
+
+.rec-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rec-card-date-group {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.rec-date-text {
+  font-size: 0.92rem;
+  color: var(--ink);
+}
+
+.rec-card-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.badge-absences-removed {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: var(--danger, #ef4444);
+  font-size: 0.72rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.badge-presents-removed {
+  background: rgba(100, 116, 139, 0.1);
+  border: 1px solid rgba(100, 116, 139, 0.25);
+  color: var(--ink-dim);
+  font-size: 0.72rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.rec-card-diffs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-top: 0.35rem;
+  border-top: 1px dashed var(--border);
+}
+
+.rec-diff-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--ink-dim);
+}
+
+.rec-diff-row.dropped-part {
+  background: rgba(239, 68, 68, 0.06);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.diff-part-name {
+  font-weight: 550;
+  color: var(--ink);
+}
+
+.diff-pct-shift strong {
+  color: var(--ink);
+}
+
+/* Floating Day Impact Popover (Section 7.1) */
+.day-impact-popover {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  padding: 0.75rem 0.95rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+  font-family: inherit;
+  min-width: 260px;
+  max-width: 320px;
+}
+
+.popover-header {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink);
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.popover-removals {
+  font-size: 0.74rem;
+  color: var(--ink-dim);
+  padding: 0.35rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.popover-removals strong {
+  color: var(--ink);
+}
+
+.popover-sub-text {
+  font-size: 0.68rem;
+  color: var(--ink-faint);
+}
+
+.popover-diffs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.3rem;
+  padding-top: 0.3rem;
+  border-top: 1px dashed var(--border);
+}
+
+.popover-diff-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.73rem;
+  color: var(--ink-dim);
+}
+
+.popover-diff-item.dropped {
+  background: rgba(239, 68, 68, 0.08);
+  padding: 2px 4px;
+  border-radius: 4px;
+  color: var(--danger);
+}
+
+.part-short-label {
+  font-weight: 550;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.part-shift-vals {
+  font-weight: 600;
+}
