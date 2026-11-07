@@ -383,9 +383,20 @@ export default function WaiverToolPage({ onBack }) {
     setSelectedWaivers(next);
   };
 
+  // Reset to recommended waivers with automatic re-solve safeguard if parameters changed
   const handleResetRecommended = () => {
-    if (solverResult?.chosenDays) {
+    if (!parsedData) return;
+    if (solverResult?.chosenDays && !hasParamsChanged) {
       setSelectedWaivers(new Set(solverResult.chosenDays.map(d => d.dateStr)));
+    } else {
+      setIsProcessing(true);
+      executeSolverAsync(parsedData, threshold, maxWaivers, (solution) => {
+        if (solution?.chosenDays && solution.chosenDays.length > 0) {
+          setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+        } else {
+          setSelectedWaivers(new Set());
+        }
+      });
     }
   };
 
@@ -459,12 +470,13 @@ export default function WaiverToolPage({ onBack }) {
     });
   };
 
+  // Strict binary status: Green if passing (> target), Red if not. No amber in bars!
   const getPartStatus = (part) => {
     const held = part.simN === undefined ? part.n : part.simN;
     if (!held) return 'none';
     if (part.type === 'pr') return 'info';
-    const buff = calculatePartBufferAndNeeded(part.simAttended ?? part.simP, part.simHeld ?? part.simN, threshold);
-    return buff.passes ? (buff.missableBuffer <= 1 ? 'tight' : 'safe') : 'fail';
+    const passes = (100 * (part.simAttended ?? part.simP)) > (threshold * (part.simHeld ?? part.simN));
+    return passes ? 'safe' : 'fail';
   };
 
   const subjectSummaries = simStats?.subjectSummaries || simStats?.subjectsStats || [];
@@ -537,8 +549,6 @@ export default function WaiverToolPage({ onBack }) {
         const statuses = parts.map(getPartStatus);
         const pill = statuses.includes('fail')
           ? ['Shortage', 'fail']
-          : statuses.includes('tight')
-          ? ['Clear, tight', 'tight']
           : ['Clear', 'safe'];
 
         return (
@@ -571,6 +581,7 @@ export default function WaiverToolPage({ onBack }) {
     onMouseLeave: () => setHoveredDate(null)
   });
 
+  // Render Grid Table with Frozen Theory and Tutorial Columns (Option A)
   const renderGridTable = (columns, isExpanded) => {
     const monthGroups = [];
     columns.forEach(col => {
@@ -597,8 +608,12 @@ export default function WaiverToolPage({ onBack }) {
                 {mg.label}
               </th>
             ))}
-            {isExpanded && <th className="rd-tot-h" rowSpan={2}>Classes</th>}
-            {isExpanded && <th className="rd-tot-h" rowSpan={2}>Attendance</th>}
+            {isExpanded && (
+              <th className="rd-frozen-h rd-frozen-th-h" rowSpan={2}>Theory</th>
+            )}
+            {isExpanded && (
+              <th className="rd-frozen-h rd-frozen-tu-h" rowSpan={2}>Tutorial</th>
+            )}
           </tr>
           <tr>
             {columns.map(col => {
@@ -624,13 +639,19 @@ export default function WaiverToolPage({ onBack }) {
         <tbody>
           {subjectSummaries.map((sub, sIdx) => {
             const rawSub = parsedData.subjects?.[sIdx];
-            const nonPrParts = (sub.partsList || Object.values(sub.parts || {})).filter(
-              p => p.type !== 'pr' && (p.simN ?? p.n) > 0
-            );
-            const simAtt = nonPrParts.reduce((acc, cur) => acc + (cur.simP ?? 0), 0);
-            const simHeld = nonPrParts.reduce((acc, cur) => acc + (cur.simN ?? 0), 0);
-            const pct = simHeld > 0 ? (simAtt / simHeld) * 100 : 100;
-            const passes = nonPrParts.every(p => p.passes);
+            const thPart = sub.parts?.th || (sub.partsList || []).find(p => p.type === 'th');
+            const tuPart = sub.parts?.tu || (sub.partsList || []).find(p => p.type === 'tu');
+
+            const thHeld = thPart ? (thPart.simN ?? thPart.n ?? 0) : 0;
+            const thAtt = thPart ? (thPart.simP ?? thPart.simAttended ?? 0) : 0;
+            const thPct = thHeld > 0 ? (thAtt / thHeld) * 100 : 100;
+            const thPasses = thHeld > 0 ? (100 * thAtt > threshold * thHeld) : true;
+
+            const tuHeld = tuPart ? (tuPart.simN ?? tuPart.n ?? 0) : 0;
+            const tuAtt = tuPart ? (tuPart.simP ?? tuPart.simAttended ?? 0) : 0;
+            const tuPct = tuHeld > 0 ? (tuAtt / tuHeld) * 100 : 100;
+            const tuPasses = tuHeld > 0 ? (100 * tuAtt > threshold * tuHeld) : true;
+            const hasTutorial = tuPart && (tuPart.baseHeld > 0 || (tuPart.p + tuPart.a) > 0);
 
             return (
               <tr key={sIdx}>
@@ -666,13 +687,31 @@ export default function WaiverToolPage({ onBack }) {
                   );
                 })}
                 {isExpanded && (
-                  <td className="rd-tot">
-                    {simAtt}/{simHeld}
+                  <td className="rd-frozen-col rd-frozen-th">
+                    {thHeld === 0 ? (
+                      <span className="rd-frozen-dash">—</span>
+                    ) : (
+                      <div className="rd-frozen-cell">
+                        <span className="rd-frozen-frac">{thAtt}/{thHeld}</span>
+                        <span className={`rd-frozen-pct ${thPasses ? 'ok' : 'bad'}`}>
+                          {thPct.toFixed(1)}%
+                        </span>
+                      </div>
+                    )}
                   </td>
                 )}
                 {isExpanded && (
-                  <td className={`rd-tot rd-tot-pct ${passes ? 'ok' : 'bad'}`}>
-                    {pct.toFixed(1)}%
+                  <td className="rd-frozen-col rd-frozen-tu">
+                    {!hasTutorial || tuHeld === 0 ? (
+                      <span className="rd-frozen-dash">—</span>
+                    ) : (
+                      <div className="rd-frozen-cell">
+                        <span className="rd-frozen-frac">{tuAtt}/{tuHeld}</span>
+                        <span className={`rd-frozen-pct ${tuPasses ? 'ok' : 'bad'}`}>
+                          {tuPct.toFixed(1)}%
+                        </span>
+                      </div>
+                    )}
                   </td>
                 )}
               </tr>
@@ -825,8 +864,7 @@ export default function WaiverToolPage({ onBack }) {
               <div className="rd-sec-head">
                 <h2>Subject health</h2>
                 <div className="rd-legend">
-                  <span><i className="f-safe" />On track</span>
-                  <span><i className="f-tight" />Close to the line</span>
+                  <span><i className="f-safe" />{threshold}% or above</span>
                   <span><i className="f-fail" />Below {threshold}%</span>
                   <span><i className="tick" />{threshold}% target</span>
                 </div>
@@ -1084,7 +1122,7 @@ export default function WaiverToolPage({ onBack }) {
                 <span><span className="rd-chip a">A<small>Th</small></span> Absent</span>
                 <span className="rd-key"><i /> Waived day (its classes are removed)</span>
               </div>
-              <span>Attendance column counts theory and tute only</span>
+              <span>Frozen Theory & Tutorial columns show real-time percentage shifts</span>
             </div>
           </section>
         </div>
