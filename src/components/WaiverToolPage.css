@@ -262,14 +262,20 @@
 }
 
 /* 3-Tier Colors: Red < 66.7%, Yellow 66.7% to < 85%, Green >= 85% */
+.f-safe,
+.rd-legend i.f-safe,
 .rd-fill.f-safe {
   background: var(--green, #0b7a54) !important;
 }
 
+.f-warn,
+.rd-legend i.f-warn,
 .rd-fill.f-warn {
-  background: var(--amber, #d97706) !important;
+  background: var(--amberfill, #d97706) !important;
 }
 
+.f-fail,
+.rd-legend i.f-fail,
 .rd-fill.f-fail {
   background: var(--red, #b91c1c) !important;
 }
