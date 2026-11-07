@@ -244,11 +244,15 @@
 }
 
 .rd-frozen-pct.ok {
-  color: var(--green);
+  color: var(--green, #0b7a54);
+}
+
+.rd-frozen-pct.warn {
+  color: var(--amber, #d97706);
 }
 
 .rd-frozen-pct.bad {
-  color: var(--red);
+  color: var(--red, #b91c1c);
 }
 
 .rd-frozen-dash {
@@ -257,9 +261,13 @@
   font-size: 14px;
 }
 
-/* Strict Binary Bar Colors: Green for >= target, Red for < target */
+/* 3-Tier Colors: Red < 66.7%, Yellow 66.7% to < 85%, Green >= 85% */
 .rd-fill.f-safe {
   background: var(--green, #0b7a54) !important;
+}
+
+.rd-fill.f-warn {
+  background: var(--amber, #d97706) !important;
 }
 
 .rd-fill.f-fail {
@@ -270,6 +278,80 @@
   color: var(--green, #0b7a54) !important;
 }
 
+.rd-pct.s-warn {
+  color: var(--amber, #d97706) !important;
+}
+
 .rd-pct.s-fail {
   color: var(--red, #b91c1c) !important;
+}
+
+.p-safe {
+  color: var(--green, #0b7a54) !important;
+  background: var(--gtint, #dcf2e3) !important;
+}
+
+.p-warn {
+  color: var(--amber, #b45309) !important;
+  background: var(--atint, #fdeccf) !important;
+}
+
+.p-fail {
+  color: var(--red, #b91c1c) !important;
+  background: var(--rtint, #fbe1e1) !important;
+}
+
+/* Shortage Insight Action Banner */
+.rd-shortage-callout {
+  background: #fdfaf3;
+  border: 1.5px solid #f2dbb3;
+  border-left: 4px solid var(--amber, #d97706);
+  border-radius: 12px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.rd-shortage-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rd-shortage-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ink, #1e1a17);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rd-shortage-desc {
+  font-size: 12.5px;
+  color: var(--muted, #5f5852);
+  line-height: 1.4;
+}
+
+.rd-shortage-btn {
+  background: var(--maroon, #7a1c28);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 6px rgba(122, 28, 40, 0.2);
+}
+
+.rd-shortage-btn:hover {
+  background: #5e141e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(122, 28, 40, 0.3);
 }

@@ -470,13 +470,19 @@ export default function WaiverToolPage({ onBack }) {
     });
   };
 
-  // Strict binary status: Green if passing (> target), Red if not. No amber in bars!
+  // 3-Tier Status:
+  // Red ('fail'): < 66.7% (Debarment Risk)
+  // Yellow ('warn'): 66.7% to < target (Below Target)
+  // Green ('safe'): >= target (Target Cleared)
   const getPartStatus = (part) => {
     const held = part.simN === undefined ? part.n : part.simN;
     if (!held) return 'none';
     if (part.type === 'pr') return 'info';
-    const passes = (100 * (part.simAttended ?? part.simP)) > (threshold * (part.simHeld ?? part.simN));
-    return passes ? 'safe' : 'fail';
+    const att = part.simAttended ?? part.simP ?? 0;
+    const currentPct = Number.isFinite(part.simPct) ? part.simPct : (held > 0 ? (att / held) * 100 : 100);
+    if (currentPct < 66.666) return 'fail';
+    const passes = (100 * att) > (threshold * held);
+    return passes ? 'safe' : 'warn';
   };
 
   const subjectSummaries = simStats?.subjectSummaries || simStats?.subjectsStats || [];
@@ -530,10 +536,12 @@ export default function WaiverToolPage({ onBack }) {
         <div className="rd-caption">
           {status === 'info' ? (
             `Not counted toward the ${threshold}% target`
+          ) : status === 'fail' ? (
+            <>⚠️ <strong style={{ color: 'var(--red, #b91c1c)' }}>Debarment Risk:</strong> Below 66.7% minimum. Attend <strong>{buff.classesNeededForDebarSafe || 1}</strong> class(es) to avoid debarment.</>
           ) : buff.passes ? (
             <>Can miss <strong>{buff.missableBuffer}</strong> more and stay above {threshold}%</>
           ) : (
-            <>Attend <strong>{buff.classesNeeded}</strong> in a row to reach {threshold}%</>
+            <>Safe from debarment. Attend <strong>{buff.classesNeeded}</strong> in a row to reach {threshold}%</>
           )}
         </div>
       </div>
@@ -547,9 +555,12 @@ export default function WaiverToolPage({ onBack }) {
           (a, b) => partOrder[a.type] - partOrder[b.type]
         );
         const statuses = parts.map(getPartStatus);
-        const pill = statuses.includes('fail')
-          ? ['Shortage', 'fail']
-          : ['Clear', 'safe'];
+        let pill = ['Clear', 'safe'];
+        if (statuses.includes('fail')) {
+          pill = ['Debarment Risk', 'fail'];
+        } else if (statuses.includes('warn')) {
+          pill = ['Below Target', 'warn'];
+        }
 
         return (
           <article key={sIdx} className="rd-card">
@@ -693,7 +704,7 @@ export default function WaiverToolPage({ onBack }) {
                     ) : (
                       <div className="rd-frozen-cell">
                         <span className="rd-frozen-frac">{thAtt}/{thHeld}</span>
-                        <span className={`rd-frozen-pct ${thPasses ? 'ok' : 'bad'}`}>
+                        <span className={`rd-frozen-pct ${thHeld === 0 ? 'none' : (thPct < 66.666 ? 'bad' : (thPasses ? 'ok' : 'warn'))}`}>
                           {thPct.toFixed(1)}%
                         </span>
                       </div>
@@ -707,7 +718,7 @@ export default function WaiverToolPage({ onBack }) {
                     ) : (
                       <div className="rd-frozen-cell">
                         <span className="rd-frozen-frac">{tuAtt}/{tuHeld}</span>
-                        <span className={`rd-frozen-pct ${tuPasses ? 'ok' : 'bad'}`}>
+                        <span className={`rd-frozen-pct ${tuHeld === 0 ? 'none' : (tuPct < 66.666 ? 'bad' : (tuPasses ? 'ok' : 'warn'))}`}>
                           {tuPct.toFixed(1)}%
                         </span>
                       </div>
@@ -832,7 +843,7 @@ export default function WaiverToolPage({ onBack }) {
             </div>
 
             {/* Status Banner */}
-            <div className={`rd-status ${simStats?.allPassing ? 'ok' : 'bad'}`}>
+            <div className={`rd-status ${simStats?.allPassing ? 'ok' : ((simStats?.debarSafeTargetCount ?? 0) < totalTargetParts ? 'bad' : 'warn')}`}>
               {simStats?.allPassing ? (
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <circle cx="12" cy="12" r="10" />
@@ -857,6 +868,37 @@ export default function WaiverToolPage({ onBack }) {
             </div>
           </div>
 
+          
+          {/* Shortage Insight Callout Banner with 1-Click Action */}
+          {solverResult?.status === 'SHORTAGE' && solverResult?.neededWaiversForAllPass && (
+            <div className="rd-shortage-callout">
+              <div className="rd-shortage-content">
+                <span className="rd-shortage-title">
+                  💡 Need {solverResult.shortfall} more waiver{solverResult.shortfall === 1 ? '' : 's'} ({solverResult.neededWaiversForAllPass} total) to clear all subjects to {threshold}%!
+                </span>
+                <span className="rd-shortage-desc">
+                  Currently {passingTargetCount} of {totalTargetParts} parts meet {threshold}%. Remaining waivers were waterfilled to maximize marks and prevent debarment.
+                </span>
+              </div>
+              <button
+                type="button"
+                className="rd-shortage-btn"
+                onClick={() => {
+                  const newLimit = solverResult.neededWaiversForAllPass;
+                  setMaxWaivers(newLimit);
+                  setIsProcessing(true);
+                  executeSolverAsync(parsedData, threshold, newLimit, (newSol) => {
+                    if (newSol?.chosenDays?.length > 0) {
+                      setSelectedWaivers(new Set(newSol.chosenDays.map(d => d.dateStr)));
+                    }
+                  });
+                }}
+              >
+                Increase to {solverResult.neededWaiversForAllPass} & Apply
+              </button>
+            </div>
+          )}
+
           {/* 2-Column Layout */}
           <div className="rd-columns">
             {/* Left: Subject Health */}
@@ -864,8 +906,9 @@ export default function WaiverToolPage({ onBack }) {
               <div className="rd-sec-head">
                 <h2>Subject health</h2>
                 <div className="rd-legend">
-                  <span><i className="f-safe" />{threshold}% or above</span>
-                  <span><i className="f-fail" />Below {threshold}%</span>
+                  <span><i className="f-safe" />{threshold}% or above (Target)</span>
+                  <span><i className="f-warn" />66.7% – {threshold - 0.1}% (Below Target)</span>
+                  <span><i className="f-fail" />Below 66.7% (Debarment Risk)</span>
                   <span><i className="tick" />{threshold}% target</span>
                 </div>
               </div>

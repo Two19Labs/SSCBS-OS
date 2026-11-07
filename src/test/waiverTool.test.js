@@ -74,7 +74,9 @@ if (fs.existsSync(samplePath)) {
   const solK2 = solveExactBnb(parsed, 85, 2);
   assert.strictEqual(solK2.status, 'SHORTAGE', 'K=2 must be SHORTAGE');
   assert.strictEqual(solK2.passCount, 7, '7 of 8 parts pass at K=2');
-  console.log('✓ K=2 shortage check passed.');
+  assert.strictEqual(solK2.neededWaiversForAllPass, 3, 'Must identify 3 total waivers needed for allPass');
+  assert.strictEqual(solK2.shortfall, 1, 'Shortfall must be exactly 1 waiver');
+  console.log('✓ K=2 shortage check passed with exact K+N shortfall calculation (needed: 3, shortfall: 1).');
 } else {
   console.warn('Sample benchmark file not found at:', samplePath);
 }

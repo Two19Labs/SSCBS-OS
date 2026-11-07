@@ -1,7 +1,26 @@
 /**
  * SSCBS OS - Waiver Tool Solver
- * Exact integer math and branch-and-bound solver implementing Sections 3, 5, and 6.
+ * Exact integer math, DU stepped tiers, and branch-and-bound solver implementing Sections 3, 5, and 6.
  */
+
+export const DU_MIN_PERCENT = 66.666; // DU ordinance minimum 66.67% to prevent debarment
+export const DU_TIERS = [
+  { min: 85.0, label: 'Full Marks / Target', tier: 5, weight: 100000 },
+  { min: 80.0, label: '4 Marks', tier: 4, weight: 20000 },
+  { min: 75.0, label: '3 Marks', tier: 3, weight: 8000 },
+  { min: 70.0, label: '2 Marks', tier: 2, weight: 3000 },
+  { min: 66.666, label: '1 Mark / Debar Safe', tier: 1, weight: 1000 },
+  { min: 0.0, label: '0 Marks / Debar Risk', tier: 0, weight: 0 }
+];
+
+export function getDUTier(pct) {
+  if (pct >= 85.0) return 5;
+  if (pct >= 80.0) return 4;
+  if (pct >= 75.0) return 3;
+  if (pct >= 70.0) return 2;
+  if (pct >= 66.666) return 1;
+  return 0;
+}
 
 /**
  * Strict passing rule: strictly over T (Section 3).
@@ -15,15 +34,25 @@ export function isPartPassing(p, n, T) {
 }
 
 /**
+ * Check if part satisfies DU 66.67% minimum debarment floor
+ */
+export function isDebarSafe(p, n) {
+  if (n <= 0) return true;
+  return (100 * p) / n >= 66.666;
+}
+
+/**
  * Per-part numbers using whole-number math (Section 6.4)
  */
 export function calculatePartBufferAndNeeded(p, n, T) {
   if (n <= 0) {
-    return { missableBuffer: 0, classesNeeded: 0, pct: 100, passes: true };
+    return { missableBuffer: 0, classesNeeded: 0, pct: 100, passes: true, debarSafe: true, tier: 5 };
   }
 
   const passes = 100 * p > T * n;
   const pct = (100 * p) / n;
+  const debarSafe = pct >= 66.666;
+  const tier = getDUTier(pct);
 
   // Classes they can still miss and stay passing: ceil((100p - T*n) / T) - 1
   let missableBuffer = 0;
@@ -37,11 +66,22 @@ export function calculatePartBufferAndNeeded(p, n, T) {
     classesNeeded = Math.max(0, Math.floor((T * n - 100 * p) / (100 - T)) + 1);
   }
 
+  // Classes needed to reach DU 66.67% debar safe line if currently failing
+  let classesNeededForDebarSafe = 0;
+  if (!debarSafe) {
+    // 100 * (p + x) / (n + x) >= 66.667 => 100p + 100x >= 66.667n + 66.667x
+    // 33.333x >= 66.667n - 100p => x >= (2n - 3p)
+    classesNeededForDebarSafe = Math.max(0, Math.ceil(2 * n - 3 * p));
+  }
+
   return {
     missableBuffer,
     classesNeeded,
+    classesNeededForDebarSafe,
     pct,
-    passes
+    passes,
+    debarSafe,
+    tier
   };
 }
 
@@ -228,6 +268,8 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
 
   const evaluateState = (chosenIndices) => {
     let passCount = 0;
+    let debarSafeCount = 0;
+    let tierScore = 0;
     let minPct = 100;
     const finalStats = [];
 
@@ -249,11 +291,29 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
         pct = (100 * simP) / simN;
         if (pct < minPct) minPct = pct;
       }
+      if (pct >= 66.666) debarSafeCount++;
+
+      if (pass) {
+        tierScore += 100000 + pct;
+      } else if (pct >= 80) {
+        tierScore += 20000 + pct;
+      } else if (pct >= 75) {
+        tierScore += 8000 + pct;
+      } else if (pct >= 70) {
+        tierScore += 3000 + pct;
+      } else if (pct >= 66.666) {
+        tierScore += 1000 + pct;
+      } else {
+        tierScore += pct;
+      }
+
       finalStats.push({ label: targetParts[c].label, p: simP, n: simN, pct, pass });
     }
 
     return {
       passCount,
+      debarSafeCount,
+      tierScore,
       total: numParts,
       allPass: passCount === numParts,
       minPct,
@@ -265,6 +325,8 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
   let best = {
     chosen: [],
     passCount: baseEval.passCount,
+    debarSafeCount: baseEval.debarSafeCount,
+    tierScore: baseEval.tierScore,
     size: 0,
     minPct: baseEval.minPct,
     allPass: baseEval.allPass
@@ -277,21 +339,15 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
   function dfs(orderIdx, targetSize) {
     if (currentChosen.length === targetSize) {
       let passCount = 0;
+      let debarSafeCount = 0;
+      let tierScore = 0;
       let minPct = 100;
 
       for (let c = 0; c < numParts; c++) {
         if (curN[c] === targetParts[c].n) {
           passCount++;
-        } else if (curW[c] >= rhs[c]) {
-          passCount++;
-          let waivedP = 0;
-          for (let k = 0; k < currentChosen.length; k++) {
-            waivedP += orderedCandidates[currentChosen[k]].pDeltas[c];
-          }
-          const simP = targetParts[c].p - waivedP;
-          const simN = targetParts[c].n - curN[c];
-          const pct = (100 * simP) / simN;
-          if (pct < minPct) minPct = pct;
+          debarSafeCount++;
+          tierScore += 100000 + 100;
         } else {
           let waivedP = 0;
           for (let k = 0; k < currentChosen.length; k++) {
@@ -301,6 +357,24 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
           const simN = targetParts[c].n - curN[c];
           const pct = (100 * simP) / simN;
           if (pct < minPct) minPct = pct;
+
+          const passes = (curW[c] >= rhs[c]) || (100 * simP > T * simN);
+          if (passes) passCount++;
+          if (pct >= 66.666) debarSafeCount++;
+
+          if (passes) {
+            tierScore += 100000 + pct;
+          } else if (pct >= 80) {
+            tierScore += 20000 + pct;
+          } else if (pct >= 75) {
+            tierScore += 8000 + pct;
+          } else if (pct >= 70) {
+            tierScore += 3000 + pct;
+          } else if (pct >= 66.666) {
+            tierScore += 1000 + pct;
+          } else {
+            tierScore += pct;
+          }
         }
       }
 
@@ -308,10 +382,29 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
       if (passCount > best.passCount) {
         isBetter = true;
       } else if (passCount === best.passCount) {
-        if (currentChosen.length < best.size) {
-          isBetter = true;
-        } else if (currentChosen.length === best.size && minPct > best.minPct + 1e-9) {
-          isBetter = true;
+        if (passCount === numParts) {
+          // All parts pass: strictly prefer fewer waivers
+          if (currentChosen.length < best.size) {
+            isBetter = true;
+          } else if (currentChosen.length === best.size && minPct > best.minPct + 1e-9) {
+            isBetter = true;
+          }
+        } else {
+          // Shortage mode: All parts cannot pass within budget.
+          // Priority 1: Avoid debarment! Maximize parts >= 66.7%
+          if (debarSafeCount > best.debarSafeCount) {
+            isBetter = true;
+          } else if (debarSafeCount === best.debarSafeCount) {
+            // Priority 2: Waterfill remaining waivers to climb DU mark slabs (80%, 75%, 70%)
+            if (tierScore > best.tierScore + 1e-4) {
+              isBetter = true;
+            } else if (Math.abs(tierScore - best.tierScore) <= 1e-4) {
+              // Priority 3: If tier score is tied, prefer fewer waivers
+              if (currentChosen.length < best.size) {
+                isBetter = true;
+              }
+            }
+          }
         }
       }
 
@@ -319,6 +412,8 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
         best = {
           chosen: [...currentChosen],
           passCount,
+          debarSafeCount,
+          tierScore,
           size: currentChosen.length,
           minPct,
           allPass: passCount === numParts
@@ -369,6 +464,23 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
     if (best.allPass) break;
   }
 
+  let neededWaiversForAllPass = null;
+  let shortfall = 0;
+
+  if (!best.allPass) {
+    const budgetBest = { ...best, chosen: [...best.chosen] };
+    const maxSearch = Math.min(numCandidates, K + 15);
+    for (let s = K + 1; s <= maxSearch; s++) {
+      dfs(0, s);
+      if (best.allPass) {
+        neededWaiversForAllPass = s;
+        shortfall = s - K;
+        break;
+      }
+    }
+    best = budgetBest;
+  }
+
   const endTime = (typeof performance !== 'undefined' ? performance.now() : Date.now());
   const evalPlan = evaluateState(best.chosen);
   const chosenDays = best.chosen.map(idx => orderedCandidates[idx]);
@@ -381,8 +493,11 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12) {
     chosenDays,
     passCount: evalPlan.passCount,
     totalTargetParts: numParts,
+    debarSafeCount: evalPlan.debarSafeCount,
     lowestPartPct: evalPlan.minPct,
     lowestPart: evalPlan.finalStats.reduce((min, cur) => cur.pct < min.pct ? cur : min, evalPlan.finalStats[0])?.label,
+    neededWaiversForAllPass,
+    shortfall,
     evalPlan,
     durationMs: Math.round(endTime - startTime)
   };
@@ -403,6 +518,7 @@ export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPc
   const T = targetPct;
 
   let passingTargetCount = 0;
+  let debarSafeTargetCount = 0;
   let lowestPartPct = 100;
   let lowestPartLabel = null;
 
@@ -455,10 +571,23 @@ export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPc
 
       if (isTarget) {
         if (metrics.passes) passingTargetCount++;
+        if (metrics.debarSafe) debarSafeTargetCount++;
         if (simH > 0 && metrics.pct < lowestPartPct) {
           lowestPartPct = metrics.pct;
           lowestPartLabel = `${sub.name} ${t === 'th' ? 'theory' : 'tutorial'}`;
         }
+      }
+
+      // Three-tier color status:
+      // Red ('fail'): < 66.7% (Debarment Risk)
+      // Yellow ('warn'): 66.7% to < T (Below 85% Target)
+      // Green ('safe'): >= T (Target Cleared)
+      let status = 'none';
+      if (simH > 0) {
+        if (t === 'pr') status = 'info';
+        else if (metrics.pct < 66.666) status = 'fail';
+        else if (metrics.passes) status = 'safe';
+        else status = 'warn';
       }
 
       const partObj = {
@@ -478,8 +607,12 @@ export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPc
         pct: metrics.pct,
         simPct: metrics.pct,
         passes: metrics.passes,
+        debarSafe: metrics.debarSafe,
+        status,
+        tier: metrics.tier,
         missableBuffer: metrics.missableBuffer,
         classesNeeded: metrics.classesNeeded,
+        classesNeededForDebarSafe: metrics.classesNeededForDebarSafe,
         isTarget
       };
 
@@ -513,6 +646,7 @@ export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPc
     subjectSummaries: subjectsStats,
     passingTargetCount,
     passingCount: passingTargetCount,
+    debarSafeTargetCount,
     totalTargetParts,
     isOptimal,
     allPassing: isOptimal,
