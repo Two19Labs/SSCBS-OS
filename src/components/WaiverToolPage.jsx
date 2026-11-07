@@ -432,8 +432,10 @@ export default function WaiverToolPage({ onBack }) {
                   const isPractical = part.type === 'pr';
 
                   // Before and After percentages
-                  const beforePct = part.basePct !== undefined ? part.basePct : part.baselinePct;
-                  const afterPct = hasClasses ? (part.simPct !== undefined ? part.simPct : part.pct) : 100;
+                  const rawBefore = typeof part.basePct === 'number' ? part.basePct : (typeof part.baselinePct === 'number' ? part.baselinePct : 100);
+                  const beforePct = isNaN(rawBefore) ? 100 : rawBefore;
+                  const rawAfter = hasClasses ? (typeof part.simPct === 'number' ? part.simPct : (typeof part.pct === 'number' ? part.pct : 100)) : 100;
+                  const afterPct = isNaN(rawAfter) ? 100 : rawAfter;
 
                   // Advice caption
                   const advice = !isPractical && hasClasses
@@ -626,13 +628,13 @@ export default function WaiverToolPage({ onBack }) {
                     })}
 
                     <td className="sticky-col-stat">
-                      <span className="sim-stat-val">{sub.simAttended}/{sub.simHeld}</span>
-                      <span className="base-stat-val">({sub.baselineAttended}/{sub.baselineHeld})</span>
+                      <span className="sim-stat-val">{sub.simAttended ?? 0}/{sub.simHeld ?? 0}</span>
+                      <span className="base-stat-val">({sub.baselineAttended ?? 0}/{sub.baselineHeld ?? 0})</span>
                     </td>
 
-                    <td className={`sticky-col-pct ${sub.simPct >= threshold ? 'pass' : 'fail'}`}>
-                      <span className="sim-pct-val">{sub.simPct.toFixed(1)}%</span>
-                      <span className="base-pct-val">({sub.baselinePct.toFixed(1)}%)</span>
+                    <td className={`sticky-col-pct ${(sub.simPct ?? 0) >= threshold ? 'pass' : 'fail'}`}>
+                      <span className="sim-pct-val">{(typeof sub.simPct === 'number' && !isNaN(sub.simPct) ? sub.simPct : 100).toFixed(1)}%</span>
+                      <span className="base-pct-val">({(typeof sub.baselinePct === 'number' && !isNaN(sub.baselinePct) ? sub.baselinePct : 100).toFixed(1)}%)</span>
                     </td>
                   </tr>
                 );
