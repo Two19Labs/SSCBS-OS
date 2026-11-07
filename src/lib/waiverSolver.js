@@ -93,10 +93,14 @@ export function extractCandidateDays(parsedData, targetParts) {
 
     const pDeltas = new Int32Array(numParts);
     const nDeltas = new Int32Array(numParts);
+    const missedSubjectsSet = new Set();
 
     (parsedData.subjects || []).forEach(sub => {
       const classes = sub.dayClasses?.[d.dateStr] || [];
       classes.forEach(c => {
+        if (!c.attended) {
+          missedSubjectsSet.add(sub.name);
+        }
         if (c.type === 'th' || c.type === 'tu') {
           const tp = targetParts.find(p => p.subject === sub.name && p.type === c.type);
           if (tp) {
@@ -122,6 +126,8 @@ export function extractCandidateDays(parsedData, targetParts) {
         dateStr: d.dateStr,
         weekday: d.weekday,
         dayNum: d.dayNum,
+        month: d.month,
+        year: d.year,
         label: d.label,
         fullLabel: d.fullLabel,
         pDeltas,
@@ -130,7 +136,8 @@ export function extractCandidateDays(parsedData, targetParts) {
         totalAbsences,
         totalPresents,
         practicalAbsences,
-        practicalPresents
+        practicalPresents,
+        missedSubjects: Array.from(missedSubjectsSet)
       });
     }
   });
