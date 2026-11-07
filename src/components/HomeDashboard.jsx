@@ -6,7 +6,7 @@ import { PERIODS, DAYS } from '../data/timetables';
 import NoticeBoard from './NoticeBoard';
 import NotificationCenter from './NotificationCenter';
 import { SearchIcon, PercentIcon, CalculatorIcon, FileIcon, TrophyIcon, DoorIcon, UsersIcon, UserIcon, ImageIcon, FlameIcon } from './icons';
-import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFacultyDatabase, canAccessSocietyTracker, canAccessCaseComps, isTimeWarpEnabled } from '../lib/admin';
+import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFacultyDatabase, canAccessSocietyTracker, canAccessCaseComps, canAccessWaiver, isTimeWarpEnabled } from '../lib/admin';
 import { exportScheduleAsImage } from '../utils/exportUtils';
 import { trackTimetableEvent } from '../lib/analytics';
 import OtherSectionsModal from './OtherSectionsModal';
@@ -683,13 +683,14 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
   const hasFacultyDbAccess = canAccessFacultyDatabase(user?.email);
   const hasSocietyTrackerAccess = canAccessSocietyTracker(user?.email);
   const hasCaseCompsAccess = canAccessCaseComps(user?.email);
+  const hasWaiverAccess = canAccessWaiver(user?.email);
 
   const tools = [
     ...(hasSocietyTrackerAccess ? [{ id: 'society-tracker', micro: 'DATABASE', microClass: 'success', title: 'Societies Database', desc: 'Directory of 62+ societies, domains & PoR contacts', Icon: UsersIcon, locked: false }] : []),
     { id: 'case-comps', micro: 'SOON', microClass: 'dim', title: 'Competitions', desc: 'OneStop early access — discover & track top competitions', Icon: FlameIcon, locked: false },
     ...(hasTeamFinderAccess ? [{ id: 'team-finder', micro: 'NEW', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post comp openings', Icon: TrophyIcon, locked: false }] : []),
     { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
-    { id: 'waiver', micro: 'SOON', microClass: 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
+    { id: 'waiver', micro: hasWaiverAccess ? 'NEW' : 'SOON', microClass: hasWaiverAccess ? 'success' : 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !hasWaiverAccess },
     { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
     { id: 'find-prof', micro: 'SEARCH', microClass: 'success', title: 'Find My Professor', desc: "Who's teaching where, right now", Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
     { id: 'empty-room', micro: 'LIVE', microClass: 'success', title: 'Classroom Radar', desc: 'Live room occupancy, daily schedules & vacant room finder', Icon: DoorIcon, locked: false },
@@ -944,9 +945,16 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
                 onClick={() => !locked && onNavigate(id)}
                 disabled={locked}
               >
-                <span className="tool-title">{title}</span>
+                <div className="tool-card-head">
+                  <span className="tool-title">{title}</span>
+                  {locked && <span className="sidebar-soon">SOON</span>}
+                </div>
                 <span className="tool-desc">{desc}</span>
-                {!locked && <span className="tool-launch">Launch →</span>}
+                {!locked ? (
+                  <span className="tool-launch">Launch →</span>
+                ) : (
+                  <span className="tool-launch tool-soon-text">Coming Soon</span>
+                )}
               </button>
             ))}
           </div>

@@ -422,46 +422,86 @@ export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPc
       });
     });
 
+    let simTotalAtt = 0;
+    let simTotalHeld = 0;
+    let baseTotalAtt = 0;
+    let baseTotalHeld = 0;
+
     const parts = {};
-    ['th', 'tu', 'pr'].forEach(t => {
+    const partsList = [];
+
+    const typeConfigs = [
+      { key: 'th', label: 'Theory', isTargetPossible: true },
+      { key: 'tu', label: 'Tutorial', isTargetPossible: true },
+      { key: 'pr', label: 'Practical', isTargetPossible: false }
+    ];
+
+    typeConfigs.forEach(({ key: t, label: typeLabel }) => {
       const baseStats = sub.parts?.[t] || { p: 0, a: 0 };
       const baseHeld = baseStats.p + baseStats.a;
       const baseAtt = baseStats.p;
       const basePct = baseHeld > 0 ? (baseAtt / baseHeld) * 100 : 100;
 
-      const simAttended = Math.max(0, baseAtt - rawWaived[t].p);
-      const simHeld = Math.max(0, baseHeld - rawWaived[t].n);
+      const simAtt = Math.max(0, baseAtt - rawWaived[t].p);
+      const simH = Math.max(0, baseHeld - rawWaived[t].n);
 
-      const metrics = calculatePartBufferAndNeeded(simAttended, simHeld, T);
+      simTotalAtt += simAtt;
+      simTotalHeld += simH;
+      baseTotalAtt += baseAtt;
+      baseTotalHeld += baseHeld;
+
+      const metrics = calculatePartBufferAndNeeded(simAtt, simH, T);
       const isTarget = (t === 'th' || t === 'tu') && baseHeld > 0;
 
       if (isTarget) {
         if (metrics.passes) passingTargetCount++;
-        if (simHeld > 0 && metrics.pct < lowestPartPct) {
+        if (simH > 0 && metrics.pct < lowestPartPct) {
           lowestPartPct = metrics.pct;
-          lowestPartLabel = `${sub.name} ${t === 'th' ? 'theory' : 'tute'}`;
+          lowestPartLabel = `${sub.name} ${t === 'th' ? 'theory' : 'tutorial'}`;
         }
       }
 
-      parts[t] = {
+      const partObj = {
+        type: t,
+        shortType: typeLabel,
+        label: `${sub.name} ${typeLabel}`,
+        p: simAtt,
+        a: simH - simAtt,
+        n: simH,
         baseAtt,
         baseHeld,
         basePct,
-        simAttended,
-        simHeld,
+        simP: simAtt,
+        simN: simH,
+        simAttended: simAtt,
+        simHeld: simH,
+        pct: metrics.pct,
         simPct: metrics.pct,
         passes: metrics.passes,
         missableBuffer: metrics.missableBuffer,
         classesNeeded: metrics.classesNeeded,
         isTarget
       };
+
+      parts[t] = partObj;
+      partsList.push(partObj);
     });
+
+    const simPct = simTotalHeld > 0 ? (simTotalAtt / simTotalHeld) * 100 : 100;
+    const baselinePct = baseTotalHeld > 0 ? (baseTotalAtt / baseTotalHeld) * 100 : 100;
 
     return {
       sno: sub.sno,
       name: sub.name,
       rollNo: sub.rollNo,
-      parts
+      simAttended: simTotalAtt,
+      simHeld: simTotalHeld,
+      simPct,
+      baselineAttended: baseTotalAtt,
+      baselineHeld: baseTotalHeld,
+      baselinePct,
+      parts,
+      partsList
     };
   });
 
@@ -470,9 +510,12 @@ export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPc
 
   return {
     subjectsStats,
+    subjectSummaries: subjectsStats,
     passingTargetCount,
+    passingCount: passingTargetCount,
     totalTargetParts,
     isOptimal,
+    allPassing: isOptimal,
     status: isOptimal ? 'OPTIMAL' : 'SHORTAGE',
     lowestPartPct,
     lowestPartLabel

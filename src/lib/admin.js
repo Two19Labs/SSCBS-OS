@@ -44,6 +44,11 @@ export function canAccessSocietyTracker(email) {
   return true; // Society Recruitment Tracker is live for all SSCBS students!
 }
 
+export function canAccessWaiver(email) {
+  if (!email || typeof email !== 'string') return false;
+  return true; // Attendance Waiver Assistant is live for all SSCBS OS students!
+}
+
 export const CASE_COMP_TESTERS = [
   'aditya.25015@sscbs.du.ac.in',
 ];
@@ -63,5 +68,3 @@ export function isTimeWarpEnabled() {
 export function setTimeWarpEnabled(enabled) {
   localStorage.setItem(TIMEWARP_KEY, enabled ? 'true' : 'false');
 }
-
-

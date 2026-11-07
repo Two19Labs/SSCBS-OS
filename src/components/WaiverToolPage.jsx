@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import FooterCredit from './FooterCredit';
 import { useAuth } from '../context/AuthContext';
+import { canAccessWaiver } from '../lib/admin';
+import { PercentIcon } from './icons';
 import { trackWaiverEvent } from '../lib/analytics';
 import { parseAttendanceFile, WEEKDAYS, MONTH_NAMES, MONTHS_FULL } from '../lib/waiverParser';
 import {
@@ -16,6 +18,28 @@ import './WaiverToolPage.css';
 
 export default function WaiverToolPage({ onBack }) {
   const { user } = useAuth();
+  const hasAccess = canAccessWaiver(user?.email);
+
+  if (!hasAccess) {
+    return (
+      <div className="waiver-locked-screen">
+        <div className="waiver-locked-card">
+          <span className="waiver-locked-badge">COMING SOON</span>
+          <div className="waiver-locked-icon">
+            <PercentIcon size={32} />
+          </div>
+          <h2>Waiver Tool is Coming Soon</h2>
+          <p>
+            We are fine-tuning the Attendance Waiver Assistant. Access is currently limited to authorized personnel during private beta testing.
+          </p>
+          <button className="waiver-locked-back-btn" onClick={onBack}>
+            ← Back to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const userKey = user?.id || user?.email || 'guest';
   const storageKey = `sscbs_waiver_tool_state_v3_${userKey}`;
 
@@ -383,12 +407,14 @@ export default function WaiverToolPage({ onBack }) {
 
   // Render Subject Health Cards (matching Image 2)
   const renderSubjectHealthCards = () => {
-    if (!simulatedStats?.subjectSummaries) return null;
+    const list = simulatedStats?.subjectSummaries || simulatedStats?.subjectsStats || [];
+    if (list.length === 0) return null;
 
     return (
       <div className="subject-health-cards-container">
-        {simulatedStats.subjectSummaries.map((sub, sIdx) => {
-          const isClear = sub.parts.filter(p => p.type !== 'pr').every(p => p.passes);
+        {list.map((sub, sIdx) => {
+          const partsArray = sub.partsList || Object.values(sub.parts || {});
+          const isClear = partsArray.filter(p => p.type !== 'pr').every(p => p.passes);
 
           return (
             <div key={sIdx} className="subject-health-card">
@@ -400,18 +426,18 @@ export default function WaiverToolPage({ onBack }) {
               </div>
 
               <div className="subject-parts-rows">
-                {sub.parts.map((part, pIdx) => {
-                  const hasClasses = part.n > 0;
+                {partsArray.map((part, pIdx) => {
+                  const hasClasses = (part.simN !== undefined ? part.simN : part.n) > 0 || (part.baseHeld > 0);
                   const passes = part.passes;
                   const isPractical = part.type === 'pr';
 
                   // Before and After percentages
-                  const beforePct = part.baselinePct;
-                  const afterPct = hasClasses ? part.pct : 100;
+                  const beforePct = part.basePct !== undefined ? part.basePct : part.baselinePct;
+                  const afterPct = hasClasses ? (part.simPct !== undefined ? part.simPct : part.pct) : 100;
 
                   // Advice caption
                   const advice = !isPractical && hasClasses
-                    ? calculatePartBufferAndNeeded(part.simP, part.simN, threshold)
+                    ? calculatePartBufferAndNeeded(part.simAttended !== undefined ? part.simAttended : part.simP, part.simHeld !== undefined ? part.simHeld : part.simN, threshold)
                     : null;
 
                   return (
@@ -554,7 +580,7 @@ export default function WaiverToolPage({ onBack }) {
             </thead>
 
             <tbody>
-              {simulatedStats.subjectSummaries.map((sub, sIdx) => {
+              {(simulatedStats?.subjectSummaries || simulatedStats?.subjectsStats || []).map((sub, sIdx) => {
                 const originalSubject = parsedData.subjects?.[sIdx];
 
                 return (
@@ -931,7 +957,7 @@ export default function WaiverToolPage({ onBack }) {
                     </span>
                   ) : (
                     <span className="status-shortage-warn">
-                      <span className="dot-warn">&#9650;</span> {simulatedStats?.totalTargetParts - simulatedStats?.passingCount} subject(s) below {threshold}%
+                      <span className="dot-warn">&#9650;</span> {Math.max(0, (simulatedStats?.totalTargetParts || 0) - (simulatedStats?.passingTargetCount ?? simulatedStats?.passingCount ?? 0))} part(s) below {threshold}%
                     </span>
                   )}
                 </div>
@@ -980,7 +1006,7 @@ export default function WaiverToolPage({ onBack }) {
             <div className="modal-summary-banner">
               <span><strong>{selectedDatesList.length}</strong> date(s) selected</span>
               <span className="summary-dot">&middot;</span>
-              <span>{simulatedStats?.allPassing ? 'All subjects clear' : `${simulatedStats?.totalTargetParts - simulatedStats?.passingCount} subject(s) remaining`}</span>
+              <span>{simulatedStats?.allPassing ? 'All subjects clear' : `${Math.max(0, (simulatedStats?.totalTargetParts || 0) - (simulatedStats?.passingTargetCount ?? simulatedStats?.passingCount ?? 0))} part(s) below target`}</span>
             </div>
 
             <div className="modal-dates-list">

@@ -470,11 +470,25 @@
   color: var(--ink-dim);
 }
 
+.tool-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
 .tool-launch {
   font-size: 12px;
   font-weight: 700;
   color: var(--accent);
   margin-top: 8px;
+}
+
+.tool-soon-text {
+  color: var(--ink-faint, #a89a90) !important;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
 }
 
 .live-card-disclaimer {

@@ -6,7 +6,7 @@ const DEFAULT_FEATURE_FLAGS = {
   'society-tracker': true,
   'find-prof': true,
   'team-finder': true,
-  'waiver': true,
+  'waiver': false,
   'gpa': true,
   'pyqs': false,
   'buzz': true,

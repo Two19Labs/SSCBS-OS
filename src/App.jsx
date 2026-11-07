@@ -9,7 +9,7 @@ import ProfileModal from './components/ProfileModal';
 import NoticeBoard from './components/NoticeBoard';
 import ErrorBoundary from './components/ErrorBoundary';
 import OneStopTeaserModal from './components/OneStopTeaserModal';
-import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFacultyDatabase, canAccessSocietyTracker, canAccessCaseComps } from './lib/admin';
+import { isAdminEmail, canAccessTeamFinder, canAccessEmptyRoom, canAccessFacultyDatabase, canAccessSocietyTracker, canAccessCaseComps, canAccessWaiver } from './lib/admin';
 import {
   HomeIcon,
   CalendarIcon,
@@ -230,11 +230,15 @@ function App() {
   const hasFacultyDbAccess = canAccessFacultyDatabase(user.email);
   const hasSocietyTrackerAccess = canAccessSocietyTracker(user.email);
   const hasCaseCompsAccess = canAccessCaseComps(user.email);
+  const hasWaiverAccess = canAccessWaiver(user?.email);
 
   const openTool = (id, extra = null) => {
     setIsMobileSidebarOpen(false);
     if (id === 'case-comps') {
       setIsOneStopPopoverOpen((prev) => !prev);
+      return;
+    }
+    if (id === 'waiver' && !hasWaiverAccess) {
       return;
     }
     trackNavigationEvent('tool_opened', id, { source_view: view, has_extra: Boolean(extra) });
@@ -256,8 +260,27 @@ function App() {
 
   const goBack = () => setView(returnView);
 
-  // Waiver Tool ships its own full-page layout
+  // Waiver Tool ships its own full-page layout (restricted during beta)
   if (view === 'waiver') {
+    if (!hasWaiverAccess) {
+      return (
+        <div className="waiver-locked-screen">
+          <div className="waiver-locked-card">
+            <span className="waiver-locked-badge">COMING SOON</span>
+            <div className="waiver-locked-icon">
+              <PercentIcon size={32} />
+            </div>
+            <h2>Waiver Tool is Coming Soon</h2>
+            <p>
+              We are fine-tuning the Attendance Waiver Assistant. Access is currently limited to authorized personnel during private beta testing.
+            </p>
+            <button className="waiver-locked-back-btn" onClick={goBack}>
+              ← Back to Dashboard
+            </button>
+          </div>
+        </div>
+      );
+    }
     return (
       <Suspense fallback={<PageLoader />}>
         <WaiverToolPage onBack={goBack} />
@@ -282,7 +305,7 @@ function App() {
         { id: 'find-prof', label: 'Find My Professor', Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
         { id: 'empty-room', label: 'Classroom Radar', Icon: DoorIcon },
         ...(hasTeamFinderAccess ? [{ id: 'team-finder', label: 'Team Finder', Icon: TrophyIcon }] : []),
-        { id: 'waiver', label: 'Waiver Tool', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
+        { id: 'waiver', label: 'Waiver Tool', Icon: PercentIcon, locked: !hasWaiverAccess },
         { id: 'gpa', label: 'GPA Calculator', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
         { id: 'pyqs', label: 'PYQs & Resources', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
       ],
@@ -404,7 +427,7 @@ function App() {
               ...(hasTeamFinderAccess ? [{ id: 'team-finder', micro: 'NEW', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post case comp openings', Icon: TrophyIcon, locked: false }] : []),
 
               { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
-              { id: 'waiver', micro: 'NEW', microClass: 'success', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !featureFlags['waiver'] && !isAdmin },
+              { id: 'waiver', micro: hasWaiverAccess ? 'NEW' : 'SOON', microClass: hasWaiverAccess ? 'success' : 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !hasWaiverAccess },
               { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
               { id: 'find-prof', micro: 'SEARCH', microClass: 'success', title: 'Find My Professor', desc: "Who's teaching where, right now", Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
 
@@ -421,6 +444,7 @@ function App() {
                   <span className="tools-hub-title">{title}</span>
                   <span className="tools-hub-desc">{desc}</span>
                 </span>
+                {locked && <span className="sidebar-soon" style={{ padding: '3px 8px', borderRadius: '6px', background: 'var(--surface-sunken, rgba(0,0,0,0.04))' }}>COMING SOON</span>}
               </button>
             ))}
           </div>
