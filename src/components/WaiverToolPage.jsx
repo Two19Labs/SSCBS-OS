@@ -110,6 +110,9 @@ export default function WaiverToolPage({ onBack }) {
   // Prioritized / starred subjects (Set of subject names)
   const [starredSubjects, setStarredSubjects] = useState(new Set());
 
+  // Ineligibility acknowledgement state (shown when baseline overall attendance < 66.7%)
+  const [hasAcknowledgedIneligible, setHasAcknowledgedIneligible] = useState(false);
+
   // Solver outcome
   const [solverResult, setSolverResult] = useState(null);
   const [kPlusOneResult, setKPlusOneResult] = useState(null);
@@ -165,6 +168,9 @@ export default function WaiverToolPage({ onBack }) {
           if (saved.maxWaivers !== undefined) setMaxWaivers(saved.maxWaivers);
           if (saved.threshold !== undefined) setThreshold(saved.threshold);
           if (saved.fileMeta) setFileMeta(saved.fileMeta);
+          if (saved.hasAcknowledgedIneligible !== undefined) {
+            setHasAcknowledgedIneligible(saved.hasAcknowledgedIneligible);
+          }
         } else {
           localStorage.removeItem(storageKey);
         }
@@ -186,13 +192,14 @@ export default function WaiverToolPage({ onBack }) {
         kPlusOneResult,
         maxWaivers,
         threshold,
-        fileMeta
+        fileMeta,
+        hasAcknowledgedIneligible
       };
       localStorage.setItem(storageKey, JSON.stringify(stateToSave));
     } catch (err) {
       console.warn('Failed to persist Waiver Tool state:', err);
     }
-  }, [parsedData, selectedWaivers, starredSubjects, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, storageKey]);
+  }, [parsedData, selectedWaivers, starredSubjects, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, hasAcknowledgedIneligible, storageKey]);
 
   // Prevent scroll when expanded grid modal is open
   useEffect(() => {
@@ -312,6 +319,7 @@ export default function WaiverToolPage({ onBack }) {
 
     setIsProcessing(true);
     setError(null);
+    setHasAcknowledgedIneligible(false);
 
     const meta = {
       name: file.name,
@@ -380,6 +388,7 @@ export default function WaiverToolPage({ onBack }) {
     setParsedData(null);
     setSelectedWaivers(new Set());
     setStarredSubjects(new Set());
+    setHasAcknowledgedIneligible(false);
     setSolverResult(null);
     setKPlusOneResult(null);
     setFile(null);
@@ -654,6 +663,12 @@ export default function WaiverToolPage({ onBack }) {
     };
   }, [simStats, subjectSummaries]);
 
+  // Overall university eligibility check:
+  // If a student's total attendance across all subjects combined is below 66.7%,
+  // they cannot officially apply for waivers in college (per DU Ordinance VII).
+  const baselineOverallPct = totalsSummary?.overall?.basePct ?? 100;
+  const isOverallIneligible = Boolean(parsedData && (totalsSummary?.overall?.held ?? 0) > 0 && baselineOverallPct < 66.666);
+
   const partOrder = { th: 0, tu: 1, pr: 2 };
 
   const renderPart = (part) => {
@@ -772,7 +787,14 @@ export default function WaiverToolPage({ onBack }) {
           return (
             <div key={item.key} className="rd-total-item">
               <div className="rd-total-item-top">
-                <span className="rd-total-item-lbl">{item.label}</span>
+                <div className="rd-total-item-lbl-wrap">
+                  <span className="rd-total-item-lbl">{item.label}</span>
+                  {item.key === 'overall' && isOverallIneligible && (
+                    <span className="rd-ineligible-tag" title="Overall attendance is below 66.7%. Official waiver submission is barred by administration.">
+                      Ineligible for Submission
+                    </span>
+                  )}
+                </div>
                 <span className={`rd-pill p-${pill[1]}`}>{pill[0]}</span>
               </div>
               <div className="rd-total-item-val">
@@ -1051,6 +1073,62 @@ export default function WaiverToolPage({ onBack }) {
         </div>
       )}
 
+      {/* Debarment Ineligibility Modal (First-look Warning when Overall Attendance < 66.7%) */}
+      {isOverallIneligible && !hasAcknowledgedIneligible && totalsSummary?.overall && (
+        <div className="rd-ineligible-overlay" role="dialog" aria-modal="true" aria-labelledby="rd-ineligible-title">
+          <div className="rd-ineligible-modal">
+            <div className="rd-ineligible-badge">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+              <span>OFFICIAL ATTENDANCE NOTICE</span>
+            </div>
+
+            <h2 id="rd-ineligible-title" className="rd-ineligible-title">
+              Not Eligible for College Waivers
+            </h2>
+
+            <div className="rd-ineligible-metric-card">
+              <div className="rd-ineligible-metric-left">
+                <span className="rd-ineligible-metric-lbl">Total Baseline Attendance</span>
+                <div className="rd-ineligible-metric-val">
+                  <span className="rd-ineligible-pct">{totalsSummary.overall.basePct.toFixed(1)}%</span>
+                  <span className="rd-ineligible-fraction">({totalsSummary.overall.att} / {totalsSummary.overall.held} classes)</span>
+                </div>
+              </div>
+              <span className="rd-ineligible-status-tag">Below 66.7% Requirement</span>
+            </div>
+
+            <div className="rd-ineligible-body">
+              <p>
+                According to University of Delhi Ordinance VII and SSCBS examination rules, students with an <strong>overall aggregate attendance below 66.7%</strong> across all subjects combined are <strong>strictly not eligible to apply for waivers</strong> (society, sports, ECA, or medical) to the college administration.
+              </p>
+              <div className="rd-ineligible-rule-note">
+                <strong>Clarification:</strong> Students who maintain <strong>&ge; 66.7% overall attendance</strong> can still apply waivers for specific individual subjects below 66.7%. However, when your combined total across all subjects is under 66.7%, the administration cannot accept any waiver application.
+              </div>
+              <div className="rd-ineligible-sandbox-box">
+                <span className="rd-sandbox-title">🧪 Simulation & Sandbox Mode Active</span>
+                <p>
+                  Even though official submission is not permitted, <strong>you can still freely use this tool</strong> to test waiver dates, simulate attendance outcomes, and check exactly how many classes you must attend to escape debarment.
+                </p>
+              </div>
+            </div>
+
+            <div className="rd-ineligible-footer">
+              <button
+                type="button"
+                className="rd-ineligible-ack-btn"
+                onClick={() => setHasAcknowledgedIneligible(true)}
+              >
+                I Understand — Let Me Experiment →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Day Diff Popover */}
       {hoverDiff && (
         <div className="rd-popover" style={{ left: `${popoverPos.x}px`, top: `${popoverPos.y}px` }}>
@@ -1169,6 +1247,21 @@ export default function WaiverToolPage({ onBack }) {
               >
                 Increase to {solverResult.neededWaiversForAllPass} & Apply
               </button>
+            </div>
+          )}
+
+          {/* Debarment Ineligibility Alert Banner (Simulation Mode) */}
+          {isOverallIneligible && totalsSummary?.overall && (
+            <div className="rd-ineligible-banner" role="alert">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+              <div>
+                <strong>Simulation Mode (Officially Ineligible):</strong> Your total baseline attendance across all subjects is{' '}
+                <strong>{totalsSummary.overall.basePct.toFixed(1)}%</strong> (below the 66.7% DU threshold). The college administration will not accept official waiver applications, but you can continue simulating waiver outcomes below.
+              </div>
             </div>
           )}
 

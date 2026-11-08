@@ -109,4 +109,33 @@ if (fs.existsSync(nov6Path)) {
   console.log('✓ Starred subject prioritization, 66.67% debarment guard, and full waiver utilization verified.');
 }
 
+// 5. Test DU Overall Attendance Debarment Ineligibility Rule (<66.7% total aggregate)
+console.log('5. Testing DU Overall Attendance Debarment Rule...');
+const checkEligibility = (totAtt, totHeld) => {
+  const pct = totHeld > 0 ? (totAtt / totHeld) * 100 : 100;
+  return pct < 66.666;
+};
+
+// Case A: Overall attendance below 66.7% -> strictly ineligible
+assert.strictEqual(checkEligibility(120, 200), true, '120/200 = 60% must be ineligible');
+assert.strictEqual(checkEligibility(66, 100), true, '66/100 = 66.0% must be ineligible (< 66.666%)');
+assert.strictEqual(checkEligibility(666, 1000), true, '66.6% must be ineligible');
+
+// Case B: Overall attendance 66.7% or above -> eligible
+assert.strictEqual(checkEligibility(67, 100), false, '67/100 = 67.0% must be eligible');
+assert.strictEqual(checkEligibility(2, 3), false, '2/3 = 66.667% must be eligible');
+assert.strictEqual(checkEligibility(172, 198), false, '172/198 = 86.87% must be eligible');
+
+// Case C: Overall is 70% but an individual subject is 30% -> eligible for waivers
+const studentParts = [
+  { subject: 'Math', att: 10, held: 30 }, // 33.3% individual (below 66.7%)
+  { subject: 'Stats', att: 60, held: 70 }  // 85.7%
+];
+const totalAtt = studentParts.reduce((s, p) => s + p.att, 0);
+const totalHeld = studentParts.reduce((s, p) => s + p.held, 0);
+assert.strictEqual(totalAtt, 70);
+assert.strictEqual(totalHeld, 100);
+assert.strictEqual(checkEligibility(totalAtt, totalHeld), false, 'Overall 70% with individual subject at 33.3% must remain eligible to apply waivers');
+console.log('✓ DU overall debarment ineligibility criteria passed with exact boundary accuracy.');
+
 console.log('\nALL UNIT TESTS PASSED SUCCESSFULLY! ✓✓✓');

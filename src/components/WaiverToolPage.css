@@ -544,3 +544,265 @@
     padding-bottom: 14px;
   }
 }
+
+/* ── Debarment Ineligibility Overlay & Modal ── */
+.rd-ineligible-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  overflow-y: auto;
+  animation: rdFadeIn 0.2s ease-out;
+}
+
+@keyframes rdFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes rdModalPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.rd-ineligible-modal {
+  background: #ffffff;
+  border-radius: 20px;
+  max-width: 580px;
+  width: 100%;
+  padding: 28px 32px;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(185, 28, 28, 0.15);
+  border: 1px solid #fecaca;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  animation: rdModalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--ink, #1e1a17);
+  box-sizing: border-box;
+}
+
+.rd-ineligible-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  width: max-content;
+}
+
+.rd-ineligible-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: #1e1a17;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.rd-ineligible-metric-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+  border-radius: 14px;
+  padding: 14px 18px;
+}
+
+.rd-ineligible-metric-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rd-ineligible-metric-lbl {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #7f1d1d;
+}
+
+.rd-ineligible-metric-val {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.rd-ineligible-pct {
+  font-size: 24px;
+  font-weight: 800;
+  color: #b91c1c;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.rd-ineligible-fraction {
+  font-size: 13px;
+  font-weight: 600;
+  color: #991b1b;
+}
+
+.rd-ineligible-status-tag {
+  font-size: 11.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  background: #dc2626;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.rd-ineligible-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #4b453f;
+}
+
+.rd-ineligible-body p {
+  margin: 0;
+}
+
+.rd-ineligible-rule-note {
+  background: #fdfbf7;
+  border: 1px solid #ebdccb;
+  border-left: 3px solid #d97706;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  color: #6b5744;
+  line-height: 1.45;
+}
+
+.rd-ineligible-sandbox-box {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rd-sandbox-title {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #15803d;
+}
+
+.rd-ineligible-sandbox-box p {
+  font-size: 12.5px;
+  color: #166534;
+  line-height: 1.45;
+}
+
+.rd-ineligible-footer {
+  margin-top: 4px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.rd-ineligible-ack-btn {
+  background: #1e1a17;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  width: 100%;
+  text-align: center;
+}
+
+.rd-ineligible-ack-btn:hover {
+  background: #000000;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ── Persistent Ineligible Banner On Page ── */
+.rd-ineligible-banner {
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+  border-left: 4px solid #dc2626;
+  border-radius: 12px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #7f1d1d;
+  font-size: 13.5px;
+  line-height: 1.45;
+  box-shadow: 0 1px 2px rgba(185, 28, 28, 0.05);
+}
+
+.rd-ineligible-banner svg {
+  color: #dc2626;
+  flex-shrink: 0;
+}
+
+.rd-ineligible-banner strong {
+  color: #991b1b;
+}
+
+/* ── Ineligible Tag in Totals Card ── */
+.rd-total-item-lbl-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rd-ineligible-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #b91c1c;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  padding: 2px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .rd-ineligible-modal {
+    padding: 22px 18px;
+    gap: 14px;
+  }
+  .rd-ineligible-title {
+    font-size: 19px;
+  }
+  .rd-ineligible-metric-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
