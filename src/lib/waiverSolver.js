@@ -580,8 +580,9 @@ export function solveKPlusOne(parsedData, targetPct = 85, maxWaiversK = 12, star
 
 /**
  * Section 7.1: Live simulation calculation across all subjects
+ * Supports both Waivers (class deletions) and CDC Duty (absences converted to presents)
  */
-export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPct = 85) {
+export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPct = 85, selectedCdcSet = new Set()) {
   const { targetParts } = extractTargetParts(parsedData);
   const T = targetPct;
 
@@ -596,6 +597,11 @@ export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPc
       tu: { p: 0, a: 0, n: 0 },
       pr: { p: 0, a: 0, n: 0 }
     };
+    const rawCdc = {
+      th: { p: 0, a: 0, n: 0 },
+      tu: { p: 0, a: 0, n: 0 },
+      pr: { p: 0, a: 0, n: 0 }
+    };
 
     selectedWaiversSet.forEach(dateStr => {
       const dayClasses = sub.dayClasses?.[dateStr] || [];
@@ -605,6 +611,18 @@ export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPc
         rawWaived[c.type].n++;
       });
     });
+
+    if (selectedCdcSet && selectedCdcSet.size > 0) {
+      selectedCdcSet.forEach(dateStr => {
+        if (selectedWaiversSet.has(dateStr)) return;
+        const dayClasses = sub.dayClasses?.[dateStr] || [];
+        dayClasses.forEach(c => {
+          if (!c.attended) {
+            rawCdc[c.type].a++; // Career Development Centre (CDC) attendance: absence becomes present
+          }
+        });
+      });
+    }
 
     let simTotalAtt = 0;
     let simTotalHeld = 0;
@@ -626,8 +644,10 @@ export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPc
       const baseAtt = baseStats.p;
       const basePct = baseHeld > 0 ? (baseAtt / baseHeld) * 100 : 100;
 
-      const simAtt = Math.max(0, baseAtt - rawWaived[t].p);
+      // Waivers delete classes (both held and attended reduced).
+      // CDC attendance credits duty: held remains identical, and absences become presents.
       const simH = Math.max(0, baseHeld - rawWaived[t].n);
+      const simAtt = Math.min(simH, Math.max(0, baseAtt - rawWaived[t].p + rawCdc[t].a));
 
       simTotalAtt += simAtt;
       simTotalHeld += simH;
@@ -786,17 +806,42 @@ export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPc
 
 /**
  * Section 7.1: Pre-toggle Day Impact Diff
- * "Before toggling, each day shows what waiving it would change compared with the current simulated state"
+ * "Before toggling, each day shows what toggling it (as waiver or CDC duty) would change compared with the current simulated state"
  */
-export function calculateDayImpactDiff(dateStr, parsedData, currentSelectedWaiversSet, targetPct = 85) {
-  const isCurrentlyWaived = currentSelectedWaiversSet.has(dateStr);
-  const nextSet = new Set(currentSelectedWaiversSet);
+export function calculateDayImpactDiff(
+  dateStr,
+  parsedData,
+  currentSelectedWaiversSet,
+  targetPct = 85,
+  currentSelectedCdcSet = new Set(),
+  mode = 'waiver'
+) {
+  const isCdcMode = mode === 'cdc';
+  const nextWaiversSet = new Set(currentSelectedWaiversSet);
+  const nextCdcSet = new Set(currentSelectedCdcSet);
 
-  if (isCurrentlyWaived) nextSet.delete(dateStr);
-  else nextSet.add(dateStr);
+  const isCurrentlyActive = isCdcMode
+    ? currentSelectedCdcSet.has(dateStr)
+    : currentSelectedWaiversSet.has(dateStr);
 
-  const currentStats = calculateSimulatedStats(parsedData, currentSelectedWaiversSet, targetPct);
-  const nextStats = calculateSimulatedStats(parsedData, nextSet, targetPct);
+  if (isCdcMode) {
+    if (isCurrentlyActive) {
+      nextCdcSet.delete(dateStr);
+    } else {
+      nextCdcSet.add(dateStr);
+      nextWaiversSet.delete(dateStr);
+    }
+  } else {
+    if (isCurrentlyActive) {
+      nextWaiversSet.delete(dateStr);
+    } else {
+      nextWaiversSet.add(dateStr);
+      nextCdcSet.delete(dateStr);
+    }
+  }
+
+  const currentStats = calculateSimulatedStats(parsedData, currentSelectedWaiversSet, targetPct, currentSelectedCdcSet);
+  const nextStats = calculateSimulatedStats(parsedData, nextWaiversSet, targetPct, nextCdcSet);
 
   let thTuAbsencesRemoved = 0;
   let thTuPresentsRemoved = 0;
@@ -859,7 +904,10 @@ export function calculateDayImpactDiff(dateStr, parsedData, currentSelectedWaive
   return {
     dateStr,
     day: dayObj,
-    isCurrentlyWaived,
+    mode,
+    isCurrentlyActive,
+    isCurrentlyWaived: currentSelectedWaiversSet.has(dateStr),
+    isCurrentlyCdc: currentSelectedCdcSet.has(dateStr),
     partDiffs,
     affectedParts: partDiffs,
     thTuAbsencesRemoved,

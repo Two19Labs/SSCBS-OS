@@ -838,3 +838,123 @@
   font-size: 11.5px;
   padding: 2px 8px;
 }
+
+/* ── Career Development Centre (CDC) Attendance Duty Styles ── */
+.rd-stat.cdc-stat {
+  border-color: #bae6fd;
+  background: #f8fcff;
+}
+
+.rd-stat.cdc-stat .lbl {
+  color: #0369a1;
+}
+
+.upload-params-row.upload-params-row-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 900px) {
+  .upload-params-row.upload-params-row-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.rd-tool-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: #efe8de;
+  border: 1px solid var(--line, #e6dfd4);
+  border-radius: 10px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.rd-tool-btn {
+  border: none;
+  background: transparent;
+  color: var(--muted, #5f5852);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.rd-tool-btn:hover {
+  color: var(--ink, #1e1a17);
+}
+
+.rd-tool-btn.active {
+  background: #ffffff;
+  color: var(--ink, #1e1a17);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.rd-tool-btn.cdc.active {
+  background: #0284c7;
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(2, 132, 199, 0.3);
+}
+
+.rd-chip.cdc {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+  flex-direction: column;
+  padding: 2px 4px;
+}
+
+.rd-cdc-micro {
+  font-size: 7.5px;
+  font-weight: 800;
+  color: #0284c7;
+  letter-spacing: 0.04em;
+  display: block;
+  line-height: 1;
+  margin-bottom: 1px;
+}
+
+.rd-date-btn.cdc-on {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+.rd-date-btn.cdc-on .wd {
+  color: #e0f2fe;
+}
+
+.rd-date-cdc-badge {
+  font-size: 8px;
+  font-weight: 800;
+  background: #0369a1;
+  color: #ffffff;
+  padding: 1px 3px;
+  border-radius: 3px;
+  line-height: 1;
+  margin-top: 1px;
+}
+
+.rd-cell.cdc-cell {
+  background: #f0f9ff;
+}
+
+.rd-cell.cdc-cell:hover {
+  background: #e0f2fe;
+}
+
+.rd-count.cdc {
+  color: #0369a1;
+  background: #e0f2fe;
+}
+
+.rd-key.cdc i {
+  background: #0284c7;
+}
+
+.rd-pop-tag.cdc {
+  color: #0369a1;
+  background: #e0f2fe;
+}

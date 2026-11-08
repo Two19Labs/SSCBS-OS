@@ -110,6 +110,11 @@ export default function WaiverToolPage({ onBack }) {
   // Prioritized / starred subjects (Set of subject names)
   const [starredSubjects, setStarredSubjects] = useState(new Set());
 
+  // Career Development Centre (CDC) Attendance Duty inputs
+  const [cdcLimit, setCdcLimit] = useState(0); // 0 to 15 dates
+  const [selectedCdcDays, setSelectedCdcDays] = useState(new Set()); // Set of 'YYYY-MM-DD'
+  const [gridToolMode, setGridToolMode] = useState('waiver'); // 'waiver' | 'cdc'
+
   // Ineligibility acknowledgement state (shown when baseline overall attendance < 66.7%)
   const [hasAcknowledgedIneligible, setHasAcknowledgedIneligible] = useState(false);
 
@@ -171,6 +176,11 @@ export default function WaiverToolPage({ onBack }) {
           if (saved.hasAcknowledgedIneligible !== undefined) {
             setHasAcknowledgedIneligible(saved.hasAcknowledgedIneligible);
           }
+          if (saved.cdcLimit !== undefined) setCdcLimit(saved.cdcLimit);
+          if (Array.isArray(saved.selectedCdcDays)) {
+            setSelectedCdcDays(new Set(saved.selectedCdcDays));
+          }
+          if (saved.gridToolMode) setGridToolMode(saved.gridToolMode);
         } else {
           localStorage.removeItem(storageKey);
         }
@@ -193,13 +203,16 @@ export default function WaiverToolPage({ onBack }) {
         maxWaivers,
         threshold,
         fileMeta,
-        hasAcknowledgedIneligible
+        hasAcknowledgedIneligible,
+        cdcLimit,
+        selectedCdcDays: Array.from(selectedCdcDays),
+        gridToolMode
       };
       localStorage.setItem(storageKey, JSON.stringify(stateToSave));
     } catch (err) {
       console.warn('Failed to persist Waiver Tool state:', err);
     }
-  }, [parsedData, selectedWaivers, starredSubjects, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, hasAcknowledgedIneligible, storageKey]);
+  }, [parsedData, selectedWaivers, starredSubjects, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, hasAcknowledgedIneligible, cdcLimit, selectedCdcDays, gridToolMode, storageKey]);
 
   // Prevent scroll when expanded grid modal is open
   useEffect(() => {
@@ -385,6 +398,9 @@ export default function WaiverToolPage({ onBack }) {
   const handleReplaceSheet = () => {
     setParsedData(null);
     setSelectedWaivers(new Set());
+    setSelectedCdcDays(new Set());
+    setCdcLimit(0);
+    setGridToolMode('waiver');
     setStarredSubjects(new Set());
     setHasAcknowledgedIneligible(false);
     setSolverResult(null);
@@ -423,13 +439,40 @@ export default function WaiverToolPage({ onBack }) {
   };
 
   const handleToggleDay = (dateStr) => {
-    const next = new Set(selectedWaivers);
-    if (next.has(dateStr)) {
-      next.delete(dateStr);
+    if (gridToolMode === 'cdc' && cdcLimit > 0) {
+      const nextCdc = new Set(selectedCdcDays);
+      if (nextCdc.has(dateStr)) {
+        nextCdc.delete(dateStr);
+      } else {
+        if (nextCdc.size >= cdcLimit) {
+          return;
+        }
+        nextCdc.add(dateStr);
+        if (selectedWaivers.has(dateStr)) {
+          const nextW = new Set(selectedWaivers);
+          nextW.delete(dateStr);
+          setSelectedWaivers(nextW);
+        }
+      }
+      setSelectedCdcDays(nextCdc);
     } else {
-      next.add(dateStr);
+      const nextW = new Set(selectedWaivers);
+      if (nextW.has(dateStr)) {
+        nextW.delete(dateStr);
+      } else {
+        nextW.add(dateStr);
+        if (selectedCdcDays.has(dateStr)) {
+          const nextC = new Set(selectedCdcDays);
+          nextC.delete(dateStr);
+          setSelectedCdcDays(nextC);
+        }
+      }
+      setSelectedWaivers(nextW);
     }
-    setSelectedWaivers(next);
+  };
+
+  const handleClearCdc = () => {
+    setSelectedCdcDays(new Set());
   };
 
   // Live parameter changes with automatic solver re-execution
@@ -521,17 +564,17 @@ export default function WaiverToolPage({ onBack }) {
     return list;
   }, [parsedData, selectedWaivers, candidateDaysMap]);
 
-  // Live simulated stats
+  // Live simulated stats (incorporating Waivers & Career Development Centre CDC Duty)
   const simStats = useMemo(() => {
     if (!parsedData) return null;
-    return calculateSimulatedStats(parsedData, selectedWaivers, threshold);
-  }, [parsedData, selectedWaivers, threshold]);
+    return calculateSimulatedStats(parsedData, selectedWaivers, threshold, selectedCdcDays);
+  }, [parsedData, selectedWaivers, threshold, selectedCdcDays]);
 
   // Hover impact difference
   const hoverDiff = useMemo(() => {
     if (!hoveredDate || !parsedData) return null;
-    return calculateDayImpactDiff(hoveredDate, parsedData, selectedWaivers, threshold);
-  }, [hoveredDate, parsedData, selectedWaivers, threshold]);
+    return calculateDayImpactDiff(hoveredDate, parsedData, selectedWaivers, threshold, selectedCdcDays, gridToolMode);
+  }, [hoveredDate, parsedData, selectedWaivers, threshold, selectedCdcDays, gridToolMode]);
 
   const isOptimalSuggested = useMemo(() => {
     if (!solverResult?.chosenDays || solverResult.chosenDays.length !== selectedWaivers.size) {
@@ -935,18 +978,21 @@ export default function WaiverToolPage({ onBack }) {
           <tr>
             {columns.map(col => {
               const isWaived = selectedWaivers.has(col.dateStr);
+              const isCdc = selectedCdcDays.has(col.dateStr);
+              const btnClass = isWaived ? 'on' : (isCdc ? 'cdc-on' : '');
               return (
                 <th key={col.dateStr} className="rd-date-th">
                   <button
                     type="button"
-                    className={`rd-date-btn ${isWaived ? 'on' : ''}`}
-                    aria-pressed={isWaived}
-                    aria-label={`Toggle waiver for ${col.fullLabel}`}
+                    className={`rd-date-btn ${btnClass}`}
+                    aria-pressed={isWaived || isCdc}
+                    aria-label={`Toggle ${col.fullLabel} (${isWaived ? 'waived' : isCdc ? 'CDC duty' : 'active'})`}
                     onClick={() => handleToggleDay(col.dateStr)}
                     {...getHoverEvents(col.dateStr)}
                   >
                     <span className="wd">{col.weekday}</span>
                     <span className="dn">{col.dayNum}</span>
+                    {isCdc && <span className="rd-date-cdc-badge" title="Career Development Centre (CDC) Attendance Duty">CDC</span>}
                   </button>
                 </th>
               );
@@ -977,11 +1023,13 @@ export default function WaiverToolPage({ onBack }) {
                 </th>
                 {columns.map(col => {
                   const isWaived = selectedWaivers.has(col.dateStr);
+                  const isCdc = selectedCdcDays.has(col.dateStr);
                   const dayClasses = rawSub?.dayClasses?.[col.dateStr] || [];
+                  const cellClass = isWaived ? 'on' : (isCdc ? 'cdc-cell' : '');
                   return (
                     <td
                       key={col.dateStr}
-                      className={`rd-cell ${isWaived ? 'on' : ''}`}
+                      className={`rd-cell ${cellClass}`}
                       onClick={() => handleToggleDay(col.dateStr)}
                       {...getHoverEvents(col.dateStr)}
                     >
@@ -989,15 +1037,33 @@ export default function WaiverToolPage({ onBack }) {
                         <span className="rd-dot">·</span>
                       ) : (
                         <div className="rd-chips">
-                          {dayClasses.map((c, cIdx) => (
-                            <span
-                              key={cIdx}
-                              className={`rd-chip ${isWaived ? 'w' : (c.attended ? 'p' : 'a')}`}
-                            >
-                              {c.attended ? 'P' : 'A'}
-                              <small>{c.type === 'th' ? 'Th' : (c.type === 'tu' ? 'Tu' : 'Pr')}</small>
-                            </span>
-                          ))}
+                          {dayClasses.map((c, cIdx) => {
+                            const isConvertedByCdc = isCdc && !c.attended;
+                            const typeShort = c.type === 'th' ? 'Th' : (c.type === 'tu' ? 'Tu' : 'Pr');
+
+                            if (isConvertedByCdc) {
+                              return (
+                                <span
+                                  key={cIdx}
+                                  className="rd-chip cdc"
+                                  title="Absence converted to Present via Career Development Centre (CDC) Duty"
+                                >
+                                  <span className="rd-cdc-micro">CDC</span>
+                                  P<small>{typeShort}</small>
+                                </span>
+                              );
+                            }
+
+                            return (
+                              <span
+                                key={cIdx}
+                                className={`rd-chip ${isWaived ? 'w' : (c.attended ? 'p' : 'a')}`}
+                              >
+                                {c.attended ? 'P' : 'A'}
+                                <small>{typeShort}</small>
+                              </span>
+                            );
+                          })}
                         </div>
                       )}
                     </td>
@@ -1145,8 +1211,16 @@ export default function WaiverToolPage({ onBack }) {
         <div className="rd-popover" style={{ left: `${popoverPos.x}px`, top: `${popoverPos.y}px` }}>
           <div className="rd-pop-head">
             <strong>{hoverDiff.day?.fullLabel || hoverDiff.dateStr}</strong>
-            <span className={`rd-pop-tag ${hoverDiff.isCurrentlyWaived ? 'rm' : 'add'}`}>
-              {hoverDiff.isCurrentlyWaived ? 'Click to restore' : 'Click to waive'}
+            <span
+              className={`rd-pop-tag ${
+                hoverDiff.mode === 'cdc'
+                  ? (hoverDiff.isCurrentlyCdc ? 'rm' : 'cdc')
+                  : (hoverDiff.isCurrentlyWaived ? 'rm' : 'add')
+              }`}
+            >
+              {hoverDiff.mode === 'cdc'
+                ? (hoverDiff.isCurrentlyCdc ? 'Click to remove CDC duty' : 'Click to claim CDC attendance')
+                : (hoverDiff.isCurrentlyWaived ? 'Click to restore day' : 'Click to waive day')}
             </span>
           </div>
           {!hoverDiff.affectedParts || hoverDiff.affectedParts.length === 0 ? (
@@ -1200,6 +1274,22 @@ export default function WaiverToolPage({ onBack }) {
                 <span className="rd-steps">
                   <button type="button" aria-label="Lower waiver limit" onClick={() => handleMaxWaiversChange(maxWaivers - 1)}>−</button>
                   <button type="button" aria-label="Raise waiver limit" onClick={() => handleMaxWaiversChange(maxWaivers + 1)}>+</button>
+                </span>
+              </div>
+            </div>
+
+            {/* Career Development Centre (CDC) Attendance Duty Stepper */}
+            <div className={`rd-stat ${cdcLimit > 0 ? 'cdc-stat' : ''}`}>
+              <span className="lbl" title="Career Development Centre (CDC) Attendance Duty Allowance">CDC Duty</span>
+              <div className="row">
+                <span className="num">
+                  {selectedCdcDays.size}
+                  <span className="of">/{cdcLimit}</span>
+                </span>
+                <span className="unit">dates</span>
+                <span className="rd-steps">
+                  <button type="button" aria-label="Lower CDC duty limit" onClick={() => setCdcLimit(Math.max(0, cdcLimit - 1))}>−</button>
+                  <button type="button" aria-label="Raise CDC duty limit" onClick={() => setCdcLimit(Math.min(15, cdcLimit + 1))}>+</button>
                 </span>
               </div>
             </div>
@@ -1327,6 +1417,24 @@ export default function WaiverToolPage({ onBack }) {
                     <span>Click a date to waive or restore that whole day</span>
                   </div>
                   <div className="rd-grid-acts">
+                    {cdcLimit > 0 && (
+                      <div className="rd-tool-toggle" role="group" aria-label="Grid Click Action Mode">
+                        <button
+                          type="button"
+                          className={`rd-tool-btn ${gridToolMode === 'waiver' ? 'active' : ''}`}
+                          onClick={() => setGridToolMode('waiver')}
+                        >
+                          Waivers
+                        </button>
+                        <button
+                          type="button"
+                          className={`rd-tool-btn cdc ${gridToolMode === 'cdc' ? 'active' : ''}`}
+                          onClick={() => setGridToolMode('cdc')}
+                        >
+                          CDC Duty ({selectedCdcDays.size}/{cdcLimit})
+                        </button>
+                      </div>
+                    )}
                     {solverResult?.chosenDays?.length > 0 && (
                       <button
                         type="button"
@@ -1337,12 +1445,22 @@ export default function WaiverToolPage({ onBack }) {
                         {selectedWaivers.size === 0 ? 'Apply recommended' : 'Reset'}
                       </button>
                     )}
+                    {selectedCdcDays.size > 0 && (
+                      <button
+                        type="button"
+                        className="rd-btn-outline sm muted"
+                        onClick={handleClearCdc}
+                        title="Clear all claimed CDC duty days"
+                      >
+                        Clear CDC
+                      </button>
+                    )}
                     <button
                       type="button"
                       className="rd-btn-outline sm muted"
                       onClick={handleClearAll}
-                      disabled={selectedWaivers.size === 0}
-                      title="Clear all active waivers"
+                      disabled={selectedWaivers.size === 0 && selectedCdcDays.size === 0}
+                      title="Clear all active waivers & CDC days"
                     >
                       Clear
                     </button>
@@ -1367,9 +1485,17 @@ export default function WaiverToolPage({ onBack }) {
                   </span>
                   <div className="rd-preview-foot-right">
                     <span className="rd-count sm">{selectedWaivers.size} of {maxWaivers} waived</span>
+                    {cdcLimit > 0 && (
+                      <span className="rd-count sm cdc">{selectedCdcDays.size} of {cdcLimit} CDC</span>
+                    )}
                     <span className="rd-key">
-                      <i />Waived day
+                      <i />Waived
                     </span>
+                    {cdcLimit > 0 && (
+                      <span className="rd-key cdc">
+                        <i />CDC Duty
+                      </span>
+                    )}
                   </div>
                 </div>
               </section>
@@ -1497,7 +1623,7 @@ export default function WaiverToolPage({ onBack }) {
               </div>
             )}
 
-            <div className="upload-params-row">
+            <div className="upload-params-row upload-params-row-4">
               {/* Target Parameter */}
               <div className="param-input-box">
                 <span className="param-label">TARGET</span>
@@ -1539,10 +1665,23 @@ export default function WaiverToolPage({ onBack }) {
                   </select>
                 </div>
               </div>
+
+              {/* CDC Attendance Duty Parameter */}
+              <div className="param-input-box">
+                <span className="param-label">CDC DUTY</span>
+                <div className="param-stepper-wrap">
+                  <span className="param-number">{cdcLimit}</span>
+                  <span className="param-unit">dates</span>
+                  <div className="param-stepper-arrows">
+                    <button type="button" className="arrow-btn" onClick={() => setCdcLimit(e => Math.min(15, e + 1))}>▲</button>
+                    <button type="button" className="arrow-btn" onClick={() => setCdcLimit(e => Math.max(0, e - 1))}>▼</button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <p className="upload-params-caption">
-              The start month is read from the file when the report includes a date. You can change all three later.
+              Career Development Centre (CDC) duty allows converting absences into presents. Leave 0 if not applicable. You can adjust all parameters later.
             </p>
 
             <button
@@ -1570,7 +1709,24 @@ export default function WaiverToolPage({ onBack }) {
                 <span>Scroll sideways for every class day. Click a date or cell to waive or restore the whole day.</span>
               </div>
               <div className="rd-exp-acts">
-                <span className="rd-count lg">{selectedWaivers.size} of {maxWaivers} waivers used</span>
+                {cdcLimit > 0 && (
+                  <div className="rd-tool-toggle" role="group" aria-label="Expanded Grid Action Mode">
+                    <button
+                      type="button"
+                      className={`rd-tool-btn ${gridToolMode === 'waiver' ? 'active' : ''}`}
+                      onClick={() => setGridToolMode('waiver')}
+                    >
+                      Waivers ({selectedWaivers.size}/{maxWaivers})
+                    </button>
+                    <button
+                      type="button"
+                      className={`rd-tool-btn cdc ${gridToolMode === 'cdc' ? 'active' : ''}`}
+                      onClick={() => setGridToolMode('cdc')}
+                    >
+                      CDC Duty ({selectedCdcDays.size}/{cdcLimit})
+                    </button>
+                  </div>
+                )}
                 {solverResult?.chosenDays?.length > 0 && (
                   <button
                     type="button"
@@ -1580,11 +1736,20 @@ export default function WaiverToolPage({ onBack }) {
                     {selectedWaivers.size === 0 ? 'Apply recommended' : 'Reset to recommended'}
                   </button>
                 )}
+                {selectedCdcDays.size > 0 && (
+                  <button
+                    type="button"
+                    className="rd-btn-outline sm muted"
+                    onClick={handleClearCdc}
+                  >
+                    Clear CDC
+                  </button>
+                )}
                 <button
                   type="button"
                   className="rd-btn-outline sm muted"
                   onClick={handleClearAll}
-                  disabled={selectedWaivers.size === 0}
+                  disabled={selectedWaivers.size === 0 && selectedCdcDays.size === 0}
                 >
                   Clear all
                 </button>
@@ -1608,7 +1773,12 @@ export default function WaiverToolPage({ onBack }) {
               <div className="rd-exp-legend">
                 <span><span className="rd-chip p">P<small>Th</small></span> Present</span>
                 <span><span className="rd-chip a">A<small>Th</small></span> Absent</span>
-                <span className="rd-key"><i /> Waived day (its classes are removed)</span>
+                <span className="rd-key"><i /> Waived day (classes removed)</span>
+                {cdcLimit > 0 && (
+                  <span className="rd-key cdc">
+                    <i /> CDC Duty day (absence marked present)
+                  </span>
+                )}
               </div>
               <span>Frozen Theory & Tutorial columns show real-time percentage shifts</span>
             </div>

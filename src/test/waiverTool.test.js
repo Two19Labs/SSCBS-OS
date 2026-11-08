@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseAttendanceFile, parseAttendanceEntry } from '../lib/waiverParser.js';
-import { solveExactBnb, isPartPassing, calculatePartBufferAndNeeded } from '../lib/waiverSolver.js';
+import { solveExactBnb, isPartPassing, calculatePartBufferAndNeeded, calculateSimulatedStats } from '../lib/waiverSolver.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -137,5 +137,53 @@ assert.strictEqual(totalAtt, 70);
 assert.strictEqual(totalHeld, 100);
 assert.strictEqual(checkEligibility(totalAtt, totalHeld), false, 'Overall 70% with individual subject at 33.3% must remain eligible to apply waivers');
 console.log('✓ DU overall debarment ineligibility criteria passed with exact boundary accuracy.');
+
+// 6. Test Career Development Centre (CDC) Attendance Duty Simulation
+console.log('6. Testing Career Development Centre (CDC) Attendance Duty...');
+const mockParsedData = {
+  dayColumns: [
+    { dateStr: '2026-08-10', dayNum: 10, month: 8, weekday: 'Mon' },
+    { dateStr: '2026-08-11', dayNum: 11, month: 8, weekday: 'Tue' }
+  ],
+  subjects: [
+    {
+      name: 'Corporate Finance',
+      parts: {
+        th: { p: 10, a: 10 }, // 10/20 = 50%
+        tu: { p: 2, a: 2 },   // 2/4 = 50%
+        pr: { p: 0, a: 0 }
+      },
+      dayClasses: {
+        '2026-08-10': [
+          { type: 'th', attended: false, raw: 'A( Th)' },
+          { type: 'tu', attended: true, raw: 'P( tu)' }
+        ],
+        '2026-08-11': [
+          { type: 'th', attended: false, raw: 'A( Th)' }
+        ]
+      }
+    }
+  ]
+};
+
+// Baseline: 0 waivers, 0 CDC
+const baseStats = calculateSimulatedStats(mockParsedData, new Set(), 85, new Set());
+assert.strictEqual(baseStats.subjectsStats[0].parts.th.simP, 10);
+assert.strictEqual(baseStats.subjectsStats[0].parts.th.simN, 20);
+
+// Apply CDC duty on 2026-08-10 (has A in Th, P in Tu)
+const cdcStats = calculateSimulatedStats(mockParsedData, new Set(), 85, new Set(['2026-08-10']));
+// Theory: Absent becomes Present -> 11/20 (held 20 unchanged!)
+assert.strictEqual(cdcStats.subjectsStats[0].parts.th.simP, 11, 'CDC must convert absent class to present');
+assert.strictEqual(cdcStats.subjectsStats[0].parts.th.simN, 20, 'CDC must leave held classes unchanged');
+// Tutorial: Was already Present -> stays 2/4
+assert.strictEqual(cdcStats.subjectsStats[0].parts.tu.simP, 2, 'CDC must leave existing presents unaffected');
+assert.strictEqual(cdcStats.subjectsStats[0].parts.tu.simN, 4, 'CDC must leave held tutorial classes unchanged');
+
+// Compare with Waiver on 2026-08-11 (deletes class: held drops to 19, attended stays 11)
+const waiverAndCdcStats = calculateSimulatedStats(mockParsedData, new Set(['2026-08-11']), 85, new Set(['2026-08-10']));
+assert.strictEqual(waiverAndCdcStats.subjectsStats[0].parts.th.simP, 11, 'Attended reflects CDC +1 present');
+assert.strictEqual(waiverAndCdcStats.subjectsStats[0].parts.th.simN, 19, 'Held reflects Waiver -1 class deletion');
+console.log('✓ Career Development Centre (CDC) Attendance Duty math and co-existence validated.');
 
 console.log('\nALL UNIT TESTS PASSED SUCCESSFULLY! ✓✓✓');
