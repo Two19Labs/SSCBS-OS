@@ -706,12 +706,72 @@ export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPc
     };
   });
 
+  let totAtt = 0, totHeld = 0, totBaseAtt = 0, totBaseHeld = 0;
+  let thAtt = 0, thHeld = 0, thBaseAtt = 0, thBaseHeld = 0;
+  let tuAtt = 0, tuHeld = 0, tuBaseAtt = 0, tuBaseHeld = 0;
+
+  subjectsStats.forEach(sub => {
+    (sub.partsList || []).forEach(p => {
+      const att = p.simAttended ?? p.p ?? 0;
+      const held = p.simHeld ?? p.n ?? 0;
+      const bAtt = p.baseAtt ?? att;
+      const bHeld = p.baseHeld ?? held;
+
+      totAtt += att;
+      totHeld += held;
+      totBaseAtt += bAtt;
+      totBaseHeld += bHeld;
+
+      if (p.type === 'th') {
+        thAtt += att;
+        thHeld += held;
+        thBaseAtt += bAtt;
+        thBaseHeld += bHeld;
+      } else if (p.type === 'tu') {
+        tuAtt += att;
+        tuHeld += held;
+        tuBaseAtt += bAtt;
+        tuBaseHeld += bHeld;
+      }
+    });
+  });
+
+  const calcPct = (a, h) => (h > 0 ? (a / h) * 100 : 100);
+
+  const totals = {
+    overall: {
+      att: totAtt,
+      held: totHeld,
+      pct: calcPct(totAtt, totHeld),
+      baseAtt: totBaseAtt,
+      baseHeld: totBaseHeld,
+      basePct: calcPct(totBaseAtt, totBaseHeld)
+    },
+    theory: {
+      att: thAtt,
+      held: thHeld,
+      pct: calcPct(thAtt, thHeld),
+      baseAtt: thBaseAtt,
+      baseHeld: thBaseHeld,
+      basePct: calcPct(thBaseAtt, thBaseHeld)
+    },
+    tutorial: {
+      att: tuAtt,
+      held: tuHeld,
+      pct: calcPct(tuAtt, tuHeld),
+      baseAtt: tuBaseAtt,
+      baseHeld: tuBaseHeld,
+      basePct: calcPct(tuBaseAtt, tuBaseHeld)
+    }
+  };
+
   const totalTargetParts = targetParts.length;
   const isOptimal = passingTargetCount === totalTargetParts;
 
   return {
     subjectsStats,
     subjectSummaries: subjectsStats,
+    totals,
     passingTargetCount,
     passingCount: passingTargetCount,
     debarSafeTargetCount,

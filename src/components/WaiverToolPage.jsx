@@ -595,6 +595,65 @@ export default function WaiverToolPage({ onBack }) {
   const totalTargetParts = simStats?.totalTargetParts || 0;
   const passingTargetCount = simStats?.passingTargetCount ?? simStats?.passingCount ?? 0;
 
+  // Aggregate totals across all subjects
+  const totalsSummary = useMemo(() => {
+    if (simStats?.totals) return simStats.totals;
+    if (!subjectSummaries || subjectSummaries.length === 0) return null;
+    let totAtt = 0, totHeld = 0, totBaseAtt = 0, totBaseHeld = 0;
+    let thAtt = 0, thHeld = 0, thBaseAtt = 0, thBaseHeld = 0;
+    let tuAtt = 0, tuHeld = 0, tuBaseAtt = 0, tuBaseHeld = 0;
+
+    subjectSummaries.forEach(sub => {
+      const parts = sub.partsList || Object.values(sub.parts || {});
+      parts.forEach(p => {
+        const att = p.simAttended ?? p.simP ?? p.p ?? 0;
+        const held = p.simHeld ?? p.simN ?? p.n ?? 0;
+        const bAtt = p.baseAtt ?? att;
+        const bHeld = p.baseHeld ?? held;
+
+        totAtt += att;
+        totHeld += held;
+        totBaseAtt += bAtt;
+        totBaseHeld += bHeld;
+
+        if (p.type === 'th') {
+          thAtt += att;
+          thHeld += held;
+          thBaseAtt += bAtt;
+          thBaseHeld += bHeld;
+        } else if (p.type === 'tu') {
+          tuAtt += att;
+          tuHeld += held;
+          tuBaseAtt += bAtt;
+          tuBaseHeld += bHeld;
+        }
+      });
+    });
+
+    const calcPct = (a, h) => (h > 0 ? (a / h) * 100 : 100);
+
+    return {
+      overall: {
+        att: totAtt,
+        held: totHeld,
+        pct: calcPct(totAtt, totHeld),
+        basePct: calcPct(totBaseAtt, totBaseHeld)
+      },
+      theory: {
+        att: thAtt,
+        held: thHeld,
+        pct: calcPct(thAtt, thHeld),
+        basePct: calcPct(thBaseAtt, thBaseHeld)
+      },
+      tutorial: {
+        att: tuAtt,
+        held: tuHeld,
+        pct: calcPct(tuAtt, tuHeld),
+        basePct: calcPct(tuBaseAtt, tuBaseHeld)
+      }
+    };
+  }, [simStats, subjectSummaries]);
+
   const partOrder = { th: 0, tu: 1, pr: 2 };
 
   const renderPart = (part) => {
@@ -650,6 +709,89 @@ export default function WaiverToolPage({ onBack }) {
             <>Safe from debarment. Attend <strong>{buff.classesNeeded}</strong> in a row to reach {threshold}%</>
           )}
         </div>
+      </div>
+    );
+  };
+
+  const renderTotalsSummary = () => {
+    if (!totalsSummary) return null;
+
+    const items = [
+      {
+        key: 'overall',
+        label: 'Total Attendance',
+        data: totalsSummary.overall,
+        hasClasses: totalsSummary.overall.held > 0
+      },
+      {
+        key: 'theory',
+        label: 'Total Theory',
+        data: totalsSummary.theory,
+        hasClasses: totalsSummary.theory.held > 0
+      },
+      {
+        key: 'tutorial',
+        label: 'Total Tutorial',
+        data: totalsSummary.tutorial,
+        hasClasses: totalsSummary.tutorial.held > 0
+      }
+    ];
+
+    return (
+      <div className="rd-totals-card" aria-label="Overall attendance summary">
+        {items.map((item) => {
+          if (!item.hasClasses) {
+            return (
+              <div key={item.key} className="rd-total-item">
+                <div className="rd-total-item-top">
+                  <span className="rd-total-item-lbl">{item.label}</span>
+                  <span className="rd-no-target-badge">None</span>
+                </div>
+                <div className="rd-total-item-val">
+                  <span className="rd-noclass">No classes held</span>
+                </div>
+                <div className="rd-bar rd-bar-empty" />
+              </div>
+            );
+          }
+
+          const curPct = item.data.pct;
+          const basePct = item.data.basePct;
+          const hasChanged = Math.abs(curPct - basePct) > 0.05;
+          let status = 'safe';
+          let pill = ['Clear', 'safe'];
+
+          if (curPct < 66.666) {
+            status = 'fail';
+            pill = ['Risk', 'fail'];
+          } else if (curPct < threshold) {
+            status = 'warn';
+            pill = ['Below Target', 'warn'];
+          }
+
+          return (
+            <div key={item.key} className="rd-total-item">
+              <div className="rd-total-item-top">
+                <span className="rd-total-item-lbl">{item.label}</span>
+                <span className={`rd-pill p-${pill[1]}`}>{pill[0]}</span>
+              </div>
+              <div className="rd-total-item-val">
+                <div className="rd-total-frac-wrap">
+                  <span className={`rd-total-pct s-${status}`}>{curPct.toFixed(1)}%</span>
+                  <span className="rd-total-frac">{item.data.att}/{item.data.held}</span>
+                </div>
+                <span className="rd-was">{hasChanged ? `was ${basePct.toFixed(1)}%` : 'unchanged'}</span>
+              </div>
+              <div className="rd-bar">
+                <div className={`rd-fill f-${status}`} style={{ width: `${Math.min(100, Math.max(0, curPct))}%` }} />
+                {hasChanged && basePct < curPct && (
+                  <div className="rd-ghost" style={{ left: `${Math.max(0, basePct)}%` }} title={`Before waivers: ${basePct.toFixed(1)}%`} />
+                )}
+                <div className="rd-tick" style={{ left: `${threshold}%` }} title={`${threshold}% target`} />
+              </div>
+            </div>
+          );
+        })}
       </div>
     );
   };
@@ -1055,6 +1197,8 @@ export default function WaiverToolPage({ onBack }) {
                   </span>
                 </div>
               </div>
+
+              {renderTotalsSummary()}
 
               {renderSubjectCards()}
             </section>
