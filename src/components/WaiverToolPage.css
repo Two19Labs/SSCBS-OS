@@ -1177,50 +1177,11 @@
   color: #fff;
 }
 
-.rd-btn-clear-blocked {
-  margin-left: 4px;
-  padding: 2px 7px;
-  font-size: 11px;
-  font-weight: 700;
-  color: #b91c1c;
-  background: #fee2e2;
-  border: 1px solid #fecaca;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.rd-btn-clear-blocked:hover {
-  background: #fca5a5;
-  color: #7f1d1d;
-}
-
-/* Grid Headers & Cells: Blocked & Pre-Society Styles */
-.rd-date-th.is-blocked .rd-date-btn {
-  background: #fef2f2;
-  border-color: #fca5a5;
-}
-
-.rd-date-blocked-badge {
-  font-size: 11px;
-  line-height: 1;
-  margin-top: 2px;
-}
-
+/* Grid Headers & Cells: Pre-Society / Timeline Styles */
 .rd-date-locked-badge {
   font-size: 11px;
   line-height: 1;
   margin-top: 2px;
-}
-
-.rd-cell.blocked-cell {
-  background: repeating-linear-gradient(
-    45deg,
-    rgba(239, 68, 68, 0.04),
-    rgba(239, 68, 68, 0.04) 6px,
-    rgba(239, 68, 68, 0.1) 6px,
-    rgba(239, 68, 68, 0.1) 12px
-  );
 }
 
 .rd-cell.pre-society-cell {
@@ -1233,7 +1194,7 @@
   );
 }
 
-/* Popover Block Button & Tags */
+/* Popover Tags */
 .rd-pop-presociety-tag {
   display: inline-block;
   padding: 1px 6px;
@@ -1243,47 +1204,6 @@
   font-size: 10px;
   font-weight: 700;
   margin-left: 6px;
-}
-
-.rd-pop-blocked-tag {
-  display: inline-block;
-  padding: 1px 6px;
-  background: #fee2e2;
-  color: #b91c1c;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 700;
-  margin-left: 6px;
-}
-
-.rd-pop-footer {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--border);
-}
-
-.rd-pop-block-btn {
-  width: 100%;
-  padding: 6px 10px;
-  font-size: 11px;
-  font-weight: 700;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--ink);
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.rd-pop-block-btn:hover {
-  background: var(--tint);
-  border-color: var(--ink-dim);
-}
-
-.rd-pop-block-btn.is-blocked {
-  background: #fee2e2;
-  color: #b91c1c;
-  border-color: #fca5a5;
 }
 
 /* CDC Rescue Tags & Modal Boxes */
@@ -1750,30 +1670,6 @@
   background: var(--accent-tint);
   border-color: var(--accent);
   color: var(--accent);
-}
-
-/* Blocked Stat */
-.rd-stat.blocked-stat {
-  min-width: 140px;
-}
-
-.rd-btn-clear-blocked {
-  background: var(--tint);
-  border: 1px solid var(--border);
-  color: var(--ink-dim);
-  border-radius: 6px;
-  padding: 3px 8px;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  margin-left: auto;
-  transition: all 0.15s ease;
-}
-
-.rd-btn-clear-blocked:hover {
-  background: var(--rtint);
-  border-color: var(--red);
-  color: var(--red);
 }
 
 /* Status Banner */

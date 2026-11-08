@@ -137,7 +137,6 @@ export default function WaiverToolPage({ onBack }) {
   // Recommended waiver timeline window: 'YYYY-MM-DD' strings
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
-  const [blockedDates, setBlockedDates] = useState(new Set()); // Set of 'YYYY-MM-DD' blacklisted/blocked from solver
   const [isTimelineModalOpen, setIsTimelineModalOpen] = useState(false);
   const [tempStartDate, setTempStartDate] = useState('');
   const [tempEndDate, setTempEndDate] = useState('');
@@ -210,9 +209,6 @@ export default function WaiverToolPage({ onBack }) {
           if (saved.gridToolMode) setGridToolMode(saved.gridToolMode);
           if (saved.customStartDate !== undefined) setCustomStartDate(saved.customStartDate);
           if (saved.customEndDate !== undefined) setCustomEndDate(saved.customEndDate);
-          if (Array.isArray(saved.blockedDates)) {
-            setBlockedDates(new Set(saved.blockedDates));
-          }
         } else {
           localStorage.removeItem(storageKey);
         }
@@ -240,14 +236,13 @@ export default function WaiverToolPage({ onBack }) {
         selectedCdcDays: Array.from(selectedCdcDays),
         gridToolMode,
         customStartDate,
-        customEndDate,
-        blockedDates: Array.from(blockedDates)
+        customEndDate
       };
       localStorage.setItem(storageKey, JSON.stringify(stateToSave));
     } catch (err) {
       console.warn('Failed to persist Waiver Tool state:', err);
     }
-  }, [parsedData, selectedWaivers, starredSubjects, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, hasAcknowledgedIneligible, cdcLimit, selectedCdcDays, gridToolMode, customStartDate, customEndDate, blockedDates, storageKey]);
+  }, [parsedData, selectedWaivers, starredSubjects, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, hasAcknowledgedIneligible, cdcLimit, selectedCdcDays, gridToolMode, customStartDate, customEndDate, storageKey]);
 
   // Prevent scroll when expanded grid modal is open
   useEffect(() => {
@@ -306,7 +301,7 @@ export default function WaiverToolPage({ onBack }) {
     setError(null);
   };
 
-  // Run Solver Async with Worker or Fallback (Joint Waivers + CDC Attendance + Timeline/Blocked Dates)
+  // Run Solver Async with Worker or Fallback (Joint Waivers + CDC Attendance + Timeline)
   const executeSolverAsync = (data, targetT = threshold, limitK = maxWaivers, limitCOrStars = cdcLimit, starsOrCb, maybeCb, solverOpts = {}) => {
     let actualCdc = cdcLimit;
     let stars = starredSubjects;
@@ -332,8 +327,6 @@ export default function WaiverToolPage({ onBack }) {
     const actualStartMonth = extraOpts.waiverStartMonth !== undefined ? extraOpts.waiverStartMonth : 0;
     const actualStartDate = extraOpts.waiverStartDate !== undefined ? extraOpts.waiverStartDate : (customStartDate || null);
     const actualEndDate = extraOpts.waiverEndDate !== undefined ? extraOpts.waiverEndDate : (customEndDate || null);
-    const actualBlocked = extraOpts.blockedDates !== undefined ? extraOpts.blockedDates : blockedDates;
-    const blockedList = Array.from(actualBlocked || []);
     const starredList = Array.from(stars || []);
 
     if (workerRef.current) {
@@ -359,8 +352,7 @@ export default function WaiverToolPage({ onBack }) {
         cdcLimit: actualCdc,
         waiverStartMonth: actualStartMonth,
         waiverStartDate: actualStartDate,
-        waiverEndDate: actualEndDate,
-        blockedDates: blockedList
+        waiverEndDate: actualEndDate
       });
     } else {
       setTimeout(() => {
@@ -368,8 +360,7 @@ export default function WaiverToolPage({ onBack }) {
           const options = {
             waiverStartMonth: actualStartMonth,
             waiverStartDate: actualStartDate,
-            waiverEndDate: actualEndDate,
-            blockedDates: new Set(blockedList)
+            waiverEndDate: actualEndDate
           };
           const solution = solveExactBnb(data, targetT, limitK, starredList, actualCdc, options);
           let kPlusOne = null;
@@ -436,8 +427,7 @@ export default function WaiverToolPage({ onBack }) {
           setSelectedCdcDays(new Set());
         }, {
           waiverStartDate: customStartDate || null,
-          waiverEndDate: customEndDate || null,
-          blockedDates
+          waiverEndDate: customEndDate || null
         });
       } catch (err) {
         console.error('Attendance parse error:', err);
@@ -462,9 +452,8 @@ export default function WaiverToolPage({ onBack }) {
 
   const currentSolverOptions = useMemo(() => ({
     waiverStartDate: activeWaiverStart || null,
-    waiverEndDate: activeWaiverEnd || null,
-    blockedDates
-  }), [activeWaiverStart, activeWaiverEnd, blockedDates]);
+    waiverEndDate: activeWaiverEnd || null
+  }), [activeWaiverStart, activeWaiverEnd]);
 
   const handleUpdateRecommendation = () => {
     if (!parsedData) return;
@@ -494,7 +483,6 @@ export default function WaiverToolPage({ onBack }) {
     setError(null);
     setCustomStartDate('');
     setCustomEndDate('');
-    setBlockedDates(new Set());
     setIsTimelineModalOpen(false);
     try {
       localStorage.removeItem(storageKey);
@@ -647,54 +635,6 @@ export default function WaiverToolPage({ onBack }) {
     }
   };
 
-  // Toggle blacklisting a specific date from solver recommendations
-  const handleToggleBlockDate = (dateStr) => {
-    const nextBlocked = new Set(blockedDates);
-    if (nextBlocked.has(dateStr)) {
-      nextBlocked.delete(dateStr);
-    } else {
-      nextBlocked.add(dateStr);
-      if (selectedWaivers.has(dateStr)) {
-        const nextW = new Set(selectedWaivers);
-        nextW.delete(dateStr);
-        setSelectedWaivers(nextW);
-      }
-      if (selectedCdcDays.has(dateStr)) {
-        const nextC = new Set(selectedCdcDays);
-        nextC.delete(dateStr);
-        setSelectedCdcDays(nextC);
-      }
-    }
-    setBlockedDates(nextBlocked);
-    if (parsedData) {
-      setIsProcessing(true);
-      executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
-        if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
-          setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
-          setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
-        }
-      }, {
-        ...currentSolverOptions,
-        blockedDates: nextBlocked
-      });
-    }
-  };
-
-  const handleClearBlocked = () => {
-    setBlockedDates(new Set());
-    if (parsedData) {
-      setIsProcessing(true);
-      executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
-        if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
-          setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
-          setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
-        }
-      }, {
-        ...currentSolverOptions,
-        blockedDates: new Set()
-      });
-    }
-  };
 
   // Apply recommended waiver & CDC dates
   const handleApplyRecommended = () => {
@@ -1218,13 +1158,12 @@ export default function WaiverToolPage({ onBack }) {
             {columns.map(col => {
               const isWaived = selectedWaivers.has(col.dateStr);
               const isCdc = selectedCdcDays.has(col.dateStr);
-              const isBlocked = blockedDates.has(col.dateStr);
               const isOutOfTimeline = Boolean(
                 (activeWaiverStart && col.dateStr < activeWaiverStart) ||
                 (activeWaiverEnd && col.dateStr > activeWaiverEnd)
               );
               const btnClass = isWaived ? 'on' : (isCdc ? 'cdc-on' : '');
-              const thClass = `rd-date-th ${isBlocked ? 'is-blocked' : ''} ${isOutOfTimeline ? 'is-pre-society' : ''}`.trim();
+              const thClass = `rd-date-th ${isOutOfTimeline ? 'is-pre-society' : ''}`.trim();
               return (
                 <th key={col.dateStr} className={thClass}>
                   <button
@@ -1237,9 +1176,7 @@ export default function WaiverToolPage({ onBack }) {
                   >
                     <span className="wd">{col.weekday}</span>
                     <span className="dn">{col.dayNum}</span>
-                    {isBlocked ? (
-                      <span className="rd-date-blocked-badge" title="Blacklisted from recommendations">🚫</span>
-                    ) : isOutOfTimeline ? (
+                    {isOutOfTimeline ? (
                       <span className="rd-date-locked-badge" title="Outside recommended waiver timeline">🔒</span>
                     ) : isCdc ? (
                       <span className="rd-date-cdc-badge" title="Career Development Centre (CDC) Attendance">CDC</span>
@@ -1275,7 +1212,6 @@ export default function WaiverToolPage({ onBack }) {
                 {columns.map(col => {
                   const isWaived = selectedWaivers.has(col.dateStr);
                   const isCdc = selectedCdcDays.has(col.dateStr);
-                  const isBlocked = blockedDates.has(col.dateStr);
                   const isOutOfTimeline = Boolean(
                     (activeWaiverStart && col.dateStr < activeWaiverStart) ||
                     (activeWaiverEnd && col.dateStr > activeWaiverEnd)
@@ -1284,7 +1220,6 @@ export default function WaiverToolPage({ onBack }) {
                   const cellClass = [
                     isWaived ? 'on' : '',
                     isCdc ? 'cdc-cell' : '',
-                    isBlocked ? 'blocked-cell' : '',
                     isOutOfTimeline ? 'pre-society-cell' : ''
                   ].filter(Boolean).join(' ');
                   return (
@@ -1460,8 +1395,7 @@ export default function WaiverToolPage({ onBack }) {
                   setIsProcessing(true);
                   const opts = {
                     waiverStartDate: finalStart || null,
-                    waiverEndDate: finalEnd || null,
-                    blockedDates
+                    waiverEndDate: finalEnd || null
                   };
                   executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
                     if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
@@ -1655,11 +1589,6 @@ export default function WaiverToolPage({ onBack }) {
                   🔒 Out of timeline
                 </span>
               )}
-              {blockedDates.has(hoverDiff.dateStr) && (
-                <span className="rd-pop-blocked-tag" title="Blocked from solver recommendations">
-                  🚫 Blocked
-                </span>
-              )}
             </div>
             <span
               className={`rd-pop-tag ${
@@ -1691,18 +1620,6 @@ export default function WaiverToolPage({ onBack }) {
               );
             })
           )}
-          <div className="rd-pop-footer">
-            <button
-              type="button"
-              className={`rd-pop-block-btn ${blockedDates.has(hoverDiff.dateStr) ? 'is-blocked' : ''}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleToggleBlockDate(hoverDiff.dateStr);
-              }}
-            >
-              {blockedDates.has(hoverDiff.dateStr) ? '✓ Unblock this date' : '🚫 Block date from recommendations'}
-            </button>
-          </div>
         </div>
       )}
 
@@ -1786,25 +1703,6 @@ export default function WaiverToolPage({ onBack }) {
                 </button>
               </div>
             </div>
-
-            {/* Blacklisted / Blocked Dates Stat (only if any blacklisted) */}
-            {blockedDates.size > 0 && (
-              <div className="rd-stat blocked-stat">
-                <span className="lbl" title="Dates blacklisted from recommendations">Blocked</span>
-                <div className="row">
-                  <span className="num">{blockedDates.size}</span>
-                  <span className="unit">dates</span>
-                  <button
-                    type="button"
-                    className="rd-btn-clear-blocked"
-                    onClick={handleClearBlocked}
-                    title="Clear blocked dates"
-                  >
-                    Clear
-                  </button>
-                </div>
-              </div>
-            )}
 
             {/* Status Banner */}
             <div className={`rd-status ${simStats?.allPassing ? 'ok' : ((simStats?.debarSafeTargetCount ?? 0) < totalTargetParts ? 'bad' : 'warn')}`}>
@@ -2287,16 +2185,6 @@ export default function WaiverToolPage({ onBack }) {
                     Apply recommended
                   </button>
                 )}
-                {blockedDates.size > 0 && (
-                  <button
-                    type="button"
-                    className="rd-btn-outline sm muted"
-                    onClick={handleClearBlocked}
-                    title="Unblock all blocked dates"
-                  >
-                    Clear blocked ({blockedDates.size})
-                  </button>
-                )}
                 <button
                   type="button"
                   className="rd-btn-outline sm muted"
@@ -2339,7 +2227,7 @@ export default function WaiverToolPage({ onBack }) {
         </div>
       )}
 
-      {/* Custom Timeline & Blacklist Modal Overlay */}
+      {/* Custom Timeline Modal Overlay */}
       {renderTimelineModal()}
     </div>
   );
