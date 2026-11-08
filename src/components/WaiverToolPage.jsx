@@ -574,7 +574,7 @@ export default function WaiverToolPage({ onBack }) {
     }
   };
 
-  // Apply or reset recommended waiver & CDC dates
+  // Apply recommended waiver & CDC dates
   const handleApplyRecommended = () => {
     if (solverResult) {
       const nextW = solverResult.chosenDays?.length ? new Set(solverResult.chosenDays.map(d => d.dateStr)) : new Set();
@@ -590,10 +590,6 @@ export default function WaiverToolPage({ onBack }) {
         setSelectedCdcDays(nextC);
       });
     }
-  };
-
-  const handleResetRecommended = () => {
-    handleApplyRecommended();
   };
 
   const handleClearAll = () => {
@@ -1531,14 +1527,14 @@ export default function WaiverToolPage({ onBack }) {
                         </button>
                       </div>
                     )}
-                    {solverResult?.chosenDays?.length > 0 && (
+                    {selectedWaivers.size === 0 && selectedCdcDays.size === 0 && (solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
                       <button
                         type="button"
-                        className={`rd-btn-outline sm ${selectedWaivers.size === 0 ? 'rd-btn-accent' : ''}`}
+                        className="rd-btn-outline sm rd-btn-accent"
                         onClick={handleApplyRecommended}
-                        title={selectedWaivers.size === 0 ? 'Apply recommended waiver plan' : 'Reset to recommended plan'}
+                        title="Apply recommended attendance dates"
                       >
-                        {selectedWaivers.size === 0 ? 'Apply recommended' : 'Reset'}
+                        Apply recommended
                       </button>
                     )}
                     {selectedCdcDays.size > 0 && (
@@ -1608,13 +1604,13 @@ export default function WaiverToolPage({ onBack }) {
                   </div>
                   <div className="acts">
                     {copyFeedback && <span className="rd-copied">{copyFeedback}</span>}
-                    {(solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
+                    {selectedWaivers.size === 0 && selectedCdcDays.size === 0 && (solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
                       <button
                         type="button"
-                        className={`rd-btn-outline sm ${selectedWaivers.size === 0 && selectedCdcDays.size === 0 ? 'rd-btn-accent' : ''}`}
+                        className="rd-btn-outline sm rd-btn-accent"
                         onClick={handleApplyRecommended}
                       >
-                        {selectedWaivers.size === 0 && selectedCdcDays.size === 0 ? 'Apply recommended' : 'Reset'}
+                        Apply recommended
                       </button>
                     )}
                     <button
@@ -1852,13 +1848,13 @@ export default function WaiverToolPage({ onBack }) {
                     </button>
                   </div>
                 )}
-                {(solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
+                {selectedWaivers.size === 0 && selectedCdcDays.size === 0 && (solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
                   <button
                     type="button"
-                    className={`rd-btn-outline sm ${selectedWaivers.size === 0 && selectedCdcDays.size === 0 ? 'rd-btn-accent' : ''}`}
+                    className="rd-btn-outline sm rd-btn-accent"
                     onClick={handleApplyRecommended}
                   >
-                    {selectedWaivers.size === 0 && selectedCdcDays.size === 0 ? 'Apply recommended' : 'Reset to recommended'}
+                    Apply recommended
                   </button>
                 )}
                 {selectedCdcDays.size > 0 && (
