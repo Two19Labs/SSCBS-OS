@@ -353,11 +353,9 @@ export default function WaiverToolPage({ onBack }) {
             chosenDaysCount: solution.chosenDays.length
           });
 
-          if (solution.chosenDays && solution.chosenDays.length > 0) {
-            setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
-          } else {
-            setSelectedWaivers(new Set());
-          }
+          // Do NOT apply waivers automatically upon file submission/open.
+          // Show pure baseline attendance first per user requirement.
+          setSelectedWaivers(new Set());
         });
       } catch (err) {
         console.error('Attendance parse error:', err);
@@ -413,11 +411,13 @@ export default function WaiverToolPage({ onBack }) {
     if (parsedData) {
       setIsProcessing(true);
       executeSolverAsync(parsedData, threshold, maxWaivers, next, (solution) => {
-        if (solution?.chosenDays && solution.chosenDays.length > 0) {
-          setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
-        } else {
-          setSelectedWaivers(new Set());
-        }
+        setSelectedWaivers(prev => {
+          if (prev.size === 0) return prev;
+          if (solution?.chosenDays && solution.chosenDays.length > 0) {
+            return new Set(solution.chosenDays.map(d => d.dateStr));
+          }
+          return new Set();
+        });
       });
     }
   };
@@ -439,11 +439,13 @@ export default function WaiverToolPage({ onBack }) {
     if (parsedData) {
       setIsProcessing(true);
       executeSolverAsync(parsedData, threshold, clamped, (solution) => {
-        if (solution?.chosenDays && solution.chosenDays.length > 0) {
-          setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
-        } else {
-          setSelectedWaivers(new Set());
-        }
+        setSelectedWaivers(prev => {
+          if (prev.size === 0) return prev;
+          if (solution?.chosenDays && solution.chosenDays.length > 0) {
+            return new Set(solution.chosenDays.map(d => d.dateStr));
+          }
+          return new Set();
+        });
       });
     }
   };
@@ -454,6 +456,24 @@ export default function WaiverToolPage({ onBack }) {
     if (parsedData) {
       setIsProcessing(true);
       executeSolverAsync(parsedData, clamped, maxWaivers, (solution) => {
+        setSelectedWaivers(prev => {
+          if (prev.size === 0) return prev;
+          if (solution?.chosenDays && solution.chosenDays.length > 0) {
+            return new Set(solution.chosenDays.map(d => d.dateStr));
+          }
+          return new Set();
+        });
+      });
+    }
+  };
+
+  // Apply or reset recommended waiver dates
+  const handleApplyRecommended = () => {
+    if (solverResult?.chosenDays && solverResult.chosenDays.length > 0) {
+      setSelectedWaivers(new Set(solverResult.chosenDays.map(d => d.dateStr)));
+    } else if (parsedData) {
+      setIsProcessing(true);
+      executeSolverAsync(parsedData, threshold, maxWaivers, (solution) => {
         if (solution?.chosenDays && solution.chosenDays.length > 0) {
           setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
         } else {
@@ -463,17 +483,8 @@ export default function WaiverToolPage({ onBack }) {
     }
   };
 
-  // Reset to recommended waivers with automatic re-solve for active parameters
   const handleResetRecommended = () => {
-    if (!parsedData) return;
-    setIsProcessing(true);
-    executeSolverAsync(parsedData, threshold, maxWaivers, (solution) => {
-      if (solution?.chosenDays && solution.chosenDays.length > 0) {
-        setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
-      } else {
-        setSelectedWaivers(new Set());
-      }
-    });
+    handleApplyRecommended();
   };
 
   const handleClearAll = () => {
@@ -1209,9 +1220,18 @@ export default function WaiverToolPage({ onBack }) {
               )}
               <div>
                 <strong>{passingTargetCount} of {totalTargetParts} theory and tute parts are above {threshold}%</strong>
-                <span>With the {selectedWaivers.size} waiver date{selectedWaivers.size === 1 ? '' : 's'} selected. Practicals are shown for info only.</span>
+                <span>
+                  {selectedWaivers.size === 0
+                    ? `Showing raw baseline attendance (0 waivers applied). You can apply recommended waivers (${solverResult?.chosenDays?.length || 0} dates) below.`
+                    : `With the ${selectedWaivers.size} waiver date${selectedWaivers.size === 1 ? '' : 's'} selected. Practicals are shown for info only.`}
+                </span>
               </div>
-              {hasParamsChanged && (
+              {selectedWaivers.size === 0 && solverResult?.chosenDays?.length > 0 && (
+                <button type="button" className="rd-btn-outline sm rd-btn-accent" onClick={handleApplyRecommended}>
+                  Apply recommended ({solverResult.chosenDays.length})
+                </button>
+              )}
+              {hasParamsChanged && selectedWaivers.size > 0 && (
                 <button type="button" className="rd-btn-outline sm" onClick={handleUpdateRecommendation}>
                   Update recommendation
                 </button>
@@ -1306,15 +1326,36 @@ export default function WaiverToolPage({ onBack }) {
                     <h2>Spreadsheet grid</h2>
                     <span>Click a date to waive or restore that whole day</span>
                   </div>
-                  <button type="button" className="rd-btn-dark" onClick={() => setIsGridExpanded(true)}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <polyline points="15 3 21 3 21 9" />
-                      <polyline points="9 21 3 21 3 15" />
-                      <line x1="21" y1="3" x2="14" y2="10" />
-                      <line x1="3" y1="21" x2="10" y2="14" />
-                    </svg>
-                    Expand grid
-                  </button>
+                  <div className="rd-grid-acts">
+                    {solverResult?.chosenDays?.length > 0 && (
+                      <button
+                        type="button"
+                        className={`rd-btn-outline sm ${selectedWaivers.size === 0 ? 'rd-btn-accent' : ''}`}
+                        onClick={handleApplyRecommended}
+                        title={selectedWaivers.size === 0 ? 'Apply recommended waiver plan' : 'Reset to recommended plan'}
+                      >
+                        {selectedWaivers.size === 0 ? 'Apply recommended' : 'Reset'}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="rd-btn-outline sm muted"
+                      onClick={handleClearAll}
+                      disabled={selectedWaivers.size === 0}
+                      title="Clear all active waivers"
+                    >
+                      Clear
+                    </button>
+                    <button type="button" className="rd-btn-dark" onClick={() => setIsGridExpanded(true)}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <polyline points="15 3 21 3 21 9" />
+                        <polyline points="9 21 3 21 3 15" />
+                        <line x1="21" y1="3" x2="14" y2="10" />
+                        <line x1="3" y1="21" x2="10" y2="14" />
+                      </svg>
+                      Expand grid
+                    </button>
+                  </div>
                 </div>
                 <div className="rd-preview-body">
                   {renderGridTable(previewColumns, false)}
@@ -1324,9 +1365,12 @@ export default function WaiverToolPage({ onBack }) {
                   <span>
                     Showing {previewColumns[0]?.label} to {lastPreviewCol?.label} of {allDayColumns.length} class days
                   </span>
-                  <span className="rd-key">
-                    <i />Waived day
-                  </span>
+                  <div className="rd-preview-foot-right">
+                    <span className="rd-count sm">{selectedWaivers.size} of {maxWaivers} waived</span>
+                    <span className="rd-key">
+                      <i />Waived day
+                    </span>
+                  </div>
                 </div>
               </section>
 
@@ -1339,9 +1383,13 @@ export default function WaiverToolPage({ onBack }) {
                   </div>
                   <div className="acts">
                     {copyFeedback && <span className="rd-copied">{copyFeedback}</span>}
-                    {!isOptimalSuggested && solverResult?.chosenDays?.length > 0 && (
-                      <button type="button" className="rd-btn-outline sm" onClick={handleResetRecommended}>
-                        Reset
+                    {solverResult?.chosenDays?.length > 0 && (
+                      <button
+                        type="button"
+                        className={`rd-btn-outline sm ${selectedWaivers.size === 0 ? 'rd-btn-accent' : ''}`}
+                        onClick={handleApplyRecommended}
+                      >
+                        {selectedWaivers.size === 0 ? 'Apply recommended' : 'Reset'}
                       </button>
                     )}
                     <button
@@ -1356,6 +1404,7 @@ export default function WaiverToolPage({ onBack }) {
                       type="button"
                       className="rd-btn-outline sm muted"
                       onClick={handleClearAll}
+                      disabled={selectedWaivers.size === 0}
                     >
                       Clear
                     </button>
@@ -1364,10 +1413,12 @@ export default function WaiverToolPage({ onBack }) {
 
                 {selectedDaysList.length === 0 ? (
                   <div className="rd-empty">
-                    <p>No dates waived yet.</p>
-                    <button type="button" className="rd-btn-dark" onClick={handleResetRecommended}>
-                      Apply recommended dates
-                    </button>
+                    <p>No waivers applied yet. Viewing raw attendance.</p>
+                    {solverResult?.chosenDays?.length > 0 && (
+                      <button type="button" className="rd-btn-dark" onClick={handleApplyRecommended}>
+                        Apply recommended waivers ({solverResult.chosenDays.length} dates)
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <ul className="rd-date-list">
@@ -1520,11 +1571,23 @@ export default function WaiverToolPage({ onBack }) {
               </div>
               <div className="rd-exp-acts">
                 <span className="rd-count lg">{selectedWaivers.size} of {maxWaivers} waivers used</span>
-                {!isOptimalSuggested && solverResult?.chosenDays?.length > 0 && (
-                  <button type="button" className="rd-btn-outline sm" onClick={handleResetRecommended}>
-                    Reset to recommended
+                {solverResult?.chosenDays?.length > 0 && (
+                  <button
+                    type="button"
+                    className={`rd-btn-outline sm ${selectedWaivers.size === 0 ? 'rd-btn-accent' : ''}`}
+                    onClick={handleApplyRecommended}
+                  >
+                    {selectedWaivers.size === 0 ? 'Apply recommended' : 'Reset to recommended'}
                   </button>
                 )}
+                <button
+                  type="button"
+                  className="rd-btn-outline sm muted"
+                  onClick={handleClearAll}
+                  disabled={selectedWaivers.size === 0}
+                >
+                  Clear all
+                </button>
                 <button type="button" className="rd-btn-dark" onClick={() => setIsGridExpanded(false)}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <polyline points="4 14 10 14 10 20" />

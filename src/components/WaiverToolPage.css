@@ -806,3 +806,35 @@
     gap: 8px;
   }
 }
+
+/* ── Spreadsheet Grid Action Buttons & Accent Styling ── */
+.rd-grid-acts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rd-btn-accent {
+  background: var(--maroon, #7a1c28) !important;
+  color: #ffffff !important;
+  border-color: var(--maroon, #7a1c28) !important;
+  font-weight: 700 !important;
+}
+
+.rd-btn-accent:hover {
+  background: #63141f !important;
+  border-color: #63141f !important;
+  color: #ffffff !important;
+}
+
+.rd-preview-foot-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rd-count.sm {
+  font-size: 11.5px;
+  padding: 2px 8px;
+}
