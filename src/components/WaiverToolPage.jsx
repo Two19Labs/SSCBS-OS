@@ -271,16 +271,27 @@ export default function WaiverToolPage({ onBack }) {
     setError(null);
   };
 
-  // Run Solver Async with Worker or Fallback
-  const executeSolverAsync = (data, targetT, limitK, starsOrCb, maybeCb) => {
+  // Run Solver Async with Worker or Fallback (Joint Waivers + CDC Attendance)
+  const executeSolverAsync = (data, targetT = threshold, limitK = maxWaivers, limitCOrStars, starsOrCb, maybeCb) => {
+    let actualCdc = cdcLimit;
     let stars = starredSubjects;
     let callback = null;
-    if (typeof starsOrCb === 'function') {
+
+    if (typeof limitCOrStars === 'number') {
+      actualCdc = limitCOrStars;
+      if (typeof starsOrCb === 'function') {
+        callback = starsOrCb;
+      } else if (starsOrCb !== undefined) {
+        stars = starsOrCb;
+        callback = maybeCb;
+      }
+    } else if (typeof limitCOrStars === 'function') {
+      callback = limitCOrStars;
+    } else if (limitCOrStars instanceof Set || Array.isArray(limitCOrStars)) {
+      stars = limitCOrStars;
       callback = starsOrCb;
-    } else if (starsOrCb !== undefined) {
-      stars = starsOrCb;
-      callback = maybeCb;
     }
+
     const starredList = Array.from(stars || []);
 
     if (workerRef.current) {
@@ -302,15 +313,16 @@ export default function WaiverToolPage({ onBack }) {
         parsedData: data,
         targetPct: targetT,
         maxWaiversK: limitK,
-        starredSubjects: starredList
+        starredSubjects: starredList,
+        cdcLimit: actualCdc
       });
     } else {
       setTimeout(() => {
         try {
-          const solution = solveExactBnb(data, targetT, limitK, starredList);
+          const solution = solveExactBnb(data, targetT, limitK, starredList, actualCdc);
           let kPlusOne = null;
           if (solution.status === 'SHORTAGE') {
-            kPlusOne = solveKPlusOne(data, targetT, limitK, starredList);
+            kPlusOne = solveKPlusOne(data, targetT, limitK, starredList, actualCdc);
           }
           setSolverResult(solution);
           setKPlusOneResult(kPlusOne);
@@ -426,11 +438,18 @@ export default function WaiverToolPage({ onBack }) {
     setStarredSubjects(next);
     if (parsedData) {
       setIsProcessing(true);
-      executeSolverAsync(parsedData, threshold, maxWaivers, next, (solution) => {
+      executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, next, (solution) => {
         setSelectedWaivers(prev => {
-          if (prev.size === 0) return prev;
+          if (prev.size === 0 && selectedCdcDays.size === 0) return prev;
           if (solution?.chosenDays && solution.chosenDays.length > 0) {
             return new Set(solution.chosenDays.map(d => d.dateStr));
+          }
+          return new Set();
+        });
+        setSelectedCdcDays(prev => {
+          if (prev.size === 0 && selectedWaivers.size === 0) return prev;
+          if (solution?.chosenCdcDays && solution.chosenCdcDays.length > 0) {
+            return new Set(solution.chosenCdcDays.map(d => d.dateStr));
           }
           return new Set();
         });
@@ -481,11 +500,18 @@ export default function WaiverToolPage({ onBack }) {
     setMaxWaivers(clamped);
     if (parsedData) {
       setIsProcessing(true);
-      executeSolverAsync(parsedData, threshold, clamped, (solution) => {
+      executeSolverAsync(parsedData, threshold, clamped, cdcLimit, (solution) => {
         setSelectedWaivers(prev => {
-          if (prev.size === 0) return prev;
+          if (prev.size === 0 && selectedCdcDays.size === 0) return prev;
           if (solution?.chosenDays && solution.chosenDays.length > 0) {
             return new Set(solution.chosenDays.map(d => d.dateStr));
+          }
+          return new Set();
+        });
+        setSelectedCdcDays(prev => {
+          if (prev.size === 0 && selectedWaivers.size === 0) return prev;
+          if (solution?.chosenCdcDays && solution.chosenCdcDays.length > 0) {
+            return new Set(solution.chosenCdcDays.map(d => d.dateStr));
           }
           return new Set();
         });
@@ -498,11 +524,18 @@ export default function WaiverToolPage({ onBack }) {
     setThreshold(clamped);
     if (parsedData) {
       setIsProcessing(true);
-      executeSolverAsync(parsedData, clamped, maxWaivers, (solution) => {
+      executeSolverAsync(parsedData, clamped, maxWaivers, cdcLimit, (solution) => {
         setSelectedWaivers(prev => {
-          if (prev.size === 0) return prev;
+          if (prev.size === 0 && selectedCdcDays.size === 0) return prev;
           if (solution?.chosenDays && solution.chosenDays.length > 0) {
             return new Set(solution.chosenDays.map(d => d.dateStr));
+          }
+          return new Set();
+        });
+        setSelectedCdcDays(prev => {
+          if (prev.size === 0 && selectedWaivers.size === 0) return prev;
+          if (solution?.chosenCdcDays && solution.chosenCdcDays.length > 0) {
+            return new Set(solution.chosenCdcDays.map(d => d.dateStr));
           }
           return new Set();
         });
@@ -510,18 +543,51 @@ export default function WaiverToolPage({ onBack }) {
     }
   };
 
-  // Apply or reset recommended waiver dates
+  const handleCdcLimitChange = (newLimit) => {
+    const clamped = Math.max(0, Math.min(15, newLimit));
+    setCdcLimit(clamped);
+    if (clamped === 0) {
+      setSelectedCdcDays(new Set());
+      setGridToolMode('waiver');
+    } else if (selectedCdcDays.size > clamped) {
+      const trimmed = new Set(Array.from(selectedCdcDays).slice(0, clamped));
+      setSelectedCdcDays(trimmed);
+    }
+    if (parsedData) {
+      setIsProcessing(true);
+      executeSolverAsync(parsedData, threshold, maxWaivers, clamped, (solution) => {
+        setSelectedWaivers(prev => {
+          if (prev.size === 0 && selectedCdcDays.size === 0) return prev;
+          if (solution?.chosenDays && solution.chosenDays.length > 0) {
+            return new Set(solution.chosenDays.map(d => d.dateStr));
+          }
+          return new Set();
+        });
+        setSelectedCdcDays(prev => {
+          if (prev.size === 0 && selectedWaivers.size === 0) return prev;
+          if (solution?.chosenCdcDays && solution.chosenCdcDays.length > 0) {
+            return new Set(solution.chosenCdcDays.map(d => d.dateStr));
+          }
+          return new Set();
+        });
+      });
+    }
+  };
+
+  // Apply or reset recommended waiver & CDC dates
   const handleApplyRecommended = () => {
-    if (solverResult?.chosenDays && solverResult.chosenDays.length > 0) {
-      setSelectedWaivers(new Set(solverResult.chosenDays.map(d => d.dateStr)));
+    if (solverResult) {
+      const nextW = solverResult.chosenDays?.length ? new Set(solverResult.chosenDays.map(d => d.dateStr)) : new Set();
+      const nextC = solverResult.chosenCdcDays?.length ? new Set(solverResult.chosenCdcDays.map(d => d.dateStr)) : new Set();
+      setSelectedWaivers(nextW);
+      setSelectedCdcDays(nextC);
     } else if (parsedData) {
       setIsProcessing(true);
-      executeSolverAsync(parsedData, threshold, maxWaivers, (solution) => {
-        if (solution?.chosenDays && solution.chosenDays.length > 0) {
-          setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
-        } else {
-          setSelectedWaivers(new Set());
-        }
+      executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, (solution) => {
+        const nextW = solution?.chosenDays?.length ? new Set(solution.chosenDays.map(d => d.dateStr)) : new Set();
+        const nextC = solution?.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set();
+        setSelectedWaivers(nextW);
+        setSelectedCdcDays(nextC);
       });
     }
   };
@@ -532,6 +598,19 @@ export default function WaiverToolPage({ onBack }) {
 
   const handleClearAll = () => {
     setSelectedWaivers(new Set());
+    setSelectedCdcDays(new Set());
+  };
+
+  const handleRemoveDate = (item) => {
+    if (item.kind === 'cdc') {
+      const nextC = new Set(selectedCdcDays);
+      nextC.delete(item.dateStr);
+      setSelectedCdcDays(nextC);
+    } else {
+      const nextW = new Set(selectedWaivers);
+      nextW.delete(item.dateStr);
+      setSelectedWaivers(nextW);
+    }
   };
 
   // Candidate days mapping for fast missed-subject lookups
@@ -544,7 +623,7 @@ export default function WaiverToolPage({ onBack }) {
     return map;
   }, [parsedData]);
 
-  // Chronologically ordered selected waiver cards for the right sidebar
+  // Chronologically ordered selected date cards for the right sidebar (both Waivers and CDC Attendance)
   const selectedDaysList = useMemo(() => {
     if (!parsedData?.dayColumns) return [];
     const list = [];
@@ -557,14 +636,26 @@ export default function WaiverToolPage({ onBack }) {
           monthShort: MONTH_NAMES[col.month - 1]?.toUpperCase() || '',
           weekday: col.weekday,
           totalMissed: cand ? cand.totalAbsences : 0,
-          missedSubjects: cand?.missedSubjects || []
+          missedSubjects: cand?.missedSubjects || [],
+          kind: 'waiver'
+        });
+      } else if (selectedCdcDays.has(col.dateStr)) {
+        const cand = candidateDaysMap.get(col.dateStr);
+        list.push({
+          dateStr: col.dateStr,
+          dayNum: String(col.dayNum).padStart(2, '0'),
+          monthShort: MONTH_NAMES[col.month - 1]?.toUpperCase() || '',
+          weekday: col.weekday,
+          totalMissed: cand ? cand.totalAbsences : 0,
+          missedSubjects: cand?.missedSubjects || [],
+          kind: 'cdc'
         });
       }
     });
     return list;
-  }, [parsedData, selectedWaivers, candidateDaysMap]);
+  }, [parsedData, selectedWaivers, selectedCdcDays, candidateDaysMap]);
 
-  // Live simulated stats (incorporating Waivers & Career Development Centre CDC Duty)
+  // Live simulated stats (incorporating Waivers & Career Development Centre CDC Attendance)
   const simStats = useMemo(() => {
     if (!parsedData) return null;
     return calculateSimulatedStats(parsedData, selectedWaivers, threshold, selectedCdcDays);
@@ -577,20 +668,40 @@ export default function WaiverToolPage({ onBack }) {
   }, [hoveredDate, parsedData, selectedWaivers, threshold, selectedCdcDays, gridToolMode]);
 
   const isOptimalSuggested = useMemo(() => {
-    if (!solverResult?.chosenDays || solverResult.chosenDays.length !== selectedWaivers.size) {
+    if (!solverResult) return false;
+    const recW = solverResult.chosenDays || [];
+    const recC = solverResult.chosenCdcDays || [];
+    if (recW.length !== selectedWaivers.size || recC.length !== selectedCdcDays.size) {
       return false;
     }
-    return solverResult.chosenDays.every(d => selectedWaivers.has(d.dateStr));
-  }, [solverResult, selectedWaivers]);
+    const wMatch = recW.every(d => selectedWaivers.has(d.dateStr));
+    const cMatch = recC.every(d => selectedCdcDays.has(d.dateStr));
+    return wMatch && cMatch;
+  }, [solverResult, selectedWaivers, selectedCdcDays]);
 
   // Copy list to clipboard with robust fallback
   const handleCopyDates = () => {
     if (selectedDaysList.length === 0) return;
-    const lines = selectedDaysList.map(item => {
-      const subs = item.missedSubjects.length > 0 ? ` (${item.missedSubjects.join(', ')})` : '';
-      return `${item.weekday}, ${item.dayNum} ${item.monthShort} - ${item.totalMissed} class(es) missed${subs}`;
-    });
-    const text = `SSCBS Attendance Waiver Dates (${selectedDaysList.length} dates):\n` + lines.join('\n');
+    const waiverItems = selectedDaysList.filter(d => d.kind === 'waiver');
+    const cdcItems = selectedDaysList.filter(d => d.kind === 'cdc');
+
+    const sections = [];
+    if (waiverItems.length > 0) {
+      const lines = waiverItems.map(item => {
+        const subs = item.missedSubjects.length > 0 ? ` (${item.missedSubjects.join(', ')})` : '';
+        return `• ${item.weekday}, ${item.dayNum} ${item.monthShort} - ${item.totalMissed} class(es) missed${subs}`;
+      });
+      sections.push(`Waivers (${waiverItems.length} dates):\n` + lines.join('\n'));
+    }
+    if (cdcItems.length > 0) {
+      const lines = cdcItems.map(item => {
+        const subs = item.missedSubjects.length > 0 ? ` (${item.missedSubjects.join(', ')})` : '';
+        return `• ${item.weekday}, ${item.dayNum} ${item.monthShort} - ${item.totalMissed} class(es) converted to present${subs}`;
+      });
+      sections.push(`CDC Attendance (${cdcItems.length} dates):\n` + lines.join('\n'));
+    }
+
+    const text = `SSCBS Attendance Recommendation (${selectedDaysList.length} dates total):\n\n` + sections.join('\n\n');
 
     const onSuccess = () => {
       setCopyFeedback('✓ Copied to clipboard!');
@@ -1288,8 +1399,8 @@ export default function WaiverToolPage({ onBack }) {
                 </span>
                 <span className="unit">dates</span>
                 <span className="rd-steps">
-                  <button type="button" aria-label="Lower CDC attendance limit" onClick={() => setCdcLimit(Math.max(0, cdcLimit - 1))}>−</button>
-                  <button type="button" aria-label="Raise CDC attendance limit" onClick={() => setCdcLimit(Math.min(15, cdcLimit + 1))}>+</button>
+                  <button type="button" aria-label="Lower CDC attendance limit" onClick={() => handleCdcLimitChange(cdcLimit - 1)}>−</button>
+                  <button type="button" aria-label="Raise CDC attendance limit" onClick={() => handleCdcLimitChange(cdcLimit + 1)}>+</button>
                 </span>
               </div>
             </div>
@@ -1311,18 +1422,18 @@ export default function WaiverToolPage({ onBack }) {
               <div>
                 <strong>{passingTargetCount} of {totalTargetParts} theory and tute parts are above {threshold}%</strong>
                 <span>
-                  {selectedWaivers.size === 0
-                    ? `Showing raw baseline attendance (0 waivers applied). You can apply recommended waivers (${solverResult?.chosenDays?.length || 0} dates) below.`
-                    : `With the ${selectedWaivers.size} waiver date${selectedWaivers.size === 1 ? '' : 's'} selected. Practicals are shown for info only.`}
+                  {selectedWaivers.size === 0 && selectedCdcDays.size === 0
+                    ? `Showing raw baseline attendance (0 dates applied). You can apply recommended dates below.`
+                    : `With ${selectedWaivers.size} waiver${selectedWaivers.size === 1 ? '' : 's'}${cdcLimit > 0 ? ` and ${selectedCdcDays.size} CDC date${selectedCdcDays.size === 1 ? '' : 's'}` : ''} selected. Practicals are shown for info only.`}
                 </span>
               </div>
-              {selectedWaivers.size === 0 && solverResult?.chosenDays?.length > 0 && (
+              {selectedWaivers.size === 0 && selectedCdcDays.size === 0 && (solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
                 <button type="button" className="rd-btn-outline sm rd-btn-accent" onClick={handleApplyRecommended}>
-                  Apply recommended ({solverResult.chosenDays.length})
+                  Apply recommended
                 </button>
               )}
-              {hasParamsChanged && selectedWaivers.size > 0 && (
-                <button type="button" className="rd-btn-outline sm" onClick={handleUpdateRecommendation}>
+              {hasParamsChanged && (selectedWaivers.size > 0 || selectedCdcDays.size > 0) && (
+                <button type="button" className="rd-btn-outline sm" onClick={handleApplyRecommended}>
                   Update recommendation
                 </button>
               )}
@@ -1490,17 +1601,20 @@ export default function WaiverToolPage({ onBack }) {
                 <div className="rd-dates-head">
                   <div className="ttl">
                     <h2>Recommended dates</h2>
-                    <span className="rd-count">{selectedWaivers.size} of {maxWaivers}</span>
+                    <span className="rd-count">
+                      {selectedWaivers.size} of {maxWaivers}
+                      {cdcLimit > 0 && ` · ${selectedCdcDays.size} of ${cdcLimit} CDC`}
+                    </span>
                   </div>
                   <div className="acts">
                     {copyFeedback && <span className="rd-copied">{copyFeedback}</span>}
-                    {solverResult?.chosenDays?.length > 0 && (
+                    {(solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
                       <button
                         type="button"
-                        className={`rd-btn-outline sm ${selectedWaivers.size === 0 ? 'rd-btn-accent' : ''}`}
+                        className={`rd-btn-outline sm ${selectedWaivers.size === 0 && selectedCdcDays.size === 0 ? 'rd-btn-accent' : ''}`}
                         onClick={handleApplyRecommended}
                       >
-                        {selectedWaivers.size === 0 ? 'Apply recommended' : 'Reset'}
+                        {selectedWaivers.size === 0 && selectedCdcDays.size === 0 ? 'Apply recommended' : 'Reset'}
                       </button>
                     )}
                     <button
@@ -1515,7 +1629,7 @@ export default function WaiverToolPage({ onBack }) {
                       type="button"
                       className="rd-btn-outline sm muted"
                       onClick={handleClearAll}
-                      disabled={selectedWaivers.size === 0}
+                      disabled={selectedWaivers.size === 0 && selectedCdcDays.size === 0}
                     >
                       Clear
                     </button>
@@ -1524,10 +1638,10 @@ export default function WaiverToolPage({ onBack }) {
 
                 {selectedDaysList.length === 0 ? (
                   <div className="rd-empty">
-                    <p>No waivers applied yet. Viewing raw attendance.</p>
-                    {solverResult?.chosenDays?.length > 0 && (
+                    <p>No dates applied yet. Viewing raw attendance.</p>
+                    {(solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
                       <button type="button" className="rd-btn-dark" onClick={handleApplyRecommended}>
-                        Apply recommended waivers ({solverResult.chosenDays.length} dates)
+                        Apply recommended dates ({solverResult.chosenDays?.length || 0} waivers{solverResult.chosenCdcDays?.length ? ` + ${solverResult.chosenCdcDays.length} CDC` : ''})
                       </button>
                     )}
                   </div>
@@ -1535,13 +1649,14 @@ export default function WaiverToolPage({ onBack }) {
                   <ul className="rd-date-list">
                     {selectedDaysList.map(item => (
                       <li key={item.dateStr}>
-                        <div className="cal">
+                        <div className={`cal ${item.kind === 'cdc' ? 'cdc' : ''}`}>
                           <b>{item.dayNum}</b>
                           <span>{item.monthShort}</span>
                         </div>
                         <div className="txt">
                           <span className="l1">
-                            {item.weekday} <em>· {item.totalMissed} missed</em>
+                            {item.weekday} <em>· {item.totalMissed} {item.kind === 'cdc' ? 'converted' : 'missed'}</em>
+                            {item.kind === 'cdc' && <span className="cdc-tag">CDC</span>}
                           </span>
                           <span className="l2">
                             {item.missedSubjects.length ? item.missedSubjects.join(', ') : 'No absences recorded'}
@@ -1550,7 +1665,7 @@ export default function WaiverToolPage({ onBack }) {
                         <button
                           type="button"
                           aria-label={`Remove ${item.dayNum} ${item.monthShort}`}
-                          onClick={() => handleToggleDay(item.dateStr)}
+                          onClick={() => handleRemoveDate(item)}
                         >
                           ×
                         </button>
@@ -1737,13 +1852,13 @@ export default function WaiverToolPage({ onBack }) {
                     </button>
                   </div>
                 )}
-                {solverResult?.chosenDays?.length > 0 && (
+                {(solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
                   <button
                     type="button"
-                    className={`rd-btn-outline sm ${selectedWaivers.size === 0 ? 'rd-btn-accent' : ''}`}
+                    className={`rd-btn-outline sm ${selectedWaivers.size === 0 && selectedCdcDays.size === 0 ? 'rd-btn-accent' : ''}`}
                     onClick={handleApplyRecommended}
                   >
-                    {selectedWaivers.size === 0 ? 'Apply recommended' : 'Reset to recommended'}
+                    {selectedWaivers.size === 0 && selectedCdcDays.size === 0 ? 'Apply recommended' : 'Reset to recommended'}
                   </button>
                 )}
                 {selectedCdcDays.size > 0 && (

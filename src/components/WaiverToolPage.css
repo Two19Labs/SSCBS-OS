@@ -988,3 +988,25 @@
   color: #0369a1;
   background: #e0f2fe;
 }
+
+.rd-date-list .cal.cdc {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+.rd-date-list .cal.cdc span {
+  color: #e0f2fe;
+}
+
+.rd-date-list .cdc-tag {
+  display: inline-block;
+  padding: 1px 6px;
+  background: #e0f2fe;
+  color: #0369a1;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  margin-left: 6px;
+  text-transform: uppercase;
+}

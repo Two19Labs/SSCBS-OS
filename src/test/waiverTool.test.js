@@ -186,4 +186,37 @@ assert.strictEqual(waiverAndCdcStats.subjectsStats[0].parts.th.simP, 11, 'Attend
 assert.strictEqual(waiverAndCdcStats.subjectsStats[0].parts.th.simN, 19, 'Held reflects Waiver -1 class deletion');
 console.log('✓ Career Development Centre (CDC) Attendance math and co-existence validated.');
 
+// 7. Test Joint Optimization Solver: Waivers + CDC Attendance Smart Recommendation
+console.log('7. Testing Joint Optimization Solver (Waivers + CDC Attendance)...');
+if (fs.existsSync(nov6Path)) {
+  const html = fs.readFileSync(nov6Path, 'utf-8');
+  const parsed = parseAttendanceFile(html, 'Student Attandance_2026-11-06_15_48_08.xls');
+
+  // Run solver with K=8 waivers and C=2 CDC attendance days
+  const jointSol = solveExactBnb(parsed, 85, 8, ['Financial Accounting Analysis'], 2);
+
+  assert(Array.isArray(jointSol.chosenDays), 'chosenDays must be an array of waivers');
+  assert(Array.isArray(jointSol.chosenCdcDays), 'chosenCdcDays must be an array of CDC attendance days');
+  assert(jointSol.chosenDays.length <= 8, `Waivers (${jointSol.chosenDays.length}) must not exceed K=8`);
+  assert(jointSol.chosenCdcDays.length <= 2, `CDC days (${jointSol.chosenCdcDays.length}) must not exceed C=2`);
+
+  // Verify mutual exclusivity: a date cannot be both waived and marked as CDC attendance
+  const waiverDates = new Set(jointSol.chosenDays.map(d => d.dateStr));
+  const cdcDates = new Set(jointSol.chosenCdcDays.map(d => d.dateStr));
+  for (const date of cdcDates) {
+    assert(!waiverDates.has(date), `Date ${date} cannot be both a waiver and CDC attendance`);
+  }
+
+  // Verify that live simulation with recommended sets yields identical results to evalPlan
+  const liveJointStats = calculateSimulatedStats(parsed, waiverDates, 85, cdcDates);
+  assert.strictEqual(liveJointStats.passingTargetCount, jointSol.passCount, 'Simulated pass count must match solver pass count');
+
+  // Verify that adding CDC attendance days improves or maintains passing performance compared to waivers alone
+  const waiverOnlySol = solveExactBnb(parsed, 85, 8, ['Financial Accounting Analysis'], 0);
+  assert(jointSol.passCount >= waiverOnlySol.passCount, 'Joint solver must achieve at least as many passing subjects as waiver-only');
+  assert(jointSol.debarSafeCount >= waiverOnlySol.debarSafeCount, 'Joint solver must preserve or improve debarment safety');
+
+  console.log(`✓ Joint optimization successfully found ${jointSol.chosenDays.length} waivers + ${jointSol.chosenCdcDays.length} CDC days with ${jointSol.passCount}/${jointSol.totalTargetParts} parts passing.`);
+}
+
 console.log('\nALL UNIT TESTS PASSED SUCCESSFULLY! ✓✓✓');

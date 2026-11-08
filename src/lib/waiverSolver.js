@@ -162,6 +162,10 @@ export function extractCandidateDays(parsedData, targetParts) {
     });
 
     if (thOrTuAbsences > 0) {
+      const aDeltas = new Int32Array(numParts);
+      for (let c = 0; c < numParts; c++) {
+        aDeltas[c] = nDeltas[c] - pDeltas[c];
+      }
       candidateDays.push({
         dateStr: d.dateStr,
         weekday: d.weekday,
@@ -172,6 +176,7 @@ export function extractCandidateDays(parsedData, targetParts) {
         fullLabel: d.fullLabel,
         pDeltas,
         nDeltas,
+        aDeltas,
         thOrTuAbsences,
         totalAbsences,
         totalPresents,
@@ -188,7 +193,7 @@ export function extractCandidateDays(parsedData, targetParts) {
 /**
  * Ultra-fast exact branch-and-bound solver adhering to Sections 6.1 and 6.2.
  */
-export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, starredSubjects = []) {
+export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, starredSubjects = [], cdcLimitC = 0) {
   const startTime = (typeof performance !== 'undefined' ? performance.now() : Date.now());
   const T = targetPct;
 
@@ -213,6 +218,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
     return {
       status: 'OPTIMAL',
       chosenDays: [],
+      chosenCdcDays: [],
       passCount: 0,
       starredPassCount: 0,
       totalStarredParts: 0,
@@ -226,6 +232,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
   const candidateDays = extractCandidateDays(parsedData, targetParts);
   const numCandidates = candidateDays.length;
   const K = Math.min(maxWaiversK, numCandidates);
+  const C = Math.max(0, Math.min(cdcLimitC || 0, numCandidates));
 
   // w_cd = T * n_cd - 100 * p_cd
   // rhs_c = T * n_c - 100 * p_c + 1
@@ -282,7 +289,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
     }
   }
 
-  const evaluateState = (chosenIndices) => {
+  const evaluateState = (chosenIndices, chosenCdcIndices = []) => {
     let passCount = 0;
     let starredPassCount = 0;
     let debarSafeCount = 0;
@@ -290,6 +297,15 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
     let starredTierScore = 0;
     let minPct = 100;
     const finalStats = [];
+
+    const cdcAddedP = new Int32Array(numParts);
+    for (let j = 0; j < chosenCdcIndices.length; j++) {
+      const cd = orderedCandidates[chosenCdcIndices[j]];
+      for (let c = 0; c < numParts; c++) {
+        const abs = cd.aDeltas ? cd.aDeltas[c] : (cd.nDeltas[c] - cd.pDeltas[c]);
+        if (abs > 0) cdcAddedP[c] += abs;
+      }
+    }
 
     for (let c = 0; c < numParts; c++) {
       let waivedP = 0;
@@ -299,8 +315,9 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
         waivedP += cd.pDeltas[c];
         waivedN += cd.nDeltas[c];
       }
-      const simP = targetParts[c].p - waivedP;
-      const simN = targetParts[c].n - waivedN;
+
+      const simN = Math.max(0, targetParts[c].n - waivedN);
+      const simP = Math.min(simN, Math.max(0, targetParts[c].p - waivedP + cdcAddedP[c]));
       const pass = isPartPassing(simP, simN, T);
       if (pass) {
         passCount++;
@@ -346,8 +363,49 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
       allPass: passCount === numParts,
       allStarredPass: totalStarredParts === 0 || starredPassCount === totalStarredParts,
       minPct,
-      finalStats
+      finalStats,
+      waiverCount: chosenIndices.length,
+      cdcCount: chosenCdcIndices.length
     };
+  };
+
+  const isStateBetter = (cand, currentBest) => {
+    if (cand.debarSafeCount > currentBest.debarSafeCount) return true;
+    if (cand.debarSafeCount < currentBest.debarSafeCount) return false;
+
+    if (hasStarred && cand.starredPassCount !== currentBest.starredPassCount) {
+      return cand.starredPassCount > currentBest.starredPassCount;
+    }
+
+    if (cand.passCount !== currentBest.passCount) {
+      return cand.passCount > currentBest.passCount;
+    }
+
+    if (cand.passCount === numParts) {
+      const candTotalDays = cand.waiverCount + cand.cdcCount;
+      const bestTotalDays = currentBest.waiverCount + currentBest.cdcCount;
+      if (candTotalDays !== bestTotalDays) {
+        return candTotalDays < bestTotalDays;
+      }
+      if (cand.minPct > currentBest.minPct + 1e-6) return true;
+      if (cand.minPct < currentBest.minPct - 1e-6) return false;
+      if (cand.cdcCount !== currentBest.cdcCount) {
+        return cand.cdcCount < currentBest.cdcCount;
+      }
+      return false;
+    }
+
+    if (hasStarred && Math.abs(cand.starredTierScore - currentBest.starredTierScore) > 1e-4) {
+      return cand.starredTierScore > currentBest.starredTierScore;
+    }
+
+    if (Math.abs(cand.tierScore - currentBest.tierScore) > 1e-4) {
+      return cand.tierScore > currentBest.tierScore;
+    }
+
+    if (cand.minPct > currentBest.minPct + 1e-6) return true;
+
+    return false;
   };
 
   const baseEval = evaluateState([]);
@@ -546,27 +604,250 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
     best = budgetBest;
   }
 
-  const endTime = (typeof performance !== 'undefined' ? performance.now() : Date.now());
-  const evalPlan = evaluateState(best.chosen);
-  const chosenDays = best.chosen.map(idx => orderedCandidates[idx]);
+  // Joint Optimization: If Career Development Centre (CDC) attendance limit C > 0,
+  // smartly search for a joint combination of Waivers and CDC Attendance.
+  let bestWaivers = [...best.chosen];
+  let bestCdc = [];
+  let bestEval = evaluateState(bestWaivers, bestCdc);
 
-  // Sort chosen days chronologically for display
+  if (C > 0 && numCandidates > 0) {
+    let curW = new Set(bestWaivers);
+    let curC = new Set();
+
+    const considerState = (wIndices, cIndices) => {
+      const wArr = Array.from(wIndices);
+      const cArr = Array.from(cIndices);
+      const ev = evaluateState(wArr, cArr);
+      if (isStateBetter(ev, bestEval)) {
+        bestEval = ev;
+        bestWaivers = [...wArr];
+        bestCdc = [...cArr];
+        return true;
+      }
+      return false;
+    };
+
+    // Phase 1: Greedy CDC Allocation
+    // Add unused candidate days to CDC where they convert absences to presents
+    while (curC.size < C) {
+      let bestDayToAdd = -1;
+      let bestAddEval = null;
+
+      for (let i = 0; i < numCandidates; i++) {
+        if (curW.has(i) || curC.has(i)) continue;
+        const testC = new Set(curC);
+        testC.add(i);
+        const ev = evaluateState(Array.from(curW), Array.from(testC));
+        if (!bestAddEval || isStateBetter(ev, bestAddEval)) {
+          bestAddEval = ev;
+          bestDayToAdd = i;
+        }
+      }
+
+      if (bestDayToAdd !== -1 && bestAddEval && (isStateBetter(bestAddEval, bestEval) || !bestEval.allPass)) {
+        curC.add(bestDayToAdd);
+        considerState(curW, curC);
+      } else {
+        break;
+      }
+    }
+
+    // Phase 2: Mixed-Day Exchange & Local Search
+    // If a day in Waivers has presents (pDeltas > 0), waiving it caused collateral damage.
+    // Moving it to CDC preserves those presents while crediting absences as presents!
+    let improved = true;
+    let iter = 0;
+    while (improved && iter < 30) {
+      improved = false;
+      iter++;
+
+      // 2a. Move mixed day from Waivers to CDC if CDC budget allows
+      if (curC.size < C) {
+        for (const wIdx of Array.from(curW)) {
+          const cd = orderedCandidates[wIdx];
+          if (cd.totalPresents > 0) {
+            const nextW = new Set(curW);
+            nextW.delete(wIdx);
+            const nextC = new Set(curC);
+            nextC.add(wIdx);
+            if (considerState(nextW, nextC)) {
+              curW = nextW;
+              curC = nextC;
+              improved = true;
+              break;
+            }
+          }
+        }
+      }
+
+      // 2b. Swap mixed day in Waivers with a day in CDC
+      if (!improved && curC.size > 0) {
+        for (const wIdx of Array.from(curW)) {
+          const wCand = orderedCandidates[wIdx];
+          if (wCand.totalPresents === 0) continue;
+          for (const cIdx of Array.from(curC)) {
+            const cCand = orderedCandidates[cIdx];
+            if (cCand.totalPresents < wCand.totalPresents) {
+              const nextW = new Set(curW);
+              nextW.delete(wIdx);
+              nextW.add(cIdx);
+              const nextC = new Set(curC);
+              nextC.delete(cIdx);
+              nextC.add(wIdx);
+              if (considerState(nextW, nextC)) {
+                curW = nextW;
+                curC = nextC;
+                improved = true;
+                break;
+              }
+            }
+          }
+          if (improved) break;
+        }
+      }
+
+      // 2c. Pairwise swaps with unused candidates
+      if (!improved) {
+        const unused = [];
+        for (let i = 0; i < numCandidates; i++) {
+          if (!curW.has(i) && !curC.has(i)) unused.push(i);
+        }
+
+        // Try replacing a waiver with an unused candidate
+        for (const wIdx of Array.from(curW)) {
+          for (const uIdx of unused) {
+            const nextW = new Set(curW);
+            nextW.delete(wIdx);
+            nextW.add(uIdx);
+            if (considerState(nextW, curC)) {
+              curW = nextW;
+              improved = true;
+              break;
+            }
+          }
+          if (improved) break;
+        }
+
+        // Try replacing a CDC day with an unused candidate
+        if (!improved) {
+          for (const cIdx of Array.from(curC)) {
+            for (const uIdx of unused) {
+              const nextC = new Set(curC);
+              nextC.delete(cIdx);
+              nextC.add(uIdx);
+              if (considerState(curW, nextC)) {
+                curC = nextC;
+                improved = true;
+                break;
+              }
+            }
+            if (improved) break;
+          }
+        }
+
+        // Try adding an unused candidate to Waivers if curW.size < K
+        if (!improved && curW.size < K) {
+          for (const uIdx of unused) {
+            const nextW = new Set(curW);
+            nextW.add(uIdx);
+            if (considerState(nextW, curC)) {
+              curW = nextW;
+              improved = true;
+              break;
+            }
+          }
+        }
+
+        // Try adding an unused candidate to CDC if curC.size < C
+        if (!improved && curC.size < C) {
+          for (const uIdx of unused) {
+            const nextC = new Set(curC);
+            nextC.add(uIdx);
+            if (considerState(curW, nextC)) {
+              curC = nextC;
+              improved = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    // Synchronize to best state found
+    curW = new Set(bestWaivers);
+    curC = new Set(bestCdc);
+
+    // Phase 4: Minimality / Resource Conservation Pruning
+    // Safely prune redundant days without hurting debarment safety, starred pass, overall pass, or tier score
+    let pruned = true;
+    while (pruned) {
+      pruned = false;
+      // Prune waivers first to conserve waivers
+      for (const wIdx of Array.from(curW)) {
+        const testW = new Set(curW);
+        testW.delete(wIdx);
+        const ev = evaluateState(Array.from(testW), Array.from(curC));
+        if (ev.debarSafeCount >= bestEval.debarSafeCount &&
+            ev.starredPassCount >= bestEval.starredPassCount &&
+            ev.passCount >= bestEval.passCount &&
+            ev.tierScore >= bestEval.tierScore - 1e-4 &&
+            ev.minPct >= bestEval.minPct - 1e-4) {
+          curW = testW;
+          bestWaivers = Array.from(curW);
+          bestEval = ev;
+          pruned = true;
+          break;
+        }
+      }
+      if (!pruned) {
+        // Prune CDC days to conserve scarce CDC duty
+        for (const cIdx of Array.from(curC)) {
+          const testC = new Set(curC);
+          testC.delete(cIdx);
+          const ev = evaluateState(Array.from(curW), Array.from(testC));
+          if (ev.debarSafeCount >= bestEval.debarSafeCount &&
+              ev.starredPassCount >= bestEval.starredPassCount &&
+              ev.passCount >= bestEval.passCount &&
+              ev.tierScore >= bestEval.tierScore - 1e-4 &&
+              ev.minPct >= bestEval.minPct - 1e-4) {
+            curC = testC;
+            bestCdc = Array.from(curC);
+            bestEval = ev;
+            pruned = true;
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  if (bestEval.allPass) {
+    neededWaiversForAllPass = bestWaivers.length;
+    shortfall = 0;
+  }
+
+  const endTime = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+  const chosenDays = bestWaivers.map(idx => orderedCandidates[idx]);
   chosenDays.sort((a, b) => a.dateStr.localeCompare(b.dateStr));
 
+  const chosenCdcDays = bestCdc.map(idx => orderedCandidates[idx]);
+  chosenCdcDays.sort((a, b) => a.dateStr.localeCompare(b.dateStr));
+
   return {
-    status: evalPlan.allPass ? 'OPTIMAL' : 'SHORTAGE',
+    status: bestEval.allPass ? 'OPTIMAL' : 'SHORTAGE',
     chosenDays,
-    passCount: evalPlan.passCount,
-    starredPassCount: evalPlan.starredPassCount,
+    chosenCdcDays,
+    passCount: bestEval.passCount,
+    starredPassCount: bestEval.starredPassCount,
     totalStarredParts,
-    allStarredPass: evalPlan.allStarredPass,
+    allStarredPass: bestEval.allStarredPass,
     totalTargetParts: numParts,
-    debarSafeCount: evalPlan.debarSafeCount,
-    lowestPartPct: evalPlan.minPct,
-    lowestPart: evalPlan.finalStats.reduce((min, cur) => cur.pct < min.pct ? cur : min, evalPlan.finalStats[0])?.label,
+    debarSafeCount: bestEval.debarSafeCount,
+    lowestPartPct: bestEval.minPct,
+    lowestPart: bestEval.finalStats.reduce((min, cur) => cur.pct < min.pct ? cur : min, bestEval.finalStats[0])?.label,
     neededWaiversForAllPass,
     shortfall,
-    evalPlan,
+    evalPlan: bestEval,
     durationMs: Math.round(endTime - startTime)
   };
 }
@@ -574,8 +855,8 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
 /**
  * Section 6.3: Calculate K+1 outcome for shortage states
  */
-export function solveKPlusOne(parsedData, targetPct = 85, maxWaiversK = 12, starredSubjects = []) {
-  return solveExactBnb(parsedData, targetPct, maxWaiversK + 1, starredSubjects);
+export function solveKPlusOne(parsedData, targetPct = 85, maxWaiversK = 12, starredSubjects = [], cdcLimitC = 0) {
+  return solveExactBnb(parsedData, targetPct, maxWaiversK + 1, starredSubjects, cdcLimitC);
 }
 
 /**
