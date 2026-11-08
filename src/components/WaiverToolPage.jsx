@@ -114,7 +114,7 @@ export default function WaiverToolPage({ onBack }) {
   // Configuration inputs
   const [file, setFile] = useState(null);
   const [fileMeta, setFileMeta] = useState(null);
-  const [maxWaivers, setMaxWaivers] = useState(12); // K: 1 - 30
+  const [maxWaivers, setMaxWaivers] = useState(12); // K >= 0 (unlocked)
   const [threshold, setThreshold] = useState(85); // T: 50 - 99
   const [startingMonth, setStartingMonth] = useState(7); // 7 = August (0-indexed)
   const [isProcessing, setIsProcessing] = useState(false);
@@ -130,7 +130,7 @@ export default function WaiverToolPage({ onBack }) {
   const [starredSubjects, setStarredSubjects] = useState(new Set());
 
   // Career Development Centre (CDC) Attendance inputs
-  const [cdcLimit, setCdcLimit] = useState(0); // 0 to 15 dates
+  const [cdcLimit, setCdcLimit] = useState(0); // CDC >= 0 (unlocked)
   const [selectedCdcDays, setSelectedCdcDays] = useState(new Set()); // Set of 'YYYY-MM-DD'
   const [gridToolMode, setGridToolMode] = useState('waiver'); // 'waiver' | 'cdc'
 
@@ -569,7 +569,7 @@ export default function WaiverToolPage({ onBack }) {
 
   // Live parameter changes with automatic solver re-execution
   const handleMaxWaiversChange = (newLimit) => {
-    const clamped = Math.max(1, Math.min(30, newLimit));
+    const clamped = Math.max(0, newLimit);
     setMaxWaivers(clamped);
     if (parsedData) {
       setIsProcessing(true);
@@ -617,7 +617,7 @@ export default function WaiverToolPage({ onBack }) {
   };
 
   const handleCdcLimitChange = (newLimit) => {
-    const clamped = Math.max(0, Math.min(15, newLimit));
+    const clamped = Math.max(0, newLimit);
     setCdcLimit(clamped);
     if (clamped === 0) {
       setSelectedCdcDays(new Set());
@@ -2168,8 +2168,8 @@ export default function WaiverToolPage({ onBack }) {
                     <span className="param-unit">dates</span>
                   </div>
                   <div className="param-stepper-arrows">
-                    <button type="button" className="arrow-btn" onClick={() => setMaxWaivers(e => Math.min(30, e + 1))} aria-label="Increase waiver limit">▲</button>
-                    <button type="button" className="arrow-btn" onClick={() => setMaxWaivers(e => Math.max(1, e - 1))} aria-label="Decrease waiver limit">▼</button>
+                    <button type="button" className="arrow-btn" onClick={() => setMaxWaivers(e => e + 1)} aria-label="Increase waiver limit">▲</button>
+                    <button type="button" className="arrow-btn" onClick={() => setMaxWaivers(e => Math.max(0, e - 1))} aria-label="Decrease waiver limit">▼</button>
                   </div>
                 </div>
               </div>
@@ -2224,7 +2224,7 @@ export default function WaiverToolPage({ onBack }) {
                     <span className="param-unit">dates</span>
                   </div>
                   <div className="param-stepper-arrows">
-                    <button type="button" className="arrow-btn" onClick={() => setCdcLimit(e => Math.min(15, e + 1))} aria-label="Increase CDC dates">▲</button>
+                    <button type="button" className="arrow-btn" onClick={() => setCdcLimit(e => e + 1)} aria-label="Increase CDC dates">▲</button>
                     <button type="button" className="arrow-btn" onClick={() => setCdcLimit(e => Math.max(0, e - 1))} aria-label="Decrease CDC dates">▼</button>
                   </div>
                 </div>

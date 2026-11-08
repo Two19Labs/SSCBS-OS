@@ -628,7 +628,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
 
   if (!best.allPass) {
     const budgetBest = { ...best, chosen: [...best.chosen] };
-    const maxSearch = Math.min(numCandidates, K + 15);
+    const maxSearch = Math.min(numCandidates, K + 30);
     for (let s = K + 1; s <= maxSearch; s++) {
       dfs(0, s, true);
       if (best.allPass) {
