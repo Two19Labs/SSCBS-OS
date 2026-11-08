@@ -115,6 +115,11 @@ export default function WaiverToolPage({ onBack }) {
   const [selectedCdcDays, setSelectedCdcDays] = useState(new Set()); // Set of 'YYYY-MM-DD'
   const [gridToolMode, setGridToolMode] = useState('waiver'); // 'waiver' | 'cdc'
 
+  // Batch year & waiver start timeline: '1st' (Sep onwards) | '2nd' (Aug onwards)
+  const [batchYear, setBatchYear] = useState('1st');
+  const [waiverStartMonth, setWaiverStartMonth] = useState(9); // 9 = Sep for 1st Year, 8 = Aug for 2nd Year
+  const [blockedDates, setBlockedDates] = useState(new Set()); // Set of 'YYYY-MM-DD' blocked from solver
+
   // Ineligibility acknowledgement state (shown when baseline overall attendance < 66.7%)
   const [hasAcknowledgedIneligible, setHasAcknowledgedIneligible] = useState(false);
 
@@ -181,6 +186,11 @@ export default function WaiverToolPage({ onBack }) {
             setSelectedCdcDays(new Set(saved.selectedCdcDays));
           }
           if (saved.gridToolMode) setGridToolMode(saved.gridToolMode);
+          if (saved.batchYear) setBatchYear(saved.batchYear);
+          if (saved.waiverStartMonth !== undefined) setWaiverStartMonth(saved.waiverStartMonth);
+          if (Array.isArray(saved.blockedDates)) {
+            setBlockedDates(new Set(saved.blockedDates));
+          }
         } else {
           localStorage.removeItem(storageKey);
         }
@@ -206,13 +216,16 @@ export default function WaiverToolPage({ onBack }) {
         hasAcknowledgedIneligible,
         cdcLimit,
         selectedCdcDays: Array.from(selectedCdcDays),
-        gridToolMode
+        gridToolMode,
+        batchYear,
+        waiverStartMonth,
+        blockedDates: Array.from(blockedDates)
       };
       localStorage.setItem(storageKey, JSON.stringify(stateToSave));
     } catch (err) {
       console.warn('Failed to persist Waiver Tool state:', err);
     }
-  }, [parsedData, selectedWaivers, starredSubjects, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, hasAcknowledgedIneligible, cdcLimit, selectedCdcDays, gridToolMode, storageKey]);
+  }, [parsedData, selectedWaivers, starredSubjects, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, hasAcknowledgedIneligible, cdcLimit, selectedCdcDays, gridToolMode, batchYear, waiverStartMonth, blockedDates, storageKey]);
 
   // Prevent scroll when expanded grid modal is open
   useEffect(() => {
@@ -271,11 +284,12 @@ export default function WaiverToolPage({ onBack }) {
     setError(null);
   };
 
-  // Run Solver Async with Worker or Fallback (Joint Waivers + CDC Attendance)
-  const executeSolverAsync = (data, targetT = threshold, limitK = maxWaivers, limitCOrStars, starsOrCb, maybeCb) => {
+  // Run Solver Async with Worker or Fallback (Joint Waivers + CDC Attendance + Timeline/Blocked Dates)
+  const executeSolverAsync = (data, targetT = threshold, limitK = maxWaivers, limitCOrStars = cdcLimit, starsOrCb, maybeCb, solverOpts = {}) => {
     let actualCdc = cdcLimit;
     let stars = starredSubjects;
     let callback = null;
+    let extraOpts = solverOpts;
 
     if (typeof limitCOrStars === 'number') {
       actualCdc = limitCOrStars;
@@ -283,7 +297,8 @@ export default function WaiverToolPage({ onBack }) {
         callback = starsOrCb;
       } else if (starsOrCb !== undefined) {
         stars = starsOrCb;
-        callback = maybeCb;
+        if (typeof maybeCb === 'function') callback = maybeCb;
+        else if (typeof maybeCb === 'object' && maybeCb !== null) extraOpts = maybeCb;
       }
     } else if (typeof limitCOrStars === 'function') {
       callback = limitCOrStars;
@@ -292,6 +307,9 @@ export default function WaiverToolPage({ onBack }) {
       callback = starsOrCb;
     }
 
+    const actualStartMonth = extraOpts.waiverStartMonth !== undefined ? extraOpts.waiverStartMonth : waiverStartMonth;
+    const actualBlocked = extraOpts.blockedDates !== undefined ? extraOpts.blockedDates : blockedDates;
+    const blockedList = Array.from(actualBlocked || []);
     const starredList = Array.from(stars || []);
 
     if (workerRef.current) {
@@ -314,15 +332,21 @@ export default function WaiverToolPage({ onBack }) {
         targetPct: targetT,
         maxWaiversK: limitK,
         starredSubjects: starredList,
-        cdcLimit: actualCdc
+        cdcLimit: actualCdc,
+        waiverStartMonth: actualStartMonth,
+        blockedDates: blockedList
       });
     } else {
       setTimeout(() => {
         try {
-          const solution = solveExactBnb(data, targetT, limitK, starredList, actualCdc);
+          const options = {
+            waiverStartMonth: actualStartMonth,
+            blockedDates: new Set(blockedList)
+          };
+          const solution = solveExactBnb(data, targetT, limitK, starredList, actualCdc, options);
           let kPlusOne = null;
           if (solution.status === 'SHORTAGE') {
-            kPlusOne = solveKPlusOne(data, targetT, limitK, starredList, actualCdc);
+            kPlusOne = solveKPlusOne(data, targetT, limitK, starredList, actualCdc, options);
           }
           setSolverResult(solution);
           setKPlusOneResult(kPlusOne);
@@ -370,7 +394,7 @@ export default function WaiverToolPage({ onBack }) {
 
         setParsedData(parsed);
 
-        executeSolverAsync(parsed, threshold, maxWaivers, (solution) => {
+        executeSolverAsync(parsed, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
           trackWaiverEvent('waiver_solved', {
             status: solution.status,
             passCount: solution.passCount,
@@ -381,7 +405,8 @@ export default function WaiverToolPage({ onBack }) {
           // Do NOT apply waivers automatically upon file submission/open.
           // Show pure baseline attendance first per user requirement.
           setSelectedWaivers(new Set());
-        });
+          setSelectedCdcDays(new Set());
+        }, { waiverStartMonth, blockedDates });
       } catch (err) {
         console.error('Attendance parse error:', err);
         setError(err.message || 'Failed to parse attendance file.');
@@ -400,11 +425,14 @@ export default function WaiverToolPage({ onBack }) {
   const handleUpdateRecommendation = () => {
     if (!parsedData) return;
     setIsProcessing(true);
-    executeSolverAsync(parsedData, threshold, maxWaivers, (solution) => {
+    executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
       if (solution?.chosenDays && solution.chosenDays.length > 0) {
         setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
       }
-    });
+      if (solution?.chosenCdcDays && solution.chosenCdcDays.length > 0) {
+        setSelectedCdcDays(new Set(solution.chosenCdcDays.map(d => d.dateStr)));
+      }
+    }, { waiverStartMonth, blockedDates });
   };
 
   const handleReplaceSheet = () => {
@@ -500,7 +528,7 @@ export default function WaiverToolPage({ onBack }) {
     setMaxWaivers(clamped);
     if (parsedData) {
       setIsProcessing(true);
-      executeSolverAsync(parsedData, threshold, clamped, cdcLimit, (solution) => {
+      executeSolverAsync(parsedData, threshold, clamped, cdcLimit, starredSubjects, (solution) => {
         setSelectedWaivers(prev => {
           if (prev.size === 0 && selectedCdcDays.size === 0) return prev;
           if (solution?.chosenDays && solution.chosenDays.length > 0) {
@@ -515,7 +543,7 @@ export default function WaiverToolPage({ onBack }) {
           }
           return new Set();
         });
-      });
+      }, { waiverStartMonth, blockedDates });
     }
   };
 
@@ -524,7 +552,7 @@ export default function WaiverToolPage({ onBack }) {
     setThreshold(clamped);
     if (parsedData) {
       setIsProcessing(true);
-      executeSolverAsync(parsedData, clamped, maxWaivers, cdcLimit, (solution) => {
+      executeSolverAsync(parsedData, clamped, maxWaivers, cdcLimit, starredSubjects, (solution) => {
         setSelectedWaivers(prev => {
           if (prev.size === 0 && selectedCdcDays.size === 0) return prev;
           if (solution?.chosenDays && solution.chosenDays.length > 0) {
@@ -539,7 +567,7 @@ export default function WaiverToolPage({ onBack }) {
           }
           return new Set();
         });
-      });
+      }, { waiverStartMonth, blockedDates });
     }
   };
 
@@ -555,7 +583,7 @@ export default function WaiverToolPage({ onBack }) {
     }
     if (parsedData) {
       setIsProcessing(true);
-      executeSolverAsync(parsedData, threshold, maxWaivers, clamped, (solution) => {
+      executeSolverAsync(parsedData, threshold, maxWaivers, clamped, starredSubjects, (solution) => {
         setSelectedWaivers(prev => {
           if (prev.size === 0 && selectedCdcDays.size === 0) return prev;
           if (solution?.chosenDays && solution.chosenDays.length > 0) {
@@ -570,7 +598,66 @@ export default function WaiverToolPage({ onBack }) {
           }
           return new Set();
         });
-      });
+      }, { waiverStartMonth, blockedDates });
+    }
+  };
+
+  // Batch year change ('1st' => Sep onwards, '2nd' => Aug onwards)
+  const handleBatchChange = (newBatch) => {
+    setBatchYear(newBatch);
+    const newStartMonth = newBatch === '1st' ? 9 : 8;
+    setWaiverStartMonth(newStartMonth);
+    if (parsedData) {
+      setIsProcessing(true);
+      executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
+        if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
+          setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+          setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
+        }
+      }, { waiverStartMonth: newStartMonth, blockedDates });
+    }
+  };
+
+  // Toggle blocking a specific date from solver recommendations
+  const handleToggleBlockDate = (dateStr) => {
+    const nextBlocked = new Set(blockedDates);
+    if (nextBlocked.has(dateStr)) {
+      nextBlocked.delete(dateStr);
+    } else {
+      nextBlocked.add(dateStr);
+      if (selectedWaivers.has(dateStr)) {
+        const nextW = new Set(selectedWaivers);
+        nextW.delete(dateStr);
+        setSelectedWaivers(nextW);
+      }
+      if (selectedCdcDays.has(dateStr)) {
+        const nextC = new Set(selectedCdcDays);
+        nextC.delete(dateStr);
+        setSelectedCdcDays(nextC);
+      }
+    }
+    setBlockedDates(nextBlocked);
+    if (parsedData) {
+      setIsProcessing(true);
+      executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
+        if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
+          setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+          setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
+        }
+      }, { waiverStartMonth, blockedDates: nextBlocked });
+    }
+  };
+
+  const handleClearBlocked = () => {
+    setBlockedDates(new Set());
+    if (parsedData) {
+      setIsProcessing(true);
+      executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
+        if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
+          setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+          setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
+        }
+      }, { waiverStartMonth, blockedDates: new Set() });
     }
   };
 
@@ -583,12 +670,12 @@ export default function WaiverToolPage({ onBack }) {
       setSelectedCdcDays(nextC);
     } else if (parsedData) {
       setIsProcessing(true);
-      executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, (solution) => {
+      executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
         const nextW = solution?.chosenDays?.length ? new Set(solution.chosenDays.map(d => d.dateStr)) : new Set();
         const nextC = solution?.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set();
         setSelectedWaivers(nextW);
         setSelectedCdcDays(nextC);
-      });
+      }, { waiverStartMonth, blockedDates });
     }
   };
 
@@ -951,9 +1038,19 @@ export default function WaiverToolPage({ onBack }) {
                 <div className="rd-total-item-lbl-wrap">
                   <span className="rd-total-item-lbl">{item.label}</span>
                   {item.key === 'overall' && isOverallIneligible && (
-                    <span className="rd-ineligible-tag" title="Overall attendance is below 66.7%. Official waiver submission is barred by administration.">
-                      Ineligible for Submission
-                    </span>
+                    curPct >= 66.666 ? (
+                      <span className="rd-rescued-tag" title="Total aggregate attendance lifted above 66.7% via CDC attendance, unlocking waiver eligibility!">
+                        🎉 Rescued via CDC Attendance ({curPct.toFixed(1)}%)
+                      </span>
+                    ) : cdcLimit > 0 ? (
+                      <span className="rd-ineligible-tag cdc-exempt" title="Total attendance < 66.7%. Society waivers are barred, but CDC attendance is officially claimable.">
+                        Waivers Barred · CDC Claimable
+                      </span>
+                    ) : (
+                      <span className="rd-ineligible-tag" title="Overall attendance is below 66.7%. Official waiver submission is barred by administration.">
+                        Ineligible for Submission
+                      </span>
+                    )
                   )}
                 </div>
                 <span className={`rd-pill p-${pill[1]}`}>{pill[0]}</span>
@@ -1086,9 +1183,12 @@ export default function WaiverToolPage({ onBack }) {
             {columns.map(col => {
               const isWaived = selectedWaivers.has(col.dateStr);
               const isCdc = selectedCdcDays.has(col.dateStr);
+              const isBlocked = blockedDates.has(col.dateStr);
+              const isPreSociety = batchYear === '1st' && col.month < 9;
               const btnClass = isWaived ? 'on' : (isCdc ? 'cdc-on' : '');
+              const thClass = `rd-date-th ${isBlocked ? 'is-blocked' : ''} ${isPreSociety ? 'is-pre-society' : ''}`.trim();
               return (
-                <th key={col.dateStr} className="rd-date-th">
+                <th key={col.dateStr} className={thClass}>
                   <button
                     type="button"
                     className={`rd-date-btn ${btnClass}`}
@@ -1099,7 +1199,13 @@ export default function WaiverToolPage({ onBack }) {
                   >
                     <span className="wd">{col.weekday}</span>
                     <span className="dn">{col.dayNum}</span>
-                    {isCdc && <span className="rd-date-cdc-badge" title="Career Development Centre (CDC) Attendance">CDC</span>}
+                    {isBlocked ? (
+                      <span className="rd-date-blocked-badge" title="Manually blocked from recommendations">🚫</span>
+                    ) : isPreSociety ? (
+                      <span className="rd-date-locked-badge" title="Pre-society period for 1st Year (waivers start September)">🔒</span>
+                    ) : isCdc ? (
+                      <span className="rd-date-cdc-badge" title="Career Development Centre (CDC) Attendance">CDC</span>
+                    ) : null}
                   </button>
                 </th>
               );
@@ -1131,8 +1237,15 @@ export default function WaiverToolPage({ onBack }) {
                 {columns.map(col => {
                   const isWaived = selectedWaivers.has(col.dateStr);
                   const isCdc = selectedCdcDays.has(col.dateStr);
+                  const isBlocked = blockedDates.has(col.dateStr);
+                  const isPreSociety = batchYear === '1st' && col.month < 9;
                   const dayClasses = rawSub?.dayClasses?.[col.dateStr] || [];
-                  const cellClass = isWaived ? 'on' : (isCdc ? 'cdc-cell' : '');
+                  const cellClass = [
+                    isWaived ? 'on' : '',
+                    isCdc ? 'cdc-cell' : '',
+                    isBlocked ? 'blocked-cell' : '',
+                    isPreSociety ? 'pre-society-cell' : ''
+                  ].filter(Boolean).join(' ');
                   return (
                     <td
                       key={col.dateStr}
@@ -1257,7 +1370,7 @@ export default function WaiverToolPage({ onBack }) {
         </div>
       )}
 
-      {/* Debarment Ineligibility Modal (First-look Warning when Overall Attendance < 66.7%) */}
+      {/* Debarment Ineligibility Modal (First-look Warning when Baseline Overall Attendance < 66.7%) */}
       {isOverallIneligible && !hasAcknowledgedIneligible && totalsSummary?.overall && (
         <div className="rd-ineligible-overlay" role="dialog" aria-modal="true" aria-labelledby="rd-ineligible-title">
           <div className="rd-ineligible-modal">
@@ -1271,7 +1384,9 @@ export default function WaiverToolPage({ onBack }) {
             </div>
 
             <h2 id="rd-ineligible-title" className="rd-ineligible-title">
-              Not Eligible for College Waivers
+              {solverResult?.cdcRescue?.cdcRescued
+                ? 'CDC Attendance Rescues Eligibility!'
+                : 'Not Eligible for College Society Waivers'}
             </h2>
 
             <div className="rd-ineligible-metric-card">
@@ -1282,32 +1397,97 @@ export default function WaiverToolPage({ onBack }) {
                   <span className="rd-ineligible-fraction">({totalsSummary.overall.att} / {totalsSummary.overall.held} classes)</span>
                 </div>
               </div>
-              <span className="rd-ineligible-status-tag">Below 66.7% Requirement</span>
+              <span className={`rd-ineligible-status-tag ${solverResult?.cdcRescue?.cdcRescued ? 'rescued' : ''}`}>
+                {solverResult?.cdcRescue?.cdcRescued ? 'Rescued via CDC Attendance' : 'Below 66.7% Requirement'}
+              </span>
             </div>
 
             <div className="rd-ineligible-body">
-              <p>
-                According to University of Delhi Ordinance VII and SSCBS examination rules, students with an <strong>overall aggregate attendance below 66.7%</strong> across all subjects combined are <strong>strictly not eligible to apply for waivers</strong> (society, sports, ECA, or medical) to the college administration.
-              </p>
-              <div className="rd-ineligible-rule-note">
-                <strong>Clarification:</strong> Students who maintain <strong>&ge; 66.7% overall attendance</strong> can still apply waivers for specific individual subjects below 66.7%. However, when your combined total across all subjects is under 66.7%, the administration cannot accept any waiver application.
-              </div>
-              <div className="rd-ineligible-sandbox-box">
-                <span className="rd-sandbox-title">🧪 Simulation & Sandbox Mode Active</span>
-                <p>
-                  Even though official submission is not permitted, <strong>you can still freely use this tool</strong> to test waiver dates, simulate attendance outcomes, and check exactly how many classes you must attend to escape debarment.
-                </p>
-              </div>
+              {solverResult?.cdcRescue?.cdcRescued ? (
+                <div className="rd-cdc-rescue-box">
+                  <div className="rd-cdc-rescue-header">
+                    <span className="rd-cdc-rescue-icon">🎉</span>
+                    <div>
+                      <strong>CDC Attendance Lifts You Above 66.7%!</strong>
+                      <p>
+                        While DU Ordinance VII bars society waivers below 66.7%, <strong>Career Development Centre (CDC) attendance duty is an official placement cell award and is completely exempt from this rule</strong>.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="rd-cdc-rescue-stats">
+                    Applying your <strong>{solverResult.chosenCdcDays?.length || cdcLimit} CDC attendance date(s)</strong> converts <strong>{solverResult.cdcRescue.cdcTotalConvertedAbsences} absence(s) into presents</strong>, raising your total aggregate attendance to <strong>{solverResult.cdcRescue.projectedOverallPctWithCdc.toFixed(1)}% (&ge; 66.7%)</strong>. This officially restores your eligibility to claim society waivers!
+                  </div>
+                </div>
+              ) : cdcLimit > 0 ? (
+                <>
+                  <div className="rd-cdc-exemption-box">
+                    <span className="rd-sandbox-title">📋 CDC Attendance is Officially Claimable</span>
+                    <p>
+                      University of Delhi Ordinance VII bars society waivers when aggregate attendance is below 66.7%. However, <strong>Career Development Centre (CDC) attendance duty is an official placement cell award and CAN be claimed regardless of your attendance percentage</strong>.
+                    </p>
+                  </div>
+                  <div className="rd-ineligible-sandbox-box">
+                    <span className="rd-sandbox-title">🧪 Simulation & Sandbox Mode Active</span>
+                    <p>
+                      You can claim your CDC attendance dates below and simulate waivers to see how many future classes you need to attend to escape debarment.
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p>
+                    According to University of Delhi Ordinance VII and SSCBS examination rules, students with an <strong>overall aggregate attendance below 66.7%</strong> across all subjects combined are <strong>strictly not eligible to apply for society waivers</strong> to the college administration.
+                  </p>
+                  <div className="rd-ineligible-rule-note">
+                    <strong>Clarification:</strong> Students who maintain <strong>&ge; 66.7% overall attendance</strong> can still apply waivers for specific individual subjects below 66.7%. However, when your combined total across all subjects is under 66.7%, the administration cannot accept society waivers.
+                  </div>
+                  <div className="rd-ineligible-cdc-tip">
+                    💡 <strong>Have placement cell duties?</strong> Enter your CDC attendance dates in the toolbar to see if they lift your total attendance above 66.7% and unlock waiver eligibility.
+                  </div>
+                  <div className="rd-ineligible-sandbox-box">
+                    <span className="rd-sandbox-title">🧪 Simulation & Sandbox Mode Active</span>
+                    <p>
+                      Even though official submission is not permitted, <strong>you can still freely use this tool</strong> to test waiver dates, simulate attendance outcomes, and check exactly how many classes you must attend to escape debarment.
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="rd-ineligible-footer">
-              <button
-                type="button"
-                className="rd-ineligible-ack-btn"
-                onClick={() => setHasAcknowledgedIneligible(true)}
-              >
-                I Understand — Let Me Experiment →
-              </button>
+              {solverResult?.cdcRescue?.cdcRescued ? (
+                <button
+                  type="button"
+                  className="rd-ineligible-ack-btn rescue"
+                  onClick={() => {
+                    setHasAcknowledgedIneligible(true);
+                    handleApplyRecommended();
+                  }}
+                >
+                  Apply Recommended Plan & Unlock Waivers ({solverResult.chosenDays?.length || 0} Waivers + {solverResult.chosenCdcDays?.length || 0} CDC) →
+                </button>
+              ) : cdcLimit > 0 ? (
+                <button
+                  type="button"
+                  className="rd-ineligible-ack-btn"
+                  onClick={() => {
+                    setHasAcknowledgedIneligible(true);
+                    if (solverResult?.chosenCdcDays?.length > 0) {
+                      setSelectedCdcDays(new Set(solverResult.chosenCdcDays.map(d => d.dateStr)));
+                    }
+                  }}
+                >
+                  Apply CDC Attendance & Explore Sandbox →
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="rd-ineligible-ack-btn"
+                  onClick={() => setHasAcknowledgedIneligible(true)}
+                >
+                  I Understand — Let Me Experiment →
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -1317,7 +1497,19 @@ export default function WaiverToolPage({ onBack }) {
       {hoverDiff && (
         <div className="rd-popover" style={{ left: `${popoverPos.x}px`, top: `${popoverPos.y}px` }}>
           <div className="rd-pop-head">
-            <strong>{hoverDiff.day?.fullLabel || hoverDiff.dateStr}</strong>
+            <div>
+              <strong>{hoverDiff.day?.fullLabel || hoverDiff.dateStr}</strong>
+              {batchYear === '1st' && hoverDiff.day?.month < 9 && (
+                <span className="rd-pop-presociety-tag" title="1st year society waivers start in September">
+                  🔒 Pre-society (1st Yr)
+                </span>
+              )}
+              {blockedDates.has(hoverDiff.dateStr) && (
+                <span className="rd-pop-blocked-tag" title="Blocked from solver recommendations">
+                  🚫 Blocked
+                </span>
+              )}
+            </div>
             <span
               className={`rd-pop-tag ${
                 hoverDiff.mode === 'cdc'
@@ -1348,6 +1540,18 @@ export default function WaiverToolPage({ onBack }) {
               );
             })
           )}
+          <div className="rd-pop-footer">
+            <button
+              type="button"
+              className={`rd-pop-block-btn ${blockedDates.has(hoverDiff.dateStr) ? 'is-blocked' : ''}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggleBlockDate(hoverDiff.dateStr);
+              }}
+            >
+              {blockedDates.has(hoverDiff.dateStr) ? '✓ Unblock this date' : '🚫 Block date from recommendations'}
+            </button>
+          </div>
         </div>
       )}
 
@@ -1400,6 +1604,48 @@ export default function WaiverToolPage({ onBack }) {
                 </span>
               </div>
             </div>
+
+            {/* Batch / Waiver Timeline Selector */}
+            <div className="rd-stat batch-stat">
+              <span className="lbl" title="Waiver eligibility timeline based on college year">Waivers from</span>
+              <div className="rd-batch-toggle" role="group" aria-label="Waiver Timeline">
+                <button
+                  type="button"
+                  className={`rd-batch-btn ${batchYear === '1st' ? 'active' : ''}`}
+                  onClick={() => handleBatchChange('1st')}
+                  title="1st Year: Joined August, societies started September (August waivers blocked)"
+                >
+                  1st Yr (Sep+)
+                </button>
+                <button
+                  type="button"
+                  className={`rd-batch-btn ${batchYear === '2nd' ? 'active' : ''}`}
+                  onClick={() => handleBatchChange('2nd')}
+                  title="2nd & 3rd Year: Waivers allowed from August"
+                >
+                  2nd+ Yr (Aug+)
+                </button>
+              </div>
+            </div>
+
+            {/* Blocked Dates Stat (only if any blocked) */}
+            {blockedDates.size > 0 && (
+              <div className="rd-stat blocked-stat">
+                <span className="lbl" title="Dates excluded from solver recommendations">Blocked</span>
+                <div className="row">
+                  <span className="num">{blockedDates.size}</span>
+                  <span className="unit">dates</span>
+                  <button
+                    type="button"
+                    className="rd-btn-clear-blocked"
+                    onClick={handleClearBlocked}
+                    title="Unblock all blocked dates"
+                  >
+                    Clear
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Status Banner */}
             <div className={`rd-status ${simStats?.allPassing ? 'ok' : ((simStats?.debarSafeTargetCount ?? 0) < totalTargetParts ? 'bad' : 'warn')}`}>
@@ -1719,6 +1965,35 @@ export default function WaiverToolPage({ onBack }) {
               </div>
             )}
 
+            {/* College Year / Waiver Timeline Selector */}
+            <div className="upload-batch-container">
+              <span className="upload-batch-label">COLLEGE YEAR / WAIVER TIMELINE</span>
+              <div className="upload-batch-selector" role="group" aria-label="College Year Timeline">
+                <button
+                  type="button"
+                  className={`batch-pill-btn ${batchYear === '1st' ? 'active' : ''}`}
+                  onClick={() => handleBatchChange('1st')}
+                >
+                  <span className="batch-pill-icon">🎓</span>
+                  <div className="batch-pill-text">
+                    <strong>1st Year</strong>
+                    <small>Waivers start September</small>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  className={`batch-pill-btn ${batchYear === '2nd' ? 'active' : ''}`}
+                  onClick={() => handleBatchChange('2nd')}
+                >
+                  <span className="batch-pill-icon">🏛️</span>
+                  <div className="batch-pill-text">
+                    <strong>2nd / 3rd Year</strong>
+                    <small>Waivers include August</small>
+                  </div>
+                </button>
+              </div>
+            </div>
+
             <div className="upload-params-row upload-params-row-4">
               {/* Target Parameter */}
               <div className="param-input-box">
@@ -1802,7 +2077,10 @@ export default function WaiverToolPage({ onBack }) {
             </div>
 
             <p className="upload-params-caption">
-              Career Development Centre (CDC) attendance allows converting absences into presents. Leave 0 if not applicable. You can adjust all parameters later.
+              {batchYear === '1st'
+                ? '1st year students joined in August; college rules allow society waivers from September onwards.'
+                : '2nd and 3rd year students can apply society waivers from August onwards.'}{' '}
+              Career Development Centre (CDC) attendance allows converting absences into presents across all months. Leave 0 if not applicable. You can adjust all parameters later.
             </p>
 
             <button
@@ -1864,6 +2142,16 @@ export default function WaiverToolPage({ onBack }) {
                     onClick={handleClearCdc}
                   >
                     Clear CDC
+                  </button>
+                )}
+                {blockedDates.size > 0 && (
+                  <button
+                    type="button"
+                    className="rd-btn-outline sm muted"
+                    onClick={handleClearBlocked}
+                    title="Unblock all blocked dates"
+                  >
+                    Clear blocked ({blockedDates.size})
                   </button>
                 )}
                 <button

@@ -217,6 +217,37 @@ if (fs.existsSync(nov6Path)) {
   assert(jointSol.debarSafeCount >= waiverOnlySol.debarSafeCount, 'Joint solver must preserve or improve debarment safety');
 
   console.log(`✓ Joint optimization successfully found ${jointSol.chosenDays.length} waivers + ${jointSol.chosenCdcDays.length} CDC days with ${jointSol.passCount}/${jointSol.totalTargetParts} parts passing.`);
+
+  // 8. Test Timeline Filtering (1st Year: Sep+), Date Blocking & CDC Rescue Calculation
+  console.log('8. Testing 1st Year Timeline (Sep+), Date Blocking, and CDC Rescue...');
+  
+  // Test A: 1st Year (waiverStartMonth = 9). August dates must be excluded from waivers
+  const firstYearSol = solveExactBnb(parsed, 85, 8, [], 2, { waiverStartMonth: 9 });
+  firstYearSol.chosenDays.forEach(d => {
+    assert(d.month >= 9, `1st year waiver recommendation must NOT include August date ${d.dateStr}`);
+  });
+  console.log('✓ 1st Year timeline constraint strictly excludes August waivers from solver recommendations.');
+
+  // Test B: Date Blocking
+  // Pick the first recommended waiver from firstYearSol and block it
+  if (firstYearSol.chosenDays.length > 0) {
+    const dateToBlock = firstYearSol.chosenDays[0].dateStr;
+    const blockedSet = new Set([dateToBlock]);
+    const blockedSol = solveExactBnb(parsed, 85, 8, [], 2, { waiverStartMonth: 9, blockedDates: blockedSet });
+    
+    const blockedInWaivers = blockedSol.chosenDays.some(d => d.dateStr === dateToBlock);
+    const blockedInCdc = blockedSol.chosenCdcDays.some(d => d.dateStr === dateToBlock);
+    assert(!blockedInWaivers, `Blocked date ${dateToBlock} must NOT appear in chosen waivers`);
+    assert(!blockedInCdc, `Blocked date ${dateToBlock} must NOT appear in chosen CDC days`);
+    console.log(`✓ Blocked date ${dateToBlock} was strictly excluded from all recommendations.`);
+  }
+
+  // Test C: CDC Rescue Calculation
+  assert(jointSol.cdcRescue, 'Solver must return cdcRescue object');
+  assert(typeof jointSol.cdcRescue.baselineOverallPct === 'number', 'cdcRescue.baselineOverallPct must be numeric');
+  assert(typeof jointSol.cdcRescue.projectedOverallPctWithCdc === 'number', 'cdcRescue.projectedOverallPctWithCdc must be numeric');
+  assert(typeof jointSol.cdcRescue.cdcRescued === 'boolean', 'cdcRescue.cdcRescued must be boolean');
+  console.log(`✓ CDC rescue metrics computed: baseline=${jointSol.cdcRescue.baselineOverallPct.toFixed(1)}%, projected=${jointSol.cdcRescue.projectedOverallPctWithCdc.toFixed(1)}%, rescued=${jointSol.cdcRescue.cdcRescued}.`);
 }
 
 console.log('\nALL UNIT TESTS PASSED SUCCESSFULLY! ✓✓✓');

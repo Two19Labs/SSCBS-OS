@@ -193,9 +193,14 @@ export function extractCandidateDays(parsedData, targetParts) {
 /**
  * Ultra-fast exact branch-and-bound solver adhering to Sections 6.1 and 6.2.
  */
-export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, starredSubjects = [], cdcLimitC = 0) {
+export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, starredSubjects = [], cdcLimitC = 0, options = {}) {
   const startTime = (typeof performance !== 'undefined' ? performance.now() : Date.now());
   const T = targetPct;
+
+  const { waiverStartMonth = 0, blockedDates = null } = options || {};
+  const blockedDatesSet = blockedDates instanceof Set
+    ? blockedDates
+    : new Set(Array.isArray(blockedDates) ? blockedDates : []);
 
   const { targetParts } = extractTargetParts(parsedData);
   const numParts = targetParts.length;
@@ -225,13 +230,31 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
       totalTargetParts: 0,
       lowestPartPct: 100,
       lowestPart: null,
+      cdcRescue: {
+        baselineOverallPct: 100,
+        projectedOverallPctWithCdc: 100,
+        isBaselineUnder667: false,
+        cdcRescued: false,
+        cdcTotalConvertedAbsences: 0
+      },
       durationMs: 0
     };
   }
 
   const candidateDays = extractCandidateDays(parsedData, targetParts);
   const numCandidates = candidateDays.length;
-  const K = Math.min(maxWaiversK, numCandidates);
+
+  // Tag candidate days with timeline eligibility & manual blocking
+  candidateDays.forEach(d => {
+    const isBlocked = blockedDatesSet.has(d.dateStr);
+    const inWaiverWindow = (!waiverStartMonth || d.month >= waiverStartMonth);
+    d.isBlocked = isBlocked;
+    d.isWaiverEligible = !isBlocked && inWaiverWindow;
+    d.isCdcEligible = !isBlocked;
+  });
+
+  const waiverEligibleCount = candidateDays.filter(d => d.isWaiverEligible).length;
+  const K = Math.min(maxWaiversK, waiverEligibleCount);
   const C = Math.max(0, Math.min(cdcLimitC || 0, numCandidates));
 
   // w_cd = T * n_cd - 100 * p_cd
@@ -271,6 +294,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
       const remainingWeights = [];
       const remainingN = [];
       for (let j = i; j < numCandidates; j++) {
+        if (!orderedCandidates[j].isWaiverEligible) continue;
         if (orderedW[c][j] > 0) remainingWeights.push(orderedW[c][j]);
         if (orderedCandidates[j].nDeltas[c] > 0) remainingN.push(orderedCandidates[j].nDeltas[c]);
       }
@@ -540,6 +564,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
     if (remainingCandidates < remainingToPick) return;
 
     for (let i = orderIdx; i <= numCandidates - remainingToPick; i++) {
+      if (!orderedCandidates[i].isWaiverEligible) continue;
       let maxPotentialPass = 0;
       let maxPotentialStarredPass = 0;
       for (let c = 0; c < numParts; c++) {
@@ -634,7 +659,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
       let bestAddEval = null;
 
       for (let i = 0; i < numCandidates; i++) {
-        if (curW.has(i) || curC.has(i)) continue;
+        if (!orderedCandidates[i].isCdcEligible || curW.has(i) || curC.has(i)) continue;
         const testC = new Set(curC);
         testC.add(i);
         const ev = evaluateState(Array.from(curW), Array.from(testC));
@@ -665,6 +690,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
       if (curC.size < C) {
         for (const wIdx of Array.from(curW)) {
           const cd = orderedCandidates[wIdx];
+          if (!cd.isCdcEligible) continue;
           if (cd.totalPresents > 0) {
             const nextW = new Set(curW);
             nextW.delete(wIdx);
@@ -684,9 +710,10 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
       if (!improved && curC.size > 0) {
         for (const wIdx of Array.from(curW)) {
           const wCand = orderedCandidates[wIdx];
-          if (wCand.totalPresents === 0) continue;
+          if (wCand.totalPresents === 0 || !wCand.isCdcEligible) continue;
           for (const cIdx of Array.from(curC)) {
             const cCand = orderedCandidates[cIdx];
+            if (!cCand.isWaiverEligible) continue;
             if (cCand.totalPresents < wCand.totalPresents) {
               const nextW = new Set(curW);
               nextW.delete(wIdx);
@@ -716,6 +743,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
         // Try replacing a waiver with an unused candidate
         for (const wIdx of Array.from(curW)) {
           for (const uIdx of unused) {
+            if (!orderedCandidates[uIdx].isWaiverEligible) continue;
             const nextW = new Set(curW);
             nextW.delete(wIdx);
             nextW.add(uIdx);
@@ -732,6 +760,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
         if (!improved) {
           for (const cIdx of Array.from(curC)) {
             for (const uIdx of unused) {
+              if (!orderedCandidates[uIdx].isCdcEligible) continue;
               const nextC = new Set(curC);
               nextC.delete(cIdx);
               nextC.add(uIdx);
@@ -748,6 +777,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
         // Try adding an unused candidate to Waivers if curW.size < K
         if (!improved && curW.size < K) {
           for (const uIdx of unused) {
+            if (!orderedCandidates[uIdx].isWaiverEligible) continue;
             const nextW = new Set(curW);
             nextW.add(uIdx);
             if (considerState(nextW, curC)) {
@@ -761,6 +791,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
         // Try adding an unused candidate to CDC if curC.size < C
         if (!improved && curC.size < C) {
           for (const uIdx of unused) {
+            if (!orderedCandidates[uIdx].isCdcEligible) continue;
             const nextC = new Set(curC);
             nextC.add(uIdx);
             if (considerState(curW, nextC)) {
@@ -833,6 +864,28 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
   const chosenCdcDays = bestCdc.map(idx => orderedCandidates[idx]);
   chosenCdcDays.sort((a, b) => a.dateStr.localeCompare(b.dateStr));
 
+  // CDC Exemption & Rescue Calculation (DU Ordinance VII aggregate threshold)
+  let totBaseAtt = 0;
+  let totBaseHeld = 0;
+  (parsedData.subjects || []).forEach(sub => {
+    ['th', 'tu', 'pr'].forEach(t => {
+      const stats = sub.parts?.[t] || { p: 0, a: 0 };
+      totBaseAtt += (stats.p || 0);
+      totBaseHeld += (stats.p || 0) + (stats.a || 0);
+    });
+  });
+  const baselineOverallPct = totBaseHeld > 0 ? (totBaseAtt / totBaseHeld) * 100 : 100;
+  const isBaselineUnder667 = baselineOverallPct < 66.666;
+
+  let cdcTotalConvertedAbsences = 0;
+  bestCdc.forEach(idx => {
+    const cd = orderedCandidates[idx];
+    cdcTotalConvertedAbsences += (cd.totalAbsences || 0);
+  });
+  const projectedOverallAttWithCdc = totBaseAtt + cdcTotalConvertedAbsences;
+  const projectedOverallPctWithCdc = totBaseHeld > 0 ? (projectedOverallAttWithCdc / totBaseHeld) * 100 : 100;
+  const cdcRescued = isBaselineUnder667 && projectedOverallPctWithCdc >= 66.666;
+
   return {
     status: bestEval.allPass ? 'OPTIMAL' : 'SHORTAGE',
     chosenDays,
@@ -848,6 +901,13 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
     neededWaiversForAllPass,
     shortfall,
     evalPlan: bestEval,
+    cdcRescue: {
+      baselineOverallPct,
+      projectedOverallPctWithCdc,
+      isBaselineUnder667,
+      cdcRescued,
+      cdcTotalConvertedAbsences
+    },
     durationMs: Math.round(endTime - startTime)
   };
 }
@@ -855,8 +915,8 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
 /**
  * Section 6.3: Calculate K+1 outcome for shortage states
  */
-export function solveKPlusOne(parsedData, targetPct = 85, maxWaiversK = 12, starredSubjects = [], cdcLimitC = 0) {
-  return solveExactBnb(parsedData, targetPct, maxWaiversK + 1, starredSubjects, cdcLimitC);
+export function solveKPlusOne(parsedData, targetPct = 85, maxWaiversK = 12, starredSubjects = [], cdcLimitC = 0, options = {}) {
+  return solveExactBnb(parsedData, targetPct, maxWaiversK + 1, starredSubjects, cdcLimitC, options);
 }
 
 /**
