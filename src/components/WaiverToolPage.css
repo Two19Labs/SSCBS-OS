@@ -827,6 +827,60 @@
 
 .upload-params-row.upload-params-row-4 {
   grid-template-columns: repeat(4, 1fr);
+  gap: 0.85rem;
+}
+
+.upload-params-row.upload-params-row-4 .param-input-box {
+  padding: 0.75rem 0.85rem;
+}
+
+/* ── Month Parameter Input Card ── */
+.param-month-box {
+  cursor: pointer;
+  position: relative;
+}
+
+.param-month-box .param-stepper-wrap {
+  align-items: center;
+}
+
+.param-month-display {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  flex: 1;
+}
+
+.param-month-text {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--waiver-ink-dark, #1e1a17);
+  line-height: 1;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+  transition: color 0.15s ease;
+}
+
+.param-month-box:hover .param-month-text {
+  color: var(--waiver-maroon, #7a1c28);
+}
+
+.param-month-native-select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  z-index: 2;
+  font-size: 1rem;
 }
 
 @media (max-width: 900px) {

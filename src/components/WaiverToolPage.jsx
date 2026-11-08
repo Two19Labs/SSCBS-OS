@@ -1636,18 +1636,43 @@ export default function WaiverToolPage({ onBack }) {
               </div>
 
               {/* Semester Starts Parameter */}
-              <div className="param-input-box">
+              <div className="param-input-box param-month-box">
                 <span className="param-label">SEMESTER STARTS</span>
-                <div className="param-select-wrap">
-                  <select
-                    className="param-select"
-                    value={startingMonth}
-                    onChange={(e) => setStartingMonth(parseInt(e.target.value, 10))}
-                  >
-                    {MONTHS_FULL.map((m, idx) => (
-                      <option key={m} value={idx}>{m}</option>
-                    ))}
-                  </select>
+                <div className="param-stepper-wrap">
+                  <div className="param-month-display" title="Click to choose month">
+                    <span className="param-number param-month-text">{MONTHS_FULL[startingMonth]}</span>
+                    <select
+                      className="param-month-native-select"
+                      value={startingMonth}
+                      onChange={(e) => setStartingMonth(parseInt(e.target.value, 10))}
+                      title="Choose semester start month"
+                      aria-label="Semester start month"
+                    >
+                      {MONTHS_FULL.map((m, idx) => (
+                        <option key={m} value={idx}>{m}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="param-stepper-arrows">
+                    <button
+                      type="button"
+                      className="arrow-btn"
+                      title="Next month"
+                      aria-label="Next month"
+                      onClick={() => setStartingMonth(m => (m + 1) % 12)}
+                    >
+                      ▲
+                    </button>
+                    <button
+                      type="button"
+                      className="arrow-btn"
+                      title="Previous month"
+                      aria-label="Previous month"
+                      onClick={() => setStartingMonth(m => (m - 1 + 12) % 12)}
+                    >
+                      ▼
+                    </button>
+                  </div>
                 </div>
               </div>
 
