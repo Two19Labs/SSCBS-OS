@@ -1034,6 +1034,57 @@
   gap: 10px;
 }
 
+.upload-batch-selector.upload-batch-selector-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 640px) {
+  .upload-batch-selector.upload-batch-selector-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.upload-custom-range-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-top: 10px;
+}
+
+.upload-custom-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-dim);
+}
+
+.upload-custom-field input[type="date"] {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--ink);
+  outline: none;
+}
+
+.upload-custom-field input[type="date"]:focus {
+  border-color: var(--accent);
+}
+
+.upload-custom-arrow {
+  color: var(--ink-dim);
+  font-weight: 700;
+}
+
 .batch-pill-btn {
   display: flex;
   align-items: center;
@@ -1116,13 +1167,52 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
+.rd-custom-timeline-badge {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--accent);
+  background: var(--accent-tint);
+  border: 1px solid rgba(139, 26, 26, 0.2);
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.rd-custom-timeline-badge:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
 .rd-stat.blocked-stat {
   border-color: #fca5a5;
   background: #fef2f2;
 }
 
-.rd-btn-clear-blocked {
+.rd-btn-manage-blocked {
   margin-left: 6px;
+  padding: 2px 7px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.rd-btn-manage-blocked:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.rd-btn-clear-blocked {
+  margin-left: 4px;
   padding: 2px 7px;
   font-size: 11px;
   font-weight: 700;
@@ -1331,4 +1421,324 @@
 
 .rd-ineligible-ack-btn.rescue:hover {
   background: #047857;
+}
+
+/* Custom Timeline & Blacklist Modal */
+.rd-timeline-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: rdFadeIn 0.2s ease-out;
+}
+
+.rd-timeline-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 580px;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: rdModalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rd-timeline-modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.rd-timeline-modal-title {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.rd-timeline-modal-icon {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.rd-timeline-modal-title h3 {
+  margin: 0 0 4px 0;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.rd-timeline-modal-title p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--ink-dim);
+  line-height: 1.4;
+}
+
+.rd-modal-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: var(--ink-dim);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  line-height: 1;
+  transition: all 0.15s ease;
+}
+
+.rd-modal-close-btn:hover {
+  background: var(--tint);
+  color: var(--ink);
+}
+
+.rd-timeline-modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.rd-timeline-section {
+  background: var(--tint);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.rd-timeline-sec-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.rd-timeline-sec-title {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.rd-timeline-sec-desc {
+  margin: 0 0 12px 0;
+  font-size: 12px;
+  color: var(--ink-dim);
+  line-height: 1.4;
+}
+
+.rd-timeline-range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+}
+
+.rd-timeline-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.rd-timeline-field label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-dim);
+}
+
+.rd-timeline-field input[type="date"] {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  outline: none;
+}
+
+.rd-timeline-field input[type="date"]:focus {
+  border-color: var(--accent);
+}
+
+.rd-timeline-range-arrow {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink-dim);
+  margin-top: 14px;
+}
+
+.rd-timeline-presets {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rd-preset-lbl {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ink-dim);
+  margin-right: 4px;
+}
+
+.rd-preset-btn {
+  padding: 4px 9px;
+  font-size: 11.5px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.rd-preset-btn:hover {
+  background: var(--accent-tint);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.rd-btn-clear-blacklist {
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #b91c1c;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.rd-btn-clear-blacklist:hover {
+  background: #fca5a5;
+  color: #7f1d1d;
+}
+
+.rd-blacklist-add-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.rd-blacklist-select {
+  flex: 1;
+  padding: 7px 10px;
+  font-size: 12.5px;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  outline: none;
+}
+
+.rd-blacklist-select:focus {
+  border-color: var(--accent);
+}
+
+.rd-blacklist-add-btn {
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  color: #fff;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.rd-blacklist-add-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rd-blacklist-add-btn:not(:disabled):hover {
+  background: var(--accent-hover);
+}
+
+.rd-blacklist-empty {
+  font-size: 12px;
+  color: var(--ink-dim);
+  line-height: 1.4;
+  padding: 10px;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  text-align: center;
+}
+
+.rd-blacklist-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 140px;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.rd-blacklist-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.rd-blacklist-pill button {
+  background: transparent;
+  border: none;
+  color: #b91c1c;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 2px;
+  border-radius: 4px;
+  transition: all 0.12s;
+}
+
+.rd-blacklist-pill button:hover {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+
+.rd-timeline-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 24px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
 }

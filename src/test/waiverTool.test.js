@@ -248,6 +248,20 @@ if (fs.existsSync(nov6Path)) {
   assert(typeof jointSol.cdcRescue.projectedOverallPctWithCdc === 'number', 'cdcRescue.projectedOverallPctWithCdc must be numeric');
   assert(typeof jointSol.cdcRescue.cdcRescued === 'boolean', 'cdcRescue.cdcRescued must be boolean');
   console.log(`✓ CDC rescue metrics computed: baseline=${jointSol.cdcRescue.baselineOverallPct.toFixed(1)}%, projected=${jointSol.cdcRescue.projectedOverallPctWithCdc.toFixed(1)}%, rescued=${jointSol.cdcRescue.cdcRescued}.`);
+
+  // Test D: Custom Timeline Range Window (waiverStartDate and waiverEndDate)
+  const customStart = '2026-09-15';
+  const customEnd = '2026-10-15';
+  const customRangeSol = solveExactBnb(parsed, 85, 8, [], 2, {
+    waiverStartDate: customStart,
+    waiverEndDate: customEnd
+  });
+
+  customRangeSol.chosenDays.forEach(d => {
+    assert(d.dateStr >= customStart, `Custom timeline waiver ${d.dateStr} must be >= ${customStart}`);
+    assert(d.dateStr <= customEnd, `Custom timeline waiver ${d.dateStr} must be <= ${customEnd}`);
+  });
+  console.log(`✓ Custom timeline constraint (${customStart} to ${customEnd}) strictly respected: all ${customRangeSol.chosenDays.length} waivers fall within the window.`);
 }
 
 console.log('\nALL UNIT TESTS PASSED SUCCESSFULLY! ✓✓✓');

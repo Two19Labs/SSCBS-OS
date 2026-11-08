@@ -115,10 +115,16 @@ export default function WaiverToolPage({ onBack }) {
   const [selectedCdcDays, setSelectedCdcDays] = useState(new Set()); // Set of 'YYYY-MM-DD'
   const [gridToolMode, setGridToolMode] = useState('waiver'); // 'waiver' | 'cdc'
 
-  // Batch year & waiver start timeline: '1st' (Sep onwards) | '2nd' (Aug onwards)
+  // Batch year & waiver start timeline: '1st' (Sep onwards) | '2nd' (Aug onwards) | 'custom' (manual From/To range)
   const [batchYear, setBatchYear] = useState('1st');
   const [waiverStartMonth, setWaiverStartMonth] = useState(9); // 9 = Sep for 1st Year, 8 = Aug for 2nd Year
-  const [blockedDates, setBlockedDates] = useState(new Set()); // Set of 'YYYY-MM-DD' blocked from solver
+  const [customStartDate, setCustomStartDate] = useState('');
+  const [customEndDate, setCustomEndDate] = useState('');
+  const [blockedDates, setBlockedDates] = useState(new Set()); // Set of 'YYYY-MM-DD' blacklisted/blocked from solver
+  const [isTimelineModalOpen, setIsTimelineModalOpen] = useState(false);
+  const [tempStartDate, setTempStartDate] = useState('');
+  const [tempEndDate, setTempEndDate] = useState('');
+  const [blacklistSelectDate, setBlacklistSelectDate] = useState('');
 
   // Ineligibility acknowledgement state (shown when baseline overall attendance < 66.7%)
   const [hasAcknowledgedIneligible, setHasAcknowledgedIneligible] = useState(false);
@@ -188,6 +194,8 @@ export default function WaiverToolPage({ onBack }) {
           if (saved.gridToolMode) setGridToolMode(saved.gridToolMode);
           if (saved.batchYear) setBatchYear(saved.batchYear);
           if (saved.waiverStartMonth !== undefined) setWaiverStartMonth(saved.waiverStartMonth);
+          if (saved.customStartDate) setCustomStartDate(saved.customStartDate);
+          if (saved.customEndDate) setCustomEndDate(saved.customEndDate);
           if (Array.isArray(saved.blockedDates)) {
             setBlockedDates(new Set(saved.blockedDates));
           }
@@ -219,13 +227,15 @@ export default function WaiverToolPage({ onBack }) {
         gridToolMode,
         batchYear,
         waiverStartMonth,
+        customStartDate,
+        customEndDate,
         blockedDates: Array.from(blockedDates)
       };
       localStorage.setItem(storageKey, JSON.stringify(stateToSave));
     } catch (err) {
       console.warn('Failed to persist Waiver Tool state:', err);
     }
-  }, [parsedData, selectedWaivers, starredSubjects, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, hasAcknowledgedIneligible, cdcLimit, selectedCdcDays, gridToolMode, batchYear, waiverStartMonth, blockedDates, storageKey]);
+  }, [parsedData, selectedWaivers, starredSubjects, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, hasAcknowledgedIneligible, cdcLimit, selectedCdcDays, gridToolMode, batchYear, waiverStartMonth, customStartDate, customEndDate, blockedDates, storageKey]);
 
   // Prevent scroll when expanded grid modal is open
   useEffect(() => {
@@ -307,7 +317,9 @@ export default function WaiverToolPage({ onBack }) {
       callback = starsOrCb;
     }
 
-    const actualStartMonth = extraOpts.waiverStartMonth !== undefined ? extraOpts.waiverStartMonth : waiverStartMonth;
+    const actualStartMonth = extraOpts.waiverStartMonth !== undefined ? extraOpts.waiverStartMonth : (batchYear === 'custom' ? 0 : waiverStartMonth);
+    const actualStartDate = extraOpts.waiverStartDate !== undefined ? extraOpts.waiverStartDate : (batchYear === 'custom' ? customStartDate : null);
+    const actualEndDate = extraOpts.waiverEndDate !== undefined ? extraOpts.waiverEndDate : (batchYear === 'custom' ? customEndDate : null);
     const actualBlocked = extraOpts.blockedDates !== undefined ? extraOpts.blockedDates : blockedDates;
     const blockedList = Array.from(actualBlocked || []);
     const starredList = Array.from(stars || []);
@@ -334,6 +346,8 @@ export default function WaiverToolPage({ onBack }) {
         starredSubjects: starredList,
         cdcLimit: actualCdc,
         waiverStartMonth: actualStartMonth,
+        waiverStartDate: actualStartDate,
+        waiverEndDate: actualEndDate,
         blockedDates: blockedList
       });
     } else {
@@ -341,6 +355,8 @@ export default function WaiverToolPage({ onBack }) {
         try {
           const options = {
             waiverStartMonth: actualStartMonth,
+            waiverStartDate: actualStartDate,
+            waiverEndDate: actualEndDate,
             blockedDates: new Set(blockedList)
           };
           const solution = solveExactBnb(data, targetT, limitK, starredList, actualCdc, options);
@@ -406,7 +422,12 @@ export default function WaiverToolPage({ onBack }) {
           // Show pure baseline attendance first per user requirement.
           setSelectedWaivers(new Set());
           setSelectedCdcDays(new Set());
-        }, { waiverStartMonth, blockedDates });
+        }, {
+          waiverStartMonth: batchYear === 'custom' ? 0 : (batchYear === '1st' ? 9 : 8),
+          waiverStartDate: batchYear === 'custom' ? customStartDate : null,
+          waiverEndDate: batchYear === 'custom' ? customEndDate : null,
+          blockedDates
+        });
       } catch (err) {
         console.error('Attendance parse error:', err);
         setError(err.message || 'Failed to parse attendance file.');
@@ -422,6 +443,16 @@ export default function WaiverToolPage({ onBack }) {
     reader.readAsText(file, 'utf-8');
   };
 
+  const sheetMinDate = useMemo(() => parsedData?.dayColumns?.[0]?.dateStr || '', [parsedData]);
+  const sheetMaxDate = useMemo(() => parsedData?.dayColumns?.[parsedData.dayColumns.length - 1]?.dateStr || '', [parsedData]);
+
+  const currentSolverOptions = useMemo(() => ({
+    waiverStartMonth: batchYear === 'custom' ? 0 : waiverStartMonth,
+    waiverStartDate: batchYear === 'custom' ? (customStartDate || sheetMinDate) : null,
+    waiverEndDate: batchYear === 'custom' ? (customEndDate || sheetMaxDate) : null,
+    blockedDates
+  }), [batchYear, waiverStartMonth, customStartDate, customEndDate, sheetMinDate, sheetMaxDate, blockedDates]);
+
   const handleUpdateRecommendation = () => {
     if (!parsedData) return;
     setIsProcessing(true);
@@ -432,7 +463,7 @@ export default function WaiverToolPage({ onBack }) {
       if (solution?.chosenCdcDays && solution.chosenCdcDays.length > 0) {
         setSelectedCdcDays(new Set(solution.chosenCdcDays.map(d => d.dateStr)));
       }
-    }, { waiverStartMonth, blockedDates });
+    }, currentSolverOptions);
   };
 
   const handleReplaceSheet = () => {
@@ -448,6 +479,10 @@ export default function WaiverToolPage({ onBack }) {
     setFile(null);
     setFileMeta(null);
     setError(null);
+    setCustomStartDate('');
+    setCustomEndDate('');
+    setBlockedDates(new Set());
+    setIsTimelineModalOpen(false);
     try {
       localStorage.removeItem(storageKey);
     } catch {
@@ -481,7 +516,7 @@ export default function WaiverToolPage({ onBack }) {
           }
           return new Set();
         });
-      });
+      }, currentSolverOptions);
     }
   };
 
@@ -543,7 +578,7 @@ export default function WaiverToolPage({ onBack }) {
           }
           return new Set();
         });
-      }, { waiverStartMonth, blockedDates });
+      }, currentSolverOptions);
     }
   };
 
@@ -567,7 +602,7 @@ export default function WaiverToolPage({ onBack }) {
           }
           return new Set();
         });
-      }, { waiverStartMonth, blockedDates });
+      }, currentSolverOptions);
     }
   };
 
@@ -598,27 +633,45 @@ export default function WaiverToolPage({ onBack }) {
           }
           return new Set();
         });
-      }, { waiverStartMonth, blockedDates });
+      }, currentSolverOptions);
     }
   };
 
-  // Batch year change ('1st' => Sep onwards, '2nd' => Aug onwards)
+  // Batch year change ('1st' => Sep onwards, '2nd' => Aug onwards, 'custom' => manual timeline)
   const handleBatchChange = (newBatch) => {
     setBatchYear(newBatch);
-    const newStartMonth = newBatch === '1st' ? 9 : 8;
-    setWaiverStartMonth(newStartMonth);
-    if (parsedData) {
-      setIsProcessing(true);
-      executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
-        if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
-          setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
-          setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
-        }
-      }, { waiverStartMonth: newStartMonth, blockedDates });
+    if (newBatch === '1st') {
+      const newStartMonth = 9;
+      setWaiverStartMonth(newStartMonth);
+      if (parsedData) {
+        setIsProcessing(true);
+        executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
+          if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
+            setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+            setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
+          }
+        }, { waiverStartMonth: newStartMonth, waiverStartDate: null, waiverEndDate: null, blockedDates });
+      }
+    } else if (newBatch === '2nd') {
+      const newStartMonth = 8;
+      setWaiverStartMonth(newStartMonth);
+      if (parsedData) {
+        setIsProcessing(true);
+        executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
+          if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
+            setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+            setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
+          }
+        }, { waiverStartMonth: newStartMonth, waiverStartDate: null, waiverEndDate: null, blockedDates });
+      }
+    } else if (newBatch === 'custom') {
+      setTempStartDate(customStartDate || sheetMinDate);
+      setTempEndDate(customEndDate || sheetMaxDate);
+      setIsTimelineModalOpen(true);
     }
   };
 
-  // Toggle blocking a specific date from solver recommendations
+  // Toggle blacklisting a specific date from solver recommendations
   const handleToggleBlockDate = (dateStr) => {
     const nextBlocked = new Set(blockedDates);
     if (nextBlocked.has(dateStr)) {
@@ -644,7 +697,12 @@ export default function WaiverToolPage({ onBack }) {
           setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
           setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
         }
-      }, { waiverStartMonth, blockedDates: nextBlocked });
+      }, {
+        waiverStartMonth: batchYear === 'custom' ? 0 : waiverStartMonth,
+        waiverStartDate: batchYear === 'custom' ? (customStartDate || sheetMinDate) : null,
+        waiverEndDate: batchYear === 'custom' ? (customEndDate || sheetMaxDate) : null,
+        blockedDates: nextBlocked
+      });
     }
   };
 
@@ -657,7 +715,12 @@ export default function WaiverToolPage({ onBack }) {
           setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
           setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
         }
-      }, { waiverStartMonth, blockedDates: new Set() });
+      }, {
+        waiverStartMonth: batchYear === 'custom' ? 0 : waiverStartMonth,
+        waiverStartDate: batchYear === 'custom' ? (customStartDate || sheetMinDate) : null,
+        waiverEndDate: batchYear === 'custom' ? (customEndDate || sheetMaxDate) : null,
+        blockedDates: new Set()
+      });
     }
   };
 
@@ -675,7 +738,7 @@ export default function WaiverToolPage({ onBack }) {
         const nextC = solution?.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set();
         setSelectedWaivers(nextW);
         setSelectedCdcDays(nextC);
-      }, { waiverStartMonth, blockedDates });
+      }, currentSolverOptions);
     }
   };
 
@@ -1184,9 +1247,13 @@ export default function WaiverToolPage({ onBack }) {
               const isWaived = selectedWaivers.has(col.dateStr);
               const isCdc = selectedCdcDays.has(col.dateStr);
               const isBlocked = blockedDates.has(col.dateStr);
-              const isPreSociety = batchYear === '1st' && col.month < 9;
+              const isOutOfTimeline = Boolean(
+                (batchYear === '1st' && col.month < 9) ||
+                (batchYear === 'custom' && customStartDate && col.dateStr < customStartDate) ||
+                (batchYear === 'custom' && customEndDate && col.dateStr > customEndDate)
+              );
               const btnClass = isWaived ? 'on' : (isCdc ? 'cdc-on' : '');
-              const thClass = `rd-date-th ${isBlocked ? 'is-blocked' : ''} ${isPreSociety ? 'is-pre-society' : ''}`.trim();
+              const thClass = `rd-date-th ${isBlocked ? 'is-blocked' : ''} ${isOutOfTimeline ? 'is-pre-society' : ''}`.trim();
               return (
                 <th key={col.dateStr} className={thClass}>
                   <button
@@ -1200,9 +1267,9 @@ export default function WaiverToolPage({ onBack }) {
                     <span className="wd">{col.weekday}</span>
                     <span className="dn">{col.dayNum}</span>
                     {isBlocked ? (
-                      <span className="rd-date-blocked-badge" title="Manually blocked from recommendations">🚫</span>
-                    ) : isPreSociety ? (
-                      <span className="rd-date-locked-badge" title="Pre-society period for 1st Year (waivers start September)">🔒</span>
+                      <span className="rd-date-blocked-badge" title="Blacklisted from recommendations">🚫</span>
+                    ) : isOutOfTimeline ? (
+                      <span className="rd-date-locked-badge" title="Outside recommended waiver timeline">🔒</span>
                     ) : isCdc ? (
                       <span className="rd-date-cdc-badge" title="Career Development Centre (CDC) Attendance">CDC</span>
                     ) : null}
@@ -1238,13 +1305,17 @@ export default function WaiverToolPage({ onBack }) {
                   const isWaived = selectedWaivers.has(col.dateStr);
                   const isCdc = selectedCdcDays.has(col.dateStr);
                   const isBlocked = blockedDates.has(col.dateStr);
-                  const isPreSociety = batchYear === '1st' && col.month < 9;
+                  const isOutOfTimeline = Boolean(
+                    (batchYear === '1st' && col.month < 9) ||
+                    (batchYear === 'custom' && customStartDate && col.dateStr < customStartDate) ||
+                    (batchYear === 'custom' && customEndDate && col.dateStr > customEndDate)
+                  );
                   const dayClasses = rawSub?.dayClasses?.[col.dateStr] || [];
                   const cellClass = [
                     isWaived ? 'on' : '',
                     isCdc ? 'cdc-cell' : '',
                     isBlocked ? 'blocked-cell' : '',
-                    isPreSociety ? 'pre-society-cell' : ''
+                    isOutOfTimeline ? 'pre-society-cell' : ''
                   ].filter(Boolean).join(' ');
                   return (
                     <td
@@ -1328,6 +1399,227 @@ export default function WaiverToolPage({ onBack }) {
   const allDayColumns = parsedData?.dayColumns || [];
   const previewColumns = allDayColumns.slice(0, 17);
   const lastPreviewCol = previewColumns[previewColumns.length - 1];
+
+  const renderTimelineModal = () => {
+    if (!isTimelineModalOpen) return null;
+
+    const effectiveStart = tempStartDate || customStartDate || sheetMinDate;
+    const effectiveEnd = tempEndDate || customEndDate || sheetMaxDate;
+
+    return (
+      <div className="rd-timeline-modal-overlay" onClick={() => setIsTimelineModalOpen(false)}>
+        <div className="rd-timeline-modal" role="dialog" aria-modal="true" aria-labelledby="rd-timeline-title" onClick={e => e.stopPropagation()}>
+          <div className="rd-timeline-modal-head">
+            <div className="rd-timeline-modal-title">
+              <span className="rd-timeline-modal-icon">📅</span>
+              <div>
+                <h3 id="rd-timeline-title">Recommendation Timeline & Blacklist</h3>
+                <p>Choose the exact dates between which waivers should be recommended, and blacklist dates you cannot take waivers on.</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="rd-modal-close-btn"
+              onClick={() => setIsTimelineModalOpen(false)}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="rd-timeline-modal-body">
+            {/* 1. Date Range Section */}
+            <section className="rd-timeline-section">
+              <h4 className="rd-timeline-sec-title">1. Waiver Timeline Window</h4>
+              <p className="rd-timeline-sec-desc">
+                Waivers will only be recommended between these dates (inclusive):
+              </p>
+              <div className="rd-timeline-range-inputs">
+                <div className="rd-timeline-field">
+                  <label htmlFor="timeline-from-input">From Date:</label>
+                  <input
+                    type="date"
+                    id="timeline-from-input"
+                    value={effectiveStart}
+                    min={sheetMinDate}
+                    max={effectiveEnd}
+                    onChange={e => setTempStartDate(e.target.value)}
+                  />
+                </div>
+                <span className="rd-timeline-range-arrow">→</span>
+                <div className="rd-timeline-field">
+                  <label htmlFor="timeline-to-input">To Date:</label>
+                  <input
+                    type="date"
+                    id="timeline-to-input"
+                    value={effectiveEnd}
+                    min={effectiveStart}
+                    max={sheetMaxDate}
+                    onChange={e => setTempEndDate(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="rd-timeline-presets">
+                <span className="rd-preset-lbl">Quick Presets:</span>
+                <button
+                  type="button"
+                  className="rd-preset-btn"
+                  onClick={() => {
+                    setTempStartDate(sheetMinDate);
+                    setTempEndDate(sheetMaxDate);
+                  }}
+                >
+                  Whole Semester
+                </button>
+                <button
+                  type="button"
+                  className="rd-preset-btn"
+                  onClick={() => {
+                    const sepCol = parsedData?.dayColumns?.find(c => c.month >= 9);
+                    setTempStartDate(sepCol ? sepCol.dateStr : sheetMinDate);
+                    setTempEndDate(sheetMaxDate);
+                  }}
+                >
+                  September Onwards
+                </button>
+                <button
+                  type="button"
+                  className="rd-preset-btn"
+                  onClick={() => {
+                    const octCol = parsedData?.dayColumns?.find(c => c.month >= 10);
+                    setTempStartDate(octCol ? octCol.dateStr : sheetMinDate);
+                    setTempEndDate(sheetMaxDate);
+                  }}
+                >
+                  October Onwards
+                </button>
+              </div>
+            </section>
+
+            {/* 2. Blacklist Dates Section */}
+            <section className="rd-timeline-section">
+              <div className="rd-timeline-sec-head">
+                <div>
+                  <h4 className="rd-timeline-sec-title">2. Blacklisted Dates ({blockedDates.size})</h4>
+                  <p className="rd-timeline-sec-desc">
+                    Blacklisted dates will <strong>never</strong> be recommended as waivers or CDC attendance.
+                  </p>
+                </div>
+                {blockedDates.size > 0 && (
+                  <button
+                    type="button"
+                    className="rd-btn-clear-blacklist"
+                    onClick={handleClearBlocked}
+                  >
+                    Clear all ({blockedDates.size})
+                  </button>
+                )}
+              </div>
+
+              {/* Add date selector */}
+              <div className="rd-blacklist-add-row">
+                <select
+                  className="rd-blacklist-select"
+                  value={blacklistSelectDate}
+                  onChange={e => setBlacklistSelectDate(e.target.value)}
+                  aria-label="Select a date to blacklist"
+                >
+                  <option value="">Select a date to blacklist...</option>
+                  {parsedData?.dayColumns
+                    ?.filter(col => !blockedDates.has(col.dateStr))
+                    .map(col => (
+                      <option key={col.dateStr} value={col.dateStr}>
+                        {col.fullLabel || `${col.dateStr} (${col.weekday})`}
+                      </option>
+                    ))}
+                </select>
+                <button
+                  type="button"
+                  className="rd-blacklist-add-btn"
+                  disabled={!blacklistSelectDate}
+                  onClick={() => {
+                    if (blacklistSelectDate) {
+                      handleToggleBlockDate(blacklistSelectDate);
+                      setBlacklistSelectDate('');
+                    }
+                  }}
+                >
+                  + Blacklist Date
+                </button>
+              </div>
+
+              {/* Blacklisted pills */}
+              {blockedDates.size === 0 ? (
+                <div className="rd-blacklist-empty">
+                  <span>No dates blacklisted yet. You can blacklist dates using the selector above or by hovering over dates in the spreadsheet grid.</span>
+                </div>
+              ) : (
+                <div className="rd-blacklist-pills">
+                  {Array.from(blockedDates).sort().map(dStr => {
+                    const col = parsedData?.dayColumns?.find(c => c.dateStr === dStr);
+                    const label = col?.fullLabel || dStr;
+                    return (
+                      <span key={dStr} className="rd-blacklist-pill">
+                        🚫 {label}
+                        <button
+                          type="button"
+                          onClick={() => handleToggleBlockDate(dStr)}
+                          title={`Remove ${label} from blacklist`}
+                          aria-label={`Remove ${label} from blacklist`}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
+          </div>
+
+          <div className="rd-timeline-modal-footer">
+            <button
+              type="button"
+              className="rd-btn-outline"
+              onClick={() => setIsTimelineModalOpen(false)}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="rd-btn-dark"
+              onClick={() => {
+                const finalStart = tempStartDate || customStartDate || sheetMinDate;
+                const finalEnd = tempEndDate || customEndDate || sheetMaxDate;
+                setCustomStartDate(finalStart);
+                setCustomEndDate(finalEnd);
+                setBatchYear('custom');
+                setWaiverStartMonth(0);
+                setIsTimelineModalOpen(false);
+                if (parsedData) {
+                  setIsProcessing(true);
+                  executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
+                    if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
+                      setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+                      setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
+                    }
+                  }, {
+                    waiverStartMonth: 0,
+                    waiverStartDate: finalStart,
+                    waiverEndDate: finalEnd,
+                    blockedDates
+                  });
+                }
+              }}
+            >
+              Apply Timeline & Re-solve →
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="waiver-tool-fullpage rd-root">
@@ -1607,7 +1899,7 @@ export default function WaiverToolPage({ onBack }) {
 
             {/* Batch / Waiver Timeline Selector */}
             <div className="rd-stat batch-stat">
-              <span className="lbl" title="Waiver eligibility timeline based on college year">Waivers from</span>
+              <span className="lbl" title="Waiver eligibility timeline">Waivers from</span>
               <div className="rd-batch-toggle" role="group" aria-label="Waiver Timeline">
                 <button
                   type="button"
@@ -1625,21 +1917,55 @@ export default function WaiverToolPage({ onBack }) {
                 >
                   2nd+ Yr (Aug+)
                 </button>
+                <button
+                  type="button"
+                  className={`rd-batch-btn ${batchYear === 'custom' ? 'active' : ''}`}
+                  onClick={() => handleBatchChange('custom')}
+                  title="Manually enter timeline & blacklist dates"
+                >
+                  Custom ⚙️
+                </button>
               </div>
+              {batchYear === 'custom' && (
+                <button
+                  type="button"
+                  className="rd-custom-timeline-badge"
+                  onClick={() => {
+                    setTempStartDate(customStartDate || sheetMinDate);
+                    setTempEndDate(customEndDate || sheetMaxDate);
+                    setIsTimelineModalOpen(true);
+                  }}
+                  title="Click to edit custom timeline & blacklisted dates"
+                >
+                  {customStartDate || sheetMinDate} → {customEndDate || sheetMaxDate} ✎
+                </button>
+              )}
             </div>
 
-            {/* Blocked Dates Stat (only if any blocked) */}
+            {/* Blacklisted Dates Stat (only if any blacklisted) */}
             {blockedDates.size > 0 && (
               <div className="rd-stat blocked-stat">
-                <span className="lbl" title="Dates excluded from solver recommendations">Blocked</span>
+                <span className="lbl" title="Dates blacklisted from solver recommendations">Blacklisted</span>
                 <div className="row">
                   <span className="num">{blockedDates.size}</span>
                   <span className="unit">dates</span>
                   <button
                     type="button"
+                    className="rd-btn-manage-blocked"
+                    onClick={() => {
+                      setTempStartDate(customStartDate || sheetMinDate);
+                      setTempEndDate(customEndDate || sheetMaxDate);
+                      setIsTimelineModalOpen(true);
+                    }}
+                    title="Manage blacklisted dates"
+                  >
+                    Manage
+                  </button>
+                  <button
+                    type="button"
                     className="rd-btn-clear-blocked"
                     onClick={handleClearBlocked}
-                    title="Unblock all blocked dates"
+                    title="Clear all blacklisted dates"
                   >
                     Clear
                   </button>
@@ -1968,7 +2294,7 @@ export default function WaiverToolPage({ onBack }) {
             {/* College Year / Waiver Timeline Selector */}
             <div className="upload-batch-container">
               <span className="upload-batch-label">COLLEGE YEAR / WAIVER TIMELINE</span>
-              <div className="upload-batch-selector" role="group" aria-label="College Year Timeline">
+              <div className="upload-batch-selector upload-batch-selector-3" role="group" aria-label="College Year Timeline">
                 <button
                   type="button"
                   className={`batch-pill-btn ${batchYear === '1st' ? 'active' : ''}`}
@@ -1991,7 +2317,45 @@ export default function WaiverToolPage({ onBack }) {
                     <small>Waivers include August</small>
                   </div>
                 </button>
+                <button
+                  type="button"
+                  className={`batch-pill-btn ${batchYear === 'custom' ? 'active' : ''}`}
+                  onClick={() => {
+                    setBatchYear('custom');
+                    setWaiverStartMonth(0);
+                  }}
+                >
+                  <span className="batch-pill-icon">📅</span>
+                  <div className="batch-pill-text">
+                    <strong>Custom Timeline</strong>
+                    <small>Manual From & To dates</small>
+                  </div>
+                </button>
               </div>
+
+              {batchYear === 'custom' && (
+                <div className="upload-custom-range-box">
+                  <div className="upload-custom-field">
+                    <label htmlFor="upload-custom-from">From Date:</label>
+                    <input
+                      type="date"
+                      id="upload-custom-from"
+                      value={customStartDate || ''}
+                      onChange={e => setCustomStartDate(e.target.value)}
+                    />
+                  </div>
+                  <span className="upload-custom-arrow">→</span>
+                  <div className="upload-custom-field">
+                    <label htmlFor="upload-custom-to">To Date:</label>
+                    <input
+                      type="date"
+                      id="upload-custom-to"
+                      value={customEndDate || ''}
+                      onChange={e => setCustomEndDate(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="upload-params-row upload-params-row-4">
@@ -2079,7 +2443,9 @@ export default function WaiverToolPage({ onBack }) {
             <p className="upload-params-caption">
               {batchYear === '1st'
                 ? '1st year students joined in August; college rules allow society waivers from September onwards.'
-                : '2nd and 3rd year students can apply society waivers from August onwards.'}{' '}
+                : batchYear === '2nd'
+                ? '2nd and 3rd year students can apply society waivers from August onwards.'
+                : `Custom waiver timeline${customStartDate ? ` from ${customStartDate}` : ''}${customEndDate ? ` to ${customEndDate}` : ''}. You can also blacklist dates.`}{' '}
               Career Development Centre (CDC) attendance allows converting absences into presents across all months. Leave 0 if not applicable. You can adjust all parameters later.
             </p>
 
@@ -2194,6 +2560,9 @@ export default function WaiverToolPage({ onBack }) {
           </section>
         </div>
       )}
+
+      {/* Custom Timeline & Blacklist Modal Overlay */}
+      {renderTimelineModal()}
     </div>
   );
 }

@@ -1,10 +1,25 @@
 import { solveExactBnb, solveKPlusOne } from '../lib/waiverSolver';
 
 self.onmessage = function (e) {
-  const { id, parsedData, targetPct, maxWaiversK, starredSubjects, cdcLimit, waiverStartMonth, blockedDates } = e.data || {};
+  const {
+    id,
+    parsedData,
+    targetPct,
+    maxWaiversK,
+    starredSubjects,
+    cdcLimit,
+    waiverStartMonth,
+    waiverEndMonth,
+    waiverStartDate,
+    waiverEndDate,
+    blockedDates
+  } = e.data || {};
   try {
     const options = {
       waiverStartMonth: waiverStartMonth || 0,
+      waiverEndMonth: waiverEndMonth || 0,
+      waiverStartDate: waiverStartDate || null,
+      waiverEndDate: waiverEndDate || null,
       blockedDates: blockedDates ? new Set(blockedDates) : new Set()
     };
     const solution = solveExactBnb(parsedData, targetPct, maxWaiversK, starredSubjects, cdcLimit, options);

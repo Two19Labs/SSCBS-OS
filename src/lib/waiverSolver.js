@@ -197,7 +197,13 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
   const startTime = (typeof performance !== 'undefined' ? performance.now() : Date.now());
   const T = targetPct;
 
-  const { waiverStartMonth = 0, blockedDates = null } = options || {};
+  const {
+    waiverStartMonth = 0,
+    waiverEndMonth = 0,
+    waiverStartDate = null,
+    waiverEndDate = null,
+    blockedDates = null
+  } = options || {};
   const blockedDatesSet = blockedDates instanceof Set
     ? blockedDates
     : new Set(Array.isArray(blockedDates) ? blockedDates : []);
@@ -247,7 +253,12 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
   // Tag candidate days with timeline eligibility & manual blocking
   candidateDays.forEach(d => {
     const isBlocked = blockedDatesSet.has(d.dateStr);
-    const inWaiverWindow = (!waiverStartMonth || d.month >= waiverStartMonth);
+    let inWaiverWindow = true;
+    if (waiverStartDate && d.dateStr < waiverStartDate) inWaiverWindow = false;
+    if (waiverEndDate && d.dateStr > waiverEndDate) inWaiverWindow = false;
+    if (waiverStartMonth && d.month < waiverStartMonth) inWaiverWindow = false;
+    if (waiverEndMonth && d.month > waiverEndMonth) inWaiverWindow = false;
+
     d.isBlocked = isBlocked;
     d.isWaiverEligible = !isBlocked && inWaiverWindow;
     d.isCdcEligible = !isBlocked;
