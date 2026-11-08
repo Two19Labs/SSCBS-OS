@@ -728,7 +728,7 @@ export default function WaiverToolPage({ onBack }) {
           {status === 'info' ? (
             `Not counted toward the ${threshold}% target`
           ) : status === 'fail' ? (
-            <>⚠️ <strong style={{ color: 'var(--red, #b91c1c)' }}>Risk:</strong> Below 66.7% minimum. Attend <strong>{buff.classesNeededForDebarSafe || 1}</strong> class(es) to avoid debarment.</>
+            <>⚠️ <strong style={{ color: 'var(--red, #b91c1c)' }}>Risk:</strong> Below 66.7% minimum. Attend <strong>{buff.classesNeededForDebarSafe || 1}</strong> class(es) to avoid risk.</>
           ) : buff.passes ? (
             <>Can miss <strong>{buff.missableBuffer}</strong> more and stay above {threshold}%</>
           ) : (
