@@ -553,9 +553,6 @@ export default function WaiverToolPage({ onBack }) {
     }
   };
 
-  const handleClearCdc = () => {
-    setSelectedCdcDays(new Set());
-  };
 
   // Live parameter changes with automatic solver re-execution
   const handleMaxWaiversChange = (newLimit) => {
@@ -2109,16 +2106,6 @@ export default function WaiverToolPage({ onBack }) {
                         Apply recommended
                       </button>
                     )}
-                    {selectedCdcDays.size > 0 && (
-                      <button
-                        type="button"
-                        className="rd-btn-outline sm muted"
-                        onClick={handleClearCdc}
-                        title="Clear all claimed CDC attendance days"
-                      >
-                        Clear CDC
-                      </button>
-                    )}
                     <button
                       type="button"
                       className="rd-btn-outline sm muted"
@@ -2501,15 +2488,6 @@ export default function WaiverToolPage({ onBack }) {
                     Apply recommended
                   </button>
                 )}
-                {selectedCdcDays.size > 0 && (
-                  <button
-                    type="button"
-                    className="rd-btn-outline sm muted"
-                    onClick={handleClearCdc}
-                  >
-                    Clear CDC
-                  </button>
-                )}
                 {blockedDates.size > 0 && (
                   <button
                     type="button"
@@ -2525,8 +2503,9 @@ export default function WaiverToolPage({ onBack }) {
                   className="rd-btn-outline sm muted"
                   onClick={handleClearAll}
                   disabled={selectedWaivers.size === 0 && selectedCdcDays.size === 0}
+                  title="Clear all active waivers & CDC days"
                 >
-                  Clear all
+                  Clear
                 </button>
                 <button type="button" className="rd-btn-dark" onClick={() => setIsGridExpanded(false)}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
