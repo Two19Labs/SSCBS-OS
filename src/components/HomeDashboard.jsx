@@ -690,7 +690,7 @@ export default function HomeDashboard({ onNavigate, onOpenProfile }) {
     { id: 'case-comps', micro: 'SOON', microClass: 'dim', title: 'Competitions', desc: 'OneStop early access — discover & track top competitions', Icon: FlameIcon, locked: false },
     ...(hasTeamFinderAccess ? [{ id: 'team-finder', micro: 'NEW', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post comp openings', Icon: TrophyIcon, locked: false }] : []),
     { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
-    { id: 'waiver', micro: hasWaiverAccess ? 'NEW' : 'SOON', microClass: hasWaiverAccess ? 'success' : 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !hasWaiverAccess },
+    { id: 'waiver', micro: hasWaiverAccess ? 'NEW' : 'SOON', microClass: hasWaiverAccess ? 'success' : 'dim', title: 'Attendance Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !hasWaiverAccess },
     { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
     { id: 'find-prof', micro: 'SEARCH', microClass: 'success', title: 'Find My Professor', desc: "Who's teaching where, right now", Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
     { id: 'empty-room', micro: 'LIVE', microClass: 'success', title: 'Classroom Radar', desc: 'Live room occupancy, daily schedules & vacant room finder', Icon: DoorIcon, locked: false },

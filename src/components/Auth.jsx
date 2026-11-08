@@ -7,7 +7,7 @@ import './Auth.css';
 
 const slides = [
   {
-    title: 'Waiver Tool',
+    title: 'Attendance Tool',
     description: 'Manage, track, and apply for college attendance waivers with automated document generation.'
   },
   {

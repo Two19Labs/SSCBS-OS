@@ -270,7 +270,7 @@ function App() {
             <div className="waiver-locked-icon">
               <PercentIcon size={32} />
             </div>
-            <h2>Waiver Tool is Coming Soon</h2>
+            <h2>Attendance Tool is Coming Soon</h2>
             <p>
               We are fine-tuning the Attendance Waiver Assistant. Access is currently limited to authorized personnel during private beta testing.
             </p>
@@ -305,7 +305,7 @@ function App() {
         { id: 'find-prof', label: 'Find My Professor', Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
         { id: 'empty-room', label: 'Classroom Radar', Icon: DoorIcon },
         ...(hasTeamFinderAccess ? [{ id: 'team-finder', label: 'Team Finder', Icon: TrophyIcon }] : []),
-        { id: 'waiver', label: 'Waiver Tool', Icon: PercentIcon, locked: !hasWaiverAccess },
+        { id: 'waiver', label: 'Attendance Tool', Icon: PercentIcon, locked: !hasWaiverAccess },
         { id: 'gpa', label: 'GPA Calculator', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
         { id: 'pyqs', label: 'PYQs & Resources', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
       ],
@@ -427,7 +427,7 @@ function App() {
               ...(hasTeamFinderAccess ? [{ id: 'team-finder', micro: 'NEW', microClass: 'success', title: 'Team Finder & Compete Hub', desc: 'Find teammates & post case comp openings', Icon: TrophyIcon, locked: false }] : []),
 
               { id: 'pyqs', micro: 'SOON', microClass: 'dim', title: 'PYQs & Resources', desc: 'Papers, syllabus, notes', Icon: FileIcon, locked: !featureFlags['pyqs'] && !isAdmin },
-              { id: 'waiver', micro: hasWaiverAccess ? 'NEW' : 'SOON', microClass: hasWaiverAccess ? 'success' : 'dim', title: 'Waiver Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !hasWaiverAccess },
+              { id: 'waiver', micro: hasWaiverAccess ? 'NEW' : 'SOON', microClass: hasWaiverAccess ? 'success' : 'dim', title: 'Attendance Tool', desc: 'Clear attendance smartly', Icon: PercentIcon, locked: !hasWaiverAccess },
               { id: 'gpa', micro: 'DU', microClass: 'maroon', title: 'GPA Calculator', desc: 'SGPA & CGPA, official schemas', Icon: CalculatorIcon, locked: !featureFlags['gpa'] && !isAdmin },
               { id: 'find-prof', micro: 'SEARCH', microClass: 'success', title: 'Find My Professor', desc: "Who's teaching where, right now", Icon: SearchIcon, locked: !featureFlags['find-prof'] && !isAdmin },
 

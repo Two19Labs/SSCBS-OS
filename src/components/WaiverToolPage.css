@@ -746,30 +746,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* ── Persistent Ineligible Banner On Page ── */
-.rd-ineligible-banner {
-  background: #fff5f5;
-  border: 1px solid #fed7d7;
-  border-left: 4px solid #dc2626;
-  border-radius: 12px;
-  padding: 12px 18px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  color: #7f1d1d;
-  font-size: 13.5px;
-  line-height: 1.45;
-  box-shadow: 0 1px 2px rgba(185, 28, 28, 0.05);
-}
-
-.rd-ineligible-banner svg {
-  color: #dc2626;
-  flex-shrink: 0;
-}
-
-.rd-ineligible-banner strong {
-  color: #991b1b;
-}
 
 /* ── Ineligible Tag in Totals Card ── */
 .rd-total-item-lbl-wrap {

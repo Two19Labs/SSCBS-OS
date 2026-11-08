@@ -55,7 +55,7 @@ export default function WaiverToolPage({ onBack }) {
             </div>
             <h2>Please open on a PC or Laptop</h2>
             <p>
-              The Waiver Tool requires a larger screen to display subject analytics, multi-column date tables, and the attendance grid accurately.
+              The Attendance Tool requires a larger screen to display subject analytics, multi-column date tables, and the attendance grid accurately.
             </p>
             <div className="mobile-hint-box">
               💡 For the best experience, open <strong>sscbsos.in/#waiver</strong> on your desktop browser.
@@ -77,7 +77,7 @@ export default function WaiverToolPage({ onBack }) {
           <div className="waiver-locked-icon">
             <PercentIcon size={32} />
           </div>
-          <h2>Waiver Tool is Coming Soon</h2>
+          <h2>Attendance Tool is Coming Soon</h2>
           <p>
             We are fine-tuning the Attendance Waiver Assistant. Access is currently limited to authorized personnel during private beta testing.
           </p>
@@ -1123,7 +1123,7 @@ export default function WaiverToolPage({ onBack }) {
 
         <div className="rd-brand">
           <img src="/sscbs_college_logo.png" alt="" width="28" height="28" />
-          <span>SSCBS <span className="accent">Waiver Tool</span></span>
+          <span>SSCBS <span className="accent">Attendance Tool</span></span>
         </div>
 
         <div className="rd-nav-right">
@@ -1357,21 +1357,6 @@ export default function WaiverToolPage({ onBack }) {
               >
                 Increase to {solverResult.neededWaiversForAllPass} & Apply
               </button>
-            </div>
-          )}
-
-          {/* Debarment Ineligibility Alert Banner (Simulation Mode) */}
-          {isOverallIneligible && totalsSummary?.overall && (
-            <div className="rd-ineligible-banner" role="alert">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                <line x1="12" y1="9" x2="12" y2="13" />
-                <line x1="12" y1="17" x2="12.01" y2="17" />
-              </svg>
-              <div>
-                <strong>Simulation Mode (Officially Ineligible):</strong> Your total baseline attendance across all subjects is{' '}
-                <strong>{totalsSummary.overall.basePct.toFixed(1)}%</strong> (below the 66.7% DU threshold). The college administration will not accept official waiver applications, but you can continue simulating waiver outcomes below.
-              </div>
             </div>
           )}
 

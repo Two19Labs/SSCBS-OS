@@ -298,7 +298,7 @@ export const FEATURE_NAMES = {
   'find-prof': 'Find My Professor',
   'team-finder': 'Team Finder & Compete Hub',
   'empty-room': 'Classroom Radar',
-  waiver: 'Waiver Tool',
+  waiver: 'Attendance Tool',
   gpa: 'GPA Calculator',
   buzz: 'Campus Buzz',
   profile: 'Profile Page',
