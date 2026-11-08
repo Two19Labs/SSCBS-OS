@@ -1056,24 +1056,6 @@ export default function WaiverToolPage({ onBack }) {
                 </div>
               </div>
 
-              {/* Attendance Health & Star Priority Guide Note */}
-              <div className="rd-health-note">
-                <div className="rd-note-title">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="16" x2="12" y2="12" />
-                    <line x1="12" y1="8" x2="12.01" y2="8" />
-                  </svg>
-                  <span>Understanding Attendance Colors & Star Priority</span>
-                </div>
-                <p className="rd-note-text">
-                  <strong className="text-safe">Green (≥{threshold}%)</strong> meets your target attendance for maximum marks.
-                  {' '}<strong className="text-warn">Yellow (66.7%–{(threshold - 0.1).toFixed(1)}%)</strong> is safe from debarment but below your target.
-                  {' '}<strong className="text-fail">Red (&lt;66.7%)</strong> is at risk of college debarment from semester exams.
-                  {' '}Click the <span className="rd-note-star">★ star icon</span> next to high-credit or core subjects to ensure they get priority to reach {threshold}% over other subjects when waivers are limited (the 66.7% safety floor is always protected for every course).
-                </p>
-              </div>
-
               {renderSubjectCards()}
             </section>
 
