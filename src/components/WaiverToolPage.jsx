@@ -15,6 +15,25 @@ import {
 } from '../lib/waiverSolver';
 import './WaiverToolPage.css';
 
+function formatTimelineDisplay(startStr, endStr, sheetMinDate, sheetMaxDate) {
+  const start = startStr || sheetMinDate;
+  const end = endStr || sheetMaxDate;
+  if (!start && !end) return 'All dates';
+  const fmt = (ds) => {
+    if (!ds) return '';
+    const parts = ds.split('-');
+    if (parts.length < 3) return ds;
+    const m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][parseInt(parts[1], 10) - 1] || parts[1];
+    return `${parseInt(parts[2], 10)} ${m}`;
+  };
+  if (start && end) {
+    if (start === end) return fmt(start);
+    return `${fmt(start)} – ${fmt(end)}`;
+  }
+  if (start) return `From ${fmt(start)}`;
+  return `Until ${fmt(end)}`;
+}
+
 export default function WaiverToolPage({ onBack }) {
   const { user } = useAuth();
   const hasAccess = canAccessWaiver(user?.email);
@@ -1407,7 +1426,7 @@ export default function WaiverToolPage({ onBack }) {
             <div className="rd-timeline-modal-title">
               <span className="rd-timeline-modal-icon">📅</span>
               <div>
-                <h3 id="rd-timeline-title">Timeline for recommended waivers</h3>
+                <h3 id="rd-timeline-title">Waiver Timeline</h3>
                 <p>Choose the dates between which waivers should be recommended.</p>
               </div>
             </div>
@@ -1756,7 +1775,7 @@ export default function WaiverToolPage({ onBack }) {
 
             {/* Waivers Used Stepper */}
             <div className="rd-stat">
-              <span className="lbl">Waivers used</span>
+              <span className="lbl">Waivers</span>
               <div className="row">
                 <span className="num">
                   {selectedWaivers.size}
@@ -1772,7 +1791,7 @@ export default function WaiverToolPage({ onBack }) {
 
             {/* Career Development Centre (CDC) Attendance Stepper */}
             <div className={`rd-stat ${cdcLimit > 0 ? 'cdc-stat' : ''}`}>
-              <span className="lbl" title="Career Development Centre (CDC) Attendance Allowance">CDC Attendance</span>
+              <span className="lbl" title="Career Development Centre (CDC) Attendance">CDC Attendance</span>
               <div className="row">
                 <span className="num">
                   {selectedCdcDays.size}
@@ -1794,17 +1813,17 @@ export default function WaiverToolPage({ onBack }) {
                 setTempEndDate(activeWaiverEnd || sheetMaxDate);
                 setIsTimelineModalOpen(true);
               }}
-              title="Click to change timeline for recommended waivers"
+              title="Click to edit recommended waiver timeline"
             >
-              <span className="lbl" title="Timeline for recommended waivers">Timeline for recommended waivers</span>
+              <span className="lbl" title="Recommended waiver timeline">Timeline</span>
               <div className="row timeline-stat-row">
                 <span className="timeline-stat-dates">
-                  {activeWaiverStart || sheetMinDate || 'Start'} → {activeWaiverEnd || sheetMaxDate || 'End'}
+                  {formatTimelineDisplay(activeWaiverStart, activeWaiverEnd, sheetMinDate, sheetMaxDate)}
                 </span>
                 <button
                   type="button"
                   className="rd-timeline-edit-btn"
-                  title="Edit timeline for recommended waivers"
+                  title="Edit timeline"
                   onClick={(e) => {
                     e.stopPropagation();
                     setTempStartDate(activeWaiverStart || sheetMinDate);
@@ -1812,15 +1831,15 @@ export default function WaiverToolPage({ onBack }) {
                     setIsTimelineModalOpen(true);
                   }}
                 >
-                  Edit ✎
+                  ✎
                 </button>
               </div>
             </div>
 
-            {/* Blacklisted Dates Stat (only if any blacklisted) */}
+            {/* Blacklisted / Blocked Dates Stat (only if any blacklisted) */}
             {blockedDates.size > 0 && (
               <div className="rd-stat blocked-stat">
-                <span className="lbl" title="Dates blacklisted from solver recommendations">Blacklisted</span>
+                <span className="lbl" title="Dates blacklisted from recommendations">Blocked</span>
                 <div className="row">
                   <span className="num">{blockedDates.size}</span>
                   <span className="unit">dates</span>
@@ -1828,7 +1847,7 @@ export default function WaiverToolPage({ onBack }) {
                     type="button"
                     className="rd-btn-clear-blocked"
                     onClick={handleClearBlocked}
-                    title="Clear all blacklisted dates"
+                    title="Clear blocked dates"
                   >
                     Clear
                   </button>
@@ -1838,34 +1857,36 @@ export default function WaiverToolPage({ onBack }) {
 
             {/* Status Banner */}
             <div className={`rd-status ${simStats?.allPassing ? 'ok' : ((simStats?.debarSafeTargetCount ?? 0) < totalTargetParts ? 'bad' : 'warn')}`}>
-              {simStats?.allPassing ? (
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <circle cx="12" cy="12" r="10" />
-                  <polyline points="8 12.5 11 15.5 16 9.5" />
-                </svg>
-              ) : (
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
-                  <line x1="12" y1="9" x2="12" y2="13" />
-                  <line x1="12" y1="17" x2="12" y2="17" />
-                </svg>
-              )}
-              <div>
-                <strong>{passingTargetCount} of {totalTargetParts} theory and tute parts are above {threshold}%</strong>
-                <span>
+              <div className="rd-status-icon-wrap">
+                {simStats?.allPassing ? (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="8 12.5 11 15.5 16 9.5" />
+                  </svg>
+                ) : (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+                    <line x1="12" y1="9" x2="12" y2="13" />
+                    <line x1="12" y1="17" x2="12" y2="17" />
+                  </svg>
+                )}
+              </div>
+              <div className="rd-status-info">
+                <strong>{passingTargetCount} of {totalTargetParts} parts meet {threshold}%</strong>
+                <span className="rd-status-sub">
                   {selectedWaivers.size === 0 && selectedCdcDays.size === 0
-                    ? `Showing raw baseline attendance (0 dates applied). You can apply recommended dates below.`
-                    : `With ${selectedWaivers.size} waiver${selectedWaivers.size === 1 ? '' : 's'}${cdcLimit > 0 ? ` and ${selectedCdcDays.size} CDC date${selectedCdcDays.size === 1 ? '' : 's'}` : ''} selected. Practicals are shown for info only.`}
+                    ? 'Baseline (0 applied)'
+                    : `${selectedWaivers.size} waiver${selectedWaivers.size === 1 ? '' : 's'}${cdcLimit > 0 ? `, ${selectedCdcDays.size} CDC` : ''} applied`}
                 </span>
               </div>
               {selectedWaivers.size === 0 && selectedCdcDays.size === 0 && (solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
-                <button type="button" className="rd-btn-outline sm rd-btn-accent" onClick={handleApplyRecommended}>
+                <button type="button" className="rd-btn-outline sm rd-btn-accent rd-status-cta" onClick={handleApplyRecommended}>
                   Apply recommended
                 </button>
               )}
               {hasParamsChanged && (selectedWaivers.size > 0 || selectedCdcDays.size > 0) && (
-                <button type="button" className="rd-btn-outline sm" onClick={handleApplyRecommended}>
-                  Update recommendation
+                <button type="button" className="rd-btn-outline sm rd-status-cta" onClick={handleApplyRecommended}>
+                  Update
                 </button>
               )}
             </div>
@@ -2144,9 +2165,9 @@ export default function WaiverToolPage({ onBack }) {
               </div>
             )}
 
-            {/* Timeline for Recommended Waivers */}
+            {/* Waiver Timeline */}
             <div className="upload-timeline-box">
-              <span className="upload-timeline-label">TIMELINE FOR RECOMMENDED WAIVERS</span>
+              <span className="upload-timeline-label">WAIVER TIMELINE</span>
 
               <div className="upload-timeline-inputs-row">
                 <div className="upload-timeline-field">

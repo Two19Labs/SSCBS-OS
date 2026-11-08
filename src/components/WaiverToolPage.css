@@ -1607,3 +1607,249 @@
   border-top: 1px solid var(--border);
   background: var(--surface);
 }
+
+/* ── Harmonized Metric Cards & Status Banner in Top Bar ── */
+.rd-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.rd-stat {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 160px;
+  height: 78px;
+  min-height: 78px;
+  max-height: 78px;
+  padding: 12px 16px;
+  box-sizing: border-box;
+}
+
+.rd-stat .lbl {
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.rd-stat .row {
+  align-items: baseline;
+  gap: 6px;
+  display: flex;
+  line-height: 1;
+  margin: 0;
+}
+
+.rd-stat .num {
+  font-variant-numeric: tabular-nums;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.rd-stat .unit {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.rd-stat .of {
+  font-size: 15px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.rd-steps {
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  display: flex;
+}
+
+.rd-steps button {
+  border: 1px solid var(--line);
+  background: #f6f1eb;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  transition: all 0.15s ease;
+}
+
+.rd-steps button:hover {
+  background: #efe8dd;
+  border-color: var(--ink-dim);
+}
+
+/* Timeline Toolbar Card */
+.rd-stat.timeline-stat {
+  min-width: 175px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.rd-stat.timeline-stat:hover {
+  border-color: var(--accent);
+  background: var(--tint);
+}
+
+.timeline-stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.timeline-stat-dates {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+}
+
+.rd-timeline-edit-btn {
+  background: var(--tint);
+  border: 1px solid var(--border);
+  color: var(--ink-dim);
+  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: auto;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+.rd-stat.timeline-stat:hover .rd-timeline-edit-btn,
+.rd-timeline-edit-btn:hover {
+  background: var(--accent-tint);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Blocked Stat */
+.rd-stat.blocked-stat {
+  min-width: 140px;
+}
+
+.rd-btn-clear-blocked {
+  background: var(--tint);
+  border: 1px solid var(--border);
+  color: var(--ink-dim);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-left: auto;
+  transition: all 0.15s ease;
+}
+
+.rd-btn-clear-blocked:hover {
+  background: var(--rtint);
+  border-color: var(--red);
+  color: var(--red);
+}
+
+/* Status Banner */
+.rd-status {
+  border: 1px solid;
+  border-radius: 14px;
+  flex: 1 1 300px;
+  align-items: center;
+  gap: 12px;
+  min-width: 280px;
+  height: 78px;
+  min-height: 78px;
+  max-height: 78px;
+  padding: 10px 16px;
+  display: flex;
+  box-sizing: border-box;
+}
+
+.rd-status.ok {
+  background: var(--gtint);
+  color: var(--green);
+  border-color: #bfe3cb;
+}
+
+.rd-status.bad {
+  background: var(--rtint);
+  color: var(--red);
+  border-color: #f2c2c2;
+}
+
+.rd-status.warn {
+  background: var(--gold-tint, #fef9c3);
+  color: var(--gold-text, #b45309);
+  border-color: var(--border-strong, #fde047);
+}
+
+.rd-status-icon-wrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rd-status-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.rd-status-info strong {
+  font-size: 13.5px;
+  font-weight: 800;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rd-status-sub {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rd-status-cta {
+  margin-left: auto;
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 8px;
+}
