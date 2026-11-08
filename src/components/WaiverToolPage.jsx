@@ -137,7 +137,6 @@ export default function WaiverToolPage({ onBack }) {
   // Recommended waiver timeline window: 'YYYY-MM-DD' strings
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
-  const [isFirstYearPreset, setIsFirstYearPreset] = useState(true); // Default to First Year preset
   const [blockedDates, setBlockedDates] = useState(new Set()); // Set of 'YYYY-MM-DD' blacklisted/blocked from solver
   const [isTimelineModalOpen, setIsTimelineModalOpen] = useState(false);
   const [tempStartDate, setTempStartDate] = useState('');
@@ -209,7 +208,6 @@ export default function WaiverToolPage({ onBack }) {
             setSelectedCdcDays(new Set(saved.selectedCdcDays));
           }
           if (saved.gridToolMode) setGridToolMode(saved.gridToolMode);
-          if (saved.isFirstYearPreset !== undefined) setIsFirstYearPreset(saved.isFirstYearPreset);
           if (saved.customStartDate !== undefined) setCustomStartDate(saved.customStartDate);
           if (saved.customEndDate !== undefined) setCustomEndDate(saved.customEndDate);
           if (Array.isArray(saved.blockedDates)) {
@@ -241,7 +239,6 @@ export default function WaiverToolPage({ onBack }) {
         cdcLimit,
         selectedCdcDays: Array.from(selectedCdcDays),
         gridToolMode,
-        isFirstYearPreset,
         customStartDate,
         customEndDate,
         blockedDates: Array.from(blockedDates)
@@ -250,7 +247,7 @@ export default function WaiverToolPage({ onBack }) {
     } catch (err) {
       console.warn('Failed to persist Waiver Tool state:', err);
     }
-  }, [parsedData, selectedWaivers, starredSubjects, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, hasAcknowledgedIneligible, cdcLimit, selectedCdcDays, gridToolMode, isFirstYearPreset, customStartDate, customEndDate, blockedDates, storageKey]);
+  }, [parsedData, selectedWaivers, starredSubjects, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, hasAcknowledgedIneligible, cdcLimit, selectedCdcDays, gridToolMode, customStartDate, customEndDate, blockedDates, storageKey]);
 
   // Prevent scroll when expanded grid modal is open
   useEffect(() => {
@@ -332,12 +329,8 @@ export default function WaiverToolPage({ onBack }) {
       callback = starsOrCb;
     }
 
-    const sepCol = data?.dayColumns?.find(c => c.month >= 9);
-    const fallbackSep = sepCol ? sepCol.dateStr : (data?.dayColumns?.[0]?.dateStr ? `${data.dayColumns[0].dateStr.slice(0, 4)}-09-01` : '2026-09-01');
-    const defaultStart = isFirstYearPreset ? fallbackSep : null;
-
     const actualStartMonth = extraOpts.waiverStartMonth !== undefined ? extraOpts.waiverStartMonth : 0;
-    const actualStartDate = extraOpts.waiverStartDate !== undefined ? extraOpts.waiverStartDate : (customStartDate || defaultStart);
+    const actualStartDate = extraOpts.waiverStartDate !== undefined ? extraOpts.waiverStartDate : (customStartDate || null);
     const actualEndDate = extraOpts.waiverEndDate !== undefined ? extraOpts.waiverEndDate : (customEndDate || null);
     const actualBlocked = extraOpts.blockedDates !== undefined ? extraOpts.blockedDates : blockedDates;
     const blockedList = Array.from(actualBlocked || []);
@@ -442,7 +435,7 @@ export default function WaiverToolPage({ onBack }) {
           setSelectedWaivers(new Set());
           setSelectedCdcDays(new Set());
         }, {
-          waiverStartDate: customStartDate || (isFirstYearPreset ? (parsed.dayColumns.find(c => c.month >= 9)?.dateStr || '2026-09-01') : null),
+          waiverStartDate: customStartDate || null,
           waiverEndDate: customEndDate || null,
           blockedDates
         });
@@ -464,12 +457,7 @@ export default function WaiverToolPage({ onBack }) {
   const sheetMinDate = useMemo(() => parsedData?.dayColumns?.[0]?.dateStr || '', [parsedData]);
   const sheetMaxDate = useMemo(() => parsedData?.dayColumns?.[parsedData.dayColumns.length - 1]?.dateStr || '', [parsedData]);
 
-  const defaultSepStart = useMemo(() => {
-    const sepCol = parsedData?.dayColumns?.find(c => c.month >= 9);
-    return sepCol ? sepCol.dateStr : (sheetMinDate ? `${sheetMinDate.slice(0, 4)}-09-01` : '2026-09-01');
-  }, [parsedData, sheetMinDate]);
-
-  const activeWaiverStart = customStartDate || (isFirstYearPreset ? defaultSepStart : '');
+  const activeWaiverStart = customStartDate || '';
   const activeWaiverEnd = customEndDate || '';
 
   const currentSolverOptions = useMemo(() => ({
@@ -656,36 +644,6 @@ export default function WaiverToolPage({ onBack }) {
           return new Set();
         });
       }, currentSolverOptions);
-    }
-  };
-
-  // Toggle First Year preset (waivers restricted to September onwards)
-  const handleToggleFirstYearPreset = () => {
-    if (isFirstYearPreset) {
-      setIsFirstYearPreset(false);
-      setCustomStartDate('');
-      if (parsedData) {
-        setIsProcessing(true);
-        executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
-          if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
-            setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
-            setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
-          }
-        }, { waiverStartDate: null, waiverEndDate: customEndDate || null, blockedDates });
-      }
-    } else {
-      setIsFirstYearPreset(true);
-      const newStart = defaultSepStart;
-      setCustomStartDate(newStart);
-      if (parsedData) {
-        setIsProcessing(true);
-        executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
-          if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
-            setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
-            setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
-          }
-        }, { waiverStartDate: newStart, waiverEndDate: customEndDate || null, blockedDates });
-      }
     }
   };
 
@@ -1415,9 +1373,8 @@ export default function WaiverToolPage({ onBack }) {
   const renderTimelineModal = () => {
     if (!isTimelineModalOpen) return null;
 
-    const effectiveStart = tempStartDate || activeWaiverStart || sheetMinDate;
-    const effectiveEnd = tempEndDate || activeWaiverEnd || sheetMaxDate;
-    const isFirstYearActive = effectiveStart === defaultSepStart;
+    const effectiveStart = tempStartDate !== '' ? tempStartDate : (customStartDate || sheetMinDate);
+    const effectiveEnd = tempEndDate !== '' ? tempEndDate : (customEndDate || sheetMaxDate);
 
     return (
       <div className="rd-timeline-modal-overlay" onClick={() => setIsTimelineModalOpen(false)}>
@@ -1467,26 +1424,21 @@ export default function WaiverToolPage({ onBack }) {
                 />
               </div>
             </div>
-
-            {/* Presets */}
-            <div className="rd-timeline-presets-section">
-              <span className="rd-preset-lbl">Presets</span>
-              <div className="rd-timeline-presets">
-                <button
-                  type="button"
-                  className={`rd-preset-btn ${isFirstYearActive ? 'active' : ''}`}
-                  onClick={() => {
-                    setTempStartDate(defaultSepStart);
-                    setTempEndDate(sheetMaxDate || effectiveEnd);
-                  }}
-                >
-                  First Year (starts from September)
-                </button>
-              </div>
-            </div>
           </div>
 
           <div className="rd-timeline-modal-footer">
+            <button
+              type="button"
+              className="rd-btn-outline"
+              onClick={() => {
+                setTempStartDate(sheetMinDate);
+                setTempEndDate(sheetMaxDate);
+              }}
+              title="Reset timeline to cover full semester"
+            >
+              Reset to Full Range
+            </button>
+            <div style={{ flex: 1 }} />
             <button
               type="button"
               className="rd-btn-outline"
@@ -1498,18 +1450,17 @@ export default function WaiverToolPage({ onBack }) {
               type="button"
               className="rd-btn-dark"
               onClick={() => {
-                const finalStart = tempStartDate || effectiveStart;
-                const finalEnd = tempEndDate || effectiveEnd;
+                const finalStart = (effectiveStart && effectiveStart !== sheetMinDate) ? effectiveStart : '';
+                const finalEnd = (effectiveEnd && effectiveEnd !== sheetMaxDate) ? effectiveEnd : '';
                 setCustomStartDate(finalStart);
                 setCustomEndDate(finalEnd);
-                setIsFirstYearPreset(finalStart === defaultSepStart);
                 setIsTimelineModalOpen(false);
 
                 if (parsedData) {
                   setIsProcessing(true);
                   const opts = {
-                    waiverStartDate: finalStart,
-                    waiverEndDate: finalEnd,
+                    waiverStartDate: finalStart || null,
+                    waiverEndDate: finalEnd || null,
                     blockedDates
                   };
                   executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
@@ -2175,11 +2126,8 @@ export default function WaiverToolPage({ onBack }) {
                   <input
                     type="date"
                     id="upload-custom-from"
-                    value={customStartDate || (isFirstYearPreset ? `${new Date().getFullYear()}-09-01` : '')}
-                    onChange={e => {
-                      setCustomStartDate(e.target.value);
-                      setIsFirstYearPreset(false);
-                    }}
+                    value={customStartDate || ''}
+                    onChange={e => setCustomStartDate(e.target.value)}
                   />
                 </div>
                 <span className="upload-timeline-arrow">→</span>
@@ -2193,25 +2141,6 @@ export default function WaiverToolPage({ onBack }) {
                   />
                 </div>
               </div>
-
-              <div className="upload-presets-row">
-                <span className="upload-presets-label">Presets</span>
-                <button
-                  type="button"
-                  className={`upload-preset-btn ${isFirstYearPreset ? 'active' : ''}`}
-                  onClick={() => {
-                    if (isFirstYearPreset) {
-                      setIsFirstYearPreset(false);
-                      setCustomStartDate('');
-                    } else {
-                      setIsFirstYearPreset(true);
-                      setCustomStartDate(`${new Date().getFullYear()}-09-01`);
-                    }
-                  }}
-                >
-                  First Year (starts from September)
-                </button>
-              </div>
             </div>
 
             <div className="upload-params-row upload-params-row-4">
@@ -2219,11 +2148,13 @@ export default function WaiverToolPage({ onBack }) {
               <div className="param-input-box">
                 <span className="param-label">TARGET</span>
                 <div className="param-stepper-wrap">
-                  <span className="param-number">{threshold}</span>
-                  <span className="param-unit">%</span>
+                  <div className="param-val-group">
+                    <span className="param-number">{threshold}</span>
+                    <span className="param-unit">%</span>
+                  </div>
                   <div className="param-stepper-arrows">
-                    <button type="button" className="arrow-btn" onClick={() => setThreshold(e => Math.min(99, e + 1))}>▲</button>
-                    <button type="button" className="arrow-btn" onClick={() => setThreshold(e => Math.max(50, e - 1))}>▼</button>
+                    <button type="button" className="arrow-btn" onClick={() => setThreshold(e => Math.min(99, e + 1))} aria-label="Increase target">▲</button>
+                    <button type="button" className="arrow-btn" onClick={() => setThreshold(e => Math.max(50, e - 1))} aria-label="Decrease target">▼</button>
                   </div>
                 </div>
               </div>
@@ -2232,20 +2163,22 @@ export default function WaiverToolPage({ onBack }) {
               <div className="param-input-box">
                 <span className="param-label">WAIVER LIMIT</span>
                 <div className="param-stepper-wrap">
-                  <span className="param-number">{maxWaivers}</span>
-                  <span className="param-unit">dates</span>
+                  <div className="param-val-group">
+                    <span className="param-number">{maxWaivers}</span>
+                    <span className="param-unit">dates</span>
+                  </div>
                   <div className="param-stepper-arrows">
-                    <button type="button" className="arrow-btn" onClick={() => setMaxWaivers(e => Math.min(30, e + 1))}>▲</button>
-                    <button type="button" className="arrow-btn" onClick={() => setMaxWaivers(e => Math.max(1, e - 1))}>▼</button>
+                    <button type="button" className="arrow-btn" onClick={() => setMaxWaivers(e => Math.min(30, e + 1))} aria-label="Increase waiver limit">▲</button>
+                    <button type="button" className="arrow-btn" onClick={() => setMaxWaivers(e => Math.max(1, e - 1))} aria-label="Decrease waiver limit">▼</button>
                   </div>
                 </div>
               </div>
 
               {/* Semester Starts Parameter */}
               <div className="param-input-box param-month-box">
-                <span className="param-label">SEMESTER STARTS</span>
+                <span className="param-label">SEMESTER START</span>
                 <div className="param-stepper-wrap">
-                  <div className="param-month-display" title="Click to choose month">
+                  <div className="param-val-group param-month-display" title="Click to choose month">
                     <span className="param-number param-month-text">{MONTHS_FULL[startingMonth]}</span>
                     <select
                       className="param-month-native-select"
@@ -2286,18 +2219,20 @@ export default function WaiverToolPage({ onBack }) {
               <div className="param-input-box">
                 <span className="param-label">CDC ATTENDANCE</span>
                 <div className="param-stepper-wrap">
-                  <span className="param-number">{cdcLimit}</span>
-                  <span className="param-unit">dates</span>
+                  <div className="param-val-group">
+                    <span className="param-number">{cdcLimit}</span>
+                    <span className="param-unit">dates</span>
+                  </div>
                   <div className="param-stepper-arrows">
-                    <button type="button" className="arrow-btn" onClick={() => setCdcLimit(e => Math.min(15, e + 1))}>▲</button>
-                    <button type="button" className="arrow-btn" onClick={() => setCdcLimit(e => Math.max(0, e - 1))}>▼</button>
+                    <button type="button" className="arrow-btn" onClick={() => setCdcLimit(e => Math.min(15, e + 1))} aria-label="Increase CDC dates">▲</button>
+                    <button type="button" className="arrow-btn" onClick={() => setCdcLimit(e => Math.max(0, e - 1))} aria-label="Decrease CDC dates">▼</button>
                   </div>
                 </div>
               </div>
             </div>
 
             <p className="upload-params-caption">
-              Waivers will only be recommended between the chosen From and To dates (First Year preset restricts waivers to September onwards). Career Development Centre (CDC) attendance allows converting absences into presents across all months. Leave 0 if not applicable. You can adjust all parameters later.
+              Waivers will only be recommended between the chosen From and To dates. Career Development Centre (CDC) attendance allows converting absences into presents across all months. Leave 0 if not applicable. You can adjust all parameters later.
             </p>
 
             <button
