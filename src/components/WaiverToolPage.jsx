@@ -986,13 +986,13 @@ export default function WaiverToolPage({ onBack }) {
                     type="button"
                     className={`rd-date-btn ${btnClass}`}
                     aria-pressed={isWaived || isCdc}
-                    aria-label={`Toggle ${col.fullLabel} (${isWaived ? 'waived' : isCdc ? 'CDC duty' : 'active'})`}
+                    aria-label={`Toggle ${col.fullLabel} (${isWaived ? 'waived' : isCdc ? 'CDC attendance' : 'active'})`}
                     onClick={() => handleToggleDay(col.dateStr)}
                     {...getHoverEvents(col.dateStr)}
                   >
                     <span className="wd">{col.weekday}</span>
                     <span className="dn">{col.dayNum}</span>
-                    {isCdc && <span className="rd-date-cdc-badge" title="Career Development Centre (CDC) Attendance Duty">CDC</span>}
+                    {isCdc && <span className="rd-date-cdc-badge" title="Career Development Centre (CDC) Attendance">CDC</span>}
                   </button>
                 </th>
               );
@@ -1046,7 +1046,7 @@ export default function WaiverToolPage({ onBack }) {
                                 <span
                                   key={cIdx}
                                   className="rd-chip cdc"
-                                  title="Absence converted to Present via Career Development Centre (CDC) Duty"
+                                  title="Absence converted to Present via Career Development Centre (CDC) Attendance"
                                 >
                                   <span className="rd-cdc-micro">CDC</span>
                                   P<small>{typeShort}</small>
@@ -1219,7 +1219,7 @@ export default function WaiverToolPage({ onBack }) {
               }`}
             >
               {hoverDiff.mode === 'cdc'
-                ? (hoverDiff.isCurrentlyCdc ? 'Click to remove CDC duty' : 'Click to claim CDC attendance')
+                ? (hoverDiff.isCurrentlyCdc ? 'Click to remove CDC attendance' : 'Click to claim CDC attendance')
                 : (hoverDiff.isCurrentlyWaived ? 'Click to restore day' : 'Click to waive day')}
             </span>
           </div>
@@ -1278,9 +1278,9 @@ export default function WaiverToolPage({ onBack }) {
               </div>
             </div>
 
-            {/* Career Development Centre (CDC) Attendance Duty Stepper */}
+            {/* Career Development Centre (CDC) Attendance Stepper */}
             <div className={`rd-stat ${cdcLimit > 0 ? 'cdc-stat' : ''}`}>
-              <span className="lbl" title="Career Development Centre (CDC) Attendance Duty Allowance">CDC Duty</span>
+              <span className="lbl" title="Career Development Centre (CDC) Attendance Allowance">CDC Attendance</span>
               <div className="row">
                 <span className="num">
                   {selectedCdcDays.size}
@@ -1288,8 +1288,8 @@ export default function WaiverToolPage({ onBack }) {
                 </span>
                 <span className="unit">dates</span>
                 <span className="rd-steps">
-                  <button type="button" aria-label="Lower CDC duty limit" onClick={() => setCdcLimit(Math.max(0, cdcLimit - 1))}>−</button>
-                  <button type="button" aria-label="Raise CDC duty limit" onClick={() => setCdcLimit(Math.min(15, cdcLimit + 1))}>+</button>
+                  <button type="button" aria-label="Lower CDC attendance limit" onClick={() => setCdcLimit(Math.max(0, cdcLimit - 1))}>−</button>
+                  <button type="button" aria-label="Raise CDC attendance limit" onClick={() => setCdcLimit(Math.min(15, cdcLimit + 1))}>+</button>
                 </span>
               </div>
             </div>
@@ -1416,7 +1416,7 @@ export default function WaiverToolPage({ onBack }) {
                           className={`rd-tool-btn cdc ${gridToolMode === 'cdc' ? 'active' : ''}`}
                           onClick={() => setGridToolMode('cdc')}
                         >
-                          CDC Duty ({selectedCdcDays.size}/{cdcLimit})
+                          CDC Attendance ({selectedCdcDays.size}/{cdcLimit})
                         </button>
                       </div>
                     )}
@@ -1435,7 +1435,7 @@ export default function WaiverToolPage({ onBack }) {
                         type="button"
                         className="rd-btn-outline sm muted"
                         onClick={handleClearCdc}
-                        title="Clear all claimed CDC duty days"
+                        title="Clear all claimed CDC attendance days"
                       >
                         Clear CDC
                       </button>
@@ -1478,7 +1478,7 @@ export default function WaiverToolPage({ onBack }) {
                     </span>
                     {cdcLimit > 0 && (
                       <span className="rd-key cdc">
-                        <i />CDC Duty
+                        <i />CDC Attendance
                       </span>
                     )}
                   </div>
@@ -1676,9 +1676,9 @@ export default function WaiverToolPage({ onBack }) {
                 </div>
               </div>
 
-              {/* CDC Attendance Duty Parameter */}
+              {/* CDC Attendance Parameter */}
               <div className="param-input-box">
-                <span className="param-label">CDC DUTY</span>
+                <span className="param-label">CDC ATTENDANCE</span>
                 <div className="param-stepper-wrap">
                   <span className="param-number">{cdcLimit}</span>
                   <span className="param-unit">dates</span>
@@ -1691,7 +1691,7 @@ export default function WaiverToolPage({ onBack }) {
             </div>
 
             <p className="upload-params-caption">
-              Career Development Centre (CDC) duty allows converting absences into presents. Leave 0 if not applicable. You can adjust all parameters later.
+              Career Development Centre (CDC) attendance allows converting absences into presents. Leave 0 if not applicable. You can adjust all parameters later.
             </p>
 
             <button
@@ -1733,7 +1733,7 @@ export default function WaiverToolPage({ onBack }) {
                       className={`rd-tool-btn cdc ${gridToolMode === 'cdc' ? 'active' : ''}`}
                       onClick={() => setGridToolMode('cdc')}
                     >
-                      CDC Duty ({selectedCdcDays.size}/{cdcLimit})
+                      CDC Attendance ({selectedCdcDays.size}/{cdcLimit})
                     </button>
                   </div>
                 )}
@@ -1786,7 +1786,7 @@ export default function WaiverToolPage({ onBack }) {
                 <span className="rd-key"><i /> Waived day (classes removed)</span>
                 {cdcLimit > 0 && (
                   <span className="rd-key cdc">
-                    <i /> CDC Duty day (absence marked present)
+                    <i /> CDC Attendance day (absence marked present)
                   </span>
                 )}
               </div>

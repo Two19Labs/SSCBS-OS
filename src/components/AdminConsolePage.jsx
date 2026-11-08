@@ -4010,7 +4010,7 @@ Extract ALL timetable blocks from the attached Excel file now:`;
                 { id: 'timetable', label: 'Timetable & Class Schedules', desc: 'Display timetable on home page and navigation' },
                 { id: 'find-prof', label: 'Find My Professor', desc: 'Allow students to search for professor locations' },
                 { id: 'team-finder', label: 'Team Finder & Competition Hub', desc: 'Allow students to post and find competition team openings' },
-                { id: 'waiver', label: 'Attendance Tool', desc: 'Interactive attendance calculation, clearance, and duty tool' },
+                { id: 'waiver', label: 'Attendance Tool', desc: 'Interactive attendance calculation, clearance, and CDC attendance tool' },
                 { id: 'gpa', label: 'GPA Calculator', desc: 'Official DU schema calculator' },
                 { id: 'pyqs', label: 'PYQs & Resources', desc: 'Access to previous year questions' },
                 { id: 'buzz', label: 'Campus Buzz', notice: 'Notice board and announcements' }

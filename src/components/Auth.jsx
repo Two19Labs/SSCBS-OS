@@ -8,7 +8,7 @@ import './Auth.css';
 const slides = [
   {
     title: 'Attendance Tool',
-    description: 'Manage, track, and apply for college attendance waivers with automated document generation.'
+    description: 'Manage, track, and optimize your college attendance, waivers, and CDC attendance.'
   },
   {
     title: 'GPA Calculator',

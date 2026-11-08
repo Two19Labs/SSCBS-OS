@@ -138,8 +138,8 @@ assert.strictEqual(totalHeld, 100);
 assert.strictEqual(checkEligibility(totalAtt, totalHeld), false, 'Overall 70% with individual subject at 33.3% must remain eligible to apply waivers');
 console.log('✓ DU overall debarment ineligibility criteria passed with exact boundary accuracy.');
 
-// 6. Test Career Development Centre (CDC) Attendance Duty Simulation
-console.log('6. Testing Career Development Centre (CDC) Attendance Duty...');
+// 6. Test Career Development Centre (CDC) Attendance Simulation
+console.log('6. Testing Career Development Centre (CDC) Attendance...');
 const mockParsedData = {
   dayColumns: [
     { dateStr: '2026-08-10', dayNum: 10, month: 8, weekday: 'Mon' },
@@ -184,6 +184,6 @@ assert.strictEqual(cdcStats.subjectsStats[0].parts.tu.simN, 4, 'CDC must leave h
 const waiverAndCdcStats = calculateSimulatedStats(mockParsedData, new Set(['2026-08-11']), 85, new Set(['2026-08-10']));
 assert.strictEqual(waiverAndCdcStats.subjectsStats[0].parts.th.simP, 11, 'Attended reflects CDC +1 present');
 assert.strictEqual(waiverAndCdcStats.subjectsStats[0].parts.th.simN, 19, 'Held reflects Waiver -1 class deletion');
-console.log('✓ Career Development Centre (CDC) Attendance Duty math and co-existence validated.');
+console.log('✓ Career Development Centre (CDC) Attendance math and co-existence validated.');
 
 console.log('\nALL UNIT TESTS PASSED SUCCESSFULLY! ✓✓✓');
