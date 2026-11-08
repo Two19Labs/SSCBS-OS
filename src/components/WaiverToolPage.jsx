@@ -725,13 +725,13 @@ export default function WaiverToolPage({ onBack }) {
       },
       {
         key: 'theory',
-        label: 'Total Theory',
+        label: 'Theory Attendance',
         data: totalsSummary.theory,
         hasClasses: totalsSummary.theory.held > 0
       },
       {
         key: 'tutorial',
-        label: 'Total Tutorial',
+        label: 'Tutorial Attendance',
         data: totalsSummary.tutorial,
         hasClasses: totalsSummary.tutorial.held > 0
       }
@@ -1172,6 +1172,9 @@ export default function WaiverToolPage({ onBack }) {
             </div>
           )}
 
+          {/* Full-width 3-Metric Aggregate Attendance Card */}
+          {renderTotalsSummary()}
+
           {/* 2-Column Layout */}
           <div className="rd-columns">
             {/* Left: Subject Health */}
@@ -1197,8 +1200,6 @@ export default function WaiverToolPage({ onBack }) {
                   </span>
                 </div>
               </div>
-
-              {renderTotalsSummary()}
 
               {renderSubjectCards()}
             </section>
