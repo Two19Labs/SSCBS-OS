@@ -831,7 +831,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
         }
       }
       if (!pruned) {
-        // Prune CDC days to conserve scarce CDC duty
+        // Prune CDC days to conserve scarce CDC attendance
         for (const cIdx of Array.from(curC)) {
           const testC = new Set(curC);
           testC.delete(cIdx);
@@ -921,7 +921,7 @@ export function solveKPlusOne(parsedData, targetPct = 85, maxWaiversK = 12, star
 
 /**
  * Section 7.1: Live simulation calculation across all subjects
- * Supports both Waivers (class deletions) and CDC Duty (absences converted to presents)
+ * Supports both Waivers (class deletions) and CDC Attendance (absences converted to presents)
  */
 export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPct = 85, selectedCdcSet = new Set()) {
   const { targetParts } = extractTargetParts(parsedData);
@@ -986,7 +986,7 @@ export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPc
       const basePct = baseHeld > 0 ? (baseAtt / baseHeld) * 100 : 100;
 
       // Waivers delete classes (both held and attended reduced).
-      // CDC attendance credits duty: held remains identical, and absences become presents.
+      // CDC attendance credits attendance: held remains identical, and absences become presents.
       const simH = Math.max(0, baseHeld - rawWaived[t].n);
       const simAtt = Math.min(simH, Math.max(0, baseAtt - rawWaived[t].p + rawCdc[t].a));
 
@@ -1147,7 +1147,7 @@ export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPc
 
 /**
  * Section 7.1: Pre-toggle Day Impact Diff
- * "Before toggling, each day shows what toggling it (as waiver or CDC duty) would change compared with the current simulated state"
+ * "Before toggling, each day shows what toggling it (as waiver or CDC attendance) would change compared with the current simulated state"
  */
 export function calculateDayImpactDiff(
   dateStr,

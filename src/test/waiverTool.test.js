@@ -171,7 +171,7 @@ const baseStats = calculateSimulatedStats(mockParsedData, new Set(), 85, new Set
 assert.strictEqual(baseStats.subjectsStats[0].parts.th.simP, 10);
 assert.strictEqual(baseStats.subjectsStats[0].parts.th.simN, 20);
 
-// Apply CDC duty on 2026-08-10 (has A in Th, P in Tu)
+// Apply CDC attendance on 2026-08-10 (has A in Th, P in Tu)
 const cdcStats = calculateSimulatedStats(mockParsedData, new Set(), 85, new Set(['2026-08-10']));
 // Theory: Absent becomes Present -> 11/20 (held 20 unchanged!)
 assert.strictEqual(cdcStats.subjectsStats[0].parts.th.simP, 11, 'CDC must convert absent class to present');

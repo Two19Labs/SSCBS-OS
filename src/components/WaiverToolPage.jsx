@@ -110,7 +110,7 @@ export default function WaiverToolPage({ onBack }) {
   // Prioritized / starred subjects (Set of subject names)
   const [starredSubjects, setStarredSubjects] = useState(new Set());
 
-  // Career Development Centre (CDC) Attendance Duty inputs
+  // Career Development Centre (CDC) Attendance inputs
   const [cdcLimit, setCdcLimit] = useState(0); // 0 to 15 dates
   const [selectedCdcDays, setSelectedCdcDays] = useState(new Set()); // Set of 'YYYY-MM-DD'
   const [gridToolMode, setGridToolMode] = useState('waiver'); // 'waiver' | 'cdc'
@@ -1410,7 +1410,7 @@ export default function WaiverToolPage({ onBack }) {
                     <div>
                       <strong>CDC Attendance Lifts You Above 66.7%!</strong>
                       <p>
-                        While DU Ordinance VII bars society waivers below 66.7%, <strong>Career Development Centre (CDC) attendance duty is an official placement cell award and is completely exempt from this rule</strong>.
+                        While DU Ordinance VII bars society waivers below 66.7%, <strong>Career Development Centre (CDC) attendance is an official placement cell award and is completely exempt from this rule</strong>.
                       </p>
                     </div>
                   </div>
@@ -1423,7 +1423,7 @@ export default function WaiverToolPage({ onBack }) {
                   <div className="rd-cdc-exemption-box">
                     <span className="rd-sandbox-title">📋 CDC Attendance is Officially Claimable</span>
                     <p>
-                      University of Delhi Ordinance VII bars society waivers when aggregate attendance is below 66.7%. However, <strong>Career Development Centre (CDC) attendance duty is an official placement cell award and CAN be claimed regardless of your attendance percentage</strong>.
+                      University of Delhi Ordinance VII bars society waivers when aggregate attendance is below 66.7%. However, <strong>Career Development Centre (CDC) attendance is an official placement cell award and CAN be claimed regardless of your attendance percentage</strong>.
                     </p>
                   </div>
                   <div className="rd-ineligible-sandbox-box">
@@ -1442,7 +1442,7 @@ export default function WaiverToolPage({ onBack }) {
                     <strong>Clarification:</strong> Students who maintain <strong>&ge; 66.7% overall attendance</strong> can still apply waivers for specific individual subjects below 66.7%. However, when your combined total across all subjects is under 66.7%, the administration cannot accept society waivers.
                   </div>
                   <div className="rd-ineligible-cdc-tip">
-                    💡 <strong>Have placement cell duties?</strong> Enter your CDC attendance dates in the toolbar to see if they lift your total attendance above 66.7% and unlock waiver eligibility.
+                    💡 <strong>Have CDC attendance?</strong> Enter your CDC attendance dates in the toolbar to see if they lift your total attendance above 66.7% and unlock waiver eligibility.
                   </div>
                   <div className="rd-ineligible-sandbox-box">
                     <span className="rd-sandbox-title">🧪 Simulation & Sandbox Mode Active</span>
