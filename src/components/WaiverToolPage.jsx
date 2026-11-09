@@ -5,6 +5,13 @@ import { PercentIcon } from './icons';
 import { trackWaiverEvent } from '../lib/analytics';
 import { parseAttendanceFile, MONTH_NAMES, MONTHS_FULL } from '../lib/waiverParser';
 import {
+  cloneParsedData,
+  editCellClasses,
+  addDateColumn,
+  deleteDateColumn,
+  diffCustomizations
+} from '../lib/attendanceEditor';
+import {
   solveExactBnb,
   solveKPlusOne,
   calculateSimulatedStats,
@@ -120,8 +127,17 @@ export default function WaiverToolPage({ onBack }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
 
-  // Parsed attendance data
+  // Parsed attendance data (active working dataset & pristine raw baseline)
   const [parsedData, setParsedData] = useState(null);
+  const [rawParsedData, setRawParsedData] = useState(null);
+
+  // Manual attendance editing state
+  const [editingCell, setEditingCell] = useState(null); // { subjectName, dateStr, classes: [...] }
+  const [isAddDateModalOpen, setIsAddDateModalOpen] = useState(false);
+  const [newDateInput, setNewDateInput] = useState('');
+  const [newDateError, setNewDateError] = useState('');
+  const [dateToDelete, setDateToDelete] = useState(null); // { dateStr, fullLabel }
+  const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
   // Active selected waivers (Set of 'YYYY-MM-DD' date strings)
   const [selectedWaivers, setSelectedWaivers] = useState(new Set());
@@ -132,7 +148,7 @@ export default function WaiverToolPage({ onBack }) {
   // Career Development Centre (CDC) Attendance inputs
   const [cdcLimit, setCdcLimit] = useState(0); // CDC >= 0 (unlocked)
   const [selectedCdcDays, setSelectedCdcDays] = useState(new Set()); // Set of 'YYYY-MM-DD'
-  const [gridToolMode, setGridToolMode] = useState('waiver'); // 'waiver' | 'cdc'
+  const [gridToolMode, setGridToolMode] = useState('waiver'); // 'waiver' | 'cdc' | 'edit'
 
   // Recommended waiver timeline window: 'YYYY-MM-DD' strings
   const [customStartDate, setCustomStartDate] = useState('');
@@ -157,6 +173,11 @@ export default function WaiverToolPage({ onBack }) {
   // Hovered date tooltip for live diff preview
   const [hoveredDate, setHoveredDate] = useState(null);
   const [popoverPos, setPopoverPos] = useState({ x: 0, y: 0 });
+
+  // Track manual attendance customizations diff
+  const customizationDiff = useMemo(() => {
+    return diffCustomizations(rawParsedData, parsedData);
+  }, [rawParsedData, parsedData]);
 
   // Web Worker ref
   const workerRef = useRef(null);
@@ -188,6 +209,11 @@ export default function WaiverToolPage({ onBack }) {
         const saved = JSON.parse(savedStr);
         if (saved && saved.parsedData && Array.isArray(saved.parsedData.dayColumns) && Array.isArray(saved.parsedData.subjects)) {
           setParsedData(saved.parsedData);
+          if (saved.rawParsedData) {
+            setRawParsedData(saved.rawParsedData);
+          } else {
+            setRawParsedData(saved.parsedData);
+          }
           if (Array.isArray(saved.selectedWaivers)) {
             setSelectedWaivers(new Set(saved.selectedWaivers));
           }
@@ -223,6 +249,7 @@ export default function WaiverToolPage({ onBack }) {
     if (!parsedData) return;
     try {
       const stateToSave = {
+        rawParsedData,
         parsedData,
         selectedWaivers: Array.from(selectedWaivers),
         starredSubjects: Array.from(starredSubjects),
@@ -242,7 +269,7 @@ export default function WaiverToolPage({ onBack }) {
     } catch (err) {
       console.warn('Failed to persist Waiver Tool state:', err);
     }
-  }, [parsedData, selectedWaivers, starredSubjects, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, hasAcknowledgedIneligible, cdcLimit, selectedCdcDays, gridToolMode, customStartDate, customEndDate, storageKey]);
+  }, [rawParsedData, parsedData, selectedWaivers, starredSubjects, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, hasAcknowledgedIneligible, cdcLimit, selectedCdcDays, gridToolMode, customStartDate, customEndDate, storageKey]);
 
   // Prevent scroll when expanded grid modal is open
   useEffect(() => {
@@ -411,6 +438,7 @@ export default function WaiverToolPage({ onBack }) {
           dayColumnsCount: parsed.dayColumns.length
         });
 
+        setRawParsedData(parsed);
         setParsedData(parsed);
 
         executeSolverAsync(parsed, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
@@ -470,6 +498,11 @@ export default function WaiverToolPage({ onBack }) {
 
   const handleReplaceSheet = () => {
     setParsedData(null);
+    setRawParsedData(null);
+    setEditingCell(null);
+    setIsAddDateModalOpen(false);
+    setDateToDelete(null);
+    setIsResetConfirmOpen(false);
     setSelectedWaivers(new Set());
     setSelectedCdcDays(new Set());
     setCdcLimit(0);
@@ -489,6 +522,136 @@ export default function WaiverToolPage({ onBack }) {
     } catch {
       // ignore
     }
+  };
+
+  // Open manual cell editor modal for a specific subject & date
+  const handleOpenCellEditor = (subjectName, dateStr) => {
+    if (!parsedData) return;
+    const sub = parsedData.subjects?.find(s => s.name === subjectName);
+    const existingClasses = sub?.dayClasses?.[dateStr];
+    const initialClasses = existingClasses && existingClasses.length > 0
+      ? existingClasses.map(c => ({ type: c.type || 'th', attended: Boolean(c.attended) }))
+      : [{ type: 'th', attended: true }];
+
+    setEditingCell({
+      subjectName,
+      dateStr,
+      classes: initialClasses
+    });
+  };
+
+  // Save modified cell classes
+  const handleSaveCellClasses = () => {
+    if (!editingCell || !parsedData) return;
+    const { subjectName, dateStr, classes } = editingCell;
+    const updated = editCellClasses(parsedData, subjectName, dateStr, classes);
+    setParsedData(updated);
+    setEditingCell(null);
+
+    // Re-run solver live with updated attendance matrix
+    setIsProcessing(true);
+    executeSolverAsync(updated, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
+      if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
+        setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+        setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
+      }
+    }, currentSolverOptions);
+  };
+
+  // Clear all classes for this cell
+  const handleClearCellClasses = () => {
+    if (!editingCell || !parsedData) return;
+    const { subjectName, dateStr } = editingCell;
+    const updated = editCellClasses(parsedData, subjectName, dateStr, []);
+    setParsedData(updated);
+    setEditingCell(null);
+
+    setIsProcessing(true);
+    executeSolverAsync(updated, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
+      if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
+        setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+        setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
+      }
+    }, currentSolverOptions);
+  };
+
+  // Add a new date column
+  const handleAddDate = () => {
+    if (!newDateInput) {
+      setNewDateError('Please choose a valid date.');
+      return;
+    }
+    if (parsedData?.dayColumns?.some(d => d.dateStr === newDateInput)) {
+      setNewDateError('This date already exists in the grid.');
+      return;
+    }
+
+    const updated = addDateColumn(parsedData, newDateInput);
+    setParsedData(updated);
+    setIsAddDateModalOpen(false);
+    setNewDateInput('');
+    setNewDateError('');
+
+    setIsProcessing(true);
+    executeSolverAsync(updated, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
+      if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
+        setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+        setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
+      }
+    }, currentSolverOptions);
+  };
+
+  // Delete a full date column
+  const handleConfirmDeleteDate = () => {
+    if (!dateToDelete || !parsedData) return;
+    const delDate = dateToDelete.dateStr;
+    const updated = deleteDateColumn(parsedData, delDate);
+
+    // If deleted date was actively waived or CDC, remove it
+    if (selectedWaivers.has(delDate)) {
+      const nextW = new Set(selectedWaivers);
+      nextW.delete(delDate);
+      setSelectedWaivers(nextW);
+    }
+    if (selectedCdcDays.has(delDate)) {
+      const nextC = new Set(selectedCdcDays);
+      nextC.delete(delDate);
+      setSelectedCdcDays(nextC);
+    }
+
+    setParsedData(updated);
+    setDateToDelete(null);
+
+    setIsProcessing(true);
+    executeSolverAsync(updated, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
+      if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
+        setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+        setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
+      }
+    }, currentSolverOptions);
+  };
+
+  // Reset all manual edits back to pristine uploaded raw file
+  const handleResetToRaw = () => {
+    if (!rawParsedData) return;
+    const pristine = cloneParsedData(rawParsedData);
+    setParsedData(pristine);
+    setIsResetConfirmOpen(false);
+
+    // Filter out any active waivers/CDC dates that were in custom dates that don't exist in pristine
+    const validDates = new Set(pristine.dayColumns.map(d => d.dateStr));
+    const nextW = new Set([...selectedWaivers].filter(d => validDates.has(d)));
+    const nextC = new Set([...selectedCdcDays].filter(d => validDates.has(d)));
+    setSelectedWaivers(nextW);
+    setSelectedCdcDays(nextC);
+
+    setIsProcessing(true);
+    executeSolverAsync(pristine, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
+      if (solution?.chosenDays && (nextW.size > 0 || nextC.size > 0)) {
+        setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+        setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
+      }
+    }, currentSolverOptions);
   };
 
   // Toggle priority star on subject with instant live re-solve
@@ -1162,26 +1325,49 @@ export default function WaiverToolPage({ onBack }) {
                 (activeWaiverStart && col.dateStr < activeWaiverStart) ||
                 (activeWaiverEnd && col.dateStr > activeWaiverEnd)
               );
+              const isAddedDate = col.isCustom || customizationDiff.addedDates.has(col.dateStr);
               const btnClass = isWaived ? 'on' : (isCdc ? 'cdc-on' : '');
-              const thClass = `rd-date-th ${isOutOfTimeline ? 'is-pre-society' : ''}`.trim();
+              const thClass = `rd-date-th ${isOutOfTimeline ? 'is-pre-society' : ''} ${gridToolMode === 'edit' ? 'is-edit-header' : ''}`.trim();
               return (
                 <th key={col.dateStr} className={thClass}>
-                  <button
-                    type="button"
-                    className={`rd-date-btn ${btnClass}`}
-                    aria-pressed={isWaived || isCdc}
-                    aria-label={`Toggle ${col.fullLabel} (${isWaived ? 'waived' : isCdc ? 'CDC attendance' : 'active'})`}
-                    onClick={() => handleToggleDay(col.dateStr)}
-                    {...getHoverEvents(col.dateStr)}
-                  >
-                    <span className="wd">{col.weekday}</span>
-                    <span className="dn">{col.dayNum}</span>
-                    {isOutOfTimeline ? (
-                      <span className="rd-date-locked-badge" title="Outside recommended waiver timeline">🔒</span>
-                    ) : isCdc ? (
-                      <span className="rd-date-cdc-badge" title="Career Development Centre (CDC) Attendance">CDC</span>
-                    ) : null}
-                  </button>
+                  <div className="rd-date-th-inner">
+                    <button
+                      type="button"
+                      className={`rd-date-btn ${btnClass}`}
+                      aria-pressed={isWaived || isCdc}
+                      aria-label={`Toggle ${col.fullLabel} (${isWaived ? 'waived' : isCdc ? 'CDC attendance' : 'active'})`}
+                      onClick={() => {
+                        if (gridToolMode !== 'edit') {
+                          handleToggleDay(col.dateStr);
+                        }
+                      }}
+                      {...(gridToolMode !== 'edit' ? getHoverEvents(col.dateStr) : {})}
+                    >
+                      <span className="wd">{col.weekday}</span>
+                      <span className="dn">{col.dayNum}</span>
+                      {isAddedDate ? (
+                        <span className="rd-date-added-badge" title="Manually added date">New</span>
+                      ) : isOutOfTimeline ? (
+                        <span className="rd-date-locked-badge" title="Outside recommended waiver timeline">🔒</span>
+                      ) : isCdc ? (
+                        <span className="rd-date-cdc-badge" title="Career Development Centre (CDC) Attendance">CDC</span>
+                      ) : null}
+                    </button>
+                    {gridToolMode === 'edit' && (
+                      <button
+                        type="button"
+                        className="rd-header-del-btn"
+                        title={`Delete ${col.fullLabel} from grid`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDateToDelete({ dateStr: col.dateStr, fullLabel: col.fullLabel });
+                        }}
+                        aria-label={`Delete ${col.fullLabel}`}
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
                 </th>
               );
             })}
@@ -1216,19 +1402,35 @@ export default function WaiverToolPage({ onBack }) {
                     (activeWaiverStart && col.dateStr < activeWaiverStart) ||
                     (activeWaiverEnd && col.dateStr > activeWaiverEnd)
                   );
+                  const isCustomCell = customizationDiff.customizedCells.has(`${sub.name}:::${col.dateStr}`);
                   const dayClasses = rawSub?.dayClasses?.[col.dateStr] || [];
                   const cellClass = [
                     isWaived ? 'on' : '',
                     isCdc ? 'cdc-cell' : '',
-                    isOutOfTimeline ? 'pre-society-cell' : ''
+                    isOutOfTimeline ? 'pre-society-cell' : '',
+                    isCustomCell ? 'is-customized' : '',
+                    gridToolMode === 'edit' ? 'is-edit-cell' : ''
                   ].filter(Boolean).join(' ');
                   return (
                     <td
                       key={col.dateStr}
                       className={`rd-cell ${cellClass}`}
-                      onClick={() => handleToggleDay(col.dateStr)}
-                      {...getHoverEvents(col.dateStr)}
+                      onClick={() => {
+                        if (gridToolMode === 'edit') {
+                          handleOpenCellEditor(sub.name, col.dateStr);
+                        } else {
+                          handleToggleDay(col.dateStr);
+                        }
+                      }}
+                      {...(gridToolMode !== 'edit' ? getHoverEvents(col.dateStr) : {})}
+                      title={gridToolMode === 'edit' ? `Click to edit classes for ${sub.name} on ${col.label}` : undefined}
                     >
+                      {isCustomCell && (
+                        <span className="rd-custom-dot" title="Manually customized classes">•</span>
+                      )}
+                      {gridToolMode === 'edit' && (
+                        <span className="rd-cell-edit-affordance" title="Click to edit">✎</span>
+                      )}
                       {dayClasses.length === 0 ? (
                         <span className="rd-dot">·</span>
                       ) : (
@@ -1407,6 +1609,337 @@ export default function WaiverToolPage({ onBack }) {
               }}
             >
               Apply Timeline
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render Cell Class Editor Modal
+  const renderCellEditorModal = () => {
+    if (!editingCell) return null;
+    const { subjectName, dateStr, classes } = editingCell;
+    const colInfo = parsedData?.dayColumns?.find(d => d.dateStr === dateStr);
+    const dateTitle = colInfo ? colInfo.fullLabel : dateStr;
+
+    return (
+      <div className="rd-modal-overlay" onClick={() => setEditingCell(null)}>
+        <div className="rd-modal-card rd-cell-editor-card" onClick={e => e.stopPropagation()}>
+          <div className="rd-modal-head">
+            <div>
+              <h3>Edit Attendance</h3>
+              <p className="rd-modal-sub">
+                <strong>{subjectName}</strong> &bull; {dateTitle}
+              </p>
+            </div>
+            <button
+              type="button"
+              className="rd-modal-close"
+              onClick={() => setEditingCell(null)}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="rd-cell-editor-body">
+            {classes.length === 0 ? (
+              <div className="rd-cell-editor-empty">
+                <p>No classes scheduled for this subject on this date.</p>
+                <button
+                  type="button"
+                  className="rd-btn-outline sm rd-btn-accent"
+                  onClick={() => {
+                    setEditingCell({
+                      ...editingCell,
+                      classes: [{ type: 'th', attended: true }]
+                    });
+                  }}
+                >
+                  + Add class
+                </button>
+              </div>
+            ) : (
+              <div className="rd-classes-list">
+                {classes.map((cls, idx) => (
+                  <div key={idx} className="rd-class-row">
+                    <span className="rd-class-num">Period {idx + 1}</span>
+
+                    <div className="rd-class-select-wrap">
+                      <label className="rd-class-lbl">Type</label>
+                      <select
+                        className="rd-class-select"
+                        value={cls.type}
+                        onChange={(e) => {
+                          const updated = [...classes];
+                          updated[idx] = { ...updated[idx], type: e.target.value };
+                          setEditingCell({ ...editingCell, classes: updated });
+                        }}
+                      >
+                        <option value="th">Theory (Th)</option>
+                        <option value="tu">Tutorial (Tu)</option>
+                        <option value="pr">Practical (Pr)</option>
+                      </select>
+                    </div>
+
+                    <div className="rd-class-select-wrap">
+                      <label className="rd-class-lbl">Status</label>
+                      <select
+                        className={`rd-class-select status ${cls.attended ? 'p' : 'a'}`}
+                        value={cls.attended ? 'p' : 'a'}
+                        onChange={(e) => {
+                          const updated = [...classes];
+                          updated[idx] = { ...updated[idx], attended: e.target.value === 'p' };
+                          setEditingCell({ ...editingCell, classes: updated });
+                        }}
+                      >
+                        <option value="p">Present (P)</option>
+                        <option value="a">Absent (A)</option>
+                      </select>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="rd-class-del-btn"
+                      title="Remove this class"
+                      onClick={() => {
+                        const updated = classes.filter((_, i) => i !== idx);
+                        setEditingCell({ ...editingCell, classes: updated });
+                      }}
+                      aria-label="Remove this class"
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+
+                <button
+                  type="button"
+                  className="rd-btn-outline xs rd-add-class-btn"
+                  onClick={() => {
+                    setEditingCell({
+                      ...editingCell,
+                      classes: [...classes, { type: 'th', attended: true }]
+                    });
+                  }}
+                >
+                  + Add another class
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="rd-modal-actions">
+            {classes.length > 0 && (
+              <button
+                type="button"
+                className="rd-btn-outline sm muted"
+                onClick={handleClearCellClasses}
+                title="Remove all classes for this subject on this date"
+              >
+                Clear Day
+              </button>
+            )}
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                className="rd-btn-outline sm"
+                onClick={() => setEditingCell(null)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="rd-btn-dark sm"
+                onClick={handleSaveCellClasses}
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render Add Date Modal
+  const renderAddDateModal = () => {
+    if (!isAddDateModalOpen) return null;
+
+    return (
+      <div className="rd-modal-overlay" onClick={() => { setIsAddDateModalOpen(false); setNewDateError(''); }}>
+        <div className="rd-modal-card" style={{ maxWidth: '420px' }} onClick={e => e.stopPropagation()}>
+          <div className="rd-modal-head">
+            <div>
+              <h3>Add Date to Grid</h3>
+              <p className="rd-modal-sub">Insert an extra date into your attendance schedule</p>
+            </div>
+            <button
+              type="button"
+              className="rd-modal-close"
+              onClick={() => { setIsAddDateModalOpen(false); setNewDateError(''); }}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div style={{ padding: '16px 20px' }}>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--ink)', marginBottom: '8px' }}>
+              Select Date:
+            </label>
+            <input
+              type="date"
+              className="rd-timeline-input"
+              style={{ width: '100%', boxSizing: 'border-box' }}
+              value={newDateInput}
+              onChange={(e) => {
+                setNewDateInput(e.target.value);
+                setNewDateError('');
+              }}
+            />
+            {newDateError && (
+              <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--red)', fontWeight: 600 }}>
+                {newDateError}
+              </div>
+            )}
+            <p style={{ marginTop: '12px', fontSize: '12px', color: 'var(--ink-dim)', lineHeight: 1.4 }}>
+              The date will be automatically inserted into the grid in chronological order. You can then click cells in this new date column to add theory, tutorial, or practical classes.
+            </p>
+          </div>
+
+          <div className="rd-modal-actions">
+            <button
+              type="button"
+              className="rd-btn-outline sm"
+              onClick={() => { setIsAddDateModalOpen(false); setNewDateError(''); }}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="rd-btn-dark sm"
+              onClick={handleAddDate}
+            >
+              Add Date
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render Confirm Delete Date Modal
+  const renderConfirmDeleteDateModal = () => {
+    if (!dateToDelete) return null;
+
+    const isWaived = selectedWaivers.has(dateToDelete.dateStr);
+    const isCdc = selectedCdcDays.has(dateToDelete.dateStr);
+
+    return (
+      <div className="rd-modal-overlay" onClick={() => setDateToDelete(null)}>
+        <div className="rd-modal-card" style={{ maxWidth: '440px' }} onClick={e => e.stopPropagation()}>
+          <div className="rd-modal-head">
+            <div>
+              <h3>Delete Date</h3>
+              <p className="rd-modal-sub">Remove entire date from grid</p>
+            </div>
+            <button
+              type="button"
+              className="rd-modal-close"
+              onClick={() => setDateToDelete(null)}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div style={{ padding: '16px 20px' }}>
+            <p style={{ fontSize: '14px', color: 'var(--ink)', lineHeight: 1.5, margin: 0 }}>
+              Are you sure you want to delete <strong>{dateToDelete.fullLabel}</strong> ({dateToDelete.dateStr})?
+            </p>
+            <p style={{ marginTop: '10px', fontSize: '12px', color: 'var(--ink-dim)', lineHeight: 1.4 }}>
+              This will remove all recorded classes for this date across all subjects and automatically recalculate all attendance percentages and solver recommendations.
+            </p>
+            {(isWaived || isCdc) && (
+              <div style={{ marginTop: '10px', padding: '8px 12px', background: '#fee2e2', borderRadius: '8px', color: '#b91c1c', fontSize: '12px', fontWeight: 600 }}>
+                ⚠️ This date is currently active as a {isWaived ? 'Waived day' : 'CDC Attendance day'} and will be unselected.
+              </div>
+            )}
+          </div>
+
+          <div className="rd-modal-actions">
+            <button
+              type="button"
+              className="rd-btn-outline sm"
+              onClick={() => setDateToDelete(null)}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="rd-btn-dark sm"
+              style={{ background: '#dc2626', borderColor: '#b91c1c', color: '#fff' }}
+              onClick={handleConfirmDeleteDate}
+            >
+              Delete Date
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render Confirm Reset to Raw Modal
+  const renderConfirmResetModal = () => {
+    if (!isResetConfirmOpen) return null;
+
+    return (
+      <div className="rd-modal-overlay" onClick={() => setIsResetConfirmOpen(false)}>
+        <div className="rd-modal-card" style={{ maxWidth: '440px' }} onClick={e => e.stopPropagation()}>
+          <div className="rd-modal-head">
+            <div>
+              <h3>Reset Attendance</h3>
+              <p className="rd-modal-sub">Revert to original file</p>
+            </div>
+            <button
+              type="button"
+              className="rd-modal-close"
+              onClick={() => setIsResetConfirmOpen(false)}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div style={{ padding: '16px 20px' }}>
+            <p style={{ fontSize: '14px', color: 'var(--ink)', lineHeight: 1.5, margin: 0 }}>
+              Reset all attendance customizations back to the original uploaded Excel file?
+            </p>
+            <p style={{ marginTop: '10px', fontSize: '12px', color: 'var(--ink-dim)', lineHeight: 1.4 }}>
+              All manually added, edited, or deleted classes ({customizationDiff.totalChanges} change{customizationDiff.totalChanges === 1 ? '' : 's'}) will be undone and your attendance will match the exact raw file baseline.
+            </p>
+          </div>
+
+          <div className="rd-modal-actions">
+            <button
+              type="button"
+              className="rd-btn-outline sm"
+              onClick={() => setIsResetConfirmOpen(false)}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="rd-btn-dark sm"
+              style={{ background: '#dc2626', borderColor: '#b91c1c', color: '#fff' }}
+              onClick={handleResetToRaw}
+            >
+              Reset to Original
             </button>
           </div>
         </div>
@@ -1814,15 +2347,15 @@ export default function WaiverToolPage({ onBack }) {
                     <span>Click a date to waive or restore that whole day</span>
                   </div>
                   <div className="rd-grid-acts">
-                    {cdcLimit > 0 && (
-                      <div className="rd-tool-toggle" role="group" aria-label="Grid Click Action Mode">
-                        <button
-                          type="button"
-                          className={`rd-tool-btn ${gridToolMode === 'waiver' ? 'active' : ''}`}
-                          onClick={() => setGridToolMode('waiver')}
-                        >
-                          Waivers
-                        </button>
+                    <div className="rd-tool-toggle" role="group" aria-label="Grid Click Action Mode">
+                      <button
+                        type="button"
+                        className={`rd-tool-btn ${gridToolMode === 'waiver' ? 'active' : ''}`}
+                        onClick={() => setGridToolMode('waiver')}
+                      >
+                        Waivers
+                      </button>
+                      {cdcLimit > 0 && (
                         <button
                           type="button"
                           className={`rd-tool-btn cdc ${gridToolMode === 'cdc' ? 'active' : ''}`}
@@ -1830,8 +2363,16 @@ export default function WaiverToolPage({ onBack }) {
                         >
                           CDC Attendance ({selectedCdcDays.size}/{cdcLimit})
                         </button>
-                      </div>
-                    )}
+                      )}
+                      <button
+                        type="button"
+                        className={`rd-tool-btn edit ${gridToolMode === 'edit' ? 'active' : ''}`}
+                        onClick={() => setGridToolMode(gridToolMode === 'edit' ? 'waiver' : 'edit')}
+                        title="Manually edit, add, or delete classes and dates"
+                      >
+                        ✎ Edit Attendance {customizationDiff.totalChanges > 0 ? `(${customizationDiff.totalChanges})` : ''}
+                      </button>
+                    </div>
                     {selectedWaivers.size === 0 && selectedCdcDays.size === 0 && (solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
                       <button
                         type="button"
@@ -1862,6 +2403,32 @@ export default function WaiverToolPage({ onBack }) {
                     </button>
                   </div>
                 </div>
+                {gridToolMode === 'edit' && (
+                  <div className="rd-edit-banner">
+                    <span className="rd-edit-banner-text">
+                      ✏️ <strong>Edit Mode:</strong> Click any cell to add/modify classes. Click ✕ on date headers to delete a day.
+                    </span>
+                    <div className="rd-edit-banner-acts">
+                      <button
+                        type="button"
+                        className="rd-btn-outline xs rd-btn-accent"
+                        onClick={() => { setIsAddDateModalOpen(true); setNewDateError(''); setNewDateInput(''); }}
+                      >
+                        + Add Date
+                      </button>
+                      {customizationDiff.hasCustomizations && (
+                        <button
+                          type="button"
+                          className="rd-btn-outline xs muted"
+                          onClick={() => setIsResetConfirmOpen(true)}
+                          title="Revert all manual edits back to the original uploaded Excel sheet"
+                        >
+                          ↺ Reset to Original ({customizationDiff.totalChanges})
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
                 <div className="rd-preview-body">
                   {renderGridTable(previewColumns, false)}
                   <div className="rd-fade" />
@@ -2158,15 +2725,15 @@ export default function WaiverToolPage({ onBack }) {
                 <span>Scroll sideways for every class day. Click a date or cell to waive or restore the whole day.</span>
               </div>
               <div className="rd-exp-acts">
-                {cdcLimit > 0 && (
-                  <div className="rd-tool-toggle" role="group" aria-label="Expanded Grid Action Mode">
-                    <button
-                      type="button"
-                      className={`rd-tool-btn ${gridToolMode === 'waiver' ? 'active' : ''}`}
-                      onClick={() => setGridToolMode('waiver')}
-                    >
-                      Waivers ({selectedWaivers.size}/{maxWaivers})
-                    </button>
+                <div className="rd-tool-toggle" role="group" aria-label="Expanded Grid Action Mode">
+                  <button
+                    type="button"
+                    className={`rd-tool-btn ${gridToolMode === 'waiver' ? 'active' : ''}`}
+                    onClick={() => setGridToolMode('waiver')}
+                  >
+                    Waivers ({selectedWaivers.size}/{maxWaivers})
+                  </button>
+                  {cdcLimit > 0 && (
                     <button
                       type="button"
                       className={`rd-tool-btn cdc ${gridToolMode === 'cdc' ? 'active' : ''}`}
@@ -2174,8 +2741,16 @@ export default function WaiverToolPage({ onBack }) {
                     >
                       CDC Attendance ({selectedCdcDays.size}/{cdcLimit})
                     </button>
-                  </div>
-                )}
+                  )}
+                  <button
+                    type="button"
+                    className={`rd-tool-btn edit ${gridToolMode === 'edit' ? 'active' : ''}`}
+                    onClick={() => setGridToolMode(gridToolMode === 'edit' ? 'waiver' : 'edit')}
+                    title="Manually edit, add, or delete classes and dates"
+                  >
+                    ✎ Edit Attendance {customizationDiff.totalChanges > 0 ? `(${customizationDiff.totalChanges})` : ''}
+                  </button>
+                </div>
                 {selectedWaivers.size === 0 && selectedCdcDays.size === 0 && (solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
                   <button
                     type="button"
@@ -2206,6 +2781,33 @@ export default function WaiverToolPage({ onBack }) {
               </div>
             </div>
 
+            {gridToolMode === 'edit' && (
+              <div className="rd-edit-banner exp">
+                <span className="rd-edit-banner-text">
+                  ✏️ <strong>Edit Mode:</strong> Click any cell to add/modify classes. Click ✕ on date headers to delete a day.
+                </span>
+                <div className="rd-edit-banner-acts">
+                  <button
+                    type="button"
+                    className="rd-btn-outline xs rd-btn-accent"
+                    onClick={() => { setIsAddDateModalOpen(true); setNewDateError(''); setNewDateInput(''); }}
+                  >
+                    + Add Date
+                  </button>
+                  {customizationDiff.hasCustomizations && (
+                    <button
+                      type="button"
+                      className="rd-btn-outline xs muted"
+                      onClick={() => setIsResetConfirmOpen(true)}
+                      title="Revert all manual edits back to the original uploaded Excel sheet"
+                    >
+                      ↺ Reset to Original ({customizationDiff.totalChanges})
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="rd-exp-body">
               {renderGridTable(allDayColumns, true)}
             </div>
@@ -2229,6 +2831,12 @@ export default function WaiverToolPage({ onBack }) {
 
       {/* Custom Timeline Modal Overlay */}
       {renderTimelineModal()}
+
+      {/* Manual Attendance Customization Modals */}
+      {renderCellEditorModal()}
+      {renderAddDateModal()}
+      {renderConfirmDeleteDateModal()}
+      {renderConfirmResetModal()}
     </div>
   );
 }

@@ -1886,3 +1886,253 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* Edit Mode Toggle Button */
+.rd-tool-btn.edit.active {
+  background: #7c3aed;
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(124, 58, 237, 0.3);
+}
+
+/* Edit Mode Banner */
+.rd-edit-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+  border-radius: 10px;
+  padding: 8px 14px;
+  margin-bottom: 12px;
+}
+
+.rd-edit-banner.exp {
+  margin: 0 16px 12px 16px;
+}
+
+.rd-edit-banner-text {
+  font-size: 12px;
+  color: #5b21b6;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.rd-edit-banner-text strong {
+  font-weight: 700;
+}
+
+.rd-edit-banner-acts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Table Header Delete Date Button */
+.rd-date-th-inner {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rd-header-del-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: #ef4444;
+  color: #ffffff;
+  border: 1.5px solid #ffffff;
+  font-size: 10px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.15s ease, background 0.15s ease;
+  z-index: 3;
+}
+
+.rd-header-del-btn:hover {
+  background: #dc2626;
+  transform: scale(1.15);
+}
+
+.rd-date-added-badge {
+  font-size: 9px;
+  font-weight: 800;
+  background: #ede9fe;
+  color: #6d28d9;
+  border-radius: 4px;
+  padding: 1px 3px;
+  line-height: 1;
+  margin-top: 2px;
+  letter-spacing: 0.2px;
+}
+
+/* Cell Edit Mode & Custom Indicators */
+.rd-cell.is-edit-cell {
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rd-cell.is-edit-cell:hover {
+  background: #f5f3ff !important;
+  outline: 1.5px dashed #a78bfa;
+  outline-offset: -2px;
+}
+
+.rd-cell.is-customized {
+  box-shadow: inset 0 0 0 1.5px #8b5cf6;
+}
+
+.rd-custom-dot {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  color: #7c3aed;
+  font-size: 10px;
+  line-height: 1;
+  font-weight: bold;
+  pointer-events: none;
+}
+
+.rd-cell-edit-affordance {
+  position: absolute;
+  bottom: 2px;
+  right: 3px;
+  font-size: 9px;
+  color: #8b5cf6;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.rd-cell.is-edit-cell:hover .rd-cell-edit-affordance {
+  opacity: 1;
+}
+
+/* Cell Editor Modal */
+.rd-cell-editor-card {
+  max-width: 480px;
+  width: 95vw;
+}
+
+.rd-cell-editor-body {
+  padding: 16px 20px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.rd-cell-editor-empty {
+  text-align: center;
+  padding: 24px 12px;
+  color: var(--ink-dim);
+  font-size: 13px;
+}
+
+.rd-cell-editor-empty p {
+  margin: 0 0 12px 0;
+}
+
+.rd-classes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rd-class-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--tint);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.rd-class-num {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  min-width: 60px;
+}
+
+.rd-class-select-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.rd-class-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.rd-class-select {
+  padding: 6px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.rd-class-select:focus {
+  border-color: var(--accent);
+}
+
+.rd-class-select.status.p {
+  color: #15803d;
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.rd-class-select.status.a {
+  color: #b91c1c;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.rd-class-del-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-dim);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.rd-class-del-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.rd-add-class-btn {
+  margin-top: 4px;
+  align-self: flex-start;
+}
+
