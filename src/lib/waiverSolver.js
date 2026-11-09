@@ -1175,6 +1175,11 @@ export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPc
       const metrics = calculatePartBufferAndNeeded(simAtt, simH, T);
       const isTarget = (t === 'th' || t === 'tu') && baseHeld > 0;
 
+      const waivedClasses = rawWaived[t].n;
+      const isOverOneThird = baseHeld > 0 && (3 * waivedClasses > baseHeld);
+      const maxAllowedOneThird = baseHeld > 0 ? Math.floor(baseHeld / 3) : 0;
+      const waivedPct = baseHeld > 0 ? (waivedClasses / baseHeld) * 100 : 0;
+
       if (isTarget) {
         if (metrics.passes) passingTargetCount++;
         if (metrics.debarSafe) debarSafeTargetCount++;
@@ -1219,7 +1224,11 @@ export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPc
         missableBuffer: metrics.missableBuffer,
         classesNeeded: metrics.classesNeeded,
         classesNeededForDebarSafe: metrics.classesNeededForDebarSafe,
-        isTarget
+        isTarget,
+        waivedClasses,
+        isOverOneThird,
+        maxAllowedOneThird,
+        waivedPct
       };
 
       parts[t] = partObj;

@@ -307,6 +307,64 @@ if (fs.existsSync(nov6Path)) {
     assert.strictEqual(fullLockedSol.passCount, 8);
     console.log('✓ Locked waivers and incremental recommendation logic verified across all edge cases.');
   }
+
+  // 10. Test One-Third (1/3rd) Class Waiver Rule Advisory Warning
+  console.log('10. Testing One-Third (1/3rd) Class Waiver Advisory Rule...');
+  const testOneThirdData = {
+    dayColumns: [
+      { dateStr: '2026-08-01', dayNum: 1, month: 8, weekday: 'Sat' },
+      { dateStr: '2026-08-02', dayNum: 2, month: 8, weekday: 'Sun' },
+      { dateStr: '2026-08-03', dayNum: 3, month: 8, weekday: 'Mon' },
+      { dateStr: '2026-08-04', dayNum: 4, month: 8, weekday: 'Tue' }
+    ],
+    subjects: [
+      {
+        name: 'Statistics for Business',
+        parts: {
+          th: { p: 5, a: 4 }, // 9 classes held total
+          tu: { p: 2, a: 2 }, // 4 classes held total
+          pr: { p: 0, a: 0 }
+        },
+        dayClasses: {
+          '2026-08-01': [{ type: 'th', attended: false, raw: 'A( Th)' }, { type: 'tu', attended: false, raw: 'A( tu)' }],
+          '2026-08-02': [{ type: 'th', attended: false, raw: 'A( Th)' }, { type: 'tu', attended: false, raw: 'A( tu)' }],
+          '2026-08-03': [{ type: 'th', attended: false, raw: 'A( Th)' }],
+          '2026-08-04': [{ type: 'th', attended: false, raw: 'A( Th)' }]
+        }
+      }
+    ]
+  };
+
+  // Case 1: Waive 3 theory classes (3/9 = 33.33% -> exactly 1/3, not over 1/3)
+  const sim3Waivers = calculateSimulatedStats(testOneThirdData, new Set(['2026-08-01', '2026-08-02', '2026-08-03']), 85);
+  const thPart3 = sim3Waivers.subjectsStats[0].parts.th;
+  assert.strictEqual(thPart3.baseHeld, 9);
+  assert.strictEqual(thPart3.waivedClasses, 3);
+  assert.strictEqual(thPart3.maxAllowedOneThird, 3);
+  assert.strictEqual(thPart3.isOverOneThird, false, '3 of 9 classes waived must NOT trigger >1/3rd warning');
+
+  // Case 2: Waive 4 theory classes (4/9 = 44.44% -> strictly > 1/3rd)
+  const sim4Waivers = calculateSimulatedStats(testOneThirdData, new Set(['2026-08-01', '2026-08-02', '2026-08-03', '2026-08-04']), 85);
+  const thPart4 = sim4Waivers.subjectsStats[0].parts.th;
+  assert.strictEqual(thPart4.baseHeld, 9);
+  assert.strictEqual(thPart4.waivedClasses, 4);
+  assert.strictEqual(thPart4.maxAllowedOneThird, 3);
+  assert.strictEqual(thPart4.isOverOneThird, true, '4 of 9 classes waived MUST trigger >1/3rd warning');
+  assert.strictEqual(Math.round(thPart4.waivedPct), 44);
+
+  // Case 3: Tutorial with 4 classes held
+  // Waiving 1 tute: 1/4 = 25% <= 33.3% -> false
+  const tuPart1 = sim3Waivers.subjectsStats[0].parts.tu; // day 1 and day 2 waived -> 2 tutes waived
+  assert.strictEqual(tuPart1.baseHeld, 4);
+  assert.strictEqual(tuPart1.waivedClasses, 2);
+  assert.strictEqual(tuPart1.maxAllowedOneThird, 1);
+  assert.strictEqual(tuPart1.isOverOneThird, true, '2 of 4 tutorial classes waived (50%) MUST trigger >1/3rd warning');
+
+  // Case 4: Verify attendance percentages and calculation unaffected
+  assert.strictEqual(thPart4.simHeld, 5, 'Simulated held classes is 9 - 4 = 5');
+  assert.strictEqual(thPart4.simAttended, 5, 'Attended stays 5');
+  assert.strictEqual(thPart4.pct, 100, '5/5 is 100%');
+  console.log('✓ One-Third (1/3rd) advisory rule logic and warning triggers verified.');
 }
 
 console.log('\nALL UNIT TESTS PASSED SUCCESSFULLY! ✓✓✓');

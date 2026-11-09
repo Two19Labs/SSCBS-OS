@@ -1233,6 +1233,14 @@ export default function WaiverToolPage({ onBack }) {
             <>Safe from debarment. Attend <strong>{buff.classesNeeded}</strong> in a row to reach {threshold}%</>
           )}
         </div>
+        {part.isOverOneThird && (
+          <div className="rd-one-third-note" role="alert">
+            <span className="rd-one-third-icon">⚠️</span>
+            <div className="rd-one-third-text">
+              <strong>1/3rd Rule Notice:</strong> You have waived off <strong>{part.waivedClasses} of {part.baseHeld}</strong> {part.shortType ? part.shortType.toLowerCase() : ''} classes ({part.waivedPct?.toFixed(0)}%), which exceeds one-third of total classes (max {part.maxAllowedOneThird} allowed). Double-check the 1/3rd rule.
+            </div>
+          </div>
+        )}
       </div>
     );
   };
