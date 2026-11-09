@@ -68,13 +68,16 @@ export default function FacultyDatabasePage({ onBack, initialProfId, onClearPref
   // Filter faculty based on search query and designation
   const filteredFaculty = useMemo(() => {
     return facultyList.filter((f) => {
+      const q = searchQuery.toLowerCase().trim();
       const matchesSearch =
-        !searchQuery ||
-        f.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        f.qualification?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        f.room?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        f.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        f.expertise?.some((e) => e.toLowerCase().includes(searchQuery.toLowerCase()));
+        !q ||
+        f.name?.toLowerCase().includes(q) ||
+        (f.prefix && `${f.prefix} ${f.name}`.toLowerCase().includes(q)) ||
+        f.department?.toLowerCase().includes(q) ||
+        f.qualification?.toLowerCase().includes(q) ||
+        f.room?.toLowerCase().includes(q) ||
+        f.email?.toLowerCase().includes(q) ||
+        f.expertise?.some((e) => e.toLowerCase().includes(q));
 
       const matchesDesignation =
         designationFilter === 'all' || f.designation === designationFilter;
@@ -115,6 +118,7 @@ export default function FacultyDatabasePage({ onBack, initialProfId, onClearPref
     if (lower.includes('associate')) return 'badge-associate';
     if (lower.includes('assistant')) return 'badge-assistant';
     if (lower.includes('guest')) return 'badge-guest';
+    if (lower.includes('visiting')) return 'badge-guest';
     if (lower.includes('professor')) return 'badge-professor';
     return 'badge-default';
   };
@@ -209,6 +213,8 @@ export default function FacultyDatabasePage({ onBack, initialProfId, onClearPref
                         src={prof.photoUrl}
                         alt={prof.name}
                         className="faculty-avatar-img"
+                        loading="lazy"
+                        decoding="async"
                         onError={(e) => {
                           e.target.onerror = null;
                           e.target.style.display = 'none';
@@ -228,14 +234,21 @@ export default function FacultyDatabasePage({ onBack, initialProfId, onClearPref
 
                   <div className="faculty-info-header">
                     <h3 className="faculty-name" title={prof.name}>
-                      {prof.name}
+                      {prof.prefix ? `${prof.prefix} ` : ''}{prof.name}
                     </h3>
                     {prof.qualification && (
                       <p className="faculty-degree">{prof.qualification}</p>
                     )}
-                    <span className={`faculty-designation-badge ${getDesignationClass(prof.designation)}`}>
-                      {prof.designation}
-                    </span>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '4px' }}>
+                      <span className={`faculty-designation-badge ${getDesignationClass(prof.designation)}`}>
+                        {prof.designation}
+                      </span>
+                      {prof.department && (
+                        <span className="faculty-dept-badge">
+                          {prof.department.replace('Department of ', '')}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -340,14 +353,21 @@ export default function FacultyDatabasePage({ onBack, initialProfId, onClearPref
 
               <div>
                 <h3 style={{ margin: '0 0 4px 0', fontSize: '1.35rem', color: 'var(--ink)', fontWeight: '800' }}>
-                  {selectedProf.name}
+                  {selectedProf.prefix ? `${selectedProf.prefix} ` : ''}{selectedProf.name}
                 </h3>
                 <p style={{ margin: '0 0 8px 0', color: 'var(--ink-dim)', fontSize: '0.85rem', fontWeight: '500' }}>
-                  {selectedProf.qualification}
+                  {selectedProf.department ? `${selectedProf.department} • ` : ''}{selectedProf.qualification}
                 </p>
-                <span className={`faculty-designation-badge ${getDesignationClass(selectedProf.designation)}`}>
-                  {selectedProf.designation}
-                </span>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                  <span className={`faculty-designation-badge ${getDesignationClass(selectedProf.designation)}`}>
+                    {selectedProf.designation}
+                  </span>
+                  {selectedProf.department && (
+                    <span className="faculty-dept-badge">
+                      {selectedProf.department.replace('Department of ', '')}
+                    </span>
+                  )}
+                </div>
 
                 <div style={{ marginTop: '12px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   <span className="faculty-room-pill">

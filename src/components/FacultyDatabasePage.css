@@ -704,3 +704,25 @@
     text-align: center;
   }
 }
+
+/* Department Badge */
+.faculty-dept-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.725rem;
+  font-weight: 700;
+  background: var(--tint);
+  border: 1px solid var(--border);
+  color: var(--ink-dim);
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 899px) {
+  .faculty-dept-badge {
+    font-size: 0.675rem;
+    padding: 2px 6px;
+  }
+}

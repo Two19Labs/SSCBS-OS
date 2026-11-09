@@ -2,17 +2,20 @@
   {
     "id": "abhimanyu-verma-mba",
     "name": "Abhimanyu Verma",
-    "qualification": "MBA",
+    "prefix": "Dr.",
     "designation": "Assistant Professor",
+    "department": "Department of Financial Studies",
+    "qualification": "MBA",
     "room": "Room No. 207A, Aral Sea",
     "email": "vermaabhi@sscbsdu.ac.in",
+    "phone": null,
     "expertise": [
       "Advertising",
       "Corporate",
       "Social Responsibility",
       "Marketing Management"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/DSC_0124-700x660.jpg",
+    "photoUrl": "/faculty/abhimanyu-verma-mba.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/abhimanyu-verma-mba/",
     "biography": "Abhimanyu Verma is an assistant Professor in the field of marketing. He is currently pursuing his PhD from FMS, University of Delhi in the field of Marketing. He has done his graduation from University of Delhi and MBA (Marketing) from Guru Gobind Singh Indraprastha University, Delhi. He has been teaching in",
     "education": [
@@ -28,15 +31,18 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": null
+    "type": "permanent"
   },
   {
     "id": "dr-ajay-jaiswal-ph-d",
     "name": "Ajay Jaiswal",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Professor",
+    "department": "Department of Computer Science",
+    "qualification": "Ph.D.",
     "room": "Room No. 622, South China Sea",
     "email": "ajayjaiswal@sscbsdu.ac.in",
+    "phone": null,
     "expertise": [
       "Pattern Recognition",
       "Image Processing",
@@ -47,7 +53,7 @@
       "We can teach from our experience",
       "but we cannot teach experience."
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/DSC_0481-700x660.jpg",
+    "photoUrl": "/faculty/dr-ajay-jaiswal-ph-d.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/dr-ajay-jaiswal-ph-d/",
     "biography": "Dr. Ajay Jaiswal is Professor in the Department of Computer Science of",
     "education": [
@@ -63,15 +69,18 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": null
+    "type": "permanent"
   },
   {
     "id": "amit-kumar-m-com",
     "name": "Amit Kumar",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Assistant Professor",
+    "department": "Department of Financial Studies",
+    "qualification": "Ph.D.",
     "room": "Room No. 525",
     "email": "amit.catlog@sscbsdu.ac.in",
+    "phone": "9490152412",
     "expertise": [
       "Distribution Decision Signals",
       "Taxation and Earnings Management",
@@ -80,7 +89,7 @@
       "Financial Econometrics",
       "Investment Analysis and Portfolio Management"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/IMG20220628150120-700x660.jpg",
+    "photoUrl": "/faculty/amit-kumar-m-com.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/amit-kumar-m-com/",
     "biography": "Taxation and Corporate Finance are two fields gradually growing towards impacting our lives more and more as the world progresses. Taxation focuses on understanding the revenue system of an economy and the regulatory requirements for individuals while Corporate Finance is guiding every financial decision from personal budgeting to investment decisions of companies and governments. Currently, Mr. Amit has been focussing his research on the discovery of real signals from the payout policy of firms. He is examining the extent of inter linkages between the developing and developed financial markets by testing the presence of market integration. He has been faculty for subjects such as taxation, corporate finance, Investment analysis and portfolio management, international finance, financial software packages, transfer pricing and international business. Starting his teaching career",
     "education": [
@@ -96,21 +105,24 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "9490152412"
+    "type": "permanent"
   },
   {
     "id": "dr-amrina-kausar-ph-d",
     "name": "Amrina Kausar",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Associate Professor",
+    "department": "Department of Computer Science",
+    "qualification": "Ph.D.",
     "room": "Room No. 207B, Adriatic Sea",
     "email": "amrinakausar@sscbsdu.ac.in",
+    "phone": null,
     "expertise": [
       "Inventory Modeling",
       "Supply Chain Management",
       "Operational Research"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/DSC_0151-700x660.jpg",
+    "photoUrl": "/faculty/dr-amrina-kausar-ph-d.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/dr-amrina-kausar-ph-d/",
     "biography": "Dr. Amrina Kausar has been serving as an Associate Professor in the Department of Management Studies at",
     "education": [
@@ -126,21 +138,24 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": null
+    "type": "permanent"
   },
   {
     "id": "dr-anamika-gupta-ph-d",
     "name": "Anamika Gupta",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Professor",
+    "department": "Department of Computer Science",
+    "qualification": "Ph.D.",
     "room": "Room No. 536, Sea of Galilee",
     "email": "anamikargupta@sscbsdu.ac.in",
+    "phone": "+91-981-071-9720",
     "expertise": [
       "Python Programming",
       "Data Mining",
       "Image Processing"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2025/07/Amba_0280-700x660.jpg",
+    "photoUrl": "/faculty/dr-anamika-gupta-ph-d.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/dr-anamika-gupta-ph-d/",
     "biography": "She has rich industry experience in the field of Computer Network and Communication Protocols. Having joined teaching in 2001, taught several subjects of B.Sc. (H) Computer Science, B.Tech (Computer Science), PGDCA, BIT. Some of the subjects taught are Programming using C++ and Java, Discrete Mathematics, Systems Programming, Internet Technologies, Data Mining, Data Structures, Computer Networks, Network Programming, Data Analysis and Visualization etc. Her research areas include data analysis and machine learning techniques in the area of image processing, medical data processing, cyber security etc. She is a member of editorial board of several journals and member of program committee of several international conferences. She has co-authored NCERT Information Practices textbooks and reviewed NCERT computer science textbooks and published more than 25 book chapters, journal an",
     "education": [
@@ -156,20 +171,23 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-981-071-9720"
+    "type": "permanent"
   },
   {
     "id": "dr-anuja-mathur-ph-d",
     "name": "Anuja Mathur",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Associate Professor",
+    "department": "Department of Financial Studies",
+    "qualification": "Ph.D.",
     "room": "Room No. 535, Sea of Cortez",
     "email": "anujamathur@sscbsdu.ac.in",
+    "phone": null,
     "expertise": [
       "Marketing",
       "Strategy"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/DSC_0055-700x660.jpg",
+    "photoUrl": "/faculty/dr-anuja-mathur-ph-d.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/dr-anuja-mathur-ph-d/",
     "biography": "Dr Mathur has interest in the field of marketing and strategy. She has over three decades of teaching experience and has taught courses both at the graduate and post-graduate level. She has supervised projects of undergraduate students in the area of Marketing and strategy. She has been associated with teaching papers in Organisational Behaviour, Marketing Management, Consumer Behaviour and Advertising and Sales Promotion Management and Strategic Management. The title of her research work was “Market Orientation and its Antecedents and Consequences: A Study of Business Firms in India”. In 2011, the Directorate of Higher",
     "education": [
@@ -185,21 +203,24 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": null
+    "type": "permanent"
   },
   {
     "id": "kavita-rastogi-msc",
     "name": "Kavita Rastogi",
-    "qualification": "M.Sc.",
+    "prefix": "Dr.",
     "designation": "Associate Professor",
+    "department": "Department of Computer Science",
+    "qualification": "M.Sc.",
     "room": "Room No. 339, Beaufort Sea",
     "email": "kavitarastogi@sscbsdu.ac.in",
+    "phone": "+91-981-051-0518",
     "expertise": [
       "Database Design",
       "Software Engineering",
       "Programming Languages - C & C++"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/DSC_0238-700x660.jpg",
+    "photoUrl": "/faculty/kavita-rastogi-msc.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/kavita-rastogi-msc/",
     "biography": "To have an interactive teaching learning environment in the classroom focusing not only the academics but on the holistic development of the students.  Have guided number of projects which the students have done as a part of their BSC(H) curriculum and industrial projects which students have undertaken for Post Graduate Diploma course.",
     "education": [
@@ -215,15 +236,18 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-981-051-0518"
+    "type": "permanent"
   },
   {
     "id": "kishori-ravi-shankar-mphil",
     "name": "Kishori Ravi Shankar",
-    "qualification": "M.Phil. (Retd.)",
+    "prefix": "Dr.",
     "designation": "Assistant Professor",
+    "department": "Department of Financial Studies",
+    "qualification": "M.Phil. (Retd.)",
     "room": "Room No. 356, Caribbean Sea",
     "email": "kishorirshankar@sscbsdu.ac.in",
+    "phone": "+91-996-806-7846",
     "expertise": [
       "Legal Aspects of Business",
       "Human Resources Management",
@@ -234,7 +258,7 @@
       "Assistant Professor",
       "To enable students to create value"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/DSC_0161-700x660.jpg",
+    "photoUrl": "/faculty/kishori-ravi-shankar-mphil.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/kishori-ravi-shankar-mphil/",
     "biography": "Joined the college with rich industrial experience in the area of Human Resource Management and Industrial Relations, and has been involved in various college related activities like promotion of college and industry interaction, activation of alumni cell, placements, and handling of college admissions. Has served as the Teacher In-Charge of Financial Studies and Management Studies Dept. Working as Principal Information Officer of the college.",
     "education": [
@@ -250,15 +274,18 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-996-806-7846"
+    "type": "permanent"
   },
   {
     "id": "kumar-bijoy-ma-eco-ph-d-cfa",
     "name": "Kumar Bijoy",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Professor",
+    "department": "Department of Financial Studies",
+    "qualification": "Ph.D.",
     "room": "Room No. 657, Levantine Sea",
     "email": "kumarbijoy@sscbsdu.ac.in",
+    "phone": "+91-981-045-2266",
     "expertise": [
       "Project Planning",
       "Appraisal",
@@ -267,7 +294,7 @@
       "Financial Engineering",
       "Financial Derivatives and Risk Management"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/photo-KB.jpeg",
+    "photoUrl": "/faculty/kumar-bijoy-ma-eco-ph-d-cfa.jpeg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/kumar-bijoy-ma-eco-ph-d-cfa/",
     "biography": "He is a Professor and Head of the Department of Financial Studies at",
     "education": [
@@ -283,20 +310,23 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-981-045-2266"
+    "type": "permanent"
   },
   {
     "id": "ca-madhu-totla-maheshwari",
     "name": "Madhu Totla",
-    "qualification": "Ph.D., CA",
+    "prefix": "Dr.",
     "designation": "Associate Professor",
+    "department": "Department of Computer Science",
+    "qualification": "Ph.D., CA",
     "room": "Room No. 332, Bay of Bengal",
     "email": "madhumaheshwari@sscbsdu.ac.in",
+    "phone": "+91-955-575-9554",
     "expertise": [
       "Corporate Finance",
       "IPO valuation and performance"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/DSC_0070-700x660.jpg",
+    "photoUrl": "/faculty/ca-madhu-totla-maheshwari.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/ca-madhu-totla-maheshwari/",
     "biography": "Dr. Madhu is an Associate Professor of Finance in the Department of Management Studies at",
     "education": [
@@ -312,22 +342,25 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-955-575-9554"
+    "type": "permanent"
   },
   {
     "id": "md-rashid-shamim-mba",
     "name": "Md Rashid Shamim",
-    "qualification": "MBA",
+    "prefix": "Dr.",
     "designation": "Assistant Professor",
+    "department": "Department of Financial Studies",
+    "qualification": "MBA",
     "room": "Room No. 333, Bay of Biscay",
     "email": "rashid.shamim@sscbsdu.ac.in",
+    "phone": "+91-882-695-6640",
     "expertise": [
       "Mergers and acquisitions",
       "Corporate finance",
       "Investment banking",
       "Corporate law"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/DSC_0301-scaled-1-700x660.jpg",
+    "photoUrl": "/faculty/md-rashid-shamim-mba.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/md-rashid-shamim-mba/",
     "biography": "Finance is a broad area of study whichcan be divided into several fields including corporate finance, merger and acquisition, public finance, investment analysis, portfolio management, asset management, behavioral finance, international finance, derivative, etc.Financial decisions are designed to control and support financial functions and related activitiesofbusinessorganization. Currently, Rashid is focusing his research on mergers and acquisitions through an intellectual capital perspective and its impact of financial performance. The study would help and guide industrialist and decision makers of the firm in formulating ofthe strategic decisions related to mergers and acquisitions.",
     "education": [
@@ -343,21 +376,24 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-882-695-6640"
+    "type": "permanent"
   },
   {
     "id": "dr-mona-verma-ph-d",
     "name": "Mona Verma",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Associate Professor",
+    "department": "Department of Financial Studies",
+    "qualification": "Ph.D.",
     "room": "Room no. 207B, Adriatic Sea",
     "email": "monavermag@sscbsdu.ac.in",
+    "phone": null,
     "expertise": [
       "Supply Chain Management",
       "Inventory management",
       "Statistical Tools"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/DSC_0359-700x660.jpg",
+    "photoUrl": "/faculty/dr-mona-verma-ph-d.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/dr-mona-verma-ph-d/",
     "biography": "Supply chain is a network of organizations, individuals, activities, engaged in successful delivery of products from the production till consumption. The role of supply chain starts right from thinking of producing a product or making some service available to the customers and terminates either with its satisfied consumption or return or refund. Dr. Mona Verma is currently doing research on the new emerging decision areas of supply chain. Her research interest lies in developing new models that will cater the need of current supply chain scenarios.",
     "education": [
@@ -373,15 +409,18 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": null
+    "type": "permanent"
   },
   {
     "id": "dr-narander-kumar-nigam-ph-d",
     "name": "Narander Kumar Nigam",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Assistant Professor",
+    "department": "Department of Computer Science",
+    "qualification": "Ph.D.",
     "room": "Room No. 133, Cape Town",
     "email": "narandernigam@sscbsdu.ac.in",
+    "phone": "+91-987-304-1007",
     "expertise": [
       "Financial econometrics",
       "Derivatives",
@@ -390,7 +429,7 @@
       "Eviews and Stata",
       "EduDialogue: Personalized Learning Sessions"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2025/11/7ea633db-5b91-4227-b243-f2e535ef69351-700x660.jpg",
+    "photoUrl": "/faculty/dr-narander-kumar-nigam-ph-d.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/dr-narander-kumar-nigam-ph-d/",
     "biography": "Dr. Nigam is Assistant Professor of Finance at Department of Management Studies,",
     "education": [
@@ -406,15 +445,18 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-987-304-1007"
+    "type": "permanent"
   },
   {
     "id": "neeraj-sehrawat-ph-d",
     "name": "Neeraj Sehrawat",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Assistant Professor",
+    "department": "Department of Computer Science",
+    "qualification": "Ph.D.",
     "room": "Room No. 525",
     "email": "nrjsehrawat@sscbsdu.ac.in",
+    "phone": "+91-701-544-8335",
     "expertise": [
       "Corporate Analysis & Valuation",
       "Financial Reporting Quality",
@@ -423,7 +465,7 @@
       "Bankruptcy Prediction using Machine learning",
       "Financial Data Analytics using R and Stata"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/IMG-3176-1-700x660.png",
+    "photoUrl": "/faculty/neeraj-sehrawat-ph-d.png",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/neeraj-sehrawat-ph-d/",
     "biography": "Prof. Neeraj Kumar Sehrawat, an Alumnus of IIM Ahmedabad and FMS (University of Delhi) is an Assistant Professor of Accounting and Finance at",
     "education": [
@@ -439,15 +481,18 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-701-544-8335"
+    "type": "permanent"
   },
   {
     "id": "dr-nidhi-kesari-ph-d",
     "name": "Nidhi Kesari",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Associate Professor",
+    "department": "Department of Computer Science",
+    "qualification": "Ph.D.",
     "room": "Room no. 522",
     "email": "nidhikesari@sscbsdu.ac.in",
+    "phone": "+91-886-055-0930",
     "expertise": [
       "Entrepreneurship",
       "Corporate Laws",
@@ -455,7 +500,7 @@
       "Corporate Restructuring",
       "Direct Taxation"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/DSC_0082-scaled-1.jpg",
+    "photoUrl": "/faculty/dr-nidhi-kesari-ph-d.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/dr-nidhi-kesari-ph-d/",
     "biography": "Dr. Nidhi Kesari is an Associate Professor in the Department of Management Studies with over sixteen years of teaching, research, and academic administration experience at the University of Delhi. She began her academic career at Hindu College and Shri Ram College of Commerce before joining",
     "education": [
@@ -471,21 +516,24 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-886-055-0930"
+    "type": "permanent"
   },
   {
     "id": "onkar-singh-m-phil-m-sc",
     "name": "Onkar Singh",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Associate Professor",
+    "department": "Department of Computer Science",
+    "qualification": "Ph.D.",
     "room": "Room No. 436, East China Sea",
     "email": "onkarsingh@sscbsdu.ac.in",
+    "phone": "+91-991-122-9493",
     "expertise": [
       "Cancelable Biometrics",
       "Pattern Recognition",
       "Machine Learning"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/DSC_0234-700x660.jpg",
+    "photoUrl": "/faculty/onkar-singh-m-phil-m-sc.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/onkar-singh-m-phil-m-sc/",
     "biography": "Dr. Onkar Singh has been serving at the college since 2009 and is currently an Associate Professor in the Department of Computer Science at",
     "education": [
@@ -501,22 +549,25 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-991-122-9493"
+    "type": "permanent"
   },
   {
     "id": "paridhi-mba",
     "name": "Paridhi",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Associate Professor",
+    "department": "Department of Financial Studies",
+    "qualification": "Ph.D.",
     "room": "Room No. 232, Balearic Sea",
     "email": "paridhisaini@sscbsdu.ac.in",
+    "phone": "+91-995-827-7936",
     "expertise": [
       "Management Accounting",
       "Financial Management",
       "Financial Implications of strategic decisions",
       "Sustainability Disclosure"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/SSCBS-Profile-Photo-600x800.jpg",
+    "photoUrl": "/faculty/paridhi-mba.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/paridhi-mba/",
     "biography": "Dr. Paridhi, an alumna of Faculty of Management Studies (FMS), University of Delhi has rich corporate experience in the field of Finance and Accounts and also has teaching experience at prestigious institutions including Shri Ram College of Commerce (SRCC) and Department of Commerce (Delhi School of Economics) University of Delhi. She is currently working as an Assistant Professor at Dept of Management Studies,",
     "education": [
@@ -532,21 +583,24 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-995-827-7936"
+    "type": "permanent"
   },
   {
     "id": "poonam-verma",
     "name": "Poonam Verma",
-    "qualification": "Professor-Principal",
+    "prefix": "Dr.",
     "designation": "Professor & Principal",
+    "department": "Principal Office",
+    "qualification": "Professor-Principal",
     "room": "Room No. 1, Surya",
     "email": "principal@sscbsdu.ac.in",
+    "phone": null,
     "expertise": [
       "Organizational Behavior",
       "Marketing",
       "Human Resource Management"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2022/03/RFS03204-600x800.jpg",
+    "photoUrl": "/faculty/poonam-verma.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/poonam-verma/",
     "biography": "Ms Verma is currently the Principal of SS College of Business Studies. She joined the University of Delhi in 1985 as Assistant Professor and has since taught many under graduate and post graduate students in some of the most prestigious institutions of the University of Delhi. She has researched on how personnel policies impact the performance of Public Sector Enterprises. She has guided more than 100 projects some of which have received international acclaim and appreciation. One such project won the third prize in the Asia Pacific Region in a competition conducted by the International Advertising Association and Bozell worldwide competition. She is a recipient of Fulbright-Nehru International",
     "education": [
@@ -562,21 +616,24 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": null
+    "type": "permanent"
   },
   {
     "id": "raj-kumar-ma",
     "name": "Raj Kumar",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Assistant Professor",
+    "department": "Department of Financial Studies",
+    "qualification": "Ph.D.",
     "room": "Room No. 331",
     "email": "rajkumarecon@sscbsdu.ac.in",
+    "phone": "+91-971-147-3663",
     "expertise": [
       "Energy Economics",
       "Food Policy",
       "Environmental Economics"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/Mr.-Raj-Kumar-700x660.jpg",
+    "photoUrl": "/faculty/raj-kumar-ma.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/raj-kumar-ma/",
     "biography": "Dr. Raj Kumar holds a PhD in Economics from Jawaharlal Nehru University, New Delhi. His work centers on development-related issues, with a focus on understanding how public policies and interventions shape the well-being of populations. Before joining the University of Delhi, Dr. Kumar served as a Research Academic at the Indian School of Business (ISB), Hyderabad. He has experience across multiple areas within the social sciences, particularly in sectors such as energy policy, health systems, and development. Dr. Kumar has authored several publications in international peer-reviewed journals. A notable contribution is his article “Renewable Deployment in India: Financing Costs and Implications for Policy”, published in Energy Policy.",
     "education": [
@@ -592,21 +649,24 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-971-147-3663"
+    "type": "permanent"
   },
   {
     "id": "ramesh-kumar-ph-d",
     "name": "Ramesh Kumar",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Assistant Professor",
+    "department": "Department of Computer Science",
+    "qualification": "Ph.D.",
     "room": "Room No. 230, Andaman Sea",
     "email": "rameshbarpa78@sscbsdu.ac.in",
+    "phone": "+91-989-130-0888",
     "expertise": [
       "Entrepreneurship Development",
       "Marketing Management",
       "Business research"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2022/04/PHOTO-2022-04-06-09-58-21-700x450.jpg",
+    "photoUrl": "/faculty/ramesh-kumar-ph-d.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/ramesh-kumar-ph-d/",
     "biography": "Dr. Ramesh Kumar is an Assistant Professor at the Department of Management Studies,",
     "education": [
@@ -622,21 +682,24 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-989-130-0888"
+    "type": "permanent"
   },
   {
     "id": "dr-rishi-rajan-sahay-ph-d",
     "name": "Rishi Rajan Sahay",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Associate Professor",
+    "department": "Department of Computer Science",
+    "qualification": "Ph.D.",
     "room": "Room No. 625, Sea of Japan",
     "email": "rajansahay@sscbsdu.ac.in",
+    "phone": "+91-981-801-1766",
     "expertise": [
       "Optimization techniques",
       "Regression Models",
       "Operations Management"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/DSC_0500-700x660.jpg",
+    "photoUrl": "/faculty/dr-rishi-rajan-sahay-ph-d.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/dr-rishi-rajan-sahay-ph-d/",
     "biography": "Dr. Sahay has earned his PhD in Operations Research from University of Delhi. He is teaching in the department of management studies, SSCBS since 2014. He has headed the Department of Management Studies between 2018-20. He was coordinator of the prestigious BBA(FIA) course from 2016 to 2018. He started his teaching career in the year 2006 at Department of Computer Science, College of Vocational Studies. He got awarded Junior Research Fellowship (JRF) in Mathematical Sciences by UGC in the year 2001. He has attended many national and international conferences. He has got his research work published in the journal of national and international repute. His area of interest includes Optimization techniques, Regression Models and Operations Management. He believes in the quote by William Arthur Ward: “The mediocre teacher tells. The good teacher explains. The superior teacher demons",
     "education": [
@@ -652,20 +715,23 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-981-801-1766"
+    "type": "permanent"
   },
   {
     "id": "dr-satish-kumar-goel-ph-d",
     "name": "Satish Kumar Goel",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Assistant Professor",
+    "department": "Department of Financial Studies",
+    "qualification": "Ph.D.",
     "room": "Room No. 468, Gulf of Carpentaria",
     "email": "satish@sscbsdu.ac.in",
+    "phone": "+91-989-198-9391",
     "expertise": [
       "Inventory",
       "Supply chain Management"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/WhatsApp-Image-2023-07-31-at-1.29.11-PM-1-700x660.jpeg",
+    "photoUrl": "/faculty/dr-satish-kumar-goel-ph-d.jpeg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/dr-satish-kumar-goel-ph-d/",
     "biography": "Dr. Satish Kumar Goel is a distinguished academician and a passionate educator, currently serving as an Assistant Professor in Department of Management. Dr. Goel's academic journey is adorned with notable achievements. He earned his Doctorate in Operational Research from University of Delhi, where his research focused on “Impact of Trade Credit on Inventory Management”. He had published 22 research papers in various reputed international and national journals which has a total of 924 Google Scholar Citation as on 31-7-23.  He had opportunity to teach variety of courses specially Operational Research papers from the last 16 years to variety of UG and PG students at University of Delhi. Apart from his academic commitments, Dr. Goel has actively participated in various conferences and seminars, where he shares his expertise and insights with the broader academic community. Educati",
     "education": [
@@ -681,20 +747,23 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-989-198-9391"
+    "type": "permanent"
   },
   {
     "id": "saumya-jain-m-com",
     "name": "Saumya Jain",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Assistant Professor",
+    "department": "Department of Computer Science",
+    "qualification": "Ph.D.",
     "room": "Room No. 238, Baltic Sea",
     "email": "saumyajain@sscbsdu.ac.in",
+    "phone": "+91-844-746-2648",
     "expertise": [
       "Accountancy",
       "Taxation and Law"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2022/04/IMG-3018-700x450.jpg",
+    "photoUrl": "/faculty/saumya-jain-m-com.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/saumya-jain-m-com/",
     "biography": "Saumya Jain holds the distinction of being the Delhi University Gold medalist in both undergraduate and postgraduate examinations. An alumna of Shri Ram College of Commerce, she started her teaching career at Shaheed Bhagat Singh College and later joined Shri Ram College of Commerce. She has been the recipient of the prestigious Posco Asia Fellowship for academic excellence at the college level and was awarded the R.L Gupta medal for highest marks in Advanced Accountancy at the undergraduate level. Her Ph.D is in the area of accounting standards specifically the impact of IFRS in the Indian context. Her areas of interest include Accounting and Statistics. Her research papers in the field of accounting standards, financial literacy, Corporate Social Responsibility & law have been published in reputed national and international journals",
     "education": [
@@ -710,20 +779,23 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-844-746-2648"
+    "type": "permanent"
   },
   {
     "id": "shalini-prakash-m-phil",
     "name": "Shalini Prakash",
-    "qualification": "M.Phil.",
+    "prefix": "Dr.",
     "designation": "Associate Professor",
+    "department": "Department of Financial Studies",
+    "qualification": "M.Phil.",
     "room": "Room No. 535, Sea of Cortez",
     "email": "shaliniprakash@sscbsdu.ac.in",
+    "phone": "+91-987-342-4231",
     "expertise": [
       "Choice theory",
       "Econometrics"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/DSC_0312-scaled-1-700x660.jpg",
+    "photoUrl": "/faculty/shalini-prakash-m-phil.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/shalini-prakash-m-phil/",
     "biography": "Economics is a social science that studies the production, distribution and consumption of goods and services. Microeconomics studies the behavior of individual and firms in making decisions regarding the allocation of scarce resources. Macroeconomics deals with the performance, structure, behavior and decision making of an economy as a whole. Shalini has teaching experience of over three decades. Her areas of specialization include Choice theory and Econometrics.   Currently, Shalini teaches the fundamentals of Microeconomics and Macroeconomics to students of BMS and BBA(FIA). She trains the students on practical application of theoretical concepts",
     "education": [
@@ -739,15 +811,18 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-987-342-4231"
+    "type": "permanent"
   },
   {
     "id": "dr-shikha-gupta-ph-d",
     "name": "Shikha Gupta",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Professor",
+    "department": "Department of Computer Science",
+    "qualification": "Ph.D.",
     "room": "Room No. 356, Caribbean Sea",
     "email": "shikhagupta@sscbsdu.ac.in",
+    "phone": "6555152311",
     "expertise": [
       "Bibliometric Analysis",
       "Social Network Analysis",
@@ -759,7 +834,7 @@
       "Teaching Pedagogy",
       "Bioinformatics"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/image-1-2-600x705.png",
+    "photoUrl": "/faculty/dr-shikha-gupta-ph-d.png",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/dr-shikha-gupta-ph-d/",
     "biography": "Dr. Shikha Gupta started her career in 1997 with HCL-Technologies and subsequently worked as a software analyst with XRT-CERG, Inc., USA. Teaching in SSCBS since 2001, she is currently working as Professor, Computer Science. She is a member of Skill Enhancement Council of University of Delhi under New",
     "education": [
@@ -775,19 +850,22 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "6555152311"
+    "type": "permanent"
   },
   {
     "id": "dr-sonika-thakral-ph-d",
     "name": "Sonika Thakral",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Associate Professor",
+    "department": "Department of Computer Science",
+    "qualification": "Ph.D.",
     "room": "Room No. 436, East China Sea",
     "email": "sonika@sscbsdu.ac.in",
+    "phone": "+91-987-303-3306",
     "expertise": [
       "Theoretical Computer Science"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/03/Sonika_pic_2023.jpg",
+    "photoUrl": "/faculty/dr-sonika-thakral-ph-d.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/dr-sonika-thakral-ph-d/",
     "biography": "Dr. Sonika is an Associate Professor at the Department of Computer Science,",
     "education": [
@@ -803,21 +881,24 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-987-303-3306"
+    "type": "permanent"
   },
   {
     "id": "dr-sushmita-ph-d",
     "name": "Sushmita",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Associate Professor",
+    "department": "Department of Financial Studies",
+    "qualification": "Ph.D.",
     "room": "Room No. 466, English Channel",
     "email": "sushmita.bhu@sscbsdu.ac.in",
+    "phone": "+91-801-024-6687",
     "expertise": [
       "Public Policy",
       "Infrastructural Macroeconomics",
       "West Asia"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/DSC_0329-700x660.jpg",
+    "photoUrl": "/faculty/dr-sushmita-ph-d.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/dr-sushmita-ph-d/",
     "biography": "Dr. Sushmita is Assistant Professor of Economics at Dept of Management Studies,",
     "education": [
@@ -833,20 +914,23 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-801-024-6687"
+    "type": "permanent"
   },
   {
     "id": "dr-tarannum-ahmad-ph-d",
     "name": "Tarannum Ahmad",
-    "qualification": "Ph.D.",
+    "prefix": "Dr.",
     "designation": "Associate Professor",
+    "department": "Department of Computer Science",
+    "qualification": "Ph.D.",
     "room": "Room No. 339, Beaufort Sea",
     "email": "tarannumahmad@sscbsdu.ac.in",
+    "phone": "+91-981-114-7285",
     "expertise": [
       "Organizational behavior",
       "Human resource management"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/DSC_0284-700x660.jpg",
+    "photoUrl": "/faculty/dr-tarannum-ahmad-ph-d.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/dr-tarannum-ahmad-ph-d/",
     "biography": "Dr Tarannum Ahmad has over 29 years of teaching experience. She holds PhD in Organisational Behaviour from Delhi University.She has done her master in Business Economics from Delhi University and Bachelors in Economics from St Stephen’s college.Her area of specialisation is Human Resource Management and Organisational Behaviour. Her research work includes “Transactional Analysis and Managerial Leadership Styles: An Empirical study.” Currently, she is member of IQAC,Grievance Redressal committee, Disciplinary committee and Internal Assessment Monitoring committee.She is also teacher in charge Fourthwall dramatics society ,Verve street play society and Annual report of the college. She is actively involved in Delhi theatre groups.",
     "education": [
@@ -862,15 +946,18 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-981-114-7285"
+    "type": "permanent"
   },
   {
     "id": "tushar-marwaha-mba",
     "name": "Tushar Marwaha",
-    "qualification": "MBA",
+    "prefix": "Dr.",
     "designation": "Assistant Professor",
+    "department": "Department of Computer Science",
+    "qualification": "MBA",
     "room": "Room details upon request",
     "email": "tusharmarwaha@sscbsdu.ac.in",
+    "phone": "+91-987-137-1441",
     "expertise": [
       "Corporate Strategies",
       "West Asian Region",
@@ -878,7 +965,7 @@
       "Bottom of the Pyramid",
       "List of"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2020/04/DSC_0195-700x660.jpg",
+    "photoUrl": "/faculty/tushar-marwaha-mba.jpg",
     "profileUrl": "https://sscbs.du.ac.in/portfolio/tushar-marwaha-mba/",
     "biography": "Tushar Marwaha is an Assistant Professor at",
     "education": [
@@ -894,395 +981,984 @@
       "Incubation Centre",
       "Our Vision and Mission"
     ],
-    "phone": "+91-987-137-1441"
+    "type": "permanent"
   },
   {
-    "id": "dr-ajay-kumar-guest",
-    "name": "Dr. Ajay Kumar",
-    "qualification": "Ph.D. (Delhi Technological University)",
+    "id": "guest-ajay-kumar",
+    "name": "Ajay Kumar",
+    "prefix": "Dr.",
     "designation": "Guest Faculty",
-    "room": "Guest Faculty Office",
+    "department": "Department of Management Studies",
+    "qualification": "Ph.D. (Delhi Technological University)",
+    "room": "Guest Faculty Room / CBS",
     "email": "ajaykumar@sscbs.du.ac.in",
     "phone": null,
     "expertise": [
-      "Computer Science",
-      "Technical Applications"
+      "Management Studies"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2024/11/Dr.-Ajay-Kumar-236x300.jpg",
+    "photoUrl": "/faculty/dr-ajay-kumar-guest.jpg",
     "profileUrl": "https://sscbs.du.ac.in/guest-faculties/",
-    "biography": "Dr. Ajay Kumar is a Guest Faculty at SSCBS. He holds a Ph.D. from Delhi Technological University.",
+    "biography": "Dr. Ajay Kumar is a Guest Faculty in the Department of Management Studies at Shaheed Sukhdev College of Business Studies, University of Delhi. Qualification: Ph.D. (Delhi Technological University).",
     "education": [
-      "Ph.D. from Delhi Technological University (DTU)"
+      "Ph.D. (Delhi Technological University)"
     ],
-    "publications": []
+    "publications": [],
+    "type": "guest"
   },
   {
-    "id": "dr-ankita-arora-guest",
-    "name": "Dr. Ankita Arora",
-    "qualification": "Ph.D (CIL) MIL&LS, Delhi University",
+    "id": "guest-ankita-arora",
+    "name": "Ankita Arora",
+    "prefix": "Dr.",
     "designation": "Guest Faculty",
-    "room": "Guest Faculty Office",
+    "department": "Department of Management Studies",
+    "qualification": "Ph.D (CIL) awarded from dept. of MIL&amp;LS, Delhi University",
+    "room": "Guest Faculty Room / CBS",
     "email": "ankita@sscbs.du.ac.in",
     "phone": null,
     "expertise": [
-      "Modern Indian Languages",
-      "Literary Studies"
+      "Management Studies"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2024/11/Ankita_Photo_180315-233x300.jpg",
+    "photoUrl": "/faculty/dr-ankita-arora-guest.jpg",
     "profileUrl": "https://sscbs.du.ac.in/guest-faculties/",
-    "biography": "Dr. Ankita Arora is a Guest Faculty at SSCBS. She was awarded her Ph.D. from the Department of MIL & LS, University of Delhi.",
+    "biography": "Dr. Ankita Arora is a Guest Faculty in the Department of Management Studies at Shaheed Sukhdev College of Business Studies, University of Delhi. Qualification: Ph.D (CIL) awarded from dept. of MIL&amp;LS, Delhi University.",
     "education": [
-      "Ph.D. (CIL), Department of MIL & LS, University of Delhi"
+      "Ph.D (CIL) awarded from dept. of MIL&amp;LS, Delhi University"
     ],
-    "publications": []
+    "publications": [],
+    "type": "guest"
   },
   {
-    "id": "dr-ashima-gaba-guest",
-    "name": "Dr. Ashima Gaba",
-    "qualification": "Ph.D. in Finance (Jamia Millia Islamia)",
+    "id": "guest-ashima-gaba",
+    "name": "Ashima Gaba",
+    "prefix": "Dr.",
     "designation": "Guest Faculty",
-    "room": "Guest Faculty Office",
+    "department": "Department of Financial Studies",
+    "qualification": "Ph.D. in Finance from Jamia Millia Islamia",
+    "room": "Guest Faculty Room / CBS",
     "email": "ashimagaba@sscbs.du.ac.in",
     "phone": null,
     "expertise": [
-      "Finance",
-      "Corporate Finance",
-      "Financial Markets"
+      "Financial Studies"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2024/11/Aashima-Gaba-233x300.jpg",
+    "photoUrl": "/faculty/dr-ashima-gaba-guest.jpg",
     "profileUrl": "https://sscbs.du.ac.in/guest-faculties/",
-    "biography": "Dr. Ashima Gaba serves as Guest Faculty at SSCBS specializing in Finance.",
+    "biography": "Dr. Ashima Gaba is a Guest Faculty in the Department of Financial Studies at Shaheed Sukhdev College of Business Studies, University of Delhi. Qualification: Ph.D. in Finance from Jamia Millia Islamia.",
     "education": [
       "Ph.D. in Finance from Jamia Millia Islamia"
     ],
-    "publications": []
+    "publications": [],
+    "type": "guest"
   },
   {
-    "id": "dr-ayushi-gupta-guest",
-    "name": "Dr. Ayushi Gupta",
-    "qualification": "Ph.D. (Ongoing) GGSIPU, New Delhi",
+    "id": "guest-ayushi-gupta",
+    "name": "Ayushi Gupta",
+    "prefix": "Dr.",
     "designation": "Guest Faculty",
-    "room": "Guest Faculty Office",
+    "department": "Department of Computer Science",
+    "qualification": "Ph.D. (Ongoing) in the area of Inter of Things, Machine Learning and Data Science from USIC&amp;T, GGSIPU, New Delhi.",
+    "room": "Guest Faculty Room / CBS",
     "email": "ayushigupta@sscbs.du.ac.in",
     "phone": null,
     "expertise": [
-      "Internet of Things (IoT)",
-      "Machine Learning",
-      "Data Science"
+      "Computer Science"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2024/09/IMG_5347.jpg",
+    "photoUrl": "/faculty/dr-ayushi-gupta-guest.jpg",
     "profileUrl": "https://sscbs.du.ac.in/guest-faculties/",
-    "biography": "Dr. Ayushi Gupta is a Guest Faculty at SSCBS researching Internet of Things, Machine Learning, and Data Science.",
+    "biography": "Dr. Ayushi Gupta is a Guest Faculty in the Department of Computer Science at Shaheed Sukhdev College of Business Studies, University of Delhi. Qualification: Ph.D. (Ongoing) in the area of Inter of Things, Machine Learning and Data Science from USIC&amp;T, GGSIPU, New Delhi..",
     "education": [
-      "Ph.D. (Ongoing), USIC&T, GGSIPU, New Delhi"
+      "Ph.D. (Ongoing) in the area of Inter of Things, Machine Learning and Data Science from USIC&amp;T, GGSIPU, New Delhi."
     ],
-    "publications": []
+    "publications": [],
+    "type": "guest"
   },
   {
-    "id": "dr-deepali-dhaka-guest",
-    "name": "Dr. Deepali Dhaka",
-    "qualification": "Ph.D. in Computer Science (Jamia Millia Islamia)",
+    "id": "guest-deepali-dhaka",
+    "name": "Deepali Dhaka",
+    "prefix": "Dr.",
     "designation": "Guest Faculty",
-    "room": "Guest Faculty Office",
+    "department": "Department of Computer Science",
+    "qualification": "Phd in computer science from Jamia Millia Islamia Delhi",
+    "room": "Guest Faculty Room / CBS",
     "email": "deepali@sscbs.du.ac.in",
     "phone": null,
     "expertise": [
-      "Computer Science",
-      "Algorithms",
-      "Software Engineering"
+      "Computer Science"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2024/09/PHOTO-2024-08-27-10-59-44-240x300.jpg",
+    "photoUrl": "/faculty/dr-deepali-dhaka-guest.jpg",
     "profileUrl": "https://sscbs.du.ac.in/guest-faculties/",
-    "biography": "Dr. Deepali Dhaka is a Guest Faculty at SSCBS specializing in Computer Science.",
+    "biography": "Dr. Deepali Dhaka is a Guest Faculty in the Department of Computer Science at Shaheed Sukhdev College of Business Studies, University of Delhi. Qualification: Phd in computer science from Jamia Millia Islamia Delhi.",
     "education": [
-      "Ph.D. in Computer Science from Jamia Millia Islamia, Delhi"
+      "Phd in computer science from Jamia Millia Islamia Delhi"
     ],
-    "publications": []
+    "publications": [],
+    "type": "guest"
   },
   {
-    "id": "ms-divya-jain-guest",
-    "name": "Ms. Divya Jain",
-    "qualification": "Ph.D. (Pursuing), M.Phil.",
+    "id": "guest-divya-jain",
+    "name": "Divya Jain",
+    "prefix": "Ms.",
     "designation": "Guest Faculty",
-    "room": "Guest Faculty Office",
+    "department": "Department of Management Studies",
+    "qualification": "Ph.D.(pursuing), M.Phil.",
+    "room": "Guest Faculty Room / CBS",
     "email": "divyajain@sscbs.du.ac.in",
     "phone": null,
     "expertise": [
-      "Management Studies",
-      "Business Analytics"
+      "Management Studies"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2024/11/Divya-Jain-233x300.jpg",
+    "photoUrl": "/faculty/ms-divya-jain-guest.jpg",
     "profileUrl": "https://sscbs.du.ac.in/guest-faculties/",
-    "biography": "Ms. Divya Jain serves as a Guest Faculty at SSCBS.",
+    "biography": "Ms. Divya Jain is a Guest Faculty in the Department of Management Studies at Shaheed Sukhdev College of Business Studies, University of Delhi. Qualification: Ph.D.(pursuing), M.Phil..",
     "education": [
-      "M.Phil.",
-      "Ph.D. (Pursuing)"
+      "Ph.D.(pursuing), M.Phil."
     ],
-    "publications": []
+    "publications": [],
+    "type": "guest"
   },
   {
-    "id": "ms-divya-seth-guest",
-    "name": "Ms. Divya Seth",
-    "qualification": "M.A. Economics (Jamia Millia Islamia)",
+    "id": "guest-divya-seth",
+    "name": "Divya Seth",
+    "prefix": "Ms.",
     "designation": "Guest Faculty",
-    "room": "Guest Faculty Office",
+    "department": "Department of Financial Studies",
+    "qualification": "M.A. Economics from Jamia Millia Islamia",
+    "room": "Guest Faculty Room / CBS",
     "email": "divyaseth@sscbs.du.ac.in",
     "phone": null,
     "expertise": [
-      "Economics",
-      "Microeconomics",
-      "Macroeconomics"
+      "Financial Studies"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2024/11/Divya-300x300.webp",
+    "photoUrl": "/faculty/ms-divya-seth-guest.webp",
     "profileUrl": "https://sscbs.du.ac.in/guest-faculties/",
-    "biography": "Ms. Divya Seth is a Guest Faculty in Economics at SSCBS.",
+    "biography": "Ms. Divya Seth is a Guest Faculty in the Department of Financial Studies at Shaheed Sukhdev College of Business Studies, University of Delhi. Qualification: M.A. Economics from Jamia Millia Islamia.",
     "education": [
       "M.A. Economics from Jamia Millia Islamia"
     ],
-    "publications": []
+    "publications": [],
+    "type": "guest"
   },
   {
-    "id": "dr-guncha-sharma-guest",
-    "name": "Dr. Guncha Sharma",
-    "qualification": "Ph.D. (University of Delhi)",
+    "id": "guest-guncha-sharma",
+    "name": "Guncha Sharma",
+    "prefix": "Dr.",
     "designation": "Guest Faculty",
-    "room": "Guest Faculty Office",
+    "department": "Department of Environmental Studies",
+    "qualification": "Ph.D. from the Department of Environmental Studies, University of Delhi,",
+    "room": "Guest Faculty Room / CBS",
     "email": "guncha@sscbs.du.ac.in",
     "phone": null,
     "expertise": [
-      "Environmental Studies",
-      "Sustainability"
+      "Environmental Studies"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2024/11/GUNCHA-SHARMA-PHOTOGRAPH-264x300.jpg",
+    "photoUrl": "/faculty/dr-guncha-sharma-guest.jpg",
     "profileUrl": "https://sscbs.du.ac.in/guest-faculties/",
-    "biography": "Dr. Guncha Sharma serves as Guest Faculty at SSCBS in Environmental Studies.",
+    "biography": "Dr. Guncha Sharma is a Guest Faculty in the Department of Environmental Studies at Shaheed Sukhdev College of Business Studies, University of Delhi. Qualification: Ph.D. from the Department of Environmental Studies, University of Delhi,.",
     "education": [
-      "Ph.D. from Department of Environmental Studies, University of Delhi"
+      "Ph.D. from the Department of Environmental Studies, University of Delhi,"
     ],
-    "publications": []
+    "publications": [],
+    "type": "guest"
   },
   {
-    "id": "ms-kajol-guest",
-    "name": "Ms. Kajol",
-    "qualification": "M.Com (SOL, University of Delhi)",
+    "id": "guest-kajol",
+    "name": "Kajol",
+    "prefix": "Ms.",
     "designation": "Guest Faculty",
-    "room": "Guest Faculty Office",
+    "department": "Department of Financial Studies",
+    "qualification": "M.com from School of Open Learning, University of Delhi",
+    "room": "Guest Faculty Room / CBS",
     "email": "kajol@sscbs.du.ac.in",
     "phone": null,
     "expertise": [
-      "Commerce",
-      "Accounting"
+      "Financial Studies"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2024/11/KAJOL-PHOTO-250x300.jpg",
+    "photoUrl": "/faculty/ms-kajol-guest.jpg",
     "profileUrl": "https://sscbs.du.ac.in/guest-faculties/",
-    "biography": "Ms. Kajol is a Guest Faculty in Commerce at SSCBS.",
+    "biography": "Ms. Kajol is a Guest Faculty in the Department of Financial Studies at Shaheed Sukhdev College of Business Studies, University of Delhi. Qualification: M.com from School of Open Learning, University of Delhi.",
     "education": [
-      "M.Com from School of Open Learning, University of Delhi"
+      "M.com from School of Open Learning, University of Delhi"
     ],
-    "publications": []
+    "publications": [],
+    "type": "guest"
   },
   {
-    "id": "dr-monika-khemani-guest",
-    "name": "Dr. Monika Khemani",
-    "qualification": "Ph.D.",
+    "id": "guest-monika-khemani",
+    "name": "Monika Khemani",
+    "prefix": "Dr.",
     "designation": "Guest Faculty",
-    "room": "Guest Faculty Office",
+    "department": "Department of Management Studies",
+    "qualification": "Ph.D",
+    "room": "Guest Faculty Room / CBS",
     "email": "monikakhemani@sscbs.du.ac.in",
     "phone": null,
     "expertise": [
-      "Management Studies",
-      "Organizational Behavior"
+      "Management Studies"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2024/11/DR.MONIKA_KHEMANI_PIC-236x300.jpeg",
+    "photoUrl": "/faculty/dr-monika-khemani-guest.jpeg",
     "profileUrl": "https://sscbs.du.ac.in/guest-faculties/",
-    "biography": "Dr. Monika Khemani is a Guest Faculty at SSCBS.",
+    "biography": "Dr. Monika Khemani is a Guest Faculty in the Department of Management Studies at Shaheed Sukhdev College of Business Studies, University of Delhi. Qualification: Ph.D.",
     "education": [
-      "Ph.D."
+      "Ph.D"
     ],
-    "publications": []
+    "publications": [],
+    "type": "guest"
   },
   {
-    "id": "ms-palak-baghla-guest",
-    "name": "Ms. Palak Baghla",
-    "qualification": "M.A. Economics (Panjab University)",
+    "id": "guest-palak-baghla",
+    "name": "Palak Baghla",
+    "prefix": "Ms.",
     "designation": "Guest Faculty",
-    "room": "Guest Faculty Office",
+    "department": "Department of Financial Studies",
+    "qualification": "M.A. Economics from Panjab University",
+    "room": "Guest Faculty Room / CBS",
     "email": "palak@sscbs.du.ac.in",
     "phone": null,
     "expertise": [
-      "Economics",
-      "Econometrics"
+      "Financial Studies"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2024/11/PIC-64kb-231x300.jpg",
+    "photoUrl": "/faculty/ms-palak-baghla-guest.jpg",
     "profileUrl": "https://sscbs.du.ac.in/guest-faculties/",
-    "biography": "Ms. Palak Baghla is a Guest Faculty in Economics at SSCBS.",
+    "biography": "Ms. Palak Baghla is a Guest Faculty in the Department of Financial Studies at Shaheed Sukhdev College of Business Studies, University of Delhi. Qualification: M.A. Economics from Panjab University.",
     "education": [
       "M.A. Economics from Panjab University"
     ],
-    "publications": []
+    "publications": [],
+    "type": "guest"
   },
   {
-    "id": "ms-priyanka-guest",
-    "name": "Ms. Priyanka",
-    "qualification": "M.Tech (IT)",
+    "id": "guest-priyanka",
+    "name": "Priyanka",
+    "prefix": "Ms.",
     "designation": "Guest Faculty",
-    "room": "Guest Faculty Office",
+    "department": "Department of Computer Science",
+    "qualification": "M.Tech(IT)",
+    "room": "Guest Faculty Room / CBS",
     "email": "priyanka@sscbs.du.ac.in",
     "phone": null,
     "expertise": [
-      "Information Technology",
-      "Software Engineering"
+      "Computer Science"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2024/11/Priyanka.png",
+    "photoUrl": "/faculty/ms-priyanka-guest.png",
     "profileUrl": "https://sscbs.du.ac.in/guest-faculties/",
-    "biography": "Ms. Priyanka is a Guest Faculty in Information Technology at SSCBS.",
+    "biography": "Ms. Priyanka is a Guest Faculty in the Department of Computer Science at Shaheed Sukhdev College of Business Studies, University of Delhi. Qualification: M.Tech(IT).",
     "education": [
-      "M.Tech in Information Technology"
+      "M.Tech(IT)"
     ],
-    "publications": []
+    "publications": [],
+    "type": "guest"
   },
   {
-    "id": "dr-rama-bansal-guest",
-    "name": "Dr. Rama Bansal",
-    "qualification": "Ph.D. in Computer Science",
+    "id": "guest-rama-bansal",
+    "name": "Rama Bansal",
+    "prefix": "Dr.",
     "designation": "Guest Faculty",
-    "room": "Guest Faculty Office",
+    "department": "Department of Computer Science",
+    "qualification": "Ph.D. in Computer Science, Jagannath University, Haryana",
+    "room": "Guest Faculty Room / CBS",
     "email": "ramabansal@sscbs.du.ac.in",
     "phone": null,
     "expertise": [
-      "Computer Science",
-      "Data Structures"
+      "Computer Science"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2024/11/rama-200x300.jpg",
+    "photoUrl": "/faculty/dr-rama-bansal-guest.jpg",
     "profileUrl": "https://sscbs.du.ac.in/guest-faculties/",
-    "biography": "Dr. Rama Bansal is a Guest Faculty in Computer Science at SSCBS.",
+    "biography": "Dr. Rama Bansal is a Guest Faculty in the Department of Computer Science at Shaheed Sukhdev College of Business Studies, University of Delhi. Qualification: Ph.D. in Computer Science, Jagannath University, Haryana.",
     "education": [
       "Ph.D. in Computer Science, Jagannath University, Haryana"
     ],
-    "publications": []
+    "publications": [],
+    "type": "guest"
   },
   {
-    "id": "ms-ruchi-singhal-guest",
-    "name": "Ms. Ruchi Singhal",
-    "qualification": "MCA (GGSIPU)",
+    "id": "guest-ruchi-singhal",
+    "name": "Ruchi Singhal",
+    "prefix": "Ms.",
     "designation": "Guest Faculty",
-    "room": "Guest Faculty Office",
+    "department": "Department of Computer Science",
+    "qualification": "MCA from GGSIPU",
+    "room": "Guest Faculty Room / CBS",
     "email": "ruchisinghal@sscbs.du.ac.in",
     "phone": null,
     "expertise": [
-      "Computer Applications",
-      "Web Development"
+      "Computer Science"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2024/11/Ruchi-Singhal.jpg",
+    "photoUrl": "/faculty/ms-ruchi-singhal-guest.jpg",
     "profileUrl": "https://sscbs.du.ac.in/guest-faculties/",
-    "biography": "Ms. Ruchi Singhal is a Guest Faculty in Computer Applications at SSCBS.",
+    "biography": "Ms. Ruchi Singhal is a Guest Faculty in the Department of Computer Science at Shaheed Sukhdev College of Business Studies, University of Delhi. Qualification: MCA from GGSIPU.",
     "education": [
-      "Master of Computer Applications (MCA), GGSIPU"
+      "MCA from GGSIPU"
     ],
-    "publications": []
+    "publications": [],
+    "type": "guest"
   },
   {
-    "id": "dr-saima-guest",
-    "name": "Dr. Saima",
-    "qualification": "Ph.D (Marketing) Jamia Millia Islamia",
+    "id": "guest-saima",
+    "name": "Saima",
+    "prefix": "Dr.",
     "designation": "Guest Faculty",
-    "room": "Guest Faculty Office",
+    "department": "Department of Management Studies",
+    "qualification": "Ph.D (Marketing) from Jamia Millia Islamia",
+    "room": "Guest Faculty Room / CBS",
     "email": "saima@sscbs.du.ac.in",
     "phone": null,
     "expertise": [
-      "Marketing",
-      "Consumer Behavior"
+      "Management Studies"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2024/11/IMG_20240905_194320-225x300.jpg",
+    "photoUrl": "/faculty/dr-saima-guest.jpg",
     "profileUrl": "https://sscbs.du.ac.in/guest-faculties/",
-    "biography": "Dr. Saima is a Guest Faculty specializing in Marketing at SSCBS.",
+    "biography": "Dr. Saima is a Guest Faculty in the Department of Management Studies at Shaheed Sukhdev College of Business Studies, University of Delhi. Qualification: Ph.D (Marketing) from Jamia Millia Islamia.",
     "education": [
-      "Ph.D. in Marketing from Jamia Millia Islamia"
+      "Ph.D (Marketing) from Jamia Millia Islamia"
     ],
-    "publications": []
+    "publications": [],
+    "type": "guest"
   },
   {
-    "id": "dr-shevata-sehgal-marwah-guest",
-    "name": "Dr. Shevata Sehgal Marwah",
-    "qualification": "Ph.D in Marketing (University of Delhi)",
+    "id": "guest-dr-shevata-sehgal-marwah",
+    "name": "Dr Shevata Sehgal Marwah",
+    "prefix": "Ms.",
     "designation": "Guest Faculty",
-    "room": "Guest Faculty Office",
+    "department": "Department of Management Studies",
+    "qualification": "PHD in marketing from Department of Commerce, University of Delhi",
+    "room": "Guest Faculty Room / CBS",
     "email": "shevata@sscbs.du.ac.in",
     "phone": null,
     "expertise": [
-      "Marketing Management",
-      "Brand Strategy"
+      "Management Studies"
     ],
     "photoUrl": null,
     "profileUrl": "https://sscbs.du.ac.in/guest-faculties/",
-    "biography": "Dr. Shevata Sehgal Marwah is a Guest Faculty in Marketing at SSCBS.",
+    "biography": "Dr Shevata Sehgal Marwah is a Guest Faculty in the Department of Management Studies at Shaheed Sukhdev College of Business Studies, University of Delhi. Qualification: PHD in marketing from Department of Commerce, University of Delhi.",
     "education": [
-      "Ph.D. in Marketing, Department of Commerce, University of Delhi"
+      "PHD in marketing from Department of Commerce, University of Delhi"
     ],
-    "publications": []
+    "publications": [],
+    "type": "guest"
   },
   {
-    "id": "dr-shiva-kapoor-guest",
-    "name": "Dr. Shiva Kapoor",
-    "qualification": "Ph.D. in Optimization (University of Delhi)",
+    "id": "guest-shiva-kapoor",
+    "name": "Shiva Kapoor",
+    "prefix": "Dr.",
     "designation": "Guest Faculty",
-    "room": "Guest Faculty Office",
+    "department": "Department of Operational Research / Mathematics",
+    "qualification": "Ph.D. in Optimization from Department of Mathematics, University of Delhi",
+    "room": "Guest Faculty Room / CBS",
     "email": "shiva@sscbs.du.ac.in",
     "phone": null,
     "expertise": [
-      "Optimization",
-      "Mathematics",
-      "Operations Research"
+      "Operational Research / Mathematics"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2024/11/Photo-239x300.jpeg",
+    "photoUrl": "/faculty/dr-shiva-kapoor-guest.jpeg",
     "profileUrl": "https://sscbs.du.ac.in/guest-faculties/",
-    "biography": "Dr. Shiva Kapoor is a Guest Faculty in Mathematics and Optimization at SSCBS.",
+    "biography": "Dr. Shiva Kapoor is a Guest Faculty in the Department of Operational Research / Mathematics at Shaheed Sukhdev College of Business Studies, University of Delhi. Qualification: Ph.D. in Optimization from Department of Mathematics, University of Delhi.",
     "education": [
       "Ph.D. in Optimization from Department of Mathematics, University of Delhi"
     ],
-    "publications": []
+    "publications": [],
+    "type": "guest"
   },
   {
-    "id": "dr-simple-arora-guest",
-    "name": "Dr. Simple Arora",
-    "qualification": "Ph.D.",
+    "id": "guest-simple-arora",
+    "name": "Simple Arora",
+    "prefix": "Dr.",
     "designation": "Guest Faculty",
-    "room": "Guest Faculty Office",
+    "department": "Department of Management Studies",
+    "qualification": "Ph.D.",
+    "room": "Guest Faculty Room / CBS",
     "email": "simplearora@sscbs.du.ac.in",
     "phone": null,
     "expertise": [
       "Management Studies"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2024/11/IMG-20240903-WA0000-187x300.jpg",
+    "photoUrl": "/faculty/dr-simple-arora-guest.jpg",
     "profileUrl": "https://sscbs.du.ac.in/guest-faculties/",
-    "biography": "Dr. Simple Arora is a Guest Faculty at SSCBS.",
+    "biography": "Dr. Simple Arora is a Guest Faculty in the Department of Management Studies at Shaheed Sukhdev College of Business Studies, University of Delhi. Qualification: Ph.D..",
     "education": [
       "Ph.D."
     ],
-    "publications": []
+    "publications": [],
+    "type": "guest"
   },
   {
-    "id": "mr-vineet-kumar-guest",
-    "name": "Mr. Vineet Kumar",
-    "qualification": "M.Sc (Electronics), MBA, LLB, Research Scholar",
+    "id": "guest-vineet-kumar",
+    "name": "Vineet Kumar",
+    "prefix": "Mr.",
     "designation": "Guest Faculty",
-    "room": "Guest Faculty Office",
+    "department": "Department of Financial Studies",
+    "qualification": "M.SC (Electronics), MBA ( Marketing &amp; Finance), LLB, Research Scholar in Business Management",
+    "room": "Guest Faculty Room / CBS",
     "email": "vineet@sscbs.du.ac.in",
     "phone": null,
     "expertise": [
-      "Electronics",
-      "Marketing & Finance",
-      "Business Law"
+      "Financial Studies"
     ],
-    "photoUrl": "https://sscbs.du.ac.in/wp-content/uploads/2024/11/Photo-3-235x300.jpg",
+    "photoUrl": "/faculty/mr-vineet-kumar-guest.jpg",
     "profileUrl": "https://sscbs.du.ac.in/guest-faculties/",
-    "biography": "Mr. Vineet Kumar is a Guest Faculty at SSCBS with qualifications in Electronics, MBA (Marketing & Finance), LLB, and Business Management.",
+    "biography": "Mr. Vineet Kumar is a Guest Faculty in the Department of Financial Studies at Shaheed Sukhdev College of Business Studies, University of Delhi. Qualification: M.SC (Electronics), MBA ( Marketing &amp; Finance), LLB, Research Scholar in Business Management.",
     "education": [
-      "M.Sc. (Electronics)",
-      "MBA (Marketing & Finance)",
-      "LLB",
-      "Research Scholar in Business Management"
+      "M.SC (Electronics), MBA ( Marketing &amp; Finance), LLB, Research Scholar in Business Management"
     ],
-    "publications": []
+    "publications": [],
+    "type": "guest"
+  },
+  {
+    "id": "visiting-anamika-agarwal",
+    "name": "Anamika Agarwal",
+    "prefix": "Dr.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Management Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Management Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Dr. Anamika Agarwal is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-satish-kumar-garg",
+    "name": "Satish Kumar Garg",
+    "prefix": "Dr.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Computer Science",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Computer Science"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Dr. Satish Kumar Garg is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-praveen-sk",
+    "name": "Praveen SK",
+    "prefix": "Mr.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Financial Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Financial Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Mr. Praveen SK is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-neha-sharma",
+    "name": "Neha Sharma",
+    "prefix": "Dr.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Computer Science",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Computer Science"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Dr. Neha Sharma is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-mehak-aggarwal",
+    "name": "Mehak Aggarwal",
+    "prefix": "Dr.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Financial Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Financial Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Dr. Mehak Aggarwal is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-mogana-neelkandan",
+    "name": "Mogana Neelkandan",
+    "prefix": "Ms.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Financial Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Financial Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Mogana Neelkandan is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-nidhi-seth",
+    "name": "Nidhi Seth",
+    "prefix": "Ms.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Management Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Management Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Nidhi Seth is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-pushkar-gole",
+    "name": "Pushkar Gole",
+    "prefix": "Ms.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Financial Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Financial Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Pushkar Gole is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-azmi-ahmad",
+    "name": "Azmi Ahmad",
+    "prefix": "Dr.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Management Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Management Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Dr. Azmi Ahmad is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-komal-sharma",
+    "name": "Komal Sharma",
+    "prefix": "Ms.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Management Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Management Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Komal Sharma is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-garima-tripathi",
+    "name": "Garima Tripathi",
+    "prefix": "Dr.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Management Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Management Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Dr. Garima Tripathi is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-soumya-guliyan",
+    "name": "Soumya Guliyan",
+    "prefix": "Dr.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Management Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Management Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Dr. Soumya Guliyan is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-vinayak-gautam",
+    "name": "Vinayak Gautam",
+    "prefix": "Ms.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Computer Science",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Computer Science"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Vinayak Gautam is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-nisha-rajput",
+    "name": "Nisha Rajput",
+    "prefix": "Ms.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Management Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Management Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Ms. Nisha Rajput is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-vipin-patel",
+    "name": "Vipin Patel",
+    "prefix": "Mr.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Management Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Management Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Mr. Vipin Patel is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-ishan-jain",
+    "name": "Ishan Jain",
+    "prefix": "Ms.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Computer Science",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Computer Science"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Ishan Jain is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-seema",
+    "name": "Seema",
+    "prefix": "Dr.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Management Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Management Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Dr. Seema is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-shikha-verma",
+    "name": "Shikha Verma",
+    "prefix": "Ms.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Financial Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Financial Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Shikha Verma is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-shipra-varshney",
+    "name": "Shipra Varshney",
+    "prefix": "Ms.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Management Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Management Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Ms. Shipra Varshney is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-sanchi-kalra",
+    "name": "Sanchi Kalra",
+    "prefix": "Ms.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Management Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Management Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Ms. Sanchi Kalra is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-ayesha-s-ansari",
+    "name": "Ayesha S. Ansari",
+    "prefix": "Ms.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Management Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Management Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Ms. Ayesha S. Ansari is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-monu",
+    "name": "Monu",
+    "prefix": "Dr.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Management Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Management Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Dr. Monu is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-ritika",
+    "name": "Ritika",
+    "prefix": "Ms.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Management Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Management Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Ritika is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-bhavya",
+    "name": "Bhavya",
+    "prefix": "Ms.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Management Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Management Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Bhavya is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-twinkle",
+    "name": "Twinkle",
+    "prefix": "Ms.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Management Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Management Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Twinkle is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-rohan-gulati",
+    "name": "Rohan Gulati",
+    "prefix": "Mr.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Management Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Management Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Mr. Rohan Gulati is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-tatkarsh",
+    "name": "Tatkarsh",
+    "prefix": "Mr.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Management Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Management Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Mr. Tatkarsh is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
+  },
+  {
+    "id": "visiting-gautam-sharma",
+    "name": "Gautam Sharma",
+    "prefix": "Ms.",
+    "designation": "Visiting Faculty",
+    "department": "Department of Management Studies",
+    "qualification": "Faculty Member",
+    "room": "Faculty Lounge / Timetable Active",
+    "email": "cbs@sscbsdu.ac.in",
+    "phone": null,
+    "expertise": [
+      "Management Studies"
+    ],
+    "photoUrl": null,
+    "profileUrl": "https://sscbs.du.ac.in/faculty/",
+    "biography": "Gautam Sharma is an active teaching faculty member taking semester courses across BMS, BBA(FIA), and B.Sc. (H) Computer Science at SSCBS.",
+    "education": [],
+    "publications": [],
+    "type": "visiting"
   }
 ]
