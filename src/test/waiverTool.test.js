@@ -400,6 +400,34 @@ if (fs.existsSync(nov6Path)) {
   assert.strictEqual(sol.hasOneThirdViolation !== undefined, true, 'Solver return must expose hasOneThirdViolation');
   assert.strictEqual(Array.isArray(sol.oneThirdViolatingParts), true, 'Solver return must expose oneThirdViolatingParts');
   console.log('✓ One-Third (1/3rd) advisory rule logic and warning triggers verified.');
+
+  // 11. Test Starred Subject Priority Guarantee & High-Speed Solver Optimization
+  console.log('11. Testing Starred Subject Priority Guarantee & Solver Speed (Macro Economics)...');
+  const macroHtml = fs.readFileSync(path.resolve('src/test/fixtures/macro_starred_case.html'), 'utf-8');
+  const macroParsed = parseAttendanceFile(macroHtml, 'Student Attandance_2026-11-09.xls');
+
+  // Baseline unstarred: Macro Economics is Below Target (68.8%)
+  const unstarredSol = solveExactBnb(macroParsed, 85, 12, [], 0);
+  const unstarredSim = calculateSimulatedStats(macroParsed, new Set(unstarredSol.chosenDays.map(d => d.dateStr)), 85);
+  const unstarredMacro = unstarredSim.subjectsStats.find(s => s.name.toLowerCase().includes('macro'));
+  assert.strictEqual(unstarredMacro.parts.th.passes, false, 'Without starring, Macro Economics theory should remain below target');
+  assert.strictEqual(Math.round(unstarredMacro.parts.th.pct * 10) / 10, 68.8);
+
+  // Starred: Macro Economics is strictly prioritized and achieves >=85%
+  const startT = performance.now();
+  const starredSol = solveExactBnb(macroParsed, 85, 12, ['Macro Economics'], 0);
+  const elapsed = performance.now() - startT;
+
+  assert.ok(elapsed < 500, `Starred solve took ${elapsed.toFixed(1)}ms, must be < 500ms`);
+  assert.strictEqual(starredSol.starredPassCount, 2, 'Both components of Macro Economics must pass');
+
+  const starredSim = calculateSimulatedStats(macroParsed, new Set(starredSol.chosenDays.map(d => d.dateStr)), 85);
+  const starredMacro = starredSim.subjectsStats.find(s => s.name.toLowerCase().includes('macro'));
+  assert.strictEqual(starredMacro.parts.th.passes, true, 'Macro Economics theory MUST pass target when starred');
+  assert.strictEqual(starredMacro.parts.tu.passes, true, 'Macro Economics tutorial MUST pass target when starred');
+  assert.strictEqual(Math.round(starredMacro.parts.th.pct * 10) / 10, 86.7);
+  assert.strictEqual(starredMacro.parts.tu.pct, 100);
+  console.log(`✓ Starred priority guarantee verified in ${elapsed.toFixed(1)}ms: Macro Theory = 86.7%, Macro Tute = 100.0%.`);
 }
 
 console.log('\nALL UNIT TESTS PASSED SUCCESSFULLY! ✓✓✓');

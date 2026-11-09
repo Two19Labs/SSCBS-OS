@@ -418,9 +418,23 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
     }
   }
 
-  // Sort candidate days by thOrTuAbsences descending to reach good solutions early
+  // Sort candidate days by thOrTuAbsences descending to reach good solutions early.
+  // When starred subjects exist, prioritize candidate days that have absences in starred subjects!
   const sortedDayIndices = Array.from({ length: numCandidates }, (_, i) => i)
-    .sort((a, b) => candidateDays[b].thOrTuAbsences - candidateDays[a].thOrTuAbsences);
+    .sort((a, b) => {
+      if (hasStarred) {
+        let sA = 0;
+        let sB = 0;
+        for (let c = 0; c < numParts; c++) {
+          if (isPartStarred[c]) {
+            sA += candidateDays[a].aDeltas ? candidateDays[a].aDeltas[c] : Math.max(0, candidateDays[a].nDeltas[c] - candidateDays[a].pDeltas[c]);
+            sB += candidateDays[b].aDeltas ? candidateDays[b].aDeltas[c] : Math.max(0, candidateDays[b].nDeltas[c] - candidateDays[b].pDeltas[c]);
+          }
+        }
+        if (sA !== sB) return sB - sA;
+      }
+      return candidateDays[b].thOrTuAbsences - candidateDays[a].thOrTuAbsences;
+    });
 
   const orderedCandidates = sortedDayIndices.map(idx => candidateDays[idx]);
   const orderedW = Array.from({ length: numParts }, (_, c) =>
@@ -788,7 +802,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
         if (maxPotentialPass < numParts) continue;
       } else if (hasStarred) {
         if (maxPotentialStarredPass < best.starredPassCount) continue;
-        if (best.starredPassCount === totalStarredParts && maxPotentialPass < best.passCount) continue;
+        if (maxPotentialStarredPass === best.starredPassCount && maxPotentialPass < best.passCount) continue;
       } else {
         if (maxPotentialPass < best.passCount) continue;
       }

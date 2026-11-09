@@ -148,6 +148,7 @@ export default function WaiverToolPage({ onBack }) {
 
   // Prioritized / starred subjects (Set of subject names)
   const [starredSubjects, setStarredSubjects] = useState(new Set());
+  const [hasPendingPriorityChange, setHasPendingPriorityChange] = useState(false);
 
   // Career Development Centre (CDC) Attendance inputs
   const [cdcLimit, setCdcLimit] = useState(0); // CDC >= 0 (unlocked)
@@ -385,9 +386,15 @@ export default function WaiverToolPage({ onBack }) {
 
     if (workerRef.current) {
       const solveId = Date.now();
+      const timeoutId = setTimeout(() => {
+        workerRef.current?.removeEventListener('message', onMessage);
+        setIsProcessing(false);
+      }, 10000);
+
       const onMessage = (ev) => {
         if (ev.data?.id === solveId) {
-          workerRef.current.removeEventListener('message', onMessage);
+          clearTimeout(timeoutId);
+          workerRef.current?.removeEventListener('message', onMessage);
           if (ev.data.success) {
             setSolverResult(ev.data.solution);
             setKPlusOneResult(ev.data.kPlusOneSolution);
@@ -396,6 +403,14 @@ export default function WaiverToolPage({ onBack }) {
           setIsProcessing(false);
         }
       };
+
+      const onError = () => {
+        clearTimeout(timeoutId);
+        workerRef.current?.removeEventListener('message', onMessage);
+        workerRef.current?.removeEventListener('error', onError);
+        setIsProcessing(false);
+      };
+      workerRef.current.addEventListener('error', onError, { once: true });
       workerRef.current.addEventListener('message', onMessage);
       workerRef.current.postMessage({
         id: solveId,
@@ -691,7 +706,7 @@ export default function WaiverToolPage({ onBack }) {
     }, currentSolverOptions);
   };
 
-  // Toggle priority star on subject with instant live re-solve
+  // Toggle priority star on subject with instant live UI and non-blocking recalculation option
   const handleToggleStar = (subjectName) => {
     const next = new Set(starredSubjects);
     if (next.has(subjectName)) {
@@ -700,25 +715,32 @@ export default function WaiverToolPage({ onBack }) {
       next.add(subjectName);
     }
     setStarredSubjects(next);
+    setHasPendingPriorityChange(true);
     if (parsedData) {
-      setIsProcessing(true);
+      // Async re-solve in background without locking the screen with a full-page modal
       executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, next, (solution) => {
-        setSelectedWaivers(prev => {
-          if (prev.size === 0 && selectedCdcDays.size === 0) return prev;
-          if (solution?.chosenDays && solution.chosenDays.length > 0) {
-            return new Set(solution.chosenDays.map(d => d.dateStr));
-          }
-          return new Set();
-        });
-        setSelectedCdcDays(prev => {
-          if (prev.size === 0 && selectedWaivers.size === 0) return prev;
-          if (solution?.chosenCdcDays && solution.chosenCdcDays.length > 0) {
-            return new Set(solution.chosenCdcDays.map(d => d.dateStr));
-          }
-          return new Set();
-        });
+        // If user has not applied any waivers yet, seamlessly update recommendation
+        if (selectedWaivers.size === 0 && selectedCdcDays.size === 0) {
+          setHasPendingPriorityChange(false);
+        }
       }, currentSolverOptions);
     }
+  };
+
+  // Recalculate waivers with updated priorities on explicit CTA click
+  const handleRecalculateWithPriorities = () => {
+    setHasPendingPriorityChange(false);
+    setLockedWaivers(new Set());
+    setLockedCdcDays(new Set());
+    setIsOneThirdAlertDismissed(false);
+    setIsProcessing(true);
+    executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
+      if (solution?.chosenDays) {
+        setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+        setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
+      }
+      setIsProcessing(false);
+    }, { ...currentSolverOptions, fixedWaiverDates: [], fixedCdcDates: [] });
   };
 
   const handleToggleDay = (dateStr) => {
@@ -920,6 +942,7 @@ export default function WaiverToolPage({ onBack }) {
     setLockedWaivers(new Set());
     setLockedCdcDays(new Set());
     setIsOneThirdAlertDismissed(false);
+    setHasPendingPriorityChange(false);
     if (solverResult) {
       const nextW = solverResult.chosenDays?.length ? new Set(solverResult.chosenDays.map(d => d.dateStr)) : new Set();
       const nextC = solverResult.chosenCdcDays?.length ? new Set(solverResult.chosenCdcDays.map(d => d.dateStr)) : new Set();
@@ -2530,6 +2553,16 @@ export default function WaiverToolPage({ onBack }) {
                   Apply recommended
                 </button>
               )}
+              {hasPendingPriorityChange && (
+                <button
+                  type="button"
+                  className="rd-btn-outline sm rd-btn-accent rd-btn-priority-recalc rd-status-cta"
+                  onClick={handleRecalculateWithPriorities}
+                  title="Recalculate and apply optimal waivers with updated starred priorities"
+                >
+                  ★ Recalculate with priorities
+                </button>
+              )}
               {canFillRemaining && (
                 <button
                   type="button"
@@ -2657,6 +2690,16 @@ export default function WaiverToolPage({ onBack }) {
                         Apply recommended
                       </button>
                     )}
+                    {hasPendingPriorityChange && (
+                      <button
+                        type="button"
+                        className="rd-btn-outline sm rd-btn-accent rd-btn-priority-recalc"
+                        onClick={handleRecalculateWithPriorities}
+                        title="Recalculate and apply optimal waivers with updated starred priorities"
+                      >
+                        ★ Recalculate with priorities
+                      </button>
+                    )}
                     {canFillRemaining && (
                       <button
                         type="button"
@@ -2757,6 +2800,16 @@ export default function WaiverToolPage({ onBack }) {
                         onClick={handleApplyRecommended}
                       >
                         Apply recommended
+                      </button>
+                    )}
+                    {hasPendingPriorityChange && (
+                      <button
+                        type="button"
+                        className="rd-btn-outline sm rd-btn-accent rd-btn-priority-recalc"
+                        onClick={handleRecalculateWithPriorities}
+                        title="Recalculate and apply optimal waivers with updated starred priorities"
+                      >
+                        ★ Recalculate with priorities
                       </button>
                     )}
                     {canFillRemaining && (
@@ -3065,6 +3118,16 @@ export default function WaiverToolPage({ onBack }) {
                     onClick={handleApplyRecommended}
                   >
                     Apply recommended
+                  </button>
+                )}
+                {hasPendingPriorityChange && (
+                  <button
+                    type="button"
+                    className="rd-btn-outline sm rd-btn-accent rd-btn-priority-recalc"
+                    onClick={handleRecalculateWithPriorities}
+                    title="Recalculate and apply optimal waivers with updated starred priorities"
+                  >
+                    ★ Recalculate with priorities
                   </button>
                 )}
                 {canFillRemaining && (
