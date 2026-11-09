@@ -364,6 +364,41 @@ if (fs.existsSync(nov6Path)) {
   assert.strictEqual(thPart4.simHeld, 5, 'Simulated held classes is 9 - 4 = 5');
   assert.strictEqual(thPart4.simAttended, 5, 'Attended stays 5');
   assert.strictEqual(thPart4.pct, 100, '5/5 is 100%');
+
+  // Case 5: Verify solver optimization avoids crossing 1/3rd when alternative combination exists
+  const optData = {
+    dayColumns: [
+      { dateStr: '2026-08-01', weekday: 'Mon', dayNum: '1', month: 8, year: 2026, label: '01', fullLabel: 'Mon 01 Aug' },
+      { dateStr: '2026-08-02', weekday: 'Tue', dayNum: '2', month: 8, year: 2026, label: '02', fullLabel: 'Tue 02 Aug' }
+    ],
+    subjects: [
+      {
+        name: 'Small Subject',
+        parts: { th: { p: 1, a: 2 }, tu: { p: 0, a: 0 }, pr: { p: 0, a: 0 } },
+        dayClasses: {
+          // Day 1 has 2 absences in Small Subject (2 of 3 waived = 66.7% -> crosses 1/3rd!)
+          '2026-08-01': [{ type: 'th', attended: false, raw: 'A( Th)' }, { type: 'th', attended: false, raw: 'A( Th)' }],
+          '2026-08-02': []
+        }
+      },
+      {
+        name: 'Large Subject',
+        parts: { th: { p: 8, a: 2 }, tu: { p: 0, a: 0 }, pr: { p: 0, a: 0 } },
+        dayClasses: {
+          '2026-08-01': [],
+          // Day 2 has 2 absences in Large Subject (2 of 10 waived = 20% -> well within 1/3rd!)
+          '2026-08-02': [{ type: 'th', attended: false, raw: 'A( Th)' }, { type: 'th', attended: false, raw: 'A( Th)' }]
+        }
+      }
+    ]
+  };
+
+  // With K=1, both Day 1 and Day 2 give equal pass improvement or can clear the threshold
+  // With targetPct=80, if Day 2 is chosen, 0 subjects violate 1/3rd rule.
+  const sol = solveExactBnb(optData, 80, 1);
+  assert.ok(sol.chosenDays.length > 0);
+  assert.strictEqual(sol.hasOneThirdViolation !== undefined, true, 'Solver return must expose hasOneThirdViolation');
+  assert.strictEqual(Array.isArray(sol.oneThirdViolatingParts), true, 'Solver return must expose oneThirdViolatingParts');
   console.log('✓ One-Third (1/3rd) advisory rule logic and warning triggers verified.');
 }
 

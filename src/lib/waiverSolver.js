@@ -398,6 +398,12 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
   const K = Math.min(remK, waiverEligibleCount);
   const C = Math.max(0, Math.min(remC, numCandidates));
 
+  // Precompute 1/3rd rule bounds per target component: maxAllowedN = floor(N / 3)
+  const maxAllowedN = new Int32Array(numParts);
+  for (let c = 0; c < numParts; c++) {
+    maxAllowedN[c] = Math.floor(targetParts[c].n / 3);
+  }
+
   // w_cd = T * n_cd - 100 * p_cd
   // rhs_c = T * n_c - 100 * p_c + 1
   const rhs = new Int32Array(numParts);
@@ -461,6 +467,8 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
     let tierScore = 0;
     let starredTierScore = 0;
     let minPct = 100;
+    let oneThirdViolations = 0;
+    let excessWaivedSum = 0;
     const finalStats = [];
 
     const cdcAddedP = new Int32Array(numParts);
@@ -479,6 +487,11 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
         const cd = orderedCandidates[chosenIndices[i]];
         waivedP += cd.pDeltas[c];
         waivedN += cd.nDeltas[c];
+      }
+
+      if (waivedN > maxAllowedN[c]) {
+        oneThirdViolations++;
+        excessWaivedSum += (waivedN - maxAllowedN[c]);
       }
 
       const simN = Math.max(0, targetParts[c].n - waivedN);
@@ -528,6 +541,8 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
       allPass: passCount === numParts,
       allStarredPass: totalStarredParts === 0 || starredPassCount === totalStarredParts,
       minPct,
+      oneThirdViolations,
+      excessWaivedSum,
       finalStats,
       waiverCount: chosenIndices.length,
       cdcCount: chosenCdcIndices.length
@@ -552,6 +567,13 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
       if (candTotalDays !== bestTotalDays) {
         return candTotalDays < bestTotalDays;
       }
+      // 1/3rd Rule Compliance: prefer plans with fewer violations, then lower excess waived classes
+      if (cand.oneThirdViolations !== currentBest.oneThirdViolations) {
+        return cand.oneThirdViolations < currentBest.oneThirdViolations;
+      }
+      if (cand.excessWaivedSum !== currentBest.excessWaivedSum) {
+        return cand.excessWaivedSum < currentBest.excessWaivedSum;
+      }
       if (cand.minPct > currentBest.minPct + 1e-6) return true;
       if (cand.minPct < currentBest.minPct - 1e-6) return false;
       if (cand.cdcCount !== currentBest.cdcCount) {
@@ -566,6 +588,14 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
 
     if (Math.abs(cand.tierScore - currentBest.tierScore) > 1e-4) {
       return cand.tierScore > currentBest.tierScore;
+    }
+
+    // In shortage mode when tier scores tie: prefer fewer 1/3rd violations
+    if (cand.oneThirdViolations !== currentBest.oneThirdViolations) {
+      return cand.oneThirdViolations < currentBest.oneThirdViolations;
+    }
+    if (cand.excessWaivedSum !== currentBest.excessWaivedSum) {
+      return cand.excessWaivedSum < currentBest.excessWaivedSum;
     }
 
     if (cand.minPct > currentBest.minPct + 1e-6) return true;
@@ -583,6 +613,8 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
     starredTierScore: baseEval.starredTierScore,
     size: 0,
     minPct: baseEval.minPct,
+    oneThirdViolations: baseEval.oneThirdViolations,
+    excessWaivedSum: baseEval.excessWaivedSum,
     allPass: baseEval.allPass,
     allStarredPass: baseEval.allStarredPass
   };
@@ -599,8 +631,15 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
       let tierScore = 0;
       let starredTierScore = 0;
       let minPct = 100;
+      let oneThirdViolations = 0;
+      let excessWaivedSum = 0;
 
       for (let c = 0; c < numParts; c++) {
+        if (curN[c] > maxAllowedN[c]) {
+          oneThirdViolations++;
+          excessWaivedSum += (curN[c] - maxAllowedN[c]);
+        }
+
         if (curN[c] === targetParts[c].n) {
           passCount++;
           if (isPartStarred[c]) starredPassCount++;
@@ -662,8 +701,15 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
           // All parts pass: strictly prefer fewer waivers
           if (currentChosen.length < best.size) {
             isBetter = true;
-          } else if (currentChosen.length === best.size && minPct > best.minPct + 1e-9) {
-            isBetter = true;
+          } else if (currentChosen.length === best.size) {
+            // Priority 3 (1/3rd Rule Compliance): strictly prefer 0 (or fewer) violations
+            if (oneThirdViolations !== best.oneThirdViolations) {
+              isBetter = oneThirdViolations < best.oneThirdViolations;
+            } else if (excessWaivedSum !== best.excessWaivedSum) {
+              isBetter = excessWaivedSum < best.excessWaivedSum;
+            } else if (minPct > best.minPct + 1e-9) {
+              isBetter = true;
+            }
           }
         } else {
           // Shortage mode:
@@ -677,8 +723,15 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
             // Priority 5: In shortage, NEVER discard waivers! Put every available waiver to work
             isBetter = currentChosen.length > best.size;
           } else {
-            // Priority 6: Higher minimum percentage floor
-            isBetter = minPct > best.minPct + 1e-9;
+            // Shortage tied on tier score & size: prefer fewer 1/3rd violations!
+            if (oneThirdViolations !== best.oneThirdViolations) {
+              isBetter = oneThirdViolations < best.oneThirdViolations;
+            } else if (excessWaivedSum !== best.excessWaivedSum) {
+              isBetter = excessWaivedSum < best.excessWaivedSum;
+            } else {
+              // Higher minimum percentage floor
+              isBetter = minPct > best.minPct + 1e-9;
+            }
           }
         }
       }
@@ -693,6 +746,8 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
           starredTierScore,
           size: currentChosen.length,
           minPct,
+          oneThirdViolations,
+          excessWaivedSum,
           allPass: passCount === numParts,
           allStarredPass: totalStarredParts === 0 || starredPassCount === totalStarredParts
         };
@@ -1071,6 +1126,8 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
     debarSafeCount,
     lowestPartPct,
     lowestPart,
+    hasOneThirdViolation: Boolean(finalSim.hasOneThirdViolation),
+    oneThirdViolatingParts: finalSim.oneThirdViolatingParts || [],
     neededWaiversForAllPass: isOptimal ? chosenDays.length : (neededWaiversForAllPass !== null ? chosenDays.length + shortfall : null),
     shortfall,
     fixedDays: Array.from(validFixedW),
@@ -1315,6 +1372,25 @@ export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPc
   const totalTargetParts = targetParts.length;
   const isOptimal = passingTargetCount === totalTargetParts;
 
+  const oneThirdViolatingParts = [];
+  subjectsStats.forEach(sub => {
+    (sub.partsList || []).forEach(p => {
+      if (p.isOverOneThird) {
+        oneThirdViolatingParts.push({
+          subjectName: sub.name,
+          type: p.type,
+          shortType: p.shortType,
+          label: p.label,
+          waivedClasses: p.waivedClasses,
+          baseHeld: p.baseHeld,
+          maxAllowedOneThird: p.maxAllowedOneThird,
+          waivedPct: p.waivedPct
+        });
+      }
+    });
+  });
+  const hasOneThirdViolation = oneThirdViolatingParts.length > 0;
+
   return {
     subjectsStats,
     subjectSummaries: subjectsStats,
@@ -1327,7 +1403,9 @@ export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPc
     allPassing: isOptimal,
     status: isOptimal ? 'OPTIMAL' : 'SHORTAGE',
     lowestPartPct,
-    lowestPartLabel
+    lowestPartLabel,
+    hasOneThirdViolation,
+    oneThirdViolatingParts
   };
 }
 

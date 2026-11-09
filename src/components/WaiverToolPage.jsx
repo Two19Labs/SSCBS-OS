@@ -164,6 +164,9 @@ export default function WaiverToolPage({ onBack }) {
   // Ineligibility acknowledgement state (shown when baseline overall attendance < 66.7%)
   const [hasAcknowledgedIneligible, setHasAcknowledgedIneligible] = useState(false);
 
+  // One-third rule alert dismiss state
+  const [isOneThirdAlertDismissed, setIsOneThirdAlertDismissed] = useState(false);
+
   // Solver outcome
   const [solverResult, setSolverResult] = useState(null);
   const [kPlusOneResult, setKPlusOneResult] = useState(null);
@@ -293,11 +296,17 @@ export default function WaiverToolPage({ onBack }) {
     };
   }, [isGridExpanded]);
 
-  // Close expanded grid on Escape key
+  // Close expanded grid and modals on Escape key
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         setIsGridExpanded(false);
+        setIsTimelineModalOpen(false);
+        setEditingCell(null);
+        setIsAddDateModalOpen(false);
+        setDateToDelete(null);
+        setIsResetConfirmOpen(false);
+        setIsOneThirdAlertDismissed(true);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -575,10 +584,11 @@ export default function WaiverToolPage({ onBack }) {
     // Re-run solver live with updated attendance matrix
     setIsProcessing(true);
     executeSolverAsync(updated, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
-      if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
+      if (solution?.chosenDays && isOptimalSuggested) {
         setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
         setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
       }
+      setIsOneThirdAlertDismissed(false);
     }, currentSolverOptions);
   };
 
@@ -592,10 +602,11 @@ export default function WaiverToolPage({ onBack }) {
 
     setIsProcessing(true);
     executeSolverAsync(updated, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
-      if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
+      if (solution?.chosenDays && isOptimalSuggested) {
         setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
         setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
       }
+      setIsOneThirdAlertDismissed(false);
     }, currentSolverOptions);
   };
 
@@ -618,10 +629,11 @@ export default function WaiverToolPage({ onBack }) {
 
     setIsProcessing(true);
     executeSolverAsync(updated, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
-      if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
+      if (solution?.chosenDays && isOptimalSuggested) {
         setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
         setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
       }
+      setIsOneThirdAlertDismissed(false);
     }, currentSolverOptions);
   };
 
@@ -648,10 +660,11 @@ export default function WaiverToolPage({ onBack }) {
 
     setIsProcessing(true);
     executeSolverAsync(updated, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
-      if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
+      if (solution?.chosenDays && isOptimalSuggested) {
         setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
         setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
       }
+      setIsOneThirdAlertDismissed(false);
     }, currentSolverOptions);
   };
 
@@ -812,6 +825,7 @@ export default function WaiverToolPage({ onBack }) {
       if (solution?.chosenCdcDays) {
         setSelectedCdcDays(new Set(solution.chosenCdcDays.map(d => d.dateStr)));
       }
+      setIsOneThirdAlertDismissed(false);
     }, fillOpts);
   };
 
@@ -905,6 +919,7 @@ export default function WaiverToolPage({ onBack }) {
   const handleApplyRecommended = () => {
     setLockedWaivers(new Set());
     setLockedCdcDays(new Set());
+    setIsOneThirdAlertDismissed(false);
     if (solverResult) {
       const nextW = solverResult.chosenDays?.length ? new Set(solverResult.chosenDays.map(d => d.dateStr)) : new Set();
       const nextC = solverResult.chosenCdcDays?.length ? new Set(solverResult.chosenCdcDays.map(d => d.dateStr)) : new Set();
@@ -917,6 +932,7 @@ export default function WaiverToolPage({ onBack }) {
         const nextC = solution?.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set();
         setSelectedWaivers(nextW);
         setSelectedCdcDays(nextC);
+        setIsOneThirdAlertDismissed(false);
       }, { ...currentSolverOptions, fixedWaiverDates: [], fixedCdcDates: [] });
     }
   };
@@ -1022,6 +1038,24 @@ export default function WaiverToolPage({ onBack }) {
 
   const remainingWaiversCount = Math.max(0, maxWaivers - selectedWaivers.size);
   const canFillRemaining = selectedWaivers.size > 0 && remainingWaiversCount > 0;
+
+  // Active or recommended 1/3rd rule violating parts
+  const violatingPartsForModal = useMemo(() => {
+    if (selectedWaivers.size > 0 && simStats?.oneThirdViolatingParts?.length > 0) {
+      return simStats.oneThirdViolatingParts;
+    }
+    if (solverResult?.oneThirdViolatingParts?.length > 0) {
+      return solverResult.oneThirdViolatingParts;
+    }
+    return [];
+  }, [selectedWaivers.size, simStats, solverResult]);
+
+  const showOneThirdAlert = Boolean(
+    !isOneThirdAlertDismissed &&
+    selectedWaivers.size > 0 &&
+    simStats?.hasOneThirdViolation &&
+    violatingPartsForModal.length > 0
+  );
 
   // Copy list to clipboard with robust fallback
   const handleCopyDates = () => {
@@ -1234,7 +1268,13 @@ export default function WaiverToolPage({ onBack }) {
           )}
         </div>
         {part.isOverOneThird && (
-          <div className="rd-one-third-note" role="alert">
+          <div
+            className="rd-one-third-note"
+            role="alert"
+            onClick={() => setIsOneThirdAlertDismissed(false)}
+            style={{ cursor: 'pointer' }}
+            title="Click to view 1/3rd rule alert"
+          >
             <span className="rd-one-third-icon">⚠️</span>
             <div className="rd-one-third-text">
               <strong>1/3rd Rule Notice:</strong> You have waived off <strong>{part.waivedClasses} of {part.baseHeld}</strong> {part.shortType ? part.shortType.toLowerCase() : ''} classes ({part.waivedPct?.toFixed(0)}%), which exceeds one-third of total classes (max {part.maxAllowedOneThird} allowed). Double-check the 1/3rd rule.
@@ -2075,6 +2115,85 @@ export default function WaiverToolPage({ onBack }) {
               onClick={handleResetToRaw}
             >
               Reset to Original
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render One-Third (1/3rd) Rule Double-Check Alert Modal
+  const renderOneThirdAlertModal = () => {
+    if (!showOneThirdAlert || violatingPartsForModal.length === 0) return null;
+
+    return (
+      <div className="rd-modal-overlay" onClick={() => setIsOneThirdAlertDismissed(true)}>
+        <div
+          className="rd-modal-card rd-one-third-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="rd-one-third-modal-title"
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="rd-modal-head">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span className="rd-one-third-modal-icon">⚠️</span>
+              <div>
+                <h3 id="rd-one-third-modal-title">Double-Check: 1/3rd Rule</h3>
+                <p className="rd-modal-sub">College waiver limit alert</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="rd-modal-close"
+              onClick={() => setIsOneThirdAlertDismissed(true)}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="rd-one-third-modal-body">
+            <p className="rd-one-third-modal-intro">
+              Some of your waivers are going over the one-third rule. In the following subject component{violatingPartsForModal.length === 1 ? '' : 's'}, over one-third of classes are being waived off:
+            </p>
+
+            <ul className="rd-one-third-modal-list">
+              {violatingPartsForModal.map((part, idx) => (
+                <li key={idx} className="rd-one-third-modal-item">
+                  <div className="rd-one-third-modal-item-head">
+                    <strong className="rd-one-third-modal-subj">{part.subjectName}</strong>
+                    <span className="rd-one-third-modal-badge">
+                      {part.type === 'tu' ? 'Tutorial' : part.type === 'pr' ? 'Practical' : 'Theory'}
+                    </span>
+                  </div>
+                  <div className="rd-one-third-modal-item-stats">
+                    <span>
+                      Waiving <strong>{part.waivedClasses}</strong> of <strong>{part.baseHeld}</strong> classes ({Math.round(part.waivedPct)}%)
+                    </span>
+                    <span className="rd-one-third-modal-max">
+                      Recommended max: {part.maxAllowedOneThird} {part.maxAllowedOneThird === 1 ? 'class' : 'classes'}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div className="rd-one-third-modal-guideline">
+              <span className="rd-one-third-modal-info-icon">ℹ️</span>
+              <p>
+                DU attendance rules generally specify that students should not eliminate more than one-third of their total classes in any individual subject component. <strong>Just double-check with the one-third rule</strong> before submitting your waiver application.
+              </p>
+            </div>
+          </div>
+
+          <div className="rd-modal-actions">
+            <button
+              type="button"
+              className="rd-btn-dark sm rd-one-third-modal-confirm-btn"
+              onClick={() => setIsOneThirdAlertDismissed(true)}
+            >
+              Got it, thanks
             </button>
           </div>
         </div>
@@ -3030,6 +3149,9 @@ export default function WaiverToolPage({ onBack }) {
       {renderAddDateModal()}
       {renderConfirmDeleteDateModal()}
       {renderConfirmResetModal()}
+
+      {/* One-Third (1/3rd) Rule Double-Check Modal */}
+      {renderOneThirdAlertModal()}
     </div>
   );
 }
