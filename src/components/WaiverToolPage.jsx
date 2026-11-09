@@ -1337,7 +1337,9 @@ export default function WaiverToolPage({ onBack }) {
                       aria-pressed={isWaived || isCdc}
                       aria-label={`Toggle ${col.fullLabel} (${isWaived ? 'waived' : isCdc ? 'CDC attendance' : 'active'})`}
                       onClick={() => {
-                        if (gridToolMode !== 'edit') {
+                        if (gridToolMode === 'edit') {
+                          setDateToDelete({ dateStr: col.dateStr, fullLabel: col.fullLabel });
+                        } else {
                           handleToggleDay(col.dateStr);
                         }
                       }}
