@@ -262,6 +262,51 @@ if (fs.existsSync(nov6Path)) {
     assert(d.dateStr <= customEnd, `Custom timeline waiver ${d.dateStr} must be <= ${customEnd}`);
   });
   console.log(`✓ Custom timeline constraint (${customStart} to ${customEnd}) strictly respected: all ${customRangeSol.chosenDays.length} waivers fall within the window.`);
+
+  // 9. Test Locked Waivers & Incremental Recommendation ("Fill Remaining Waivers")
+  console.log('9. Testing Locked Waivers & Incremental Recommendation...');
+  if (fs.existsSync(samplePath)) {
+    const sampleHtml = fs.readFileSync(samplePath, 'utf-8');
+    const benchmarkParsed = parseAttendanceFile(sampleHtml, 'sample.xls');
+
+    // Scenario A: User manually locks '2026-08-10' (Mon 10 Aug). K=3.
+    // The solver must keep 2026-08-10 as fixed, and find the 2 remaining optimal days (Mon 5 Oct and Fri 6 Nov).
+    const lockedSol = solveExactBnb(benchmarkParsed, 85, 3, [], 0, {
+      fixedWaiverDates: ['2026-08-10']
+    });
+    assert.strictEqual(lockedSol.status, 'OPTIMAL', 'Incremental recommendation must achieve OPTIMAL status');
+    assert.strictEqual(lockedSol.passCount, 8, 'All 8 parts must pass');
+    assert.strictEqual(lockedSol.chosenDays.length, 3, 'Must contain total 3 days (1 fixed + 2 recommended)');
+    assert.strictEqual(lockedSol.fixedDays.length, 1, 'Must report 1 fixed waiver day');
+    assert.strictEqual(lockedSol.fixedDays[0], '2026-08-10');
+    assert.strictEqual(lockedSol.recommendedAdditionalDays.length, 2, 'Must recommend exactly 2 remaining days');
+    const lockedLabels = lockedSol.chosenDays.map(d => `${d.weekday} ${d.label}`);
+    assert.deepStrictEqual(lockedLabels, ['Mon 10 Aug', 'Mon 5 Oct', 'Fri 6 Nov'], 'Combined days must match the optimal set');
+
+    const fixedDayObj = lockedSol.chosenDays.find(d => d.dateStr === '2026-08-10');
+    assert.strictEqual(fixedDayObj.isFixed, true, 'Manually fixed day must have isFixed = true');
+    const addedDayObj = lockedSol.chosenDays.find(d => d.dateStr === '2026-10-05');
+    assert.strictEqual(addedDayObj.isFixed, false, 'Recommended day must have isFixed = false');
+
+    // Scenario B: User manually locks a non-optimal day, e.g. 2026-08-20.
+    // Solver must NOT discard it; it must preserve it and pick the best 2 additional days.
+    const subOptimalLockedSol = solveExactBnb(benchmarkParsed, 85, 3, [], 0, {
+      fixedWaiverDates: ['2026-08-20']
+    });
+    assert.strictEqual(subOptimalLockedSol.chosenDays.length, 3, 'Must contain 3 days total');
+    assert(subOptimalLockedSol.chosenDays.some(d => d.dateStr === '2026-08-20'), 'Fixed day 2026-08-20 must be included');
+    assert.strictEqual(subOptimalLockedSol.recommendedAdditionalDays.length, 2, 'Must recommend 2 remaining days');
+    assert(!subOptimalLockedSol.recommendedAdditionalDays.some(d => d.dateStr === '2026-08-20'), 'Fixed day must not be duplicated in recommendations');
+
+    // Scenario C: User has already locked all K days (fixed = 3, K = 3).
+    const fullLockedSol = solveExactBnb(benchmarkParsed, 85, 3, [], 0, {
+      fixedWaiverDates: ['2026-08-10', '2026-10-05', '2026-11-06']
+    });
+    assert.strictEqual(fullLockedSol.chosenDays.length, 3);
+    assert.strictEqual(fullLockedSol.recommendedAdditionalDays.length, 0, 'No additional days needed when budget is met by fixed days');
+    assert.strictEqual(fullLockedSol.passCount, 8);
+    console.log('✓ Locked waivers and incremental recommendation logic verified across all edge cases.');
+  }
 }
 
 console.log('\nALL UNIT TESTS PASSED SUCCESSFULLY! ✓✓✓');

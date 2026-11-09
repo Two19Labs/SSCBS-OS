@@ -120,6 +120,70 @@ export function extractTargetParts(parsedData) {
 /**
  * Extract candidate days: only days with at least one Theory or Tute ABSENCE can help (Section 5).
  */
+export function getDayDeltas(parsedData, targetParts, dateStr) {
+  const numParts = targetParts.length;
+  const pDeltas = new Int32Array(numParts);
+  const nDeltas = new Int32Array(numParts);
+  let thOrTuAbsences = 0;
+  let totalAbsences = 0;
+  let totalPresents = 0;
+  let practicalAbsences = 0;
+  let practicalPresents = 0;
+  const missedSubjectsSet = new Set();
+
+  (parsedData.subjects || []).forEach(sub => {
+    const classes = sub.dayClasses?.[dateStr] || [];
+    classes.forEach(c => {
+      if (!c.attended) {
+        missedSubjectsSet.add(sub.name);
+      }
+      if (c.type === 'th' || c.type === 'tu') {
+        const tp = targetParts.find(p => p.subject === sub.name && p.type === c.type);
+        if (tp) {
+          if (c.attended) {
+            pDeltas[tp.targetIdx]++;
+            nDeltas[tp.targetIdx]++;
+            totalPresents++;
+          } else {
+            nDeltas[tp.targetIdx]++;
+            thOrTuAbsences++;
+            totalAbsences++;
+          }
+        }
+      } else if (c.type === 'pr') {
+        if (c.attended) practicalPresents++;
+        else practicalAbsences++;
+      }
+    });
+  });
+
+  const aDeltas = new Int32Array(numParts);
+  for (let c = 0; c < numParts; c++) {
+    aDeltas[c] = nDeltas[c] - pDeltas[c];
+  }
+
+  const d = (parsedData.dayColumns || []).find(col => col.dateStr === dateStr) || {};
+
+  return {
+    dateStr,
+    weekday: d.weekday || '',
+    dayNum: d.dayNum || 0,
+    month: d.month || 0,
+    year: d.year || 0,
+    label: d.label || dateStr,
+    fullLabel: d.fullLabel || dateStr,
+    pDeltas,
+    nDeltas,
+    aDeltas,
+    thOrTuAbsences,
+    totalAbsences,
+    totalPresents,
+    practicalAbsences,
+    practicalPresents,
+    missedSubjects: Array.from(missedSubjectsSet)
+  };
+}
+
 export function extractCandidateDays(parsedData, targetParts) {
   const numParts = targetParts.length;
   const candidateDays = [];
@@ -202,11 +266,21 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
     waiverEndMonth = 0,
     waiverStartDate = null,
     waiverEndDate = null,
-    blockedDates = null
+    blockedDates = null,
+    fixedWaiverDates = null,
+    fixedCdcDates = null
   } = options || {};
   const blockedDatesSet = blockedDates instanceof Set
     ? blockedDates
     : new Set(Array.isArray(blockedDates) ? blockedDates : []);
+
+  const rawFixedWSet = fixedWaiverDates instanceof Set
+    ? fixedWaiverDates
+    : new Set(Array.isArray(fixedWaiverDates) ? fixedWaiverDates : []);
+
+  const rawFixedCSet = fixedCdcDates instanceof Set
+    ? fixedCdcDates
+    : new Set(Array.isArray(fixedCdcDates) ? fixedCdcDates : []);
 
   const { targetParts } = extractTargetParts(parsedData);
   const numParts = targetParts.length;
@@ -236,6 +310,10 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
       totalTargetParts: 0,
       lowestPartPct: 100,
       lowestPart: null,
+      fixedDays: [],
+      fixedCdcDays: [],
+      recommendedAdditionalDays: [],
+      recommendedAdditionalCdcDays: [],
       cdcRescue: {
         baselineOverallPct: 100,
         projectedOverallPctWithCdc: 100,
@@ -247,7 +325,57 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
     };
   }
 
-  const candidateDays = extractCandidateDays(parsedData, targetParts);
+  // Clone original target parts before applying fixed day adjustments
+  const targetPartsOriginal = targetParts.map(p => ({ ...p }));
+
+  // Validate fixed dates against dayColumns
+  const validFixedW = new Set();
+  rawFixedWSet.forEach(d => {
+    if ((parsedData.dayColumns || []).some(col => col.dateStr === d)) {
+      validFixedW.add(d);
+    }
+  });
+
+  const validFixedC = new Set();
+  rawFixedCSet.forEach(d => {
+    if (!validFixedW.has(d) && (parsedData.dayColumns || []).some(col => col.dateStr === d)) {
+      validFixedC.add(d);
+    }
+  });
+
+  // Calculate day objects for fixed days and deduct them from target parts
+  const fixedWaiverDays = [];
+  validFixedW.forEach(dateStr => {
+    const dayObj = getDayDeltas(parsedData, targetPartsOriginal, dateStr);
+    dayObj.isFixed = true;
+    fixedWaiverDays.push(dayObj);
+
+    // Waived classes reduce both attended and held for each target part
+    for (let c = 0; c < numParts; c++) {
+      targetParts[c].p = Math.max(0, targetParts[c].p - dayObj.pDeltas[c]);
+      targetParts[c].n = Math.max(0, targetParts[c].n - dayObj.nDeltas[c]);
+      if (targetParts[c].p > targetParts[c].n) {
+        targetParts[c].p = targetParts[c].n;
+      }
+    }
+  });
+
+  const fixedCdcDays = [];
+  validFixedC.forEach(dateStr => {
+    const dayObj = getDayDeltas(parsedData, targetPartsOriginal, dateStr);
+    dayObj.isFixed = true;
+    fixedCdcDays.push(dayObj);
+
+    // CDC converts absences to presents; held unchanged
+    for (let c = 0; c < numParts; c++) {
+      const abs = dayObj.aDeltas[c];
+      targetParts[c].p = Math.min(targetParts[c].n, targetParts[c].p + abs);
+    }
+  });
+
+  const allCandidateDays = extractCandidateDays(parsedData, targetPartsOriginal);
+  // Exclude fixed dates from candidate search pool
+  const candidateDays = allCandidateDays.filter(d => !validFixedW.has(d.dateStr) && !validFixedC.has(d.dateStr));
   const numCandidates = candidateDays.length;
 
   // Tag candidate days with timeline eligibility & manual blocking
@@ -265,8 +393,10 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
   });
 
   const waiverEligibleCount = candidateDays.filter(d => d.isWaiverEligible).length;
-  const K = Math.min(maxWaiversK, waiverEligibleCount);
-  const C = Math.max(0, Math.min(cdcLimitC || 0, numCandidates));
+  const remK = Math.max(0, maxWaiversK - validFixedW.size);
+  const remC = Math.max(0, (cdcLimitC || 0) - validFixedC.size);
+  const K = Math.min(remK, waiverEligibleCount);
+  const C = Math.max(0, Math.min(remC, numCandidates));
 
   // w_cd = T * n_cd - 100 * p_cd
   // rhs_c = T * n_c - 100 * p_c + 1
@@ -869,10 +999,19 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
   }
 
   const endTime = (typeof performance !== 'undefined' ? performance.now() : Date.now());
-  const chosenDays = bestWaivers.map(idx => orderedCandidates[idx]);
+  const additionalWaiverDays = bestWaivers.map(idx => {
+    const d = orderedCandidates[idx];
+    return { ...d, isFixed: false };
+  });
+  const additionalCdcDays = bestCdc.map(idx => {
+    const d = orderedCandidates[idx];
+    return { ...d, isFixed: false };
+  });
+
+  const chosenDays = [...fixedWaiverDays, ...additionalWaiverDays];
   chosenDays.sort((a, b) => a.dateStr.localeCompare(b.dateStr));
 
-  const chosenCdcDays = bestCdc.map(idx => orderedCandidates[idx]);
+  const chosenCdcDays = [...fixedCdcDays, ...additionalCdcDays];
   chosenCdcDays.sort((a, b) => a.dateStr.localeCompare(b.dateStr));
 
   // CDC Exemption & Rescue Calculation (DU Ordinance VII aggregate threshold)
@@ -889,28 +1028,55 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
   const isBaselineUnder667 = baselineOverallPct < 66.666;
 
   let cdcTotalConvertedAbsences = 0;
-  bestCdc.forEach(idx => {
-    const cd = orderedCandidates[idx];
+  chosenCdcDays.forEach(cd => {
     cdcTotalConvertedAbsences += (cd.totalAbsences || 0);
   });
   const projectedOverallAttWithCdc = totBaseAtt + cdcTotalConvertedAbsences;
   const projectedOverallPctWithCdc = totBaseHeld > 0 ? (projectedOverallAttWithCdc / totBaseHeld) * 100 : 100;
   const cdcRescued = isBaselineUnder667 && projectedOverallPctWithCdc >= 66.666;
 
+  const allChosenWaiversSet = new Set(chosenDays.map(d => d.dateStr));
+  const allChosenCdcSet = new Set(chosenCdcDays.map(d => d.dateStr));
+  const finalSim = calculateSimulatedStats(parsedData, allChosenWaiversSet, T, allChosenCdcSet);
+
+  let starredPassCount = 0;
+  finalSim.subjectsStats.forEach(sub => {
+    if (starredSet.has(sub.name)) {
+      ['th', 'tu'].forEach(t => {
+        if (sub.parts[t] && sub.parts[t].isTarget && sub.parts[t].passes) {
+          starredPassCount++;
+        }
+      });
+    }
+  });
+  const allStarredPass = (totalStarredParts === 0) || (starredPassCount === totalStarredParts);
+  const hasFixedDays = validFixedW.size > 0 || validFixedC.size > 0;
+  const isOptimal = hasFixedDays ? (finalSim.passingTargetCount === numParts) : bestEval.allPass;
+  const passCount = hasFixedDays ? finalSim.passingTargetCount : bestEval.passCount;
+  const debarSafeCount = hasFixedDays ? finalSim.debarSafeTargetCount : bestEval.debarSafeCount;
+  const lowestPartPct = hasFixedDays ? finalSim.lowestPartPct : bestEval.minPct;
+  const lowestPart = hasFixedDays
+    ? (finalSim.lowestPartLabel ? finalSim.lowestPartLabel.replace(' tutorial', ' tute') : null)
+    : bestEval.finalStats.reduce((min, cur) => cur.pct < min.pct ? cur : min, bestEval.finalStats[0])?.label;
+
   return {
-    status: bestEval.allPass ? 'OPTIMAL' : 'SHORTAGE',
+    status: isOptimal ? 'OPTIMAL' : 'SHORTAGE',
     chosenDays,
     chosenCdcDays,
-    passCount: bestEval.passCount,
-    starredPassCount: bestEval.starredPassCount,
+    passCount,
+    starredPassCount: hasFixedDays ? starredPassCount : bestEval.starredPassCount,
     totalStarredParts,
-    allStarredPass: bestEval.allStarredPass,
+    allStarredPass: hasFixedDays ? allStarredPass : bestEval.allStarredPass,
     totalTargetParts: numParts,
-    debarSafeCount: bestEval.debarSafeCount,
-    lowestPartPct: bestEval.minPct,
-    lowestPart: bestEval.finalStats.reduce((min, cur) => cur.pct < min.pct ? cur : min, bestEval.finalStats[0])?.label,
-    neededWaiversForAllPass,
+    debarSafeCount,
+    lowestPartPct,
+    lowestPart,
+    neededWaiversForAllPass: isOptimal ? chosenDays.length : (neededWaiversForAllPass !== null ? chosenDays.length + shortfall : null),
     shortfall,
+    fixedDays: Array.from(validFixedW),
+    fixedCdcDays: Array.from(validFixedC),
+    recommendedAdditionalDays: additionalWaiverDays,
+    recommendedAdditionalCdcDays: additionalCdcDays,
     evalPlan: bestEval,
     cdcRescue: {
       baselineOverallPct,

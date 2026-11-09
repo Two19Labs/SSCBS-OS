@@ -12,7 +12,9 @@ self.onmessage = function (e) {
     waiverEndMonth,
     waiverStartDate,
     waiverEndDate,
-    blockedDates
+    blockedDates,
+    fixedWaiverDates,
+    fixedCdcDates
   } = e.data || {};
   try {
     const options = {
@@ -20,7 +22,9 @@ self.onmessage = function (e) {
       waiverEndMonth: waiverEndMonth || 0,
       waiverStartDate: waiverStartDate || null,
       waiverEndDate: waiverEndDate || null,
-      blockedDates: blockedDates ? new Set(blockedDates) : new Set()
+      blockedDates: blockedDates ? new Set(blockedDates) : new Set(),
+      fixedWaiverDates: fixedWaiverDates ? (fixedWaiverDates instanceof Set ? fixedWaiverDates : new Set(fixedWaiverDates)) : new Set(),
+      fixedCdcDates: fixedCdcDates ? (fixedCdcDates instanceof Set ? fixedCdcDates : new Set(fixedCdcDates)) : new Set()
     };
     const solution = solveExactBnb(parsedData, targetPct, maxWaiversK, starredSubjects, cdcLimit, options);
     let kPlusOneSolution = null;

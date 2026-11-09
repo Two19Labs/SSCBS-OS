@@ -142,6 +142,10 @@ export default function WaiverToolPage({ onBack }) {
   // Active selected waivers (Set of 'YYYY-MM-DD' date strings)
   const [selectedWaivers, setSelectedWaivers] = useState(new Set());
 
+  // Manually locked / pinned waivers and CDC dates (Set of 'YYYY-MM-DD' date strings)
+  const [lockedWaivers, setLockedWaivers] = useState(new Set());
+  const [lockedCdcDays, setLockedCdcDays] = useState(new Set());
+
   // Prioritized / starred subjects (Set of subject names)
   const [starredSubjects, setStarredSubjects] = useState(new Set());
 
@@ -217,6 +221,12 @@ export default function WaiverToolPage({ onBack }) {
           if (Array.isArray(saved.selectedWaivers)) {
             setSelectedWaivers(new Set(saved.selectedWaivers));
           }
+          if (Array.isArray(saved.lockedWaivers)) {
+            setLockedWaivers(new Set(saved.lockedWaivers));
+          }
+          if (Array.isArray(saved.lockedCdcDays)) {
+            setLockedCdcDays(new Set(saved.lockedCdcDays));
+          }
           if (Array.isArray(saved.starredSubjects)) {
             setStarredSubjects(new Set(saved.starredSubjects));
           }
@@ -252,6 +262,8 @@ export default function WaiverToolPage({ onBack }) {
         rawParsedData,
         parsedData,
         selectedWaivers: Array.from(selectedWaivers),
+        lockedWaivers: Array.from(lockedWaivers),
+        lockedCdcDays: Array.from(lockedCdcDays),
         starredSubjects: Array.from(starredSubjects),
         solverResult,
         kPlusOneResult,
@@ -269,7 +281,7 @@ export default function WaiverToolPage({ onBack }) {
     } catch (err) {
       console.warn('Failed to persist Waiver Tool state:', err);
     }
-  }, [rawParsedData, parsedData, selectedWaivers, starredSubjects, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, hasAcknowledgedIneligible, cdcLimit, selectedCdcDays, gridToolMode, customStartDate, customEndDate, storageKey]);
+  }, [rawParsedData, parsedData, selectedWaivers, lockedWaivers, lockedCdcDays, starredSubjects, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, hasAcknowledgedIneligible, cdcLimit, selectedCdcDays, gridToolMode, customStartDate, customEndDate, storageKey]);
 
   // Prevent scroll when expanded grid modal is open
   useEffect(() => {
@@ -354,6 +366,12 @@ export default function WaiverToolPage({ onBack }) {
     const actualStartMonth = extraOpts.waiverStartMonth !== undefined ? extraOpts.waiverStartMonth : 0;
     const actualStartDate = extraOpts.waiverStartDate !== undefined ? extraOpts.waiverStartDate : (customStartDate || null);
     const actualEndDate = extraOpts.waiverEndDate !== undefined ? extraOpts.waiverEndDate : (customEndDate || null);
+    const actualFixedWaivers = extraOpts.fixedWaiverDates !== undefined
+      ? (Array.isArray(extraOpts.fixedWaiverDates) ? extraOpts.fixedWaiverDates : Array.from(extraOpts.fixedWaiverDates || []))
+      : (lockedWaivers.size > 0 ? Array.from(lockedWaivers) : []);
+    const actualFixedCdc = extraOpts.fixedCdcDates !== undefined
+      ? (Array.isArray(extraOpts.fixedCdcDates) ? extraOpts.fixedCdcDates : Array.from(extraOpts.fixedCdcDates || []))
+      : (lockedCdcDays.size > 0 ? Array.from(lockedCdcDays) : []);
     const starredList = Array.from(stars || []);
 
     if (workerRef.current) {
@@ -379,7 +397,9 @@ export default function WaiverToolPage({ onBack }) {
         cdcLimit: actualCdc,
         waiverStartMonth: actualStartMonth,
         waiverStartDate: actualStartDate,
-        waiverEndDate: actualEndDate
+        waiverEndDate: actualEndDate,
+        fixedWaiverDates: actualFixedWaivers,
+        fixedCdcDates: actualFixedCdc
       });
     } else {
       setTimeout(() => {
@@ -387,7 +407,9 @@ export default function WaiverToolPage({ onBack }) {
           const options = {
             waiverStartMonth: actualStartMonth,
             waiverStartDate: actualStartDate,
-            waiverEndDate: actualEndDate
+            waiverEndDate: actualEndDate,
+            fixedWaiverDates: actualFixedWaivers,
+            fixedCdcDates: actualFixedCdc
           };
           const solution = solveExactBnb(data, targetT, limitK, starredList, actualCdc, options);
           let kPlusOne = null;
@@ -505,6 +527,8 @@ export default function WaiverToolPage({ onBack }) {
     setIsResetConfirmOpen(false);
     setSelectedWaivers(new Set());
     setSelectedCdcDays(new Set());
+    setLockedWaivers(new Set());
+    setLockedCdcDays(new Set());
     setCdcLimit(0);
     setGridToolMode('waiver');
     setStarredSubjects(new Set());
@@ -689,6 +713,12 @@ export default function WaiverToolPage({ onBack }) {
       const nextCdc = new Set(selectedCdcDays);
       if (nextCdc.has(dateStr)) {
         nextCdc.delete(dateStr);
+        setLockedCdcDays(prev => {
+          if (!prev.has(dateStr)) return prev;
+          const next = new Set(prev);
+          next.delete(dateStr);
+          return next;
+        });
       } else {
         if (nextCdc.size >= cdcLimit) {
           return;
@@ -698,6 +728,12 @@ export default function WaiverToolPage({ onBack }) {
           const nextW = new Set(selectedWaivers);
           nextW.delete(dateStr);
           setSelectedWaivers(nextW);
+          setLockedWaivers(prev => {
+            if (!prev.has(dateStr)) return prev;
+            const next = new Set(prev);
+            next.delete(dateStr);
+            return next;
+          });
         }
       }
       setSelectedCdcDays(nextCdc);
@@ -705,18 +741,79 @@ export default function WaiverToolPage({ onBack }) {
       const nextW = new Set(selectedWaivers);
       if (nextW.has(dateStr)) {
         nextW.delete(dateStr);
+        setLockedWaivers(prev => {
+          if (!prev.has(dateStr)) return prev;
+          const next = new Set(prev);
+          next.delete(dateStr);
+          return next;
+        });
       } else {
         nextW.add(dateStr);
         if (selectedCdcDays.has(dateStr)) {
           const nextC = new Set(selectedCdcDays);
           nextC.delete(dateStr);
           setSelectedCdcDays(nextC);
+          setLockedCdcDays(prev => {
+            if (!prev.has(dateStr)) return prev;
+            const next = new Set(prev);
+            next.delete(dateStr);
+            return next;
+          });
         }
       }
       setSelectedWaivers(nextW);
     }
   };
 
+  // Toggle lock / pin on a specific date so solver preserves it
+  const handleToggleLockDate = (dateStr, kind = 'waiver') => {
+    if (kind === 'cdc') {
+      setLockedCdcDays(prev => {
+        const next = new Set(prev);
+        if (next.has(dateStr)) next.delete(dateStr);
+        else next.add(dateStr);
+        return next;
+      });
+    } else {
+      setLockedWaivers(prev => {
+        const next = new Set(prev);
+        if (next.has(dateStr)) next.delete(dateStr);
+        else next.add(dateStr);
+        return next;
+      });
+    }
+  };
+
+  // Fill remaining waivers keeping currently selected and locked dates fixed
+  const handleFillRemainingWaivers = () => {
+    if (!parsedData) return;
+    setIsProcessing(true);
+
+    const currentWaiversArray = Array.from(selectedWaivers);
+    const currentCdcArray = Array.from(selectedCdcDays);
+
+    // Auto-lock all currently selected dates
+    const nextLockedW = new Set([...lockedWaivers, ...currentWaiversArray]);
+    setLockedWaivers(nextLockedW);
+
+    const nextLockedC = new Set([...lockedCdcDays, ...currentCdcArray]);
+    setLockedCdcDays(nextLockedC);
+
+    const fillOpts = {
+      ...currentSolverOptions,
+      fixedWaiverDates: currentWaiversArray,
+      fixedCdcDates: currentCdcArray
+    };
+
+    executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
+      if (solution?.chosenDays) {
+        setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+      }
+      if (solution?.chosenCdcDays) {
+        setSelectedCdcDays(new Set(solution.chosenCdcDays.map(d => d.dateStr)));
+      }
+    }, fillOpts);
+  };
 
   // Live parameter changes with automatic solver re-execution
   const handleMaxWaiversChange = (newLimit) => {
@@ -772,10 +869,16 @@ export default function WaiverToolPage({ onBack }) {
     setCdcLimit(clamped);
     if (clamped === 0) {
       setSelectedCdcDays(new Set());
+      setLockedCdcDays(new Set());
       setGridToolMode('waiver');
     } else if (selectedCdcDays.size > clamped) {
       const trimmed = new Set(Array.from(selectedCdcDays).slice(0, clamped));
       setSelectedCdcDays(trimmed);
+      setLockedCdcDays(prev => {
+        const next = new Set();
+        prev.forEach(d => { if (trimmed.has(d)) next.add(d); });
+        return next;
+      });
     }
     if (parsedData) {
       setIsProcessing(true);
@@ -798,9 +901,10 @@ export default function WaiverToolPage({ onBack }) {
     }
   };
 
-
-  // Apply recommended waiver & CDC dates
+  // Apply recommended waiver & CDC dates (clearing locks to adopt pure recommended set)
   const handleApplyRecommended = () => {
+    setLockedWaivers(new Set());
+    setLockedCdcDays(new Set());
     if (solverResult) {
       const nextW = solverResult.chosenDays?.length ? new Set(solverResult.chosenDays.map(d => d.dateStr)) : new Set();
       const nextC = solverResult.chosenCdcDays?.length ? new Set(solverResult.chosenCdcDays.map(d => d.dateStr)) : new Set();
@@ -813,13 +917,15 @@ export default function WaiverToolPage({ onBack }) {
         const nextC = solution?.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set();
         setSelectedWaivers(nextW);
         setSelectedCdcDays(nextC);
-      }, currentSolverOptions);
+      }, { ...currentSolverOptions, fixedWaiverDates: [], fixedCdcDates: [] });
     }
   };
 
   const handleClearAll = () => {
     setSelectedWaivers(new Set());
     setSelectedCdcDays(new Set());
+    setLockedWaivers(new Set());
+    setLockedCdcDays(new Set());
   };
 
   const handleRemoveDate = (item) => {
@@ -827,10 +933,22 @@ export default function WaiverToolPage({ onBack }) {
       const nextC = new Set(selectedCdcDays);
       nextC.delete(item.dateStr);
       setSelectedCdcDays(nextC);
+      setLockedCdcDays(prev => {
+        if (!prev.has(item.dateStr)) return prev;
+        const next = new Set(prev);
+        next.delete(item.dateStr);
+        return next;
+      });
     } else {
       const nextW = new Set(selectedWaivers);
       nextW.delete(item.dateStr);
       setSelectedWaivers(nextW);
+      setLockedWaivers(prev => {
+        if (!prev.has(item.dateStr)) return prev;
+        const next = new Set(prev);
+        next.delete(item.dateStr);
+        return next;
+      });
     }
   };
 
@@ -858,7 +976,8 @@ export default function WaiverToolPage({ onBack }) {
           weekday: col.weekday,
           totalMissed: cand ? cand.totalAbsences : 0,
           missedSubjects: cand?.missedSubjects || [],
-          kind: 'waiver'
+          kind: 'waiver',
+          isLocked: lockedWaivers.has(col.dateStr)
         });
       } else if (selectedCdcDays.has(col.dateStr)) {
         const cand = candidateDaysMap.get(col.dateStr);
@@ -869,12 +988,13 @@ export default function WaiverToolPage({ onBack }) {
           weekday: col.weekday,
           totalMissed: cand ? cand.totalAbsences : 0,
           missedSubjects: cand?.missedSubjects || [],
-          kind: 'cdc'
+          kind: 'cdc',
+          isLocked: lockedCdcDays.has(col.dateStr)
         });
       }
     });
     return list;
-  }, [parsedData, selectedWaivers, selectedCdcDays, candidateDaysMap]);
+  }, [parsedData, selectedWaivers, selectedCdcDays, lockedWaivers, lockedCdcDays, candidateDaysMap]);
 
   // Live simulated stats (incorporating Waivers & Career Development Centre CDC Attendance)
   const simStats = useMemo(() => {
@@ -899,6 +1019,9 @@ export default function WaiverToolPage({ onBack }) {
     const cMatch = recC.every(d => selectedCdcDays.has(d.dateStr));
     return wMatch && cMatch;
   }, [solverResult, selectedWaivers, selectedCdcDays]);
+
+  const remainingWaiversCount = Math.max(0, maxWaivers - selectedWaivers.size);
+  const canFillRemaining = selectedWaivers.size > 0 && remainingWaiversCount > 0;
 
   // Copy list to clipboard with robust fallback
   const handleCopyDates = () => {
@@ -1349,6 +1472,8 @@ export default function WaiverToolPage({ onBack }) {
                       <span className="dn">{col.dayNum}</span>
                       {isAddedDate ? (
                         <span className="rd-date-added-badge" title="Manually added date">New</span>
+                      ) : (isWaived && lockedWaivers.has(col.dateStr)) || (isCdc && lockedCdcDays.has(col.dateStr)) ? (
+                        <span className="rd-date-pinned-badge" title="Pinned / locked date">📌</span>
                       ) : isOutOfTimeline ? (
                         <span className="rd-date-locked-badge" title="Outside recommended waiver timeline">🔒</span>
                       ) : isCdc ? (
@@ -2119,6 +2244,11 @@ export default function WaiverToolPage({ onBack }) {
           <div className="rd-pop-head">
             <div>
               <strong>{hoverDiff.day?.fullLabel || hoverDiff.dateStr}</strong>
+              {Boolean(lockedWaivers.has(hoverDiff.dateStr) || lockedCdcDays.has(hoverDiff.dateStr)) && (
+                <span className="rd-pop-pinned-tag" title="Pinned date (kept when auto-filling)">
+                  📌 Fixed
+                </span>
+              )}
               {Boolean((activeWaiverStart && hoverDiff.dateStr < activeWaiverStart) || (activeWaiverEnd && hoverDiff.dateStr > activeWaiverEnd)) && (
                 <span className="rd-pop-presociety-tag" title="Outside recommended waiver timeline">
                   🔒 Out of timeline
@@ -2268,6 +2398,16 @@ export default function WaiverToolPage({ onBack }) {
                   Apply recommended
                 </button>
               )}
+              {canFillRemaining && (
+                <button
+                  type="button"
+                  className="rd-btn-outline sm rd-btn-accent rd-status-cta rd-btn-fill-remaining"
+                  onClick={handleFillRemainingWaivers}
+                  title={`Keep current ${selectedWaivers.size} selected dates and solve for remaining ${remainingWaiversCount} waivers`}
+                >
+                  💡 Fill remaining {remainingWaiversCount} waivers
+                </button>
+              )}
               {hasParamsChanged && (selectedWaivers.size > 0 || selectedCdcDays.size > 0) && (
                 <button type="button" className="rd-btn-outline sm rd-status-cta" onClick={handleApplyRecommended}>
                   Update
@@ -2385,6 +2525,16 @@ export default function WaiverToolPage({ onBack }) {
                         Apply recommended
                       </button>
                     )}
+                    {canFillRemaining && (
+                      <button
+                        type="button"
+                        className="rd-btn-outline sm rd-btn-accent rd-btn-fill-remaining"
+                        onClick={handleFillRemainingWaivers}
+                        title={`Keep current ${selectedWaivers.size} selected dates and solve for remaining ${remainingWaiversCount} waivers`}
+                      >
+                        💡 Fill remaining ({remainingWaiversCount})
+                      </button>
+                    )}
                     <button
                       type="button"
                       className="rd-btn-outline sm muted"
@@ -2477,6 +2627,16 @@ export default function WaiverToolPage({ onBack }) {
                         Apply recommended
                       </button>
                     )}
+                    {canFillRemaining && (
+                      <button
+                        type="button"
+                        className="rd-btn-outline sm rd-btn-accent rd-btn-sidebar-fill"
+                        onClick={handleFillRemainingWaivers}
+                        title={`Keep current ${selectedWaivers.size} selected dates and solve for remaining ${remainingWaiversCount} waivers`}
+                      >
+                        💡 Fill remaining ({remainingWaiversCount})
+                      </button>
+                    )}
                     <button
                       type="button"
                       className="rd-btn-outline sm"
@@ -2508,7 +2668,7 @@ export default function WaiverToolPage({ onBack }) {
                 ) : (
                   <ul className="rd-date-list">
                     {selectedDaysList.map(item => (
-                      <li key={item.dateStr}>
+                      <li key={item.dateStr} className={item.isLocked ? 'is-locked-day' : ''}>
                         <div className={`cal ${item.kind === 'cdc' ? 'cdc' : ''}`}>
                           <b>{item.dayNum}</b>
                           <span>{item.monthShort}</span>
@@ -2516,19 +2676,32 @@ export default function WaiverToolPage({ onBack }) {
                         <div className="txt">
                           <span className="l1">
                             {item.weekday} <em>· {item.totalMissed} {item.kind === 'cdc' ? 'converted' : 'missed'}</em>
+                            {item.isLocked && <span className="rd-date-pinned-badge" title="Manually fixed/pinned date">📌 Fixed</span>}
                             {item.kind === 'cdc' && <span className="cdc-tag">CDC</span>}
                           </span>
                           <span className="l2">
                             {item.missedSubjects.length ? item.missedSubjects.join(', ') : 'No absences recorded'}
                           </span>
                         </div>
-                        <button
-                          type="button"
-                          aria-label={`Remove ${item.dayNum} ${item.monthShort}`}
-                          onClick={() => handleRemoveDate(item)}
-                        >
-                          ×
-                        </button>
+                        <div className="rd-date-item-actions">
+                          <button
+                            type="button"
+                            className={`rd-pin-btn ${item.isLocked ? 'pinned' : ''}`}
+                            onClick={() => handleToggleLockDate(item.dateStr, item.kind)}
+                            title={item.isLocked ? 'Pinned / locked (click to unlock)' : 'Click to pin / lock this date'}
+                            aria-label={item.isLocked ? `Unlock ${item.dayNum} ${item.monthShort}` : `Lock ${item.dayNum} ${item.monthShort}`}
+                          >
+                            📌
+                          </button>
+                          <button
+                            type="button"
+                            className="rd-date-del-btn"
+                            aria-label={`Remove ${item.dayNum} ${item.monthShort}`}
+                            onClick={() => handleRemoveDate(item)}
+                          >
+                            ×
+                          </button>
+                        </div>
                       </li>
                     ))}
                   </ul>
@@ -2760,6 +2933,16 @@ export default function WaiverToolPage({ onBack }) {
                     onClick={handleApplyRecommended}
                   >
                     Apply recommended
+                  </button>
+                )}
+                {canFillRemaining && (
+                  <button
+                    type="button"
+                    className="rd-btn-outline sm rd-btn-accent rd-btn-fill-remaining"
+                    onClick={handleFillRemainingWaivers}
+                    title={`Keep current ${selectedWaivers.size} selected dates and solve for remaining ${remainingWaiversCount} waivers`}
+                  >
+                    💡 Fill remaining ({remainingWaiversCount})
                   </button>
                 )}
                 <button
