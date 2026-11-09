@@ -574,6 +574,10 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
       if (cand.excessWaivedSum !== currentBest.excessWaivedSum) {
         return cand.excessWaivedSum < currentBest.excessWaivedSum;
       }
+      // Starred subject boost when all pass: prefer higher percentage in starred subjects
+      if (hasStarred && Math.abs(cand.starredTierScore - currentBest.starredTierScore) > 1e-4) {
+        return cand.starredTierScore > currentBest.starredTierScore;
+      }
       if (cand.minPct > currentBest.minPct + 1e-6) return true;
       if (cand.minPct < currentBest.minPct - 1e-6) return false;
       if (cand.cdcCount !== currentBest.cdcCount) {
@@ -707,6 +711,9 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
               isBetter = oneThirdViolations < best.oneThirdViolations;
             } else if (excessWaivedSum !== best.excessWaivedSum) {
               isBetter = excessWaivedSum < best.excessWaivedSum;
+            } else if (hasStarred && Math.abs(starredTierScore - best.starredTierScore) > 1e-4) {
+              // Starred subject boost when all pass: prefer higher percentage in starred subjects
+              isBetter = starredTierScore > best.starredTierScore;
             } else if (minPct > best.minPct + 1e-9) {
               isBetter = true;
             }

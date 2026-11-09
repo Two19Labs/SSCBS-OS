@@ -2518,6 +2518,11 @@ export default function WaiverToolPage({ onBack }) {
                   {selectedWaivers.size === 0 && selectedCdcDays.size === 0
                     ? 'Baseline (0 applied)'
                     : `${selectedWaivers.size} waiver${selectedWaivers.size === 1 ? '' : 's'}${cdcLimit > 0 ? `, ${selectedCdcDays.size} CDC` : ''} applied`}
+                  {starredSubjects.size > 0 && (
+                    <span className="rd-status-priority-tag" title={`Prioritizing ${starredSubjects.size} starred subject${starredSubjects.size === 1 ? '' : 's'}`}>
+                      ★ {starredSubjects.size} Priority
+                    </span>
+                  )}
                 </span>
               </div>
               {selectedWaivers.size === 0 && selectedCdcDays.size === 0 && (solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
@@ -2562,11 +2567,11 @@ export default function WaiverToolPage({ onBack }) {
                   const newLimit = solverResult.neededWaiversForAllPass;
                   setMaxWaivers(newLimit);
                   setIsProcessing(true);
-                  executeSolverAsync(parsedData, threshold, newLimit, (newSol) => {
+                  executeSolverAsync(parsedData, threshold, newLimit, cdcLimit, starredSubjects, (newSol) => {
                     if (newSol?.chosenDays?.length > 0) {
                       setSelectedWaivers(new Set(newSol.chosenDays.map(d => d.dateStr)));
                     }
-                  });
+                  }, currentSolverOptions);
                 }}
               >
                 Increase to {solverResult.neededWaiversForAllPass} & Apply
