@@ -1884,13 +1884,12 @@
 .rd-status {
   border: 1px solid;
   border-radius: 14px;
-  flex: 1 1 300px;
+  flex: 2 1 360px;
   align-items: center;
   gap: 12px;
-  min-width: 280px;
-  height: 78px;
+  min-width: 340px;
   min-height: 78px;
-  max-height: 78px;
+  height: auto;
   padding: 10px 16px;
   display: flex;
   box-sizing: border-box;
@@ -1924,8 +1923,9 @@
 .rd-status-info {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 3px;
-  min-width: 0;
+  min-width: 140px;
   flex: 1;
 }
 
@@ -1974,7 +1974,7 @@
   margin-left: auto;
   flex-shrink: 0;
   white-space: nowrap;
-  padding: 7px 14px;
+  padding: 6px 12px;
   font-size: 12px;
   font-weight: 700;
   border-radius: 8px;
@@ -2474,9 +2474,9 @@
    ========================================================================== */
 
 .rd-btn-fill-remaining {
-  background: linear-gradient(135deg, rgba(176, 141, 62, 0.12), rgba(113, 34, 44, 0.12));
-  border-color: var(--gold, #b08d3e) !important;
-  color: var(--gold-text, #8a6c2a) !important;
+  background: linear-gradient(135deg, rgba(176, 141, 62, 0.14), rgba(113, 34, 44, 0.08)) !important;
+  border: 1px solid var(--gold, #b08d3e) !important;
+  color: #78350f !important;
   font-weight: 800;
   display: inline-flex;
   align-items: center;
@@ -2493,12 +2493,13 @@
 }
 
 .rd-btn-sidebar-fill {
-  background: linear-gradient(135deg, rgba(176, 141, 62, 0.12), rgba(113, 34, 44, 0.12));
-  border-color: var(--gold, #b08d3e) !important;
-  color: var(--gold-text, #8a6c2a) !important;
+  background: linear-gradient(135deg, rgba(176, 141, 62, 0.14), rgba(113, 34, 44, 0.08)) !important;
+  border: 1px solid var(--gold, #b08d3e) !important;
+  color: #78350f !important;
   font-weight: 700;
   font-size: 11.5px;
   padding: 4px 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .rd-btn-sidebar-fill:hover {
@@ -2774,3 +2775,336 @@
 
 
 
+
+/* ==========================================================================
+   Comprehensive Dark Mode Palette & Tokens for Attendance Tool
+   ========================================================================== */
+
+[data-theme='dark'] {
+  --waiver-cream-bg: #181114;
+  --waiver-card-bg: #231a1d;
+  --waiver-border: rgba(242, 232, 226, 0.1);
+  --waiver-border-subtle: rgba(242, 232, 226, 0.06);
+  --waiver-ink-dark: #f2e8e2;
+  --waiver-ink-muted: #a89a90;
+  --waiver-ink-light: #7d716b;
+  --waiver-maroon: #d98a94;
+  --waiver-maroon-hover: #e59ba4;
+  --waiver-maroon-tint: rgba(217, 138, 148, 0.15);
+  --waiver-green: #57c896;
+  --waiver-green-tint: rgba(87, 200, 150, 0.15);
+  --waiver-red: #e57373;
+  --waiver-red-tint: rgba(229, 115, 115, 0.15);
+  --waiver-bar-track: rgba(242, 232, 226, 0.1);
+  --waiver-bar-before: #5a504b;
+}
+
+[data-theme='dark'] .rd-root {
+  --ink: #f2e8e2;
+  --muted: #a89a90;
+  --faint: #7d716b;
+  --line: rgba(242, 232, 226, 0.1);
+  --bg: #181114;
+  --card: #231a1d;
+  --maroon: #d98a94;
+  --mtint: rgba(217, 138, 148, 0.15);
+  --green: #57c896;
+  --gtint: rgba(87, 200, 150, 0.15);
+  --amber: #e8a355;
+  --amberfill: #c9a558;
+  --atint: rgba(232, 163, 85, 0.15);
+  --red: #e57373;
+  --rtint: rgba(229, 115, 115, 0.15);
+  --slate: #94a3b8;
+  --stint: rgba(148, 163, 184, 0.15);
+  --track: rgba(242, 232, 226, 0.1);
+  color: var(--ink);
+  background: var(--bg) !important;
+}
+
+/* Navbars & Header Bars */
+[data-theme='dark'] .fullpage-navbar,
+[data-theme='dark'] .rd-nav {
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
+}
+
+[data-theme='dark'] .btn-back-portal {
+  border-color: var(--line) !important;
+  color: var(--muted) !important;
+}
+
+[data-theme='dark'] .btn-back-portal:hover {
+  background: rgba(242, 232, 226, 0.06) !important;
+  color: var(--ink) !important;
+}
+
+/* Stat Cards, Panels, Totals Card, and Cards */
+[data-theme='dark'] .rd-stat {
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
+}
+
+[data-theme='dark'] .rd-stat.priority-stat:hover {
+  background: rgba(245, 158, 11, 0.08) !important;
+  border-color: #f59e0b !important;
+}
+
+[data-theme='dark'] .rd-stat.priority-stat.active {
+  background: rgba(245, 158, 11, 0.15) !important;
+  border-color: #f59e0b !important;
+}
+
+[data-theme='dark'] .rd-totals-card,
+[data-theme='dark'] .rd-card,
+[data-theme='dark'] .rd-panel,
+[data-theme='dark'] .subject-health-card,
+[data-theme='dark'] .spreadsheet-grid-wrapper,
+[data-theme='dark'] .waiver-dates-card,
+[data-theme='dark'] .active-sheet-info-box {
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
+}
+
+[data-theme='dark'] .rd-card.rd-card-starred {
+  background: rgba(201, 165, 88, 0.05) !important;
+  border-left-color: var(--amberfill) !important;
+}
+
+[data-theme='dark'] .rd-panel-foot {
+  background: rgba(242, 232, 226, 0.03) !important;
+  border-color: var(--line) !important;
+}
+
+/* Action Buttons & Button Inversion */
+[data-theme='dark'] .rd-btn-dark {
+  background: var(--ink) !important;
+  color: #181114 !important;
+}
+
+[data-theme='dark'] .rd-btn-dark:hover {
+  background: #ffffff !important;
+  color: #181114 !important;
+}
+
+[data-theme='dark'] .rd-btn-outline {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border-color: var(--line) !important;
+}
+
+[data-theme='dark'] .rd-btn-outline:hover {
+  background: rgba(242, 232, 226, 0.08) !important;
+  border-color: rgba(242, 232, 226, 0.2) !important;
+}
+
+[data-theme='dark'] .rd-steps button {
+  background: rgba(242, 232, 226, 0.06) !important;
+  color: var(--ink) !important;
+  border-color: var(--line) !important;
+}
+
+[data-theme='dark'] .rd-steps button:hover {
+  background: rgba(242, 232, 226, 0.12) !important;
+}
+
+/* Fill Remaining Button Dark Mode */
+[data-theme='dark'] .rd-btn-fill-remaining {
+  background: rgba(201, 165, 88, 0.18) !important;
+  border-color: rgba(201, 165, 88, 0.45) !important;
+  color: #fcd34d !important;
+}
+
+[data-theme='dark'] .rd-btn-fill-remaining:hover {
+  background: var(--gold, #c9a558) !important;
+  color: #181114 !important;
+  border-color: var(--gold, #c9a558) !important;
+}
+
+[data-theme='dark'] .rd-btn-sidebar-fill {
+  background: rgba(201, 165, 88, 0.18) !important;
+  border-color: rgba(201, 165, 88, 0.45) !important;
+  color: #fcd34d !important;
+}
+
+[data-theme='dark'] .rd-btn-sidebar-fill:hover {
+  background: var(--gold, #c9a558) !important;
+  color: #181114 !important;
+  border-color: var(--gold, #c9a558) !important;
+}
+
+/* Table Grid & Sticky Columns */
+[data-theme='dark'] .rd-sticky,
+[data-theme='dark'] .rd-subj,
+[data-theme='dark'] .sticky-col-name,
+[data-theme='dark'] .sticky-col-stat,
+[data-theme='dark'] .sticky-pct-header {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+}
+
+[data-theme='dark'] .rd-subj-h,
+[data-theme='dark'] .sticky-sub-header {
+  background: rgba(242, 232, 226, 0.06) !important;
+  color: var(--muted) !important;
+}
+
+[data-theme='dark'] .tr-month-header th {
+  background: rgba(242, 232, 226, 0.06) !important;
+  color: var(--ink) !important;
+}
+
+[data-theme='dark'] .tr-date-header th {
+  background: rgba(242, 232, 226, 0.03) !important;
+}
+
+[data-theme='dark'] .tr-date-header th:hover {
+  background: rgba(242, 232, 226, 0.08) !important;
+}
+
+[data-theme='dark'] .tr-subject-row:hover td {
+  background: rgba(242, 232, 226, 0.04) !important;
+}
+
+[data-theme='dark'] .rd-cell:hover {
+  background: rgba(242, 232, 226, 0.05);
+}
+
+[data-theme='dark'] .rd-fade {
+  background: linear-gradient(90deg, rgba(35, 26, 29, 0), var(--surface) 75%) !important;
+}
+
+[data-theme='dark'] .grid-helper-callout {
+  background: rgba(242, 232, 226, 0.03) !important;
+  border-color: var(--line) !important;
+  color: var(--muted) !important;
+}
+
+/* Date List, Modals, Beta & Mobile Screens */
+[data-theme='dark'] .waiver-locked-card,
+[data-theme='dark'] .waiver-mobile-card {
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
+  color: var(--ink) !important;
+}
+
+[data-theme='dark'] .rd-expanded {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+}
+
+[data-theme='dark'] .rd-ineligible-modal,
+[data-theme='dark'] .waiver-modal-card,
+[data-theme='dark'] .rd-modal-card {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border-color: var(--line) !important;
+}
+
+[data-theme='dark'] .rd-priority-modal-toolbar {
+  background: rgba(242, 232, 226, 0.04) !important;
+  border-color: var(--line) !important;
+}
+
+[data-theme='dark'] .rd-priority-date-card {
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
+}
+
+[data-theme='dark'] .rd-priority-date-card:hover {
+  background: rgba(245, 158, 11, 0.08) !important;
+  border-color: #f59e0b !important;
+}
+
+[data-theme='dark'] .rd-priority-date-card.selected {
+  background: rgba(245, 158, 11, 0.15) !important;
+  border-color: #f59e0b !important;
+}
+
+[data-theme='dark'] .rd-date-list li {
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
+}
+
+[data-theme='dark'] .rd-date-del-btn {
+  background: var(--surface) !important;
+  color: var(--muted) !important;
+  border-color: var(--line) !important;
+}
+
+[data-theme='dark'] .rd-date-del-btn:hover {
+  background: var(--rtint) !important;
+  color: var(--red) !important;
+}
+
+[data-theme='dark'] .rd-date-pinned-badge {
+  background: rgba(245, 158, 11, 0.2) !important;
+  color: #fcd34d !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+[data-theme='dark'] .rd-date-list li.is-locked-day {
+  border-color: rgba(245, 158, 11, 0.4) !important;
+  background: linear-gradient(to right, rgba(245, 158, 11, 0.1), transparent) !important;
+}
+
+[data-theme='dark'] .rd-popover,
+[data-theme='dark'] .popover-inner-card {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border-color: var(--line) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6) !important;
+}
+
+[data-theme='dark'] .rd-pop-row .nm {
+  color: var(--muted) !important;
+}
+
+[data-theme='dark'] .rd-tool-toggle {
+  background: rgba(242, 232, 226, 0.08) !important;
+  border-color: var(--line) !important;
+}
+
+[data-theme='dark'] .rd-tool-btn.active {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+}
+
+[data-theme='dark'] .rd-tool-btn.priority {
+  background: rgba(245, 158, 11, 0.15) !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+  color: #fcd34d !important;
+}
+
+[data-theme='dark'] .dropzone-upload-box {
+  background: rgba(242, 232, 226, 0.03) !important;
+  border-color: rgba(242, 232, 226, 0.15) !important;
+}
+
+[data-theme='dark'] .dropzone-upload-box:hover {
+  background: rgba(242, 232, 226, 0.06) !important;
+}
+
+[data-theme='dark'] .param-input-box {
+  background: rgba(242, 232, 226, 0.04) !important;
+  border-color: var(--line) !important;
+}
+
+[data-theme='dark'] .param-select {
+  color: var(--ink) !important;
+}
+
+[data-theme='dark'] .pill-toggle-btn.active {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+}
+
+[data-theme='dark'] .view-mode-toggle-pills {
+  background: rgba(242, 232, 226, 0.06) !important;
+  border-color: var(--line) !important;
+}
+
+[data-theme='dark'] .badge-info-only {
+  background: rgba(242, 232, 226, 0.08) !important;
+  color: var(--muted) !important;
+}

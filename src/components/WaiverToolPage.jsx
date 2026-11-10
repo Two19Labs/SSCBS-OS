@@ -2789,7 +2789,7 @@ export default function WaiverToolPage({ onBack }) {
               {hasPendingPriorityChange && (
                 <button
                   type="button"
-                  className="rd-btn-outline sm rd-btn-accent rd-btn-priority-recalc rd-status-cta"
+                  className="rd-btn-outline sm rd-btn-priority-recalc rd-status-cta"
                   onClick={handleRecalculateWithPriorities}
                   title="Recalculate and apply optimal waivers with updated starred priorities"
                 >
@@ -2799,11 +2799,11 @@ export default function WaiverToolPage({ onBack }) {
               {canFillRemaining && (
                 <button
                   type="button"
-                  className="rd-btn-outline sm rd-btn-accent rd-status-cta rd-btn-fill-remaining"
+                  className="rd-btn-outline sm rd-status-cta rd-btn-fill-remaining"
                   onClick={handleFillRemainingWaivers}
                   title={`Keep current ${selectedWaivers.size} selected dates and solve for remaining ${remainingWaiversCount} waivers`}
                 >
-                  💡 Fill remaining {remainingWaiversCount} waivers
+                  💡 Fill remaining ({remainingWaiversCount})
                 </button>
               )}
               {hasParamsChanged && (selectedWaivers.size > 0 || selectedCdcDays.size > 0) && (
@@ -2934,7 +2934,7 @@ export default function WaiverToolPage({ onBack }) {
                     {hasPendingPriorityChange && (
                       <button
                         type="button"
-                        className="rd-btn-outline sm rd-btn-accent rd-btn-priority-recalc"
+                        className="rd-btn-outline sm rd-btn-priority-recalc"
                         onClick={handleRecalculateWithPriorities}
                         title="Recalculate and apply optimal waivers with updated starred priorities"
                       >
@@ -2944,7 +2944,7 @@ export default function WaiverToolPage({ onBack }) {
                     {canFillRemaining && (
                       <button
                         type="button"
-                        className="rd-btn-outline sm rd-btn-accent rd-btn-fill-remaining"
+                        className="rd-btn-outline sm rd-btn-fill-remaining"
                         onClick={handleFillRemainingWaivers}
                         title={`Keep current ${selectedWaivers.size} selected dates and solve for remaining ${remainingWaiversCount} waivers`}
                       >
@@ -3046,7 +3046,7 @@ export default function WaiverToolPage({ onBack }) {
                     {hasPendingPriorityChange && (
                       <button
                         type="button"
-                        className="rd-btn-outline sm rd-btn-accent rd-btn-priority-recalc"
+                        className="rd-btn-outline sm rd-btn-priority-recalc"
                         onClick={handleRecalculateWithPriorities}
                         title="Recalculate and apply optimal waivers with updated starred priorities"
                       >
@@ -3056,7 +3056,7 @@ export default function WaiverToolPage({ onBack }) {
                     {canFillRemaining && (
                       <button
                         type="button"
-                        className="rd-btn-outline sm rd-btn-accent rd-btn-sidebar-fill"
+                        className="rd-btn-outline sm rd-btn-sidebar-fill"
                         onClick={handleFillRemainingWaivers}
                         title={`Keep current ${selectedWaivers.size} selected dates and solve for remaining ${remainingWaiversCount} waivers`}
                       >
@@ -3373,7 +3373,7 @@ export default function WaiverToolPage({ onBack }) {
                 {hasPendingPriorityChange && (
                   <button
                     type="button"
-                    className="rd-btn-outline sm rd-btn-accent rd-btn-priority-recalc"
+                    className="rd-btn-outline sm rd-btn-priority-recalc"
                     onClick={handleRecalculateWithPriorities}
                     title="Recalculate and apply optimal waivers with updated starred priorities"
                   >
@@ -3383,7 +3383,7 @@ export default function WaiverToolPage({ onBack }) {
                 {canFillRemaining && (
                   <button
                     type="button"
-                    className="rd-btn-outline sm rd-btn-accent rd-btn-fill-remaining"
+                    className="rd-btn-outline sm rd-btn-fill-remaining"
                     onClick={handleFillRemainingWaivers}
                     title={`Keep current ${selectedWaivers.size} selected dates and solve for remaining ${remainingWaiversCount} waivers`}
                   >
