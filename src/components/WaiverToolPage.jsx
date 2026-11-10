@@ -135,8 +135,7 @@ export default function WaiverToolPage({ onBack }) {
   // Special Attendance Adjustment (aggregate-only extra credits, e.g. college representation/duty leaves)
   const [specialAttendanceAdjustment, setSpecialAttendanceAdjustment] = useState({ attended: 0, held: 0 });
   const [isSpecialAdjOpen, setIsSpecialAdjOpen] = useState(false);
-  const [syncHeldWithAttended, setSyncHeldWithAttended] = useState(true);
-
+  
   // Granular Undo & Redo History Stacks (Excel-grade for all grid mutations)
   const [undoStack, setUndoStack] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
@@ -1732,9 +1731,9 @@ export default function WaiverToolPage({ onBack }) {
                       title="Adjust total attendance for special institutional cases (duty leaves or representation credits)"
                     >
                       {(specialAttendanceAdjustment.attended !== 0 || specialAttendanceAdjustment.held !== 0) ? (
-                        <span>⚡ Special ({specialAttendanceAdjustment.attended >= 0 ? `+${specialAttendanceAdjustment.attended}` : specialAttendanceAdjustment.attended}/{specialAttendanceAdjustment.held >= 0 ? `+${specialAttendanceAdjustment.held}` : specialAttendanceAdjustment.held}) ✎</span>
+                        <span>⚡ Adjusted ({item.data.att}/{item.data.held}) ✎</span>
                       ) : (
-                        <span>✎ Adjust Special</span>
+                        <span>✎ Adjust</span>
                       )}
                     </button>
                   )}
@@ -1803,16 +1802,7 @@ export default function WaiverToolPage({ onBack }) {
                 <div className="rd-total-frac-wrap">
                   <span className={`rd-total-pct s-${status}`}>{curPct.toFixed(1)}%</span>
                   <span className="rd-total-frac">{item.data.att}/{item.data.held}</span>
-                  {item.key === 'overall' && (
-                    <button
-                      type="button"
-                      className={`rd-special-quick-btn ${(specialAttendanceAdjustment.attended !== 0 || specialAttendanceAdjustment.held !== 0) ? 'is-active' : ''}`}
-                      onClick={() => setIsSpecialAdjOpen(!isSpecialAdjOpen)}
-                      title="Click to increase or decrease total attendance (+/-)"
-                    >
-                      ✎ Edit
-                    </button>
-                  )}
+                  
                 </div>
                 <span className="rd-was">{hasChanged ? `was ${basePct.toFixed(1)}%` : 'unchanged'}</span>
               </div>
@@ -1824,99 +1814,76 @@ export default function WaiverToolPage({ onBack }) {
                 <div className="rd-tick" style={{ left: `${threshold}%` }} title={`${threshold}% target`} />
               </div>
               {item.key === 'overall' && isSpecialAdjOpen && (
-                <div className="rd-special-adj-panel" role="region" aria-label="Special Case Attendance Adjustment">
+                <div className="rd-special-adj-panel" role="region" aria-label="Adjust Total Attendance">
                   <div className="rd-special-adj-head">
-                    <div className="rd-special-adj-title">
-                      <strong>Special Case Attendance Adjustment</strong>
-                      <span className="rd-special-adj-tag">Total Aggregate Only · No Subject</span>
-                    </div>
+                    <span className="rd-special-adj-title">
+                      <strong>Adjust Total Attendance</strong>
+                    </span>
                     <button
                       type="button"
                       className="rd-special-adj-close"
                       onClick={() => setIsSpecialAdjOpen(false)}
-                      aria-label="Close adjustment panel"
+                      aria-label="Close"
                     >
                       ✕
                     </button>
                   </div>
 
-                  <div className="rd-special-adj-note">
-                    <span className="rd-special-adj-note-icon">ℹ️</span>
-                    <p>
-                      <strong>Institutional Special Cases:</strong> This adjustment is for special circumstances where extra attendance credits are awarded directly to your aggregate total (e.g. college-approved duty leaves, representation credits, or administrative credits not assigned to any specific subject). This updates your total attendance percentage and waiver eligibility.
-                    </p>
-                  </div>
+                  <p className="rd-special-adj-subtext">
+                    For special cases where extra attendance is added directly to your total tally.
+                  </p>
 
                   <div className="rd-special-adj-steppers">
-                    {/* Attended (Numerator) Stepper */}
+                    {/* Attended Stepper */}
                     <div className="rd-adj-stepper-field">
-                      <label>
-                        <strong>Extra Attended (+P / Numerator):</strong>
-                        <span className="rd-adj-field-sub">Credit for classes attended</span>
-                      </label>
+                      <label>Attended (Present):</label>
                       <div className="rd-stepper-row">
                         <button
                           type="button"
                           className="rd-stepper-btn"
                           onClick={() => {
-                            setSpecialAttendanceAdjustment(prev => {
-                              const nextAtt = prev.attended - 1;
-                              const nextHeld = syncHeldWithAttended ? prev.held - 1 : prev.held;
-                              return { attended: nextAtt, held: nextHeld };
-                            });
+                            setSpecialAttendanceAdjustment(prev => ({
+                              ...prev,
+                              attended: prev.attended - 1
+                            }));
                           }}
-                          title="Decrease attended credit by 1"
+                          title="Decrease attended by 1"
                         >
                           −
                         </button>
                         <input
                           type="number"
                           className="rd-stepper-input"
-                          value={specialAttendanceAdjustment.attended}
+                          value={item.data.att}
                           onChange={(e) => {
-                            const val = parseInt(e.target.value, 10) || 0;
-                            setSpecialAttendanceAdjustment(prev => ({
-                              attended: val,
-                              held: syncHeldWithAttended ? (prev.held + (val - prev.attended)) : prev.held
-                            }));
+                            const val = parseInt(e.target.value, 10);
+                            if (!Number.isNaN(val)) {
+                              setSpecialAttendanceAdjustment(prev => ({
+                                ...prev,
+                                attended: val - (item.data.rawAtt || 0)
+                              }));
+                            }
                           }}
                         />
                         <button
                           type="button"
                           className="rd-stepper-btn"
                           onClick={() => {
-                            setSpecialAttendanceAdjustment(prev => {
-                              const nextAtt = prev.attended + 1;
-                              const nextHeld = syncHeldWithAttended ? prev.held + 1 : prev.held;
-                              return { attended: nextAtt, held: nextHeld };
-                            });
-                          }}
-                          title="Increase attended credit by 1"
-                        >
-                          +
-                        </button>
-                        <button
-                          type="button"
-                          className="rd-stepper-quick"
-                          onClick={() => {
                             setSpecialAttendanceAdjustment(prev => ({
-                              attended: prev.attended + 5,
-                              held: syncHeldWithAttended ? prev.held + 5 : prev.held
+                              ...prev,
+                              attended: prev.attended + 1
                             }));
                           }}
-                          title="Add 5"
+                          title="Increase attended by 1"
                         >
-                          +5
+                          +
                         </button>
                       </div>
                     </div>
 
-                    {/* Held (Denominator) Stepper */}
+                    {/* Total Held Stepper */}
                     <div className="rd-adj-stepper-field">
-                      <label>
-                        <strong>Extra Total Held (+N / Denominator):</strong>
-                        <span className="rd-adj-field-sub">Classes conducted/held</span>
-                      </label>
+                      <label>Total Classes (Held):</label>
                       <div className="rd-stepper-row">
                         <button
                           type="button"
@@ -1927,17 +1894,22 @@ export default function WaiverToolPage({ onBack }) {
                               held: prev.held - 1
                             }));
                           }}
-                          title="Decrease total held credit by 1"
+                          title="Decrease held by 1"
                         >
                           −
                         </button>
                         <input
                           type="number"
                           className="rd-stepper-input"
-                          value={specialAttendanceAdjustment.held}
+                          value={item.data.held}
                           onChange={(e) => {
-                            const val = parseInt(e.target.value, 10) || 0;
-                            setSpecialAttendanceAdjustment(prev => ({ ...prev, held: val }));
+                            const val = parseInt(e.target.value, 10);
+                            if (!Number.isNaN(val)) {
+                              setSpecialAttendanceAdjustment(prev => ({
+                                ...prev,
+                                held: val - (item.data.rawHeld || 0)
+                              }));
+                            }
                           }}
                         />
                         <button
@@ -1949,68 +1921,31 @@ export default function WaiverToolPage({ onBack }) {
                               held: prev.held + 1
                             }));
                           }}
-                          title="Increase total held credit by 1"
+                          title="Increase held by 1"
                         >
                           +
-                        </button>
-                        <button
-                          type="button"
-                          className="rd-stepper-quick"
-                          onClick={() => {
-                            setSpecialAttendanceAdjustment(prev => ({
-                              ...prev,
-                              held: prev.held + 5
-                            }));
-                          }}
-                          title="Add 5"
-                        >
-                          +5
                         </button>
                       </div>
                     </div>
                   </div>
 
-                  {/* Sync checkbox */}
-                  <div className="rd-special-adj-sync">
-                    <label className="rd-sync-label">
-                      <input
-                        type="checkbox"
-                        checked={syncHeldWithAttended}
-                        onChange={(e) => setSyncHeldWithAttended(e.target.checked)}
-                      />
-                      <span>Sync Total Held with Attended (recommended for 100% duty credit)</span>
-                    </label>
-                  </div>
-
-                  {/* Full transparency breakdown */}
-                  <div className="rd-special-adj-breakdown">
-                    <div className="rd-adj-calc-row">
-                      <span>Raw Sheet Attendance:</span>
-                      <strong>{item.data.rawAtt} / {item.data.rawHeld} ({item.data.rawPct?.toFixed(1)}%)</strong>
-                    </div>
-                    <div className="rd-adj-calc-row">
-                      <span>Special Adjustment:</span>
-                      <strong style={{ color: specialAttendanceAdjustment.attended >= 0 ? '#059669' : '#dc2626' }}>
-                        {specialAttendanceAdjustment.attended >= 0 ? `+${specialAttendanceAdjustment.attended}` : specialAttendanceAdjustment.attended} Attended / {specialAttendanceAdjustment.held >= 0 ? `+${specialAttendanceAdjustment.held}` : specialAttendanceAdjustment.held} Held
-                      </strong>
-                    </div>
-                    <div className="rd-adj-calc-row total-highlight">
-                      <span>Effective Total Aggregate:</span>
-                      <strong>{curPct.toFixed(1)}% ({item.data.att}/{item.data.held})</strong>
-                    </div>
-                  </div>
-
                   <div className="rd-special-adj-foot">
+                    <span className="rd-adj-summary-text">
+                      Original: {item.data.rawAtt}/{item.data.rawHeld}
+                      {(specialAttendanceAdjustment.attended !== 0 || specialAttendanceAdjustment.held !== 0) && (
+                        <> · <strong style={{ color: curPct >= threshold ? '#059669' : '#d97706' }}>Now: {item.data.att}/{item.data.held} ({curPct.toFixed(1)}%)</strong></>
+                      )}
+                    </span>
+                    <div style={{ flex: 1 }} />
                     {(specialAttendanceAdjustment.attended !== 0 || specialAttendanceAdjustment.held !== 0) && (
                       <button
                         type="button"
                         className="rd-btn-outline xs muted"
                         onClick={() => setSpecialAttendanceAdjustment({ attended: 0, held: 0 })}
                       >
-                        Reset Adjustment
+                        Reset
                       </button>
                     )}
-                    <div style={{ flex: 1 }} />
                     <button
                       type="button"
                       className="rd-btn-dark xs"

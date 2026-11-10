@@ -3412,7 +3412,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 7px;
+  padding: 2px 8px;
   font-size: 11px;
   font-weight: 600;
   border-radius: 6px;
@@ -3451,7 +3451,7 @@
   border-radius: 10px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   animation: rdFadeIn 0.15s ease-out;
 }
@@ -3470,25 +3470,19 @@
 }
 
 .rd-special-adj-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   font-size: 12px;
   color: var(--text-main, #1e1a17);
 }
 
-.rd-special-adj-tag {
-  font-size: 10px;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: #e0e7ff;
-  color: #3730a3;
-  font-weight: 600;
+.rd-special-adj-subtext {
+  margin: 0;
+  font-size: 11px;
+  color: var(--muted, #666);
+  line-height: 1.35;
 }
 
-[data-theme='dark'] .rd-special-adj-tag {
-  background: rgba(99, 102, 241, 0.2);
-  color: #a5b4fc;
+[data-theme='dark'] .rd-special-adj-subtext {
+  color: #999;
 }
 
 .rd-special-adj-close {
@@ -3506,37 +3500,11 @@
   color: var(--text-main, #1e1a17);
 }
 
-.rd-special-adj-note {
-  display: flex;
-  gap: 8px;
-  padding: 8px 10px;
-  background: #eff6ff;
-  border-left: 3px solid #3b82f6;
-  border-radius: 6px;
-  font-size: 11px;
-  line-height: 1.4;
-  color: #1e40af;
-}
-
-[data-theme='dark'] .rd-special-adj-note {
-  background: rgba(59, 130, 246, 0.12);
-  border-left-color: #60a5fa;
-  color: #bfdbfe;
-}
-
-.rd-special-adj-note-icon {
-  font-size: 13px;
-  flex-shrink: 0;
-}
-
-.rd-special-adj-note p {
-  margin: 0;
-}
-
 .rd-special-adj-steppers {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
+  margin-top: 4px;
 }
 
 @media (max-width: 600px) {
@@ -3548,20 +3516,13 @@
 .rd-adj-stepper-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .rd-adj-stepper-field label {
-  display: flex;
-  flex-direction: column;
   font-size: 11px;
+  font-weight: 600;
   color: var(--text-main, #1e1a17);
-}
-
-.rd-adj-field-sub {
-  font-size: 10px;
-  color: var(--muted, #777);
-  font-weight: normal;
 }
 
 .rd-stepper-row {
@@ -3571,7 +3532,7 @@
 }
 
 .rd-stepper-btn {
-  width: 28px;
+  width: 30px;
   height: 28px;
   display: inline-flex;
   align-items: center;
@@ -3592,7 +3553,7 @@
 }
 
 .rd-stepper-input {
-  width: 50px;
+  width: 60px;
   height: 28px;
   text-align: center;
   font-size: 13px;
@@ -3603,72 +3564,22 @@
   color: var(--text-main, #1e1a17);
 }
 
-.rd-stepper-quick {
-  height: 28px;
-  padding: 0 8px;
-  border: 1px solid var(--line, #e2d9cf);
-  background: var(--surface-muted, #f4eee9);
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  color: var(--text-main, #1e1a17);
-  transition: all 0.1s ease;
-}
-
-.rd-stepper-quick:hover {
-  background: var(--amberfill, #c9a558);
-  color: #ffffff;
-  border-color: var(--amberfill, #c9a558);
-}
-
-.rd-special-adj-sync {
-  font-size: 11px;
-  color: var(--muted, #5f5852);
-}
-
-.rd-sync-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.rd-special-adj-breakdown {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 8px 10px;
-  background: var(--surface-muted, #f8f6f2);
-  border-radius: 6px;
-  font-size: 11px;
-}
-
-[data-theme='dark'] .rd-special-adj-breakdown {
-  background: #252220;
-}
-
-.rd-adj-calc-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: var(--muted, #666);
-}
-
-.rd-adj-calc-row.total-highlight {
-  font-weight: 700;
-  color: var(--text-main, #1e1a17);
-  border-top: 1px dashed var(--line, #e2d9cf);
-  padding-top: 4px;
-  margin-top: 2px;
-}
-
 .rd-special-adj-foot {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 2px;
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--line, #e2d9cf);
+}
+
+.rd-adj-summary-text {
+  font-size: 11px;
+  color: var(--muted, #666);
+}
+
+[data-theme='dark'] .rd-adj-summary-text {
+  color: #aaa;
 }
 
 /* ── Panel Header Title Row & History Buttons (Undo / Redo) ── */
@@ -3741,49 +3652,3 @@
 }
 
 
-.rd-special-quick-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 1px 6px;
-  font-size: 11px;
-  font-weight: 600;
-  border-radius: 4px;
-  background: var(--surface-muted, #f4eee9);
-  color: var(--text-muted, #666);
-  border: 1px solid var(--line, #e2d9cf);
-  cursor: pointer;
-  margin-left: 6px;
-  transition: all 0.15s ease;
-  line-height: 1.2;
-}
-
-.rd-special-quick-btn:hover {
-  background: var(--surface-hover, #ede4dc);
-  border-color: var(--amberfill, #c9a558);
-  color: var(--text-main, #1e1a17);
-}
-
-.rd-special-quick-btn.is-active {
-  background: #ecfdf5;
-  color: #065f46;
-  border-color: #a7f3d0;
-}
-
-[data-theme='dark'] .rd-special-quick-btn {
-  background: #252220;
-  border-color: #383430;
-  color: #a09890;
-}
-
-[data-theme='dark'] .rd-special-quick-btn:hover {
-  background: #332f2b;
-  color: #fff;
-  border-color: #c9a558;
-}
-
-[data-theme='dark'] .rd-special-quick-btn.is-active {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border-color: rgba(16, 185, 129, 0.35);
-}
