@@ -537,7 +537,76 @@ test('Date range generation skips both Saturdays and Sundays (Mon – Fri only)'
 });
 
 // -------------------------------------------------------------
-// SECTION 8: SUMMARY & AUDIT RESULTS
+// -------------------------------------------------------------
+// SECTION 8: BLACKLISTED DATES (BLOCKED / EXCLUDED DATES)
+// -------------------------------------------------------------
+console.log('\n--- SECTION 8: Blacklisted Dates (Blocked/Excluded Dates) ---');
+
+test('Solver strictly never allocates waivers to blacklisted dates', () => {
+  // Base mock data has candidate absent dates: 09-01, 09-02, 09-03, 09-04, 09-05.
+  const blocked = ['2026-09-01', '2026-09-02'];
+  const sol = solveExactBnb(baseMockData, 85, 3, [], 0, {
+    blockedDates: blocked
+  });
+
+  assert.ok(sol.chosenDays.length > 0, 'Solver should still find a valid solution if eligible days exist');
+  sol.chosenDays.forEach(d => {
+    assert.strictEqual(
+      blocked.includes(d.dateStr),
+      false,
+      `Blacklisted date ${d.dateStr} was mistakenly chosen by solver`
+    );
+  });
+});
+
+test('Solver redirects waivers away from blacklisted date to other eligible dates', () => {
+  const solNoBlock = solveExactBnb(baseMockData, 85, 1, [], 0, {});
+  const topDate = solNoBlock.chosenDays[0]?.dateStr;
+  assert.ok(topDate, 'Solver should pick a top date without blocks');
+
+  // Now block the top date
+  const solWithBlock = solveExactBnb(baseMockData, 85, 1, [], 0, {
+    blockedDates: [topDate]
+  });
+
+  assert.notStrictEqual(
+    solWithBlock.chosenDays[0]?.dateStr,
+    topDate,
+    `Solver must not pick the blacklisted top date ${topDate}`
+  );
+  assert.ok(solWithBlock.chosenDays.length === 1, 'Solver should pick alternative date');
+});
+
+test('Blacklist takes precedence over priority dates if both are provided', () => {
+  const conflictDate = '2026-09-01';
+  const sol = solveExactBnb(baseMockData, 85, 2, [], 0, {
+    priorityWaiverDates: [conflictDate, '2026-09-03'],
+    blockedDates: [conflictDate]
+  });
+
+  // conflictDate must NOT be chosen
+  assert.strictEqual(
+    sol.chosenDays.some(d => d.dateStr === conflictDate),
+    false,
+    `Blacklisted date ${conflictDate} must NEVER be chosen even if prioritized`
+  );
+  // Other priority date 2026-09-03 should still be chosen
+  assert.ok(
+    sol.chosenDays.some(d => d.dateStr === '2026-09-03'),
+    'Unblocked priority date 2026-09-03 must still be chosen'
+  );
+});
+
+test('Blacklisting all candidate dates results in 0 chosen waiver days', () => {
+  const allAbsentDates = ['2026-09-01', '2026-09-02', '2026-09-03', '2026-09-04', '2026-09-05'];
+  const sol = solveExactBnb(baseMockData, 85, 3, [], 0, {
+    blockedDates: allAbsentDates
+  });
+  assert.strictEqual(sol.chosenDays.length, 0, 'Should pick 0 days when all absent dates are blacklisted');
+});
+
+// -------------------------------------------------------------
+// SECTION 9: SUMMARY & AUDIT RESULTS
 // -------------------------------------------------------------
 console.log('\n=====================================================');
 console.log(`TOTAL TESTS: ${totalTests} | PASSED: ${passedTests} | FAILED: ${issuesFound.length}`);

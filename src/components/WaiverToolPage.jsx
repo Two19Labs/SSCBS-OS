@@ -126,6 +126,12 @@ export default function WaiverToolPage({ onBack }) {
   const [tempPriorityDates, setTempPriorityDates] = useState(new Set());
   const [priorityDateSearch, setPriorityDateSearch] = useState('');
 
+  // Blacklisted Dates (dates blocked from receiving waivers e.g. unapproved bunks)
+  const [blacklistedDates, setBlacklistedDates] = useState(new Set());
+  const [isBlacklistedDatesModalOpen, setIsBlacklistedDatesModalOpen] = useState(false);
+  const [tempBlacklistedDates, setTempBlacklistedDates] = useState(new Set());
+  const [blacklistDateSearch, setBlacklistDateSearch] = useState('');
+
   // Ineligibility acknowledgement state (shown when baseline overall attendance < 66.7%)
   const [hasAcknowledgedIneligible, setHasAcknowledgedIneligible] = useState(false);
 
@@ -213,6 +219,9 @@ export default function WaiverToolPage({ onBack }) {
           if (Array.isArray(saved.priorityDates)) {
             setPriorityDates(new Set(saved.priorityDates));
           }
+          if (Array.isArray(saved.blacklistedDates)) {
+            setBlacklistedDates(new Set(saved.blacklistedDates));
+          }
           if (saved.gridToolMode) setGridToolMode(saved.gridToolMode);
           if (saved.customStartDate !== undefined) setCustomStartDate(saved.customStartDate);
           if (saved.customEndDate !== undefined) setCustomEndDate(saved.customEndDate);
@@ -245,6 +254,7 @@ export default function WaiverToolPage({ onBack }) {
         cdcLimit,
         selectedCdcDays: Array.from(selectedCdcDays),
         priorityDates: Array.from(priorityDates),
+        blacklistedDates: Array.from(blacklistedDates),
         gridToolMode,
         customStartDate,
         customEndDate
@@ -253,7 +263,7 @@ export default function WaiverToolPage({ onBack }) {
     } catch (err) {
       console.warn('Failed to persist Waiver Tool state:', err);
     }
-  }, [rawParsedData, parsedData, selectedWaivers, lockedWaivers, lockedCdcDays, starredSubjects, priorityDates, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, hasAcknowledgedIneligible, cdcLimit, selectedCdcDays, gridToolMode, customStartDate, customEndDate, storageKey]);
+  }, [rawParsedData, parsedData, selectedWaivers, lockedWaivers, lockedCdcDays, starredSubjects, priorityDates, blacklistedDates, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, hasAcknowledgedIneligible, cdcLimit, selectedCdcDays, gridToolMode, customStartDate, customEndDate, storageKey]);
 
   // Prevent scroll when expanded grid modal is open
   useEffect(() => {
@@ -272,6 +282,7 @@ export default function WaiverToolPage({ onBack }) {
         setIsGridExpanded(false);
         setIsTimelineModalOpen(false);
         setIsPriorityDatesModalOpen(false);
+        setIsBlacklistedDatesModalOpen(false);
         setEditingCell(null);
         setIsAddDateModalOpen(false);
         setDateToDelete(null);
@@ -354,6 +365,9 @@ export default function WaiverToolPage({ onBack }) {
     const actualPriorityDates = extraOpts.priorityWaiverDates !== undefined
       ? (Array.isArray(extraOpts.priorityWaiverDates) ? extraOpts.priorityWaiverDates : Array.from(extraOpts.priorityWaiverDates || []))
       : (priorityDates.size > 0 ? Array.from(priorityDates) : []);
+    const actualBlockedDates = extraOpts.blockedDates !== undefined
+      ? (Array.isArray(extraOpts.blockedDates) ? extraOpts.blockedDates : Array.from(extraOpts.blockedDates || []))
+      : (blacklistedDates.size > 0 ? Array.from(blacklistedDates) : []);
     const starredList = Array.from(stars || []);
 
     if (workerRef.current) {
@@ -396,7 +410,8 @@ export default function WaiverToolPage({ onBack }) {
         waiverEndDate: actualEndDate,
         fixedWaiverDates: actualFixedWaivers,
         fixedCdcDates: actualFixedCdc,
-        priorityWaiverDates: actualPriorityDates
+        priorityWaiverDates: actualPriorityDates,
+        blockedDates: actualBlockedDates
       });
     } else {
       setTimeout(() => {
@@ -407,7 +422,8 @@ export default function WaiverToolPage({ onBack }) {
             waiverEndDate: actualEndDate,
             fixedWaiverDates: actualFixedWaivers,
             fixedCdcDates: actualFixedCdc,
-            priorityWaiverDates: actualPriorityDates
+            priorityWaiverDates: actualPriorityDates,
+            blockedDates: actualBlockedDates
           };
           const solution = solveExactBnb(data, targetT, limitK, starredList, actualCdc, options);
           let kPlusOne = null;
@@ -525,8 +541,9 @@ export default function WaiverToolPage({ onBack }) {
   const currentSolverOptions = useMemo(() => ({
     waiverStartDate: activeWaiverStart || null,
     waiverEndDate: activeWaiverEnd || null,
-    priorityWaiverDates: priorityDates.size > 0 ? Array.from(priorityDates) : []
-  }), [activeWaiverStart, activeWaiverEnd, priorityDates]);
+    priorityWaiverDates: priorityDates.size > 0 ? Array.from(priorityDates) : [],
+    blockedDates: blacklistedDates.size > 0 ? Array.from(blacklistedDates) : []
+  }), [activeWaiverStart, activeWaiverEnd, priorityDates, blacklistedDates]);
 
   const handleReplaceSheet = () => {
     setParsedData(null);
@@ -553,6 +570,8 @@ export default function WaiverToolPage({ onBack }) {
     setIsTimelineModalOpen(false);
     setPriorityDates(new Set());
     setIsPriorityDatesModalOpen(false);
+    setBlacklistedDates(new Set());
+    setIsBlacklistedDatesModalOpen(false);
     try {
       localStorage.removeItem(storageKey);
     } catch {
@@ -836,6 +855,13 @@ export default function WaiverToolPage({ onBack }) {
         const next = new Set(prev);
         if (next.has(dateStr)) next.delete(dateStr);
         else next.add(dateStr);
+        return next;
+      });
+      // Mutual exclusivity: remove from blacklisted if prioritized
+      setBlacklistedDates(prev => {
+        if (!prev.has(dateStr)) return prev;
+        const next = new Set(prev);
+        next.delete(dateStr);
         return next;
       });
       if (selectedWaivers.size > 0 || selectedCdcDays.size > 0) {
@@ -1631,8 +1657,9 @@ export default function WaiverToolPage({ onBack }) {
               const isFutureDate = col.isFuture || customizationDiff.futureDates?.has(col.dateStr) || Boolean(parsedData?.reportDate && col.dateStr > parsedData.reportDate);
               const isAddedDate = col.isCustom || customizationDiff.addedDates?.has(col.dateStr);
               const isPriority = priorityDates.has(col.dateStr);
-              const btnClass = isWaived ? 'on' : (isCdc ? 'cdc-on' : (isPriority ? 'priority-on' : ''));
-              const thClass = `rd-date-th ${isOutOfTimeline ? 'is-pre-society' : ''} ${isFutureDate ? 'is-future-col' : ''} ${gridToolMode === 'edit' ? 'is-edit-header' : ''} ${gridToolMode === 'priority' ? 'is-priority-header' : ''} ${isPriority ? 'is-priority-col' : ''}`.trim();
+              const isBlacklisted = blacklistedDates.has(col.dateStr);
+              const btnClass = isWaived ? 'on' : (isCdc ? 'cdc-on' : (isPriority ? 'priority-on' : (isBlacklisted ? 'blacklist-on' : '')));
+              const thClass = `rd-date-th ${isOutOfTimeline ? 'is-pre-society' : ''} ${isFutureDate ? 'is-future-col' : ''} ${isBlacklisted ? 'is-blacklisted-col' : ''} ${gridToolMode === 'edit' ? 'is-edit-header' : ''} ${gridToolMode === 'priority' ? 'is-priority-header' : ''} ${isPriority ? 'is-priority-col' : ''}`.trim();
               return (
                 <th key={col.dateStr} className={thClass}>
                   <div className="rd-date-th-inner">
@@ -1652,7 +1679,9 @@ export default function WaiverToolPage({ onBack }) {
                     >
                       <span className="wd">{col.weekday}</span>
                       <span className="dn">{col.dayNum}</span>
-                      {isFutureDate ? (
+                      {isBlacklisted ? (
+                        <span className="rd-date-blacklist-badge" title="Blacklisted date (strictly excluded from recommended waivers)">🚫</span>
+                      ) : isFutureDate ? (
                         <span className="rd-date-future-badge" title="Future speculative date (simulated attendance)">🔮</span>
                       ) : isAddedDate ? (
                         <span className="rd-date-added-badge" title="Manually added date">New</span>
@@ -1931,6 +1960,209 @@ export default function WaiverToolPage({ onBack }) {
   };
 
   // Render Approved Society Dates (Priority Dates) Modal
+  // Render Blacklisted Dates (Excluded Dates) Modal
+  const renderBlacklistedDatesModal = () => {
+    if (!isBlacklistedDatesModalOpen) return null;
+
+    const filteredCols = (parsedData?.dayColumns || []).filter(col => {
+      if (!blacklistDateSearch.trim()) return true;
+      const q = blacklistDateSearch.toLowerCase();
+      const cand = candidateDaysMap.get(col.dateStr);
+      const subjs = cand ? cand.missedSubjects.join(' ').toLowerCase() : '';
+      return (
+        col.dateStr.toLowerCase().includes(q) ||
+        col.fullLabel.toLowerCase().includes(q) ||
+        col.weekday.toLowerCase().includes(q) ||
+        subjs.includes(q)
+      );
+    });
+
+    const candidateDatesWithAbsences = (parsedData?.dayColumns || []).filter(col => {
+      const cand = candidateDaysMap.get(col.dateStr);
+      return cand && cand.thOrTuAbsences > 0;
+    });
+
+    return (
+      <div className="rd-timeline-modal-overlay" onClick={() => setIsBlacklistedDatesModalOpen(false)}>
+        <div className="rd-timeline-modal rd-blacklist-modal" role="dialog" aria-modal="true" aria-labelledby="rd-blacklist-title" onClick={e => e.stopPropagation()}>
+          <div className="rd-timeline-modal-head">
+            <div className="rd-timeline-modal-title">
+              <span className="rd-timeline-modal-icon" style={{ background: '#fee2e2', color: '#b91c1c' }}>🚫</span>
+              <div>
+                <h3 id="rd-blacklist-title">Blacklisted Dates (Excluded from Waivers)</h3>
+                <p>Choose dates that must NEVER receive recommended waivers or CDC attendance (e.g. unapproved casual bunks, rejected teacher slips, or personal leaves).</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="rd-modal-close-btn"
+              onClick={() => setIsBlacklistedDatesModalOpen(false)}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="rd-priority-modal-toolbar">
+            <input
+              type="text"
+              className="rd-priority-search"
+              placeholder="Filter by date, weekday, or missed subject..."
+              value={blacklistDateSearch}
+              onChange={e => setBlacklistDateSearch(e.target.value)}
+            />
+            <div className="rd-priority-quick-actions">
+              <button
+                type="button"
+                className="rd-btn-outline sm"
+                onClick={() => {
+                  const next = new Set(tempBlacklistedDates);
+                  candidateDatesWithAbsences.forEach(c => next.add(c.dateStr));
+                  setTempBlacklistedDates(next);
+                }}
+                title="Select all dates with absences to exclude them from waivers"
+              >
+                Blacklist All Missed Dates ({candidateDatesWithAbsences.length})
+              </button>
+              <button
+                type="button"
+                className="rd-btn-outline sm muted"
+                onClick={() => setTempBlacklistedDates(new Set())}
+                disabled={tempBlacklistedDates.size === 0}
+              >
+                Clear Blacklist
+              </button>
+            </div>
+          </div>
+
+          <div className="rd-priority-modal-body">
+            <div className="rd-priority-date-grid">
+              {filteredCols.map(col => {
+                const cand = candidateDaysMap.get(col.dateStr);
+                const hasAbs = cand && cand.thOrTuAbsences > 0;
+                const isSelected = tempBlacklistedDates.has(col.dateStr);
+                const isAlsoPriority = priorityDates.has(col.dateStr);
+
+                return (
+                  <div
+                    key={col.dateStr}
+                    className={`rd-priority-date-card rd-blacklist-card ${isSelected ? 'selected' : ''} ${!hasAbs ? 'no-absences' : ''}`}
+                    onClick={() => {
+                      setTempBlacklistedDates(prev => {
+                        const next = new Set(prev);
+                        if (next.has(col.dateStr)) next.delete(col.dateStr);
+                        else next.add(col.dateStr);
+                        return next;
+                      });
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      readOnly
+                      className="rd-priority-check rd-blacklist-check"
+                    />
+                    <div className="rd-priority-card-info">
+                      <div className="rd-priority-card-date">
+                        <strong>{col.weekday}, {col.dayNum} {MONTH_NAMES[col.month - 1]}</strong>
+                        {isSelected && <span className="rd-blacklist-card-tag">🚫 Blacklisted</span>}
+                        {!isSelected && isAlsoPriority && <span className="rd-priority-card-star">★ Currently Priority</span>}
+                      </div>
+                      <div className="rd-priority-card-sub">
+                        {hasAbs ? (
+                          <span className="rd-priority-abs-count">
+                            {cand.totalAbsences} missed ({cand.missedSubjects.slice(0, 2).join(', ')}{cand.missedSubjects.length > 2 ? '…' : ''})
+                          </span>
+                        ) : (
+                          <span className="rd-priority-no-abs">No classes missed (Present)</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="rd-timeline-modal-footer">
+            <span className="rd-priority-count-badge" style={{ background: tempBlacklistedDates.size > 0 ? '#fee2e2' : undefined, color: tempBlacklistedDates.size > 0 ? '#991b1b' : undefined }}>
+              <strong>{tempBlacklistedDates.size}</strong> date{tempBlacklistedDates.size === 1 ? '' : 's'} blacklisted
+            </span>
+            <div style={{ flex: 1 }} />
+            <button
+              type="button"
+              className="rd-btn-outline"
+              onClick={() => setIsBlacklistedDatesModalOpen(false)}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="rd-btn-dark rd-btn-danger"
+              onClick={() => {
+                const nextBlacklistedDates = Array.from(tempBlacklistedDates);
+                setBlacklistedDates(tempBlacklistedDates);
+
+                // Mutual exclusivity: remove newly blacklisted dates from priorityDates
+                setPriorityDates(prev => {
+                  let changed = false;
+                  const next = new Set(prev);
+                  tempBlacklistedDates.forEach(d => { if (next.delete(d)) changed = true; });
+                  return changed ? next : prev;
+                });
+
+                // Revoke any active waivers or CDC on newly blacklisted dates
+                setSelectedWaivers(prev => {
+                  let changed = false;
+                  const next = new Set(prev);
+                  tempBlacklistedDates.forEach(d => { if (next.delete(d)) changed = true; });
+                  return changed ? next : prev;
+                });
+                setSelectedCdcDays(prev => {
+                  let changed = false;
+                  const next = new Set(prev);
+                  tempBlacklistedDates.forEach(d => { if (next.delete(d)) changed = true; });
+                  return changed ? next : prev;
+                });
+                setLockedWaivers(prev => {
+                  let changed = false;
+                  const next = new Set(prev);
+                  tempBlacklistedDates.forEach(d => { if (next.delete(d)) changed = true; });
+                  return changed ? next : prev;
+                });
+                setLockedCdcDays(prev => {
+                  let changed = false;
+                  const next = new Set(prev);
+                  tempBlacklistedDates.forEach(d => { if (next.delete(d)) changed = true; });
+                  return changed ? next : prev;
+                });
+
+                setIsBlacklistedDatesModalOpen(false);
+
+                if (parsedData) {
+                  setIsProcessing(true);
+                  const opts = {
+                    ...currentSolverOptions,
+                    blockedDates: nextBlacklistedDates,
+                    priorityWaiverDates: Array.from(priorityDates).filter(d => !tempBlacklistedDates.has(d))
+                  };
+                  executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
+                    if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
+                      setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+                      setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
+                    }
+                  }, opts);
+                }
+              }}
+            >
+              Save & Recalculate ({tempBlacklistedDates.size})
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderPriorityDatesModal = () => {
     if (!isPriorityDatesModalOpen) return null;
 
@@ -2011,6 +2243,7 @@ export default function WaiverToolPage({ onBack }) {
                 const cand = candidateDaysMap.get(col.dateStr);
                 const hasAbs = cand && cand.thOrTuAbsences > 0;
                 const isSelected = tempPriorityDates.has(col.dateStr);
+                const isAlsoBlacklisted = blacklistedDates.has(col.dateStr);
 
                 return (
                   <div
@@ -2035,6 +2268,7 @@ export default function WaiverToolPage({ onBack }) {
                       <div className="rd-priority-card-date">
                         <strong>{col.weekday}, {col.dayNum} {MONTH_NAMES[col.month - 1]}</strong>
                         {isSelected && <span className="rd-priority-card-star">★ Prioritized</span>}
+                        {!isSelected && isAlsoBlacklisted && <span className="rd-blacklist-card-tag" style={{ marginLeft: 6 }}>🚫 Blacklisted</span>}
                       </div>
                       <div className="rd-priority-card-sub">
                         {hasAbs ? (
@@ -2070,6 +2304,13 @@ export default function WaiverToolPage({ onBack }) {
               onClick={() => {
                 const nextPriorityDates = Array.from(tempPriorityDates);
                 setPriorityDates(tempPriorityDates);
+                // Mutual exclusivity: remove newly prioritized dates from blacklistedDates
+                setBlacklistedDates(prev => {
+                  let changed = false;
+                  const next = new Set(prev);
+                  tempPriorityDates.forEach(d => { if (next.delete(d)) changed = true; });
+                  return changed ? next : prev;
+                });
                 setIsPriorityDatesModalOpen(false);
 
                 if (parsedData) {
@@ -3017,6 +3258,39 @@ export default function WaiverToolPage({ onBack }) {
               </div>
             </div>
 
+            {/* Blacklisted Dates (Never Waived) Stat */}
+            <div
+              className={`rd-stat blacklist-stat ${blacklistedDates.size > 0 ? 'active' : ''}`}
+              onClick={() => {
+                setTempBlacklistedDates(new Set(blacklistedDates));
+                setBlacklistDateSearch('');
+                setIsBlacklistedDatesModalOpen(true);
+              }}
+              title="Click to view or edit blacklisted dates that must never receive waivers"
+            >
+              <span className="lbl" title="Dates excluded from ever receiving waivers">
+                Blacklisted
+              </span>
+              <div className="row timeline-stat-row">
+                <span className="timeline-stat-dates">
+                  {blacklistedDates.size === 0 ? 'None' : `${blacklistedDates.size} date${blacklistedDates.size > 1 ? 's' : ''} 🚫`}
+                </span>
+                <button
+                  type="button"
+                  className="rd-timeline-edit-btn"
+                  title="Edit blacklisted dates"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setTempBlacklistedDates(new Set(blacklistedDates));
+                    setBlacklistDateSearch('');
+                    setIsBlacklistedDatesModalOpen(true);
+                  }}
+                >
+                  ✎
+                </button>
+              </div>
+            </div>
+
             {/* Status Banner */}
             <div className={`rd-status ${simStats?.allPassing ? 'ok' : ((simStats?.debarSafeTargetCount ?? 0) < totalTargetParts ? 'bad' : 'warn')}`}>
               <div className="rd-status-icon-wrap">
@@ -3175,7 +3449,19 @@ export default function WaiverToolPage({ onBack }) {
                         onClick={() => setGridToolMode(gridToolMode === 'priority' ? 'waiver' : 'priority')}
                         title="Click column headers to toggle approved society priority dates"
                       >
-                        ★ Priority Dates ({priorityDates.size})
+                        ★ Priority ({priorityDates.size})
+                    </button>
+                    <button
+                      type="button"
+                      className={`rd-tool-btn blacklist ${blacklistedDates.size > 0 ? 'active' : ''}`}
+                      onClick={() => {
+                        setTempBlacklistedDates(new Set(blacklistedDates));
+                        setBlacklistDateSearch('');
+                        setIsBlacklistedDatesModalOpen(true);
+                      }}
+                      title="Manage blacklisted dates that must never receive waivers"
+                    >
+                      🚫 Blacklist ({blacklistedDates.size})
                       </button>
                       <button
                         type="button"
@@ -3643,7 +3929,19 @@ export default function WaiverToolPage({ onBack }) {
                     onClick={() => setGridToolMode(gridToolMode === 'priority' ? 'waiver' : 'priority')}
                     title="Click column headers to toggle approved society priority dates"
                   >
-                    ★ Priority Dates ({priorityDates.size})
+                    ★ Priority ({priorityDates.size})
+                    </button>
+                    <button
+                      type="button"
+                      className={`rd-tool-btn blacklist ${blacklistedDates.size > 0 ? 'active' : ''}`}
+                      onClick={() => {
+                        setTempBlacklistedDates(new Set(blacklistedDates));
+                        setBlacklistDateSearch('');
+                        setIsBlacklistedDatesModalOpen(true);
+                      }}
+                      title="Manage blacklisted dates that must never receive waivers"
+                    >
+                      🚫 Blacklist ({blacklistedDates.size})
                   </button>
                   <button
                     type="button"
@@ -3785,6 +4083,7 @@ export default function WaiverToolPage({ onBack }) {
 
       {/* Approved Society Priority Dates Modal Overlay */}
       {renderPriorityDatesModal()}
+      {renderBlacklistedDatesModal()}
 
       {/* Manual Attendance Customization Modals */}
       {renderCellEditorModal()}

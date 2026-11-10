@@ -1736,6 +1736,106 @@
   align-self: center;
 }
 
+/* ── Blacklisted Dates Modal & Toolbar Mode ── */
+.rd-stat.blacklist-stat {
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.rd-stat.blacklist-stat:hover {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.rd-stat.blacklist-stat.active {
+  border-color: #ef4444;
+  background: #fee2e2;
+}
+
+.rd-stat.blacklist-stat.active .timeline-stat-dates {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.rd-tool-btn.blacklist {
+  border-color: #fecaca;
+  color: #991b1b;
+  background: #fef2f2;
+}
+
+.rd-tool-btn.blacklist:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.rd-tool-btn.blacklist.active {
+  background: #ef4444;
+  border-color: #dc2626;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(220, 38, 38, 0.3);
+}
+
+.rd-date-th.is-blacklisted-col .rd-date-btn {
+  border: 1.5px solid #ef4444;
+}
+
+.rd-date-btn.blacklist-on {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #991b1b;
+}
+
+.rd-date-blacklist-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  padding: 1px 5px;
+  background: #fee2e2;
+  color: #991b1b;
+  border-radius: 4px;
+  font-weight: 700;
+  margin-top: 2px;
+  border: 1px solid #fecaca;
+}
+
+.rd-blacklist-card.selected {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.rd-blacklist-card:hover {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.rd-blacklist-card-tag {
+  font-size: 0.7rem;
+  color: #991b1b;
+  background: #fee2e2;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  border: 1px solid #fecaca;
+}
+
+.rd-blacklist-check {
+  cursor: pointer;
+  accent-color: #ef4444;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
+.rd-btn-dark.rd-btn-danger {
+  background: #dc2626 !important;
+  border-color: #b91c1c !important;
+  color: #ffffff !important;
+}
+
+.rd-btn-dark.rd-btn-danger:hover {
+  background: #b91c1c !important;
+}
+
+
 /* ── Harmonized Metric Cards & Status Banner in Top Bar ── */
 .rd-top {
   display: flex;
@@ -2854,6 +2954,55 @@
   background: rgba(245, 158, 11, 0.15) !important;
   border-color: #f59e0b !important;
 }
+
+[data-theme='dark'] .rd-stat.blacklist-stat:hover {
+  background: rgba(239, 68, 68, 0.08) !important;
+  border-color: #ef4444 !important;
+}
+
+[data-theme='dark'] .rd-stat.blacklist-stat.active {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: #ef4444 !important;
+}
+
+[data-theme='dark'] .rd-stat.blacklist-stat.active .timeline-stat-dates {
+  color: #f87171 !important;
+}
+
+[data-theme='dark'] .rd-tool-btn.blacklist {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .rd-tool-btn.blacklist:hover {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: #ef4444;
+}
+
+[data-theme='dark'] .rd-tool-btn.blacklist.active {
+  background: #ef4444;
+  border-color: #dc2626;
+  color: #ffffff;
+}
+
+[data-theme='dark'] .rd-date-blacklist-badge {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+[data-theme='dark'] .rd-blacklist-card.selected {
+  background: rgba(239, 68, 68, 0.12) !important;
+  border-color: #ef4444 !important;
+}
+
+[data-theme='dark'] .rd-blacklist-card-tag {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
 
 [data-theme='dark'] .rd-totals-card,
 [data-theme='dark'] .rd-card,
