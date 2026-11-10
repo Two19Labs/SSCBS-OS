@@ -428,6 +428,36 @@ if (fs.existsSync(nov6Path)) {
   assert.strictEqual(Math.round(starredMacro.parts.th.pct * 10) / 10, 86.7);
   assert.strictEqual(starredMacro.parts.tu.pct, 100);
   console.log(`✓ Starred priority guarantee verified in ${elapsed.toFixed(1)}ms: Macro Theory = 86.7%, Macro Tute = 100.0%.`);
+
+  // 12. Test Prioritized / Approved Society Dates (Official Society Approval Emails)
+  console.log('12. Testing Prioritized / Approved Society Dates Allocation...');
+  // Case A: M <= K (3 priority dates, budget 10)
+  const priorityDatesA = ['2026-08-21', '2026-08-24', '2026-09-02'];
+  const solPriA = solveExactBnb(macroParsed, 85, 10, [], 0, { priorityWaiverDates: priorityDatesA });
+  const priChosenA = solPriA.chosenDays.map(d => d.dateStr);
+  priorityDatesA.forEach(pd => {
+    assert.ok(priChosenA.includes(pd), `Priority date ${pd} MUST be included in chosen waivers`);
+    const dayObj = solPriA.chosenDays.find(d => d.dateStr === pd);
+    assert.strictEqual(dayObj.isPriorityDate, true, `Chosen priority date ${pd} must be tagged isPriorityDate`);
+  });
+  assert.strictEqual(solPriA.chosenDays.length, 10, 'Full budget of 10 must be utilized in shortage');
+  console.log('✓ Priority dates M <= K: all priority dates strictly included + optimal fillers chosen.');
+
+  // Case B: M > K (5 priority dates, budget 2)
+  const priorityDatesB = ['2026-08-11', '2026-08-12', '2026-08-21', '2026-08-24', '2026-09-02'];
+  const solPriB = solveExactBnb(macroParsed, 85, 2, [], 0, { priorityWaiverDates: priorityDatesB });
+  assert.strictEqual(solPriB.chosenDays.length, 2, 'Must pick exactly K=2 priority dates');
+  solPriB.chosenDays.forEach(d => {
+    assert.ok(priorityDatesB.includes(d.dateStr), `Chosen date ${d.dateStr} must be from priorityDatesB`);
+    assert.strictEqual(d.isPriorityDate, true, 'Chosen date must be tagged isPriorityDate');
+  });
+  console.log('✓ Priority dates M > K: exactly K best priority dates selected.');
+
+  // 13. Test CDC Rescue Safety Guard (Zero False CDC Tag When CDC Days = 0)
+  console.log('13. Testing CDC Rescue Safety Guard...');
+  const lowAttSol = solveExactBnb(macroParsed, 85, 10, [], 0);
+  assert.strictEqual(lowAttSol.cdcRescue.cdcRescued, false, 'CDC rescue must NEVER trigger when 0 CDC days were allocated');
+  console.log('✓ Zero false CDC tag verified: cdcRescued is strictly false with 0 CDC days.');
 }
 
 console.log('\nALL UNIT TESTS PASSED SUCCESSFULLY! ✓✓✓');

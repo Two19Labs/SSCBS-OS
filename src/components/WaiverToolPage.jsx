@@ -162,6 +162,12 @@ export default function WaiverToolPage({ onBack }) {
   const [tempStartDate, setTempStartDate] = useState('');
   const [tempEndDate, setTempEndDate] = useState('');
 
+  // Prioritized / Approved Society Dates (waivers prioritized for official society approval dates)
+  const [priorityDates, setPriorityDates] = useState(new Set());
+  const [isPriorityDatesModalOpen, setIsPriorityDatesModalOpen] = useState(false);
+  const [tempPriorityDates, setTempPriorityDates] = useState(new Set());
+  const [priorityDateSearch, setPriorityDateSearch] = useState('');
+
   // Ineligibility acknowledgement state (shown when baseline overall attendance < 66.7%)
   const [hasAcknowledgedIneligible, setHasAcknowledgedIneligible] = useState(false);
 
@@ -246,6 +252,9 @@ export default function WaiverToolPage({ onBack }) {
           if (Array.isArray(saved.selectedCdcDays)) {
             setSelectedCdcDays(new Set(saved.selectedCdcDays));
           }
+          if (Array.isArray(saved.priorityDates)) {
+            setPriorityDates(new Set(saved.priorityDates));
+          }
           if (saved.gridToolMode) setGridToolMode(saved.gridToolMode);
           if (saved.customStartDate !== undefined) setCustomStartDate(saved.customStartDate);
           if (saved.customEndDate !== undefined) setCustomEndDate(saved.customEndDate);
@@ -277,6 +286,7 @@ export default function WaiverToolPage({ onBack }) {
         hasAcknowledgedIneligible,
         cdcLimit,
         selectedCdcDays: Array.from(selectedCdcDays),
+        priorityDates: Array.from(priorityDates),
         gridToolMode,
         customStartDate,
         customEndDate
@@ -285,7 +295,7 @@ export default function WaiverToolPage({ onBack }) {
     } catch (err) {
       console.warn('Failed to persist Waiver Tool state:', err);
     }
-  }, [rawParsedData, parsedData, selectedWaivers, lockedWaivers, lockedCdcDays, starredSubjects, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, hasAcknowledgedIneligible, cdcLimit, selectedCdcDays, gridToolMode, customStartDate, customEndDate, storageKey]);
+  }, [rawParsedData, parsedData, selectedWaivers, lockedWaivers, lockedCdcDays, starredSubjects, priorityDates, solverResult, kPlusOneResult, maxWaivers, threshold, fileMeta, hasAcknowledgedIneligible, cdcLimit, selectedCdcDays, gridToolMode, customStartDate, customEndDate, storageKey]);
 
   // Prevent scroll when expanded grid modal is open
   useEffect(() => {
@@ -303,6 +313,7 @@ export default function WaiverToolPage({ onBack }) {
       if (e.key === 'Escape') {
         setIsGridExpanded(false);
         setIsTimelineModalOpen(false);
+        setIsPriorityDatesModalOpen(false);
         setEditingCell(null);
         setIsAddDateModalOpen(false);
         setDateToDelete(null);
@@ -382,6 +393,9 @@ export default function WaiverToolPage({ onBack }) {
     const actualFixedCdc = extraOpts.fixedCdcDates !== undefined
       ? (Array.isArray(extraOpts.fixedCdcDates) ? extraOpts.fixedCdcDates : Array.from(extraOpts.fixedCdcDates || []))
       : (lockedCdcDays.size > 0 ? Array.from(lockedCdcDays) : []);
+    const actualPriorityDates = extraOpts.priorityWaiverDates !== undefined
+      ? (Array.isArray(extraOpts.priorityWaiverDates) ? extraOpts.priorityWaiverDates : Array.from(extraOpts.priorityWaiverDates || []))
+      : (priorityDates.size > 0 ? Array.from(priorityDates) : []);
     const starredList = Array.from(stars || []);
 
     if (workerRef.current) {
@@ -423,7 +437,8 @@ export default function WaiverToolPage({ onBack }) {
         waiverStartDate: actualStartDate,
         waiverEndDate: actualEndDate,
         fixedWaiverDates: actualFixedWaivers,
-        fixedCdcDates: actualFixedCdc
+        fixedCdcDates: actualFixedCdc,
+        priorityWaiverDates: actualPriorityDates
       });
     } else {
       setTimeout(() => {
@@ -433,7 +448,8 @@ export default function WaiverToolPage({ onBack }) {
             waiverStartDate: actualStartDate,
             waiverEndDate: actualEndDate,
             fixedWaiverDates: actualFixedWaivers,
-            fixedCdcDates: actualFixedCdc
+            fixedCdcDates: actualFixedCdc,
+            priorityWaiverDates: actualPriorityDates
           };
           const solution = solveExactBnb(data, targetT, limitK, starredList, actualCdc, options);
           let kPlusOne = null;
@@ -526,8 +542,9 @@ export default function WaiverToolPage({ onBack }) {
 
   const currentSolverOptions = useMemo(() => ({
     waiverStartDate: activeWaiverStart || null,
-    waiverEndDate: activeWaiverEnd || null
-  }), [activeWaiverStart, activeWaiverEnd]);
+    waiverEndDate: activeWaiverEnd || null,
+    priorityWaiverDates: priorityDates.size > 0 ? Array.from(priorityDates) : []
+  }), [activeWaiverStart, activeWaiverEnd, priorityDates]);
 
   const handleUpdateRecommendation = () => {
     if (!parsedData) return;
@@ -744,6 +761,19 @@ export default function WaiverToolPage({ onBack }) {
   };
 
   const handleToggleDay = (dateStr) => {
+    if (gridToolMode === 'priority') {
+      setPriorityDates(prev => {
+        const next = new Set(prev);
+        if (next.has(dateStr)) next.delete(dateStr);
+        else next.add(dateStr);
+        return next;
+      });
+      if (selectedWaivers.size > 0 || selectedCdcDays.size > 0) {
+        setHasPendingPriorityChange(true);
+      }
+      return;
+    }
+
     if (gridToolMode === 'cdc' && cdcLimit > 0) {
       const nextCdc = new Set(selectedCdcDays);
       if (nextCdc.has(dateStr)) {
@@ -1016,7 +1046,8 @@ export default function WaiverToolPage({ onBack }) {
           totalMissed: cand ? cand.totalAbsences : 0,
           missedSubjects: cand?.missedSubjects || [],
           kind: 'waiver',
-          isLocked: lockedWaivers.has(col.dateStr)
+          isLocked: lockedWaivers.has(col.dateStr),
+          isPriority: priorityDates.has(col.dateStr)
         });
       } else if (selectedCdcDays.has(col.dateStr)) {
         const cand = candidateDaysMap.get(col.dateStr);
@@ -1028,12 +1059,13 @@ export default function WaiverToolPage({ onBack }) {
           totalMissed: cand ? cand.totalAbsences : 0,
           missedSubjects: cand?.missedSubjects || [],
           kind: 'cdc',
-          isLocked: lockedCdcDays.has(col.dateStr)
+          isLocked: lockedCdcDays.has(col.dateStr),
+          isPriority: priorityDates.has(col.dateStr)
         });
       }
     });
     return list;
-  }, [parsedData, selectedWaivers, selectedCdcDays, lockedWaivers, lockedCdcDays, candidateDaysMap]);
+  }, [parsedData, selectedWaivers, selectedCdcDays, lockedWaivers, lockedCdcDays, priorityDates, candidateDaysMap]);
 
   // Live simulated stats (incorporating Waivers & Career Development Centre CDC Attendance)
   const simStats = useMemo(() => {
@@ -1370,7 +1402,7 @@ export default function WaiverToolPage({ onBack }) {
                 <div className="rd-total-item-lbl-wrap">
                   <span className="rd-total-item-lbl">{item.label}</span>
                   {item.key === 'overall' && isOverallIneligible && (
-                    curPct >= 66.666 ? (
+                    (selectedCdcDays.size > 0 && curPct >= 66.666) ? (
                       <span className="rd-rescued-tag" title="Total aggregate attendance lifted above 66.7% via CDC attendance, unlocking waiver eligibility!">
                         🎉 Rescued via CDC Attendance ({curPct.toFixed(1)}%)
                       </span>
@@ -1520,16 +1552,17 @@ export default function WaiverToolPage({ onBack }) {
                 (activeWaiverEnd && col.dateStr > activeWaiverEnd)
               );
               const isAddedDate = col.isCustom || customizationDiff.addedDates.has(col.dateStr);
-              const btnClass = isWaived ? 'on' : (isCdc ? 'cdc-on' : '');
-              const thClass = `rd-date-th ${isOutOfTimeline ? 'is-pre-society' : ''} ${gridToolMode === 'edit' ? 'is-edit-header' : ''}`.trim();
+              const isPriority = priorityDates.has(col.dateStr);
+              const btnClass = isWaived ? 'on' : (isCdc ? 'cdc-on' : (isPriority ? 'priority-on' : ''));
+              const thClass = `rd-date-th ${isOutOfTimeline ? 'is-pre-society' : ''} ${gridToolMode === 'edit' ? 'is-edit-header' : ''} ${gridToolMode === 'priority' ? 'is-priority-header' : ''} ${isPriority ? 'is-priority-col' : ''}`.trim();
               return (
                 <th key={col.dateStr} className={thClass}>
                   <div className="rd-date-th-inner">
                     <button
                       type="button"
                       className={`rd-date-btn ${btnClass}`}
-                      aria-pressed={isWaived || isCdc}
-                      aria-label={`Toggle ${col.fullLabel} (${isWaived ? 'waived' : isCdc ? 'CDC attendance' : 'active'})`}
+                      aria-pressed={isWaived || isCdc || isPriority}
+                      aria-label={`Toggle ${col.fullLabel} (${isWaived ? 'waived' : isCdc ? 'CDC attendance' : isPriority ? 'priority approved date' : 'active'})`}
                       onClick={() => {
                         if (gridToolMode === 'edit') {
                           setDateToDelete({ dateStr: col.dateStr, fullLabel: col.fullLabel });
@@ -1549,6 +1582,8 @@ export default function WaiverToolPage({ onBack }) {
                         <span className="rd-date-locked-badge" title="Outside recommended waiver timeline">🔒</span>
                       ) : isCdc ? (
                         <span className="rd-date-cdc-badge" title="Career Development Centre (CDC) Attendance">CDC</span>
+                      ) : isPriority ? (
+                        <span className="rd-date-priority-badge" title="Prioritized / approved society date">★</span>
                       ) : null}
                     </button>
                     {gridToolMode === 'edit' && (
@@ -1807,6 +1842,171 @@ export default function WaiverToolPage({ onBack }) {
               }}
             >
               Apply Timeline
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render Approved Society Dates (Priority Dates) Modal
+  const renderPriorityDatesModal = () => {
+    if (!isPriorityDatesModalOpen) return null;
+
+    const filteredCols = (parsedData?.dayColumns || []).filter(col => {
+      if (!priorityDateSearch.trim()) return true;
+      const q = priorityDateSearch.toLowerCase();
+      const cand = candidateDaysMap.get(col.dateStr);
+      const subjs = cand ? cand.missedSubjects.join(' ').toLowerCase() : '';
+      return (
+        col.dateStr.toLowerCase().includes(q) ||
+        col.fullLabel.toLowerCase().includes(q) ||
+        col.weekday.toLowerCase().includes(q) ||
+        subjs.includes(q)
+      );
+    });
+
+    const candidateDatesWithAbsences = (parsedData?.dayColumns || []).filter(col => {
+      const cand = candidateDaysMap.get(col.dateStr);
+      return cand && cand.thOrTuAbsences > 0;
+    });
+
+    return (
+      <div className="rd-timeline-modal-overlay" onClick={() => setIsPriorityDatesModalOpen(false)}>
+        <div className="rd-timeline-modal rd-priority-modal" role="dialog" aria-modal="true" aria-labelledby="rd-priority-title" onClick={e => e.stopPropagation()}>
+          <div className="rd-timeline-modal-head">
+            <div className="rd-timeline-modal-title">
+              <span className="rd-timeline-modal-icon" style={{ background: '#fef3c7', color: '#b45309' }}>★</span>
+              <div>
+                <h3 id="rd-priority-title">Approved Society Dates (Priority Dates)</h3>
+                <p>Choose dates where your society sent official approval emails to teachers. Waivers will be prioritized for these dates first.</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="rd-modal-close-btn"
+              onClick={() => setIsPriorityDatesModalOpen(false)}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="rd-priority-modal-toolbar">
+            <input
+              type="text"
+              className="rd-priority-search"
+              placeholder="Filter by date, weekday, or missed subject..."
+              value={priorityDateSearch}
+              onChange={e => setPriorityDateSearch(e.target.value)}
+            />
+            <div className="rd-priority-quick-actions">
+              <button
+                type="button"
+                className="rd-btn-outline sm"
+                onClick={() => {
+                  const next = new Set(tempPriorityDates);
+                  candidateDatesWithAbsences.forEach(c => next.add(c.dateStr));
+                  setTempPriorityDates(next);
+                }}
+                title="Select all dates with theory or tutorial absences"
+              >
+                Select All Missed Dates ({candidateDatesWithAbsences.length})
+              </button>
+              <button
+                type="button"
+                className="rd-btn-outline sm muted"
+                onClick={() => setTempPriorityDates(new Set())}
+                disabled={tempPriorityDates.size === 0}
+              >
+                Clear Selection
+              </button>
+            </div>
+          </div>
+
+          <div className="rd-priority-modal-body">
+            <div className="rd-priority-date-grid">
+              {filteredCols.map(col => {
+                const cand = candidateDaysMap.get(col.dateStr);
+                const hasAbs = cand && cand.thOrTuAbsences > 0;
+                const isSelected = tempPriorityDates.has(col.dateStr);
+
+                return (
+                  <div
+                    key={col.dateStr}
+                    className={`rd-priority-date-card ${isSelected ? 'selected' : ''} ${!hasAbs ? 'no-absences' : ''}`}
+                    onClick={() => {
+                      setTempPriorityDates(prev => {
+                        const next = new Set(prev);
+                        if (next.has(col.dateStr)) next.delete(col.dateStr);
+                        else next.add(col.dateStr);
+                        return next;
+                      });
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      readOnly
+                      className="rd-priority-check"
+                    />
+                    <div className="rd-priority-card-info">
+                      <div className="rd-priority-card-date">
+                        <strong>{col.weekday}, {col.dayNum} {MONTH_NAMES[col.month - 1]}</strong>
+                        {isSelected && <span className="rd-priority-card-star">★ Prioritized</span>}
+                      </div>
+                      <div className="rd-priority-card-sub">
+                        {hasAbs ? (
+                          <span className="rd-priority-abs-count">
+                            {cand.totalAbsences} missed ({cand.missedSubjects.slice(0, 2).join(', ')}{cand.missedSubjects.length > 2 ? '…' : ''})
+                          </span>
+                        ) : (
+                          <span className="rd-priority-no-abs">No classes missed (Present)</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="rd-timeline-modal-footer">
+            <span className="rd-priority-count-badge">
+              <strong>{tempPriorityDates.size}</strong> date{tempPriorityDates.size === 1 ? '' : 's'} prioritized
+            </span>
+            <div style={{ flex: 1 }} />
+            <button
+              type="button"
+              className="rd-btn-outline"
+              onClick={() => setIsPriorityDatesModalOpen(false)}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="rd-btn-dark"
+              onClick={() => {
+                const nextPriorityDates = Array.from(tempPriorityDates);
+                setPriorityDates(tempPriorityDates);
+                setIsPriorityDatesModalOpen(false);
+
+                if (parsedData) {
+                  setIsProcessing(true);
+                  const opts = {
+                    ...currentSolverOptions,
+                    priorityWaiverDates: nextPriorityDates
+                  };
+                  executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
+                    if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
+                      setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+                      setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
+                    }
+                  }, opts);
+                }
+              }}
+            >
+              Save & Recalculate ({tempPriorityDates.size})
             </button>
           </div>
         </div>
@@ -2519,6 +2719,39 @@ export default function WaiverToolPage({ onBack }) {
               </div>
             </div>
 
+            {/* Priority Dates for Approved Society Emails Stat */}
+            <div
+              className={`rd-stat priority-stat ${priorityDates.size > 0 ? 'active' : ''}`}
+              onClick={() => {
+                setTempPriorityDates(new Set(priorityDates));
+                setPriorityDateSearch('');
+                setIsPriorityDatesModalOpen(true);
+              }}
+              title="Click to view or edit prioritized approved society dates"
+            >
+              <span className="lbl" title="Dates prioritized for official society email approvals">
+                Priority Dates
+              </span>
+              <div className="row timeline-stat-row">
+                <span className="timeline-stat-dates">
+                  {priorityDates.size === 0 ? 'None' : `${priorityDates.size} date${priorityDates.size > 1 ? 's' : ''} ★`}
+                </span>
+                <button
+                  type="button"
+                  className="rd-timeline-edit-btn"
+                  title="Edit priority dates"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setTempPriorityDates(new Set(priorityDates));
+                    setPriorityDateSearch('');
+                    setIsPriorityDatesModalOpen(true);
+                  }}
+                >
+                  ✎
+                </button>
+              </div>
+            </div>
+
             {/* Status Banner */}
             <div className={`rd-status ${simStats?.allPassing ? 'ok' : ((simStats?.debarSafeTargetCount ?? 0) < totalTargetParts ? 'bad' : 'warn')}`}>
               <div className="rd-status-icon-wrap">
@@ -2671,6 +2904,14 @@ export default function WaiverToolPage({ onBack }) {
                           CDC Attendance ({selectedCdcDays.size}/{cdcLimit})
                         </button>
                       )}
+                      <button
+                        type="button"
+                        className={`rd-tool-btn priority ${gridToolMode === 'priority' ? 'active' : ''}`}
+                        onClick={() => setGridToolMode(gridToolMode === 'priority' ? 'waiver' : 'priority')}
+                        title="Click column headers to toggle approved society priority dates"
+                      >
+                        ★ Priority Dates ({priorityDates.size})
+                      </button>
                       <button
                         type="button"
                         className={`rd-tool-btn edit ${gridToolMode === 'edit' ? 'active' : ''}`}
@@ -2862,6 +3103,7 @@ export default function WaiverToolPage({ onBack }) {
                           <span className="l1">
                             {item.weekday} <em>· {item.totalMissed} {item.kind === 'cdc' ? 'converted' : 'missed'}</em>
                             {item.isLocked && <span className="rd-date-pinned-badge" title="Manually fixed/pinned date">📌 Fixed</span>}
+                            {item.isPriority && <span className="rd-date-priority-badge" title="Prioritized / approved society date">★ Approved Date</span>}
                             {item.kind === 'cdc' && <span className="cdc-tag">CDC</span>}
                           </span>
                           <span className="l2">
@@ -3104,6 +3346,14 @@ export default function WaiverToolPage({ onBack }) {
                   )}
                   <button
                     type="button"
+                    className={`rd-tool-btn priority ${gridToolMode === 'priority' ? 'active' : ''}`}
+                    onClick={() => setGridToolMode(gridToolMode === 'priority' ? 'waiver' : 'priority')}
+                    title="Click column headers to toggle approved society priority dates"
+                  >
+                    ★ Priority Dates ({priorityDates.size})
+                  </button>
+                  <button
+                    type="button"
                     className={`rd-tool-btn edit ${gridToolMode === 'edit' ? 'active' : ''}`}
                     onClick={() => setGridToolMode(gridToolMode === 'edit' ? 'waiver' : 'edit')}
                     title="Manually edit, add, or delete classes and dates"
@@ -3211,6 +3461,9 @@ export default function WaiverToolPage({ onBack }) {
 
       {/* Custom Timeline Modal Overlay */}
       {renderTimelineModal()}
+
+      {/* Approved Society Priority Dates Modal Overlay */}
+      {renderPriorityDatesModal()}
 
       {/* Manual Attendance Customization Modals */}
       {renderCellEditorModal()}

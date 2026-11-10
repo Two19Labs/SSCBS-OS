@@ -268,7 +268,8 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
     waiverEndDate = null,
     blockedDates = null,
     fixedWaiverDates = null,
-    fixedCdcDates = null
+    fixedCdcDates = null,
+    priorityWaiverDates = null
   } = options || {};
   const blockedDatesSet = blockedDates instanceof Set
     ? blockedDates
@@ -281,6 +282,10 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
   const rawFixedCSet = fixedCdcDates instanceof Set
     ? fixedCdcDates
     : new Set(Array.isArray(fixedCdcDates) ? fixedCdcDates : []);
+
+  const rawPrioritySet = priorityWaiverDates instanceof Set
+    ? priorityWaiverDates
+    : new Set(Array.isArray(priorityWaiverDates) ? priorityWaiverDates : []);
 
   const { targetParts } = extractTargetParts(parsedData);
   const numParts = targetParts.length;
@@ -376,7 +381,6 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
   const allCandidateDays = extractCandidateDays(parsedData, targetPartsOriginal);
   // Exclude fixed dates from candidate search pool
   const candidateDays = allCandidateDays.filter(d => !validFixedW.has(d.dateStr) && !validFixedC.has(d.dateStr));
-  const numCandidates = candidateDays.length;
 
   // Tag candidate days with timeline eligibility & manual blocking
   candidateDays.forEach(d => {
@@ -390,12 +394,53 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
     d.isBlocked = isBlocked;
     d.isWaiverEligible = !isBlocked && inWaiverWindow;
     d.isCdcEligible = !isBlocked;
+    d.isPriorityDate = rawPrioritySet.has(d.dateStr);
   });
 
-  const waiverEligibleCount = candidateDays.filter(d => d.isWaiverEligible).length;
   const remK = Math.max(0, maxWaiversK - validFixedW.size);
   const remC = Math.max(0, (cdcLimitC || 0) - validFixedC.size);
-  const K = Math.min(remK, waiverEligibleCount);
+
+  const eligiblePriorityCandidates = candidateDays.filter(d => d.isWaiverEligible && d.isPriorityDate);
+  const eligiblePrioritySet = new Set(eligiblePriorityCandidates.map(d => d.dateStr));
+  const numPriority = eligiblePriorityCandidates.length;
+
+  let preallocatedPriorityDays = [];
+  let searchCandidates = candidateDays;
+  let effectiveRemK = remK;
+
+  if (numPriority > 0) {
+    if (numPriority <= remK) {
+      // Case A: All eligible priority dates fit within budget remK.
+      // Preallocate them, deduct their deltas from targetParts, and search remaining slots.
+      preallocatedPriorityDays = eligiblePriorityCandidates.map(d => ({
+        ...d,
+        isFixed: false,
+        isPriorityDate: true
+      }));
+
+      preallocatedPriorityDays.forEach(dayObj => {
+        for (let c = 0; c < numParts; c++) {
+          targetParts[c].p = Math.max(0, targetParts[c].p - dayObj.pDeltas[c]);
+          targetParts[c].n = Math.max(0, targetParts[c].n - dayObj.nDeltas[c]);
+          if (targetParts[c].p > targetParts[c].n) {
+            targetParts[c].p = targetParts[c].n;
+          }
+        }
+      });
+
+      searchCandidates = candidateDays.filter(d => !eligiblePrioritySet.has(d.dateStr));
+      effectiveRemK = remK - numPriority;
+    } else {
+      // Case B: Priority dates exceed budget remK.
+      // Restrict search candidates to ONLY priority dates with budget remK to find the best subset.
+      searchCandidates = eligiblePriorityCandidates;
+      effectiveRemK = remK;
+    }
+  }
+
+  const numCandidates = searchCandidates.length;
+  const waiverEligibleCount = searchCandidates.filter(d => d.isWaiverEligible).length;
+  const K = Math.min(effectiveRemK, waiverEligibleCount);
   const C = Math.max(0, Math.min(remC, numCandidates));
 
   // Precompute 1/3rd rule bounds per target component: maxAllowedN = floor(N / 3)
@@ -414,7 +459,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
   const wMatrix = Array.from({ length: numParts }, () => new Int32Array(numCandidates));
   for (let c = 0; c < numParts; c++) {
     for (let d = 0; d < numCandidates; d++) {
-      wMatrix[c][d] = T * candidateDays[d].nDeltas[c] - 100 * candidateDays[d].pDeltas[c];
+      wMatrix[c][d] = T * searchCandidates[d].nDeltas[c] - 100 * searchCandidates[d].pDeltas[c];
     }
   }
 
@@ -427,16 +472,16 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
         let sB = 0;
         for (let c = 0; c < numParts; c++) {
           if (isPartStarred[c]) {
-            sA += candidateDays[a].aDeltas ? candidateDays[a].aDeltas[c] : Math.max(0, candidateDays[a].nDeltas[c] - candidateDays[a].pDeltas[c]);
-            sB += candidateDays[b].aDeltas ? candidateDays[b].aDeltas[c] : Math.max(0, candidateDays[b].nDeltas[c] - candidateDays[b].pDeltas[c]);
+            sA += searchCandidates[a].aDeltas ? searchCandidates[a].aDeltas[c] : Math.max(0, searchCandidates[a].nDeltas[c] - searchCandidates[a].pDeltas[c]);
+            sB += searchCandidates[b].aDeltas ? searchCandidates[b].aDeltas[c] : Math.max(0, searchCandidates[b].nDeltas[c] - searchCandidates[b].pDeltas[c]);
           }
         }
         if (sA !== sB) return sB - sA;
       }
-      return candidateDays[b].thOrTuAbsences - candidateDays[a].thOrTuAbsences;
+      return searchCandidates[b].thOrTuAbsences - searchCandidates[a].thOrTuAbsences;
     });
 
-  const orderedCandidates = sortedDayIndices.map(idx => candidateDays[idx]);
+  const orderedCandidates = sortedDayIndices.map(idx => searchCandidates[idx]);
   const orderedW = Array.from({ length: numParts }, (_, c) =>
     new Int32Array(numCandidates).map((_, d) => wMatrix[c][sortedDayIndices[d]])
   );
@@ -824,9 +869,11 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
     }
   }
 
-  for (let s = 1; s <= K; s++) {
-    dfs(0, s);
-    if (best.allPass) break;
+  if (!best.allPass) {
+    for (let s = 1; s <= K; s++) {
+      dfs(0, s);
+      if (best.allPass) break;
+    }
   }
 
   let neededWaiversForAllPass = null;
@@ -1077,14 +1124,15 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
   const endTime = (typeof performance !== 'undefined' ? performance.now() : Date.now());
   const additionalWaiverDays = bestWaivers.map(idx => {
     const d = orderedCandidates[idx];
-    return { ...d, isFixed: false };
+    return { ...d, isFixed: false, isPriorityDate: Boolean(d.isPriorityDate) };
   });
   const additionalCdcDays = bestCdc.map(idx => {
     const d = orderedCandidates[idx];
     return { ...d, isFixed: false };
   });
 
-  const chosenDays = [...fixedWaiverDays, ...additionalWaiverDays];
+  const recommendedWaivers = [...preallocatedPriorityDays, ...additionalWaiverDays];
+  const chosenDays = [...fixedWaiverDays, ...recommendedWaivers];
   chosenDays.sort((a, b) => a.dateStr.localeCompare(b.dateStr));
 
   const chosenCdcDays = [...fixedCdcDays, ...additionalCdcDays];
@@ -1109,7 +1157,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
   });
   const projectedOverallAttWithCdc = totBaseAtt + cdcTotalConvertedAbsences;
   const projectedOverallPctWithCdc = totBaseHeld > 0 ? (projectedOverallAttWithCdc / totBaseHeld) * 100 : 100;
-  const cdcRescued = isBaselineUnder667 && projectedOverallPctWithCdc >= 66.666;
+  const cdcRescued = isBaselineUnder667 && chosenCdcDays.length > 0 && projectedOverallPctWithCdc >= 66.666;
 
   const allChosenWaiversSet = new Set(chosenDays.map(d => d.dateStr));
   const allChosenCdcSet = new Set(chosenCdcDays.map(d => d.dateStr));
@@ -1126,7 +1174,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
     }
   });
   const allStarredPass = (totalStarredParts === 0) || (starredPassCount === totalStarredParts);
-  const hasFixedDays = validFixedW.size > 0 || validFixedC.size > 0;
+  const hasFixedDays = validFixedW.size > 0 || validFixedC.size > 0 || preallocatedPriorityDays.length > 0;
   const isOptimal = hasFixedDays ? (finalSim.passingTargetCount === numParts) : bestEval.allPass;
   const passCount = hasFixedDays ? finalSim.passingTargetCount : bestEval.passCount;
   const debarSafeCount = hasFixedDays ? finalSim.debarSafeTargetCount : bestEval.debarSafeCount;
@@ -1153,7 +1201,8 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
     shortfall,
     fixedDays: Array.from(validFixedW),
     fixedCdcDays: Array.from(validFixedC),
-    recommendedAdditionalDays: additionalWaiverDays,
+    priorityDates: Array.from(eligiblePrioritySet),
+    recommendedAdditionalDays: recommendedWaivers,
     recommendedAdditionalCdcDays: additionalCdcDays,
     evalPlan: bestEval,
     cdcRescue: {

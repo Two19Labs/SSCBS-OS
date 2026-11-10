@@ -14,7 +14,8 @@ self.onmessage = function (e) {
     waiverEndDate,
     blockedDates,
     fixedWaiverDates,
-    fixedCdcDates
+    fixedCdcDates,
+    priorityWaiverDates
   } = e.data || {};
   try {
     const options = {
@@ -24,7 +25,8 @@ self.onmessage = function (e) {
       waiverEndDate: waiverEndDate || null,
       blockedDates: blockedDates ? new Set(blockedDates) : new Set(),
       fixedWaiverDates: fixedWaiverDates ? (fixedWaiverDates instanceof Set ? fixedWaiverDates : new Set(fixedWaiverDates)) : new Set(),
-      fixedCdcDates: fixedCdcDates ? (fixedCdcDates instanceof Set ? fixedCdcDates : new Set(fixedCdcDates)) : new Set()
+      fixedCdcDates: fixedCdcDates ? (fixedCdcDates instanceof Set ? fixedCdcDates : new Set(fixedCdcDates)) : new Set(),
+      priorityWaiverDates: priorityWaiverDates ? (priorityWaiverDates instanceof Set ? priorityWaiverDates : new Set(priorityWaiverDates)) : new Set()
     };
     const solution = solveExactBnb(parsedData, targetPct, maxWaiversK, starredSubjects, cdcLimit, options);
     let kPlusOneSolution = null;
