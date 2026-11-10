@@ -3108,3 +3108,144 @@
   background: rgba(242, 232, 226, 0.08) !important;
   color: var(--muted) !important;
 }
+
+/* ==========================================================================
+   Future Attendance & Speculative Simulation Styles
+   ========================================================================== */
+
+.rd-date-future-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  font-size: 8.5px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: #7c3aed;
+  color: #ffffff;
+  line-height: 1.1;
+  pointer-events: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.rd-date-th.is-future-col {
+  background: rgba(124, 58, 237, 0.04);
+}
+
+[data-theme='dark'] .rd-date-th.is-future-col {
+  background: rgba(139, 92, 246, 0.08);
+}
+
+.rd-cell.is-future-cell {
+  background: rgba(124, 58, 237, 0.02);
+}
+
+[data-theme='dark'] .rd-cell.is-future-cell {
+  background: rgba(139, 92, 246, 0.04);
+}
+
+/* Future Simulation Banner */
+.rd-future-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 14px;
+  border-radius: 8px;
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+  color: #5b21b6;
+  font-size: 12.5px;
+  margin-bottom: 12px;
+}
+
+[data-theme='dark'] .rd-future-banner {
+  background: rgba(124, 58, 237, 0.16);
+  border-color: rgba(167, 139, 250, 0.35);
+  color: #ddd6fe;
+}
+
+.rd-future-banner strong {
+  color: #4c1d95;
+}
+
+[data-theme='dark'] .rd-future-banner strong {
+  color: #ede9fe;
+}
+
+.rd-future-banner-acts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.rd-future-clear-btn {
+  color: #dc2626 !important;
+  border-color: rgba(220, 38, 38, 0.3) !important;
+}
+
+.rd-future-clear-btn:hover {
+  background: rgba(220, 38, 38, 0.08) !important;
+}
+
+[data-theme='dark'] .rd-future-clear-btn {
+  color: #f87171 !important;
+  border-color: rgba(248, 113, 113, 0.4) !important;
+}
+
+/* Add Date Modal Tabs & Badges */
+.rd-add-mode-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  background: var(--surface-subtle, #f5f5f4);
+  padding: 3px;
+  border-radius: 8px;
+}
+
+.rd-add-mode-tab {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: var(--ink-dim, #71717a);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.rd-add-mode-tab.active {
+  background: var(--surface, #ffffff);
+  color: var(--ink, #18181b);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] .rd-add-mode-tabs {
+  background: #14171a;
+}
+
+[data-theme='dark'] .rd-add-mode-tab.active {
+  background: #232830;
+  color: #f1f5f9;
+}
+
+.rd-future-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+[data-theme='dark'] .rd-future-pill {
+  color: #c4b5fd;
+  background: rgba(124, 58, 237, 0.25);
+}
+

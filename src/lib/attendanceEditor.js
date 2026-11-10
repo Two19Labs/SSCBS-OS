@@ -103,10 +103,52 @@ export function editCellClasses(parsedData, subjectName, dateStr, newClasses) {
 }
 
 /**
+ * Searches backwards for the most recent day in parsedData matching weekday that has classes recorded.
+ * Used for pre-populating future dates with expected recurring timetables.
+ */
+export function findRecentDaySchedule(parsedData, weekday, beforeDateStr = null) {
+  if (!parsedData || !parsedData.dayColumns || !weekday) return null;
+
+  const candidates = [...parsedData.dayColumns]
+    .filter(d => d.weekday === weekday && (!beforeDateStr || d.dateStr < beforeDateStr))
+    .reverse();
+
+  for (const d of candidates) {
+    const classesBySubject = {};
+    let totalClasses = 0;
+
+    (parsedData.subjects || []).forEach(sub => {
+      const list = sub.dayClasses?.[d.dateStr] || [];
+      if (list.length > 0) {
+        classesBySubject[sub.name] = list.map(c => ({
+          type: c.type,
+          attended: c.attended
+        }));
+        totalClasses += list.length;
+      }
+    });
+
+    if (totalClasses > 0) {
+      return {
+        dateStr: d.dateStr,
+        label: d.label,
+        fullLabel: d.fullLabel,
+        weekday: d.weekday,
+        totalClasses,
+        classesBySubject
+      };
+    }
+  }
+
+  return null;
+}
+
+/**
  * Adds a new date column into parsedData.dayColumns in strict chronological order.
+ * If classesBySubject is provided, populates classes for specified subjects.
  * If the date already exists, returns parsedData unchanged.
  */
-export function addDateColumn(parsedData, newDateStr) {
+export function addDateColumn(parsedData, newDateStr, classesBySubject = null) {
   if (!newDateStr) return parsedData;
   const cloned = cloneParsedData(parsedData);
   const exists = cloned.dayColumns.some(d => d.dateStr === newDateStr);
@@ -124,6 +166,9 @@ export function addDateColumn(parsedData, newDateStr) {
   const weekday = WEEKDAYS[dateObj.getUTCDay()];
   const monthLabel = MONTH_NAMES[curMonth - 1];
 
+  const repDate = cloned.reportDate || '';
+  const isFuture = Boolean(repDate && newDateStr > repDate);
+
   const newCol = {
     colIdx: cloned.dayColumns.length + 1000,
     dayNum,
@@ -133,11 +178,104 @@ export function addDateColumn(parsedData, newDateStr) {
     weekday,
     label: `${dayNum} ${monthLabel}`,
     fullLabel: `${weekday} ${dayNum} ${monthLabel}`,
-    isCustom: true
+    isCustom: true,
+    isFuture
   };
 
   cloned.dayColumns.push(newCol);
   cloned.dayColumns.sort((a, b) => a.dateStr.localeCompare(b.dateStr));
+
+  if (classesBySubject && typeof classesBySubject === 'object') {
+    cloned.subjects = cloned.subjects.map(sub => {
+      const classList = classesBySubject[sub.name];
+      if (classList && Array.isArray(classList) && classList.length > 0) {
+        if (!sub.dayClasses) sub.dayClasses = {};
+        sub.dayClasses[newDateStr] = classList.map(c => ({
+          type: c.type === 'th' || c.type === 'tu' || c.type === 'pr' ? c.type : 'th',
+          attended: Boolean(c.attended),
+          raw: `${c.attended ? 'P' : 'A'}(${(c.type || 'th').toUpperCase()})`,
+          ignore: false,
+          isCustom: true
+        }));
+        return recalculateSubjectTotals(sub);
+      }
+      return sub;
+    });
+  }
+
+  return cloned;
+}
+
+/**
+ * Adds multiple dates (e.g. date range) into parsedData, optionally autofilling timetable
+ * from the most recent matching weekday schedule with defaultStatus ('p' | 'a' | 'as_is').
+ */
+export function batchAddDates(parsedData, datesList, templateMode = 'none', defaultStatus = 'p') {
+  if (!parsedData || !Array.isArray(datesList) || datesList.length === 0) return parsedData;
+  let current = cloneParsedData(parsedData);
+
+  datesList.forEach(dateStr => {
+    if (current.dayColumns.some(d => d.dateStr === dateStr)) return;
+
+    let classesBySub = null;
+    if (templateMode === 'copy_weekday') {
+      const parts = dateStr.split('-');
+      if (parts.length >= 3) {
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10);
+        const dn = parseInt(parts[2], 10);
+        const dateObj = new Date(Date.UTC(y, m - 1, dn));
+        const weekday = WEEKDAYS[dateObj.getUTCDay()];
+        const sched = findRecentDaySchedule(current, weekday, dateStr);
+        if (sched && sched.classesBySubject) {
+          classesBySub = {};
+          Object.entries(sched.classesBySubject).forEach(([sName, list]) => {
+            classesBySub[sName] = list.map(c => ({
+              type: c.type,
+              attended: defaultStatus === 'p' ? true : (defaultStatus === 'a' ? false : c.attended)
+            }));
+          });
+        }
+      }
+    }
+
+    current = addDateColumn(current, dateStr, classesBySub);
+  });
+
+  return current;
+}
+
+/**
+ * Removes all dates strictly after reportDate (purging future / speculative dates).
+ * Recalculates subject totals for all affected subjects.
+ */
+export function clearFutureDates(parsedData, reportDate) {
+  if (!parsedData || !reportDate) return parsedData;
+  const cloned = cloneParsedData(parsedData);
+  const futureDateSet = new Set(
+    (cloned.dayColumns || []).filter(d => d.dateStr > reportDate).map(d => d.dateStr)
+  );
+
+  if (futureDateSet.size === 0) return cloned;
+
+  cloned.dayColumns = cloned.dayColumns.filter(d => !futureDateSet.has(d.dateStr));
+
+  cloned.subjects = cloned.subjects.map(sub => {
+    if (sub.dayClasses) {
+      const nextClasses = { ...sub.dayClasses };
+      let changed = false;
+      futureDateSet.forEach(dateStr => {
+        if (nextClasses[dateStr]) {
+          delete nextClasses[dateStr];
+          changed = true;
+        }
+      });
+      if (changed) {
+        return recalculateSubjectTotals({ ...sub, dayClasses: nextClasses });
+      }
+    }
+    return sub;
+  });
 
   return cloned;
 }
@@ -239,10 +377,44 @@ export function diffCustomizations(rawParsedData, currentParsedData) {
 
   const totalChanges = customizedCells.size + addedDates.size + deletedDates.size;
 
+  // Track speculative future dates strictly after original reportDate
+  const futureDates = new Set();
+  const repDate = rawParsedData.reportDate || '';
+  let futureClassesTotal = 0;
+  let futureClassesP = 0;
+  let futureClassesA = 0;
+
+  if (repDate) {
+    (currentParsedData.dayColumns || []).forEach(d => {
+      if (d.dateStr > repDate) {
+        futureDates.add(d.dateStr);
+      }
+    });
+
+    (currentParsedData.subjects || []).forEach(curSub => {
+      futureDates.forEach(dateStr => {
+        const list = curSub.dayClasses?.[dateStr] || [];
+        list.forEach(c => {
+          if (!c.ignore) {
+            futureClassesTotal++;
+            if (c.attended) futureClassesP++;
+            else futureClassesA++;
+          }
+        });
+      });
+    });
+  }
+
   return {
     customizedCells,
     addedDates,
     deletedDates,
+    futureDates,
+    futureClassesStats: {
+      total: futureClassesTotal,
+      p: futureClassesP,
+      a: futureClassesA
+    },
     hasCustomizations: totalChanges > 0,
     totalChanges
   };

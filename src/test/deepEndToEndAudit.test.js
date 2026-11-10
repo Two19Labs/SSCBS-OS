@@ -12,6 +12,12 @@ import {
   extractTargetParts,
   extractCandidateDays
 } from '../lib/waiverSolver.js';
+import {
+  findRecentDaySchedule,
+  batchAddDates,
+  clearFutureDates,
+  diffCustomizations
+} from '../lib/attendanceEditor.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -393,7 +399,103 @@ test('Waiving a day with co-occurring practical absence correctly removes practi
 });
 
 // -------------------------------------------------------------
-// SECTION 7: SUMMARY & AUDIT RESULTS
+// SECTION 7: FUTURE ATTENDANCE SPECULATION & TIMETABLE AUTOFILL
+// -------------------------------------------------------------
+console.log('\n--- SECTION 7: Future Attendance Speculation & Timetable Autofill ---');
+
+const futureBaseDataset = {
+  reportDate: '2026-11-06',
+  dayColumns: [
+    { dateStr: '2026-11-02', dayNum: 2, month: 11, year: 2026, weekday: 'Mon', label: '02 Nov', fullLabel: 'Mon 02 Nov' },
+    { dateStr: '2026-11-03', dayNum: 3, month: 11, year: 2026, weekday: 'Tue', label: '03 Nov', fullLabel: 'Tue 03 Nov' },
+    { dateStr: '2026-11-04', dayNum: 4, month: 11, year: 2026, weekday: 'Wed', label: '04 Nov', fullLabel: 'Wed 04 Nov' }
+  ],
+  subjects: [
+    {
+      name: 'Financial Management',
+      parts: { th: { p: 2, a: 1 }, tu: { p: 0, a: 1 }, pr: { p: 0, a: 0 } },
+      dayClasses: {
+        '2026-11-02': [{ type: 'th', attended: true, raw: 'P(Th)' }],
+        '2026-11-03': [
+          { type: 'th', attended: false, raw: 'A(Th)' },
+          { type: 'tu', attended: false, raw: 'A(Tu)' }
+        ],
+        '2026-11-04': [{ type: 'th', attended: true, raw: 'P(Th)' }]
+      }
+    }
+  ]
+};
+
+test('findRecentDaySchedule finds matching weekday with classes recorded', () => {
+  const tuesdaySched = findRecentDaySchedule(futureBaseDataset, 'Tue');
+  assert.ok(tuesdaySched, 'Must find Tuesday schedule');
+  assert.strictEqual(tuesdaySched.dateStr, '2026-11-03');
+  assert.strictEqual(tuesdaySched.totalClasses, 2);
+  assert.strictEqual(tuesdaySched.classesBySubject['Financial Management'].length, 2);
+});
+
+test('batchAddDates single future date with copy_weekday (default P for 100% attendance)', () => {
+  // 2026-11-10 is next Tuesday (strictly after reportDate 2026-11-06)
+  const updated = batchAddDates(futureBaseDataset, ['2026-11-10'], 'copy_weekday', 'p');
+  const futureCol = updated.dayColumns.find(d => d.dateStr === '2026-11-10');
+  assert.ok(futureCol, 'Future column must be present in dayColumns');
+  assert.strictEqual(futureCol.isFuture, true, 'Must be flagged isFuture: true');
+  assert.strictEqual(futureCol.weekday, 'Tue');
+
+  const classes = updated.subjects[0].dayClasses['2026-11-10'];
+  assert.strictEqual(classes.length, 2, 'Must copy 2 classes from Tuesday');
+  assert.strictEqual(classes[0].attended, true, 'Both classes must be marked Present');
+  assert.strictEqual(classes[1].attended, true, 'Both classes must be marked Present');
+
+  // Baseline was P:2, A:1 for Th and P:0, A:1 for Tu
+  // Adding 1 Th Present and 1 Tu Present makes it P:3 for Th and P:1 for Tu
+  assert.strictEqual(updated.subjects[0].parts.th.p, 3);
+  assert.strictEqual(updated.subjects[0].parts.tu.p, 1);
+});
+
+test('batchAddDates date range with copy_weekday (default A for upcoming fest/duty leave)', () => {
+  // Add upcoming Tuesday and Wednesday marked Absent
+  const updated = batchAddDates(futureBaseDataset, ['2026-11-10', '2026-11-11'], 'copy_weekday', 'a');
+  assert.strictEqual(updated.dayColumns.length, 5);
+
+  const tueClasses = updated.subjects[0].dayClasses['2026-11-10'];
+  assert.ok(tueClasses.every(c => c.attended === false), 'All simulated upcoming classes must be absent');
+
+  // Solver synergy: Verify that solver now evaluates these upcoming absences for waivers
+  const sol = solveExactBnb(updated, 85, 2);
+  assert.ok(sol.chosenDays.length > 0, 'Solver must find optimal waivers');
+});
+
+test('diffCustomizations correctly tracks futureDates set and futureClassesStats', () => {
+  const updated = batchAddDates(futureBaseDataset, ['2026-11-10', '2026-11-11'], 'copy_weekday', 'p');
+  const diff = diffCustomizations(futureBaseDataset, updated);
+  assert.strictEqual(diff.futureDates.size, 2, 'Must detect exactly 2 future dates');
+  assert.ok(diff.futureDates.has('2026-11-10'));
+  assert.ok(diff.futureDates.has('2026-11-11'));
+  assert.strictEqual(diff.futureClassesStats.total, 3); // 2 on Tue + 1 on Wed = 3
+  assert.strictEqual(diff.futureClassesStats.p, 3);
+  assert.strictEqual(diff.futureClassesStats.a, 0);
+});
+
+test('clearFutureDates purges only future dates without affecting historical dates', () => {
+  const updated = batchAddDates(futureBaseDataset, ['2026-11-10', '2026-11-11'], 'copy_weekday', 'p');
+  assert.strictEqual(updated.dayColumns.length, 5);
+
+  const cleared = clearFutureDates(updated, futureBaseDataset.reportDate);
+  assert.strictEqual(cleared.dayColumns.length, 3, 'Must restore exactly 3 original day columns');
+  assert.deepStrictEqual(
+    cleared.dayColumns.map(d => d.dateStr),
+    ['2026-11-02', '2026-11-03', '2026-11-04']
+  );
+  // Subject totals must revert to baseline
+  assert.strictEqual(cleared.subjects[0].parts.th.p, 2);
+  assert.strictEqual(cleared.subjects[0].parts.th.a, 1);
+  assert.strictEqual(cleared.subjects[0].parts.tu.p, 0);
+  assert.strictEqual(cleared.subjects[0].parts.tu.a, 1);
+});
+
+// -------------------------------------------------------------
+// SECTION 8: SUMMARY & AUDIT RESULTS
 // -------------------------------------------------------------
 console.log('\n=====================================================');
 console.log(`TOTAL TESTS: ${totalTests} | PASSED: ${passedTests} | FAILED: ${issuesFound.length}`);

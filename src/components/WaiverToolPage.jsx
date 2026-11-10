@@ -3,13 +3,15 @@ import { useAuth } from '../context/AuthContext';
 import { canAccessWaiver } from '../lib/admin';
 import { PercentIcon } from './icons';
 import { trackWaiverEvent } from '../lib/analytics';
-import { parseAttendanceFile, MONTH_NAMES, MONTHS_FULL } from '../lib/waiverParser';
+import { parseAttendanceFile, WEEKDAYS, MONTH_NAMES, MONTHS_FULL } from '../lib/waiverParser';
 import {
   cloneParsedData,
   editCellClasses,
-  addDateColumn,
   deleteDateColumn,
-  diffCustomizations
+  diffCustomizations,
+  findRecentDaySchedule,
+  batchAddDates,
+  clearFutureDates
 } from '../lib/attendanceEditor';
 import {
   solveExactBnb,
@@ -86,7 +88,11 @@ export default function WaiverToolPage({ onBack }) {
   // Manual attendance editing state
   const [editingCell, setEditingCell] = useState(null); // { subjectName, dateStr, classes: [...] }
   const [isAddDateModalOpen, setIsAddDateModalOpen] = useState(false);
+  const [addDateMode, setAddDateMode] = useState('single'); // 'single' | 'range'
   const [newDateInput, setNewDateInput] = useState('');
+  const [newEndDateInput, setNewEndDateInput] = useState('');
+  const [timetableTemplateMode, setTimetableTemplateMode] = useState('copy_weekday'); // 'copy_weekday' | 'blank'
+  const [timetableDefaultStatus, setTimetableDefaultStatus] = useState('p'); // 'p' | 'a' | 'as_is'
   const [newDateError, setNewDateError] = useState('');
   const [dateToDelete, setDateToDelete] = useState(null); // { dateStr, fullLabel }
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
@@ -486,6 +492,27 @@ export default function WaiverToolPage({ onBack }) {
     reader.readAsText(file, 'utf-8');
   };
 
+  const selectedDateInfo = useMemo(() => {
+    if (!newDateInput) return null;
+    const parts = newDateInput.split('-');
+    if (parts.length < 3) return null;
+    const y = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+    const dn = parseInt(parts[2], 10);
+    if (isNaN(y) || isNaN(m) || isNaN(dn)) return null;
+
+    const dateObj = new Date(Date.UTC(y, m - 1, dn));
+    const weekday = WEEKDAYS[dateObj.getUTCDay()];
+    const isFuture = Boolean(parsedData?.reportDate && newDateInput > parsedData.reportDate);
+    const sched = parsedData ? findRecentDaySchedule(parsedData, weekday, newDateInput) : null;
+
+    return {
+      weekday,
+      isFuture,
+      recentSchedule: sched
+    };
+  }, [newDateInput, parsedData]);
+
   const sheetMinDate = useMemo(() => parsedData?.dayColumns?.[0]?.dateStr || '', [parsedData]);
   const sheetMaxDate = useMemo(() => parsedData?.dayColumns?.[parsedData.dayColumns.length - 1]?.dateStr || '', [parsedData]);
 
@@ -583,26 +610,124 @@ export default function WaiverToolPage({ onBack }) {
     }, currentSolverOptions);
   };
 
-  // Add a new date column
+  // Add a new date column (or date range) with future attendance simulation & timetable autofill
   const handleAddDate = () => {
     if (!newDateInput) {
       setNewDateError('Please choose a valid date.');
       return;
     }
-    if (parsedData?.dayColumns?.some(d => d.dateStr === newDateInput)) {
-      setNewDateError('This date already exists in the grid.');
+
+    let datesToAdd = [];
+    if (addDateMode === 'single') {
+      datesToAdd = [newDateInput];
+    } else {
+      if (!newEndDateInput) {
+        setNewDateError('Please choose an end date for the date range.');
+        return;
+      }
+      if (newEndDateInput < newDateInput) {
+        setNewDateError('End date must be on or after start date.');
+        return;
+      }
+
+      // Generate date range
+      const cur = new Date(newDateInput + 'T00:00:00Z');
+      const end = new Date(newEndDateInput + 'T00:00:00Z');
+      const maxDays = 31; // Safety limit
+      let count = 0;
+
+      while (cur <= end && count < maxDays) {
+        const y = cur.getUTCFullYear();
+        const m = String(cur.getUTCMonth() + 1).padStart(2, '0');
+        const d = String(cur.getUTCDate()).padStart(2, '0');
+        const ds = `${y}-${m}-${d}`;
+        // Skip Sundays (UTC day 0)
+        if (cur.getUTCDay() !== 0) {
+          datesToAdd.push(ds);
+        }
+        cur.setUTCDate(cur.getUTCDate() + 1);
+        count++;
+      }
+
+      if (datesToAdd.length === 0) {
+        setNewDateError('No weekday dates found in the chosen range.');
+        return;
+      }
+    }
+
+    // Filter out dates that already exist
+    const existingSet = new Set((parsedData?.dayColumns || []).map(d => d.dateStr));
+    const newDates = datesToAdd.filter(d => !existingSet.has(d));
+
+    if (newDates.length === 0) {
+      setNewDateError(addDateMode === 'single' ? 'This date already exists in the grid.' : 'All dates in this range already exist in the grid.');
       return;
     }
 
-    const updated = addDateColumn(parsedData, newDateInput);
+    const updated = batchAddDates(parsedData, newDates, timetableTemplateMode, timetableDefaultStatus);
     setParsedData(updated);
     setIsAddDateModalOpen(false);
     setNewDateInput('');
+    setNewEndDateInput('');
     setNewDateError('');
 
     setIsProcessing(true);
     executeSolverAsync(updated, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
       if (solution?.chosenDays && isOptimalSuggested) {
+        setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+        setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
+      }
+      setIsOneThirdAlertDismissed(false);
+    }, currentSolverOptions);
+  };
+
+  // Clear only speculative future dates strictly after original reportDate
+  const handleClearFutureDates = () => {
+    if (!parsedData || !rawParsedData?.reportDate) return;
+    const repDate = rawParsedData.reportDate;
+    const futureSet = new Set(
+      (parsedData.dayColumns || []).filter(d => d.dateStr > repDate).map(d => d.dateStr)
+    );
+    if (futureSet.size === 0) return;
+
+    const updated = clearFutureDates(parsedData, repDate);
+    setParsedData(updated);
+
+    // Clean up any waivers, CDC, or priority dates referencing purged future dates
+    setSelectedWaivers(prev => {
+      let changed = false;
+      const next = new Set(prev);
+      futureSet.forEach(d => { if (next.delete(d)) changed = true; });
+      return changed ? next : prev;
+    });
+    setSelectedCdcDays(prev => {
+      let changed = false;
+      const next = new Set(prev);
+      futureSet.forEach(d => { if (next.delete(d)) changed = true; });
+      return changed ? next : prev;
+    });
+    setLockedWaivers(prev => {
+      let changed = false;
+      const next = new Set(prev);
+      futureSet.forEach(d => { if (next.delete(d)) changed = true; });
+      return changed ? next : prev;
+    });
+    setLockedCdcDays(prev => {
+      let changed = false;
+      const next = new Set(prev);
+      futureSet.forEach(d => { if (next.delete(d)) changed = true; });
+      return changed ? next : prev;
+    });
+    setPriorityDates(prev => {
+      let changed = false;
+      const next = new Set(prev);
+      futureSet.forEach(d => { if (next.delete(d)) changed = true; });
+      return changed ? next : prev;
+    });
+
+    setIsProcessing(true);
+    executeSolverAsync(updated, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
+      if (solution?.chosenDays && (selectedWaivers.size > 0 || selectedCdcDays.size > 0)) {
         setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
         setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
       }
@@ -1499,10 +1624,11 @@ export default function WaiverToolPage({ onBack }) {
                 (activeWaiverStart && col.dateStr < activeWaiverStart) ||
                 (activeWaiverEnd && col.dateStr > activeWaiverEnd)
               );
-              const isAddedDate = col.isCustom || customizationDiff.addedDates.has(col.dateStr);
+              const isFutureDate = col.isFuture || customizationDiff.futureDates?.has(col.dateStr) || Boolean(parsedData?.reportDate && col.dateStr > parsedData.reportDate);
+              const isAddedDate = col.isCustom || customizationDiff.addedDates?.has(col.dateStr);
               const isPriority = priorityDates.has(col.dateStr);
               const btnClass = isWaived ? 'on' : (isCdc ? 'cdc-on' : (isPriority ? 'priority-on' : ''));
-              const thClass = `rd-date-th ${isOutOfTimeline ? 'is-pre-society' : ''} ${gridToolMode === 'edit' ? 'is-edit-header' : ''} ${gridToolMode === 'priority' ? 'is-priority-header' : ''} ${isPriority ? 'is-priority-col' : ''}`.trim();
+              const thClass = `rd-date-th ${isOutOfTimeline ? 'is-pre-society' : ''} ${isFutureDate ? 'is-future-col' : ''} ${gridToolMode === 'edit' ? 'is-edit-header' : ''} ${gridToolMode === 'priority' ? 'is-priority-header' : ''} ${isPriority ? 'is-priority-col' : ''}`.trim();
               return (
                 <th key={col.dateStr} className={thClass}>
                   <div className="rd-date-th-inner">
@@ -1522,7 +1648,9 @@ export default function WaiverToolPage({ onBack }) {
                     >
                       <span className="wd">{col.weekday}</span>
                       <span className="dn">{col.dayNum}</span>
-                      {isAddedDate ? (
+                      {isFutureDate ? (
+                        <span className="rd-date-future-badge" title="Future speculative date (simulated attendance)">🔮</span>
+                      ) : isAddedDate ? (
                         <span className="rd-date-added-badge" title="Manually added date">New</span>
                       ) : (isWaived && lockedWaivers.has(col.dateStr)) || (isCdc && lockedCdcDays.has(col.dateStr)) ? (
                         <span className="rd-date-pinned-badge" title="Pinned / locked date">📌</span>
@@ -1589,6 +1717,7 @@ export default function WaiverToolPage({ onBack }) {
                     isWaived ? 'on' : '',
                     isCdc ? 'cdc-cell' : '',
                     isOutOfTimeline ? 'pre-society-cell' : '',
+                    (parsedData?.reportDate && col.dateStr > parsedData.reportDate) ? 'is-future-cell' : '',
                     isCustomCell ? 'is-customized' : '',
                     gridToolMode === 'edit' ? 'is-edit-cell' : ''
                   ].filter(Boolean).join(' ');
@@ -2112,17 +2241,20 @@ export default function WaiverToolPage({ onBack }) {
     );
   };
 
-  // Render Add Date Modal
+  // Render Add Date / Future Attendance Modal
   const renderAddDateModal = () => {
     if (!isAddDateModalOpen) return null;
 
+    const repDate = parsedData?.reportDate || '';
+    const isSingleFuture = Boolean(repDate && newDateInput && newDateInput > repDate);
+
     return (
       <div className="rd-modal-overlay" onClick={() => { setIsAddDateModalOpen(false); setNewDateError(''); }}>
-        <div className="rd-modal-card" style={{ maxWidth: '420px' }} onClick={e => e.stopPropagation()}>
+        <div className="rd-modal-card rd-future-modal-card" style={{ maxWidth: '460px' }} onClick={e => e.stopPropagation()}>
           <div className="rd-modal-head">
             <div>
-              <h3>Add Date to Grid</h3>
-              <p className="rd-modal-sub">Insert an extra date into your attendance schedule</p>
+              <h3>Add Dates & Future Attendance</h3>
+              <p className="rd-modal-sub">Add past corrections or speculate upcoming dates</p>
             </div>
             <button
               type="button"
@@ -2135,27 +2267,154 @@ export default function WaiverToolPage({ onBack }) {
           </div>
 
           <div style={{ padding: '16px 20px' }}>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--ink)', marginBottom: '8px' }}>
-              Select Date:
-            </label>
-            <input
-              type="date"
-              className="rd-timeline-input"
-              style={{ width: '100%', boxSizing: 'border-box' }}
-              value={newDateInput}
-              onChange={(e) => {
-                setNewDateInput(e.target.value);
-                setNewDateError('');
-              }}
-            />
+            {/* Mode Toggle: Single Date vs Date Range */}
+            <div className="rd-add-mode-tabs">
+              <button
+                type="button"
+                className={`rd-add-mode-tab ${addDateMode === 'single' ? 'active' : ''}`}
+                onClick={() => { setAddDateMode('single'); setNewDateError(''); }}
+              >
+                📅 Single Date
+              </button>
+              <button
+                type="button"
+                className={`rd-add-mode-tab ${addDateMode === 'range' ? 'active' : ''}`}
+                onClick={() => { setAddDateMode('range'); setNewDateError(''); }}
+              >
+                🗓️ Date Range (Multi-day)
+              </button>
+            </div>
+
+            {addDateMode === 'single' ? (
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--ink)', marginBottom: '6px' }}>
+                  Select Date:
+                </label>
+                <input
+                  type="date"
+                  className="rd-timeline-input"
+                  style={{ width: '100%', boxSizing: 'border-box' }}
+                  value={newDateInput}
+                  onChange={(e) => {
+                    setNewDateInput(e.target.value);
+                    setNewDateError('');
+                  }}
+                />
+                {selectedDateInfo && (
+                  <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--ink)' }}>
+                      {selectedDateInfo.weekday}
+                    </span>
+                    {selectedDateInfo.isFuture && (
+                      <span className="rd-future-pill">
+                        🔮 Future Date (Speculative)
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--ink)', marginBottom: '6px' }}>
+                  Select Date Range (Excludes Sundays):
+                </label>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <input
+                    type="date"
+                    className="rd-timeline-input"
+                    style={{ flex: 1, boxSizing: 'border-box' }}
+                    value={newDateInput}
+                    onChange={(e) => {
+                      setNewDateInput(e.target.value);
+                      setNewDateError('');
+                    }}
+                  />
+                  <span style={{ color: 'var(--ink-dim)', fontWeight: 600 }}>→</span>
+                  <input
+                    type="date"
+                    className="rd-timeline-input"
+                    style={{ flex: 1, boxSizing: 'border-box' }}
+                    value={newEndDateInput}
+                    min={newDateInput}
+                    onChange={(e) => {
+                      setNewEndDateInput(e.target.value);
+                      setNewDateError('');
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
             {newDateError && (
-              <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--red)', fontWeight: 600 }}>
+              <div style={{ marginTop: '10px', fontSize: '12px', color: 'var(--red)', fontWeight: 600 }}>
                 {newDateError}
               </div>
             )}
-            <p style={{ marginTop: '12px', fontSize: '12px', color: 'var(--ink-dim)', lineHeight: 1.4 }}>
-              The date will be automatically inserted into the grid in chronological order. You can then click cells in this new date column to add theory, tutorial, or practical classes.
-            </p>
+
+            {/* Timetable Autofill Options */}
+            <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px solid var(--border)' }}>
+              <div style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--ink)', marginBottom: '8px' }}>
+                Class Schedule & Initial Attendance:
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12px', color: 'var(--ink)', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="rd-template-mode"
+                    checked={timetableTemplateMode === 'copy_weekday'}
+                    onChange={() => setTimetableTemplateMode('copy_weekday')}
+                    style={{ marginTop: '2px' }}
+                  />
+                  <div>
+                    <strong>Auto-fill classes from matching weekday</strong>
+                    <div style={{ fontSize: '11.5px', color: 'var(--ink-dim)', marginTop: '2px' }}>
+                      Automatically copies your typical subjects & periods for that day of the week from previous weeks.
+                    </div>
+                  </div>
+                </label>
+
+                {timetableTemplateMode === 'copy_weekday' && (
+                  <div style={{ marginLeft: '24px', marginTop: '4px', background: 'var(--surface-subtle)', padding: '10px 12px', borderRadius: '8px' }}>
+                    <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, color: 'var(--ink)', marginBottom: '4px' }}>
+                      Initial Attendance Status for Planned Classes:
+                    </label>
+                    <select
+                      className="rd-class-select"
+                      style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
+                      value={timetableDefaultStatus}
+                      onChange={(e) => setTimetableDefaultStatus(e.target.value)}
+                    >
+                      <option value="p">Mark all as Present (P) — Simulate 100% attendance</option>
+                      <option value="a">Mark all as Absent (A) — Simulate duty leave / event absence</option>
+                      <option value="as_is">Keep original past status</option>
+                    </select>
+                  </div>
+                )}
+
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12px', color: 'var(--ink)', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="rd-template-mode"
+                    checked={timetableTemplateMode === 'blank'}
+                    onChange={() => setTimetableTemplateMode('blank')}
+                    style={{ marginTop: '2px' }}
+                  />
+                  <div>
+                    <strong>Start with blank day</strong>
+                    <div style={{ fontSize: '11.5px', color: 'var(--ink-dim)', marginTop: '2px' }}>
+                      Adds an empty column so you can manually click cells to add individual periods.
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            {isSingleFuture && (
+              <div style={{ marginTop: '14px', background: 'rgba(124, 58, 237, 0.08)', border: '1px solid rgba(124, 58, 237, 0.2)', padding: '8px 12px', borderRadius: '6px', fontSize: '11.5px', color: '#6d28d9', lineHeight: 1.4 }}>
+                💡 <strong>Future Speculation:</strong> This date is after your ERP export. The tool will project your updated attendance in real-time. You can clear future dates anytime with 1 click.
+              </div>
+            )}
           </div>
 
           <div className="rd-modal-actions">
@@ -2168,10 +2427,10 @@ export default function WaiverToolPage({ onBack }) {
             </button>
             <button
               type="button"
-              className="rd-btn-dark sm"
+              className="rd-btn-dark sm rd-btn-accent"
               onClick={handleAddDate}
             >
-              Add Date
+              {addDateMode === 'single' ? 'Add Date' : 'Add Date Range'}
             </button>
           </div>
         </div>
@@ -2968,6 +3227,34 @@ export default function WaiverToolPage({ onBack }) {
                     </button>
                   </div>
                 </div>
+                {customizationDiff.futureDates?.size > 0 && (
+                  <div className="rd-future-banner">
+                    <div className="rd-future-banner-text">
+                      🔮 <strong>Future Speculation:</strong>{' '}
+                      {customizationDiff.futureDates.size} upcoming date{customizationDiff.futureDates.size === 1 ? '' : 's'} simulated{' '}
+                      ({customizationDiff.futureClassesStats?.total || 0} classes: {customizationDiff.futureClassesStats?.p || 0} Present, {customizationDiff.futureClassesStats?.a || 0} Absent)
+                    </div>
+                    <div className="rd-future-banner-acts">
+                      {gridToolMode === 'edit' && (
+                        <button
+                          type="button"
+                          className="rd-btn-outline xs"
+                          onClick={() => { setIsAddDateModalOpen(true); setNewDateError(''); setNewDateInput(''); }}
+                        >
+                          + Add More
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        className="rd-btn-outline xs rd-future-clear-btn"
+                        onClick={handleClearFutureDates}
+                        title="Remove all speculative future dates and restore current attendance"
+                      >
+                        ✕ Clear Future ({customizationDiff.futureDates.size})
+                      </button>
+                    </div>
+                  </div>
+                )}
                 {gridToolMode === 'edit' && (
                   <div className="rd-edit-banner">
                     <span className="rd-edit-banner-text">
@@ -3408,6 +3695,34 @@ export default function WaiverToolPage({ onBack }) {
               </div>
             </div>
 
+            {customizationDiff.futureDates?.size > 0 && (
+              <div className="rd-future-banner exp">
+                <div className="rd-future-banner-text">
+                  🔮 <strong>Future Speculation Active:</strong>{' '}
+                  {customizationDiff.futureDates.size} upcoming date{customizationDiff.futureDates.size === 1 ? '' : 's'} simulated{' '}
+                  ({customizationDiff.futureClassesStats?.total || 0} classes: {customizationDiff.futureClassesStats?.p || 0} Present, {customizationDiff.futureClassesStats?.a || 0} Absent)
+                </div>
+                <div className="rd-future-banner-acts">
+                  {gridToolMode === 'edit' && (
+                    <button
+                      type="button"
+                      className="rd-btn-outline xs"
+                      onClick={() => { setIsAddDateModalOpen(true); setNewDateError(''); setNewDateInput(''); }}
+                    >
+                      + Add More
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="rd-btn-outline xs rd-future-clear-btn"
+                    onClick={handleClearFutureDates}
+                    title="Remove all speculative future dates and restore current attendance"
+                  >
+                    ✕ Clear Future ({customizationDiff.futureDates.size})
+                  </button>
+                </div>
+              </div>
+            )}
             {gridToolMode === 'edit' && (
               <div className="rd-edit-banner exp">
                 <span className="rd-edit-banner-text">
