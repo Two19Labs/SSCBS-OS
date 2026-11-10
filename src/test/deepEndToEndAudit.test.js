@@ -6,8 +6,6 @@ import { parseAttendanceFile, parseAttendanceEntry } from '../lib/waiverParser.j
 import {
   solveExactBnb,
   solveKPlusOne,
-  isPartPassing,
-  calculatePartBufferAndNeeded,
   calculateSimulatedStats,
   extractTargetParts,
   extractCandidateDays
@@ -746,7 +744,51 @@ test('Undo/Redo: Date deletion undo restores deleted column and all classes', ()
 });
 
 // -------------------------------------------------------------
-// SECTION 10: SUMMARY & AUDIT RESULTS
+// SECTION 10: CDC-FIRST PRIORITIZATION & MAXIMIZE REMAINING
+// -------------------------------------------------------------
+console.log('\n--- SECTION 10: CDC-First Prioritization & Maximize Remaining ---');
+
+test('CDC days are prioritized and fully maximized up to C before waivers', () => {
+  // Candidate absent days exist on 2026-09-01, 2026-09-02, 2026-09-03, 2026-09-04, 2026-09-05.
+  const sol = solveExactBnb(baseMockData, 85, 5, [], 2, {});
+  assert.strictEqual(sol.chosenCdcDays.length, 2, 'Solver must allocate exactly min(C, candidateDays) CDC days');
+  // Check no overlap between CDC days and society waiver days
+  const waiverDates = new Set(sol.chosenDays.map(d => d.dateStr));
+  sol.chosenCdcDays.forEach(cdc => {
+    assert.strictEqual(waiverDates.has(cdc.dateStr), false, 'CDC day must not duplicate as society waiver');
+  });
+});
+
+test('High baseline attendance still allocates all available CDC days (utilization priority)', () => {
+  // Target 50% where baseline already passes 100% of subjects
+  const sol = solveExactBnb(baseMockData, 50, 5, [], 3, {});
+  assert.strictEqual(sol.chosenCdcDays.length, 3, 'CDC days must be fully allocated even if target is already met');
+  assert.strictEqual(sol.chosenDays.length, 0, 'No society waivers needed when baseline meets target');
+});
+
+test('CDC allocation reduces society waivers needed to meet targets', () => {
+  const solNoCdc = solveExactBnb(baseMockData, 85, 5, [], 0, {});
+  const solWithCdc = solveExactBnb(baseMockData, 85, 5, [], 2, {});
+
+  assert.ok(
+    solWithCdc.chosenDays.length <= solNoCdc.chosenDays.length,
+    'CDC attendance conversion should reduce or equal society waivers required'
+  );
+});
+
+test('maximizeRemaining: true allocates additional waivers when budget allows', () => {
+  // With target 50%, standard solver picks 0 waivers
+  const standardSol = solveExactBnb(baseMockData, 50, 3, [], 0, { maximizeRemaining: false });
+  assert.strictEqual(standardSol.chosenDays.length, 0, 'Standard solver picks 0 waivers when already passing');
+
+  // With maximizeRemaining: true, solver should use remaining budget up to available candidate days
+  const maxSol = solveExactBnb(baseMockData, 50, 3, [], 0, { maximizeRemaining: true });
+  assert.ok(maxSol.chosenDays.length > 0, 'maximizeRemaining must allocate additional waivers to maximize attendance');
+  assert.strictEqual(maxSol.chosenDays.length, 3, 'maximizeRemaining should allocate up to maxWaiversK budget');
+});
+
+// -------------------------------------------------------------
+// SECTION 11: SUMMARY & AUDIT RESULTS
 // -------------------------------------------------------------
 console.log('\n=====================================================');
 console.log(`TOTAL TESTS: ${totalTests} | PASSED: ${passedTests} | FAILED: ${issuesFound.length}`);

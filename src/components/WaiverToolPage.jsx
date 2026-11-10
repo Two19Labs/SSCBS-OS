@@ -425,7 +425,8 @@ export default function WaiverToolPage({ onBack }) {
         fixedWaiverDates: actualFixedWaivers,
         fixedCdcDates: actualFixedCdc,
         priorityWaiverDates: actualPriorityDates,
-        blockedDates: actualBlockedDates
+        blockedDates: actualBlockedDates,
+        maximizeRemaining: Boolean(extraOpts.maximizeRemaining)
       });
     } else {
       setTimeout(() => {
@@ -437,7 +438,8 @@ export default function WaiverToolPage({ onBack }) {
             fixedWaiverDates: actualFixedWaivers,
             fixedCdcDates: actualFixedCdc,
             priorityWaiverDates: actualPriorityDates,
-            blockedDates: actualBlockedDates
+            blockedDates: actualBlockedDates,
+            maximizeRemaining: Boolean(extraOpts.maximizeRemaining)
           };
           const solution = solveExactBnb(data, targetT, limitK, starredList, actualCdc, options);
           let kPlusOne = null;
@@ -1127,7 +1129,8 @@ export default function WaiverToolPage({ onBack }) {
     const fillOpts = {
       ...currentSolverOptions,
       fixedWaiverDates: currentWaiversArray,
-      fixedCdcDates: currentCdcArray
+      fixedCdcDates: currentCdcArray,
+      maximizeRemaining: true
     };
 
     executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
@@ -3742,7 +3745,7 @@ export default function WaiverToolPage({ onBack }) {
               </div>
               {selectedWaivers.size === 0 && selectedCdcDays.size === 0 && (solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
                 <button type="button" className="rd-btn-outline sm rd-btn-accent rd-status-cta" onClick={handleApplyRecommended}>
-                  Apply recommended
+                  {getApplyRecommendedLabel(true)}
                 </button>
               )}
               {hasPendingPriorityChange && (
@@ -3902,7 +3905,7 @@ export default function WaiverToolPage({ onBack }) {
                         onClick={handleApplyRecommended}
                         title="Apply recommended attendance dates"
                       >
-                        Apply recommended
+                        {getApplyRecommendedLabel(true)}
                       </button>
                     )}
                     {hasPendingPriorityChange && (
@@ -4043,7 +4046,7 @@ export default function WaiverToolPage({ onBack }) {
                         className="rd-btn-outline sm rd-btn-accent"
                         onClick={handleApplyRecommended}
                       >
-                        Apply recommended
+                        {getApplyRecommendedLabel(true)}
                       </button>
                     )}
                     {hasPendingPriorityChange && (
@@ -4090,7 +4093,7 @@ export default function WaiverToolPage({ onBack }) {
                     <p>No dates applied yet. Viewing raw attendance.</p>
                     {(solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
                       <button type="button" className="rd-btn-dark" onClick={handleApplyRecommended}>
-                        Apply recommended dates ({solverResult.chosenDays?.length || 0} waivers{solverResult.chosenCdcDays?.length ? ` + ${solverResult.chosenCdcDays.length} CDC` : ''})
+                        {getApplyRecommendedLabel(false)}
                       </button>
                     )}
                   </div>
@@ -4385,7 +4388,7 @@ export default function WaiverToolPage({ onBack }) {
                     className="rd-btn-outline sm rd-btn-accent"
                     onClick={handleApplyRecommended}
                   >
-                    Apply recommended
+                    {getApplyRecommendedLabel(true)}
                   </button>
                 )}
                 {hasPendingPriorityChange && (
