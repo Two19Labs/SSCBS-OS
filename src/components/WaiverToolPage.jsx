@@ -1436,20 +1436,44 @@ export default function WaiverToolPage({ onBack }) {
   const subjectSummaries = simStats?.subjectSummaries || simStats?.subjectsStats || [];
   const totalTargetParts = simStats?.totalTargetParts || 0;
   const passingTargetCount = simStats?.passingTargetCount ?? simStats?.passingCount ?? 0;
-  const passingPct = totalTargetParts > 0 ? Math.round((passingTargetCount / totalTargetParts) * 100) : 100;
-  const projectedPassingCount = solverResult?.passingTargetCount ?? solverResult?.passCount ?? passingTargetCount;
-  const projectedPct = totalTargetParts > 0 ? Math.round((projectedPassingCount / totalTargetParts) * 100) : passingPct;
+  // Real-time breakdown of subject clearance state for the mission-control status banner (Zero Percentages)
+  const subjectStatusList = useMemo(() => {
+    if (!simStats?.subjectsStats) return [];
+    return simStats.subjectsStats.map(sub => {
+      const targetParts = (sub.partsList || []).filter(p => p.isTarget);
+      if (targetParts.length === 0) return null;
+      const allPass = targetParts.every(p => p.passes);
+      const anyDebarRisk = targetParts.some(p => p.simPct < 66.666);
+      const failingParts = targetParts.filter(p => !p.passes);
+      let failingLabel = '';
+      if (targetParts.length > 1 && failingParts.length > 0 && failingParts.length < targetParts.length) {
+        failingLabel = failingParts.map(p => (p.type === 'tu' ? 'Tu' : 'Th')).join('/');
+      }
+      return {
+        name: sub.name,
+        allPass,
+        anyDebarRisk,
+        failingLabel,
+        partsCount: targetParts.length,
+        failingPartsCount: failingParts.length
+      };
+    }).filter(Boolean);
+  }, [simStats]);
+
+  const passingSubs = useMemo(() => subjectStatusList.filter(s => s.allPass), [subjectStatusList]);
+  const failingSubs = useMemo(() => subjectStatusList.filter(s => !s.allPass), [subjectStatusList]);
 
   // Aggregate totals across all subjects
   // Aggregate totals across all subjects (plus special aggregate attendance adjustment)
   const totalsSummary = useMemo(() => {
     let baseTotals = simStats?.totals;
-    if (!baseTotals && subjectSummaries && subjectSummaries.length > 0) {
+    const subsList = simStats?.subjectSummaries || simStats?.subjectsStats || [];
+    if (!baseTotals && subsList.length > 0) {
       let totAtt = 0, totHeld = 0, totBaseAtt = 0, totBaseHeld = 0;
       let thAtt = 0, thHeld = 0, thBaseAtt = 0, thBaseHeld = 0;
       let tuAtt = 0, tuHeld = 0, tuBaseAtt = 0, tuBaseHeld = 0;
 
-      subjectSummaries.forEach(sub => {
+      subsList.forEach(sub => {
         const parts = sub.partsList || Object.values(sub.parts || {});
         parts.forEach(p => {
           const att = p.simAttended ?? p.simP ?? p.p ?? 0;
@@ -1540,7 +1564,7 @@ export default function WaiverToolPage({ onBack }) {
       theory: baseTotals.theory,
       tutorial: baseTotals.tutorial
     };
-  }, [simStats, subjectSummaries, specialAttendanceAdjustment]);
+  }, [simStats, specialAttendanceAdjustment]);
 
   // Overall university eligibility check:
   // If a student's total attendance across all subjects combined is below 66.7%,
@@ -3709,7 +3733,11 @@ export default function WaiverToolPage({ onBack }) {
                   )}
                 </div>
                 <div className="rd-status-info">
-                  <strong>{passingTargetCount} of {totalTargetParts} parts meet {threshold}%</strong>
+                  <strong>
+                    {failingSubs.length === 0
+                      ? 'All Subjects Clearing'
+                      : `${failingSubs.length} Subject${failingSubs.length === 1 ? '' : 's'} Below Target`}
+                  </strong>
                   <span className="rd-status-sub">
                     {selectedWaivers.size === 0 && selectedCdcDays.size === 0
                       ? 'Baseline (0 applied)'
@@ -3723,33 +3751,56 @@ export default function WaiverToolPage({ onBack }) {
                 </div>
               </div>
 
-              {/* Middle: Visual Clearance Progress & Projected Outcome */}
+              {/* Middle: Real-Time Subject Clearance State Chips (Zero Percentages) */}
               <div className="rd-status-middle">
-                <div className="rd-status-progress-head">
-                  <span className="rd-status-progress-label">
-                    Clearance: <strong>{passingPct}%</strong> ({passingTargetCount}/{totalTargetParts} passing)
-                  </span>
-                  {!simStats?.allPassing && projectedPassingCount > passingTargetCount && !isOptimalSuggested && (
-                    <span className="rd-status-projected-pill">
-                      → Projected: <strong>{projectedPct}%</strong> ({projectedPassingCount}/{totalTargetParts})
+                {failingSubs.length > 0 && (
+                  <div className="rd-status-sub-group failing">
+                    <span className="rd-status-group-label">
+                      <span className="rd-group-dot fail" />
+                      Below target ({failingSubs.length})
                     </span>
-                  )}
-                </div>
-                <div className="rd-status-progress-track">
-                  <div
-                    className="rd-status-progress-fill"
-                    style={{ width: `${passingPct}%` }}
-                  />
-                  {!simStats?.allPassing && projectedPassingCount > passingTargetCount && !isOptimalSuggested && (
-                    <div
-                      className="rd-status-progress-proj-fill"
-                      style={{
-                        left: `${passingPct}%`,
-                        width: `${Math.max(0, projectedPct - passingPct)}%`
-                      }}
-                    />
-                  )}
-                </div>
+                    <div className="rd-status-chips">
+                      {failingSubs.map(sub => (
+                        <span
+                          key={sub.name}
+                          className={`rd-sub-chip ${sub.anyDebarRisk ? 'debar' : 'fail'}`}
+                          title={`${sub.name}${sub.anyDebarRisk ? ' — Debarment Risk (< 66.7%)' : ''}${sub.failingLabel ? ` (${sub.failingLabel} below target)` : ' (Below target)'}`}
+                        >
+                          <span className="rd-chip-icon">{sub.anyDebarRisk ? '!' : '✕'}</span>
+                          <span className="rd-chip-name">{sub.name}</span>
+                          {sub.failingLabel && (
+                            <span className="rd-chip-part-tag">{sub.failingLabel}</span>
+                          )}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {passingSubs.length > 0 && (
+                  <div className="rd-status-sub-group passing">
+                    <span className="rd-status-group-label">
+                      <span className="rd-group-dot pass" />
+                      Clearing ({passingSubs.length})
+                    </span>
+                    <div className="rd-status-chips">
+                      {passingSubs.map(sub => (
+                        <span
+                          key={sub.name}
+                          className="rd-sub-chip pass"
+                          title={`${sub.name} — Clearing attendance target`}
+                        >
+                          <span className="rd-chip-icon">✓</span>
+                          <span className="rd-chip-name">{sub.name}</span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {subjectStatusList.length === 0 && (
+                  <span className="rd-status-empty-note">All subjects practical / no target requirements</span>
+                )}
               </div>
 
               {/* Right: Actions */}
