@@ -3544,7 +3544,8 @@ export default function WaiverToolPage({ onBack }) {
         <main className="rd-main">
           {/* Top Metrics Row */}
           <div className="rd-top">
-            {/* Target Stepper */}
+            <div className="rd-stats-grid">
+              {/* Target Stepper */}
             <div className="rd-stat">
               <span className="lbl">Target</span>
               <div className="row">
@@ -3684,6 +3685,7 @@ export default function WaiverToolPage({ onBack }) {
                   ✎
                 </button>
               </div>
+            </div>
             </div>
 
             {/* Status Banner */}
