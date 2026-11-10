@@ -3751,56 +3751,36 @@ export default function WaiverToolPage({ onBack }) {
                 </div>
               </div>
 
-              {/* Middle: Horizontal Subject Clearance Strip (Zero Percentages, Frozen Height) */}
+              {/* Middle: Horizontal Subject Clearance Strip (Single Row, Zero Percentages, Frozen Height) */}
               <div className="rd-status-middle" tabIndex={0} role="region" aria-label="Subject clearance list">
-                {failingSubs.length > 0 && (
-                  <div className="rd-h-group fail-group">
-                    <span className="rd-h-badge fail" title={`${failingSubs.length} subject${failingSubs.length === 1 ? '' : 's'} below target`}>
-                      <span className="rd-dot fail" />
-                      Below ({failingSubs.length})
-                    </span>
-                    <div className="rd-h-chips">
-                      {failingSubs.map(sub => (
-                        <span
-                          key={sub.name}
-                          className={`rd-h-chip ${sub.anyDebarRisk ? 'debar' : 'fail'}`}
-                          title={`${sub.name}${sub.anyDebarRisk ? ' — Debarment Risk (< 66.7%)' : ''}${sub.failingLabel ? ` (${sub.failingLabel} below target)` : ' (Below target)'}`}
-                        >
-                          <span className="rd-h-icon">{sub.anyDebarRisk ? '!' : '✕'}</span>
-                          <span className="rd-h-name">{sub.name}</span>
-                          {sub.failingLabel && (
-                            <span className="rd-h-part">{sub.failingLabel}</span>
-                          )}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                {failingSubs.map(sub => (
+                  <span
+                    key={sub.name}
+                    className={`rd-sub-pill ${sub.anyDebarRisk ? 'debar' : 'fail'}`}
+                    title={`${sub.name}${sub.anyDebarRisk ? ' — Debarment Risk (< 66.7%)' : ''}${sub.failingLabel ? ` (${sub.failingLabel} below target)` : ' (Below target)'}`}
+                  >
+                    <span className="rd-sub-pill-badge">{sub.anyDebarRisk ? '!' : '✕'}</span>
+                    <span className="rd-sub-pill-name">{sub.name}</span>
+                    {sub.failingLabel && (
+                      <span className="rd-sub-pill-tag">{sub.failingLabel}</span>
+                    )}
+                  </span>
+                ))}
 
                 {failingSubs.length > 0 && passingSubs.length > 0 && (
-                  <span className="rd-h-divider" aria-hidden="true" />
+                  <span className="rd-sub-pill-divider" aria-hidden="true" />
                 )}
 
-                {passingSubs.length > 0 && (
-                  <div className="rd-h-group pass-group">
-                    <span className="rd-h-badge pass" title={`${passingSubs.length} subject${passingSubs.length === 1 ? '' : 's'} clearing target`}>
-                      <span className="rd-dot pass" />
-                      Clearing ({passingSubs.length})
-                    </span>
-                    <div className="rd-h-chips">
-                      {passingSubs.map(sub => (
-                        <span
-                          key={sub.name}
-                          className="rd-h-chip pass"
-                          title={`${sub.name} — Clearing attendance target`}
-                        >
-                          <span className="rd-h-icon">✓</span>
-                          <span className="rd-h-name">{sub.name}</span>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                {passingSubs.map(sub => (
+                  <span
+                    key={sub.name}
+                    className="rd-sub-pill pass"
+                    title={`${sub.name} — Clearing attendance target`}
+                  >
+                    <span className="rd-sub-pill-badge">✓</span>
+                    <span className="rd-sub-pill-name">{sub.name}</span>
+                  </span>
+                ))}
 
                 {subjectStatusList.length === 0 && (
                   <span className="rd-status-empty-note">All subjects practical / no target requirements</span>

@@ -2006,10 +2006,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  height: 68px;
-  min-height: 68px;
-  max-height: 68px;
-  padding: 0 18px;
+  min-height: 72px;
+  height: 72px;
+  max-height: 72px;
+  padding: 0 20px;
   box-sizing: border-box;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
@@ -2110,169 +2110,123 @@
   gap: 6px;
 }
 
-/* Status Banner Middle Subject State Section (Zero Percentages, Frozen Horizontal) */
+/* Status Banner Middle Subject State Section (Single Horizontal Row, Zero Percentages) */
 .rd-status-middle {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex: 1 1 auto;
   min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  white-space: nowrap;
   padding: 2px 4px;
+  height: 100%;
 }
 
 .rd-status-middle::-webkit-scrollbar {
   display: none;
 }
 
-.rd-h-group {
+.rd-sub-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  flex-shrink: 0;
-}
-
-.rd-h-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 10.5px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 3px 8px;
-  border-radius: 6px;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.rd-h-badge.fail {
-  color: #b91c1c;
-  background: rgba(185, 28, 28, 0.09);
-  border: 1px solid rgba(185, 28, 28, 0.2);
-}
-
-.rd-h-badge.pass {
-  color: #0b7a54;
-  background: rgba(11, 122, 84, 0.09);
-  border: 1px solid rgba(11, 122, 84, 0.2);
-}
-
-.rd-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.rd-dot.fail {
-  background: #dc2626;
-  box-shadow: 0 0 5px rgba(220, 38, 38, 0.5);
-}
-
-.rd-dot.pass {
-  background: #0b7a54;
-  box-shadow: 0 0 5px rgba(11, 122, 84, 0.5);
-}
-
-.rd-h-chips {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  flex-shrink: 0;
-}
-
-.rd-h-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  height: 26px;
-  padding: 0 9px;
+  height: 28px;
+  padding: 0 10px 0 5px;
   border-radius: 999px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
-  line-height: 1;
   white-space: nowrap;
   flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: all 0.15s ease;
   user-select: none;
 }
 
-.rd-h-chip .rd-h-name {
+.rd-sub-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+.rd-sub-pill-badge {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 900;
+  color: #ffffff;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.rd-sub-pill-name {
   max-width: 125px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  line-height: 1.2;
 }
 
-.rd-h-chip .rd-h-icon {
-  font-size: 10px;
-  font-weight: 900;
-  line-height: 1;
-}
-
-.rd-h-chip .rd-h-part {
-  font-size: 9px;
+.rd-sub-pill-tag {
+  font-size: 9.5px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   padding: 1px 4px;
-  border-radius: 3px;
+  border-radius: 4px;
   background: rgba(0, 0, 0, 0.08);
   line-height: 1;
 }
 
-/* Passing Chip (Green) */
-.rd-h-chip.pass {
-  background: #ecfdf5;
-  color: #065f46;
-  border: 1px solid #a7f3d0;
+/* Passing Pill (Green) */
+.rd-sub-pill.pass {
+  background: #ffffff;
+  color: #15803d;
+  border: 1.5px solid #86efac;
+  box-shadow: 0 1px 3px rgba(22, 163, 74, 0.1);
 }
 
-.rd-h-chip.pass:hover {
-  background: #d1fae5;
-  border-color: #6ee7b7;
+.rd-sub-pill.pass .rd-sub-pill-badge {
+  background: #16a34a;
 }
 
-/* Failing Chip (Warn/Fail) */
-.rd-h-chip.fail {
-  background: #fff1f2;
-  color: #b91c1c;
-  border: 1px solid #fecdd3;
+/* Below Target Pill (Amber/Orange) */
+.rd-sub-pill.fail {
+  background: #ffffff;
+  color: #c2410c;
+  border: 1.5px solid #fdba74;
+  box-shadow: 0 1px 3px rgba(234, 88, 12, 0.1);
 }
 
-.rd-h-chip.fail:hover {
-  background: #ffe4e6;
-  border-color: #fda4af;
+.rd-sub-pill.fail .rd-sub-pill-badge {
+  background: #ea580c;
 }
 
-/* Debarment Risk Chip (Urgent Red) */
-.rd-h-chip.debar {
-  background: #fee2e2;
+/* Debarment Risk Pill (Red) */
+.rd-sub-pill.debar {
+  background: #ffffff;
   color: #991b1b;
-  border: 1px solid #f87171;
+  border: 1.5px solid #f87171;
+  box-shadow: 0 1px 3px rgba(220, 38, 38, 0.14);
   font-weight: 800;
 }
 
-.rd-h-chip.debar .rd-h-icon {
-  color: #dc2626;
-  font-weight: 900;
+.rd-sub-pill.debar .rd-sub-pill-badge {
+  background: #dc2626;
 }
 
-.rd-h-chip.debar:hover {
-  background: #fecaca;
-  border-color: #ef4444;
-}
-
-.rd-h-divider {
+.rd-sub-pill-divider {
   width: 1px;
   height: 20px;
-  background: rgba(36, 26, 20, 0.15);
+  background: rgba(36, 26, 20, 0.18);
   flex-shrink: 0;
-  margin: 0 4px;
+  margin: 0 3px;
 }
 
 .rd-status-empty-note {
@@ -2344,7 +2298,7 @@
   }
 }
 
-/* Dark mode adjustments for status banner horizontal subject chips */
+/* Dark mode adjustments for status banner horizontal subject pills */
 [data-theme='dark'] .rd-status.bad .rd-status-icon-wrap {
   background: rgba(239, 68, 68, 0.2);
   color: #f87171;
@@ -2360,68 +2314,46 @@
   color: #34d399;
 }
 
-[data-theme='dark'] .rd-h-badge.fail {
-  color: #f87171;
-  background: rgba(239, 68, 68, 0.15);
-  border-color: rgba(239, 68, 68, 0.35);
+[data-theme='dark'] .rd-sub-pill.pass {
+  background: #15261f;
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
 
-[data-theme='dark'] .rd-h-badge.pass {
-  color: #57c896;
-  background: rgba(87, 200, 150, 0.15);
-  border-color: rgba(87, 200, 150, 0.35);
+[data-theme='dark'] .rd-sub-pill.pass .rd-sub-pill-badge {
+  background: #10b981;
 }
 
-[data-theme='dark'] .rd-dot.fail {
-  background: #f87171;
-  box-shadow: 0 0 5px rgba(248, 113, 113, 0.6);
+[data-theme='dark'] .rd-sub-pill.fail {
+  background: #2a1f18;
+  color: #fdba74;
+  border: 1px solid rgba(249, 115, 22, 0.45);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
 
-[data-theme='dark'] .rd-dot.pass {
-  background: #57c896;
-  box-shadow: 0 0 5px rgba(87, 200, 150, 0.5);
+[data-theme='dark'] .rd-sub-pill.fail .rd-sub-pill-badge {
+  background: #f97316;
 }
 
-[data-theme='dark'] .rd-h-chip.pass {
-  background: rgba(87, 200, 150, 0.14);
-  color: #57c896;
-  border-color: rgba(87, 200, 150, 0.35);
-}
-
-[data-theme='dark'] .rd-h-chip.pass:hover {
-  background: rgba(87, 200, 150, 0.24);
-  border-color: rgba(87, 200, 150, 0.55);
-}
-
-[data-theme='dark'] .rd-h-chip.fail {
-  background: rgba(239, 68, 68, 0.14);
-  color: #f87171;
-  border-color: rgba(239, 68, 68, 0.35);
-}
-
-[data-theme='dark'] .rd-h-chip.fail:hover {
-  background: rgba(239, 68, 68, 0.24);
-  border-color: rgba(239, 68, 68, 0.55);
-}
-
-[data-theme='dark'] .rd-h-chip.debar {
-  background: rgba(239, 68, 68, 0.24);
+[data-theme='dark'] .rd-sub-pill.debar {
+  background: #2a1619;
   color: #fca5a5;
-  border-color: rgba(239, 68, 68, 0.55);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
 
-[data-theme='dark'] .rd-h-chip.debar:hover {
-  background: rgba(239, 68, 68, 0.35);
-  border-color: rgba(239, 68, 68, 0.75);
+[data-theme='dark'] .rd-sub-pill.debar .rd-sub-pill-badge {
+  background: #ef4444;
 }
 
-[data-theme='dark'] .rd-h-chip .rd-h-part {
-  background: rgba(255, 255, 255, 0.14);
+[data-theme='dark'] .rd-sub-pill-tag {
+  background: rgba(255, 255, 255, 0.12);
   color: #f2e8e2;
 }
 
-[data-theme='dark'] .rd-h-divider {
-  background: rgba(242, 232, 226, 0.15);
+[data-theme='dark'] .rd-sub-pill-divider {
+  background: rgba(242, 232, 226, 0.18);
 }
 
 [data-theme='dark'] .rd-status-empty-note {
