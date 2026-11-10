@@ -2002,13 +2002,15 @@
   border: 1px solid;
   border-radius: 14px;
   width: 100%;
-  align-items: center;
-  gap: 12px;
-  min-height: 78px;
-  height: auto;
-  padding: 10px 16px;
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 72px;
+  height: auto;
+  padding: 12px 20px;
   box-sizing: border-box;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @media (max-width: 1023px) {
@@ -2047,11 +2049,37 @@
   border-color: var(--border-strong, #fde047);
 }
 
-.rd-status-icon-wrap {
+.rd-status-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   flex-shrink: 0;
+  min-width: 220px;
+}
+
+.rd-status-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+}
+
+.rd-status.bad .rd-status-icon-wrap {
+  background: rgba(185, 28, 28, 0.12);
+  color: #b91c1c;
+}
+
+.rd-status.warn .rd-status-icon-wrap {
+  background: rgba(180, 83, 9, 0.14);
+  color: #b45309;
+}
+
+.rd-status.ok .rd-status-icon-wrap {
+  background: rgba(11, 122, 84, 0.14);
+  color: #0b7a54;
 }
 
 .rd-status-info {
@@ -2059,17 +2087,14 @@
   flex-direction: column;
   justify-content: center;
   gap: 3px;
-  min-width: 140px;
-  flex: 1;
+  min-width: 0;
 }
 
 .rd-status-info strong {
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 800;
   line-height: 1.25;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .rd-status-sub {
@@ -2078,11 +2103,176 @@
   font-weight: 600;
   line-height: 1.2;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+}
+
+/* Status Banner Middle Progress Section */
+.rd-status-middle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  flex: 1 1 280px;
+  max-width: 480px;
+  min-width: 200px;
+  padding: 0 10px;
+}
+
+.rd-status-progress-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11.5px;
+  line-height: 1;
+}
+
+.rd-status-progress-label {
+  color: var(--ink);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.rd-status-progress-label strong {
+  font-weight: 800;
+}
+
+.rd-status-projected-pill {
+  background: rgba(11, 122, 84, 0.15);
+  color: #0b7a54;
+  border-radius: 999px;
+  padding: 2px 7px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.rd-status-progress-track {
+  width: 100%;
+  height: 7px;
+  background: rgba(36, 26, 20, 0.08);
+  border-radius: 999px;
+  position: relative;
+  overflow: hidden;
+}
+
+.rd-status-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rd-status.bad .rd-status-progress-fill {
+  background: #dc2626;
+}
+
+.rd-status.warn .rd-status-progress-fill {
+  background: #d97706;
+}
+
+.rd-status.ok .rd-status-progress-fill {
+  background: #0b7a54;
+}
+
+.rd-status-progress-proj-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    #10b981,
+    #10b981 6px,
+    #059669 6px,
+    #059669 12px
+  );
+  opacity: 0.85;
+  border-radius: 999px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Status Banner Actions */
+.rd-status-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.rd-status-cta {
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  padding: 9px 18px !important;
+  border-radius: 10px !important;
+  white-space: nowrap !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.rd-status-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 900px) {
+  .rd-status {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+  .rd-status-middle {
+    order: 3;
+    flex-basis: 100%;
+    max-width: 100%;
+    padding: 0;
+  }
+  .rd-status-actions {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .rd-status-left {
+    min-width: 0;
+  }
+  .rd-status-actions {
+    width: 100%;
+    order: 4;
+  }
+  .rd-status-actions .rd-status-cta {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Dark mode adjustments for status middle */
+[data-theme='dark'] .rd-status.bad .rd-status-icon-wrap {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+[data-theme='dark'] .rd-status.warn .rd-status-icon-wrap {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+}
+
+[data-theme='dark'] .rd-status.ok .rd-status-icon-wrap {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+
+[data-theme='dark'] .rd-status-progress-track {
+  background: rgba(242, 232, 226, 0.12);
+}
+
+[data-theme='dark'] .rd-status-progress-label {
+  color: #f2e8e2;
+}
+
+[data-theme='dark'] .rd-status-projected-pill {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
 }
 
 .rd-status-priority-tag {
