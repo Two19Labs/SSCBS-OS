@@ -1230,6 +1230,22 @@ export default function WaiverToolPage({ onBack }) {
     }
   };
 
+  // Transparent label for Apply Recommended button showing CDC vs waiver breakdown
+  const getApplyRecommendedLabel = (short = false) => {
+    const cCount = solverResult?.chosenCdcDays?.length || 0;
+    const wCount = solverResult?.chosenDays?.length || 0;
+    if (cCount > 0 && wCount > 0) {
+      return short ? `Apply recommended (${cCount} CDC + ${wCount} Waivers)` : `Apply recommended dates (${cCount} CDC + ${wCount} waivers)`;
+    }
+    if (cCount > 0) {
+      return short ? `Apply recommended (${cCount} CDC)` : `Apply recommended dates (${cCount} CDC)`;
+    }
+    if (wCount > 0) {
+      return short ? `Apply recommended (${wCount} Waivers)` : `Apply recommended dates (${wCount} waivers)`;
+    }
+    return short ? 'Apply recommended' : 'Apply recommended dates';
+  };
+
   // Apply recommended waiver & CDC dates (clearing locks to adopt pure recommended set)
   const handleApplyRecommended = () => {
     setLockedWaivers(new Set());
