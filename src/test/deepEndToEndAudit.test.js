@@ -8,7 +8,9 @@ import {
   solveKPlusOne,
   isPartPassing,
   calculatePartBufferAndNeeded,
-  calculateSimulatedStats
+  calculateSimulatedStats,
+  extractTargetParts,
+  extractCandidateDays
 } from '../lib/waiverSolver.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -296,7 +298,102 @@ realUserFiles.forEach(fileRel => {
 });
 
 // -------------------------------------------------------------
-// SECTION 6: SUMMARY & AUDIT RESULTS
+// SECTION 6: PRACTICAL CLASSES & AGGREGATE MATHEMATICS
+// -------------------------------------------------------------
+console.log('\n--- SECTION 6: Practical Classes & Aggregate Mathematics ---');
+
+const practicalMockData = {
+  dayColumns: [
+    { dateStr: '2026-09-01', dayNum: 1, month: 9, weekday: 'Tue', year: 2026, label: '01', fullLabel: 'Tue 01 Sep' },
+    { dateStr: '2026-09-02', dayNum: 2, month: 9, weekday: 'Wed', year: 2026, label: '02', fullLabel: 'Wed 02 Sep' },
+    { dateStr: '2026-09-03', dayNum: 3, month: 9, weekday: 'Thu', year: 2026, label: '03', fullLabel: 'Thu 03 Sep' }
+  ],
+  subjects: [
+    {
+      name: 'Python for Data Analysis',
+      parts: { th: { p: 10, a: 0 }, tu: { p: 0, a: 0 }, pr: { p: 2, a: 8 } }, // 10/10 Th (100%), 2/10 Pr (20%)
+      dayClasses: {
+        '2026-09-01': [{ type: 'pr', attended: false, raw: 'A( pr)' }],
+        '2026-09-02': [{ type: 'pr', attended: false, raw: 'A( pr)' }],
+        '2026-09-03': [{ type: 'th', attended: true, raw: 'P( Th)' }]
+      }
+    }
+  ]
+};
+
+test('Practical classes are strictly excluded from targetParts', () => {
+  const { targetParts, allParts } = extractTargetParts(practicalMockData);
+  assert.strictEqual(targetParts.length, 1, 'Only Theory should be a target part');
+  assert.strictEqual(targetParts[0].type, 'th');
+  assert.strictEqual(targetParts[0].subject, 'Python for Data Analysis');
+  assert.ok(allParts.some(p => p.type === 'pr'), 'Practical exists in allParts list');
+  assert.ok(!targetParts.some(p => p.type === 'pr'), 'Practical must never be in targetParts');
+});
+
+test('Days with ONLY practical absences are never candidate days for waivers', () => {
+  const { targetParts } = extractTargetParts(practicalMockData);
+  const candidateDays = extractCandidateDays(practicalMockData, targetParts);
+  assert.strictEqual(candidateDays.length, 0, 'No candidate days when absences are only in practicals');
+});
+
+test('Solver NEVER allocates waivers to rescue or target practicals', () => {
+  const sol = solveExactBnb(practicalMockData, 85, 5);
+  assert.strictEqual(sol.chosenDays.length, 0, '0 waivers must be allocated when theory is already passing');
+  assert.strictEqual(sol.status, 'OPTIMAL');
+  assert.strictEqual(sol.passCount, 1); // 1 target part (theory) passing
+});
+
+test('Practical classes ARE included in Total Attendance (Aggregate)', () => {
+  const sim = calculateSimulatedStats(practicalMockData, new Set());
+  // 10 theory attended + 2 practical attended = 12 attended
+  // 10 theory held + 10 practical held = 20 held
+  assert.strictEqual(sim.totals.overall.att, 12, 'Total aggregate attended must include practical attended');
+  assert.strictEqual(sim.totals.overall.held, 20, 'Total aggregate held must include practical held');
+  assert.strictEqual(sim.totals.overall.pct, 60, '12 / 20 = 60.0% aggregate');
+  // Individual component status:
+  const prPart = sim.subjectsStats[0].parts.pr;
+  assert.strictEqual(prPart.status, 'info', 'Practical status must be info');
+  assert.strictEqual(prPart.isTarget, false, 'Practical isTarget must be false');
+});
+
+test('Waiving a day with co-occurring practical absence correctly removes practical class without prioritizing it', () => {
+  const coOccurringData = {
+    dayColumns: [
+      { dateStr: '2026-09-01', dayNum: 1, month: 9, weekday: 'Tue', year: 2026, label: '01', fullLabel: 'Tue 01 Sep' }
+    ],
+    subjects: [
+      {
+        name: 'Database Management',
+        parts: { th: { p: 8, a: 2 }, tu: { p: 0, a: 0 }, pr: { p: 2, a: 8 } },
+        dayClasses: {
+          '2026-09-01': [
+            { type: 'th', attended: false, raw: 'A( Th)' },
+            { type: 'pr', attended: false, raw: 'A( pr)' }
+          ]
+        }
+      }
+    ]
+  };
+
+  const sol = solveExactBnb(coOccurringData, 85, 1);
+  assert.strictEqual(sol.chosenDays.length, 1);
+  assert.strictEqual(sol.chosenDays[0].dateStr, '2026-09-01');
+
+  const sim = calculateSimulatedStats(coOccurringData, new Set(['2026-09-01']));
+  // Theory went from 8/10 (80%) -> 8/9 (88.9%)
+  assert.strictEqual(sim.subjectsStats[0].parts.th.simP, 8);
+  assert.strictEqual(sim.subjectsStats[0].parts.th.simN, 9);
+  // Practical went from 2/10 (20%) -> 2/9 (22.2%) because day was waived
+  assert.strictEqual(sim.subjectsStats[0].parts.pr.simP, 2);
+  assert.strictEqual(sim.subjectsStats[0].parts.pr.simN, 9);
+  assert.strictEqual(sim.subjectsStats[0].parts.pr.status, 'info');
+  // Overall aggregate: (8 + 2) / (9 + 9) = 10 / 18 = 55.55%
+  assert.strictEqual(sim.totals.overall.att, 10);
+  assert.strictEqual(sim.totals.overall.held, 18);
+});
+
+// -------------------------------------------------------------
+// SECTION 7: SUMMARY & AUDIT RESULTS
 // -------------------------------------------------------------
 console.log('\n=====================================================');
 console.log(`TOTAL TESTS: ${totalTests} | PASSED: ${passedTests} | FAILED: ${issuesFound.length}`);

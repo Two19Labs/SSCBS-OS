@@ -1236,7 +1236,14 @@ export default function WaiverToolPage({ onBack }) {
           <div className="rd-part-left">
             <span className="rd-part-name">{part.shortType || (part.type === 'th' ? 'Theory' : part.type === 'tu' ? 'Tutorial' : 'Practical')}</span>
             <span className="rd-part-frac">{part.simP ?? part.simAttended}/{held} classes</span>
-            {status === 'info' && <span className="rd-info-tag">Info only</span>}
+            {status === 'info' && (
+              <span
+                className="rd-info-tag"
+                title="Counted in Total Attendance aggregate, but not prioritized for individual subject waivers."
+              >
+                Info only
+              </span>
+            )}
           </div>
           <div className="rd-part-right">
             <span className="rd-was">{hasChanged ? `was ${basePct.toFixed(1)}%` : 'unchanged'}</span>
@@ -1254,7 +1261,7 @@ export default function WaiverToolPage({ onBack }) {
         </div>
         <div className="rd-caption">
           {status === 'info' ? (
-            `Not counted toward the ${threshold}% target`
+            `Counted in aggregate attendance · Not targeted for individual waivers`
           ) : status === 'fail' ? (
             <>⚠️ <strong style={{ color: 'var(--red, #b91c1c)' }}>Risk:</strong> Below 66.7% minimum. Attend <strong>{buff.classesNeededForDebarSafe || 1}</strong> class(es) to avoid risk.</>
           ) : buff.passes ? (
