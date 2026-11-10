@@ -2002,17 +2002,13 @@
   border: 1px solid;
   border-radius: 14px;
   width: 100%;
-  display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  min-height: 72px;
-  height: 72px;
-  max-height: 72px;
-  padding: 0 20px;
+  gap: 12px;
+  min-height: 78px;
+  height: auto;
+  padding: 10px 16px;
+  display: flex;
   box-sizing: border-box;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
 }
 
 @media (max-width: 1023px) {
@@ -2051,37 +2047,11 @@
   border-color: var(--border-strong, #fde047);
 }
 
-.rd-status-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-  min-width: 220px;
-}
-
 .rd-status-icon-wrap {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-}
-
-.rd-status.bad .rd-status-icon-wrap {
-  background: rgba(185, 28, 28, 0.12);
-  color: #b91c1c;
-}
-
-.rd-status.warn .rd-status-icon-wrap {
-  background: rgba(180, 83, 9, 0.14);
-  color: #b45309;
-}
-
-.rd-status.ok .rd-status-icon-wrap {
-  background: rgba(11, 122, 84, 0.14);
-  color: #0b7a54;
 }
 
 .rd-status-info {
@@ -2089,14 +2059,17 @@
   flex-direction: column;
   justify-content: center;
   gap: 3px;
-  min-width: 0;
+  min-width: 140px;
+  flex: 1;
 }
 
 .rd-status-info strong {
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 800;
   line-height: 1.25;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .rd-status-sub {
@@ -2105,260 +2078,13 @@
   font-weight: 600;
   line-height: 1.2;
   white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* Status Banner Middle Subject State Section (Single Horizontal Row, Zero Percentages) */
-.rd-status-middle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  white-space: nowrap;
-  padding: 2px 4px;
-  height: 100%;
-}
-
-.rd-status-middle::-webkit-scrollbar {
-  display: none;
-}
-
-.rd-sub-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 28px;
-  padding: 0 10px 0 5px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-  white-space: nowrap;
-  flex-shrink: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  transition: all 0.15s ease;
-  user-select: none;
-}
-
-.rd-sub-pill:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
-}
-
-.rd-sub-pill-badge {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: 900;
-  color: #ffffff;
-  flex-shrink: 0;
-  line-height: 1;
-}
-
-.rd-sub-pill-name {
-  max-width: 125px;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
-  line-height: 1.2;
-}
-
-.rd-sub-pill-tag {
-  font-size: 9.5px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 1px 4px;
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.08);
-  line-height: 1;
-}
-
-/* Passing Pill (Green) */
-.rd-sub-pill.pass {
-  background: #ffffff;
-  color: #15803d;
-  border: 1.5px solid #86efac;
-  box-shadow: 0 1px 3px rgba(22, 163, 74, 0.1);
-}
-
-.rd-sub-pill.pass .rd-sub-pill-badge {
-  background: #16a34a;
-}
-
-/* Below Target Pill (Amber/Orange) */
-.rd-sub-pill.fail {
-  background: #ffffff;
-  color: #c2410c;
-  border: 1.5px solid #fdba74;
-  box-shadow: 0 1px 3px rgba(234, 88, 12, 0.1);
-}
-
-.rd-sub-pill.fail .rd-sub-pill-badge {
-  background: #ea580c;
-}
-
-/* Debarment Risk Pill (Red) */
-.rd-sub-pill.debar {
-  background: #ffffff;
-  color: #991b1b;
-  border: 1.5px solid #f87171;
-  box-shadow: 0 1px 3px rgba(220, 38, 38, 0.14);
-  font-weight: 800;
-}
-
-.rd-sub-pill.debar .rd-sub-pill-badge {
-  background: #dc2626;
-}
-
-.rd-sub-pill-divider {
-  width: 1px;
-  height: 20px;
-  background: rgba(36, 26, 20, 0.18);
-  flex-shrink: 0;
-  margin: 0 3px;
-}
-
-.rd-status-empty-note {
-  font-size: 12px;
-  color: var(--muted, #7a6d5f);
-  font-style: italic;
-  white-space: nowrap;
-}
-
-/* Status Banner Actions */
-.rd-status-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
+  gap: 4px;
 }
 
-.rd-status-cta {
-  font-size: 13.5px !important;
-  font-weight: 800 !important;
-  padding: 9px 18px !important;
-  border-radius: 10px !important;
-  white-space: nowrap !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-.rd-status-cta:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-@media (max-width: 900px) {
-  .rd-status {
-    flex-wrap: wrap;
-    gap: 12px;
-    padding: 12px 16px;
-  }
-  .rd-status-middle {
-    order: 3;
-    flex-basis: 100%;
-    max-width: 100%;
-    padding: 0;
-  }
-  .rd-status-actions {
-    margin-left: auto;
-  }
-}
-
-@media (max-width: 640px) {
-  .rd-status-left {
-    min-width: 0;
-  }
-  .rd-status-sub-group {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-  }
-  .rd-status-group-label {
-    width: auto;
-  }
-  .rd-status-actions {
-    width: 100%;
-    order: 4;
-  }
-  .rd-status-actions .rd-status-cta {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-/* Dark mode adjustments for status banner horizontal subject pills */
-[data-theme='dark'] .rd-status.bad .rd-status-icon-wrap {
-  background: rgba(239, 68, 68, 0.2);
-  color: #f87171;
-}
-
-[data-theme='dark'] .rd-status.warn .rd-status-icon-wrap {
-  background: rgba(245, 158, 11, 0.2);
-  color: #fbbf24;
-}
-
-[data-theme='dark'] .rd-status.ok .rd-status-icon-wrap {
-  background: rgba(16, 185, 129, 0.2);
-  color: #34d399;
-}
-
-[data-theme='dark'] .rd-sub-pill.pass {
-  background: #15261f;
-  color: #6ee7b7;
-  border: 1px solid rgba(16, 185, 129, 0.45);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
-}
-
-[data-theme='dark'] .rd-sub-pill.pass .rd-sub-pill-badge {
-  background: #10b981;
-}
-
-[data-theme='dark'] .rd-sub-pill.fail {
-  background: #2a1f18;
-  color: #fdba74;
-  border: 1px solid rgba(249, 115, 22, 0.45);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
-}
-
-[data-theme='dark'] .rd-sub-pill.fail .rd-sub-pill-badge {
-  background: #f97316;
-}
-
-[data-theme='dark'] .rd-sub-pill.debar {
-  background: #2a1619;
-  color: #fca5a5;
-  border: 1px solid rgba(239, 68, 68, 0.5);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
-}
-
-[data-theme='dark'] .rd-sub-pill.debar .rd-sub-pill-badge {
-  background: #ef4444;
-}
-
-[data-theme='dark'] .rd-sub-pill-tag {
-  background: rgba(255, 255, 255, 0.12);
-  color: #f2e8e2;
-}
-
-[data-theme='dark'] .rd-sub-pill-divider {
-  background: rgba(242, 232, 226, 0.18);
-}
-
-[data-theme='dark'] .rd-status-empty-note {
-  color: #a89a90;
-}
 .rd-status-priority-tag {
   display: inline-flex;
   align-items: center;

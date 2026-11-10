@@ -1436,32 +1436,6 @@ export default function WaiverToolPage({ onBack }) {
   const subjectSummaries = simStats?.subjectSummaries || simStats?.subjectsStats || [];
   const totalTargetParts = simStats?.totalTargetParts || 0;
   const passingTargetCount = simStats?.passingTargetCount ?? simStats?.passingCount ?? 0;
-  // Real-time breakdown of subject clearance state for the mission-control status banner (Zero Percentages)
-  const subjectStatusList = useMemo(() => {
-    if (!simStats?.subjectsStats) return [];
-    return simStats.subjectsStats.map(sub => {
-      const targetParts = (sub.partsList || []).filter(p => p.isTarget);
-      if (targetParts.length === 0) return null;
-      const allPass = targetParts.every(p => p.passes);
-      const anyDebarRisk = targetParts.some(p => p.simPct < 66.666);
-      const failingParts = targetParts.filter(p => !p.passes);
-      let failingLabel = '';
-      if (targetParts.length > 1 && failingParts.length > 0 && failingParts.length < targetParts.length) {
-        failingLabel = failingParts.map(p => (p.type === 'tu' ? 'Tu' : 'Th')).join('/');
-      }
-      return {
-        name: sub.name,
-        allPass,
-        anyDebarRisk,
-        failingLabel,
-        partsCount: targetParts.length,
-        failingPartsCount: failingParts.length
-      };
-    }).filter(Boolean);
-  }, [simStats]);
-
-  const passingSubs = useMemo(() => subjectStatusList.filter(s => s.allPass), [subjectStatusList]);
-  const failingSubs = useMemo(() => subjectStatusList.filter(s => !s.allPass), [subjectStatusList]);
 
   // Aggregate totals across all subjects
   // Aggregate totals across all subjects (plus special aggregate attendance adjustment)
@@ -3717,101 +3691,55 @@ export default function WaiverToolPage({ onBack }) {
 
             {/* Status Banner */}
             <div className={`rd-status ${simStats?.allPassing ? 'ok' : ((simStats?.debarSafeTargetCount ?? 0) < totalTargetParts ? 'bad' : 'warn')}`}>
-              <div className="rd-status-left">
-                <div className="rd-status-icon-wrap">
-                  {simStats?.allPassing ? (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <circle cx="12" cy="12" r="10" />
-                      <polyline points="8 12.5 11 15.5 16 9.5" />
-                    </svg>
-                  ) : (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
-                      <line x1="12" y1="9" x2="12" y2="13" />
-                      <line x1="12" y1="17" x2="12" y2="17" />
-                    </svg>
+              <div className="rd-status-icon-wrap">
+                {simStats?.allPassing ? (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="8 12.5 11 15.5 16 9.5" />
+                  </svg>
+                ) : (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+                    <line x1="12" y1="9" x2="12" y2="13" />
+                    <line x1="12" y1="17" x2="12" y2="17" />
+                  </svg>
+                )}
+              </div>
+              <div className="rd-status-info">
+                <strong>{passingTargetCount} of {totalTargetParts} parts meet {threshold}%</strong>
+                <span className="rd-status-sub">
+                  {selectedWaivers.size === 0 && selectedCdcDays.size === 0
+                    ? 'Baseline (0 applied)'
+                    : `${selectedWaivers.size} waiver${selectedWaivers.size === 1 ? '' : 's'}${cdcLimit > 0 ? `, ${selectedCdcDays.size} CDC` : ''} applied`}
+                  {starredSubjects.size > 0 && (
+                    <span className="rd-status-priority-tag" title={`Prioritizing ${starredSubjects.size} starred subject${starredSubjects.size === 1 ? '' : 's'}`}>
+                      ★ {starredSubjects.size} Priority
+                    </span>
                   )}
-                </div>
-                <div className="rd-status-info">
-                  <strong>
-                    {failingSubs.length === 0
-                      ? 'All Subjects Clearing'
-                      : `${failingSubs.length} Subject${failingSubs.length === 1 ? '' : 's'} Below Target`}
-                  </strong>
-                  <span className="rd-status-sub">
-                    {selectedWaivers.size === 0 && selectedCdcDays.size === 0
-                      ? 'Baseline (0 applied)'
-                      : `${selectedWaivers.size} waiver${selectedWaivers.size === 1 ? '' : 's'}${cdcLimit > 0 ? `, ${selectedCdcDays.size} CDC` : ''} active`}
-                    {starredSubjects.size > 0 && (
-                      <span className="rd-status-priority-tag" title={`Prioritizing ${starredSubjects.size} starred subject${starredSubjects.size === 1 ? '' : 's'}`}>
-                        ★ {starredSubjects.size} Priority
-                      </span>
-                    )}
-                  </span>
-                </div>
+                </span>
               </div>
-
-              {/* Middle: Horizontal Subject Clearance Strip (Single Row, Zero Percentages, Frozen Height) */}
-              <div className="rd-status-middle" tabIndex={0} role="region" aria-label="Subject clearance list">
-                {failingSubs.map(sub => (
-                  <span
-                    key={sub.name}
-                    className={`rd-sub-pill ${sub.anyDebarRisk ? 'debar' : 'fail'}`}
-                    title={`${sub.name}${sub.anyDebarRisk ? ' — Debarment Risk (< 66.7%)' : ''}${sub.failingLabel ? ` (${sub.failingLabel} below target)` : ' (Below target)'}`}
-                  >
-                    <span className="rd-sub-pill-badge">{sub.anyDebarRisk ? '!' : '✕'}</span>
-                    <span className="rd-sub-pill-name">{sub.name}</span>
-                    {sub.failingLabel && (
-                      <span className="rd-sub-pill-tag">{sub.failingLabel}</span>
-                    )}
-                  </span>
-                ))}
-
-                {failingSubs.length > 0 && passingSubs.length > 0 && (
-                  <span className="rd-sub-pill-divider" aria-hidden="true" />
-                )}
-
-                {passingSubs.map(sub => (
-                  <span
-                    key={sub.name}
-                    className="rd-sub-pill pass"
-                    title={`${sub.name} — Clearing attendance target`}
-                  >
-                    <span className="rd-sub-pill-badge">✓</span>
-                    <span className="rd-sub-pill-name">{sub.name}</span>
-                  </span>
-                ))}
-
-                {subjectStatusList.length === 0 && (
-                  <span className="rd-status-empty-note">All subjects practical / no target requirements</span>
-                )}
-              </div>
-
-              {/* Right: Actions */}
-              <div className="rd-status-actions">
-                {(solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
-                  <button
-                    type="button"
-                    className={`rd-btn-outline sm ${!isOptimalSuggested ? 'rd-btn-accent' : 'muted'} rd-status-cta`}
-                    onClick={handleApplyRecommended}
-                    title={isOptimalSuggested ? 'Recommended attendance plan is active (click to re-apply)' : 'Apply recommended attendance dates'}
-                  >
-                    {isOptimalSuggested
-                      ? '✓ Recommended applied'
-                      : getApplyRecommendedLabel(true)}
-                  </button>
-                )}
-                {hasPendingPriorityChange && (
-                  <button
-                    type="button"
-                    className="rd-btn-outline sm rd-btn-priority-recalc rd-status-cta"
-                    onClick={handleRecalculateWithPriorities}
-                    title="Recalculate and apply optimal waivers with updated starred priorities"
-                  >
-                    ★ Recalculate with priorities
-                  </button>
-                )}
-              </div>
+              {(solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
+                <button
+                  type="button"
+                  className={`rd-btn-outline sm ${!isOptimalSuggested ? 'rd-btn-accent' : 'muted'} rd-status-cta`}
+                  onClick={handleApplyRecommended}
+                  title={isOptimalSuggested ? 'Recommended attendance plan is active (click to re-apply)' : 'Apply recommended attendance dates'}
+                >
+                  {isOptimalSuggested
+                    ? '✓ Recommended applied'
+                    : getApplyRecommendedLabel(true)}
+                </button>
+              )}
+              {hasPendingPriorityChange && (
+                <button
+                  type="button"
+                  className="rd-btn-outline sm rd-btn-priority-recalc rd-status-cta"
+                  onClick={handleRecalculateWithPriorities}
+                  title="Recalculate and apply optimal waivers with updated starred priorities"
+                >
+                  ★ Recalculate with priorities
+                </button>
+              )}
             </div>
           </div>
 
