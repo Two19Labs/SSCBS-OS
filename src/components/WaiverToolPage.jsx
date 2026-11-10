@@ -502,13 +502,16 @@ export default function WaiverToolPage({ onBack }) {
     if (isNaN(y) || isNaN(m) || isNaN(dn)) return null;
 
     const dateObj = new Date(Date.UTC(y, m - 1, dn));
-    const weekday = WEEKDAYS[dateObj.getUTCDay()];
+    const dayOfWeek = dateObj.getUTCDay();
+    const weekday = WEEKDAYS[dayOfWeek];
     const isFuture = Boolean(parsedData?.reportDate && newDateInput > parsedData.reportDate);
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
     const sched = parsedData ? findRecentDaySchedule(parsedData, weekday, newDateInput) : null;
 
     return {
       weekday,
       isFuture,
+      isWeekend,
       recentSchedule: sched
     };
   }, [newDateInput, parsedData]);
@@ -641,8 +644,9 @@ export default function WaiverToolPage({ onBack }) {
         const m = String(cur.getUTCMonth() + 1).padStart(2, '0');
         const d = String(cur.getUTCDate()).padStart(2, '0');
         const ds = `${y}-${m}-${d}`;
-        // Skip Sundays (UTC day 0)
-        if (cur.getUTCDay() !== 0) {
+        // Skip weekends in range mode (Saturday = 6, Sunday = 0)
+        const dayOfWeek = cur.getUTCDay();
+        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
           datesToAdd.push(ds);
         }
         cur.setUTCDate(cur.getUTCDate() + 1);
@@ -650,7 +654,7 @@ export default function WaiverToolPage({ onBack }) {
       }
 
       if (datesToAdd.length === 0) {
-        setNewDateError('No weekday dates found in the chosen range.');
+        setNewDateError('No weekday dates (Mon – Fri) found in the chosen range.');
         return;
       }
     }
@@ -2305,6 +2309,11 @@ export default function WaiverToolPage({ onBack }) {
                     <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--ink)' }}>
                       {selectedDateInfo.weekday}
                     </span>
+                    {selectedDateInfo.isWeekend && (
+                      <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--muted)', background: 'var(--surface-subtle)', padding: '2px 7px', borderRadius: '4px' }}>
+                        Weekend / Extra Class
+                      </span>
+                    )}
                     {selectedDateInfo.isFuture && (
                       <span className="rd-future-pill">
                         🔮 Future Date (Speculative)
@@ -2316,7 +2325,7 @@ export default function WaiverToolPage({ onBack }) {
             ) : (
               <div>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--ink)', marginBottom: '6px' }}>
-                  Select Date Range (Excludes Sundays):
+                  Select Date Range (Mon – Fri, excludes weekends):
                 </label>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                   <input

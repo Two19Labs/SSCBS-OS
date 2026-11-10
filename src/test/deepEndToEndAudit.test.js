@@ -494,6 +494,48 @@ test('clearFutureDates purges only future dates without affecting historical dat
   assert.strictEqual(cleared.subjects[0].parts.tu.a, 1);
 });
 
+test('Adding individual Saturday or Sunday (extra / compensatory class) succeeds cleanly', () => {
+  // 2026-11-14 is Saturday
+  const saturdayData = batchAddDates(futureBaseDataset, ['2026-11-14'], 'none');
+  const satCol = saturdayData.dayColumns.find(d => d.dateStr === '2026-11-14');
+  assert.ok(satCol, 'Saturday column must be added when individually specified');
+  assert.strictEqual(satCol.weekday, 'Sat');
+  assert.strictEqual(satCol.isFuture, true);
+
+  // 2026-11-15 is Sunday
+  const sundayData = batchAddDates(futureBaseDataset, ['2026-11-15'], 'none');
+  const sunCol = sundayData.dayColumns.find(d => d.dateStr === '2026-11-15');
+  assert.ok(sunCol, 'Sunday column must be added when individually specified');
+  assert.strictEqual(sunCol.weekday, 'Sun');
+  assert.strictEqual(sunCol.isFuture, true);
+});
+
+test('Date range generation skips both Saturdays and Sundays (Mon – Fri only)', () => {
+  // Simulate range loop from Fri 2026-11-13 to Tue 2026-11-17
+  const start = new Date('2026-11-13T00:00:00Z');
+  const end = new Date('2026-11-17T00:00:00Z');
+  const generatedDates = [];
+  const cur = new Date(start);
+
+  while (cur <= end) {
+    const y = cur.getUTCFullYear();
+    const m = String(cur.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(cur.getUTCDate()).padStart(2, '0');
+    const ds = `${y}-${m}-${d}`;
+    const dayOfWeek = cur.getUTCDay();
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+      generatedDates.push(ds);
+    }
+    cur.setUTCDate(cur.getUTCDate() + 1);
+  }
+
+  assert.deepStrictEqual(
+    generatedDates,
+    ['2026-11-13', '2026-11-16', '2026-11-17'],
+    'Must contain Friday, Monday, and Tuesday only; Saturday (14) and Sunday (15) must be excluded'
+  );
+});
+
 // -------------------------------------------------------------
 // SECTION 8: SUMMARY & AUDIT RESULTS
 // -------------------------------------------------------------
