@@ -1767,6 +1767,20 @@ export default function WaiverToolPage({ onBack }) {
               <div className="rd-total-item-top">
                 <div className="rd-total-item-lbl-wrap">
                   <span className="rd-total-item-lbl">{item.label}</span>
+                  {item.key === 'overall' && (
+                    <button
+                      type="button"
+                      className={`rd-special-adj-btn ${(specialAttendanceAdjustment.attended !== 0 || specialAttendanceAdjustment.held !== 0) ? 'is-active' : ''}`}
+                      onClick={() => setIsSpecialAdjOpen(!isSpecialAdjOpen)}
+                      title="Adjust total attendance for special institutional cases (duty leaves or representation credits)"
+                    >
+                      {(specialAttendanceAdjustment.attended !== 0 || specialAttendanceAdjustment.held !== 0) ? (
+                        <span>⚡ Special ({specialAttendanceAdjustment.attended >= 0 ? `+${specialAttendanceAdjustment.attended}` : specialAttendanceAdjustment.attended}/{specialAttendanceAdjustment.held >= 0 ? `+${specialAttendanceAdjustment.held}` : specialAttendanceAdjustment.held}) ✎</span>
+                      ) : (
+                        <span>✎ Adjust Total (+/-)</span>
+                      )}
+                    </button>
+                  )}
                   {item.key === 'overall' && isOverallIneligible && (
                     (selectedCdcDays.size > 0 && curPct >= 66.666) ? (
                       <span className="rd-rescued-tag" title="Total aggregate attendance lifted above 66.7% via CDC attendance, unlocking waiver eligibility!">
@@ -1789,6 +1803,16 @@ export default function WaiverToolPage({ onBack }) {
                 <div className="rd-total-frac-wrap">
                   <span className={`rd-total-pct s-${status}`}>{curPct.toFixed(1)}%</span>
                   <span className="rd-total-frac">{item.data.att}/{item.data.held}</span>
+                  {item.key === 'overall' && (
+                    <button
+                      type="button"
+                      className={`rd-special-quick-btn ${(specialAttendanceAdjustment.attended !== 0 || specialAttendanceAdjustment.held !== 0) ? 'is-active' : ''}`}
+                      onClick={() => setIsSpecialAdjOpen(!isSpecialAdjOpen)}
+                      title="Click to increase or decrease total attendance (+/-)"
+                    >
+                      ✎ Edit
+                    </button>
+                  )}
                 </div>
                 <span className="rd-was">{hasChanged ? `was ${basePct.toFixed(1)}%` : 'unchanged'}</span>
               </div>

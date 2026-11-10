@@ -3739,3 +3739,51 @@
   cursor: not-allowed;
   color: var(--muted, #888);
 }
+
+
+.rd-special-quick-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 4px;
+  background: var(--surface-muted, #f4eee9);
+  color: var(--text-muted, #666);
+  border: 1px solid var(--line, #e2d9cf);
+  cursor: pointer;
+  margin-left: 6px;
+  transition: all 0.15s ease;
+  line-height: 1.2;
+}
+
+.rd-special-quick-btn:hover {
+  background: var(--surface-hover, #ede4dc);
+  border-color: var(--amberfill, #c9a558);
+  color: var(--text-main, #1e1a17);
+}
+
+.rd-special-quick-btn.is-active {
+  background: #ecfdf5;
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+
+[data-theme='dark'] .rd-special-quick-btn {
+  background: #252220;
+  border-color: #383430;
+  color: #a09890;
+}
+
+[data-theme='dark'] .rd-special-quick-btn:hover {
+  background: #332f2b;
+  color: #fff;
+  border-color: #c9a558;
+}
+
+[data-theme='dark'] .rd-special-quick-btn.is-active {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.35);
+}
