@@ -744,9 +744,9 @@ test('Undo/Redo: Date deletion undo restores deleted column and all classes', ()
 });
 
 // -------------------------------------------------------------
-// SECTION 10: CDC-FIRST PRIORITIZATION & MAXIMIZE REMAINING
+// SECTION 10: CDC-FIRST PRIORITIZATION & MINIMAL WAIVER CONSERVATION
 // -------------------------------------------------------------
-console.log('\n--- SECTION 10: CDC-First Prioritization & Maximize Remaining ---');
+console.log('\n--- SECTION 10: CDC-First Prioritization & Minimal Waiver Conservation ---');
 
 test('CDC days are prioritized and fully maximized up to C before waivers', () => {
   // Candidate absent days exist on 2026-09-01, 2026-09-02, 2026-09-03, 2026-09-04, 2026-09-05.
@@ -776,15 +776,11 @@ test('CDC allocation reduces society waivers needed to meet targets', () => {
   );
 });
 
-test('maximizeRemaining: true allocates additional waivers when budget allows', () => {
-  // With target 50%, standard solver picks 0 waivers
-  const standardSol = solveExactBnb(baseMockData, 50, 3, [], 0, { maximizeRemaining: false });
-  assert.strictEqual(standardSol.chosenDays.length, 0, 'Standard solver picks 0 waivers when already passing');
-
-  // With maximizeRemaining: true, solver should use remaining budget up to available candidate days
-  const maxSol = solveExactBnb(baseMockData, 50, 3, [], 0, { maximizeRemaining: true });
-  assert.ok(maxSol.chosenDays.length > 0, 'maximizeRemaining must allocate additional waivers to maximize attendance');
-  assert.strictEqual(maxSol.chosenDays.length, 3, 'maximizeRemaining should allocate up to maxWaiversK budget');
+test('Solver recommends minimal waivers necessary to hit target without needlessly consuming budget', () => {
+  // If target can be satisfied with fewer waivers than maxWaiversK budget (e.g. 10),
+  // solver should strictly stop at the minimal waivers required.
+  const sol = solveExactBnb(baseMockData, 75, 10, [], 0, {});
+  assert.ok(sol.chosenDays.length < 10, `Solver should use minimal waivers instead of consuming all 10 (used ${sol.chosenDays.length})`);
 });
 
 // -------------------------------------------------------------

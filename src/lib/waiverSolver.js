@@ -269,8 +269,7 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
     blockedDates = null,
     fixedWaiverDates = null,
     fixedCdcDates = null,
-    priorityWaiverDates = null,
-    maximizeRemaining = false
+    priorityWaiverDates = null
   } = options || {};
   const blockedDatesSet = blockedDates instanceof Set
     ? blockedDates
@@ -892,10 +891,10 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
     }
   }
 
-  if (!best.allPass || maximizeRemaining) {
+  if (!best.allPass) {
     for (let s = 1; s <= K; s++) {
       dfs(0, s);
-      if (best.allPass && !maximizeRemaining) break;
+      if (best.allPass) break;
     }
   }
 
@@ -917,56 +916,25 @@ export function solveExactBnb(parsedData, targetPct = 85, maxWaiversK = 12, star
   }
 
   let bestWaivers = [...best.chosen];
-
-  // If instructed to maximize remaining attendance up to waiver budget K:
-  if (maximizeRemaining && bestWaivers.length < K) {
-    const chosenSet = new Set(bestWaivers);
-    while (chosenSet.size < K) {
-      let bestExtraIdx = -1;
-      let bestExtraScore = -Infinity;
-
-      for (let i = 0; i < numCandidates; i++) {
-        if (chosenSet.has(i)) continue;
-        const cd = orderedCandidates[i];
-        if (!cd.isWaiverEligible || (cd.thOrTuAbsences || 0) <= 0) continue;
-
-        let score = (cd.thOrTuAbsences || 0) * 1000 - (cd.totalPresents || 0) * 50;
-        if (score > bestExtraScore) {
-          bestExtraScore = score;
-          bestExtraIdx = i;
-        }
-      }
-
-      if (bestExtraIdx !== -1 && bestExtraScore > 0) {
-        chosenSet.add(bestExtraIdx);
-        bestWaivers.push(bestExtraIdx);
-      } else {
-        break;
-      }
-    }
-  }
-
   let bestEval = evaluateState(bestWaivers, []);
 
   // Minimality / Resource Conservation Pruning of Waivers
-  // (Only prune if not explicitly instructed to maximize remaining attendance)
-  if (!maximizeRemaining) {
-    let pruned = true;
-    while (pruned) {
-      pruned = false;
-      for (let i = 0; i < bestWaivers.length; i++) {
-        const testW = bestWaivers.filter((_, idx) => idx !== i);
-        const ev = evaluateState(testW, []);
-        if (ev.debarSafeCount >= bestEval.debarSafeCount &&
-            ev.starredPassCount >= bestEval.starredPassCount &&
-            ev.passCount >= bestEval.passCount &&
-            ev.tierScore >= bestEval.tierScore - 1e-4 &&
-            ev.minPct >= bestEval.minPct - 1e-4) {
-          bestWaivers = testW;
-          bestEval = ev;
-          pruned = true;
-          break;
-        }
+  // (Society waivers are scarce; find minimal waivers needed to hit passing targets)
+  let pruned = true;
+  while (pruned) {
+    pruned = false;
+    for (let i = 0; i < bestWaivers.length; i++) {
+      const testW = bestWaivers.filter((_, idx) => idx !== i);
+      const ev = evaluateState(testW, []);
+      if (ev.debarSafeCount >= bestEval.debarSafeCount &&
+          ev.starredPassCount >= bestEval.starredPassCount &&
+          ev.passCount >= bestEval.passCount &&
+          ev.tierScore >= bestEval.tierScore - 1e-4 &&
+          ev.minPct >= bestEval.minPct - 1e-4) {
+        bestWaivers = testW;
+        bestEval = ev;
+        pruned = true;
+        break;
       }
     }
   }

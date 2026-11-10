@@ -308,15 +308,7 @@ export default function WaiverToolPage({ onBack }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Track solver parameters
-  const [lastSolvedParams, setLastSolvedParams] = useState(null);
-  useEffect(() => {
-    if (solverResult) {
-      setLastSolvedParams({ t: threshold, k: maxWaivers });
-    }
-  }, [solverResult]);
 
-  const hasParamsChanged = lastSolvedParams && (lastSolvedParams.t !== threshold || lastSolvedParams.k !== maxWaivers);
 
   // File Drag & Drop handlers
   const handleDragOver = (e) => {
@@ -425,8 +417,7 @@ export default function WaiverToolPage({ onBack }) {
         fixedWaiverDates: actualFixedWaivers,
         fixedCdcDates: actualFixedCdc,
         priorityWaiverDates: actualPriorityDates,
-        blockedDates: actualBlockedDates,
-        maximizeRemaining: Boolean(extraOpts.maximizeRemaining)
+        blockedDates: actualBlockedDates
       });
     } else {
       setTimeout(() => {
@@ -438,8 +429,7 @@ export default function WaiverToolPage({ onBack }) {
             fixedWaiverDates: actualFixedWaivers,
             fixedCdcDates: actualFixedCdc,
             priorityWaiverDates: actualPriorityDates,
-            blockedDates: actualBlockedDates,
-            maximizeRemaining: Boolean(extraOpts.maximizeRemaining)
+            blockedDates: actualBlockedDates
           };
           const solution = solveExactBnb(data, targetT, limitK, starredList, actualCdc, options);
           let kPlusOne = null;
@@ -1111,38 +1101,6 @@ export default function WaiverToolPage({ onBack }) {
     }
   };
 
-  // Fill remaining waivers keeping currently selected and locked dates fixed
-  const handleFillRemainingWaivers = () => {
-    if (!parsedData) return;
-    setIsProcessing(true);
-
-    const currentWaiversArray = Array.from(selectedWaivers);
-    const currentCdcArray = Array.from(selectedCdcDays);
-
-    // Auto-lock all currently selected dates
-    const nextLockedW = new Set([...lockedWaivers, ...currentWaiversArray]);
-    setLockedWaivers(nextLockedW);
-
-    const nextLockedC = new Set([...lockedCdcDays, ...currentCdcArray]);
-    setLockedCdcDays(nextLockedC);
-
-    const fillOpts = {
-      ...currentSolverOptions,
-      fixedWaiverDates: currentWaiversArray,
-      fixedCdcDates: currentCdcArray,
-      maximizeRemaining: true
-    };
-
-    executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
-      if (solution?.chosenDays) {
-        setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
-      }
-      if (solution?.chosenCdcDays) {
-        setSelectedCdcDays(new Set(solution.chosenCdcDays.map(d => d.dateStr)));
-      }
-      setIsOneThirdAlertDismissed(false);
-    }, fillOpts);
-  };
 
   // Live parameter changes with automatic solver re-execution
   const handleMaxWaiversChange = (newLimit) => {
@@ -1370,8 +1328,6 @@ export default function WaiverToolPage({ onBack }) {
     return wMatch && cMatch;
   }, [solverResult, selectedWaivers, selectedCdcDays]);
 
-  const remainingWaiversCount = Math.max(0, maxWaivers - selectedWaivers.size);
-  const canFillRemaining = selectedWaivers.size > 0 && remainingWaiversCount > 0;
 
   // Active or recommended 1/3rd rule violating parts
   const violatingPartsForModal = useMemo(() => {
@@ -3759,9 +3715,16 @@ export default function WaiverToolPage({ onBack }) {
                   )}
                 </span>
               </div>
-              {selectedWaivers.size === 0 && selectedCdcDays.size === 0 && (solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
-                <button type="button" className="rd-btn-outline sm rd-btn-accent rd-status-cta" onClick={handleApplyRecommended}>
-                  {getApplyRecommendedLabel(true)}
+              {(solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
+                <button
+                  type="button"
+                  className={`rd-btn-outline sm ${!isOptimalSuggested ? 'rd-btn-accent' : 'muted'} rd-status-cta`}
+                  onClick={handleApplyRecommended}
+                  title={isOptimalSuggested ? 'Recommended attendance plan is active (click to re-apply)' : 'Apply recommended attendance dates'}
+                >
+                  {isOptimalSuggested
+                    ? '✓ Recommended applied'
+                    : getApplyRecommendedLabel(true)}
                 </button>
               )}
               {hasPendingPriorityChange && (
@@ -3772,21 +3735,6 @@ export default function WaiverToolPage({ onBack }) {
                   title="Recalculate and apply optimal waivers with updated starred priorities"
                 >
                   ★ Recalculate with priorities
-                </button>
-              )}
-              {canFillRemaining && (
-                <button
-                  type="button"
-                  className="rd-btn-outline sm rd-status-cta rd-btn-fill-remaining"
-                  onClick={handleFillRemainingWaivers}
-                  title={`Keep current ${selectedWaivers.size} selected dates and solve for remaining ${remainingWaiversCount} waivers`}
-                >
-                  💡 Fill remaining ({remainingWaiversCount})
-                </button>
-              )}
-              {hasParamsChanged && (selectedWaivers.size > 0 || selectedCdcDays.size > 0) && (
-                <button type="button" className="rd-btn-outline sm rd-status-cta" onClick={handleApplyRecommended}>
-                  Update
                 </button>
               )}
             </div>
@@ -3914,14 +3862,16 @@ export default function WaiverToolPage({ onBack }) {
                         ✎ Edit Attendance {customizationDiff.totalChanges > 0 ? `(${customizationDiff.totalChanges})` : ''}
                       </button>
                     </div>
-                    {selectedWaivers.size === 0 && selectedCdcDays.size === 0 && (solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
+                    {(solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
                       <button
                         type="button"
-                        className="rd-btn-outline sm rd-btn-accent"
+                        className={`rd-btn-outline sm ${!isOptimalSuggested ? 'rd-btn-accent' : 'muted'}`}
                         onClick={handleApplyRecommended}
-                        title="Apply recommended attendance dates"
+                        title={isOptimalSuggested ? 'Recommended attendance plan is active (click to re-apply)' : 'Apply recommended attendance dates'}
                       >
-                        {getApplyRecommendedLabel(true)}
+                        {isOptimalSuggested
+                          ? '✓ Recommended applied'
+                          : getApplyRecommendedLabel(true)}
                       </button>
                     )}
                     {hasPendingPriorityChange && (
@@ -3932,16 +3882,6 @@ export default function WaiverToolPage({ onBack }) {
                         title="Recalculate and apply optimal waivers with updated starred priorities"
                       >
                         ★ Recalculate with priorities
-                      </button>
-                    )}
-                    {canFillRemaining && (
-                      <button
-                        type="button"
-                        className="rd-btn-outline sm rd-btn-fill-remaining"
-                        onClick={handleFillRemainingWaivers}
-                        title={`Keep current ${selectedWaivers.size} selected dates and solve for remaining ${remainingWaiversCount} waivers`}
-                      >
-                        💡 Fill remaining ({remainingWaiversCount})
                       </button>
                     )}
                     <button
@@ -4056,13 +3996,16 @@ export default function WaiverToolPage({ onBack }) {
                   </div>
                   <div className="acts">
                     {copyFeedback && <span className="rd-copied">{copyFeedback}</span>}
-                    {selectedWaivers.size === 0 && selectedCdcDays.size === 0 && (solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
+                    {(solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
                       <button
                         type="button"
-                        className="rd-btn-outline sm rd-btn-accent"
+                        className={`rd-btn-outline sm ${!isOptimalSuggested ? 'rd-btn-accent' : 'muted'}`}
                         onClick={handleApplyRecommended}
+                        title={isOptimalSuggested ? 'Recommended attendance plan is active (click to re-apply)' : 'Apply recommended attendance dates'}
                       >
-                        {getApplyRecommendedLabel(true)}
+                        {isOptimalSuggested
+                          ? '✓ Recommended applied'
+                          : getApplyRecommendedLabel(true)}
                       </button>
                     )}
                     {hasPendingPriorityChange && (
@@ -4073,16 +4016,6 @@ export default function WaiverToolPage({ onBack }) {
                         title="Recalculate and apply optimal waivers with updated starred priorities"
                       >
                         ★ Recalculate with priorities
-                      </button>
-                    )}
-                    {canFillRemaining && (
-                      <button
-                        type="button"
-                        className="rd-btn-outline sm rd-btn-sidebar-fill"
-                        onClick={handleFillRemainingWaivers}
-                        title={`Keep current ${selectedWaivers.size} selected dates and solve for remaining ${remainingWaiversCount} waivers`}
-                      >
-                        💡 Fill remaining ({remainingWaiversCount})
                       </button>
                     )}
                     <button
@@ -4398,13 +4331,16 @@ export default function WaiverToolPage({ onBack }) {
                     ✎ Edit Attendance {customizationDiff.totalChanges > 0 ? `(${customizationDiff.totalChanges})` : ''}
                   </button>
                 </div>
-                {selectedWaivers.size === 0 && selectedCdcDays.size === 0 && (solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
+                {(solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
                   <button
                     type="button"
-                    className="rd-btn-outline sm rd-btn-accent"
+                    className={`rd-btn-outline sm ${!isOptimalSuggested ? 'rd-btn-accent' : 'muted'}`}
                     onClick={handleApplyRecommended}
+                    title={isOptimalSuggested ? 'Recommended attendance plan is active (click to re-apply)' : 'Apply recommended attendance dates'}
                   >
-                    {getApplyRecommendedLabel(true)}
+                    {isOptimalSuggested
+                      ? '✓ Recommended applied'
+                      : getApplyRecommendedLabel(true)}
                   </button>
                 )}
                 {hasPendingPriorityChange && (
@@ -4415,16 +4351,6 @@ export default function WaiverToolPage({ onBack }) {
                     title="Recalculate and apply optimal waivers with updated starred priorities"
                   >
                     ★ Recalculate with priorities
-                  </button>
-                )}
-                {canFillRemaining && (
-                  <button
-                    type="button"
-                    className="rd-btn-outline sm rd-btn-fill-remaining"
-                    onClick={handleFillRemainingWaivers}
-                    title={`Keep current ${selectedWaivers.size} selected dates and solve for remaining ${remainingWaiversCount} waivers`}
-                  >
-                    💡 Fill remaining ({remainingWaiversCount})
                   </button>
                 )}
                 <button

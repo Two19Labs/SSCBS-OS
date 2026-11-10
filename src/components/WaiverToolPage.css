@@ -2577,41 +2577,6 @@
    Locked Waivers & Incremental Recommendation ("Fill Remaining")
    ========================================================================== */
 
-.rd-btn-fill-remaining {
-  background: linear-gradient(135deg, rgba(176, 141, 62, 0.14), rgba(113, 34, 44, 0.08)) !important;
-  border: 1px solid var(--gold, #b08d3e) !important;
-  color: #78350f !important;
-  font-weight: 800;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.rd-btn-fill-remaining:hover {
-  background: var(--gold, #b08d3e) !important;
-  color: #ffffff !important;
-  border-color: var(--gold, #b08d3e) !important;
-  box-shadow: 0 4px 12px rgba(176, 141, 62, 0.25);
-  transform: translateY(-1px);
-}
-
-.rd-btn-sidebar-fill {
-  background: linear-gradient(135deg, rgba(176, 141, 62, 0.14), rgba(113, 34, 44, 0.08)) !important;
-  border: 1px solid var(--gold, #b08d3e) !important;
-  color: #78350f !important;
-  font-weight: 700;
-  font-size: 11.5px;
-  padding: 4px 8px;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.rd-btn-sidebar-fill:hover {
-  background: var(--gold, #b08d3e) !important;
-  color: #ffffff !important;
-  border-color: var(--gold, #b08d3e) !important;
-}
-
 /* Date card pinned badge & actions */
 .rd-date-pinned-badge {
   display: inline-flex;
@@ -3059,31 +3024,6 @@
 
 [data-theme='dark'] .rd-steps button:hover {
   background: rgba(242, 232, 226, 0.12) !important;
-}
-
-/* Fill Remaining Button Dark Mode */
-[data-theme='dark'] .rd-btn-fill-remaining {
-  background: rgba(201, 165, 88, 0.18) !important;
-  border-color: rgba(201, 165, 88, 0.45) !important;
-  color: #fcd34d !important;
-}
-
-[data-theme='dark'] .rd-btn-fill-remaining:hover {
-  background: var(--gold, #c9a558) !important;
-  color: #181114 !important;
-  border-color: var(--gold, #c9a558) !important;
-}
-
-[data-theme='dark'] .rd-btn-sidebar-fill {
-  background: rgba(201, 165, 88, 0.18) !important;
-  border-color: rgba(201, 165, 88, 0.45) !important;
-  color: #fcd34d !important;
-}
-
-[data-theme='dark'] .rd-btn-sidebar-fill:hover {
-  background: var(--gold, #c9a558) !important;
-  color: #181114 !important;
-  border-color: var(--gold, #c9a558) !important;
 }
 
 /* Table Grid & Sticky Columns */
