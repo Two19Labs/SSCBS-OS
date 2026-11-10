@@ -67,54 +67,6 @@ export default function WaiverToolPage({ onBack }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  if (isMobileScreen) {
-    return (
-      <div className="waiver-mobile-gate-screen">
-        <div className="waiver-mobile-card-wrapper">
-          <div className="waiver-mobile-card">
-            <div className="mobile-icon-badge">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                <line x1="8" y1="21" x2="16" y2="21" />
-                <line x1="12" y1="17" x2="12" y2="21" />
-              </svg>
-            </div>
-            <h2>Please open on a PC or Laptop</h2>
-            <p>
-              The Attendance Tool requires a larger screen to display subject analytics, multi-column date tables, and the attendance grid accurately.
-            </p>
-            <div className="mobile-hint-box">
-              💡 For the best experience, open <strong>sscbsos.in/#waiver</strong> on your desktop browser.
-            </div>
-            <button className="btn-back-portal-primary" onClick={onBack}>
-              ← Back to Campus OS
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!hasAccess) {
-    return (
-      <div className="waiver-locked-screen">
-        <div className="waiver-locked-card">
-          <span className="waiver-locked-badge">COMING SOON</span>
-          <div className="waiver-locked-icon">
-            <PercentIcon size={32} />
-          </div>
-          <h2>Attendance Tool is Coming Soon</h2>
-          <p>
-            We are fine-tuning the Attendance Waiver Assistant. Access is currently limited to authorized personnel during private beta testing.
-          </p>
-          <button className="waiver-locked-back-btn" onClick={onBack}>
-            ← Back to Dashboard
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   const userKey = user?.id || user?.email || 'guest';
   const storageKey = `sscbs_waiver_tool_state_v3_${userKey}`;
 
@@ -546,19 +498,6 @@ export default function WaiverToolPage({ onBack }) {
     priorityWaiverDates: priorityDates.size > 0 ? Array.from(priorityDates) : []
   }), [activeWaiverStart, activeWaiverEnd, priorityDates]);
 
-  const handleUpdateRecommendation = () => {
-    if (!parsedData) return;
-    setIsProcessing(true);
-    executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
-      if (solution?.chosenDays && solution.chosenDays.length > 0) {
-        setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
-      }
-      if (solution?.chosenCdcDays && solution.chosenCdcDays.length > 0) {
-        setSelectedCdcDays(new Set(solution.chosenCdcDays.map(d => d.dateStr)));
-      }
-    }, currentSolverOptions);
-  };
-
   const handleReplaceSheet = () => {
     setParsedData(null);
     setRawParsedData(null);
@@ -582,6 +521,8 @@ export default function WaiverToolPage({ onBack }) {
     setCustomStartDate('');
     setCustomEndDate('');
     setIsTimelineModalOpen(false);
+    setPriorityDates(new Set());
+    setIsPriorityDatesModalOpen(false);
     try {
       localStorage.removeItem(storageKey);
     } catch {
@@ -735,7 +676,7 @@ export default function WaiverToolPage({ onBack }) {
     setHasPendingPriorityChange(true);
     if (parsedData) {
       // Async re-solve in background without locking the screen with a full-page modal
-      executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, next, (solution) => {
+      executeSolverAsync(parsedData, threshold, maxWaivers, cdcLimit, next, (_solution) => {
         // If user has not applied any waivers yet, seamlessly update recommendation
         if (selectedWaivers.size === 0 && selectedCdcDays.size === 0) {
           setHasPendingPriorityChange(false);
@@ -2423,6 +2364,55 @@ export default function WaiverToolPage({ onBack }) {
       </div>
     );
   };
+
+  if (isMobileScreen) {
+    return (
+      <div className="waiver-mobile-gate-screen">
+        <div className="waiver-mobile-card-wrapper">
+          <div className="waiver-mobile-card">
+            <div className="mobile-icon-badge">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                <line x1="8" y1="21" x2="16" y2="21" />
+                <line x1="12" y1="17" x2="12" y2="21" />
+              </svg>
+            </div>
+            <h2>Please open on a PC or Laptop</h2>
+            <p>
+              The Attendance Tool requires a larger screen to display subject analytics, multi-column date tables, and the attendance grid accurately.
+            </p>
+            <div className="mobile-hint-box">
+              💡 For the best experience, open <strong>sscbsos.in/#waiver</strong> on your desktop browser.
+            </div>
+            <button className="btn-back-portal-primary" onClick={onBack}>
+              ← Back to Campus OS
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!hasAccess) {
+    return (
+      <div className="waiver-locked-screen">
+        <div className="waiver-locked-card">
+          <span className="waiver-locked-badge">COMING SOON</span>
+          <div className="waiver-locked-icon">
+            <PercentIcon size={32} />
+          </div>
+          <h2>Attendance Tool is Coming Soon</h2>
+          <p>
+            We are fine-tuning the Attendance Waiver Assistant. Access is currently limited to authorized personnel during private beta testing.
+          </p>
+          <button className="waiver-locked-back-btn" onClick={onBack}>
+            ← Back to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <div className="waiver-tool-fullpage rd-root">

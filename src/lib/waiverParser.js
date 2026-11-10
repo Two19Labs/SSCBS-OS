@@ -15,7 +15,12 @@ export const MONTHS_FULL = [
 export const ENTRY_REGEX = /^(P|A|Not Taken)(\|[^(]*)?\s*\(\s*(\w+)\s*\)$/i;
 
 export function parseAttendanceEntry(raw) {
-  const clean = String(raw || '').trim();
+  let clean = String(raw || '')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&#160;/gi, ' ')
+    .replace(/\u00A0/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
   if (!clean) return null;
   const match = clean.match(ENTRY_REGEX);
   if (!match) {
@@ -199,7 +204,23 @@ export function parseAttendanceFile(htmlText, fileName = '') {
     throw new Error(`Invalid attendance table structure: only found ${outerRows.length} rows.`);
   }
 
-  const headerCells = extractOuterCells(outerRows[0]).map(h => h.replace(/<[^>]*>/g, '').trim());
+  // Find header row dynamically (supports tables with preceding metadata rows)
+  let headerRowIdx = -1;
+  let headerCells = [];
+  for (let r = 0; r < Math.min(outerRows.length, 5); r++) {
+    const candidateCells = extractOuterCells(outerRows[r]).map(h => h.replace(/<[^>]*>/g, '').trim());
+    if (candidateCells.length >= 5 && candidateCells.some(c => /sno|student|roll\s*no/i.test(c))) {
+      headerRowIdx = r;
+      headerCells = candidateCells;
+      break;
+    }
+  }
+
+  if (headerRowIdx === -1) {
+    headerRowIdx = 0;
+    headerCells = extractOuterCells(outerRows[0]).map(h => h.replace(/<[^>]*>/g, '').trim());
+  }
+
   if (headerCells.length < 5) {
     throw new Error('Header row does not contain sufficient columns (expected sno, Student, Roll No, dates..., Total Present, Total Absent).');
   }
@@ -271,7 +292,7 @@ export function parseAttendanceFile(htmlText, fileName = '') {
   const subjects = [];
   let rollNo = '';
 
-  for (let r = 1; r < outerRows.length; r++) {
+  for (let r = headerRowIdx + 1; r < outerRows.length; r++) {
     const cells = extractOuterCells(outerRows[r]);
     if (cells.length < 3) continue;
 
@@ -306,9 +327,17 @@ export function parseAttendanceFile(htmlText, fileName = '') {
 
     dayColumns.forEach(d => {
       const cellHtml = cells[d.colIdx] || '';
-      const innerTds = (cellHtml.match(/<td[^>]*>([\s\S]*?)<\/td>/gi) || [])
+      let innerTds = (cellHtml.match(/<td[^>]*>([\s\S]*?)<\/td>/gi) || [])
         .map(t => t.replace(/<[^>]*>/g, '').trim())
         .filter(Boolean);
+
+      // Fallback: If cell is a flat <td> without nested <table>, or has entries separated by <br> or newlines
+      if (innerTds.length === 0 && cellHtml.trim()) {
+        const textOnly = cellHtml.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]*>/g, '').trim();
+        if (textOnly) {
+          innerTds = textOnly.split(/\r?\n/).map(t => t.trim()).filter(Boolean);
+        }
+      }
 
       const dayList = [];
       innerTds.forEach(rawToken => {
