@@ -132,6 +132,15 @@ export default function WaiverToolPage({ onBack }) {
   const [tempBlacklistedDates, setTempBlacklistedDates] = useState(new Set());
   const [blacklistDateSearch, setBlacklistDateSearch] = useState('');
 
+  // Special Attendance Adjustment (aggregate-only extra credits, e.g. college representation/duty leaves)
+  const [specialAttendanceAdjustment, setSpecialAttendanceAdjustment] = useState({ attended: 0, held: 0 });
+  const [isSpecialAdjOpen, setIsSpecialAdjOpen] = useState(false);
+  const [syncHeldWithAttended, setSyncHeldWithAttended] = useState(true);
+
+  // Granular Undo & Redo History Stacks (Excel-grade for all grid mutations)
+  const [undoStack, setUndoStack] = useState([]);
+  const [redoStack, setRedoStack] = useState([]);
+
   // Ineligibility acknowledgement state (shown when baseline overall attendance < 66.7%)
   const [hasAcknowledgedIneligible, setHasAcknowledgedIneligible] = useState(false);
 
@@ -221,6 +230,12 @@ export default function WaiverToolPage({ onBack }) {
           }
           if (Array.isArray(saved.blacklistedDates)) {
             setBlacklistedDates(new Set(saved.blacklistedDates));
+          }
+          if (saved.specialAttendanceAdjustment && typeof saved.specialAttendanceAdjustment === 'object') {
+            setSpecialAttendanceAdjustment({
+              attended: Number(saved.specialAttendanceAdjustment.attended) || 0,
+              held: Number(saved.specialAttendanceAdjustment.held) || 0
+            });
           }
           if (saved.gridToolMode) setGridToolMode(saved.gridToolMode);
           if (saved.customStartDate !== undefined) setCustomStartDate(saved.customStartDate);
@@ -572,6 +587,10 @@ export default function WaiverToolPage({ onBack }) {
     setIsPriorityDatesModalOpen(false);
     setBlacklistedDates(new Set());
     setIsBlacklistedDatesModalOpen(false);
+    setSpecialAttendanceAdjustment({ attended: 0, held: 0 });
+    setIsSpecialAdjOpen(false);
+    setUndoStack([]);
+    setRedoStack([]);
     try {
       localStorage.removeItem(storageKey);
     } catch {
@@ -596,9 +615,151 @@ export default function WaiverToolPage({ onBack }) {
   };
 
   // Save modified cell classes
+  
+  // Record an immutable history snapshot before grid mutations (Excel-grade Undo/Redo)
+  const recordHistorySnapshot = (description) => {
+    if (!parsedData) return;
+    const snapshot = {
+      id: `${Date.now()}_${Math.random()}`,
+      description,
+      timestamp: Date.now(),
+      parsedData: cloneParsedData(parsedData),
+      selectedWaivers: new Set(selectedWaivers),
+      selectedCdcDays: new Set(selectedCdcDays),
+      lockedWaivers: new Set(lockedWaivers),
+      lockedCdcDays: new Set(lockedCdcDays),
+      priorityDates: new Set(priorityDates),
+      blacklistedDates: new Set(blacklistedDates)
+    };
+    setUndoStack(prev => [...prev.slice(-49), snapshot]);
+    setRedoStack([]);
+  };
+
+  const handleUndo = () => {
+    if (undoStack.length === 0 || !parsedData) return;
+    const previousSnapshot = undoStack[undoStack.length - 1];
+    const nextUndoStack = undoStack.slice(0, -1);
+
+    const currentSnapshot = {
+      id: `${Date.now()}_${Math.random()}`,
+      description: previousSnapshot.description,
+      timestamp: Date.now(),
+      parsedData: cloneParsedData(parsedData),
+      selectedWaivers: new Set(selectedWaivers),
+      selectedCdcDays: new Set(selectedCdcDays),
+      lockedWaivers: new Set(lockedWaivers),
+      lockedCdcDays: new Set(lockedCdcDays),
+      priorityDates: new Set(priorityDates),
+      blacklistedDates: new Set(blacklistedDates)
+    };
+
+    setRedoStack(prev => [...prev, currentSnapshot]);
+    setUndoStack(nextUndoStack);
+
+    const restoredParsedData = cloneParsedData(previousSnapshot.parsedData);
+    setParsedData(restoredParsedData);
+    setSelectedWaivers(new Set(previousSnapshot.selectedWaivers));
+    setSelectedCdcDays(new Set(previousSnapshot.selectedCdcDays));
+    setLockedWaivers(new Set(previousSnapshot.lockedWaivers));
+    setLockedCdcDays(new Set(previousSnapshot.lockedCdcDays));
+    setPriorityDates(new Set(previousSnapshot.priorityDates));
+    setBlacklistedDates(new Set(previousSnapshot.blacklistedDates));
+
+    setIsProcessing(true);
+    executeSolverAsync(restoredParsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
+      if (solution?.chosenDays && isOptimalSuggested) {
+        setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+        setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
+      }
+      setIsOneThirdAlertDismissed(false);
+    }, {
+      ...currentSolverOptions,
+      priorityWaiverDates: Array.from(previousSnapshot.priorityDates),
+      blockedDates: Array.from(previousSnapshot.blacklistedDates)
+    });
+  };
+
+  const handleRedo = () => {
+    if (redoStack.length === 0 || !parsedData) return;
+    const nextSnapshot = redoStack[redoStack.length - 1];
+    const nextRedoStack = redoStack.slice(0, -1);
+
+    const currentSnapshot = {
+      id: `${Date.now()}_${Math.random()}`,
+      description: nextSnapshot.description,
+      timestamp: Date.now(),
+      parsedData: cloneParsedData(parsedData),
+      selectedWaivers: new Set(selectedWaivers),
+      selectedCdcDays: new Set(selectedCdcDays),
+      lockedWaivers: new Set(lockedWaivers),
+      lockedCdcDays: new Set(lockedCdcDays),
+      priorityDates: new Set(priorityDates),
+      blacklistedDates: new Set(blacklistedDates)
+    };
+
+    setUndoStack(prev => [...prev, currentSnapshot]);
+    setRedoStack(nextRedoStack);
+
+    const restoredParsedData = cloneParsedData(nextSnapshot.parsedData);
+    setParsedData(restoredParsedData);
+    setSelectedWaivers(new Set(nextSnapshot.selectedWaivers));
+    setSelectedCdcDays(new Set(nextSnapshot.selectedCdcDays));
+    setLockedWaivers(new Set(nextSnapshot.lockedWaivers));
+    setLockedCdcDays(new Set(nextSnapshot.lockedCdcDays));
+    setPriorityDates(new Set(nextSnapshot.priorityDates));
+    setBlacklistedDates(new Set(nextSnapshot.blacklistedDates));
+
+    setIsProcessing(true);
+    executeSolverAsync(restoredParsedData, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
+      if (solution?.chosenDays && isOptimalSuggested) {
+        setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+        setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
+      }
+      setIsOneThirdAlertDismissed(false);
+    }, {
+      ...currentSolverOptions,
+      priorityWaiverDates: Array.from(nextSnapshot.priorityDates),
+      blockedDates: Array.from(nextSnapshot.blacklistedDates)
+    });
+  };
+
+  // Global Keyboard Shortcuts for Undo (Ctrl+Z / Cmd+Z) and Redo (Ctrl+Y / Ctrl+Shift+Z / Cmd+Shift+Z)
+  const handleUndoRef = useRef(handleUndo);
+  const handleRedoRef = useRef(handleRedo);
+  handleUndoRef.current = handleUndo;
+  handleRedoRef.current = handleRedo;
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const tag = e.target.tagName?.toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+
+      const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+      const isCmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
+
+      if (isCmdOrCtrl && !e.altKey) {
+        if (e.key === 'z' || e.key === 'Z') {
+          if (e.shiftKey) {
+            e.preventDefault();
+            handleRedoRef.current?.();
+          } else {
+            e.preventDefault();
+            handleUndoRef.current?.();
+          }
+        } else if (e.key === 'y' || e.key === 'Y') {
+          e.preventDefault();
+          handleRedoRef.current?.();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const handleSaveCellClasses = () => {
     if (!editingCell || !parsedData) return;
     const { subjectName, dateStr, classes } = editingCell;
+    recordHistorySnapshot(`Edit cell: ${subjectName} on ${dateStr}`);
     const updated = editCellClasses(parsedData, subjectName, dateStr, classes);
     setParsedData(updated);
     setEditingCell(null);
@@ -618,6 +779,7 @@ export default function WaiverToolPage({ onBack }) {
   const handleClearCellClasses = () => {
     if (!editingCell || !parsedData) return;
     const { subjectName, dateStr } = editingCell;
+    recordHistorySnapshot(`Clear cell: ${subjectName} on ${dateStr}`);
     const updated = editCellClasses(parsedData, subjectName, dateStr, []);
     setParsedData(updated);
     setEditingCell(null);
@@ -687,6 +849,7 @@ export default function WaiverToolPage({ onBack }) {
       return;
     }
 
+    recordHistorySnapshot(addDateMode === 'single' ? `Add date ${newDates[0]}` : `Add date range ${newDates[0]} to ${newDates[newDates.length - 1]}`);
     const updated = batchAddDates(parsedData, newDates, timetableTemplateMode, timetableDefaultStatus);
     setParsedData(updated);
     setIsAddDateModalOpen(false);
@@ -712,7 +875,7 @@ export default function WaiverToolPage({ onBack }) {
       (parsedData.dayColumns || []).filter(d => d.dateStr > repDate).map(d => d.dateStr)
     );
     if (futureSet.size === 0) return;
-
+    recordHistorySnapshot('Clear speculative future dates');
     const updated = clearFutureDates(parsedData, repDate);
     setParsedData(updated);
 
@@ -762,6 +925,7 @@ export default function WaiverToolPage({ onBack }) {
   const handleConfirmDeleteDate = () => {
     if (!dateToDelete || !parsedData) return;
     const delDate = dateToDelete.dateStr;
+    recordHistorySnapshot(`Delete date ${delDate}`);
     const updated = deleteDateColumn(parsedData, delDate);
 
     // If deleted date was actively waived or CDC, remove it
@@ -792,6 +956,7 @@ export default function WaiverToolPage({ onBack }) {
   // Reset all manual edits back to pristine uploaded raw file
   const handleResetToRaw = () => {
     if (!rawParsedData) return;
+    recordHistorySnapshot('Reset grid to original file');
     const pristine = cloneParsedData(rawParsedData);
     setParsedData(pristine);
     setIsResetConfirmOpen(false);
@@ -1299,63 +1464,106 @@ export default function WaiverToolPage({ onBack }) {
   const passingTargetCount = simStats?.passingTargetCount ?? simStats?.passingCount ?? 0;
 
   // Aggregate totals across all subjects
+  // Aggregate totals across all subjects (plus special aggregate attendance adjustment)
   const totalsSummary = useMemo(() => {
-    if (simStats?.totals) return simStats.totals;
-    if (!subjectSummaries || subjectSummaries.length === 0) return null;
-    let totAtt = 0, totHeld = 0, totBaseAtt = 0, totBaseHeld = 0;
-    let thAtt = 0, thHeld = 0, thBaseAtt = 0, thBaseHeld = 0;
-    let tuAtt = 0, tuHeld = 0, tuBaseAtt = 0, tuBaseHeld = 0;
+    let baseTotals = simStats?.totals;
+    if (!baseTotals && subjectSummaries && subjectSummaries.length > 0) {
+      let totAtt = 0, totHeld = 0, totBaseAtt = 0, totBaseHeld = 0;
+      let thAtt = 0, thHeld = 0, thBaseAtt = 0, thBaseHeld = 0;
+      let tuAtt = 0, tuHeld = 0, tuBaseAtt = 0, tuBaseHeld = 0;
 
-    subjectSummaries.forEach(sub => {
-      const parts = sub.partsList || Object.values(sub.parts || {});
-      parts.forEach(p => {
-        const att = p.simAttended ?? p.simP ?? p.p ?? 0;
-        const held = p.simHeld ?? p.simN ?? p.n ?? 0;
-        const bAtt = p.baseAtt ?? att;
-        const bHeld = p.baseHeld ?? held;
+      subjectSummaries.forEach(sub => {
+        const parts = sub.partsList || Object.values(sub.parts || {});
+        parts.forEach(p => {
+          const att = p.simAttended ?? p.simP ?? p.p ?? 0;
+          const held = p.simHeld ?? p.simN ?? p.n ?? 0;
+          const bAtt = p.baseAtt ?? att;
+          const bHeld = p.baseHeld ?? held;
 
-        totAtt += att;
-        totHeld += held;
-        totBaseAtt += bAtt;
-        totBaseHeld += bHeld;
+          totAtt += att;
+          totHeld += held;
+          totBaseAtt += bAtt;
+          totBaseHeld += bHeld;
 
-        if (p.type === 'th') {
-          thAtt += att;
-          thHeld += held;
-          thBaseAtt += bAtt;
-          thBaseHeld += bHeld;
-        } else if (p.type === 'tu') {
-          tuAtt += att;
-          tuHeld += held;
-          tuBaseAtt += bAtt;
-          tuBaseHeld += bHeld;
-        }
+          if (p.type === 'th') {
+            thAtt += att;
+            thHeld += held;
+            thBaseAtt += bAtt;
+            thBaseHeld += bHeld;
+          } else if (p.type === 'tu') {
+            tuAtt += att;
+            tuHeld += held;
+            tuBaseAtt += bAtt;
+            tuBaseHeld += bHeld;
+          }
+        });
       });
-    });
+
+      const calcPct = (a, h) => (h > 0 ? (a / h) * 100 : 100);
+
+      baseTotals = {
+        overall: {
+          att: totAtt,
+          held: totHeld,
+          pct: calcPct(totAtt, totHeld),
+          baseAtt: totBaseAtt,
+          baseHeld: totBaseHeld,
+          basePct: calcPct(totBaseAtt, totBaseHeld)
+        },
+        theory: {
+          att: thAtt,
+          held: thHeld,
+          pct: calcPct(thAtt, thHeld),
+          baseAtt: thBaseAtt,
+          baseHeld: thBaseHeld,
+          basePct: calcPct(thBaseAtt, thBaseHeld)
+        },
+        tutorial: {
+          att: tuAtt,
+          held: tuHeld,
+          pct: calcPct(tuAtt, tuHeld),
+          baseAtt: tuBaseAtt,
+          baseHeld: tuBaseHeld,
+          basePct: calcPct(tuBaseAtt, tuBaseHeld)
+        }
+      };
+    }
+
+    if (!baseTotals) return null;
+
+    const adjAtt = Number(specialAttendanceAdjustment.attended) || 0;
+    const adjHeld = Number(specialAttendanceAdjustment.held) || 0;
+
+    const rawAtt = baseTotals.overall.att;
+    const rawHeld = baseTotals.overall.held;
+    const rawBaseAtt = baseTotals.overall.baseAtt ?? rawAtt;
+    const rawBaseHeld = baseTotals.overall.baseHeld ?? rawHeld;
+
+    const effectiveAtt = Math.max(0, rawAtt + adjAtt);
+    const effectiveHeld = Math.max(effectiveAtt, rawHeld + adjHeld);
+    const effectiveBaseAtt = Math.max(0, rawBaseAtt + adjAtt);
+    const effectiveBaseHeld = Math.max(effectiveBaseAtt, rawBaseHeld + adjHeld);
 
     const calcPct = (a, h) => (h > 0 ? (a / h) * 100 : 100);
 
     return {
       overall: {
-        att: totAtt,
-        held: totHeld,
-        pct: calcPct(totAtt, totHeld),
-        basePct: calcPct(totBaseAtt, totBaseHeld)
+        att: effectiveAtt,
+        held: effectiveHeld,
+        pct: calcPct(effectiveAtt, effectiveHeld),
+        baseAtt: effectiveBaseAtt,
+        baseHeld: effectiveBaseHeld,
+        basePct: calcPct(effectiveBaseAtt, effectiveBaseHeld),
+        rawAtt,
+        rawHeld,
+        rawPct: calcPct(rawAtt, rawHeld),
+        rawBasePct: calcPct(rawBaseAtt, rawBaseHeld),
+        specialAdjustment: { attended: adjAtt, held: adjHeld }
       },
-      theory: {
-        att: thAtt,
-        held: thHeld,
-        pct: calcPct(thAtt, thHeld),
-        basePct: calcPct(thBaseAtt, thBaseHeld)
-      },
-      tutorial: {
-        att: tuAtt,
-        held: tuHeld,
-        pct: calcPct(tuAtt, tuHeld),
-        basePct: calcPct(tuBaseAtt, tuBaseHeld)
-      }
+      theory: baseTotals.theory,
+      tutorial: baseTotals.tutorial
     };
-  }, [simStats, subjectSummaries]);
+  }, [simStats, subjectSummaries, specialAttendanceAdjustment]);
 
   // Overall university eligibility check:
   // If a student's total attendance across all subjects combined is below 66.7%,
@@ -1443,6 +1651,47 @@ export default function WaiverToolPage({ onBack }) {
     );
   };
 
+  
+  const renderHistoryButtons = () => {
+    const canUndo = undoStack.length > 0;
+    const canRedo = redoStack.length > 0;
+    const lastUndo = canUndo ? undoStack[undoStack.length - 1] : null;
+    const lastRedo = canRedo ? redoStack[redoStack.length - 1] : null;
+
+    return (
+      <div className="rd-history-btns" role="group" aria-label="Undo and Redo changes">
+        <button
+          type="button"
+          className="rd-history-btn"
+          disabled={!canUndo}
+          onClick={handleUndo}
+          title={canUndo ? `Undo ${lastUndo.description} (Ctrl+Z)` : 'Undo (Ctrl+Z)'}
+          aria-label="Undo last change"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="9 14 4 9 9 4" />
+            <path d="M20 20v-7a4 4 0 0 0-4-4H4" />
+          </svg>
+          <span>Undo{canUndo ? ` (${undoStack.length})` : ''}</span>
+        </button>
+        <button
+          type="button"
+          className="rd-history-btn"
+          disabled={!canRedo}
+          onClick={handleRedo}
+          title={canRedo ? `Redo ${lastRedo.description} (Ctrl+Y)` : 'Redo (Ctrl+Y)'}
+          aria-label="Redo last change"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="15 14 20 9 15 4" />
+            <path d="M4 20v-7a4 4 0 0 1 4-4h12" />
+          </svg>
+          <span>Redo{canRedo ? ` (${redoStack.length})` : ''}</span>
+        </button>
+      </div>
+    );
+  };
+
   const renderTotalsSummary = () => {
     if (!totalsSummary) return null;
 
@@ -1475,6 +1724,20 @@ export default function WaiverToolPage({ onBack }) {
               <div key={item.key} className="rd-total-item">
                 <div className="rd-total-item-top">
                   <span className="rd-total-item-lbl">{item.label}</span>
+                  {item.key === 'overall' && (
+                    <button
+                      type="button"
+                      className={`rd-special-adj-btn ${(specialAttendanceAdjustment.attended !== 0 || specialAttendanceAdjustment.held !== 0) ? 'is-active' : ''}`}
+                      onClick={() => setIsSpecialAdjOpen(!isSpecialAdjOpen)}
+                      title="Adjust total attendance for special institutional cases (duty leaves or representation credits)"
+                    >
+                      {(specialAttendanceAdjustment.attended !== 0 || specialAttendanceAdjustment.held !== 0) ? (
+                        <span>⚡ Special ({specialAttendanceAdjustment.attended >= 0 ? `+${specialAttendanceAdjustment.attended}` : specialAttendanceAdjustment.attended}/{specialAttendanceAdjustment.held >= 0 ? `+${specialAttendanceAdjustment.held}` : specialAttendanceAdjustment.held}) ✎</span>
+                      ) : (
+                        <span>✎ Adjust Special</span>
+                      )}
+                    </button>
+                  )}
                   <span className="rd-no-target-badge">None</span>
                 </div>
                 <div className="rd-total-item-val">
@@ -1536,6 +1799,204 @@ export default function WaiverToolPage({ onBack }) {
                 )}
                 <div className="rd-tick" style={{ left: `${threshold}%` }} title={`${threshold}% target`} />
               </div>
+              {item.key === 'overall' && isSpecialAdjOpen && (
+                <div className="rd-special-adj-panel" role="region" aria-label="Special Case Attendance Adjustment">
+                  <div className="rd-special-adj-head">
+                    <div className="rd-special-adj-title">
+                      <strong>Special Case Attendance Adjustment</strong>
+                      <span className="rd-special-adj-tag">Total Aggregate Only · No Subject</span>
+                    </div>
+                    <button
+                      type="button"
+                      className="rd-special-adj-close"
+                      onClick={() => setIsSpecialAdjOpen(false)}
+                      aria-label="Close adjustment panel"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  <div className="rd-special-adj-note">
+                    <span className="rd-special-adj-note-icon">ℹ️</span>
+                    <p>
+                      <strong>Institutional Special Cases:</strong> This adjustment is for special circumstances where extra attendance credits are awarded directly to your aggregate total (e.g. college-approved duty leaves, representation credits, or administrative credits not assigned to any specific subject). This updates your total attendance percentage and waiver eligibility.
+                    </p>
+                  </div>
+
+                  <div className="rd-special-adj-steppers">
+                    {/* Attended (Numerator) Stepper */}
+                    <div className="rd-adj-stepper-field">
+                      <label>
+                        <strong>Extra Attended (+P / Numerator):</strong>
+                        <span className="rd-adj-field-sub">Credit for classes attended</span>
+                      </label>
+                      <div className="rd-stepper-row">
+                        <button
+                          type="button"
+                          className="rd-stepper-btn"
+                          onClick={() => {
+                            setSpecialAttendanceAdjustment(prev => {
+                              const nextAtt = prev.attended - 1;
+                              const nextHeld = syncHeldWithAttended ? prev.held - 1 : prev.held;
+                              return { attended: nextAtt, held: nextHeld };
+                            });
+                          }}
+                          title="Decrease attended credit by 1"
+                        >
+                          −
+                        </button>
+                        <input
+                          type="number"
+                          className="rd-stepper-input"
+                          value={specialAttendanceAdjustment.attended}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value, 10) || 0;
+                            setSpecialAttendanceAdjustment(prev => ({
+                              attended: val,
+                              held: syncHeldWithAttended ? (prev.held + (val - prev.attended)) : prev.held
+                            }));
+                          }}
+                        />
+                        <button
+                          type="button"
+                          className="rd-stepper-btn"
+                          onClick={() => {
+                            setSpecialAttendanceAdjustment(prev => {
+                              const nextAtt = prev.attended + 1;
+                              const nextHeld = syncHeldWithAttended ? prev.held + 1 : prev.held;
+                              return { attended: nextAtt, held: nextHeld };
+                            });
+                          }}
+                          title="Increase attended credit by 1"
+                        >
+                          +
+                        </button>
+                        <button
+                          type="button"
+                          className="rd-stepper-quick"
+                          onClick={() => {
+                            setSpecialAttendanceAdjustment(prev => ({
+                              attended: prev.attended + 5,
+                              held: syncHeldWithAttended ? prev.held + 5 : prev.held
+                            }));
+                          }}
+                          title="Add 5"
+                        >
+                          +5
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Held (Denominator) Stepper */}
+                    <div className="rd-adj-stepper-field">
+                      <label>
+                        <strong>Extra Total Held (+N / Denominator):</strong>
+                        <span className="rd-adj-field-sub">Classes conducted/held</span>
+                      </label>
+                      <div className="rd-stepper-row">
+                        <button
+                          type="button"
+                          className="rd-stepper-btn"
+                          onClick={() => {
+                            setSpecialAttendanceAdjustment(prev => ({
+                              ...prev,
+                              held: prev.held - 1
+                            }));
+                          }}
+                          title="Decrease total held credit by 1"
+                        >
+                          −
+                        </button>
+                        <input
+                          type="number"
+                          className="rd-stepper-input"
+                          value={specialAttendanceAdjustment.held}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value, 10) || 0;
+                            setSpecialAttendanceAdjustment(prev => ({ ...prev, held: val }));
+                          }}
+                        />
+                        <button
+                          type="button"
+                          className="rd-stepper-btn"
+                          onClick={() => {
+                            setSpecialAttendanceAdjustment(prev => ({
+                              ...prev,
+                              held: prev.held + 1
+                            }));
+                          }}
+                          title="Increase total held credit by 1"
+                        >
+                          +
+                        </button>
+                        <button
+                          type="button"
+                          className="rd-stepper-quick"
+                          onClick={() => {
+                            setSpecialAttendanceAdjustment(prev => ({
+                              ...prev,
+                              held: prev.held + 5
+                            }));
+                          }}
+                          title="Add 5"
+                        >
+                          +5
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sync checkbox */}
+                  <div className="rd-special-adj-sync">
+                    <label className="rd-sync-label">
+                      <input
+                        type="checkbox"
+                        checked={syncHeldWithAttended}
+                        onChange={(e) => setSyncHeldWithAttended(e.target.checked)}
+                      />
+                      <span>Sync Total Held with Attended (recommended for 100% duty credit)</span>
+                    </label>
+                  </div>
+
+                  {/* Full transparency breakdown */}
+                  <div className="rd-special-adj-breakdown">
+                    <div className="rd-adj-calc-row">
+                      <span>Raw Sheet Attendance:</span>
+                      <strong>{item.data.rawAtt} / {item.data.rawHeld} ({item.data.rawPct?.toFixed(1)}%)</strong>
+                    </div>
+                    <div className="rd-adj-calc-row">
+                      <span>Special Adjustment:</span>
+                      <strong style={{ color: specialAttendanceAdjustment.attended >= 0 ? '#059669' : '#dc2626' }}>
+                        {specialAttendanceAdjustment.attended >= 0 ? `+${specialAttendanceAdjustment.attended}` : specialAttendanceAdjustment.attended} Attended / {specialAttendanceAdjustment.held >= 0 ? `+${specialAttendanceAdjustment.held}` : specialAttendanceAdjustment.held} Held
+                      </strong>
+                    </div>
+                    <div className="rd-adj-calc-row total-highlight">
+                      <span>Effective Total Aggregate:</span>
+                      <strong>{curPct.toFixed(1)}% ({item.data.att}/{item.data.held})</strong>
+                    </div>
+                  </div>
+
+                  <div className="rd-special-adj-foot">
+                    {(specialAttendanceAdjustment.attended !== 0 || specialAttendanceAdjustment.held !== 0) && (
+                      <button
+                        type="button"
+                        className="rd-btn-outline xs muted"
+                        onClick={() => setSpecialAttendanceAdjustment({ attended: 0, held: 0 })}
+                      >
+                        Reset Adjustment
+                      </button>
+                    )}
+                    <div style={{ flex: 1 }} />
+                    <button
+                      type="button"
+                      className="rd-btn-dark xs"
+                      onClick={() => setIsSpecialAdjOpen(false)}
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}
@@ -3421,8 +3882,11 @@ export default function WaiverToolPage({ onBack }) {
               {/* Spreadsheet Grid Preview */}
               <section className="rd-panel rd-preview" aria-label="Spreadsheet grid preview">
                 <div className="rd-panel-head">
-                  <div>
-                    <h2>Spreadsheet grid</h2>
+                  <div className="rd-panel-title-wrap">
+                    <div className="rd-panel-title-row">
+                      <h2>Spreadsheet grid</h2>
+                      {renderHistoryButtons()}
+                    </div>
                     <span>Click a date to waive or restore that whole day</span>
                   </div>
                   <div className="rd-grid-acts">
@@ -3556,6 +4020,7 @@ export default function WaiverToolPage({ onBack }) {
                       ✏️ <strong>Edit Mode:</strong> Click any cell to add/modify classes. Click ✕ on date headers to delete a day.
                     </span>
                     <div className="rd-edit-banner-acts">
+                      {renderHistoryButtons()}
                       <button
                         type="button"
                         className="rd-btn-outline xs rd-btn-accent"
@@ -3901,8 +4366,11 @@ export default function WaiverToolPage({ onBack }) {
         <div className="rd-overlay" onClick={() => setIsGridExpanded(false)}>
           <section className="rd-expanded" role="dialog" aria-label="Spreadsheet grid, expanded" onClick={(e) => e.stopPropagation()}>
             <div className="rd-panel-head">
-              <div>
-                <h2>Spreadsheet grid</h2>
+              <div className="rd-panel-title-wrap">
+                <div className="rd-panel-title-row">
+                  <h2>Spreadsheet grid</h2>
+                  {renderHistoryButtons()}
+                </div>
                 <span>Scroll sideways for every class day. Click a date or cell to waive or restore the whole day.</span>
               </div>
               <div className="rd-exp-acts">
@@ -4036,6 +4504,7 @@ export default function WaiverToolPage({ onBack }) {
                   ✏️ <strong>Edit Mode:</strong> Click any cell to add/modify classes. Click ✕ on date headers to delete a day.
                 </span>
                 <div className="rd-edit-banner-acts">
+                  {renderHistoryButtons()}
                   <button
                     type="button"
                     className="rd-btn-outline xs rd-btn-accent"

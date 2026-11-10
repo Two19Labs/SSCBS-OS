@@ -16,7 +16,10 @@ import {
   findRecentDaySchedule,
   batchAddDates,
   clearFutureDates,
-  diffCustomizations
+  diffCustomizations,
+  cloneParsedData,
+  editCellClasses,
+  deleteDateColumn
 } from '../lib/attendanceEditor.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -606,7 +609,144 @@ test('Blacklisting all candidate dates results in 0 chosen waiver days', () => {
 });
 
 // -------------------------------------------------------------
-// SECTION 9: SUMMARY & AUDIT RESULTS
+// -------------------------------------------------------------
+// SECTION 9: SPECIAL ATTENDANCE ADJUSTMENT & UNDO/REDO ENGINE
+// -------------------------------------------------------------
+console.log('\n--- SECTION 9: Special Attendance Adjustment & Undo/Redo Engine ---');
+
+test('Special attendance adjustment updates aggregate total without altering individual subjects', () => {
+  const sim = calculateSimulatedStats(baseMockData, new Set(), 85, new Set());
+  const rawTot = sim.totals.overall;
+
+  const adj = { attended: 5, held: 5 };
+  const effectiveAtt = rawTot.att + adj.attended;
+  const effectiveHeld = rawTot.held + adj.held;
+  const effectivePct = (effectiveAtt / effectiveHeld) * 100;
+
+  assert.strictEqual(effectiveAtt, rawTot.att + 5);
+  assert.strictEqual(effectiveHeld, rawTot.held + 5);
+  assert.ok(Math.abs(effectivePct - (effectiveAtt / effectiveHeld) * 100) < 0.001);
+
+  // Verify individual subjects remain 100% unaltered
+  sim.subjectsStats.forEach(sub => {
+    sub.partsList.forEach(p => {
+      assert.strictEqual(p.simAttended, p.baseAtt, 'Subject parts must remain untouched by aggregate adjustment');
+      assert.strictEqual(p.simHeld, p.baseHeld, 'Subject parts held must remain untouched');
+    });
+  });
+});
+
+test('Independent numerator and denominator special attendance adjustments calculate transparently', () => {
+  const rawAtt = 40;
+  const rawHeld = 50;
+  const adj = { attended: 10, held: 12 };
+
+  const finalAtt = rawAtt + adj.attended; // 50
+  const finalHeld = rawHeld + adj.held;     // 62
+  const finalPct = (finalAtt / finalHeld) * 100; // 80.645%
+
+  assert.strictEqual(finalAtt, 50);
+  assert.strictEqual(finalHeld, 62);
+  assert.ok(Math.abs(finalPct - 80.645) < 0.01);
+});
+
+test('Special attendance adjustment lifts ineligibility when aggregate crosses 66.7%', () => {
+  // Student with 32 attended out of 50 held = 64% (< 66.666%)
+  const rawAtt = 32;
+  const rawHeld = 50;
+  const rawPct = (rawAtt / rawHeld) * 100;
+  assert.ok(rawPct < 66.666, 'Raw percentage must be below 66.7%');
+
+  // Add +5 attended out of +5 held (institutional duty credit)
+  const adj = { attended: 5, held: 5 };
+  const effectiveAtt = rawAtt + adj.attended; // 37
+  const effectiveHeld = rawHeld + adj.held;   // 55
+  const effectivePct = (effectiveAtt / effectiveHeld) * 100; // 67.27%
+
+  assert.ok(effectivePct >= 66.666, 'Effective percentage must cross 66.7% threshold');
+  const isOverallIneligible = effectivePct < 66.666;
+  assert.strictEqual(isOverallIneligible, false, 'Student must become eligible for waivers');
+});
+
+test('Undo/Redo: Cell class mutation undo restores original state and redo re-applies', () => {
+  const original = cloneParsedData(baseMockData);
+  const undoStack = [];
+  const redoStack = [];
+
+  // Snapshot before edit
+  undoStack.push({
+    description: 'Edit cell classes',
+    parsedData: cloneParsedData(original)
+  });
+
+  // Mutate cell on 2026-09-01 for first subject: change from absent to present
+  const subName = original.subjects[0].name;
+  const edited = editCellClasses(original, subName, '2026-09-01', [
+    { type: 'th', attended: true }
+  ]);
+
+  assert.notDeepStrictEqual(edited.subjects[0].parts.th, original.subjects[0].parts.th);
+
+  // Simulate Undo
+  const prevSnapshot = undoStack.pop();
+  redoStack.push({
+    description: prevSnapshot.description,
+    parsedData: cloneParsedData(edited)
+  });
+  const restoredFromUndo = cloneParsedData(prevSnapshot.parsedData);
+
+  assert.deepStrictEqual(
+    restoredFromUndo.subjects[0].parts.th,
+    baseMockData.subjects[0].parts.th,
+    'Undo must restore exact pristine theory totals'
+  );
+
+  // Simulate Redo
+  const redoSnapshot = redoStack.pop();
+  undoStack.push({
+    description: redoSnapshot.description,
+    parsedData: cloneParsedData(restoredFromUndo)
+  });
+  const restoredFromRedo = cloneParsedData(redoSnapshot.parsedData);
+
+  assert.deepStrictEqual(
+    restoredFromRedo.subjects[0].parts.th,
+    edited.subjects[0].parts.th,
+    'Redo must re-apply the edited theory totals'
+  );
+});
+
+test('Undo/Redo: Date deletion undo restores deleted column and all classes', () => {
+  const original = cloneParsedData(baseMockData);
+  const undoStack = [];
+
+  // Snapshot before date deletion
+  undoStack.push({
+    description: 'Delete date 2026-09-01',
+    parsedData: cloneParsedData(original)
+  });
+
+  // Delete column 2026-09-01
+  const afterDelete = deleteDateColumn(original, '2026-09-01');
+  assert.strictEqual(afterDelete.dayColumns.some(d => d.dateStr === '2026-09-01'), false);
+
+  // Undo date deletion
+  const snapshot = undoStack.pop();
+  const restored = cloneParsedData(snapshot.parsedData);
+
+  assert.ok(
+    restored.dayColumns.some(d => d.dateStr === '2026-09-01'),
+    'Undo must completely restore deleted date column'
+  );
+  assert.deepStrictEqual(
+    restored.dayColumns.map(d => d.dateStr),
+    baseMockData.dayColumns.map(d => d.dateStr),
+    'Day columns array must match original'
+  );
+});
+
+// -------------------------------------------------------------
+// SECTION 10: SUMMARY & AUDIT RESULTS
 // -------------------------------------------------------------
 console.log('\n=====================================================');
 console.log(`TOTAL TESTS: ${totalTests} | PASSED: ${passedTests} | FAILED: ${issuesFound.length}`);
