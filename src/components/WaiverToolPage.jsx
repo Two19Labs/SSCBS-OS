@@ -210,6 +210,11 @@ export default function WaiverToolPage({ onBack }) {
   const [hoveredDate, setHoveredDate] = useState(null);
   const [popoverPos, setPopoverPos] = useState({ x: 0, y: 0 });
 
+  // Track manual attendance customizations diff
+  const customizationDiff = useMemo(() => {
+    return diffCustomizations(rawParsedData, parsedData);
+  }, [rawParsedData, parsedData]);
+
   // Web Worker ref
   const workerRef = useRef(null);
 
