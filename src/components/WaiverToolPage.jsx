@@ -3901,15 +3901,10 @@ export default function WaiverToolPage({ onBack }) {
                     </svg>
                     ★ Star (Prioritize)
                   </span>
+                  <span className="rd-legend-credits" title="Internal assessment marks are calculated per DU UGCF continuous assessment guidelines. Credits are auto-estimated from timetables—adjust the dropdown on any card if needed.">
+                    ℹ️ Credits auto-estimated · Adjust on cards if needed
+                  </span>
                 </div>
-              </div>
-
-              {/* Marks Transparency Note */}
-              <div className="rd-marks-transparency-note">
-                <span className="rd-note-icon">ℹ️</span>
-                <span className="rd-note-text">
-                  <strong>Verify Your Course Credits:</strong> Internal assessment marks are calculated using standard DU UGCF continuous assessment guidelines. Credits are automatically estimated from your class timetable. Please review each subject card below and adjust the <strong>Credits</strong> dropdown if any paper has a different credit weight.
-                </span>
               </div>
 
               {renderSubjectCards()}
