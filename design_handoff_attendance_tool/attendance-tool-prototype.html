@@ -1,0 +1,1266 @@
+<!doctype html>
+<!--
+  SSCBS Attendance Tool — redesigned UI, clickable design prototype (design only, sample data).
+
+  HOW TO USE (for the implementing agent):
+  - This file is a DESIGN REFERENCE. Recreate it in the existing React + Vite app
+    (src/components/WaiverToolPage.jsx + WaiverToolPage.css). Keep the real data,
+    solver and parser logic; change only the presentation to match this file.
+  - All styles are inline on each element, so exact colours, sizes, radii and spacing
+    can be read straight from the markup. The design tokens are listed in README.md.
+  - Each screen lives in a <template data-dc="..."> block, and its sample data plus
+    interaction state in the matching <script type="text/x-dc-logic"> (renderVals()).
+    {{name}} = value from renderVals(); <template data-k="for"> = list; <template data-k="if"> = condition.
+  - The small runtime at the bottom only exists to make this file clickable. Do not port it.
+
+  FLOW: Upload (click drop zone, then Analyse) → loading → Results with the
+  "Not eligible" notice → 1/3rd-rule alert → dashboard. On the dashboard: Expand grid,
+  grid tool tabs, credit pickers, the 1/3rd notice link, Replace sheet, and the CDC tile
+  (+ / −) or "+ Add CDC days", which switches the whole dashboard into its CDC state.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SSCBS Attendance Tool — Design Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f7f3ec}
+a{color:#7a1c28}a:hover{color:#5c1520}
+@keyframes proto-spin{to{transform:rotate(360deg)}}
+input[type=date]::-webkit-calendar-picker-indicator{opacity:.8}
+body{margin:0}
+</style>
+</head>
+<body>
+<div id="app" data-entry="Prototype"></div>
+
+<!-- ===== Screen: Prototype ===== -->
+<template data-dc="Prototype"><div style="min-height: 100vh; background: #f7f3ec; font-family: Manrope, system-ui, sans-serif; color: #1e1a17">
+
+  <template data-k="if" value="{{isUpload}}" hint-placeholder-val="{{true}}">
+    <dc-import name="Main" on-nav="{{nav}}" hint-size="100%,1000px"></dc-import>
+  </template>
+
+  <template data-k="if" value="{{isLoading}}" hint-placeholder-val="{{false}}">
+    <div style="min-height: 100vh; display: flex; flex-direction: column">
+      <nav style="display: flex; align-items: center; gap: 16px; padding: 14px 40px; background: #ffffff; border-bottom: 1px solid #e6dfd4">
+        <span style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border: 1px solid #e6dfd4; border-radius: 10px; font-size: 14px; font-weight: 700">← Campus OS</span>
+        <span style="display: flex; align-items: center; gap: 10px">
+          <img src="data:image/png;base64,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" alt="" width="28" height="28" style="width: 28px; height: 28px; object-fit: contain">
+          <span style="font-size: 19px; font-weight: 800">SSCBS <span style="color: #7a1c28">Attendance Tool</span></span>
+        </span>
+      </nav>
+      <div role="status" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 120px 16px">
+        <span style="width: 34px; height: 34px; box-sizing: border-box; border: 3px solid #e6dfd4; border-top-color: #7a1c28; border-radius: 999px; animation: proto-spin 0.8s linear infinite"></span>
+        <p style="margin: 0; font-size: 15px; font-weight: 600; color: #5f5852">Calculating optimal waiver plan...</p>
+      </div>
+    </div>
+  </template>
+
+  <template data-k="if" value="{{isResults}}" hint-placeholder-val="{{false}}">
+    <dc-import name="Results" on-nav="{{nav}}" hint-size="100%,3700px"></dc-import>
+  </template>
+
+  <template data-k="if" value="{{showIneligible}}" hint-placeholder-val="{{false}}">
+    <div style="position: fixed; inset: 0; z-index: 200; background: rgba(30,26,23,0.55); display: flex; align-items: center; justify-content: center; padding: 24px; overflow: auto">
+      <dc-import name="Ineligible" bare="{{yes}}" on-nav="{{nav}}" hint-size="580px,700px"></dc-import>
+    </div>
+  </template>
+
+  <template data-k="if" value="{{showThird}}" hint-placeholder-val="{{false}}">
+    <div style="position: fixed; inset: 0; z-index: 200; background: rgba(30,26,23,0.55); display: flex; align-items: center; justify-content: center; padding: 24px; overflow: auto">
+      <dc-import name="OneThird" bare="{{yes}}" on-nav="{{nav}}" hint-size="520px,400px"></dc-import>
+    </div>
+  </template>
+
+  <template data-k="if" value="{{showGrid}}" hint-placeholder-val="{{false}}">
+    <div style="position: fixed; inset: 0; z-index: 200; background: rgba(30,26,23,0.55); display: flex; align-items: flex-start; justify-content: center; padding: 32px; overflow: auto; box-sizing: border-box">
+      <div style="width: 100%; max-width: 1600px">
+        <dc-import name="GridExpanded" bare="{{yes}}" on-nav="{{nav}}" hint-size="100%,700px"></dc-import>
+      </div>
+    </div>
+  </template>
+</div>
+</template>
+<script type="text/x-dc-logic" data-dc="Prototype">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { screen: 'upload', overlay: null };
+  }
+  componentWillUnmount() { clearTimeout(this.timer); }
+  go(where) {
+    const top = () => { try { window.scrollTo(0, 0); } catch (e) {} };
+    if (where === 'analyse') {
+      this.setState({ screen: 'loading', overlay: null }); top();
+      clearTimeout(this.timer);
+      this.timer = setTimeout(() => { this.setState({ screen: 'results', overlay: 'ineligible' }); top(); }, 1400);
+    } else if (where === 'ack') {
+      this.setState({ overlay: 'onethird' });
+    } else if (where === 'onethird' || where === 'grid') {
+      this.setState({ overlay: where });
+    } else if (where === 'close') {
+      this.setState({ overlay: null });
+    } else if (where === 'upload') {
+      this.setState({ screen: 'upload', overlay: null }); top();
+    }
+  }
+  renderVals() {
+    const { screen, overlay } = this.state;
+    return {
+      yes: true,
+      nav: (where) => this.go(where),
+      isUpload: screen === 'upload',
+      isLoading: screen === 'loading',
+      isResults: screen === 'results',
+      showIneligible: screen === 'results' && overlay === 'ineligible',
+      showThird: screen === 'results' && overlay === 'onethird',
+      showGrid: screen === 'results' && overlay === 'grid'
+    };
+  }
+}
+</script>
+
+<!-- ===== Screen: Main ===== -->
+<template data-dc="Main"><div style="min-height: 1000px; background: #f7f3ec; color: #1e1a17; font-family: Manrope, system-ui, sans-serif; display: flex; flex-direction: column">
+  <nav style="display: flex; align-items: center; gap: 16px; padding: 14px 40px; background: #ffffff; border-bottom: 1px solid #e6dfd4; flex-wrap: wrap">
+    <a href="#" style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border: 1px solid #e6dfd4; border-radius: 10px; background: #ffffff; color: #1e1a17; font-size: 14px; font-weight: 700; text-decoration: none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      Campus OS
+    </a>
+    <div style="display: flex; align-items: center; gap: 10px">
+      <img src="data:image/png;base64,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" alt="" width="28" height="28" style="width: 28px; height: 28px; object-fit: contain">
+      <span style="font-size: 19px; font-weight: 800">SSCBS <span style="color: #7a1c28">Attendance Tool</span></span>
+    </div>
+  </nav>
+
+  <main style="flex: 1; display: flex; justify-content: center; padding: 48px 16px 48px">
+    <section style="width: 100%; max-width: 680px; box-sizing: border-box; background: #ffffff; border: 1px solid #e6dfd4; border-radius: 24px; padding: 48px 48px 44px; display: flex; flex-direction: column; gap: 24px; box-shadow: 0 1px 2px rgba(30,26,23,0.04)">
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <h1 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.01em">Upload your attendance sheet</h1>
+        <p style="margin: 0; font-size: 15px; line-height: 1.55; color: #5f5852">Use the attendance report exported from the college ERP portal. We read every class you attended or missed and work out which dates are worth waiving.</p>
+      </div>
+
+      <button type="button" onClick="{{pick}}" aria-label="Choose attendance sheet" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; height: 212px; border: 1.5px dashed {{dzBorder}}; border-radius: 14px; background: {{dzBg}}; cursor: pointer; text-align: center; font-family: inherit; color: #1e1a17">
+        <span style="width: 46px; height: 46px; border-radius: 999px; background: #efe8df; display: flex; align-items: center; justify-content: center; margin-bottom: 6px">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1e1a17" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        </span>
+        <template data-k="if" value="{{empty}}" hint-placeholder-val="{{true}}">
+          <span style="display: flex; flex-direction: column; gap: 10px; align-items: center">
+            <span style="font-size: 15px; font-weight: 600">Drop the file here, or <span style="color: #7a1c28; text-decoration: underline">browse</span></span>
+            <span style="font-size: 12.5px; color: #8a8279">.xls (HTML export) or .xlsx</span>
+          </span>
+        </template>
+        <template data-k="if" value="{{ready}}" hint-placeholder-val="{{false}}">
+          <span style="display: flex; flex-direction: column; gap: 6px; align-items: center">
+            <span style="font-size: 15px; font-weight: 800">Student Attandance_2026-11-09_10_00_00.xls</span>
+            <span style="font-size: 12.5px; color: #5f5852">(34.5 KB)</span>
+            <span style="font-size: 12.5px; color: #7a1c28; text-decoration: underline">Click to choose another</span>
+          </span>
+        </template>
+      </button>
+
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="border: 1px solid #e6dfd4; border-radius: 12px; background: #fffdf9; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px">
+          <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #5f5852">Waiver timeline</span>
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+            <label for="from" style="font-size: 13px; font-weight: 700; color: #5f5852">From</label>
+            <input id="from" type="date" style="flex: 1; min-width: 160px; height: 38px; box-sizing: border-box; padding: 0 12px; border: 1px solid #e6dfd4; border-radius: 8px; background: #f6f1eb; font-family: inherit; font-size: 14px; font-weight: 600; color: #1e1a17">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5f5852" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            <label for="to" style="font-size: 13px; font-weight: 700; color: #5f5852">To</label>
+            <input id="to" type="date" style="flex: 1; min-width: 160px; height: 38px; box-sizing: border-box; padding: 0 12px; border: 1px solid #e6dfd4; border-radius: 8px; background: #f6f1eb; font-family: inherit; font-size: 14px; font-weight: 600; color: #1e1a17">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px">
+          <template data-k="for" list="{{params}}" as="p" hint-placeholder-count="4">
+            <div style="border: 1px solid #e6dfd4; border-radius: 12px; background: #fffdf9; padding: 12px 12px 12px 14px; display: flex; flex-direction: column; gap: 8px; min-width: 0">
+              <span style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #5f5852; white-space: nowrap">{{p.label}}</span>
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px">
+                <span style="display: flex; align-items: baseline; gap: 5px; min-width: 0"><b style="font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums">{{p.value}}</b><span style="font-size: 12px; font-weight: 700; color: #5f5852">{{p.unit}}</span></span>
+                <span style="display: flex; flex-direction: column; gap: 3px">
+                  <button type="button" aria-label="Increase" style="width: 20px; height: 14px; padding: 0; border: 1px solid #e6dfd4; border-radius: 3px; background: #f6f1eb; font-size: 7px; color: #1e1a17; cursor: pointer">▲</button>
+                  <button type="button" aria-label="Decrease" style="width: 20px; height: 14px; padding: 0; border: 1px solid #e6dfd4; border-radius: 3px; background: #f6f1eb; font-size: 7px; color: #1e1a17; cursor: pointer">▼</button>
+                </span>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <p style="margin: 2px 0 0; font-size: 13px; line-height: 1.5; color: #8a8279">Waivers will only be recommended between the chosen From and To dates. Career Development Centre (CDC) attendance allows converting absences into presents across all months. Leave 0 if not applicable. You can adjust all parameters later.</p>
+      </div>
+
+      <template data-k="if" value="{{empty}}" hint-placeholder-val="{{true}}">
+        <button type="button" disabled style="width: 100%; height: 52px; border: 0; border-radius: 12px; background: #e6dfd7; color: #a39a90; font-family: inherit; font-size: 16px; font-weight: 700; cursor: not-allowed">Analyse attendance</button>
+      </template>
+      <template data-k="if" value="{{ready}}" hint-placeholder-val="{{false}}">
+        <button type="button" onClick="{{analyse}}" style="width: 100%; height: 52px; border: 0; border-radius: 12px; background: #7a1c28; color: #ffffff; font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 6px rgba(122,28,40,0.25)">Analyse attendance</button>
+      </template>
+      <p style="margin: 0; text-align: center; font-size: 12.5px; color: #8a8279">Your sheet stays in this browser. Nothing is uploaded to a server.</p>
+    </section>
+  </main>
+</div>
+</template>
+<script type="text/x-dc-logic" data-dc="Main">
+class Component extends DCLogic {
+  renderVals() {
+    const ready = !!(this.state && this.state.ready);
+    return {
+      ready, empty: !ready,
+      dzBorder: ready ? '#3f8f63' : '#d9c3be',
+      dzBg: ready ? '#f1f7f2' : '#faf6f1',
+      pick: () => this.setState({ ready: true }),
+      analyse: () => { if (this.props.onNav) this.props.onNav('analyse'); },
+      params: [
+        { label: 'Target', value: '85', unit: '%' },
+        { label: 'Waiver limit', value: '12', unit: 'dates' },
+        { label: 'Semester start', value: 'August', unit: '' },
+        { label: 'CDC attendance', value: '0', unit: 'dates' }
+      ]
+    };
+  }
+}
+</script>
+
+<!-- ===== Screen: Results ===== -->
+<template data-dc="Results"><div style="min-height: 3700px; background: #f7f3ec; color: #1e1a17; font-family: Manrope, system-ui, sans-serif">
+
+  <nav style="display: flex; align-items: center; gap: 16px; padding: 14px 40px; background: #ffffff; border-bottom: 1px solid #e6dfd4; flex-wrap: wrap">
+    <a href="#" style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border: 1px solid #e6dfd4; border-radius: 10px; background: #ffffff; color: #1e1a17; font-size: 14px; font-weight: 700; text-decoration: none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      Campus OS
+    </a>
+    <div style="display: flex; align-items: center; gap: 10px">
+      <img src="data:image/png;base64,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" alt="" width="28" height="28" style="width: 28px; height: 28px; object-fit: contain">
+      <span style="font-size: 19px; font-weight: 800">SSCBS <span style="color: #7a1c28">Attendance Tool</span></span>
+    </div>
+    <div style="margin-left: auto; display: flex; align-items: center; gap: 16px; min-width: 0">
+      <span style="max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 600; color: #5f5852">Student Attandance_2026-11-09_10_00_00.xls</span>
+      <button type="button" onClick="{{goUpload}}" style="padding: 8px 12px; border: 1px solid #e6dfd4; border-radius: 10px; background: #ffffff; font-family: inherit; font-size: 13px; font-weight: 700; color: #1e1a17; cursor: pointer; white-space: nowrap">Replace sheet</button>
+    </div>
+  </nav>
+
+  <main style="max-width: 1400px; margin: 0 auto; box-sizing: border-box; padding: 28px 40px 60px; display: flex; flex-direction: column; gap: 24px">
+
+    
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px">
+        <template data-k="for" list="{{stats}}" as="s" hint-placeholder-count="6">
+          <div style="border: 1px solid #e6dfd4; background: #ffffff; border-radius: 14px; padding: 14px 14px 14px 14px; display: flex; flex-direction: column; gap: 6px; min-width: 0">
+            <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #5f5852">{{s.label}}</span>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <span style="flex: 1; display: flex; align-items: baseline; gap: 5px; min-width: 0; white-space: nowrap">
+                <b style="font-size: {{s.numSize}}; font-weight: 800; font-variant-numeric: tabular-nums">{{s.num}}</b><span style="font-size: 16px; font-weight: 700; color: #8a8279">{{s.of}}</span><span style="font-size: 13px; font-weight: 600; color: #5f5852">{{s.unit}}</span>
+              </span>
+              <template data-k="if" value="{{s.steps}}" hint-placeholder-val="{{true}}">
+                <span style="display: flex; gap: 4px">
+                  <button type="button" aria-label="Decrease" onClick="{{s.dec}}" style="width: 24px; height: 24px; padding: 0; border: 1px solid #e6dfd4; border-radius: 6px; background: #f6f1eb; font-family: inherit; font-size: 14px; font-weight: 800; color: #1e1a17; cursor: pointer">−</button>
+                  <button type="button" aria-label="Increase" onClick="{{s.inc}}" style="width: 24px; height: 24px; padding: 0; border: 1px solid #e6dfd4; border-radius: 6px; background: #f6f1eb; font-family: inherit; font-size: 14px; font-weight: 800; color: #1e1a17; cursor: pointer">+</button>
+                </span>
+              </template>
+              <template data-k="if" value="{{s.edit}}" hint-placeholder-val="{{false}}">
+                <button type="button" aria-label="Edit" style="width: 24px; height: 24px; padding: 0; border: 1px solid #e6dfd4; border-radius: 6px; background: #f6f1eb; color: #8a8279; cursor: pointer; display: flex; align-items: center; justify-content: center">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+                </button>
+              </template>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      
+      <div role="status" style="display: flex; flex-wrap: wrap; align-items: stretch; border: 1px solid #ecdcb8; background: #fdfaf3; border-radius: 14px; padding: 14px 8px; row-gap: 14px">
+        <div style="flex: 1.25 1 240px; display: flex; align-items: center; gap: 12px; padding: 0 16px 0 10px; border-right: 1px solid #efe4cc; min-width: 0">
+          <span style="width: 42px; height: 42px; flex: 0 0 42px; border-radius: 11px; background: #fdeccf; display: flex; align-items: center; justify-content: center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          </span>
+          <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+            <span style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #b45309">Below target</span>
+            <strong style="font-size: 16px; font-weight: 800; white-space: nowrap">{{sb.headline}}</strong>
+            <span style="font-size: 12.5px; font-weight: 600; color: #5f5852">{{sb.sub}}</span>
+          </div>
+        </div>
+        <div style="flex: 1.45 1 260px; display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 0 18px; border-right: 1px solid #efe4cc; min-width: 0">
+          <div style="display: flex; align-items: baseline; justify-content: space-between">
+            <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #5f5852">Parts on target</span>
+            <span style="font-size: 13px; font-weight: 800">{{sb.met}}<span style="color: #8a8279">/8</span></span>
+          </div>
+          <div style="display: flex; gap: 3px">
+            <template data-k="for" list="{{bannerParts}}" as="bp" hint-placeholder-count="8">
+              <span title="{{bp.label}}" style="flex: 1; height: 8px; border-radius: 3px; background: {{bp.color}}"></span>
+            </template>
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap">
+            <template data-k="for" list="{{sb.attention}}" as="at" hint-placeholder-count="2">
+              <span style="padding: 2px 7px; border-radius: 999px; background: #fdeccf; color: #b45309; font-size: 11px; font-weight: 700">{{at}}</span>
+            </template>
+          </div>
+        </div>
+        <div style="flex: 1.3 1 240px; display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 0 18px; border-right: 1px solid #efe4cc; min-width: 0">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px">
+            <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #5f5852">Internal marks</span>
+            <span style="display: flex; align-items: baseline; gap: 6px"><b style="font-size: 15px; font-weight: 800">{{sb.marks}}</b><span style="padding: 1px 6px; border-radius: 5px; background: #dcf2e3; color: #15803d; font-size: 11px; font-weight: 800">{{sb.gain}}</span></span>
+          </div>
+          <div style="position: relative; height: 8px; border-radius: 999px; background: #ece6dc; overflow: hidden">
+            <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 39%; background: #b8ab9b"></div>
+            <div style="position: absolute; top: 0; bottom: 0; left: 39%; width: 40%; background: #15803d"></div>
+            <div style="position: absolute; top: 0; bottom: 0; left: 79%; width: {{sb.cdcW}}; background: #0284c7"></div>
+          </div>
+          <span style="font-size: 11.5px; font-weight: 600; color: #8a8279">{{sb.marksNote}}</span>
+        </div>
+        <div style="flex: 1 1 180px; display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 0 18px; min-width: 0">
+          <div style="display: flex; align-items: baseline; justify-content: space-between">
+            <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #5f5852">{{sb.useLabel}}</span>
+            <span style="font-size: 13px; font-weight: 800">{{sb.used}}<span style="color: #8a8279">/{{sb.cap}}</span></span>
+          </div>
+          <div style="display: flex; gap: 3px; height: 8px">
+            <div style="flex: 12 1 0; position: relative; border-radius: 999px; background: #ece6dc; overflow: hidden">
+              <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 100%; border-radius: 999px; background: #7a1c28"></div>
+            </div>
+            <template data-k="if" value="{{cdc}}" hint-placeholder-val="{{false}}">
+              <div style="flex: 3 1 0; position: relative; border-radius: 999px; background: #0284c7"></div>
+            </template>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 11.5px; font-weight: 600; color: #8a8279">
+            <template data-k="if" value="{{noCdc}}" hint-placeholder-val="{{true}}">
+              <span style="display: flex; gap: 10px; align-items: center">
+                <span>Limit reached</span>
+                <button type="button" onClick="{{toggleCdc}}" style="padding: 0; border: 0; background: transparent; font-family: inherit; font-size: 11.5px; font-weight: 700; color: #0369a1; text-decoration: underline; cursor: pointer">+ Add CDC days</button>
+              </span>
+            </template>
+            <template data-k="if" value="{{cdc}}" hint-placeholder-val="{{false}}">
+              <span style="display: flex; gap: 10px; align-items: center">
+                <span style="display: inline-flex; align-items: center; gap: 5px"><i style="width: 8px; height: 8px; border-radius: 2px; background: #7a1c28"></i>12/12 waivers</span>
+                <span style="display: inline-flex; align-items: center; gap: 5px"><i style="width: 8px; height: 8px; border-radius: 2px; background: #0284c7"></i>3/3 CDC</span>
+              </span>
+            </template>
+          </div>
+        </div>
+        <div style="flex: 0 0 auto; display: flex; align-items: center; padding: 0 10px 0 8px">
+          <button type="button" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 14px; border: 1px solid #e6dfd4; border-radius: 10px; background: #ffffff; font-family: inherit; font-size: 13.5px; font-weight: 700; color: #5f5852; cursor: pointer; white-space: nowrap">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Recommended applied
+          </button>
+        </div>
+      </div>
+    </div>
+
+    
+    <div style="background: #ffffff; border: 1px solid #e6dfd4; border-radius: 16px; padding: 16px 24px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; box-shadow: 0 1px 2px rgba(30,26,23,0.04)">
+      <template data-k="for" list="{{totals}}" as="t" hint-placeholder-count="3">
+        <div style="display: flex; flex-direction: column; gap: 8px; padding-right: 24px; border-right: {{t.divider}}; min-width: 0">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px">
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+                <span style="font-size: 11.5px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: #5f5852">{{t.label}}</span>
+                <template data-k="if" value="{{t.adjust}}" hint-placeholder-val="{{false}}">
+                  <button type="button" style="padding: 2px 8px; border: 1px solid #e6dfd4; border-radius: 6px; background: #f7f3ee; font-family: inherit; font-size: 11px; font-weight: 600; color: #5f5852; cursor: pointer">✎ Adjust Total (+/-)</button>
+                </template>
+              </div>
+              <template data-k="if" value="{{t.ineligible}}" hint-placeholder-val="{{false}}">
+                <span style="padding: 2px 7px; border: 1px solid #fecaca; border-radius: 999px; background: #fee2e2; color: #b91c1c; font-size: 10px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase">Ineligible for submission</span>
+              </template>
+              <template data-k="if" value="{{t.rescued}}" hint-placeholder-val="{{false}}">
+                <span style="padding: 2px 7px; border: 1px solid #bae6fd; border-radius: 999px; background: #e0f2fe; color: #0369a1; font-size: 10px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase">Rescued via CDC attendance</span>
+              </template>
+            </div>
+            <span style="padding: 4px 10px; border-radius: 999px; background: {{t.badgeBg}}; color: {{t.badgeFg}}; font-size: 11.5px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap">{{t.badge}}</span>
+          </div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+            <span style="display: flex; align-items: baseline; gap: 8px"><b style="font-size: 20px; font-weight: 800; color: {{t.pctColor}}; font-variant-numeric: tabular-nums">{{t.pct}}</b><span style="font-size: 14px; font-weight: 600; color: #5f5852">{{t.frac}}</span></span>
+            <span style="font-size: 12px; font-weight: 600; color: #5f5852">{{t.was}}</span>
+          </div>
+          <div style="position: relative; height: 14px; border-radius: 999px; background: #ece6dc; margin-top: 4px">
+            <div style="position: absolute; left: 0; top: 0; bottom: 0; width: {{t.fill}}; border-radius: 999px; background: {{t.fillColor}}"></div>
+            <div style="position: absolute; top: 2px; left: {{t.ghost}}; width: 3px; height: 10px; margin-left: -1.5px; border-radius: 2px; background: rgba(255,255,255,0.9)"></div>
+            <div style="position: absolute; top: -5px; left: 85%; width: 2px; height: 24px; margin-left: -1px; border-radius: 1px; background: #1e1a17"></div>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    
+    <div style="display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start">
+
+      
+      <section style="flex: 5 1 480px; min-width: 0; display: flex; flex-direction: column">
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px">
+          <h2 style="margin: 0; font-size: 22px; font-weight: 800">Subject health</h2>
+          <span style="margin-top: -6px; font-size: 13px; font-weight: 500; color: #5f5852">Star any subject to prioritize it for waivers</span>
+          <div style="display: flex; flex-wrap: wrap; gap: 16px; font-size: 12.5px; font-weight: 600; color: #5f5852">
+            <span style="display: inline-flex; align-items: center; gap: 6px"><i style="width: 14px; height: 8px; border-radius: 99px; background: #15803d"></i>85% or above (Target)</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px"><i style="width: 14px; height: 8px; border-radius: 99px; background: #d97706"></i>66.7% – 84.9% (Below Target)</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px"><i style="width: 14px; height: 8px; border-radius: 99px; background: #b91c1c"></i>Below 66.7% (Risk)</span>
+          </div>
+          <span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border: 1px solid #f0d28a; border-radius: 999px; background: #fdf3dc; font-size: 12.5px; font-weight: 700; color: #b45309">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#f5b301" stroke="#b45309" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.1 8.3 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 8.9 8.3 12 2"></polygon></svg>
+            ★ Star (Prioritize)
+          </span>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; border: 1px solid #e6dfd4; border-radius: 8px; background: #fbf9f5; font-size: 11.5px; line-height: 1.45; color: #5f5852">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex: 0 0 16px" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"></rect><line x1="12" y1="11" x2="12" y2="16"></line><line x1="12" y1="7.5" x2="12.01" y2="7.5"></line></svg>
+            <span style="padding-left: 10px"><b style="color: #1e1a17">Verify Your Course Credits:</b> Internal assessment marks are calculated using standard DU UGCF continuous assessment guidelines. Credits are automatically estimated from your class timetable. Please review each subject card below and adjust the <b style="color: #1e1a17">Credits</b> dropdown if any paper has a different credit weight.</span>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px">
+          <template data-k="for" list="{{subjects}}" as="sub" hint-placeholder-count="7">
+            <article style="background: #ffffff; border: 1px solid #e6dfd4; border-radius: 16px; padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 1px 2px rgba(30,26,23,0.04)">
+              <div style="display: flex; align-items: center; gap: 12px">
+                <template data-k="if" value="{{sub.star}}" hint-placeholder-val="{{true}}">
+                  <button type="button" aria-label="Star subject" style="width: 28px; height: 28px; padding: 0; border: 0; background: transparent; color: #8a8279; cursor: pointer; display: flex; align-items: center; justify-content: center">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.1 8.3 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 8.9 8.3 12 2"></polygon></svg>
+                  </button>
+                </template>
+                <template data-k="if" value="{{sub.prTag}}" hint-placeholder-val="{{false}}">
+                  <span style="padding: 2px 6px; border-radius: 4px; background: #e7ebf0; color: #64748b; font-size: 9.5px; font-weight: 800; letter-spacing: 0.06em">PRACTICAL</span>
+                </template>
+                <h3 style="flex: 1; margin: 0; font-size: 17px; font-weight: 700; min-width: 0">{{sub.name}}</h3>
+                <span style="padding: 4px 10px; border-radius: 999px; background: {{sub.badgeBg}}; color: {{sub.badgeFg}}; font-size: 11.5px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap">{{sub.badge}}</span>
+              </div>
+
+              <template data-k="if" value="{{sub.marks}}" hint-placeholder-val="{{true}}">
+                <div style="display: flex; flex-direction: column; gap: 7px; margin-top: -4px">
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap">
+                    <div style="display: flex; align-items: baseline; gap: 7px">
+                      <span style="font-size: 12px; font-weight: 600; color: #5f5852">Marks</span>
+                      <b style="font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums">{{sub.marks}}</b>
+                      <span style="font-size: 11.5px; font-weight: 800; color: #15803d">{{sub.gain}}</span>
+                    </div>
+                    <div role="radiogroup" aria-label="Credits" style="display: inline-flex; gap: 1px; padding: 1px; border-radius: 7px; background: #f1ece5">
+                      <template data-k="for" list="{{sub.creditOpts}}" as="co" hint-placeholder-count="3">
+                        <button type="button" role="radio" aria-checked="{{co.on}}" onClick="{{co.pick}}" style="padding: 2px 7px; border: 0; border-radius: 6px; background: {{co.bg}}; box-shadow: {{co.shadow}}; font-family: inherit; font-size: 10.5px; font-weight: 700; color: {{co.fg}}; cursor: pointer; white-space: nowrap">{{co.label}}</button>
+                      </template>
+                    </div>
+                  </div>
+                  <div style="display: flex; gap: 3px">
+                    <template data-k="for" list="{{sub.segs}}" as="g" hint-placeholder-count="2">
+                      <div title="{{g.name}} {{g.got}}/{{g.max}} M" style="flex: {{g.max}} 1 0; position: relative; height: 5px; border-radius: 999px; background: #ece6dc; overflow: hidden">
+                        <div style="position: absolute; top: 0; bottom: 0; left: 0; width: {{g.baseW}}; background: #c4b8a9"></div>
+                        <div style="position: absolute; top: 0; bottom: 0; left: {{g.baseW}}; width: {{g.gainW}}; background: #15803d"></div>
+                        <div style="position: absolute; top: 0; bottom: 0; left: {{g.cdcL}}; width: {{g.cdcW}}; background: #0284c7"></div>
+                      </div>
+                    </template>
+                  </div>
+                  <div style="display: flex; gap: 3px">
+                    <template data-k="for" list="{{sub.segs}}" as="g" hint-placeholder-count="2">
+                      <span style="flex: {{g.max}} 1 0; font-size: 10.5px; font-weight: 600; color: #8a8279">{{g.name}} <b style="color: #5f5852">{{g.got}}/{{g.max}}</b></span>
+                    </template>
+                  </div>
+                </div>
+              </template>
+
+              <template data-k="for" list="{{sub.parts}}" as="pt" hint-placeholder-count="3">
+                <div style="display: flex; flex-direction: column; gap: 8px; padding-top: {{pt.padTop}}; border-top: {{pt.rule}}">
+                  <template data-k="if" value="{{pt.has}}" hint-placeholder-val="{{true}}">
+                    <div style="display: flex; flex-direction: column; gap: 8px">
+                      <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap">
+                        <span style="display: flex; align-items: baseline; gap: 8px">
+                          <span style="font-size: 15px; font-weight: 700">{{pt.name}}</span>
+                          <span style="font-size: 13px; font-weight: 600; color: #5f5852">{{pt.frac}}</span>
+                          <template data-k="if" value="{{pt.info}}" hint-placeholder-val="{{false}}">
+                            <span style="padding: 2px 7px; border-radius: 999px; background: #e7ebf0; color: #64748b; font-size: 11px; font-weight: 700; letter-spacing: 0.04em">INFO ONLY</span>
+                          </template>
+                          <template data-k="if" value="{{pt.cdcTag}}" hint-placeholder-val="{{false}}">
+                            <span style="padding: 2px 7px; border: 1px solid #bae6fd; border-radius: 999px; background: #e0f2fe; color: #0369a1; font-size: 11px; font-weight: 700">{{pt.cdcTag}}</span>
+                          </template>
+                        </span>
+                        <span style="display: flex; align-items: baseline; gap: 8px">
+                          <span style="font-size: 12px; font-weight: 600; color: #5f5852">{{pt.was}}</span>
+                          <b style="font-size: 20px; font-weight: 800; color: {{pt.color}}; font-variant-numeric: tabular-nums">{{pt.pct}}</b>
+                          <span style="padding: 1px 6px; border-radius: 5px; background: #ece6dc; color: #5f5852; font-size: 11px; font-weight: 700">{{pt.chip}}</span>
+                        </span>
+                      </div>
+                      <div style="position: relative; height: 14px; border-radius: 999px; background: #ece6dc">
+                        <div style="position: absolute; left: 0; top: 0; bottom: 0; width: {{pt.fill}}; border-radius: 999px; background: {{pt.fillColor}}"></div>
+                        <div style="position: absolute; top: 2px; left: {{pt.ghost}}; width: 3px; height: 10px; margin-left: -1.5px; border-radius: 2px; background: rgba(255,255,255,0.9)"></div>
+                        <div style="position: absolute; top: -5px; left: 85%; width: 2px; height: 24px; margin-left: -1px; border-radius: 1px; background: #1e1a17"></div>
+                      </div>
+                      <span style="font-size: 12.5px; color: #5f5852">{{pt.c1}}<b style="color: #1e1a17">{{pt.c2}}</b>{{pt.c3}}</span>
+                      <template data-k="if" value="{{pt.third}}" hint-placeholder-val="{{false}}">
+                        <div style="display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 1px solid #f3d9a4; border-radius: 10px; background: #fdf6e7; font-size: 12.5px; line-height: 1.5; color: #7c4a03">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="#f5b301" stroke="#7c4a03" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex: 0 0 16px; margin-top: 2px" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                          <span><b>1/3rd Rule Notice:</b> You have waived off 4 of 8 tutorial classes (50%), which exceeds one-third of total classes (max 2 allowed). <button type="button" onClick="{{goThird}}" style="padding: 0; border: 0; background: transparent; font-family: inherit; font-size: 12.5px; font-weight: 700; color: #7c4a03; text-decoration: underline; cursor: pointer">Double-check the 1/3rd rule.</button></span>
+                        </div>
+                      </template>
+                    </div>
+                  </template>
+                  <template data-k="if" value="{{pt.none}}" hint-placeholder-val="{{false}}">
+                    <div style="display: flex; flex-direction: column; gap: 8px">
+                      <div style="display: flex; justify-content: space-between; align-items: baseline">
+                        <span style="font-size: 15px; font-weight: 700; color: #8a8279">{{pt.name}}</span>
+                        <span style="font-size: 13px; font-weight: 600; color: #8a8279">No classes</span>
+                      </div>
+                      <div style="height: 12px; box-sizing: border-box; border: 1.5px dashed #d6cec2; border-radius: 999px"></div>
+                    </div>
+                  </template>
+                </div>
+              </template>
+            </article>
+          </template>
+        </div>
+      </section>
+
+      
+      <aside style="flex: 6 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+        <section style="background: #ffffff; border: 1px solid #e6dfd4; border-radius: 16px; overflow: hidden">
+          <div style="padding: 16px 20px; border-bottom: 1px solid #e6dfd4; display: flex; flex-direction: column; gap: 12px">
+            <div style="display: flex; flex-direction: column; gap: 2px">
+              <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+                <h2 style="margin: 0; font-size: 18px; font-weight: 800">Spreadsheet grid</h2>
+                <span style="display: inline-flex; gap: 4px; padding: 2px 4px; border: 1px solid #e6dfd4; border-radius: 8px; background: #f4eee9">
+                  <button type="button" disabled style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border: 0; background: transparent; font-family: inherit; font-size: 12px; font-weight: 600; color: #a39a90">↶ Undo</button>
+                  <button type="button" disabled style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border: 0; background: transparent; font-family: inherit; font-size: 12px; font-weight: 600; color: #a39a90">↷ Redo</button>
+                </span>
+              </div>
+              <span style="font-size: 13px; color: #5f5852">Click a date to waive or restore that whole day</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+              <div role="group" aria-label="Grid tool" style="display: inline-flex; gap: 2px; padding: 2px; border: 1px solid #e6dfd4; border-radius: 10px; background: #efe8de; flex-wrap: wrap">
+                <template data-k="for" list="{{tabs}}" as="tb" hint-placeholder-count="4">
+                  <button type="button" aria-pressed="{{tb.pressed}}" onClick="{{tb.pick}}" style="padding: 5px 10px; border: 0; border-radius: 8px; background: {{tb.bg}}; box-shadow: {{tb.shadow}}; font-family: inherit; font-size: 12px; font-weight: 700; color: {{tb.fg}}; cursor: pointer">{{tb.label}}</button>
+                </template>
+              </div>
+              <button type="button" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 12px; border: 1px solid #e6dfd4; border-radius: 10px; background: #ffffff; font-family: inherit; font-size: 13px; font-weight: 600; color: #5f5852; cursor: pointer">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Recommended applied
+              </button>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <button type="button" style="padding: 9px 12px; border: 1px solid #e6dfd4; border-radius: 10px; background: #ffffff; font-family: inherit; font-size: 13px; font-weight: 700; color: #5f5852; cursor: pointer">Clear</button>
+              <a href="GridExpanded.dc.html" onClick="{{goGrid}}" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 10px; background: #1e1a17; color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                Expand grid
+              </a>
+            </div>
+          </div>
+
+          <div style="position: relative; overflow-x: auto">
+            <table style="border-collapse: separate; border-spacing: 0; font-size: 13px">
+              <thead>
+                <tr>
+                  <th rowspan="2" style="position: sticky; left: 0; z-index: 3; background: #ffffff; box-shadow: 1px 0 0 #e6dfd4; width: 150px; min-width: 150px; text-align: left; vertical-align: bottom; padding: 8px 12px 8px 16px; font-size: 11px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: #5f5852">Subject</th>
+                  <th colspan="3" style="border-left: 1px solid #e6dfd4; text-align: left; padding: 8px 0 4px 8px; font-size: 12px; font-weight: 800">July 2026</th>
+                  <th colspan="12" style="border-left: 1px solid #e6dfd4; text-align: left; padding: 8px 0 4px 8px; font-size: 12px; font-weight: 800">August 2026</th>
+                </tr>
+                <tr>
+                  <template data-k="for" list="{{pDates}}" as="d" hint-placeholder-count="15">
+                    <th style="border-left: 1px solid #e6dfd4; width: 33px; min-width: 33px; padding: 2px 0 6px; opacity: {{d.op}}">
+                      <button type="button" aria-pressed="{{d.on}}" aria-label="Toggle {{d.wd}} {{d.dn}}" style="width: calc(100% - 6px); margin: 0 auto; padding: 4px 0; border: 0; border-radius: 8px; background: {{d.bg}}; color: {{d.fg}}; font-family: inherit; display: flex; flex-direction: column; align-items: center; gap: 1px; cursor: pointer; overflow: hidden">
+                        <span style="font-size: 10px; font-weight: 700; color: {{d.wdc}}">{{d.wd}}</span>
+                        <span style="font-size: 13px; font-weight: 800">{{d.dn}}</span>
+                      </button>
+                    </th>
+                  </template>
+                </tr>
+              </thead>
+              <tbody>
+                <template data-k="for" list="{{pRows}}" as="r" hint-placeholder-count="7">
+                  <tr>
+                    <td style="position: sticky; left: 0; z-index: 2; background: #ffffff; box-shadow: 1px 0 0 #e6dfd4; border-top: 1px solid #e6dfd4; width: 150px; min-width: 150px; max-width: 150px; text-align: left; padding: 8px 12px 8px 16px; font-size: 13px; font-weight: 700; line-height: 1.3">{{r.name}}</td>
+                    <template data-k="for" list="{{r.cells}}" as="c" hint-placeholder-count="15">
+                      <td style="border-left: 1px solid #e6dfd4; border-top: 1px solid #e6dfd4; background: {{c.bg}}; text-align: center; vertical-align: middle; padding: 6px 0; opacity: {{c.op}}">
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 3px">
+                          <template data-k="if" value="{{c.empty}}" hint-placeholder-val="{{false}}"><span style="font-size: 12px; color: #cfc7bc">·</span></template>
+                          <template data-k="for" list="{{c.chips}}" as="ch" hint-placeholder-count="1">
+                            <span style="display: inline-flex; align-items: baseline; justify-content: center; gap: 1px; min-width: 26px; box-sizing: border-box; padding: 2px 3px; border-radius: 5px; background: {{ch.bg}}; color: {{ch.fg}}; text-decoration: {{ch.td}}; font-size: 11px; font-weight: 800; line-height: 1.2">{{ch.s}}<small style="font-size: 8.5px; font-weight: 700">{{ch.t}}</small></span>
+                          </template>
+                        </div>
+                      </td>
+                    </template>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+            <div style="pointer-events: none; position: absolute; top: 0; bottom: 0; right: 0; width: 140px; background: linear-gradient(90deg, rgba(255,255,255,0), #ffffff 75%)"></div>
+          </div>
+
+          <div style="border-top: 1px solid #e6dfd4; background: #fcfaf7; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 12.5px; font-weight: 600; color: #5f5852">
+            <span>Showing 29 Jul to 20 Aug of 55 class days</span>
+            <span style="display: flex; align-items: center; gap: 12px">
+              <span style="padding: 2px 8px; border-radius: 999px; background: #f6e7e9; color: #7a1c28; font-size: 11.5px; font-weight: 800">12 of 12 waived</span>
+              <template data-k="if" value="{{cdc}}" hint-placeholder-val="{{false}}">
+                <span style="padding: 2px 8px; border-radius: 999px; background: #e0f2fe; color: #0369a1; font-size: 11.5px; font-weight: 800">3 CDC</span>
+              </template>
+              <span style="display: inline-flex; align-items: center; gap: 6px"><i style="width: 12px; height: 12px; border-radius: 4px; background: #7a1c28"></i>Waived</span>
+              <template data-k="if" value="{{cdc}}" hint-placeholder-val="{{false}}">
+                <span style="display: inline-flex; align-items: center; gap: 6px"><i style="width: 12px; height: 12px; border-radius: 4px; background: #0284c7"></i>CDC</span>
+              </template>
+            </span>
+          </div>
+        </section>
+
+        <section style="background: #ffffff; border: 1px solid #e6dfd4; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 16px">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap">
+            <div style="display: flex; align-items: center; gap: 10px">
+              <h2 style="margin: 0; font-size: 18px; font-weight: 800">Recommended dates</h2>
+              <span style="padding: 3px 10px; border-radius: 999px; background: #f6e7e9; color: #7a1c28; font-size: 13px; font-weight: 800">12 of 12</span>
+              <template data-k="if" value="{{cdc}}" hint-placeholder-val="{{false}}">
+                <span style="padding: 3px 10px; border-radius: 999px; background: #e0f2fe; color: #0369a1; font-size: 13px; font-weight: 800">+ 3 CDC</span>
+              </template>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px">
+              <button type="button" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border: 1px solid #e6dfd4; border-radius: 10px; background: #ffffff; font-family: inherit; font-size: 13px; font-weight: 600; color: #5f5852; cursor: pointer">✓ Recommended applied</button>
+              <button type="button" style="padding: 8px 12px; border: 1px solid #e6dfd4; border-radius: 10px; background: #ffffff; font-family: inherit; font-size: 13px; font-weight: 700; color: #1e1a17; cursor: pointer">Copy list</button>
+              <button type="button" style="padding: 8px 12px; border: 1px solid #e6dfd4; border-radius: 10px; background: #ffffff; font-family: inherit; font-size: 13px; font-weight: 700; color: #5f5852; cursor: pointer">Clear</button>
+            </div>
+          </div>
+          <ul style="margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px">
+            <template data-k="for" list="{{dates}}" as="it" hint-placeholder-count="12">
+              <li style="display: flex; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid #e6dfd4; border-radius: 12px; background: #ffffff">
+                <div style="width: 48px; height: 48px; flex: 0 0 48px; border-radius: 10px; background: {{it.calBg}}; color: {{it.calFg}}; display: flex; flex-direction: column; align-items: center; justify-content: center">
+                  <b style="font-size: 18px; font-weight: 800; line-height: 1">{{it.d}}</b>
+                  <span style="font-size: 10px; font-weight: 800; letter-spacing: 0.06em; color: {{it.monFg}}">{{it.m}}</span>
+                </div>
+                <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+                  <span style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 800">{{it.wd}} <span style="font-weight: 600; color: #5f5852">· {{it.miss}} {{it.verb}}</span>
+                    <template data-k="if" value="{{it.cdc}}" hint-placeholder-val="{{false}}"><span style="padding: 1px 6px; border-radius: 999px; background: #e0f2fe; color: #0369a1; font-size: 10px; font-weight: 800; letter-spacing: 0.04em">CDC</span></template>
+                  </span>
+                  <span style="font-size: 12.5px; line-height: 1.4; color: #5f5852">{{it.subs}}</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px">
+                  <button type="button" aria-label="Lock {{it.d}} {{it.m}}" style="width: 32px; height: 32px; padding: 0; border: 1px solid #e6dfd4; border-radius: 8px; background: #ffffff; color: #8a8279; cursor: pointer; display: flex; align-items: center; justify-content: center">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.8a2 2 0 0 0-1.1-1.8l-1.8-.9A2 2 0 0 1 15 10.8V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.8a2 2 0 0 1-1.1 1.8l-1.8.9A2 2 0 0 0 5 15.2Z"></path></svg>
+                  </button>
+                  <button type="button" aria-label="Remove {{it.d}} {{it.m}}" style="width: 32px; height: 32px; padding: 0; border: 1px solid #e6dfd4; border-radius: 8px; background: #ffffff; color: #5f5852; font-family: inherit; font-size: 16px; cursor: pointer">×</button>
+                </div>
+              </li>
+            </template>
+          </ul>
+        </section>
+      </aside>
+    </div>
+  </main>
+</div>
+</template>
+<script type="text/x-dc-logic" data-dc="Results">
+class Component extends DCLogic {
+  navTo(where, e) {
+    if (this.props.onNav) { if (e && e.preventDefault) e.preventDefault(); this.props.onNav(where); }
+  }
+  renderVals() {
+    // CDC state: 3 Career Development Centre days (sample). Toggled by the CDC tile or "+ Add CDC days".
+    const cdc = (this.state && this.state.cdc !== undefined) ? this.state.cdc : !!this.props.cdc;
+    const K = cdc;
+    const setCdc = (v) => () => this.setState({ cdc: v });
+    const noop = () => {};
+    const tool = (this.state && this.state.tool) || 'waiver';
+    const tabDefs = [
+      { id: 'waiver', label: 'Waivers', idle: ['transparent', '#5f5852'] },
+      { id: 'priority', label: '★ Priority (0)', idle: ['#fdf3dc', '#b45309'] },
+      { id: 'blacklist', label: '⃠ Blacklist (0)', idle: ['#fbe1e1', '#b91c1c'] },
+      { id: 'edit', label: '✎ Edit Attendance', idle: ['transparent', '#5f5852'] }
+    ];
+    const tabs = tabDefs.map((t) => {
+      const on = t.id === tool;
+      return {
+        label: t.label, pressed: on ? 'true' : 'false',
+        bg: on ? '#ffffff' : t.idle[0], fg: on ? '#1e1a17' : t.idle[1],
+        shadow: on ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+        pick: () => this.setState({ tool: t.id })
+      };
+    });
+    const goUpload = (e) => this.navTo('upload', e);
+    const goGrid = (e) => this.navTo('grid', e);
+    const goThird = (e) => this.navTo('onethird', e);
+    const G = '#15803d', A = '#b45309', R = '#b91c1c', SL = '#64748b';
+    const fillOf = (p) => p >= 85 ? '#15803d' : p >= 66.7 ? '#d97706' : '#b91c1c';
+    const colOf = (p) => p >= 85 ? G : p >= 66.7 ? A : R;
+    const badge = {
+      clear: { badge: 'Clear', badgeBg: '#dcf2e3', badgeFg: G },
+      below: { badge: 'Below target', badgeBg: '#fdeccf', badgeFg: A },
+      risk: { badge: 'Risk', badgeBg: '#fbe1e1', badgeFg: R },
+      info: { badge: 'Info only', badgeBg: '#e7ebf0', badgeFg: SL }
+    };
+
+    const stats = [
+      { label: 'Target', num: '85', of: '', unit: '%', steps: true, edit: false, numSize: '20px', inc: noop, dec: noop },
+      { label: 'Waivers', num: '12', of: '/12', unit: 'dates', steps: true, edit: false, numSize: '20px', inc: noop, dec: noop },
+      { label: 'CDC attendance', num: K ? '3' : '0', of: K ? '/3' : '/0', unit: 'dates', steps: true, edit: false, numSize: '20px', inc: setCdc(true), dec: setCdc(false) },
+      { label: 'Timeline', num: '29 Jul – 6 Nov', of: '', unit: '', steps: false, edit: true, numSize: '14px' },
+      { label: 'Priority dates', num: 'None', of: '', unit: '', steps: false, edit: true, numSize: '14px' },
+      { label: 'Blacklisted', num: 'None', of: '', unit: '', steps: false, edit: true, numSize: '14px' }
+    ];
+
+    const tot = (label, pct, was, frac, b, extra) => Object.assign({
+      label, pct: pct.toFixed(1) + '%', frac, was: 'was ' + was.toFixed(1) + '%',
+      fill: pct + '%', ghost: was + '%', fillColor: fillOf(pct), pctColor: colOf(pct),
+      adjust: false, ineligible: false, rescued: false, divider: '1px solid #e6dfd4'
+    }, badge[b], extra || {});
+    const totals = [
+      K ? tot('Total attendance', 78.8, 62.1, '119/151', 'below', { adjust: true, rescued: true })
+        : tot('Total attendance', 74.2, 62.1, '112/151', 'below', { adjust: true, ineligible: true }),
+      K ? tot('Theory attendance', 88.8, 67.8, '79/89', 'clear')
+        : tot('Theory attendance', 83.1, 67.8, '74/89', 'below'),
+      tot('Tutorial attendance', 90.9, 81.3, '10/11', 'clear', { divider: '0', badge: 'Clear' })
+    ];
+
+    const part = (name, att, held, was, chip, cap, opts) => {
+      const o = opts || {};
+      const pct = att / held * 100;
+      return {
+        has: true, none: false, name, frac: att + '/' + held + ' classes',
+        was: 'was ' + was.toFixed(1) + '%', pct: pct.toFixed(1) + '%',
+        color: o.info ? SL : colOf(pct), fill: pct + '%', ghost: was + '%',
+        fillColor: o.info ? SL : fillOf(pct), chip, info: !!o.info, third: !!o.third, cdcTag: (K && o.cdc) || '',
+        c1: cap[0], c2: cap[1] || '', c3: cap[2] || ''
+      };
+    };
+    const none = (name) => ({ has: false, none: true, name });
+    const full = (m) => ['Full marks (' + m + ' M) · Can miss ', '0', ' more without dropping below 85%'];
+    const infoCap = ['Counted in aggregate attendance · Not targeted for individual waivers (0 marks)'];
+    const withRules = (parts) => parts.map((p, i) => Object.assign(p, {
+      padTop: i ? '16px' : '0', rule: i ? '1px solid #e6dfd4' : '0'
+    }));
+    const subj = (name, b, marks, gain, credits, parts, o) => Object.assign({
+      name, marks, gain, credits, star: true, prTag: false, parts: withRules(parts)
+    }, badge[b], o || {});
+
+    const subjects = [
+      subj('Organisational Behaviour', 'clear', '11 / 11 M', '+5.6 M', '4 Credits · 6M', [
+        part('Theory', K ? 17 : 16, 18, 72.0, '6/6 M', full(6), { cdc: '+1 CDC' }),
+        part('Tutorial', 6, 7, 75.0, '5/5 M', full(5)),
+        none('Practical')
+      ]),
+      subj('Hindi B BMS', 'clear', '4 / 4 M', '+1.6 M', '4C GE / 2C AEC · 4M', [
+        part('Theory', 10, 11, 78.6, '4/4 M', full(4)), none('Tutorial'), none('Practical')
+      ]),
+      subj('Social and Emotional Learning BMS', 'clear', '2 / 2 M', '+1.6 M', '2 Credits · 2M', [
+        part('Theory', 4, 4, 66.7, '2/2 M', full(2)), none('Tutorial'),
+        part('Practical', 9, 13, 60.0, '0 M', infoCap, { info: true })
+      ]),
+      subj('Introduction to Business Analytics', 'clear', '6 / 6 M', '+3.6 M', '4 Credits · 6M', [
+        part('Theory', K ? 23 : 22, 25, 74.2, '6/6 M', full(6), { cdc: '+1 CDC' }), none('Tutorial'),
+        part('Practical', 9, 10, 75.0, '0 M', infoCap, { info: true })
+      ]),
+      subj('Business Intelligence and data visualisation', 'info', '', '', '', [
+        none('Theory'), none('Tutorial'),
+        part('Practical', K ? 4 : 3, 17, 14.3, '0 M', infoCap, { info: true, cdc: '+1 CDC' })
+      ], { star: false, prTag: true }),
+      subj('Creativity and Innovation', K ? 'clear' : 'below', K ? '6 / 6 M' : '2.4 / 6 M', K ? '+6.0 M' : '+2.4 M', '4 Credits · 6M', [
+        K ? part('Theory', 13, 15, 52.4, '6/6 M', full(6), { cdc: '+2 CDC' })
+          : part('Theory', 11, 15, 52.4, '2.4/6 M', ['Safe from debarment (2.4/6 M) · Attend ', '12', ' in a row to reach 85% (+3.6 M)']),
+        none('Tutorial'),
+        part('Practical', K ? 8 : 7, 11, 56.3, '0 M', infoCap, { info: true, cdc: '+1 CDC' })
+      ]),
+      subj('Macro Economics', 'below', K ? '7.4 / 11 M' : '6.2 / 11 M', K ? '+2.4 M' : '+1.2 M', '4 Credits · 6M', [
+        K ? part('Theory', 12, 16, 61.9, '2.4/6 M', ['Safe from debarment (2.4/6 M) · Attend ', '11', ' in a row to reach 85% (+3.6 M)'], { cdc: '+1 CDC' })
+          : part('Theory', 11, 16, 61.9, '1.2/6 M', ['Safe from debarment (1.2/6 M) · Attend ', '18', ' in a row to reach 85% (+4.8 M)']),
+        part('Tutorial', 4, 4, 87.5, '5/5 M', full(5), { third: true }),
+        none('Practical')
+      ])
+    ];
+
+    // Grid preview: first 15 class days
+    const allDates = ['Wed 29*','Thu 30','Fri 31','Mon 3','Tue 4','Wed 5','Thu 6','Fri 7','Mon 10','Tue 11*','Wed 12*','Thu 13','Fri 14','Mon 17*','Tue 18'];
+    const N = allDates.length;
+    const pDates = allDates.map((s, i) => {
+      const on = s.endsWith('*');
+      const [wd, dn] = s.replace('*', '').split(' ');
+      const op = i === N - 1 ? '0.35' : i === N - 2 ? '0.7' : '1';
+      const isCdc = K && (i === 3 || i === 7);
+      return {
+        wd, dn, on: on ? 'true' : 'false', cdc: isCdc, op,
+        bg: on ? '#7a1c28' : isCdc ? '#0284c7' : 'transparent',
+        fg: on || isCdc ? '#ffffff' : '#1e1a17',
+        wdc: on ? '#f3d9dd' : isCdc ? '#e0f2fe' : '#8a8279'
+      };
+    });
+    const rows = [
+      ['Organisational Behaviour', ' pPTh    pPTh pPTh  pPTu  wPTh pPTh  wATu pPTh'],
+      ['Hindi B BMS', '  pPTh|pPTh     pPTh|pPTh     pPTh  '],
+      ['Social and Emotional Learning BMS', '    pPTh pPTh   pPTh wAPr wATh   wAPr aAPr'],
+      ['Introduction to Business Analytics', ' pPTh aATh|pPPr     pPPr pPTh wPTh  pPTh pPPr|pPTh wATh pPTh'],
+      ['Business Intelligence and data visualisation', '        aAPr|aAPr wAPr|wAPr    wAPr|wAPr aAPr|aAPr'],
+      ['Creativity and Innovation', '   aATh  pPPr pPPr|pPTh aATh  wATh|wATh wPPr pPTh|pPPr   aAPr|aAPr'],
+      ['Macro Economics', 'wATh|wPTu     aATh|pPTu pPTh  pPTh  wPTh|wPTu aATh  wATh  ']
+    ];
+    const chipStyle = {
+      p: { bg: '#dcf2e3', fg: G, td: 'none' },
+      a: { bg: '#fbe1e1', fg: R, td: 'none' },
+      w: { bg: '#efe9e1', fg: '#a39a90', td: 'line-through' }
+    };
+    const pRows = rows.map(([name, str]) => {
+      const raw = str.split(' ');
+      const cells = pDates.map((d, i) => {
+        const v = raw[i] || '';
+        const cdcChip = { bg: '#e0f2fe', fg: '#0369a1', td: 'none' };
+        const chips = v ? v.split('|').map(c => d.cdc && c[0] === 'a'
+          ? Object.assign({ s: 'P', t: c.slice(2) }, cdcChip)
+          : Object.assign({ s: c[1], t: c.slice(2) }, chipStyle[c[0]])) : [];
+        return { chips, empty: !chips.length, bg: d.on === 'true' ? '#f6e7e9' : d.cdc ? '#f0f9ff' : 'transparent', op: d.op };
+      });
+      return { name, cells };
+    });
+
+    const dates = [
+      ['29','JUL','Wed',1,'Macro Economics'],
+      ['11','AUG','Tue',2,'Social and Emotional Learning BMS, Business Intelligence and data visualisation, Creativity and Innovation'],
+      ['12','AUG','Wed',1,'Social and Emotional Learning BMS'],
+      ['17','AUG','Mon',3,'Organisational Behaviour, Social and Emotional Learning BMS, Introduction to Business Analytics, Business Intelligence and data visualisation, Macro Economics'],
+      ['19','AUG','Wed',2,'Macro Economics'],
+      ['20','AUG','Thu',3,'Organisational Behaviour, Introduction to Business Analytics, Creativity and Innovation'],
+      ['27','AUG','Thu',2,'Introduction to Business Analytics, Creativity and Innovation'],
+      ['30','SEP','Wed',1,'Social and Emotional Learning BMS'],
+      ['05','OCT','Mon',3,'Hindi B BMS, Introduction to Business Analytics'],
+      ['08','OCT','Thu',2,'Organisational Behaviour, Introduction to Business Analytics, Creativity and Innovation'],
+      ['09','OCT','Fri',2,'Introduction to Business Analytics, Creativity and Innovation'],
+      ['13','OCT','Tue',3,'Organisational Behaviour']
+    ].map(([d, m, wd, miss, subs]) => ({ d, m, wd, miss, subs, verb: 'missed', cdc: false, calBg: '#f6e7e9', calFg: '#7a1c28', monFg: '#7a1c28' }));
+    if (K) {
+      const cdcDates = [
+        ['03', 'AUG', 'Mon', 1, 'Creativity and Innovation'],
+        ['07', 'AUG', 'Fri', 1, 'Creativity and Innovation'],
+        ['24', 'SEP', 'Thu', 5, 'Organisational Behaviour, Introduction to Business Analytics, Macro Economics, Creativity and Innovation (Pr), Business Intelligence (Pr)']
+      ].map(([d, m, wd, miss, subs]) => ({ d, m, wd, miss, subs, verb: 'covered', cdc: true, calBg: '#0284c7', calFg: '#ffffff', monFg: '#e0f2fe' }));
+      dates.unshift(...cdcDates);
+    }
+
+    // Marks row: credit picker + per-component marks breakdown
+    const creditLabels = ['4C · 6M', 'GE/AEC · 4M', '2C · 2M'];
+    const creditIdx = { '4 Credits · 6M': 0, '4C GE / 2C AEC · 4M': 1, '2 Credits · 2M': 2 };
+    const picked = (this.state && this.state.credits) || {};
+    // seg(name, before waivers, after waivers, after CDC, max)
+    const seg = (name, base, afterW, afterC, max) => {
+      const got = K ? afterC : afterW;
+      return {
+        name, got: String(got), max: String(max),
+        baseW: (base / max * 100) + '%', gainW: ((afterW - base) / max * 100) + '%',
+        cdcL: (afterW / max * 100) + '%', cdcW: K ? ((afterC - afterW) / max * 100) + '%' : '0%'
+      };
+    };
+    const segMap = {
+      'Organisational Behaviour': [seg('Theory', 2.4, 6, 6, 6), seg('Tutorial', 3, 5, 5, 5)],
+      'Hindi B BMS': [seg('Theory', 2.4, 4, 4, 4)],
+      'Social and Emotional Learning BMS': [seg('Theory', 0.4, 2, 2, 2)],
+      'Introduction to Business Analytics': [seg('Theory', 2.4, 6, 6, 6)],
+      'Creativity and Innovation': [seg('Theory', 0, 2.4, 6, 6)],
+      'Macro Economics': [seg('Theory', 0, 1.2, 2.4, 6), seg('Tutorial', 5, 5, 5, 5)]
+    };
+    subjects.forEach((s) => {
+      const cur = picked[s.name] ?? creditIdx[s.credits] ?? 0;
+      s.segs = segMap[s.name] || [];
+      s.creditOpts = creditLabels.map((label, i) => ({
+        label, on: i === cur ? 'true' : 'false',
+        bg: i === cur ? '#ffffff' : 'transparent', fg: i === cur ? '#1e1a17' : '#5f5852',
+        shadow: i === cur ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+        pick: () => this.setState({ credits: Object.assign({}, picked, { [s.name]: i }) })
+      }));
+    });
+    const bannerParts = (K
+      ? [['OB Th', 94.4], ['OB Tu', 85.7], ['Hindi Th', 90.9], ['SEL Th', 100], ['IBA Th', 92], ['C&I Th', 86.7], ['Macro Th', 75], ['Macro Tu', 100]]
+      : [['OB Th', 88.9], ['OB Tu', 85.7], ['Hindi Th', 90.9], ['SEL Th', 100], ['IBA Th', 88], ['C&I Th', 73.3], ['Macro Th', 68.8], ['Macro Tu', 100]])
+      .map(([l, p]) => ({ label: l + ' ' + p + '%', color: fillOf(p) }));
+    const sb = K ? {
+      headline: '7 of 8 parts meet 85%', sub: 'CDC covered 7 absences · 1 part left', met: 7,
+      attention: ['Macro Th 75.0%'],
+      marks: '36.4 / 40 M', gain: '+20.8 M', cdcW: '12%', marksNote: '+16.0 M waivers · +4.8 M CDC',
+      useLabel: 'Waivers + CDC', used: 15, cap: 15
+    } : {
+      headline: '6 of 8 parts meet 85%', sub: '2 parts still need attention', met: 6,
+      attention: ['C&I Th 73.3%', 'Macro Th 68.8%'],
+      marks: '31.6 / 40 M', gain: '+16.0 M', cdcW: '0%', marksNote: 'was 15.6 M before waivers',
+      useLabel: 'Waivers', used: 12, cap: 12
+    };
+
+    return {
+      stats, totals, subjects, pDates, pRows, dates, tabs, goUpload, goGrid, goThird, bannerParts,
+      sb, cdc, noCdc: !cdc, toggleCdc: setCdc(!cdc)
+    };
+  }
+}
+</script>
+
+<!-- ===== Screen: GridExpanded ===== -->
+<template data-dc="GridExpanded"><div style="width: {{rootW}}; height: {{rootH}}; box-sizing: border-box; padding: {{rootPad}}; background: {{rootBg}}; font-family: Manrope, system-ui, sans-serif; color: #1e1a17; display: flex; justify-content: center; align-items: flex-start">
+  <section role="dialog" aria-label="Spreadsheet grid" style="width: 100%; max-width: 1600px; background: #ffffff; border-radius: 18px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.25)">
+    <div style="padding: 16px 20px; border-bottom: 1px solid #e6dfd4; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <h2 style="margin: 0; font-size: 18px; font-weight: 800">Spreadsheet grid</h2>
+          <span style="display: inline-flex; gap: 4px; padding: 2px 4px; border: 1px solid #e6dfd4; border-radius: 8px; background: #f4eee9">
+            <button type="button" disabled style="padding: 2px 8px; border: 0; background: transparent; font-family: inherit; font-size: 12px; font-weight: 600; color: #a39a90">↶ Undo</button>
+            <button type="button" disabled style="padding: 2px 8px; border: 0; background: transparent; font-family: inherit; font-size: 12px; font-weight: 600; color: #a39a90">↷ Redo</button>
+          </span>
+        </div>
+        <span style="font-size: 13px; color: #5f5852">Scroll sideways for every class day. Click a date or cell to waive or restore the whole day.</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+        <div role="group" aria-label="Grid tool" style="display: inline-flex; gap: 2px; padding: 2px; border: 1px solid #e6dfd4; border-radius: 10px; background: #efe8de">
+          <button type="button" aria-pressed="true" style="padding: 5px 10px; border: 0; border-radius: 8px; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-family: inherit; font-size: 12px; font-weight: 700; color: #1e1a17">Waivers (12/12)</button>
+          <button type="button" aria-pressed="false" style="padding: 5px 10px; border: 0; border-radius: 8px; background: #fdf3dc; font-family: inherit; font-size: 12px; font-weight: 700; color: #b45309">★ Priority (0)</button>
+          <button type="button" aria-pressed="false" style="padding: 5px 10px; border: 0; border-radius: 8px; background: #fbe1e1; font-family: inherit; font-size: 12px; font-weight: 700; color: #b91c1c">⃠ Blacklist (0)</button>
+          <button type="button" aria-pressed="false" style="padding: 5px 10px; border: 0; border-radius: 8px; background: transparent; font-family: inherit; font-size: 12px; font-weight: 600; color: #5f5852">✎ Edit Attendance</button>
+        </div>
+        <button type="button" style="padding: 9px 12px; border: 1px solid #e6dfd4; border-radius: 10px; background: #ffffff; font-family: inherit; font-size: 13px; font-weight: 600; color: #5f5852">✓ Recommended applied</button>
+        <button type="button" style="padding: 9px 12px; border: 1px solid #e6dfd4; border-radius: 10px; background: #ffffff; font-family: inherit; font-size: 13px; font-weight: 700; color: #5f5852">Clear</button>
+        <a href="Results.dc.html" onClick="{{collapse}}" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 10px; background: #1e1a17; color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+          Collapse
+        </a>
+      </div>
+    </div>
+
+    <div style="overflow-x: auto">
+      <table style="border-collapse: separate; border-spacing: 0; font-size: 13px">
+        <thead>
+          <tr>
+            <th rowspan="2" style="position: sticky; left: 0; z-index: 3; background: #ffffff; box-shadow: 1px 0 0 #e6dfd4; width: 230px; min-width: 230px; text-align: left; vertical-align: bottom; padding: 8px 12px 8px 16px; font-size: 11px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: #5f5852">Subject</th>
+            <template data-k="for" list="{{months}}" as="m" hint-placeholder-count="5">
+              <th colspan="{{m.span}}" style="border-left: 1px solid #e6dfd4; text-align: left; padding: 8px 0 4px 8px; font-size: 12px; font-weight: 800; white-space: nowrap">{{m.label}}</th>
+            </template>
+            <th rowspan="2" style="position: sticky; right: 120px; z-index: 3; background: #fcfaf7; border-left: 1px solid #e6dfd4; box-shadow: -1px 0 0 #e6dfd4; width: 120px; min-width: 120px; vertical-align: bottom; padding: 8px; font-size: 11px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: #5f5852">Theory</th>
+            <th rowspan="2" style="position: sticky; right: 0; z-index: 3; background: #fcfaf7; border-left: 1px solid #e6dfd4; width: 120px; min-width: 120px; vertical-align: bottom; padding: 8px; font-size: 11px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: #5f5852">Tutorial</th>
+          </tr>
+          <tr>
+            <template data-k="for" list="{{days}}" as="d" hint-placeholder-count="55">
+              <th style="border-left: 1px solid #e6dfd4; width: 38px; min-width: 38px; padding: 2px 0 6px">
+                <button type="button" aria-pressed="{{d.on}}" aria-label="Toggle {{d.wd}} {{d.dn}}" style="width: calc(100% - 6px); margin: 0 auto; padding: 4px 0; border: 0; border-radius: 8px; background: {{d.bg}}; color: {{d.fg}}; font-family: inherit; display: flex; flex-direction: column; align-items: center; gap: 1px; cursor: pointer; overflow: hidden">
+                  <span style="font-size: 10px; font-weight: 700; color: {{d.wdc}}">{{d.wd}}</span>
+                  <span style="font-size: 13px; font-weight: 800">{{d.dn}}</span>
+                </button>
+              </th>
+            </template>
+          </tr>
+        </thead>
+        <tbody>
+          <template data-k="for" list="{{rows}}" as="r" hint-placeholder-count="7">
+            <tr>
+              <td style="position: sticky; left: 0; z-index: 2; background: #ffffff; box-shadow: 1px 0 0 #e6dfd4; border-top: 1px solid #e6dfd4; width: 230px; min-width: 230px; max-width: 230px; text-align: left; padding: 8px 12px 8px 16px; font-size: 13px; font-weight: 700; line-height: 1.3">{{r.name}}</td>
+              <template data-k="for" list="{{r.cells}}" as="c" hint-placeholder-count="55">
+                <td style="border-left: 1px solid #e6dfd4; border-top: 1px solid #e6dfd4; background: {{c.bg}}; text-align: center; vertical-align: middle; padding: 6px 0">
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 3px">
+                    <template data-k="if" value="{{c.empty}}" hint-placeholder-val="{{false}}"><span style="font-size: 12px; color: #cfc7bc">·</span></template>
+                    <template data-k="for" list="{{c.chips}}" as="ch" hint-placeholder-count="1">
+                      <span style="display: inline-flex; align-items: baseline; justify-content: center; gap: 1px; min-width: 26px; box-sizing: border-box; padding: 2px 3px; border-radius: 5px; background: {{ch.bg}}; color: {{ch.fg}}; text-decoration: {{ch.td}}; font-size: 11px; font-weight: 800; line-height: 1.2">{{ch.s}}<small style="font-size: 8.5px; font-weight: 700">{{ch.t}}</small></span>
+                    </template>
+                  </div>
+                </td>
+              </template>
+              <template data-k="for" list="{{r.fz}}" as="f" hint-placeholder-count="2">
+                <td style="position: sticky; right: {{f.right}}; z-index: 2; background: #fcfaf7; border-left: 1px solid #e6dfd4; border-top: 1px solid #e6dfd4; box-shadow: {{f.shadow}}; width: 120px; min-width: 120px; text-align: center; padding: 8px">
+                  <template data-k="if" value="{{f.has}}" hint-placeholder-val="{{true}}">
+                    <div style="display: flex; flex-direction: column; gap: 2px; align-items: center">
+                      <span style="font-size: 11.5px; font-weight: 600; color: #5f5852">{{f.frac}}</span>
+                      <b style="font-size: 14px; font-weight: 800; color: {{f.color}}">{{f.pct}}</b>
+                    </div>
+                  </template>
+                  <template data-k="if" value="{{f.dash}}" hint-placeholder-val="{{false}}"><span style="color: #a39a90">—</span></template>
+                </td>
+              </template>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="border-top: 1px solid #e6dfd4; background: #fcfaf7; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; font-size: 12.5px; font-weight: 600; color: #5f5852">
+      <span style="display: flex; gap: 16px; flex-wrap: wrap">
+        <span style="display: inline-flex; align-items: center; gap: 6px"><span style="padding: 2px 3px; border-radius: 5px; background: #dcf2e3; color: #15803d; font-size: 11px; font-weight: 800">P<small style="font-size: 8.5px">Th</small></span>Present</span>
+        <span style="display: inline-flex; align-items: center; gap: 6px"><span style="padding: 2px 3px; border-radius: 5px; background: #fbe1e1; color: #b91c1c; font-size: 11px; font-weight: 800">A<small style="font-size: 8.5px">Th</small></span>Absent</span>
+        <span style="display: inline-flex; align-items: center; gap: 6px"><i style="width: 12px; height: 12px; border-radius: 4px; background: #7a1c28"></i>Waived day (classes removed)</span>
+      </span>
+      <span>Frozen Theory &amp; Tutorial columns show real-time percentage shifts</span>
+    </div>
+  </section>
+</div>
+</template>
+<script type="text/x-dc-logic" data-dc="GridExpanded">
+class Component extends DCLogic {
+  renderVals() {
+    const bare = !!this.props.bare;
+    const frame = {
+      rootW: bare ? '100%' : '1440px', rootH: bare ? 'auto' : '780px',
+      rootPad: bare ? '0' : '32px', rootBg: bare ? 'transparent' : '#8f8a85',
+      collapse: (e) => { if (this.props.onNav) { e.preventDefault(); this.props.onNav('close'); } }
+    };
+    return Object.assign(frame, this.gridVals());
+  }
+  gridVals() {
+    const months = [['July 2026',3],['August 2026',20],['September 2026',21],['October 2026',8],['November 2026',3]].map(([label, span]) => ({ label, span }));
+    const raw = ['Wed 29*','Thu 30','Fri 31','Mon 3','Tue 4','Wed 5','Thu 6','Fri 7','Mon 10','Tue 11*','Wed 12*','Thu 13','Fri 14','Mon 17*','Tue 18','Wed 19*','Thu 20*','Fri 21','Mon 24','Tue 25','Thu 27*','Fri 28','Mon 31','Tue 1','Wed 2','Thu 3','Mon 7','Tue 8','Wed 9','Thu 10','Mon 14','Tue 15','Wed 16','Thu 17','Fri 18','Sat 19','Mon 21','Tue 22','Wed 23','Thu 24','Fri 25','Mon 28','Tue 29','Wed 30*','Thu 1','Mon 5*','Thu 8*','Fri 9*','Mon 12','Tue 13*','Wed 14','Wed 28','Mon 2','Thu 5','Fri 6'];
+    const days = raw.map((s) => {
+      const on = s.endsWith('*');
+      const [wd, dn] = s.replace('*', '').split(' ');
+      return { wd, dn, on: on ? 'true' : 'false', bg: on ? '#7a1c28' : 'transparent', fg: on ? '#ffffff' : '#1e1a17', wdc: on ? '#f3d9dd' : '#8a8279' };
+    });
+    const chipStyle = {
+      p: { bg: '#dcf2e3', fg: '#15803d', td: 'none' },
+      a: { bg: '#fbe1e1', fg: '#b91c1c', td: 'none' },
+      w: { bg: '#efe9e1', fg: '#a39a90', td: 'line-through' }
+    };
+    const pctColor = (p) => p >= 85 ? '#15803d' : p >= 66.7 ? '#b45309' : '#b91c1c';
+    const fz = (v, i) => {
+      const base = { right: i === 0 ? '120px' : '0', shadow: i === 0 ? '-1px 0 0 #e6dfd4' : 'none' };
+      if (!v) return Object.assign(base, { has: false, dash: true });
+      const [frac, pct] = v.split(' ');
+      return Object.assign(base, { has: true, dash: false, frac, pct: pct + '%', color: pctColor(parseFloat(pct)) });
+    };
+    const src = [
+      ['Organisational Behaviour', ' pPTh    pPTh pPTh  pPTu  wPTh pPTh  wATu pPTh wPTh wATh      pPTu aATh pPTh pPTh pPTu aATh pPTh pPTh pPTu pPTh pPTh pPTh   pPTu pPTh pPTh pPTh       wATh   wATh|wATh|wATh pPTh aATu pPTu  ', ['16/18 88.9', '6/7 85.7']],
+      ['Hindi B BMS', '  pPTh|pPTh     pPTh|pPTh     pPTh                 pPTh     pPTh|aATh     pPTh pPTh|pPTh   wPTh  wATh|wATh         ', ['10/11 90.9', '']],
+      ['Social and Emotional Learning BMS', '    pPTh pPTh   pPTh wAPr wATh   wAPr aAPr    aAPr pPPr    pPPr pPTh  pPPr pPPr   pPPr pPPr    pPPr pPPr  pPPr   aAPr aAPr wATh           ', ['4/4 100.0', '']],
+      ['Introduction to Business Analytics', ' pPTh aATh|pPPr     pPPr pPTh wPTh  pPTh pPPr|pPTh wATh pPTh  wATh aATh aATh pPTh wATh  aAPr|pPTh pPTh  pPPr pPTh pPTh  pPTh pPTh pPTh  pPPr pPPr|pPTh  pPTh pPTh  pPTh pPPr|pPTh pPTh pPTh  pPTh wATh wAPr wAPr|wATh pPTh     pPPr pPPr', ['22/25 88.0', '']],
+      ['Business Intelligence and data visualisation', '        aAPr|aAPr wAPr|wAPr    wAPr|wAPr aAPr|aAPr    aAPr|aAPr aAPr|pPPr   aAPr    aAPr|aAPr aAPr|aAPr    aAPr|pPPr     aAPr|pPPr                  ', ['', '']],
+      ['Creativity and Innovation', '   aATh  pPPr pPPr|pPTh aATh  wATh|wATh wPPr pPTh|pPPr   aAPr|aAPr wPPr wATh|wAPr    wATh|wAPr aAPr    pPTh  pPTh|pPPr  aATh    pPTh aAPr|pPTh   pPTh|pPPr  pPTh   pPTh|pPPr  pPPr  wATh wAPr|wATh      pPTh aATh|pPTh', ['11/15 73.3', '']],
+      ['Macro Economics', 'wATh|wPTu     aATh|pPTu pPTh  pPTh  wPTh|wPTu aATh  wATh  wATh|wATu   pPTh    pPTh  pPTu|aATh aATh     pPTh  aATh|pPTu pPTh   pPTh  pPTh|pPTu pPTh|pPTh  pPTh  wPTu|wPTh           ', ['11/16 68.8', '4/4 100.0']]
+    ];
+    const rows = src.map(([name, str, f]) => {
+      const parts = str.split(' ');
+      const cells = days.map((d, i) => {
+        const v = parts[i] || '';
+        const chips = v ? v.split('|').map(c => Object.assign({ s: c[1], t: c.slice(2) }, chipStyle[c[0]])) : [];
+        return { chips, empty: !chips.length, bg: d.on === 'true' ? '#f6e7e9' : 'transparent' };
+      });
+      return { name, cells, fz: f.map(fz) };
+    });
+    return { months, days, rows };
+  }
+}
+</script>
+
+<!-- ===== Screen: Ineligible ===== -->
+<template data-dc="Ineligible"><div style="width: {{rootW}}; height: {{rootH}}; box-sizing: border-box; padding: {{rootPad}}; background: {{rootBg}}; font-family: Manrope, system-ui, sans-serif; color: #1e1a17; display: flex; align-items: center; justify-content: center">
+  <section role="dialog" aria-modal="true" aria-labelledby="inel-title" style="width: 580px; box-sizing: border-box; background: #ffffff; border: 1px solid #f2c2c2; border-radius: 20px; padding: 28px 32px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 24px 60px rgba(0,0,0,0.3)">
+    <span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border: 1px solid #f2c2c2; border-radius: 999px; background: #fdf0f0; color: #b91c1c; font-size: 11.5px; font-weight: 800; letter-spacing: 0.05em">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+      OFFICIAL ATTENDANCE NOTICE
+    </span>
+    <h2 id="inel-title" style="margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.01em">Not Eligible for College Society Waivers</h2>
+
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border: 1px solid #f6caca; border-radius: 12px; background: #fdf3f3; flex-wrap: wrap">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.05em; color: #5f5852">TOTAL BASELINE ATTENDANCE</span>
+        <span style="display: flex; align-items: baseline; gap: 8px"><b style="font-size: 24px; font-weight: 800; color: #b91c1c">62.1%</b><span style="font-size: 13px; font-weight: 600; color: #b91c1c">(123 / 198 classes)</span></span>
+      </div>
+      <span style="padding: 5px 10px; border-radius: 999px; background: #dc2626; color: #ffffff; font-size: 11.5px; font-weight: 800; letter-spacing: 0.04em">BELOW 66.7% REQUIREMENT</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px">
+      <p style="margin: 0; font-size: 14px; line-height: 1.55; color: #3a332e">According to University of Delhi Ordinance VII and SSCBS examination rules, students with an <b style="color: #1e1a17">overall aggregate attendance below 66.7%</b> across all subjects combined are <b style="color: #1e1a17">strictly not eligible to apply for society waivers</b> to the college administration.</p>
+      <div style="padding: 12px 16px; border: 1px solid #ecdcc2; border-left: 3px solid #d97706; border-radius: 8px; background: #fdfaf4; font-size: 12.5px; line-height: 1.5; color: #5f5852"><b style="color: #8a6c2a">Clarification:</b> Students who maintain <b style="color: #1e1a17">≥ 66.7% overall attendance</b> can still apply waivers for specific individual subjects below 66.7%. However, when your combined total across all subjects is under 66.7%, the administration cannot accept society waivers.</div>
+      <div style="display: flex; gap: 6px; padding: 10px 12px; border: 1px dashed #93c5fd; border-radius: 8px; background: #f0f7ff; font-size: 12.5px; line-height: 1.45; color: #1d4ed8">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#facc15" stroke="#a16207" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex: 0 0 14px; margin-top: 2px" aria-hidden="true"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2Z"></path></svg>
+        <span><b>Have CDC attendance?</b> Enter your CDC attendance dates in the toolbar to see if they lift your total attendance above 66.7% and unlock waiver eligibility.</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px; padding: 12px 16px; border: 1px solid #bfe3cb; border-radius: 10px; background: #effaf2">
+        <span style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 800; color: #15803d">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6"></path><path d="M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 9V3"></path><line x1="7" y1="15" x2="17" y2="15"></line></svg>
+          Simulation &amp; Sandbox Mode Active
+        </span>
+        <p style="margin: 0; font-size: 12.5px; line-height: 1.5; color: #166534">Even though official submission is not permitted, <b>you can still freely use this tool</b> to test waiver dates, simulate attendance outcomes, and check exactly how many classes you must attend to escape debarment.</p>
+      </div>
+    </div>
+
+    <a href="Results.dc.html" onClick="{{ack}}" style="display: flex; align-items: center; justify-content: center; height: 44px; border-radius: 10px; background: #1e1a17; color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none">I Understand — Let Me Experiment →</a>
+  </section>
+</div>
+</template>
+<script type="text/x-dc-logic" data-dc="Ineligible">
+class Component extends DCLogic {
+  renderVals() {
+    const bare = !!this.props.bare;
+    return {
+      rootW: bare ? 'auto' : '640px', rootH: bare ? 'auto' : '760px',
+      rootPad: bare ? '0' : '30px', rootBg: bare ? 'transparent' : '#6b6763',
+      ack: (e) => { if (this.props.onNav) { e.preventDefault(); this.props.onNav('ack'); } }
+    };
+  }
+}
+</script>
+
+<!-- ===== Screen: OneThird ===== -->
+<template data-dc="OneThird"><div style="width: {{rootW}}; height: {{rootH}}; box-sizing: border-box; padding: {{rootPad}}; background: {{rootBg}}; font-family: Manrope, system-ui, sans-serif; color: #1e1a17; display: flex; align-items: center; justify-content: center">
+  <section role="dialog" aria-modal="true" aria-labelledby="third-title" style="width: 520px; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.3)">
+    <div style="display: flex; align-items: flex-start; gap: 12px; padding: 20px 20px 16px 22px; border-bottom: 1px solid #e6dfd4">
+      <svg width="24" height="24" viewBox="0 0 24 24" style="flex: 0 0 24px; margin-top: 8px" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" fill="#f5b301" stroke="#b45309" stroke-width="1.4" stroke-linejoin="round"></path><line x1="12" y1="9" x2="12" y2="13" stroke="#1e1a17" stroke-width="2.2" stroke-linecap="round"></line><line x1="12" y1="17" x2="12.01" y2="17" stroke="#1e1a17" stroke-width="2.4" stroke-linecap="round"></line></svg>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+        <h3 id="third-title" style="margin: 0; font-size: 17px; font-weight: 800">Double-Check: 1/3rd Rule</h3>
+        <span style="font-size: 13px; color: #5f5852">College waiver limit alert</span>
+      </div>
+      <button type="button" aria-label="Close" onClick="{{close}}" style="width: 28px; height: 28px; padding: 0; border: 0; background: transparent; color: #5f5852; cursor: pointer; display: flex; align-items: center; justify-content: center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+    <div style="padding: 18px 20px; display: flex; flex-direction: column; gap: 16px">
+      <p style="margin: 0; font-size: 13.5px; line-height: 1.5">Some of your waivers are going over the one-third rule. In the following subject component, over one-third of classes are being waived off:</p>
+      <div style="display: flex; flex-direction: column; gap: 8px; padding: 12px 12px 12px 14px; border: 1px solid #e6dfd4; border-left: 3px solid #eab308; border-radius: 8px; background: #f7f3ee">
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <span style="font-size: 13px; font-weight: 700">Macro Economics</span>
+          <span style="padding: 2px 8px; border: 1px solid #e6dfd4; border-radius: 4px; background: #ffffff; font-size: 10.5px; font-weight: 800; letter-spacing: 0.04em; color: #5f5852">TUTORIAL</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: #5f5852">
+          <span>Waiving <b style="color: #1e1a17">4</b> of <b style="color: #1e1a17">8</b> classes (50%)</span>
+          <span style="font-weight: 700; color: #b45309">Recommended max: 2 classes</span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px; padding: 12px 14px; border: 1px solid #f3e1a8; border-radius: 8px; background: #fefbea; font-size: 12px; line-height: 1.5; color: #3a332e">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex: 0 0 16px; margin-top: 1px" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"></rect><line x1="12" y1="11" x2="12" y2="16"></line><line x1="12" y1="7.5" x2="12.01" y2="7.5"></line></svg>
+        <span>DU attendance rules generally specify that students should not eliminate more than one-third of their total classes in any individual subject component. <b style="color: #1e1a17">Just double-check with the one-third rule</b> before submitting your waiver application.</span>
+      </div>
+    </div>
+    <div style="display: flex; justify-content: flex-end; padding: 14px 20px; border-top: 1px solid #e6dfd4; background: #f5f2ee">
+      <a href="Results.dc.html" onClick="{{close}}" style="padding: 9px 16px; border-radius: 8px; background: #1e293b; color: #ffffff; font-size: 13.5px; font-weight: 700; text-decoration: none">Got it, thanks</a>
+    </div>
+  </section>
+</div>
+</template>
+<script type="text/x-dc-logic" data-dc="OneThird">
+class Component extends DCLogic {
+  renderVals() {
+    const bare = !!this.props.bare;
+    return {
+      rootW: bare ? 'auto' : '600px', rootH: bare ? 'auto' : '480px',
+      rootPad: bare ? '0' : '40px', rootBg: bare ? 'transparent' : '#6b6763',
+      close: (e) => { if (this.props.onNav) { if (e && e.preventDefault) e.preventDefault(); this.props.onNav('close'); } }
+    };
+  }
+}
+</script>
+
+<!-- ===== Prototype runtime (makes this file clickable; not part of the design) ===== -->
+<script>
+/*
+ * Tiny standalone runtime for the design screens below.
+ * Each <template data-dc="Name"> holds one screen's markup; the matching
+ * <script type="text/x-dc-logic" data-dc="Name"> holds its logic class.
+ * Markup syntax:
+ *   {{path}}                      value lookup from renderVals()
+ *   <template data-k="for" list="{{items}}" as="item">   repeat
+ *   <template data-k="if" value="{{flag}}">              conditional
+ *   <dc-import name="Results" some-prop="{{x}}">         child screen
+ *   onClick="{{handler}}"                                event handler
+ * Everything is rendered with plain DOM; re-render on setState.
+ */
+(function () {
+  class DCLogic {
+    constructor(props) { this.props = props || {}; this.state = null; }
+    setState(patch) {
+      const p = typeof patch === 'function' ? patch(this.state || {}, this.props) : patch;
+      this.state = Object.assign({}, this.state || {}, p);
+      scheduleRender();
+    }
+    forceUpdate() { scheduleRender(); }
+  }
+
+  const templates = {};
+  const classes = {};
+  document.querySelectorAll('template[data-dc]').forEach((t) => { templates[t.dataset.dc] = t; });
+  document.querySelectorAll('script[type="text/x-dc-logic"]').forEach((s) => {
+    classes[s.dataset.dc] = new Function('DCLogic', s.textContent + '\nreturn Component;')(DCLogic);
+  });
+
+  const HOLE = /\{\{\s*([^}]+?)\s*\}\}/g;
+  const WHOLE = /^\{\{\s*([^}]+?)\s*\}\}$/;
+
+  function lookup(path, scope) {
+    if (path === 'true') return true;
+    if (path === 'false') return false;
+    if (path === 'null') return null;
+    if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path);
+    if (/^(['"]).*\1$/.test(path)) return path.slice(1, -1);
+    let v = scope;
+    for (const part of path.split('.')) {
+      if (v == null) return undefined;
+      v = v[part];
+    }
+    return v;
+  }
+  const interp = (str, scope) => str.replace(HOLE, (_, p) => {
+    const v = lookup(p, scope);
+    return v == null ? '' : String(v);
+  });
+  const raw = (str, scope) => {
+    const m = str.match(WHOLE);
+    return m ? lookup(m[1], scope) : interp(str, scope);
+  };
+  const camel = (s) => s.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+
+  const instances = {};
+
+  function renderComponent(name, props, key) {
+    const Cls = classes[name];
+    let inst = instances[key];
+    if (!inst) {
+      inst = new Cls(props);
+      inst.props = props;
+      instances[key] = inst;
+    } else {
+      inst.props = props;
+    }
+    const vals = inst.renderVals ? inst.renderVals() : {};
+    const ctx = { key, count: {} };
+    return renderChildren(templates[name].content, vals, ctx);
+  }
+
+  function renderChildren(parent, scope, ctx) {
+    const out = [];
+    parent.childNodes.forEach((n) => out.push(...renderNode(n, scope, ctx)));
+    return out;
+  }
+
+  function renderNode(node, scope, ctx) {
+    if (node.nodeType === 3) return [document.createTextNode(interp(node.textContent, scope))];
+    if (node.nodeType !== 1) return [];
+    const tag = node.localName;
+
+    if (tag === 'template' && node.dataset.k === 'for') {
+      const list = raw(node.getAttribute('list') || '', scope) || [];
+      const as = node.getAttribute('as') || 'item';
+      const out = [];
+      list.forEach((item, i) => {
+        const s = Object.create(scope);
+        s[as] = item; s.$index = i;
+        out.push(...renderChildren(node.content, s, ctx));
+      });
+      return out;
+    }
+    if (tag === 'template' && node.dataset.k === 'if') {
+      return raw(node.getAttribute('value') || '', scope) ? renderChildren(node.content, scope, ctx) : [];
+    }
+    if (tag === 'dc-import') {
+      const name = node.getAttribute('name');
+      const props = {};
+      for (const a of node.attributes) {
+        if (a.name === 'name' || a.name.startsWith('hint-')) continue;
+        props[camel(a.name)] = raw(a.value, scope);
+      }
+      ctx.count[name] = (ctx.count[name] || 0) + 1;
+      return renderComponent(name, props, ctx.key + '/' + name + '#' + ctx.count[name]);
+    }
+
+    const el = node.namespaceURI === 'http://www.w3.org/2000/svg'
+      ? document.createElementNS(node.namespaceURI, tag)
+      : document.createElement(tag);
+    for (const a of node.attributes) {
+      if (/^on[A-Z]/.test(a.name) || /^on[a-z]+$/.test(a.name) && a.value.includes('{{')) {
+        const fn = raw(a.value, scope);
+        if (typeof fn === 'function') el.addEventListener(a.name.slice(2).toLowerCase(), fn);
+        continue;
+      }
+      el.setAttribute(a.name, interp(a.value, scope));
+    }
+    const kids = tag === 'template' ? node.content : node;
+    renderChildren(kids, scope, ctx).forEach((c) => el.appendChild(c));
+    return [el];
+  }
+
+  const root = document.getElementById('app');
+  let queued = false;
+  function scheduleRender() {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => { queued = false; draw(); });
+  }
+  function draw() {
+    const y = window.scrollY;
+    root.replaceChildren(...renderComponent(root.dataset.entry, {}, 'root'));
+    window.scrollTo(0, y);
+  }
+  draw();
+})();
+
+</script>
+</body>
+</html>
