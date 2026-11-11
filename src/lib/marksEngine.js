@@ -62,11 +62,13 @@ function getPartAttended(part) {
 /**
  * Automatically infers default max marks based on available components
  * in DU UGCF NEP:
- * - Has Tutorial (TU) -> 4-Credit Core (Theory 6M, Tutorial 5M)
- * - Has TH + PR and high lecture count (>= 20) -> 4-Credit Core with Practical (Theory 6M, Practical 0M)
- * - Has TH + PR and lower lecture count (< 20) -> 2-Credit Blended SEC/VAC (Theory 2M, Practical 0M)
- * - Has TH only -> 2-Credit Pure Theory / AEC (Theory 4M)
- * - Has PR only -> Pure Practical (0M)
+ * - Has Tutorial (TU) -> Rule 1: 4-Credit Core (Theory 6M, Tutorial 5M)
+ * - Has Practical (PR) only -> Rule 2: Pure Practical (0M)
+ * - Has TH only -> Rule 3: 2-Credit Pure Theory / AEC (Theory 4M)
+ * - Has TH + PR -> Rule 4: Structural contact hour math distinguishes 4C vs 2C:
+ *     (thHeld > prHeld) || (thHeld >= 16) || (totalHeld >= 40)
+ *     -> 4-Credit Core/GE with Lab (Theory 6M, Practical 0M)
+ *     -> Otherwise 2-Credit Blended SEC/VAC (Theory 2M, Practical 0M)
  */
 export function inferDefaultMaxMarks(subject) {
   const parts = subject?.parts || {};
@@ -74,26 +76,26 @@ export function inferDefaultMaxMarks(subject) {
   const hasPR = getPartHeld(parts.pr) > 0;
   const hasTH = getPartHeld(parts.th) > 0;
   const thHeld = getPartHeld(parts.th);
+  const prHeld = getPartHeld(parts.pr);
+  const totalHeld = thHeld + prHeld;
 
   let thMax = 6.0;
   let tuMax = hasTU ? 5.0 : 0.0;
   let prMax = 0.0; // DU UGCF rule: 0 marks for practical attendance
   let defaultCredit = 6;
 
-  const name = String(subject?.name || '').toLowerCase();
-  const isExplicit2Credit = /environment|evs|social\s*and\s*emotional|fit\s*india|sports|swachh|digital\s*empowerment|ethics|vedic|culture/i.test(name);
-  const isExplicitCoreOrGE = /entrepreneurship|analytics|macro|micro|accounting|finance|management|statistics|database|python|programming|data\s*structures|marketing|creativity/i.test(name);
-
   if (hasTU) {
-    // 4-Credit Core with Tutorial (3L + 1T): 6M Theory + 5M Tutorial = 11M
+    // Rule 1: 4-Credit Core with Tutorial (3L + 1T): 6M Theory + 5M Tutorial = 11M
     thMax = 6.0;
     defaultCredit = 6;
   } else if (hasTH && hasPR) {
-    // Has both Theory and Practical:
-    // In 4-Credit papers with Practicals (Core DSC 3L+1P or GE 2L+2P, like Business Analytics or Entrepreneurship Essentials),
-    // they are major Core/GE courses -> 6.0 M Theory.
-    // In 2-Credit blended papers (VAC/SEC 1L+1P, like Social & Emotional Learning or EVS), there is only 1 lecture/week -> 2.0 M Theory.
-    if (isExplicitCoreOrGE || (!isExplicit2Credit && thHeld >= 18)) {
+    // Rule 4: Both Theory and Practical present.
+    // Dissect 4-Credit Core/GE (3L+1P or 2L+2P) vs 2-Credit Blended SEC/VAC (1L+1P) via pure timetable math:
+    // 1. In 3L+1P, Theory contact hours exceed Practical (thHeld > prHeld)
+    // 2. High lecture volume (thHeld >= 16) indicates 2-3 lectures/week vs 1 lecture/week in 1L courses
+    // 3. High combined volume (totalHeld >= 40) reflects major 4-credit papers with lab sessions
+    const is4CreditBlended = (thHeld > prHeld) || (thHeld >= 16) || (totalHeld >= 40);
+    if (is4CreditBlended) {
       thMax = 6.0;
       defaultCredit = 6;
     } else {
@@ -101,11 +103,11 @@ export function inferDefaultMaxMarks(subject) {
       defaultCredit = 2;
     }
   } else if (hasTH && !hasPR && !hasTU) {
-    // Pure Theory without Tutorial/Practical (e.g. 2-Credit AEC 2L or Pure Theory 2L/4L)
+    // Rule 3: Pure Theory without Tutorial/Practical (e.g. 2-Credit AEC 2L): 4.0 M
     thMax = 4.0;
     defaultCredit = 4;
   } else if (!hasTH && hasPR) {
-    // Pure Practical (e.g. SEC Lab with 0 lectures)
+    // Rule 2: Pure Practical / Lab (e.g. 2-Credit SEC Lab with 0 lectures): 0.0 M
     thMax = 0.0;
     defaultCredit = 0;
   }
