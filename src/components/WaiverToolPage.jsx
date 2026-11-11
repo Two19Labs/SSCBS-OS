@@ -3796,15 +3796,18 @@ export default function WaiverToolPage({ onBack }) {
               ) : cdcLimit > 0 ? (
                 <>
                   <div className="rd-cdc-exemption-box">
-                    <span className="rd-sandbox-title">📋 CDC Attendance is Officially Claimable</span>
+                    <span className="rd-speculate-title">📋 CDC Attendance is Officially Claimable</span>
                     <p>
                       University of Delhi Ordinance VII bars society waivers when aggregate attendance is below 66.7%. However, <strong>Career Development Centre (CDC) attendance is an official placement cell award and CAN be claimed regardless of your attendance percentage</strong>.
                     </p>
                   </div>
-                  <div className="rd-ineligible-sandbox-box">
-                    <span className="rd-sandbox-title">🧪 Simulation & Sandbox Mode Active</span>
+                  <div className="rd-ineligible-speculate-box">
+                    <span className="rd-speculate-title">🔮 Expecting More Classes Before Semester Ends?</span>
                     <p>
-                      You can claim your CDC attendance dates below and simulate waivers to see how many future classes you need to attend to escape debarment.
+                      If you have upcoming lectures, makeup classes, or pending attendance updates that will help you hit <strong>66.7%</strong>, you can use the <strong>✎ Edit Attendance</strong> feature to add projected classes and test your target trajectory.
+                    </p>
+                    <p>
+                      You can also claim your CDC attendance dates below and plan waivers ahead so you are ready the moment your aggregate clears 66.7%.
                     </p>
                   </div>
                 </>
@@ -3819,10 +3822,13 @@ export default function WaiverToolPage({ onBack }) {
                   <div className="rd-ineligible-cdc-tip">
                     💡 <strong>Have CDC attendance?</strong> Enter your CDC attendance dates in the toolbar to see if they lift your total attendance above 66.7% and unlock waiver eligibility.
                   </div>
-                  <div className="rd-ineligible-sandbox-box">
-                    <span className="rd-sandbox-title">🧪 Simulation & Sandbox Mode Active</span>
+                  <div className="rd-ineligible-speculate-box">
+                    <span className="rd-speculate-title">🔮 Expecting More Classes Before Semester Ends?</span>
                     <p>
-                      Even though official submission is not permitted, <strong>you can still freely use this tool</strong> to test waiver dates, simulate attendance outcomes, and check exactly how many classes you must attend to escape debarment.
+                      If you have upcoming lectures, makeup classes, or pending attendance updates that could bring your aggregate to <strong>66.7%</strong>, you can use the <strong>✎ Edit Attendance</strong> feature to add projected classes and test if you can reach eligibility.
+                    </p>
+                    <p>
+                      You can also continue into the tool right now to explore waiver combinations and find the optimal dates so you are ready to claim them the moment your attendance crosses 66.7%.
                     </p>
                   </div>
                 </>
@@ -3842,26 +3848,52 @@ export default function WaiverToolPage({ onBack }) {
                   Apply Recommended Plan & Unlock Waivers ({solverResult.chosenDays?.length || 0} Waivers + {solverResult.chosenCdcDays?.length || 0} CDC) →
                 </button>
               ) : cdcLimit > 0 ? (
-                <button
-                  type="button"
-                  className="rd-ineligible-ack-btn"
-                  onClick={() => {
-                    setHasAcknowledgedIneligible(true);
-                    if (solverResult?.chosenCdcDays?.length > 0) {
-                      setSelectedCdcDays(new Set(solverResult.chosenCdcDays.map(d => d.dateStr)));
-                    }
-                  }}
-                >
-                  Apply CDC Attendance & Explore Sandbox →
-                </button>
+                <div className="rd-ineligible-footer-btns">
+                  <button
+                    type="button"
+                    className="rd-ineligible-secondary-btn"
+                    onClick={() => {
+                      setHasAcknowledgedIneligible(true);
+                      setGridToolMode('edit');
+                    }}
+                    title="Open Edit Attendance to add projected classes and simulate hitting 66.7%"
+                  >
+                    ✎ Project Classes in Edit Attendance
+                  </button>
+                  <button
+                    type="button"
+                    className="rd-ineligible-ack-btn"
+                    onClick={() => {
+                      setHasAcknowledgedIneligible(true);
+                      if (solverResult?.chosenCdcDays?.length > 0) {
+                        setSelectedCdcDays(new Set(solverResult.chosenCdcDays.map(d => d.dateStr)));
+                      }
+                    }}
+                  >
+                    Apply CDC Attendance & Continue →
+                  </button>
+                </div>
               ) : (
-                <button
-                  type="button"
-                  className="rd-ineligible-ack-btn"
-                  onClick={() => setHasAcknowledgedIneligible(true)}
-                >
-                  I Understand — Let Me Experiment →
-                </button>
+                <div className="rd-ineligible-footer-btns">
+                  <button
+                    type="button"
+                    className="rd-ineligible-secondary-btn"
+                    onClick={() => {
+                      setHasAcknowledgedIneligible(true);
+                      setGridToolMode('edit');
+                    }}
+                    title="Open Edit Attendance to add projected classes and simulate hitting 66.7%"
+                  >
+                    ✎ Project Classes in Edit Attendance
+                  </button>
+                  <button
+                    type="button"
+                    className="rd-ineligible-ack-btn"
+                    onClick={() => setHasAcknowledgedIneligible(true)}
+                  >
+                    Continue & Plan Waivers →
+                  </button>
+                </div>
               )}
             </div>
           </div>
