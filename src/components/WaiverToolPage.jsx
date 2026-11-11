@@ -27,7 +27,8 @@ import {
   calculateSubjectMarks,
   calculateAggregateMarks,
   inferDefaultMaxMarks,
-  CREDIT_OPTIONS
+  CREDIT_OPTIONS,
+  getSubjectCreditOptions
 } from '../lib/marksEngine';
 import './WaiverToolPage.css';
 
@@ -1927,17 +1928,7 @@ export default function WaiverToolPage({ onBack }) {
           </div>
           <div className="rd-sb-caption-row">
             {totalCdcCap === 0 ? (
-              <>
-                <span>{totalUsedWaivers >= totalWaiverCap ? 'Limit reached' : `${totalWaiverCap - totalUsedWaivers} remaining`}</span>
-                <button
-                  type="button"
-                  onClick={() => setCdcLimit(3)}
-                  className="rd-sb-cdc-link"
-                  title="Claim up to 3 Career Development Centre attendance days"
-                >
-                  + Add CDC days
-                </button>
-              </>
+              <span>{totalUsedWaivers >= totalWaiverCap ? 'Limit reached' : `${totalWaiverCap - totalUsedWaivers} remaining`}</span>
             ) : (
               <>
                 <span className="rd-sb-legend-item">
@@ -2320,11 +2311,7 @@ export default function WaiverToolPage({ onBack }) {
                   </div>
                   {sub.parts?.th && (
                     <div role="radiogroup" aria-label={`Credits for ${sub.name}`} className="rd-card-credits-segmented">
-                      {[
-                        { label: '4C · 6M', value: 6 },
-                        { label: 'GE/AEC · 4M', value: 4 },
-                        { label: '2C · 2M', value: 2 }
-                      ].map((opt) => {
+                      {getSubjectCreditOptions(sub).map((opt) => {
                         const isSelected = subMarks.thMax === opt.value;
                         return (
                           <button
@@ -2334,7 +2321,7 @@ export default function WaiverToolPage({ onBack }) {
                             aria-checked={isSelected}
                             className={`rd-credit-seg-btn ${isSelected ? 'is-active' : ''}`}
                             onClick={() => handleSetCreditOverride(sub.name, opt.value)}
-                            title={`Set to ${opt.label}`}
+                            title={opt.tooltip || `Set to ${opt.label}`}
                           >
                             {opt.label}
                           </button>
@@ -4141,7 +4128,7 @@ export default function WaiverToolPage({ onBack }) {
                     </svg>
                     ★ Star (Prioritize)
                   </span>
-                  <span className="rd-legend-credits" title="Internal assessment marks are calculated per DU UGCF continuous assessment guidelines. Credits are auto-estimated from timetables—adjust the dropdown on any card if needed.">
+                  <span className="rd-legend-credits" title="Internal assessment marks are calculated per DU UGCF continuous assessment guidelines. Credits are auto-estimated from timetables—adjust using the credit buttons on each card if needed.">
                     ℹ️ Credits auto-estimated · Adjust on cards if needed
                   </span>
                 </div>

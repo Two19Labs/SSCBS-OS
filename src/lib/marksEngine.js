@@ -116,6 +116,40 @@ export function inferDefaultMaxMarks(subject) {
 }
 
 /**
+ * Returns dynamic credit options for a subject tailored to its structural profile:
+ * - Theory + Tutorial (OB, Macro): 6M Th + 5M Tu = 11M, 4M Th + 5M Tu = 9M, 2M Th + 5M Tu = 7M
+ * - Theory + Practical (IBA, BI, SEL): 6M Th + 0M Pr = 6M, 4M Th + 0M Pr = 4M, 2M Th + 0M Pr = 2M
+ * - Pure Theory (Hindi B, AEC): 6M Th = 6M, 4M Th = 4M, 2M Th = 2M
+ */
+export function getSubjectCreditOptions(subject) {
+  const parts = subject?.parts || {};
+  const hasTU = getPartHeld(parts.tu) > 0;
+  const hasPR = getPartHeld(parts.pr) > 0;
+
+  if (hasTU) {
+    return [
+      { value: 6, label: '4C · 11M', tooltip: '4 Credits Core / GE (6M Theory + 5M Tutorial = 11M Total)' },
+      { value: 4, label: '4C · 9M', tooltip: '4 Credits GE / Elective (4M Theory + 5M Tutorial = 9M Total)' },
+      { value: 2, label: '2C · 7M', tooltip: '2 Credits Blended (2M Theory + 5M Tutorial = 7M Total)' }
+    ];
+  }
+
+  if (hasPR) {
+    return [
+      { value: 6, label: '4C · 6M', tooltip: '4 Credits Core (3L+1P: 6M Theory + 0M Practical = 6M Total)' },
+      { value: 4, label: 'GE · 4M', tooltip: '4 Credits GE (2L+2P: 4M Theory + 0M Practical = 4M Total)' },
+      { value: 2, label: '2C · 2M', tooltip: '2 Credits SEC / VAC (1L+1P: 2M Theory + 0M Practical = 2M Total)' }
+    ];
+  }
+
+  return [
+    { value: 6, label: '4C · 6M', tooltip: '4 Credits Pure Theory (4L: 6M Theory Total)' },
+    { value: 4, label: '2C · 4M', tooltip: '2 Credits AEC (2L: 4M Theory Total)' },
+    { value: 2, label: '2C · 2M', tooltip: '2 Credits SEC / VAC (1L: 2M Theory Total)' }
+  ];
+}
+
+/**
  * Calculate component attendance marks given percentage and max marks
  */
 export function calculateComponentMarks(pct, maxMarks) {
