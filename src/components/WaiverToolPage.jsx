@@ -30,6 +30,10 @@ import {
   CREDIT_OPTIONS,
   getSubjectCreditOptions
 } from '../lib/marksEngine';
+import {
+  compileAttendanceChangelog,
+  countTotalAuditChanges
+} from '../lib/attendanceAuditLogger';
 import './WaiverToolPage.css';
 
 function formatTimelineDisplay(startStr, endStr, sheetMinDate, sheetMaxDate) {
@@ -209,6 +213,19 @@ export default function WaiverToolPage({ onBack }) {
   const customizationDiff = useMemo(() => {
     return diffCustomizations(rawParsedData, parsedData);
   }, [rawParsedData, parsedData]);
+
+  // Total count of active user modifications (waivers, CDC, edits, dates, rules)
+  const totalAuditChanges = useMemo(() => {
+    return countTotalAuditChanges({
+      selectedWaivers,
+      selectedCdcDays,
+      priorityDates,
+      blacklistedDates,
+      creditOverrides,
+      specialAttendanceAdjustment,
+      customizationDiff
+    });
+  }, [selectedWaivers, selectedCdcDays, priorityDates, blacklistedDates, creditOverrides, specialAttendanceAdjustment, customizationDiff]);
 
   // Web Worker ref
   const workerRef = useRef(null);
@@ -1418,6 +1435,69 @@ export default function WaiverToolPage({ onBack }) {
 
     const onSuccess = () => {
       setCopyFeedback('✓ Copied to clipboard!');
+      setTimeout(() => setCopyFeedback(null), 3000);
+    };
+
+    const onFail = () => {
+      setCopyFeedback('Failed to copy');
+      setTimeout(() => setCopyFeedback(null), 2500);
+    };
+
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).then(onSuccess).catch(() => {
+        try {
+          const textArea = document.createElement('textarea');
+          textArea.value = text;
+          textArea.style.position = 'fixed';
+          textArea.style.opacity = '0';
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          const successful = document.execCommand('copy');
+          document.body.removeChild(textArea);
+          if (successful) onSuccess();
+          else onFail();
+        } catch {
+          onFail();
+        }
+      });
+    } else {
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        if (successful) onSuccess();
+        else onFail();
+      } catch {
+        onFail();
+      }
+    }
+  };
+
+  // Copy full audit log of all changes to clipboard
+  const handleCopyFullChangelog = () => {
+    const text = compileAttendanceChangelog({
+      rawParsedData,
+      currentParsedData: parsedData,
+      selectedWaivers,
+      selectedCdcDays,
+      priorityDates,
+      blacklistedDates,
+      creditOverrides,
+      specialAttendanceAdjustment,
+      totalsSummary,
+      aggregateMarks,
+      fileMeta
+    });
+
+    const onSuccess = () => {
+      setCopyFeedback('✓ Copied all changes to clipboard!');
       setTimeout(() => setCopyFeedback(null), 3000);
     };
 
@@ -4262,6 +4342,14 @@ export default function WaiverToolPage({ onBack }) {
                     >
                       Clear
                     </button>
+                    <button
+                      type="button"
+                      className="rd-btn-outline sm rd-copy-changes-btn"
+                      onClick={handleCopyFullChangelog}
+                      title="Copy complete audit log of all waivers, edits, and adjustments to clipboard"
+                    >
+                      📋 Copy All Changes {totalAuditChanges > 0 ? `(${totalAuditChanges})` : ''}
+                    </button>
                     <button type="button" className="rd-btn-dark" onClick={() => setIsGridExpanded(true)}>
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                         <polyline points="15 3 21 3 21 9" />
@@ -4394,6 +4482,14 @@ export default function WaiverToolPage({ onBack }) {
                       disabled={selectedDaysList.length === 0}
                     >
                       Copy list
+                    </button>
+                    <button
+                      type="button"
+                      className="rd-btn-outline sm rd-copy-changes-btn"
+                      onClick={handleCopyFullChangelog}
+                      title="Copy complete audit log of all waivers, edits, and adjustments to clipboard"
+                    >
+                      📋 Copy All Changes {totalAuditChanges > 0 ? `(${totalAuditChanges})` : ''}
                     </button>
                     <button
                       type="button"
@@ -4730,6 +4826,14 @@ export default function WaiverToolPage({ onBack }) {
                   title="Clear all active waivers & CDC days"
                 >
                   Clear
+                </button>
+                <button
+                  type="button"
+                  className="rd-btn-outline sm rd-copy-changes-btn"
+                  onClick={handleCopyFullChangelog}
+                  title="Copy complete audit log of all waivers, edits, and adjustments to clipboard"
+                >
+                  📋 Copy All Changes {totalAuditChanges > 0 ? `(${totalAuditChanges})` : ''}
                 </button>
                 <button type="button" className="rd-btn-dark" onClick={() => setIsGridExpanded(false)}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

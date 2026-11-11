@@ -838,6 +838,21 @@
   flex-wrap: wrap;
 }
 
+.rd-copy-changes-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 700;
+  transition: all 0.18s ease;
+}
+
+.rd-copy-changes-btn:hover {
+  background: var(--surface);
+  border-color: var(--ink-dim);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+
 .rd-ineligible-tag {
   font-size: 10px;
   font-weight: 800;
