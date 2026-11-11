@@ -3658,3 +3658,174 @@ th.rd-subj-h,
 }
 
 
+
+/* ── Real-Time Attendance Marks Styling ── */
+.rd-status-main-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.rd-status-marks-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+[data-theme='dark'] .rd-status-marks-pill {
+  background: rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.rd-marks-chip-title {
+  color: var(--muted, #666);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rd-marks-chip-score {
+  color: var(--ink, #1e1a17);
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+
+[data-theme='dark'] .rd-marks-chip-score {
+  color: #fff;
+}
+
+.rd-marks-chip-gain {
+  color: var(--green, #15803d);
+  background: var(--gtint, #dcf2e3);
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+[data-theme='dark'] .rd-marks-chip-gain {
+  background: rgba(21, 128, 61, 0.25);
+  color: #4ade80;
+}
+
+/* Card Marks Bar */
+.rd-card-marks-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--surface-muted, #f7f3ee);
+  border: 1px solid var(--line, #e6dfd4);
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 12.5px;
+}
+
+[data-theme='dark'] .rd-card-marks-bar {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.rd-card-marks-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.rd-marks-bar-label {
+  color: var(--muted, #7a6d5f);
+  font-weight: 600;
+  font-size: 11.5px;
+}
+
+.rd-marks-bar-val {
+  color: var(--ink, #1e1a17);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-theme='dark'] .rd-marks-bar-val {
+  color: #fff;
+}
+
+.rd-marks-bar-gain {
+  color: var(--green, #15803d);
+  background: var(--gtint, #dcf2e3);
+  padding: 1px 5px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+[data-theme='dark'] .rd-marks-bar-gain {
+  background: rgba(21, 128, 61, 0.25);
+  color: #4ade80;
+}
+
+.rd-credit-select-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.rd-credit-select {
+  border: 1px solid var(--line, #dcd4c8);
+  background: #ffffff;
+  color: var(--ink, #1e1a17);
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.rd-credit-select:hover {
+  border-color: var(--maroon, #71222c);
+}
+
+[data-theme='dark'] .rd-credit-select {
+  background: #25201c;
+  color: #f2e8e2;
+  border-color: #443c36;
+}
+
+/* Part Score Box */
+.rd-part-score-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rd-part-marks-chip {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted, #7a6d5f);
+  background: var(--track, #ece6dc);
+  padding: 1px 6px;
+  border-radius: 5px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+}
+
+.rd-part-marks-chip.muted {
+  opacity: 0.65;
+  font-weight: 500;
+}
+
+[data-theme='dark'] .rd-part-marks-chip {
+  background: rgba(255, 255, 255, 0.08);
+  color: #bbb;
+}

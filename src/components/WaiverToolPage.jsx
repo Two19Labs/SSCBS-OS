@@ -22,6 +22,13 @@ import {
   extractTargetParts,
   extractCandidateDays
 } from '../lib/waiverSolver';
+import {
+  calculateComponentMarks,
+  calculateSubjectMarks,
+  calculateAggregateMarks,
+  inferDefaultMaxMarks,
+  CREDIT_OPTIONS
+} from '../lib/marksEngine';
 import './WaiverToolPage.css';
 
 function formatTimelineDisplay(startStr, endStr, sheetMinDate, sheetMaxDate) {
@@ -145,6 +152,27 @@ export default function WaiverToolPage({ onBack }) {
 
   // One-third rule alert dismiss state
   const [isOneThirdAlertDismissed, setIsOneThirdAlertDismissed] = useState(false);
+
+  // Subject credit overrides for internal assessment marks calculation
+  const [creditOverrides, setCreditOverrides] = useState(() => {
+    if (typeof window === 'undefined') return {};
+    try {
+      const saved = localStorage.getItem(`sscbs_credit_overrides_${userKey}`);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const handleSetCreditOverride = (subjectName, value) => {
+    setCreditOverrides(prev => {
+      const next = { ...prev, [subjectName]: value };
+      try {
+        localStorage.setItem(`sscbs_credit_overrides_${userKey}`, JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
 
   // Solver outcome
   const [solverResult, setSolverResult] = useState(null);
@@ -1540,6 +1568,12 @@ export default function WaiverToolPage({ onBack }) {
     };
   }, [simStats, specialAttendanceAdjustment]);
 
+  // Real-time aggregate internal assessment attendance marks based on DU percentage slabs
+  const aggregateMarks = useMemo(() => {
+    if (!subjectSummaries || subjectSummaries.length === 0) return null;
+    return calculateAggregateMarks(subjectSummaries, creditOverrides);
+  }, [subjectSummaries, creditOverrides]);
+
   // Overall university eligibility check:
   // If a student's total attendance across all subjects combined is below 66.7%,
   // they cannot officially apply for waivers in college (per DU Ordinance VII).
@@ -1548,7 +1582,7 @@ export default function WaiverToolPage({ onBack }) {
 
   const partOrder = { th: 0, tu: 1, pr: 2 };
 
-  const renderPart = (part) => {
+  const renderPart = (part, sub, subMarks) => {
     const status = getPartStatus(part);
     const held = part.simN === undefined ? part.n : part.simN;
     if (status === 'none') {
@@ -1568,6 +1602,16 @@ export default function WaiverToolPage({ onBack }) {
     const hasChanged = Math.abs(currentPct - basePct) > 0.05;
     const buff = status === 'info' ? null : calculatePartBufferAndNeeded(part.simAttended ?? part.simP, part.simHeld ?? part.simN, threshold);
 
+    let partMaxM = 0;
+    let partEarnedM = 0;
+    if (part.type === 'th') {
+      partMaxM = subMarks?.thMax ?? 6.0;
+      partEarnedM = subMarks?.thEarned ?? 0.0;
+    } else if (part.type === 'tu') {
+      partMaxM = subMarks?.tuMax ?? 5.0;
+      partEarnedM = subMarks?.tuEarned ?? 0.0;
+    }
+
     return (
       <div key={part.type} className="rd-part">
         <div className="rd-part-top">
@@ -1585,7 +1629,18 @@ export default function WaiverToolPage({ onBack }) {
           </div>
           <div className="rd-part-right">
             <span className="rd-was">{hasChanged ? `was ${basePct.toFixed(1)}%` : 'unchanged'}</span>
-            <span className={`rd-pct s-${status}`}>{currentPct.toFixed(1)}%</span>
+            <div className="rd-part-score-box">
+              <span className={`rd-pct s-${status}`}>{currentPct.toFixed(1)}%</span>
+              {partMaxM > 0 ? (
+                <span className="rd-part-marks-chip" title={`${part.shortType || part.type} attendance marks`}>
+                  <strong>{partEarnedM}</strong>/{partMaxM} M
+                </span>
+              ) : (
+                <span className="rd-part-marks-chip muted" title="Practical attendance carries 0 internal marks per DU UGCF">
+                  0 M
+                </span>
+              )}
+            </div>
           </div>
         </div>
         <div className="rd-bar">
@@ -1599,13 +1654,13 @@ export default function WaiverToolPage({ onBack }) {
         </div>
         <div className="rd-caption">
           {status === 'info' ? (
-            `Counted in aggregate attendance · Not targeted for individual waivers`
+            `Counted in aggregate attendance · Not targeted for individual waivers (0 marks)`
           ) : status === 'fail' ? (
-            <>⚠️ <strong style={{ color: 'var(--red, #b91c1c)' }}>Risk:</strong> Below 66.7% minimum. Attend <strong>{buff.classesNeededForDebarSafe || 1}</strong> class(es) to avoid risk.</>
+            <>⚠️ <strong style={{ color: 'var(--red, #b91c1c)' }}>Risk:</strong> Below 66.7% minimum. Attend <strong>{buff.classesNeededForDebarSafe || 1}</strong> class(es) to avoid risk (currently 0 M).</>
           ) : buff.passes ? (
-            <>Can miss <strong>{buff.missableBuffer}</strong> more and stay above {threshold}%</>
+            <>Full marks ({partMaxM} M) · Can miss <strong>{buff.missableBuffer}</strong> more without dropping below {threshold}%</>
           ) : (
-            <>Safe from debarment. Attend <strong>{buff.classesNeeded}</strong> in a row to reach {threshold}%</>
+            <>Safe from debarment ({partEarnedM}/{partMaxM} M) · Attend <strong>{buff.classesNeeded}</strong> in a row to reach {threshold}%{partMaxM > partEarnedM ? ` (+${(partMaxM - partEarnedM).toFixed(1)} M)` : ''}</>
           )}
         </div>
         {part.isOverOneThird && (
@@ -1957,6 +2012,7 @@ export default function WaiverToolPage({ onBack }) {
         }
 
         const isStarred = starredSubjects.has(sub.name);
+        const subMarks = calculateSubjectMarks(sub, creditOverrides[sub.name]);
 
         return (
           <article key={sIdx} className={`rd-card ${isStarred ? 'rd-card-starred' : ''}`}>
@@ -1984,10 +2040,43 @@ export default function WaiverToolPage({ onBack }) {
               </div>
               <span className={`rd-pill p-${pill[1]}`}>{pill[0]}</span>
             </div>
+
+            {/* Sleek Marks Bar */}
+            {subMarks.subjectMax > 0 && (
+              <div className="rd-card-marks-bar">
+                <div className="rd-card-marks-left">
+                  <span className="rd-marks-bar-label">Internal Marks:</span>
+                  <span className="rd-marks-bar-val">
+                    <strong>{subMarks.subjectEarned}</strong> / {subMarks.subjectMax} M
+                  </span>
+                  {subMarks.subjectGain > 0 && (
+                    <span className="rd-marks-bar-gain">+{subMarks.subjectGain.toFixed(1)} M</span>
+                  )}
+                </div>
+                {sub.parts?.th && (
+                  <div className="rd-credit-select-wrap">
+                    <select
+                      className="rd-credit-select"
+                      value={subMarks.thMax}
+                      onChange={(e) => handleSetCreditOverride(sub.name, Number(e.target.value))}
+                      title="Select lecture credit weighting for internal assessment marks"
+                      aria-label={`Credit setting for ${sub.name}`}
+                    >
+                      {CREDIT_OPTIONS.map(opt => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.shortLabel}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
+            )}
+
             {parts.map((p, pIdx) => (
               <React.Fragment key={p.type}>
                 {pIdx > 0 && <div className="rd-divider" />}
-                {renderPart(p)}
+                {renderPart(p, sub, subMarks)}
               </React.Fragment>
             ))}
           </article>
@@ -3706,7 +3795,18 @@ export default function WaiverToolPage({ onBack }) {
                 )}
               </div>
               <div className="rd-status-info">
-                <strong>{passingTargetCount} of {totalTargetParts} parts meet {threshold}%</strong>
+                <div className="rd-status-main-row">
+                  <strong>{passingTargetCount} of {totalTargetParts} parts meet {threshold}%</strong>
+                  {aggregateMarks && aggregateMarks.maxMarks > 0 && (
+                    <div className="rd-status-marks-pill" title="Total internal assessment attendance marks based on DU percentage slabs">
+                      <span className="rd-marks-chip-title">Marks:</span>
+                      <span className="rd-marks-chip-score">{aggregateMarks.earned} / {aggregateMarks.maxMarks} M</span>
+                      {aggregateMarks.gain > 0 && (
+                        <span className="rd-marks-chip-gain">+{aggregateMarks.gain.toFixed(1)} M</span>
+                      )}
+                    </div>
+                  )}
+                </div>
                 <span className="rd-status-sub">
                   {selectedWaivers.size === 0 && selectedCdcDays.size === 0
                     ? 'Baseline (0 applied)'
