@@ -3750,18 +3750,18 @@ export default function WaiverToolPage({ onBack }) {
         <div className="rd-ineligible-overlay" role="dialog" aria-modal="true" aria-labelledby="rd-ineligible-title">
           <div className="rd-ineligible-modal">
             <div className="rd-ineligible-badge">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
                 <line x1="12" y1="9" x2="12" y2="13" />
                 <line x1="12" y1="17" x2="12.01" y2="17" />
               </svg>
-              <span>OFFICIAL ATTENDANCE NOTICE</span>
+              <span>ATTENDANCE NOTICE</span>
             </div>
 
             <h2 id="rd-ineligible-title" className="rd-ineligible-title">
               {solverResult?.cdcRescue?.cdcRescued
                 ? 'CDC Attendance Rescues Eligibility!'
-                : 'Not Eligible for College Society Waivers'}
+                : 'Overall Attendance is Below 66.7%'}
             </h2>
 
             <div className="rd-ineligible-metric-card">
@@ -3795,41 +3795,42 @@ export default function WaiverToolPage({ onBack }) {
                 </div>
               ) : cdcLimit > 0 ? (
                 <>
-                  <div className="rd-cdc-exemption-box">
-                    <span className="rd-speculate-title">📋 CDC Attendance is Officially Claimable</span>
-                    <p>
-                      University of Delhi Ordinance VII bars society waivers when aggregate attendance is below 66.7%. However, <strong>Career Development Centre (CDC) attendance is an official placement cell award and CAN be claimed regardless of your attendance percentage</strong>.
-                    </p>
-                  </div>
-                  <div className="rd-ineligible-speculate-box">
-                    <span className="rd-speculate-title">🔮 Expecting More Classes Before Semester Ends?</span>
-                    <p>
-                      If you have upcoming lectures, makeup classes, or pending attendance updates that will help you hit <strong>66.7%</strong>, you can use the <strong>✎ Edit Attendance</strong> feature to add projected classes and test your target trajectory.
-                    </p>
-                    <p>
-                      You can also claim your CDC attendance dates below and plan waivers ahead so you are ready the moment your aggregate clears 66.7%.
-                    </p>
+                  <p className="rd-ineligible-lead-text">
+                    While society waivers require &ge; 66.7% aggregate attendance under DU rules, <strong>Career Development Centre (CDC) attendance is an official placement cell award and CAN be claimed regardless of your attendance percentage</strong>.
+                  </p>
+                  <div className="rd-ineligible-action-card">
+                    <div className="rd-ineligible-action-item">
+                      <span className="rd-ineligible-action-heading">🔮 Project Future Attendance</span>
+                      <p>
+                        Expecting upcoming lectures or pending marks? Use <strong>✎ Edit Attendance</strong> to project classes and see if they lift your total above 66.7%.
+                      </p>
+                    </div>
+                    <div className="rd-ineligible-action-item">
+                      <span className="rd-ineligible-action-heading">📋 Claim CDC & Plan Ahead</span>
+                      <p>
+                        Claim your CDC attendance dates below and test waiver combinations so you are prepared once your total crosses 66.7%.
+                      </p>
+                    </div>
                   </div>
                 </>
               ) : (
                 <>
-                  <p>
-                    According to University of Delhi Ordinance VII and SSCBS examination rules, students with an <strong>overall aggregate attendance below 66.7%</strong> across all subjects combined are <strong>strictly not eligible to apply for society waivers</strong> to the college administration.
+                  <p className="rd-ineligible-lead-text">
+                    Under University of Delhi Ordinance VII, an overall aggregate of at least <strong>66.7%</strong> across all subjects is required to submit society waivers. Individual subject waivers can only be claimed once your combined total crosses this threshold.
                   </p>
-                  <div className="rd-ineligible-rule-note">
-                    <strong>Clarification:</strong> Students who maintain <strong>&ge; 66.7% overall attendance</strong> can still apply waivers for specific individual subjects below 66.7%. However, when your combined total across all subjects is under 66.7%, the administration cannot accept society waivers.
-                  </div>
-                  <div className="rd-ineligible-cdc-tip">
-                    💡 <strong>Have CDC attendance?</strong> Enter your CDC attendance dates in the toolbar to see if they lift your total attendance above 66.7% and unlock waiver eligibility.
-                  </div>
-                  <div className="rd-ineligible-speculate-box">
-                    <span className="rd-speculate-title">🔮 Expecting More Classes Before Semester Ends?</span>
-                    <p>
-                      If you have upcoming lectures, makeup classes, or pending attendance updates that could bring your aggregate to <strong>66.7%</strong>, you can use the <strong>✎ Edit Attendance</strong> feature to add projected classes and test if you can reach eligibility.
-                    </p>
-                    <p>
-                      You can also continue into the tool right now to explore waiver combinations and find the optimal dates so you are ready to claim them the moment your attendance crosses 66.7%.
-                    </p>
+                  <div className="rd-ineligible-action-card">
+                    <div className="rd-ineligible-action-item">
+                      <span className="rd-ineligible-action-heading">🔮 Project Future Attendance</span>
+                      <p>
+                        Expecting upcoming lectures or pending marks? Use <strong>✎ Edit Attendance</strong> to project future classes and test what it takes to hit 66.7%.
+                      </p>
+                    </div>
+                    <div className="rd-ineligible-action-item">
+                      <span className="rd-ineligible-action-heading">📋 Plan Waivers & CDC Days</span>
+                      <p>
+                        Find your optimal waiver dates now, or enter CDC attendance dates if you have them, so you're ready once your attendance clears 66.7%.
+                      </p>
+                    </div>
                   </div>
                 </>
               )}
@@ -3855,8 +3856,9 @@ export default function WaiverToolPage({ onBack }) {
                     onClick={() => {
                       setHasAcknowledgedIneligible(true);
                       setGridToolMode('edit');
+                      setIsGridExpanded(true);
                     }}
-                    title="Open Edit Attendance to add projected classes and simulate hitting 66.7%"
+                    title="Open Edit Attendance in full expanded grid to project classes"
                   >
                     ✎ Project Classes in Edit Attendance
                   </button>
@@ -3881,8 +3883,9 @@ export default function WaiverToolPage({ onBack }) {
                     onClick={() => {
                       setHasAcknowledgedIneligible(true);
                       setGridToolMode('edit');
+                      setIsGridExpanded(true);
                     }}
-                    title="Open Edit Attendance to add projected classes and simulate hitting 66.7%"
+                    title="Open Edit Attendance in full expanded grid to project classes"
                   >
                     ✎ Project Classes in Edit Attendance
                   </button>
@@ -3891,7 +3894,7 @@ export default function WaiverToolPage({ onBack }) {
                     className="rd-ineligible-ack-btn"
                     onClick={() => setHasAcknowledgedIneligible(true)}
                   >
-                    Continue & Plan Waivers →
+                    Continue to Planner →
                   </button>
                 </div>
               )}
