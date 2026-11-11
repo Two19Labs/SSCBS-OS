@@ -3776,6 +3776,15 @@ th.rd-subj-h,
 .rd-credit-select-wrap {
   display: flex;
   align-items: center;
+  gap: 5px;
+}
+
+.rd-credit-select-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted, #7a6d5f);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .rd-credit-select {
@@ -3790,6 +3799,7 @@ th.rd-subj-h,
   outline: none;
   font-family: inherit;
   transition: border-color 0.15s ease;
+  max-width: 210px;
 }
 
 .rd-credit-select:hover {
@@ -3800,6 +3810,41 @@ th.rd-subj-h,
   background: #25201c;
   color: #f2e8e2;
   border-color: #443c36;
+}
+
+/* Marks Transparency Note */
+.rd-marks-transparency-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #fbf9f5;
+  border: 1px solid var(--line, #dcd4c8);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--muted, #605548);
+}
+
+.rd-marks-transparency-note strong {
+  color: var(--ink, #1e1a17);
+  font-weight: 700;
+}
+
+.rd-marks-transparency-note .rd-note-icon {
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+[data-theme='dark'] .rd-marks-transparency-note {
+  background: #201b17;
+  border-color: #383029;
+  color: #a89c90;
+}
+
+[data-theme='dark'] .rd-marks-transparency-note strong {
+  color: #f0e6de;
 }
 
 /* Part Score Box */

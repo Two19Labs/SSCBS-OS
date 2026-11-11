@@ -2055,15 +2055,16 @@ export default function WaiverToolPage({ onBack }) {
                 </div>
                 {sub.parts?.th && (
                   <div className="rd-credit-select-wrap">
+                    <span className="rd-credit-select-label">Credits:</span>
                     <select
                       className="rd-credit-select"
                       value={subMarks.thMax}
                       onChange={(e) => handleSetCreditOverride(sub.name, Number(e.target.value))}
-                      title="Select lecture credit weighting for internal assessment marks"
+                      title="Select paper credit weighting for internal assessment marks"
                       aria-label={`Credit setting for ${sub.name}`}
                     >
                       {CREDIT_OPTIONS.map(opt => (
-                        <option key={opt.value} value={opt.value}>
+                        <option key={opt.value} value={opt.value} title={opt.label}>
                           {opt.shortLabel}
                         </option>
                       ))}
@@ -3901,6 +3902,14 @@ export default function WaiverToolPage({ onBack }) {
                     ★ Star (Prioritize)
                   </span>
                 </div>
+              </div>
+
+              {/* Marks Transparency Note */}
+              <div className="rd-marks-transparency-note">
+                <span className="rd-note-icon">ℹ️</span>
+                <span className="rd-note-text">
+                  <strong>Attendance Marks:</strong> Calculated via DU UGCF continuous assessment guidelines. Credits are auto-inferred from class schedule—please double-check and adjust paper credits on each card if needed.
+                </span>
               </div>
 
               {renderSubjectCards()}

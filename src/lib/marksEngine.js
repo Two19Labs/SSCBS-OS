@@ -28,9 +28,9 @@ export function getSlabLevel(pct) {
  * Standard credit options that can be toggled for Theory
  */
 export const CREDIT_OPTIONS = [
-  { value: 6, label: '4 Credits (6M Theory)', shortLabel: '4C · 6M' },
-  { value: 4, label: '2 Credits Pure Theory (4M)', shortLabel: '2C · 4M' },
-  { value: 2, label: '2 Credits Blended (2M)', shortLabel: '2C · 2M' }
+  { value: 6, label: '4 Credits Core (3L+1T or 3L+1P · 6M Theory)', shortLabel: '4 Credits · 6M' },
+  { value: 4, label: '4 Credits GE / 2-Credit AEC (2L · 4M Theory)', shortLabel: '4C GE / 2C AEC · 4M' },
+  { value: 2, label: '2 Credits Blended SEC / VAC (1L+1P · 2M Theory)', shortLabel: '2 Credits · 2M' }
 ];
 
 /**
@@ -63,15 +63,17 @@ function getPartAttended(part) {
  * Automatically infers default max marks based on available components
  * in DU UGCF NEP:
  * - Has Tutorial (TU) -> 4-Credit Core (Theory 6M, Tutorial 5M)
- * - Has Practical (PR) only -> Pure Practical (0M)
- * - Has TH + PR -> 2-Credit Blended SEC/VAC (Theory 2M, Practical 0M)
- * - Has TH only -> 2-Credit Pure Theory (Theory 4M)
+ * - Has TH + PR and high lecture count (>= 20) -> 4-Credit Core with Practical (Theory 6M, Practical 0M)
+ * - Has TH + PR and lower lecture count (< 20) -> 2-Credit Blended SEC/VAC (Theory 2M, Practical 0M)
+ * - Has TH only -> 2-Credit Pure Theory / AEC (Theory 4M)
+ * - Has PR only -> Pure Practical (0M)
  */
 export function inferDefaultMaxMarks(subject) {
   const parts = subject?.parts || {};
   const hasTU = getPartHeld(parts.tu) > 0;
   const hasPR = getPartHeld(parts.pr) > 0;
   const hasTH = getPartHeld(parts.th) > 0;
+  const thHeld = getPartHeld(parts.th);
 
   let thMax = 6.0;
   let tuMax = hasTU ? 5.0 : 0.0;
@@ -79,15 +81,27 @@ export function inferDefaultMaxMarks(subject) {
   let defaultCredit = 6;
 
   if (hasTU) {
+    // 4-Credit Core with Tutorial (3L + 1T): 6M Theory + 5M Tutorial = 11M
     thMax = 6.0;
     defaultCredit = 6;
   } else if (hasTH && hasPR) {
-    thMax = 2.0;
-    defaultCredit = 2;
+    // Has both Theory and Practical:
+    // If high lecture count (>= 20 classes held), it is a 4-Credit Core/DSC paper with Practical
+    // (3L + 1P, e.g. Introduction to Business Analytics or Computer Science), so Theory is 6.0 M.
+    // Otherwise, it is a 2-Credit blended SEC/VAC (1L + 1P), where Theory is 2.0 M.
+    if (thHeld >= 20) {
+      thMax = 6.0;
+      defaultCredit = 6;
+    } else {
+      thMax = 2.0;
+      defaultCredit = 2;
+    }
   } else if (hasTH && !hasPR && !hasTU) {
+    // Pure Theory without Tutorial/Practical (e.g. 2-Credit AEC 2L or Pure Theory 2L/4L)
     thMax = 4.0;
     defaultCredit = 4;
   } else if (!hasTH && hasPR) {
+    // Pure Practical (e.g. SEC Lab with 0 lectures)
     thMax = 0.0;
     defaultCredit = 0;
   }
