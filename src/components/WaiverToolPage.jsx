@@ -1960,9 +1960,13 @@ export default function WaiverToolPage({ onBack }) {
           <div className="rd-sb-meta-row">
             <span className="rd-sb-col-title">Internal marks</span>
             <span className="rd-sb-marks-tally">
-              <b className="rd-sb-marks-num">{marksData.earned.toFixed(1)} / {marksData.maxMarks} M</b>
+              <b className="rd-sb-marks-num">
+                {marksData.earned.toFixed(1)}
+                <span className="rd-sb-marks-denom">/{marksData.maxMarks}</span>
+                <span className="rd-sb-marks-unit">M</span>
+              </b>
               {marksData.gain > 0 && (
-                <span className="rd-sb-gain-badge">+{marksData.gain.toFixed(1)} M</span>
+                <span className="rd-sb-gain-badge">+{marksData.gain.toFixed(1)}M</span>
               )}
             </span>
           </div>
@@ -2380,9 +2384,13 @@ export default function WaiverToolPage({ onBack }) {
                 <div className="rd-card-marks-header">
                   <div className="rd-card-marks-score-group">
                     <span className="rd-card-marks-lbl">Marks</span>
-                    <b className="rd-card-marks-val">{subMarks.subjectEarned} / {subMarks.subjectMax} M</b>
+                    <b className="rd-card-marks-val">
+                      {subMarks.subjectEarned}
+                      <span className="rd-card-marks-denom">/{subMarks.subjectMax}</span>
+                      <span className="rd-card-marks-unit">M</span>
+                    </b>
                     {subMarks.subjectGain > 0 && (
-                      <span className="rd-card-marks-gain">+{subMarks.subjectGain.toFixed(1)} M</span>
+                      <span className="rd-card-marks-gain">+{subMarks.subjectGain.toFixed(1)}M</span>
                     )}
                   </div>
                   {sub.parts?.th && (

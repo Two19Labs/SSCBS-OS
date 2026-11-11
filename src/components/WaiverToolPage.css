@@ -2186,17 +2186,47 @@
   border-right: 1px solid var(--rd-sb-rule);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1140px) {
+  .rd-status-bar-5col {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 20px;
+    padding: 16px 18px;
+  }
+
+  .rd-sb-col {
+    padding: 0 !important;
+  }
+
   .rd-sb-col:not(:last-child) {
     border-right: none;
+  }
+
+  .rd-sb-col-1,
+  .rd-sb-col-2 {
     border-bottom: 1px solid var(--rd-sb-rule);
-    padding-bottom: 12px;
+    padding-bottom: 14px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .rd-status-bar-5col {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 14px;
+  }
+
+  .rd-sb-col-1,
+  .rd-sb-col-2,
+  .rd-sb-col-3 {
+    border-bottom: 1px solid var(--rd-sb-rule);
+    padding-bottom: 14px !important;
   }
 }
 
 /* Col 1: Status Tone & Icon */
 .rd-sb-col-1 {
-  flex: 1.25 1 240px;
+  flex: 1.15 1 220px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -2291,12 +2321,13 @@
 
 /* Col 2: Parts on Target */
 .rd-sb-col-2 {
-  flex: 1.45 1 260px;
+  flex: 1.35 1 240px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 8px;
   padding: 0 18px;
+  min-width: 0;
 }
 
 .rd-sb-meta-row {
@@ -2304,14 +2335,17 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 8px;
+  min-width: 0;
 }
 
 .rd-sb-col-title {
   font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: #5f5852;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 [data-theme='dark'] .rd-sb-col-title {
@@ -2395,38 +2429,72 @@
 
 /* Col 3: Internal Marks */
 .rd-sb-col-3 {
-  flex: 1.3 1 240px;
+  flex: 1.45 1 260px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 8px;
   padding: 0 18px;
+  min-width: 0;
 }
 
 .rd-sb-marks-tally {
-  display: flex;
+  display: inline-flex;
   align-items: baseline;
-  gap: 6px;
+  gap: 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .rd-sb-marks-num {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 800;
   color: #1e1a17;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.rd-sb-marks-num .rd-sb-marks-denom {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #8a8279;
+}
+
+.rd-sb-marks-num .rd-sb-marks-unit {
+  font-size: 11px;
+  font-weight: 800;
+  color: #8a8279;
+  margin-left: 2px;
+  letter-spacing: 0.02em;
 }
 
 [data-theme='dark'] .rd-sb-marks-num {
   color: #fff;
 }
 
+[data-theme='dark'] .rd-sb-marks-num .rd-sb-marks-denom {
+  color: #9a9187;
+}
+
+[data-theme='dark'] .rd-sb-marks-num .rd-sb-marks-unit {
+  color: #9a9187;
+}
+
 .rd-sb-gain-badge {
-  padding: 1px 6px;
+  padding: 1.5px 6px;
   border-radius: 5px;
   background: #dcf2e3;
   color: #15803d;
   font-size: 11px;
   font-weight: 800;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
 }
 
 [data-theme='dark'] .rd-sb-gain-badge {
@@ -2485,6 +2553,9 @@
   font-size: 11.5px;
   font-weight: 600;
   color: #8a8279;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 [data-theme='dark'] .rd-sb-note {
@@ -4286,14 +4357,18 @@ th.rd-subj-h,
 }
 
 .rd-card-marks-score-group {
-  display: flex;
+  display: inline-flex;
   align-items: baseline;
-  gap: 7px;
+  gap: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .rd-card-marks-lbl {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   color: #5f5852;
 }
 
@@ -4302,23 +4377,57 @@ th.rd-subj-h,
 }
 
 .rd-card-marks-val {
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 800;
   color: #1e1a17;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.rd-card-marks-val .rd-card-marks-denom {
+  font-size: 12px;
+  font-weight: 700;
+  color: #8a8279;
+}
+
+.rd-card-marks-val .rd-card-marks-unit {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #8a8279;
+  margin-left: 2px;
+  letter-spacing: 0.02em;
 }
 
 [data-theme='dark'] .rd-card-marks-val {
   color: #fff;
 }
 
+[data-theme='dark'] .rd-card-marks-val .rd-card-marks-denom {
+  color: #9a9187;
+}
+
+[data-theme='dark'] .rd-card-marks-val .rd-card-marks-unit {
+  color: #9a9187;
+}
+
 .rd-card-marks-gain {
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 800;
   color: #15803d;
+  background: #dcf2e3;
+  padding: 1px 5px;
+  border-radius: 4px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
 }
 
 [data-theme='dark'] .rd-card-marks-gain {
+  background: rgba(21, 128, 61, 0.25);
   color: #4ade80;
 }
 
