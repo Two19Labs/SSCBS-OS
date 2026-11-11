@@ -80,16 +80,20 @@ export function inferDefaultMaxMarks(subject) {
   let prMax = 0.0; // DU UGCF rule: 0 marks for practical attendance
   let defaultCredit = 6;
 
+  const name = String(subject?.name || '').toLowerCase();
+  const isExplicit2Credit = /environment|evs|social\s*and\s*emotional|fit\s*india|sports|swachh|digital\s*empowerment|ethics|vedic|culture/i.test(name);
+  const isExplicitCoreOrGE = /entrepreneurship|analytics|macro|micro|accounting|finance|management|statistics|database|python|programming|data\s*structures|marketing|creativity/i.test(name);
+
   if (hasTU) {
     // 4-Credit Core with Tutorial (3L + 1T): 6M Theory + 5M Tutorial = 11M
     thMax = 6.0;
     defaultCredit = 6;
   } else if (hasTH && hasPR) {
     // Has both Theory and Practical:
-    // If high lecture count (>= 20 classes held), it is a 4-Credit Core/DSC paper with Practical
-    // (3L + 1P, e.g. Introduction to Business Analytics or Computer Science), so Theory is 6.0 M.
-    // Otherwise, it is a 2-Credit blended SEC/VAC (1L + 1P), where Theory is 2.0 M.
-    if (thHeld >= 20) {
+    // In 4-Credit papers with Practicals (Core DSC 3L+1P or GE 2L+2P, like Business Analytics or Entrepreneurship Essentials),
+    // they are major Core/GE courses -> 6.0 M Theory.
+    // In 2-Credit blended papers (VAC/SEC 1L+1P, like Social & Emotional Learning or EVS), there is only 1 lecture/week -> 2.0 M Theory.
+    if (isExplicitCoreOrGE || (!isExplicit2Credit && thHeld >= 18)) {
       thMax = 6.0;
       defaultCredit = 6;
     } else {
