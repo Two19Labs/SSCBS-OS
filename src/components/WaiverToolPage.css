@@ -853,6 +853,12 @@
   transform: translateY(-1px);
 }
 
+.rd-copy-changes-btn.copied {
+  color: var(--success);
+  border-color: var(--success);
+  background: var(--success-tint);
+}
+
 .rd-ineligible-tag {
   font-size: 10px;
   font-weight: 800;

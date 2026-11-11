@@ -31,8 +31,7 @@ import {
   getSubjectCreditOptions
 } from '../lib/marksEngine';
 import {
-  compileAttendanceChangelog,
-  countTotalAuditChanges
+  compileAttendanceChangelog
 } from '../lib/attendanceAuditLogger';
 import './WaiverToolPage.css';
 
@@ -202,30 +201,14 @@ export default function WaiverToolPage({ onBack }) {
   // Grid modal expansion state
   const [isGridExpanded, setIsGridExpanded] = useState(false);
 
-  // Copy feedback
+  // Copy feedback & changelog copied status
   const [copyFeedback, setCopyFeedback] = useState(null);
+  const [copiedChangelog, setCopiedChangelog] = useState(false);
+  const changelogCopyTimerRef = useRef(null);
 
   // Hovered date tooltip for live diff preview
   const [hoveredDate, setHoveredDate] = useState(null);
   const [popoverPos, setPopoverPos] = useState({ x: 0, y: 0 });
-
-  // Track manual attendance customizations diff
-  const customizationDiff = useMemo(() => {
-    return diffCustomizations(rawParsedData, parsedData);
-  }, [rawParsedData, parsedData]);
-
-  // Total count of active user modifications (waivers, CDC, edits, dates, rules)
-  const totalAuditChanges = useMemo(() => {
-    return countTotalAuditChanges({
-      selectedWaivers,
-      selectedCdcDays,
-      priorityDates,
-      blacklistedDates,
-      creditOverrides,
-      specialAttendanceAdjustment,
-      customizationDiff
-    });
-  }, [selectedWaivers, selectedCdcDays, priorityDates, blacklistedDates, creditOverrides, specialAttendanceAdjustment, customizationDiff]);
 
   // Web Worker ref
   const workerRef = useRef(null);
@@ -245,6 +228,9 @@ export default function WaiverToolPage({ onBack }) {
     return () => {
       if (workerRef.current) {
         workerRef.current.terminate();
+      }
+      if (changelogCopyTimerRef.current) {
+        clearTimeout(changelogCopyTimerRef.current);
       }
     };
   }, []);
@@ -1497,8 +1483,13 @@ export default function WaiverToolPage({ onBack }) {
     });
 
     const onSuccess = () => {
-      setCopyFeedback('✓ Copied all changes to clipboard!');
-      setTimeout(() => setCopyFeedback(null), 3000);
+      setCopiedChangelog(true);
+      setCopyFeedback('Copied');
+      if (changelogCopyTimerRef.current) clearTimeout(changelogCopyTimerRef.current);
+      changelogCopyTimerRef.current = setTimeout(() => {
+        setCopiedChangelog(false);
+        setCopyFeedback(null);
+      }, 3000);
     };
 
     const onFail = () => {
@@ -4344,11 +4335,11 @@ export default function WaiverToolPage({ onBack }) {
                     </button>
                     <button
                       type="button"
-                      className="rd-btn-outline sm rd-copy-changes-btn"
+                      className={`rd-btn-outline sm rd-copy-changes-btn ${copiedChangelog ? 'copied' : ''}`}
                       onClick={handleCopyFullChangelog}
-                      title="Copy complete audit log of all waivers, edits, and adjustments to clipboard"
+                      title="Copy complete list of all changes, waivers, edits, and adjustments to clipboard"
                     >
-                      📋 Copy All Changes {totalAuditChanges > 0 ? `(${totalAuditChanges})` : ''}
+                      {copiedChangelog ? 'Copied' : 'Copy List of Changes'}
                     </button>
                     <button type="button" className="rd-btn-dark" onClick={() => setIsGridExpanded(true)}>
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -4485,11 +4476,11 @@ export default function WaiverToolPage({ onBack }) {
                     </button>
                     <button
                       type="button"
-                      className="rd-btn-outline sm rd-copy-changes-btn"
+                      className={`rd-btn-outline sm rd-copy-changes-btn ${copiedChangelog ? 'copied' : ''}`}
                       onClick={handleCopyFullChangelog}
-                      title="Copy complete audit log of all waivers, edits, and adjustments to clipboard"
+                      title="Copy complete list of all changes, waivers, edits, and adjustments to clipboard"
                     >
-                      📋 Copy All Changes {totalAuditChanges > 0 ? `(${totalAuditChanges})` : ''}
+                      {copiedChangelog ? 'Copied' : 'Copy List of Changes'}
                     </button>
                     <button
                       type="button"
@@ -4829,11 +4820,11 @@ export default function WaiverToolPage({ onBack }) {
                 </button>
                 <button
                   type="button"
-                  className="rd-btn-outline sm rd-copy-changes-btn"
+                  className={`rd-btn-outline sm rd-copy-changes-btn ${copiedChangelog ? 'copied' : ''}`}
                   onClick={handleCopyFullChangelog}
-                  title="Copy complete audit log of all waivers, edits, and adjustments to clipboard"
+                  title="Copy complete list of all changes, waivers, edits, and adjustments to clipboard"
                 >
-                  📋 Copy All Changes {totalAuditChanges > 0 ? `(${totalAuditChanges})` : ''}
+                  {copiedChangelog ? 'Copied' : 'Copy List of Changes'}
                 </button>
                 <button type="button" className="rd-btn-dark" onClick={() => setIsGridExpanded(false)}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
