@@ -1110,8 +1110,13 @@ export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPc
 
       // Waivers delete classes (both held and attended reduced).
       // CDC attendance credits attendance: held remains identical, and absences become presents.
-      const simH = Math.max(0, baseHeld - rawWaived[t].n);
-      const simAtt = Math.min(simH, Math.max(0, baseAtt - rawWaived[t].p + rawCdc[t].a));
+      const waiverH = Math.max(0, baseHeld - rawWaived[t].n);
+      const waiverAtt = Math.max(0, baseAtt - rawWaived[t].p);
+      const waiverPct = waiverH > 0 ? (waiverAtt / waiverH) * 100 : 100;
+      const cdcAtt = rawCdc[t].a;
+
+      const simH = waiverH;
+      const simAtt = Math.min(simH, waiverAtt + cdcAtt);
 
       simTotalAtt += simAtt;
       simTotalHeld += simH;
@@ -1157,6 +1162,10 @@ export function calculateSimulatedStats(parsedData, selectedWaiversSet, targetPc
         baseAtt,
         baseHeld,
         basePct,
+        waiverAtt,
+        waiverHeld: waiverH,
+        waiverPct,
+        cdcAtt,
         simP: simAtt,
         simN: simH,
         simAttended: simAtt,

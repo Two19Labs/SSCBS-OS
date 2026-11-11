@@ -50,6 +50,22 @@ function formatTimelineDisplay(startStr, endStr, sheetMinDate, sheetMaxDate) {
   return `Until ${fmt(end)}`;
 }
 
+function getSubjAbbreviation(name) {
+  if (!name) return '';
+  const clean = name.replace(/\b(BMS|BBA|FIA|DU|CBCS|LOCF|UGCF)\b/gi, '').trim();
+  if (/creativity/i.test(clean)) return 'C&I';
+  if (/macro/i.test(clean)) return 'Macro';
+  if (/hindi/i.test(clean)) return 'Hindi';
+  if (/organi[sz]ational/i.test(clean)) return 'OB';
+  if (/business analytics/i.test(clean)) return 'IBA';
+  if (/intelligence/i.test(clean)) return 'BI';
+  const words = clean.split(/\s+/).filter(w => !['and', '&', 'to', 'for', 'of', 'in', 'the'].includes(w.toLowerCase()));
+  if (words.length >= 2) {
+    return words.slice(0, 3).map(w => w[0].toUpperCase()).join('');
+  }
+  return clean.substring(0, 5);
+}
+
 export default function WaiverToolPage({ onBack }) {
   const { user } = useAuth();
   const hasAccess = canAccessWaiver(user?.email);
@@ -1574,6 +1590,38 @@ export default function WaiverToolPage({ onBack }) {
     return calculateAggregateMarks(subjectSummaries, creditOverrides);
   }, [subjectSummaries, creditOverrides]);
 
+  // Target components list for Status Bar parts on target
+  const bannerParts = useMemo(() => {
+    if (!subjectSummaries || subjectSummaries.length === 0) return [];
+    const parts = [];
+    subjectSummaries.forEach(sub => {
+      const pList = sub.partsList || Object.values(sub.parts || {});
+      pList.forEach(p => {
+        if ((p.type === 'th' || p.type === 'tu') && ((p.simN ?? p.n ?? 0) > 0 || (p.baseHeld ?? 0) > 0)) {
+          const held = p.simN ?? p.n ?? 0;
+          const att = p.simAttended ?? p.simP ?? 0;
+          const pct = held > 0 ? (att / held) * 100 : 100;
+          const abbr = getSubjAbbreviation(sub.name);
+          const shortName = `${abbr} ${p.type === 'th' ? 'Th' : 'Tu'}`;
+          let color = '#15803d'; // green >= threshold
+          if (pct < 66.666) color = '#b91c1c'; // red < 66.7%
+          else if (pct < threshold) color = '#d97706'; // amber < threshold
+          parts.push({
+            id: `${sub.name}_${p.type}`,
+            subjName: sub.name,
+            type: p.type,
+            shortName,
+            label: `${sub.name} ${p.shortType || (p.type === 'th' ? 'Theory' : 'Tutorial')}`,
+            pct,
+            color,
+            needsAttention: pct < threshold
+          });
+        }
+      });
+    });
+    return parts;
+  }, [subjectSummaries, threshold]);
+
   // Overall university eligibility check:
   // If a student's total attendance across all subjects combined is below 66.7%,
   // they cannot officially apply for waivers in college (per DU Ordinance VII).
@@ -1624,6 +1672,14 @@ export default function WaiverToolPage({ onBack }) {
                 title="Counted in Total Attendance aggregate, but not prioritized for individual subject waivers."
               >
                 Info only
+              </span>
+            )}
+            {part.cdcAtt > 0 && (
+              <span
+                className="rd-part-cdc-tag"
+                title={`${part.cdcAtt} class(es) converted from absent to present via Career Development Centre (CDC) attendance`}
+              >
+                +{part.cdcAtt} CDC
               </span>
             )}
           </div>
@@ -1718,6 +1774,216 @@ export default function WaiverToolPage({ onBack }) {
           </svg>
           <span>Redo{canRedo ? ` (${redoStack.length})` : ''}</span>
         </button>
+      </div>
+    );
+  };
+
+  const renderStatusBar = () => {
+    if (!simStats) return null;
+
+    const allPassing = simStats.allPassing;
+    const debarSafeCount = simStats.debarSafeTargetCount ?? 0;
+    let tone = 'warn';
+    let toneLabel = 'Below target';
+
+    if (allPassing) {
+      tone = 'safe';
+      toneLabel = 'Target met';
+    } else if (debarSafeCount < totalTargetParts) {
+      tone = 'fail';
+      toneLabel = 'At risk';
+    }
+
+    const headline = allPassing
+      ? `All ${totalTargetParts} parts meet ${threshold}%`
+      : `${passingTargetCount} of ${totalTargetParts} parts meet ${threshold}%`;
+
+    const remainingCount = totalTargetParts - passingTargetCount;
+    let subHeadline = `${remainingCount} part${remainingCount === 1 ? '' : 's'} still need${remainingCount === 1 ? 's' : ''} attention`;
+    if (allPassing) {
+      subHeadline = 'All attendance requirements satisfied';
+    } else if (cdcLimit > 0 && selectedCdcDays.size > 0) {
+      subHeadline = `CDC active · ${remainingCount} part${remainingCount === 1 ? '' : 's'} left`;
+    }
+
+    const attentionParts = bannerParts.filter(p => p.needsAttention);
+    const marksData = aggregateMarks || { earned: 0, baseEarned: 0, maxMarks: 40, gain: 0, waiverGain: 0, cdcGain: 0 };
+    const maxM = marksData.maxMarks > 0 ? marksData.maxMarks : 40;
+    const baseW = Math.min(100, (marksData.baseEarned / maxM) * 100);
+    const waiverW = Math.max(0, (marksData.waiverGain / maxM) * 100);
+    const cdcW = Math.max(0, (marksData.cdcGain / maxM) * 100);
+
+    const totalUsedWaivers = selectedWaivers.size;
+    const totalUsedCdc = selectedCdcDays.size;
+    const totalWaiverCap = maxWaivers;
+    const totalCdcCap = cdcLimit;
+    const combinedUsed = totalUsedWaivers + (totalCdcCap > 0 ? totalUsedCdc : 0);
+    const combinedCap = totalWaiverCap + (totalCdcCap > 0 ? totalCdcCap : 0);
+
+    return (
+      <div role="status" className={`rd-status-bar-5col tone-${tone}`}>
+        {/* Col 1: Status Tone & Icon */}
+        <div className="rd-sb-col rd-sb-col-1">
+          <span className="rd-sb-icon-box">
+            {tone === 'safe' ? (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="8 12.5 11 15.5 16 9.5" />
+              </svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+            )}
+          </span>
+          <div className="rd-sb-info-stack">
+            <span className="rd-sb-tone-lbl">{toneLabel}</span>
+            <strong className="rd-sb-headline">{headline}</strong>
+            <span className="rd-sb-sub">{subHeadline}</span>
+          </div>
+        </div>
+
+        {/* Col 2: Parts on Target */}
+        <div className="rd-sb-col rd-sb-col-2">
+          <div className="rd-sb-meta-row">
+            <span className="rd-sb-col-title">Parts on target</span>
+            <span className="rd-sb-col-val">{passingTargetCount}<span>/{totalTargetParts}</span></span>
+          </div>
+          <div className="rd-sb-parts-seg-bar">
+            {bannerParts.map(bp => (
+              <span
+                key={bp.id}
+                title={`${bp.label} ${bp.pct.toFixed(1)}%`}
+                className="rd-sb-part-seg"
+                style={{ background: bp.color }}
+              />
+            ))}
+          </div>
+          <div className="rd-sb-chips-row">
+            {attentionParts.length === 0 ? (
+              <span className="rd-sb-all-clear">✓ All target parts cleared</span>
+            ) : (
+              attentionParts.map(bp => (
+                <span
+                  key={bp.id}
+                  className={`rd-sb-attn-chip ${bp.pct < 66.666 ? 'is-risk' : 'is-warn'}`}
+                  title={`${bp.label} is at ${bp.pct.toFixed(1)}% (target ${threshold}%)`}
+                >
+                  {bp.shortName} {bp.pct.toFixed(1)}%
+                </span>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Col 3: Internal Marks */}
+        <div className="rd-sb-col rd-sb-col-3">
+          <div className="rd-sb-meta-row">
+            <span className="rd-sb-col-title">Internal marks</span>
+            <span className="rd-sb-marks-tally">
+              <b className="rd-sb-marks-num">{marksData.earned.toFixed(1)} / {marksData.maxMarks} M</b>
+              {marksData.gain > 0 && (
+                <span className="rd-sb-gain-badge">+{marksData.gain.toFixed(1)} M</span>
+              )}
+            </span>
+          </div>
+          <div className="rd-sb-stacked-bar" title={`Base: ${marksData.baseEarned.toFixed(1)} M, Waivers gain: +${marksData.waiverGain.toFixed(1)} M, CDC gain: +${marksData.cdcGain.toFixed(1)} M`}>
+            <div className="rd-sb-seg-base" style={{ width: `${baseW}%` }} />
+            <div className="rd-sb-seg-gain" style={{ left: `${baseW}%`, width: `${waiverW}%` }} />
+            <div className="rd-sb-seg-cdc" style={{ left: `${baseW + waiverW}%`, width: `${cdcW}%` }} />
+          </div>
+          <span className="rd-sb-note">
+            {totalCdcCap > 0 && marksData.cdcGain > 0
+              ? `+${marksData.waiverGain.toFixed(1)} M waivers · +${marksData.cdcGain.toFixed(1)} M CDC`
+              : marksData.gain > 0
+                ? `was ${marksData.baseEarned.toFixed(1)} M before waivers`
+                : `Full baseline (${marksData.baseEarned.toFixed(1)} M)`}
+          </span>
+        </div>
+
+        {/* Col 4: Waivers (+ CDC) */}
+        <div className="rd-sb-col rd-sb-col-4">
+          <div className="rd-sb-meta-row">
+            <span className="rd-sb-col-title">{totalCdcCap > 0 ? 'Waivers + CDC' : 'Waivers'}</span>
+            <span className="rd-sb-col-val">{combinedUsed}<span>/{combinedCap}</span></span>
+          </div>
+          <div className="rd-sb-dual-bar">
+            <div className="rd-sb-bar-wrap" style={{ flex: `${Math.max(1, totalWaiverCap)} 1 0` }}>
+              <div
+                className="rd-sb-bar-fill-waivers"
+                style={{ width: `${totalWaiverCap > 0 ? Math.min(100, (totalUsedWaivers / totalWaiverCap) * 100) : 0}%` }}
+              />
+            </div>
+            {totalCdcCap > 0 && (
+              <div className="rd-sb-bar-wrap" style={{ flex: `${totalCdcCap} 1 0` }}>
+                <div
+                  className="rd-sb-bar-fill-cdc"
+                  style={{ width: `${Math.min(100, (totalUsedCdc / totalCdcCap) * 100)}%` }}
+                />
+              </div>
+            )}
+          </div>
+          <div className="rd-sb-caption-row">
+            {totalCdcCap === 0 ? (
+              <>
+                <span>{totalUsedWaivers >= totalWaiverCap ? 'Limit reached' : `${totalWaiverCap - totalUsedWaivers} remaining`}</span>
+                <button
+                  type="button"
+                  onClick={() => setCdcLimit(3)}
+                  className="rd-sb-cdc-link"
+                  title="Claim up to 3 Career Development Centre attendance days"
+                >
+                  + Add CDC days
+                </button>
+              </>
+            ) : (
+              <>
+                <span className="rd-sb-legend-item">
+                  <i className="rd-dot-maroon" />
+                  {totalUsedWaivers}/{totalWaiverCap} waivers
+                </span>
+                <span className="rd-sb-legend-item">
+                  <i className="rd-dot-cdc" />
+                  {totalUsedCdc}/{totalCdcCap} CDC
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Col 5: Action Button */}
+        <div className="rd-sb-col rd-sb-col-5">
+          {hasPendingPriorityChange ? (
+            <button
+              type="button"
+              className="rd-sb-action-btn is-priority"
+              onClick={handleRecalculateWithPriorities}
+              title="Recalculate and apply optimal waivers with updated starred priorities"
+            >
+              ★ Recalculate
+            </button>
+          ) : (solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) ? (
+            <button
+              type="button"
+              className={`rd-sb-action-btn ${isOptimalSuggested ? 'is-applied' : 'is-unapplied'}`}
+              onClick={handleApplyRecommended}
+              title={isOptimalSuggested ? 'Recommended attendance plan is active (click to re-apply)' : 'Apply recommended attendance dates'}
+            >
+              {isOptimalSuggested ? (
+                <>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Recommended applied
+                </>
+              ) : (
+                getApplyRecommendedLabel(true)
+              )}
+            </button>
+          ) : null}
+        </div>
       </div>
     );
   };
@@ -2041,35 +2307,70 @@ export default function WaiverToolPage({ onBack }) {
               <span className={`rd-pill p-${pill[1]}`}>{pill[0]}</span>
             </div>
 
-            {/* Sleek Marks Bar */}
+            {/* Redesigned Sleek Marks Row */}
             {subMarks.subjectMax > 0 && (
-              <div className="rd-card-marks-bar">
-                <div className="rd-card-marks-left">
-                  <span className="rd-marks-bar-label">Internal Marks:</span>
-                  <span className="rd-marks-bar-val">
-                    <strong>{subMarks.subjectEarned}</strong> / {subMarks.subjectMax} M
-                  </span>
-                  {subMarks.subjectGain > 0 && (
-                    <span className="rd-marks-bar-gain">+{subMarks.subjectGain.toFixed(1)} M</span>
+              <div className="rd-card-marks-section">
+                <div className="rd-card-marks-header">
+                  <div className="rd-card-marks-score-group">
+                    <span className="rd-card-marks-lbl">Marks</span>
+                    <b className="rd-card-marks-val">{subMarks.subjectEarned} / {subMarks.subjectMax} M</b>
+                    {subMarks.subjectGain > 0 && (
+                      <span className="rd-card-marks-gain">+{subMarks.subjectGain.toFixed(1)} M</span>
+                    )}
+                  </div>
+                  {sub.parts?.th && (
+                    <div role="radiogroup" aria-label={`Credits for ${sub.name}`} className="rd-card-credits-segmented">
+                      {[
+                        { label: '4C · 6M', value: 6 },
+                        { label: 'GE/AEC · 4M', value: 4 },
+                        { label: '2C · 2M', value: 2 }
+                      ].map((opt) => {
+                        const isSelected = subMarks.thMax === opt.value;
+                        return (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            role="radio"
+                            aria-checked={isSelected}
+                            className={`rd-credit-seg-btn ${isSelected ? 'is-active' : ''}`}
+                            onClick={() => handleSetCreditOverride(sub.name, opt.value)}
+                            title={`Set to ${opt.label}`}
+                          >
+                            {opt.label}
+                          </button>
+                        );
+                      })}
+                    </div>
                   )}
                 </div>
-                {sub.parts?.th && (
-                  <div className="rd-credit-select-wrap">
-                    <span className="rd-credit-select-label">Credits:</span>
-                    <select
-                      className="rd-credit-select"
-                      value={subMarks.thMax}
-                      onChange={(e) => handleSetCreditOverride(sub.name, Number(e.target.value))}
-                      title="Select paper credit weighting for internal assessment marks"
-                      aria-label={`Credit setting for ${sub.name}`}
-                    >
-                      {CREDIT_OPTIONS.map(opt => (
-                        <option key={opt.value} value={opt.value} title={opt.label}>
-                          {opt.shortLabel}
-                        </option>
+
+                {/* 5px Multi-segment Component Progress Bar */}
+                {subMarks.componentSegments?.length > 0 && (
+                  <>
+                    <div className="rd-card-marks-split-bar">
+                      {subMarks.componentSegments.map((g) => (
+                        <div
+                          key={g.name}
+                          title={`${g.name} ${g.got}/${g.max} M`}
+                          className="rd-card-marks-comp-track"
+                          style={{ flex: `${g.max} 1 0` }}
+                        >
+                          <div className="rd-card-marks-seg-base" style={{ width: g.baseW }} />
+                          <div className="rd-card-marks-seg-gain" style={{ left: g.baseW, width: g.gainW }} />
+                          <div className="rd-card-marks-seg-cdc" style={{ left: g.cdcL, width: g.cdcW }} />
+                        </div>
                       ))}
-                    </select>
-                  </div>
+                    </div>
+
+                    {/* Component Subtext Labels */}
+                    <div className="rd-card-marks-labels-row">
+                      {subMarks.componentSegments.map((g) => (
+                        <span key={g.name} className="rd-card-marks-comp-lbl" style={{ flex: `${g.max} 1 0` }}>
+                          {g.name} <b>{g.got}/{g.max}</b>
+                        </span>
+                      ))}
+                    </div>
+                  </>
                 )}
               </div>
             )}
@@ -3779,69 +4080,8 @@ export default function WaiverToolPage({ onBack }) {
             </div>
             </div>
 
-            {/* Status Banner */}
-            <div className={`rd-status ${simStats?.allPassing ? 'ok' : ((simStats?.debarSafeTargetCount ?? 0) < totalTargetParts ? 'bad' : 'warn')}`}>
-              <div className="rd-status-icon-wrap">
-                {simStats?.allPassing ? (
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10" />
-                    <polyline points="8 12.5 11 15.5 16 9.5" />
-                  </svg>
-                ) : (
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
-                    <line x1="12" y1="9" x2="12" y2="13" />
-                    <line x1="12" y1="17" x2="12" y2="17" />
-                  </svg>
-                )}
-              </div>
-              <div className="rd-status-info">
-                <div className="rd-status-main-row">
-                  <strong>{passingTargetCount} of {totalTargetParts} parts meet {threshold}%</strong>
-                  {aggregateMarks && aggregateMarks.maxMarks > 0 && (
-                    <div className="rd-status-marks-pill" title="Total internal assessment attendance marks based on DU percentage slabs">
-                      <span className="rd-marks-chip-title">Marks:</span>
-                      <span className="rd-marks-chip-score">{aggregateMarks.earned} / {aggregateMarks.maxMarks} M</span>
-                      {aggregateMarks.gain > 0 && (
-                        <span className="rd-marks-chip-gain">+{aggregateMarks.gain.toFixed(1)} M</span>
-                      )}
-                    </div>
-                  )}
-                </div>
-                <span className="rd-status-sub">
-                  {selectedWaivers.size === 0 && selectedCdcDays.size === 0
-                    ? 'Baseline (0 applied)'
-                    : `${selectedWaivers.size} waiver${selectedWaivers.size === 1 ? '' : 's'}${cdcLimit > 0 ? `, ${selectedCdcDays.size} CDC` : ''} applied`}
-                  {starredSubjects.size > 0 && (
-                    <span className="rd-status-priority-tag" title={`Prioritizing ${starredSubjects.size} starred subject${starredSubjects.size === 1 ? '' : 's'}`}>
-                      ★ {starredSubjects.size} Priority
-                    </span>
-                  )}
-                </span>
-              </div>
-              {(solverResult?.chosenDays?.length > 0 || solverResult?.chosenCdcDays?.length > 0) && (
-                <button
-                  type="button"
-                  className={`rd-btn-outline sm ${!isOptimalSuggested ? 'rd-btn-accent' : 'muted'} rd-status-cta`}
-                  onClick={handleApplyRecommended}
-                  title={isOptimalSuggested ? 'Recommended attendance plan is active (click to re-apply)' : 'Apply recommended attendance dates'}
-                >
-                  {isOptimalSuggested
-                    ? '✓ Recommended applied'
-                    : getApplyRecommendedLabel(true)}
-                </button>
-              )}
-              {hasPendingPriorityChange && (
-                <button
-                  type="button"
-                  className="rd-btn-outline sm rd-btn-priority-recalc rd-status-cta"
-                  onClick={handleRecalculateWithPriorities}
-                  title="Recalculate and apply optimal waivers with updated starred priorities"
-                >
-                  ★ Recalculate with priorities
-                </button>
-              )}
-            </div>
+            {/* Redesigned 5-Column Status Bar */}
+            {renderStatusBar()}
           </div>
 
           

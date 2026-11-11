@@ -214,6 +214,9 @@ export function calculateSubjectMarks(subject, creditOverride = null) {
   const thBasePct = thPart ? (Number.isFinite(thPart.basePct) ? thPart.basePct : (Number.isFinite(thPart.pct) ? thPart.pct : calcPct(thPart.p ?? 0, (thPart.p ?? 0) + (thPart.a ?? 0)))) : 0;
   const tuBasePct = tuPart ? (Number.isFinite(tuPart.basePct) ? tuPart.basePct : (Number.isFinite(tuPart.pct) ? tuPart.pct : calcPct(tuPart.p ?? 0, (tuPart.p ?? 0) + (tuPart.a ?? 0)))) : 0;
 
+  const thWaiverPct = thPart ? (Number.isFinite(thPart.waiverPct) ? thPart.waiverPct : thPct) : 0;
+  const tuWaiverPct = tuPart ? (Number.isFinite(tuPart.waiverPct) ? tuPart.waiverPct : tuPct) : 0;
+
   const thEarned = thHeld > 0 ? calculateComponentMarks(thPct, thMax) : 0;
   const tuEarned = tuHeld > 0 ? calculateComponentMarks(tuPct, tuMax) : 0;
   const prEarned = 0.0;
@@ -221,16 +224,54 @@ export function calculateSubjectMarks(subject, creditOverride = null) {
   const thBaseEarned = thHeld > 0 ? calculateComponentMarks(thBasePct, thMax) : 0;
   const tuBaseEarned = tuHeld > 0 ? calculateComponentMarks(tuBasePct, tuMax) : 0;
 
+  const thWaiverEarned = thHeld > 0 ? calculateComponentMarks(thWaiverPct, thMax) : 0;
+  const tuWaiverEarned = tuHeld > 0 ? calculateComponentMarks(tuWaiverPct, tuMax) : 0;
+
   const subjectMax = (thHeld > 0 ? thMax : 0) + (tuHeld > 0 ? tuMax : 0);
   const subjectEarned = (thHeld > 0 ? thEarned : 0) + (tuHeld > 0 ? tuEarned : 0);
   const subjectBaseEarned = (thHeld > 0 ? thBaseEarned : 0) + (tuHeld > 0 ? tuBaseEarned : 0);
+  const subjectWaiverEarned = (thHeld > 0 ? thWaiverEarned : 0) + (tuHeld > 0 ? tuWaiverEarned : 0);
+
+  const componentSegments = [];
+  if (thHeld > 0) {
+    const baseW = Math.min(100, (thBaseEarned / thMax) * 100);
+    const waiverW = Math.min(100, (thWaiverEarned / thMax) * 100);
+    const cdcW = Math.min(100, (thEarned / thMax) * 100);
+    componentSegments.push({
+      name: 'Theory',
+      max: thMax,
+      got: thEarned % 1 === 0 ? thEarned.toFixed(0) : thEarned.toFixed(1),
+      baseW: `${baseW}%`,
+      gainW: `${Math.max(0, waiverW - baseW)}%`,
+      cdcL: `${waiverW}%`,
+      cdcW: `${Math.max(0, cdcW - waiverW)}%`
+    });
+  }
+  if (tuHeld > 0) {
+    const baseW = Math.min(100, (tuBaseEarned / tuMax) * 100);
+    const waiverW = Math.min(100, (tuWaiverEarned / tuMax) * 100);
+    const cdcW = Math.min(100, (tuEarned / tuMax) * 100);
+    componentSegments.push({
+      name: 'Tutorial',
+      max: tuMax,
+      got: tuEarned % 1 === 0 ? tuEarned.toFixed(0) : tuEarned.toFixed(1),
+      baseW: `${baseW}%`,
+      gainW: `${Math.max(0, waiverW - baseW)}%`,
+      cdcL: `${waiverW}%`,
+      cdcW: `${Math.max(0, cdcW - waiverW)}%`
+    });
+  }
 
   return {
     thMax,
     tuMax,
     prMax,
     thEarned,
+    thBaseEarned,
+    thWaiverEarned,
     tuEarned,
+    tuBaseEarned,
+    tuWaiverEarned,
     prEarned,
     thHeld,
     tuHeld,
@@ -238,7 +279,11 @@ export function calculateSubjectMarks(subject, creditOverride = null) {
     subjectMax: Math.round(subjectMax * 10) / 10,
     subjectEarned: Math.round(subjectEarned * 10) / 10,
     subjectBaseEarned: Math.round(subjectBaseEarned * 10) / 10,
+    subjectWaiverEarned: Math.round(subjectWaiverEarned * 10) / 10,
     subjectGain: Math.round((subjectEarned - subjectBaseEarned) * 10) / 10,
+    subjectWaiverGain: Math.round((subjectWaiverEarned - subjectBaseEarned) * 10) / 10,
+    subjectCdcGain: Math.round((subjectEarned - subjectWaiverEarned) * 10) / 10,
+    componentSegments,
     thInsight: thHeld > 0 ? getComponentMarksInsight(thPct, thMax, thHeld, thAttended) : null,
     tuInsight: tuHeld > 0 ? getComponentMarksInsight(tuPct, tuMax, tuHeld, tuAttended) : null,
     prInsight: prHeld > 0 ? { isPractical: true, hint: 'Practical attendance carries 0 internal marks (DU UGCF)' } : null
@@ -250,11 +295,12 @@ export function calculateSubjectMarks(subject, creditOverride = null) {
  */
 export function calculateAggregateMarks(subjects, creditOverrides = {}) {
   if (!subjects || subjects.length === 0) {
-    return { earned: 0, baseEarned: 0, maxMarks: 0, pct: 0, gain: 0 };
+    return { earned: 0, baseEarned: 0, waiverEarned: 0, maxMarks: 0, pct: 0, gain: 0, waiverGain: 0, cdcGain: 0 };
   }
 
   let totalEarned = 0;
   let totalBaseEarned = 0;
+  let totalWaiverEarned = 0;
   let totalMax = 0;
 
   subjects.forEach(sub => {
@@ -262,20 +308,27 @@ export function calculateAggregateMarks(subjects, creditOverrides = {}) {
     const res = calculateSubjectMarks(sub, override);
     totalEarned += res.subjectEarned;
     totalBaseEarned += res.subjectBaseEarned;
+    totalWaiverEarned += res.subjectWaiverEarned;
     totalMax += res.subjectMax;
   });
 
   const earned = Math.round(totalEarned * 10) / 10;
   const baseEarned = Math.round(totalBaseEarned * 10) / 10;
+  const waiverEarned = Math.round(totalWaiverEarned * 10) / 10;
   const maxMarks = Math.round(totalMax * 10) / 10;
   const gain = Math.round((earned - baseEarned) * 10) / 10;
+  const waiverGain = Math.round((waiverEarned - baseEarned) * 10) / 10;
+  const cdcGain = Math.round((earned - waiverEarned) * 10) / 10;
   const pct = maxMarks > 0 ? Math.round((earned / maxMarks) * 1000) / 10 : 0;
 
   return {
     earned,
     baseEarned,
+    waiverEarned,
     maxMarks,
     gain,
+    waiverGain,
+    cdcGain,
     pct
   };
 }
