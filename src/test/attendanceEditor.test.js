@@ -6,10 +6,11 @@ import { parseAttendanceFile } from '../lib/waiverParser.js';
 import { solveExactBnb } from '../lib/waiverSolver.js';
 import {
   cloneParsedData,
-  recalculateSubjectTotals,
   editCellClasses,
   addDateColumn,
   deleteDateColumn,
+  deleteSubject,
+  addSubject,
   diffCustomizations
 } from '../lib/attendanceEditor.js';
 
@@ -116,5 +117,39 @@ const solution2 = solveExactBnb(editedParsed, 85, 3, [], 0, {});
 assert(solution1.totalTargetParts > 0);
 assert(solution2.totalTargetParts > 0);
 console.log('✓ Solver seamlessly executed on customized attendance dataset.');
+
+// Test 8: Delete subject
+console.log('8. Testing subject deletion...');
+const subjectToDelete = rawParsed.subjects[1].name;
+const withDeletedSubject = deleteSubject(rawParsed, subjectToDelete);
+assert.strictEqual(withDeletedSubject.subjects.length, rawParsed.subjects.length - 1);
+assert(!withDeletedSubject.subjects.some(s => s.name === subjectToDelete));
+const diffDelSub = diffCustomizations(rawParsed, withDeletedSubject);
+assert(diffDelSub.hasCustomizations);
+assert(diffDelSub.deletedSubjects.has(subjectToDelete));
+assert.strictEqual(diffDelSub.totalChanges, 1);
+console.log('✓ Subject deletion and diff tracking verified.');
+
+// Test 9: Add subject
+console.log('9. Testing subject addition...');
+const newSubName = 'Digital Marketing & AI';
+const withAddedSubject = addSubject(rawParsed, newSubName);
+assert.strictEqual(withAddedSubject.subjects.length, rawParsed.subjects.length + 1);
+const addedSubjectObj = withAddedSubject.subjects.find(s => s.name === newSubName);
+assert(addedSubjectObj);
+assert.strictEqual(addedSubjectObj.isCustom, true);
+assert.strictEqual(addedSubjectObj.parsedP, 0);
+assert.strictEqual(addedSubjectObj.parsedA, 0);
+
+// Test duplicate rejection
+assert.throws(() => {
+  addSubject(withAddedSubject, newSubName);
+}, /already exists/);
+
+const diffAddSub = diffCustomizations(rawParsed, withAddedSubject);
+assert(diffAddSub.hasCustomizations);
+assert(diffAddSub.addedSubjects.has(newSubName));
+assert.strictEqual(diffAddSub.totalChanges, 1);
+console.log('✓ Subject addition, validation, and diff tracking verified.');
 
 console.log('\nALL ATTENDANCE EDITOR TESTS PASSED SUCCESSFULLY! ✓✓✓');

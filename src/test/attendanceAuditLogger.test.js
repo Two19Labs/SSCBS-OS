@@ -128,4 +128,30 @@ assert(changelog.includes('22 Sep (Tue)'), 'Must report blacklisted date');
 assert(changelog.includes('Blacklisted / Blocked Dates (1) — Protected from waivers:'), 'Must report blacklisted section');
 assert(changelog.includes('Special Institutional Adjustment: +1 Attended / +1 Held'), 'Must report duty leave');
 
+// Test changelog output with deleted and added subjects
+const dataWithSubChanges = {
+  ...currentData,
+  subjects: [
+    currentData.subjects[0], // OB kept, Macro deleted
+    {
+      name: 'Business Law',
+      rollNo: '2026-1049',
+      parsedP: 10,
+      parsedA: 2,
+      dayClasses: {}
+    }
+  ]
+};
+
+const changelogWithSubDiff = compileAttendanceChangelog({
+  rawParsedData: baseRawData,
+  currentParsedData: dataWithSubChanges,
+  creditOverrides: { 'Business Law': 6 }
+});
+
+assert(changelogWithSubDiff.includes('Deleted Subjects (1):'), 'Must list deleted subjects');
+assert(changelogWithSubDiff.includes('Macro Economics'), 'Must name deleted subject');
+assert(changelogWithSubDiff.includes('Added Subjects (1):'), 'Must list added subjects');
+assert(changelogWithSubDiff.includes('Business Law'), 'Must name added subject');
+
 console.log('ALL AUDIT LOGGER TESTS PASSED SUCCESSFULLY! ✓');

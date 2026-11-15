@@ -302,6 +302,53 @@ export function deleteDateColumn(parsedData, dateStr) {
 }
 
 /**
+ * Permanently removes an entire subject from parsedData.subjects.
+ * Cleans up all its dayClasses entries and returns the updated parsedData clone.
+ */
+export function deleteSubject(parsedData, subjectName) {
+  if (!parsedData || !subjectName) return parsedData;
+  const cloned = cloneParsedData(parsedData);
+  cloned.subjects = (cloned.subjects || []).filter(s => s.name !== subjectName);
+  return cloned;
+}
+
+/**
+ * Adds a new subject into parsedData.subjects.
+ * Automatically validates uniqueness and sets up default component structure.
+ */
+export function addSubject(parsedData, subjectName, options = {}) {
+  if (!parsedData || !subjectName || !subjectName.trim()) return parsedData;
+  const cleanName = subjectName.trim();
+  const cloned = cloneParsedData(parsedData);
+  if (!cloned.subjects) cloned.subjects = [];
+
+  const exists = cloned.subjects.some(s => s.name.toLowerCase() === cleanName.toLowerCase());
+  if (exists) {
+    throw new Error(`Subject "${cleanName}" already exists.`);
+  }
+
+  const newSub = {
+    sno: String(cloned.subjects.length + 1),
+    name: cleanName,
+    rollNo: cloned.rollNo || '',
+    reportedP: 0,
+    reportedA: 0,
+    parsedP: 0,
+    parsedA: 0,
+    parts: {
+      th: { p: 0, a: 0 },
+      tu: { p: 0, a: 0 },
+      pr: { p: 0, a: 0 }
+    },
+    dayClasses: {},
+    isCustom: true
+  };
+
+  cloned.subjects.push(newSub);
+  return cloned;
+}
+
+/**
  * Compares raw baseline parsedData against the customized active parsedData
  * to produce sets of customized cells, added dates, and deleted dates.
  */
@@ -309,16 +356,36 @@ export function diffCustomizations(rawParsedData, currentParsedData) {
   const customizedCells = new Set();
   const addedDates = new Set();
   const deletedDates = new Set();
+  const deletedSubjects = new Set();
+  const addedSubjects = new Set();
 
   if (!rawParsedData || !currentParsedData) {
     return {
       customizedCells,
       addedDates,
       deletedDates,
+      deletedSubjects,
+      addedSubjects,
       hasCustomizations: false,
       totalChanges: 0
     };
   }
+
+  // Check deleted and added subjects
+  const rawSubNameSet = new Set((rawParsedData.subjects || []).map(s => s.name));
+  const curSubNameSet = new Set((currentParsedData.subjects || []).map(s => s.name));
+
+  rawSubNameSet.forEach(name => {
+    if (!curSubNameSet.has(name)) {
+      deletedSubjects.add(name);
+    }
+  });
+
+  curSubNameSet.forEach(name => {
+    if (!rawSubNameSet.has(name)) {
+      addedSubjects.add(name);
+    }
+  });
 
   const rawDateMap = new Map();
   (rawParsedData.dayColumns || []).forEach(d => rawDateMap.set(d.dateStr, true));
@@ -375,7 +442,7 @@ export function diffCustomizations(rawParsedData, currentParsedData) {
     });
   });
 
-  const totalChanges = customizedCells.size + addedDates.size + deletedDates.size;
+  const totalChanges = customizedCells.size + addedDates.size + deletedDates.size + deletedSubjects.size + addedSubjects.size;
 
   // Track speculative future dates strictly after original reportDate
   const futureDates = new Set();
@@ -409,6 +476,8 @@ export function diffCustomizations(rawParsedData, currentParsedData) {
     customizedCells,
     addedDates,
     deletedDates,
+    deletedSubjects,
+    addedSubjects,
     futureDates,
     futureClassesStats: {
       total: futureClassesTotal,

@@ -4638,3 +4638,208 @@ th.rd-subj-h,
   background: rgba(255, 255, 255, 0.08);
   color: #bbb;
 }
+
+/* Subject Management: Delete & Add Subjects in Edit Attendance Mode */
+.rd-subj-del-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid #fca5a5;
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  margin-right: 6px;
+  vertical-align: middle;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.rd-subj-del-btn:hover {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #b91c1c;
+  transform: scale(1.1);
+}
+
+[data-theme='dark'] .rd-subj-del-btn {
+  background: rgba(220, 38, 38, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #f87171;
+}
+
+[data-theme='dark'] .rd-subj-del-btn:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.rd-card-del-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1px solid #fecaca;
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-right: 6px;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.rd-card-del-btn:hover {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #b91c1c;
+  transform: scale(1.08);
+}
+
+[data-theme='dark'] .rd-card-del-btn {
+  background: rgba(220, 38, 38, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #f87171;
+}
+
+[data-theme='dark'] .rd-card-del-btn:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.rd-grid-add-subj-tr {
+  background: var(--surface-subtle, #faf8f5);
+}
+
+.rd-grid-add-subj-td {
+  padding: 10px 14px;
+  text-align: left;
+  border-top: 1px dashed var(--line, #dcd4c8);
+}
+
+.rd-grid-add-subj-row-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fdfbf7;
+  border: 1.5px dashed #bfa382;
+  color: #8c531b;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.rd-grid-add-subj-row-btn:hover {
+  background: #f5eedf;
+  border-color: #8c531b;
+  color: #63380b;
+}
+
+[data-theme='dark'] .rd-grid-add-subj-tr {
+  background: #1e1b18;
+}
+
+[data-theme='dark'] .rd-grid-add-subj-row-btn {
+  background: #26211c;
+  border-color: #66523e;
+  color: #e5b882;
+}
+
+[data-theme='dark'] .rd-grid-add-subj-row-btn:hover {
+  background: #332b24;
+  border-color: #e5b882;
+  color: #fed7aa;
+}
+
+.rd-subj-profile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  max-height: 230px;
+  overflow-y: auto;
+}
+
+.rd-subj-profile-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--line, #e2dcd2);
+  border-radius: 8px;
+  background: var(--surface, #ffffff);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.rd-subj-profile-card:hover {
+  border-color: #cbbfb0;
+  background: var(--surface-subtle, #fcfbf9);
+}
+
+.rd-subj-profile-card.selected {
+  border-color: #1e1a17;
+  background: #fdfbf7;
+  box-shadow: 0 0 0 1px #1e1a17;
+}
+
+[data-theme='dark'] .rd-subj-profile-card {
+  background: #25211e;
+  border-color: #3e3832;
+}
+
+[data-theme='dark'] .rd-subj-profile-card:hover {
+  border-color: #554d45;
+  background: #2c2723;
+}
+
+[data-theme='dark'] .rd-subj-profile-card.selected {
+  border-color: #f59e0b;
+  background: #2f271c;
+  box-shadow: 0 0 0 1px #f59e0b;
+}
+
+.rd-subj-profile-radio {
+  margin-top: 3px;
+  cursor: pointer;
+}
+
+.rd-subj-profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rd-subj-profile-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink, #1e1a17);
+}
+
+[data-theme='dark'] .rd-subj-profile-title {
+  color: #eee;
+}
+
+.rd-subj-profile-sub {
+  font-size: 11px;
+  color: var(--ink-dim, #736b63);
+  line-height: 1.35;
+}
+
+[data-theme='dark'] .rd-subj-profile-sub {
+  color: #9e9488;
+}

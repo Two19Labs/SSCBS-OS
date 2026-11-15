@@ -226,7 +226,30 @@ export function compileAttendanceChangelog({
   if (!diff.hasCustomizations) {
     lines.push('• No manual cell edits or timetable changes made');
   } else {
-    // 3A. Added Dates
+    // 3A. Deleted Subjects
+    if (diff.deletedSubjects?.size > 0) {
+      lines.push(`• Deleted Subjects (${diff.deletedSubjects.size}):`);
+      Array.from(diff.deletedSubjects).sort().forEach(subName => {
+        const rawSub = (rawParsedData?.subjects || []).find(s => s.name === subName);
+        const p = rawSub?.parsedP ?? rawSub?.reportedP ?? 0;
+        const a = rawSub?.parsedA ?? rawSub?.reportedA ?? 0;
+        lines.push(`  - ${subName}: Completely removed (${p + a} classes: ${p} Present, ${a} Absent)`);
+      });
+    }
+
+    // 3B. Added Subjects
+    if (diff.addedSubjects?.size > 0) {
+      lines.push(`• Added Subjects (${diff.addedSubjects.size}):`);
+      Array.from(diff.addedSubjects).sort().forEach(subName => {
+        const curSub = (currentParsedData?.subjects || []).find(s => s.name === subName);
+        const p = curSub?.parsedP ?? 0;
+        const a = curSub?.parsedA ?? 0;
+        const overrideM = creditOverrides[subName] ? ` · ${creditOverrides[subName]}M credit` : '';
+        lines.push(`  - ${subName}${overrideM}: Manually added (${p + a} classes: ${p} Present, ${a} Absent)`);
+      });
+    }
+
+    // 3C. Added Dates
     if (diff.addedDates.size > 0) {
       lines.push(`• Added Dates (${diff.addedDates.size}):`);
       Array.from(diff.addedDates).sort().forEach(dStr => {

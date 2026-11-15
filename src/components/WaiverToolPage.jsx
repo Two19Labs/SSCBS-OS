@@ -8,6 +8,8 @@ import {
   cloneParsedData,
   editCellClasses,
   deleteDateColumn,
+  deleteSubject,
+  addSubject,
   diffCustomizations,
   findRecentDaySchedule,
   batchAddDates,
@@ -70,6 +72,39 @@ function getSubjAbbreviation(name) {
   return clean.substring(0, 5);
 }
 
+const SUBJECT_PROFILE_OPTIONS = [
+  {
+    id: 'th_tu_4cr_11m',
+    title: 'Theory + Tutorial (4 Credits · 11M)',
+    subtitle: 'Standard Core / Major Elective (3 Lectures + 1 Tutorial · 6M Theory + 5M Tutorial)',
+    config: { hasTheory: true, hasTutorial: true, hasPractical: false, creditValue: 6 }
+  },
+  {
+    id: 'th_pr_4cr_6m',
+    title: 'Theory + Practical (4 Credits · 6M)',
+    subtitle: 'Core / GE with Practical Lab (e.g. Analytics, Programming, Finance Lab)',
+    config: { hasTheory: true, hasTutorial: false, hasPractical: true, creditValue: 6 }
+  },
+  {
+    id: 'th_4cr_10m',
+    title: 'Pure Theory (4 Credits · 6M)',
+    subtitle: '4 Credits Pure Theory without Tutorial or Lab (4 Lectures)',
+    config: { hasTheory: true, hasTutorial: false, hasPractical: false, creditValue: 6 }
+  },
+  {
+    id: 'th_2cr_4m',
+    title: 'Pure Theory (2 Credits · 4M)',
+    subtitle: '2 Credits Ability Enhancement Course (AEC) / VAC (2 Lectures)',
+    config: { hasTheory: true, hasTutorial: false, hasPractical: false, creditValue: 4 }
+  },
+  {
+    id: 'pr_2cr_2m',
+    title: 'Blended / Practical (2 Credits · 2M)',
+    subtitle: '2 Credits Skill Enhancement Course (SEC) / VAC (1 Lecture + 1 Practical)',
+    config: { hasTheory: true, hasTutorial: false, hasPractical: true, creditValue: 2 }
+  }
+];
+
 export default function WaiverToolPage({ onBack }) {
   const { user } = useAuth();
   const hasAccess = canAccessWaiver(user?.email);
@@ -122,6 +157,11 @@ export default function WaiverToolPage({ onBack }) {
   const [timetableDefaultStatus, setTimetableDefaultStatus] = useState('p'); // 'p' | 'a' | 'as_is'
   const [newDateError, setNewDateError] = useState('');
   const [dateToDelete, setDateToDelete] = useState(null); // { dateStr, fullLabel }
+  const [subjectToDelete, setSubjectToDelete] = useState(null); // subject object { name, ... } to delete
+  const [isAddSubjectModalOpen, setIsAddSubjectModalOpen] = useState(false);
+  const [newSubjectName, setNewSubjectName] = useState('');
+  const [newSubjectProfile, setNewSubjectProfile] = useState('th_tu_4cr_11m');
+  const [addSubjectError, setAddSubjectError] = useState('');
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
   // Active selected waivers (Set of 'YYYY-MM-DD' date strings)
@@ -353,6 +393,8 @@ export default function WaiverToolPage({ onBack }) {
         setEditingCell(null);
         setIsAddDateModalOpen(false);
         setDateToDelete(null);
+        setSubjectToDelete(null);
+        setIsAddSubjectModalOpen(false);
         setIsResetConfirmOpen(false);
         setIsOneThirdAlertDismissed(true);
       }
@@ -610,6 +652,10 @@ export default function WaiverToolPage({ onBack }) {
     setEditingCell(null);
     setIsAddDateModalOpen(false);
     setDateToDelete(null);
+    setSubjectToDelete(null);
+    setIsAddSubjectModalOpen(false);
+    setNewSubjectName('');
+    setAddSubjectError('');
     setIsResetConfirmOpen(false);
     setSelectedWaivers(new Set());
     setSelectedCdcDays(new Set());
@@ -995,6 +1041,82 @@ export default function WaiverToolPage({ onBack }) {
       }
       setIsOneThirdAlertDismissed(false);
     }, currentSolverOptions);
+  };
+
+  // Delete an entire subject and its attendances
+  const handleConfirmDeleteSubject = () => {
+    if (!subjectToDelete || !parsedData) return;
+    const name = subjectToDelete.name;
+    recordHistorySnapshot(`Delete subject: ${name}`);
+    const updated = deleteSubject(parsedData, name);
+
+    // Clean up priority stars
+    if (starredSubjects.has(name)) {
+      const nextStar = new Set(starredSubjects);
+      nextStar.delete(name);
+      setStarredSubjects(nextStar);
+    }
+    // Clean up credit override
+    if (creditOverrides[name]) {
+      const nextOverrides = { ...creditOverrides };
+      delete nextOverrides[name];
+      setCreditOverrides(nextOverrides);
+      try {
+        localStorage.setItem(`sscbs_credit_overrides_${userKey}`, JSON.stringify(nextOverrides));
+      } catch {}
+    }
+
+    setParsedData(updated);
+    setSubjectToDelete(null);
+
+    setIsProcessing(true);
+    executeSolverAsync(updated, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
+      if (solution?.chosenDays && isOptimalSuggested) {
+        setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+        setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
+      }
+      setIsOneThirdAlertDismissed(false);
+    }, currentSolverOptions);
+  };
+
+  // Add an entire new subject to the grid
+  const handleConfirmAddSubject = () => {
+    if (!newSubjectName.trim()) {
+      setAddSubjectError('Please enter a subject name.');
+      return;
+    }
+    const cleanName = newSubjectName.trim();
+    const exists = (parsedData?.subjects || []).some(s => s.name.toLowerCase() === cleanName.toLowerCase());
+    if (exists) {
+      setAddSubjectError(`A subject named "${cleanName}" already exists.`);
+      return;
+    }
+
+    const profile = SUBJECT_PROFILE_OPTIONS.find(p => p.id === newSubjectProfile) || SUBJECT_PROFILE_OPTIONS[0];
+
+    try {
+      recordHistorySnapshot(`Add subject: ${cleanName}`);
+      const updated = addSubject(parsedData, cleanName, profile.config);
+      if (profile.config.creditValue) {
+        handleSetCreditOverride(cleanName, profile.config.creditValue);
+      }
+      setParsedData(updated);
+      setIsAddSubjectModalOpen(false);
+      setNewSubjectName('');
+      setNewSubjectProfile('th_tu_4cr_11m');
+      setAddSubjectError('');
+
+      setIsProcessing(true);
+      executeSolverAsync(updated, threshold, maxWaivers, cdcLimit, starredSubjects, (solution) => {
+        if (solution?.chosenDays && isOptimalSuggested) {
+          setSelectedWaivers(new Set(solution.chosenDays.map(d => d.dateStr)));
+          setSelectedCdcDays(solution.chosenCdcDays?.length ? new Set(solution.chosenCdcDays.map(d => d.dateStr)) : new Set());
+        }
+        setIsOneThirdAlertDismissed(false);
+      }, currentSolverOptions);
+    } catch (err) {
+      setAddSubjectError(err.message || 'Failed to add subject.');
+    }
   };
 
   // Reset all manual edits back to pristine uploaded raw file
@@ -2355,6 +2477,17 @@ export default function WaiverToolPage({ onBack }) {
           <article key={sIdx} className={`rd-card ${isStarred ? 'rd-card-starred' : ''}`}>
             <div className="rd-card-head">
               <div className="rd-card-title-group">
+                {gridToolMode === 'edit' && (
+                  <button
+                    type="button"
+                    className="rd-card-del-btn"
+                    title={`Delete ${sub.name} and all its attendances`}
+                    onClick={() => setSubjectToDelete(sub)}
+                    aria-label={`Delete ${sub.name}`}
+                  >
+                    ✕
+                  </button>
+                )}
                 {hasTargetParts ? (
                   <button
                     type="button"
@@ -2593,7 +2726,21 @@ export default function WaiverToolPage({ onBack }) {
             return (
               <tr key={sIdx}>
                 <th scope="row" className="rd-sticky rd-subj">
-                  {sub.name}
+                  {gridToolMode === 'edit' && (
+                    <button
+                      type="button"
+                      className="rd-subj-del-btn"
+                      title={`Delete ${sub.name} and all its attendances`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSubjectToDelete(sub);
+                      }}
+                      aria-label={`Delete ${sub.name}`}
+                    >
+                      ✕
+                    </button>
+                  )}
+                  <span className="rd-subj-name-text">{sub.name}</span>
                 </th>
                 {columns.map(col => {
                   const isWaived = selectedWaivers.has(col.dateStr);
@@ -2699,6 +2846,24 @@ export default function WaiverToolPage({ onBack }) {
               </tr>
             );
           })}
+          {gridToolMode === 'edit' && (
+            <tr className="rd-grid-add-subj-tr">
+              <td colSpan={columns.length + 1 + (isExpanded ? 2 : 0)} className="rd-grid-add-subj-td">
+                <button
+                  type="button"
+                  className="rd-grid-add-subj-row-btn"
+                  onClick={() => {
+                    setNewSubjectName('');
+                    setNewSubjectProfile('th_tu_4cr_11m');
+                    setAddSubjectError('');
+                    setIsAddSubjectModalOpen(true);
+                  }}
+                >
+                  + Add Subject to Grid
+                </button>
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     );
@@ -3539,6 +3704,185 @@ export default function WaiverToolPage({ onBack }) {
               onClick={handleAddDate}
             >
               {addDateMode === 'single' ? 'Add Date' : 'Add Date Range'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render Add Subject Modal
+  const renderAddSubjectModal = () => {
+    if (!isAddSubjectModalOpen) return null;
+
+    return (
+      <div className="rd-modal-overlay" onClick={() => { setIsAddSubjectModalOpen(false); setAddSubjectError(''); }}>
+        <div className="rd-modal-card" style={{ maxWidth: '480px' }} onClick={e => e.stopPropagation()}>
+          <div className="rd-modal-head">
+            <div>
+              <h3>Add Subject</h3>
+              <p className="rd-modal-sub">Add a missing course or elective to your attendance sheet</p>
+            </div>
+            <button
+              type="button"
+              className="rd-modal-close"
+              onClick={() => { setIsAddSubjectModalOpen(false); setAddSubjectError(''); }}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div style={{ padding: '16px 20px' }}>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--ink)', marginBottom: '6px' }}>
+              Subject Name:
+            </label>
+            <input
+              type="text"
+              className="rd-timeline-input"
+              style={{ width: '100%', boxSizing: 'border-box' }}
+              placeholder="e.g. Operations Research, Business Ethics, VAC..."
+              value={newSubjectName}
+              autoFocus
+              onChange={(e) => {
+                setNewSubjectName(e.target.value);
+                setAddSubjectError('');
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleConfirmAddSubject();
+                }
+              }}
+            />
+
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--ink)', marginTop: '16px', marginBottom: '4px' }}>
+              Components & Credit Structure:
+            </label>
+            <span style={{ fontSize: '11.5px', color: 'var(--ink-dim)', display: 'block', marginBottom: '8px' }}>
+              Select the paper's structure for internal assessment marks calculation:
+            </span>
+
+            <div className="rd-subj-profile-list">
+              {SUBJECT_PROFILE_OPTIONS.map((opt) => {
+                const isSelected = newSubjectProfile === opt.id;
+                return (
+                  <label
+                    key={opt.id}
+                    className={`rd-subj-profile-card ${isSelected ? 'selected' : ''}`}
+                  >
+                    <input
+                      type="radio"
+                      name="subj_profile"
+                      className="rd-subj-profile-radio"
+                      checked={isSelected}
+                      onChange={() => setNewSubjectProfile(opt.id)}
+                    />
+                    <div className="rd-subj-profile-info">
+                      <span className="rd-subj-profile-title">{opt.title}</span>
+                      <span className="rd-subj-profile-sub">{opt.subtitle}</span>
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+
+            {addSubjectError && (
+              <div style={{ marginTop: '12px', padding: '8px 12px', background: '#fee2e2', borderRadius: '6px', color: '#b91c1c', fontSize: '12px', fontWeight: 600 }}>
+                ⚠️ {addSubjectError}
+              </div>
+            )}
+
+            <div style={{ marginTop: '14px', background: 'var(--surface-subtle)', border: '1px solid var(--line)', padding: '9px 12px', borderRadius: '6px', fontSize: '11.5px', color: 'var(--ink-dim)', lineHeight: 1.45 }}>
+              💡 <strong>Next step:</strong> Once added, you can click on cells in the new row under <em>Edit Attendance</em> mode to record attendance (Present / Absent, Lecture / Tutorial / Practical).
+            </div>
+          </div>
+
+          <div className="rd-modal-actions">
+            <button
+              type="button"
+              className="rd-btn-outline sm"
+              onClick={() => { setIsAddSubjectModalOpen(false); setAddSubjectError(''); }}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="rd-btn-dark sm rd-btn-accent"
+              onClick={handleConfirmAddSubject}
+            >
+              Add Subject
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render Confirm Delete Subject Modal
+  const renderConfirmDeleteSubjectModal = () => {
+    if (!subjectToDelete) return null;
+
+    const subP = subjectToDelete.parsedP ?? subjectToDelete.reportedP ?? 0;
+    const subA = subjectToDelete.parsedA ?? subjectToDelete.reportedA ?? 0;
+    const totalClasses = subP + subA;
+    const subPct = totalClasses > 0 ? ((subP / totalClasses) * 100).toFixed(1) : '0.0';
+    const subMarks = calculateSubjectMarks(subjectToDelete, creditOverrides[subjectToDelete.name]);
+
+    return (
+      <div className="rd-modal-overlay" onClick={() => setSubjectToDelete(null)}>
+        <div className="rd-modal-card" style={{ maxWidth: '440px' }} onClick={e => e.stopPropagation()}>
+          <div className="rd-modal-head">
+            <div>
+              <h3>Delete Subject?</h3>
+              <p className="rd-modal-sub">Permanently remove subject and its attendances</p>
+            </div>
+            <button
+              type="button"
+              className="rd-modal-close"
+              onClick={() => setSubjectToDelete(null)}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div style={{ padding: '16px 20px' }}>
+            <p style={{ fontSize: '14px', color: 'var(--ink)', lineHeight: 1.5, margin: 0 }}>
+              Are you sure you want to delete <strong>{subjectToDelete.name}</strong>?
+            </p>
+
+            <div style={{ marginTop: '12px', padding: '10px 14px', background: 'var(--surface-subtle)', borderRadius: '8px', border: '1px solid var(--line)', fontSize: '12.5px', lineHeight: 1.5 }}>
+              <div>📊 <strong>Attendance:</strong> {subPct}% ({subP} Present, {subA} Absent · {totalClasses} classes)</div>
+              {subMarks.subjectMax > 0 && (
+                <div style={{ marginTop: '4px' }}>🎯 <strong>Continuous Assessment:</strong> {subMarks.subjectEarned}/{subMarks.subjectMax} M</div>
+              )}
+            </div>
+
+            <p style={{ marginTop: '12px', fontSize: '12px', color: 'var(--ink-dim)', lineHeight: 1.45, margin: '12px 0 0' }}>
+              All {totalClasses} classes will be removed from your aggregate attendance, waiver targets, and internal marks calculations.
+            </p>
+
+            <p style={{ marginTop: '8px', fontSize: '11.5px', color: 'var(--muted)', fontStyle: 'italic', margin: '8px 0 0' }}>
+              Tip: You can restore this subject anytime using Undo (Ctrl+Z) or "Reset to Original".
+            </p>
+          </div>
+
+          <div className="rd-modal-actions">
+            <button
+              type="button"
+              className="rd-btn-outline sm"
+              onClick={() => setSubjectToDelete(null)}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="rd-btn-dark sm"
+              style={{ background: '#dc2626', borderColor: '#b91c1c', color: '#fff' }}
+              onClick={handleConfirmDeleteSubject}
+            >
+              Delete Subject
             </button>
           </div>
         </div>
@@ -4396,7 +4740,7 @@ export default function WaiverToolPage({ onBack }) {
                 {gridToolMode === 'edit' && (
                   <div className="rd-edit-banner">
                     <span className="rd-edit-banner-text">
-                      ✏️ <strong>Edit Mode:</strong> Click any cell to add/modify classes. Click ✕ on date headers to delete a day.
+                      ✏️ <strong>Edit Mode:</strong> Click any cell to add/modify classes. Click ✕ on date/subject headers to delete.
                     </span>
                     <div className="rd-edit-banner-acts">
                       {renderHistoryButtons()}
@@ -4406,6 +4750,18 @@ export default function WaiverToolPage({ onBack }) {
                         onClick={() => { setIsAddDateModalOpen(true); setNewDateError(''); setNewDateInput(''); }}
                       >
                         + Add Date
+                      </button>
+                      <button
+                        type="button"
+                        className="rd-btn-outline xs rd-btn-accent"
+                        onClick={() => {
+                          setNewSubjectName('');
+                          setNewSubjectProfile('th_tu_4cr_11m');
+                          setAddSubjectError('');
+                          setIsAddSubjectModalOpen(true);
+                        }}
+                      >
+                        + Add Subject
                       </button>
                       {customizationDiff.hasCustomizations && (
                         <button
@@ -4882,7 +5238,7 @@ export default function WaiverToolPage({ onBack }) {
             {gridToolMode === 'edit' && (
               <div className="rd-edit-banner exp">
                 <span className="rd-edit-banner-text">
-                  ✏️ <strong>Edit Mode:</strong> Click any cell to add/modify classes. Click ✕ on date headers to delete a day.
+                  ✏️ <strong>Edit Mode:</strong> Click any cell to add/modify classes. Click ✕ on date/subject headers to delete.
                 </span>
                 <div className="rd-edit-banner-acts">
                   {renderHistoryButtons()}
@@ -4892,6 +5248,18 @@ export default function WaiverToolPage({ onBack }) {
                     onClick={() => { setIsAddDateModalOpen(true); setNewDateError(''); setNewDateInput(''); }}
                   >
                     + Add Date
+                  </button>
+                  <button
+                    type="button"
+                    className="rd-btn-outline xs rd-btn-accent"
+                    onClick={() => {
+                      setNewSubjectName('');
+                      setNewSubjectProfile('th_tu_4cr_11m');
+                      setAddSubjectError('');
+                      setIsAddSubjectModalOpen(true);
+                    }}
+                  >
+                    + Add Subject
                   </button>
                   {customizationDiff.hasCustomizations && (
                     <button
@@ -4938,6 +5306,8 @@ export default function WaiverToolPage({ onBack }) {
       {/* Manual Attendance Customization Modals */}
       {renderCellEditorModal()}
       {renderAddDateModal()}
+      {renderAddSubjectModal()}
+      {renderConfirmDeleteSubjectModal()}
       {renderConfirmDeleteDateModal()}
       {renderConfirmResetModal()}
 
