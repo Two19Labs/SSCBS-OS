@@ -1,0 +1,347 @@
+/* ═══════════════════════════════════════════════════════════
+   FTB (Fire in the Belly) Promotional Collaboration Banner
+   Desktop & Mobile Optimized Component Styles
+   ═══════════════════════════════════════════════════════════ */
+
+.ftb-banner-root {
+  width: 100%;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Main Banner Card ── */
+.ftb-banner-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: radial-gradient(120% 140% at 30% 20%, #ff9a2e 0%, #f47a1a 45%, #e8620f 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-sizing: border-box;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ftb-banner-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(232, 98, 15, 0.28);
+}
+
+/* ── Left Content ── */
+.ftb-banner-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 auto;
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+}
+
+/* Headline */
+.ftb-banner-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  font-family: 'Baloo 2', system-ui, sans-serif;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(180, 50, 0, 0.2);
+}
+
+.ftb-banner-logo {
+  display: block;
+  align-self: center;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+}
+
+.ftb-banner-domain {
+  color: #ffffff;
+}
+
+/* Badges */
+.ftb-banner-badges {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.ftb-badge-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+
+.ftb-badge {
+  background: #f8e6cc;
+  border-radius: 6px;
+  font-family: 'Lilita One', cursive, sans-serif;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  white-space: nowrap;
+  display: inline-block;
+  box-shadow: 0 1px 2px rgba(150, 40, 0, 0.12);
+}
+
+.ftb-badge-accent {
+  color: #ec6a12;
+}
+
+.ftb-badge-dark {
+  color: #1d1410;
+}
+
+/* Tagline Slogan */
+.ftb-banner-tagline-wrap {
+  display: flex;
+  align-items: center;
+  margin-top: 1px;
+}
+
+.ftb-banner-tagline {
+  background: #ffffff;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  white-space: nowrap;
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #3a3a3a;
+  line-height: 1.3;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.ftb-kalam {
+  font-family: 'Kalam', cursive, sans-serif;
+  font-weight: 700;
+  color: #ec6a12;
+  letter-spacing: 0;
+}
+
+/* ── Action Buttons ── */
+.ftb-banner-actions {
+  display: flex;
+}
+
+.ftb-btn-whatsapp,
+.ftb-btn-platform {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  text-decoration: none;
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.ftb-btn-whatsapp {
+  background: #ffffff;
+  color: #1d1410;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
+}
+
+.ftb-btn-whatsapp:hover {
+  background: #fff3e6;
+  color: #1d1410;
+  transform: translateY(-1px);
+}
+
+.ftb-btn-platform {
+  background: #1d1410;
+  color: #ffffff;
+}
+
+.ftb-btn-platform:hover {
+  background: #000000;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+[data-theme='dark'] .ftb-btn-platform {
+  background: #15100d;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+[data-theme='dark'] .ftb-btn-platform:hover {
+  background: #000000;
+}
+
+/* ── Mascot Pingo ── */
+.ftb-banner-mascot {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  filter: drop-shadow(0 4px 8px rgba(120, 40, 0, 0.3));
+  object-fit: contain;
+  user-select: none;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Desktop & Tablet Layout (>= 680px)
+   ═══════════════════════════════════════════════════════════ */
+@media (min-width: 680px) {
+  .ftb-banner-card {
+    padding: 14px 108px 14px 20px;
+  }
+
+  .ftb-banner-content {
+    gap: 7px;
+  }
+
+  .ftb-banner-heading {
+    font-size: 19px;
+    line-height: 1.15;
+  }
+
+  .ftb-banner-logo {
+    height: 25px;
+    margin: 0 2px;
+  }
+
+  .ftb-banner-badges {
+    gap: 5px;
+  }
+
+  .ftb-badge {
+    font-size: 12.5px;
+    padding: 3px 8px;
+  }
+
+  .ftb-banner-tagline {
+    font-size: 14px;
+    padding: 3px 10px;
+  }
+
+  .ftb-kalam {
+    font-size: 16px;
+  }
+
+  .ftb-actions-desktop {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+    align-self: flex-end;
+    margin: 0 28px 2px 0;
+  }
+
+  .ftb-actions-desktop .ftb-btn-whatsapp,
+  .ftb-actions-desktop .ftb-btn-platform {
+    font-size: 13px;
+    padding: 8px 14px;
+    gap: 6px;
+  }
+
+  .ftb-actions-mobile {
+    display: none !important;
+  }
+
+  .ftb-banner-mascot {
+    right: 0px;
+    bottom: -10px;
+    height: 124px;
+    width: auto;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Mobile Layout (< 680px)
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 679px) {
+  .ftb-banner-root {
+    gap: 8px;
+  }
+
+  .ftb-banner-card {
+    padding: 10px 12px;
+  }
+
+  .ftb-banner-content {
+    gap: 5px;
+    padding-right: 60px;
+  }
+
+  .ftb-banner-heading {
+    font-size: 12.5px;
+    line-height: 1.2;
+    gap: 4px;
+  }
+
+  .ftb-banner-logo {
+    height: 15px;
+    margin: 0;
+    flex-shrink: 0;
+  }
+
+  .ftb-banner-badges {
+    gap: 3px;
+    margin-top: -2px;
+  }
+
+  .ftb-badge-row {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .ftb-badge {
+    font-size: 9.5px;
+    padding: 2px 6px;
+  }
+
+  .ftb-banner-tagline-wrap {
+    align-self: flex-start;
+  }
+
+  .ftb-banner-tagline {
+    font-size: 11px;
+    padding: 2px 8px;
+    gap: 3px;
+  }
+
+  .ftb-kalam {
+    font-size: 12.5px;
+  }
+
+  .ftb-actions-desktop {
+    display: none !important;
+  }
+
+  .ftb-actions-mobile {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .ftb-actions-mobile .ftb-btn-whatsapp,
+  .ftb-actions-mobile .ftb-btn-platform {
+    flex: 1;
+    min-height: 36px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 7px 10px;
+    gap: 6px;
+  }
+
+  .ftb-banner-mascot {
+    right: 2px;
+    bottom: -10px;
+    height: 84px;
+    width: auto;
+  }
+}
