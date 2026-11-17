@@ -62,7 +62,7 @@ export default function FtbBanner() {
             <span>Join Community</span>
           </a>
           <a
-            href="https://ftbhustle.com"
+            href="https://www.ftbhustle.com/?utm_source=two19labs&utm_medium=referral&utm_campaign=partner-listing"
             target="_blank"
             rel="noopener noreferrer"
             className="ftb-btn-platform"
@@ -108,7 +108,7 @@ export default function FtbBanner() {
           <span>Join Community</span>
         </a>
         <a
-          href="https://ftbhustle.com"
+          href="https://www.ftbhustle.com/?utm_source=two19labs&utm_medium=referral&utm_campaign=partner-listing"
           target="_blank"
           rel="noopener noreferrer"
           className="ftb-btn-platform"
